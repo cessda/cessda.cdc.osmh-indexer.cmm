@@ -7,27 +7,35 @@ Cessda PaSC OSMH repository handler for harvesting OAI-PMH metadata format
 These instructions will get you a copy of the project up and running on your local machine for development and testing 
 purposes. See deployment for notes on how to deploy the project on a live system.
 
+### Test it
+
+    mvn clean test
+
+### Sonar it
+
+Static code quality with verification with Sonar Qube
+
+    mvn sonar:sonar \
+      -Dsonar.host.url=http://localhost:9000 \
+
 ### Build it
 
     mvn clean package 
 
-### Build install it with Sonar
-    mvn clean install sonar:sonar -Dsonar.host.url=http://localhost:9000
-
 ### Run it 
 
-    java -Xms2G -Xmx4G -jar target/<artifactId>-*.jar 
+    java -Xms2G -Xmx4G -jar target/pasc-osmh-handler.oai-pmh*.jar 
 
-### Run it with profile
-    java -jar -Dspring.profiles.active=dev target/<artifactId>-*.jar
-    java -jar -Dspring.profiles.active=uat target/<artifactId>-*.jar
-    java -jar -Dspring.profiles.active=prod target/<artifactId>-*.jar
+### Run it - with profile
+    java -jar -Dspring.profiles.active=dev target/pasc-osmh-handler.oai-pmh*.jar
+    java -jar -Dspring.profiles.active=uat target/pasc-osmh-handler.oai-pmh*.jar
+    java -jar -Dspring.profiles.active=prod target/pasc-osmh-handler.oai-pmh*.jar
 
 Note if no profile flag is set the default profile will be used. Which is non.
 
 
 # Debug/Test it with Swagger UI API documentation
-   - [Localhost](http://localhost:<port>/<context-base>/swagger-ui.html#/)
+   - [Localhost](http://localhost:9091/swagger-ui.html#/) http://localhost:<port>/<context-base>/swagger-ui.html#/
        
     
 ### Prerequisites

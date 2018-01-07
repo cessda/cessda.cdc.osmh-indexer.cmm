@@ -16,7 +16,17 @@ logging:
     de: INFO
     eu.cessda.pasc.harvesting: WARN
     eu.cessda.pasc.harvesting.HarvesterReport: INFO
-
+osmhhandler:
+  oaiPmh:
+    supportedApiVersions:
+    - v1.0
+    supportedRecordTypes:
+    - Study
+    repos:
+    - url: www.test-repo.com
+      preferredMetadataVersion: 2.5
+    - url: www.test-repo2.com
+      preferredMetadataVersion: 3.2
 
 ---
 
