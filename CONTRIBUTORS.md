@@ -1,5 +1,7 @@
-# Project Name
+# PaSC OSMH Handler OAI-PMH
 
-## First Name - Last Name ##
+## Contributors
 
-Descritption of the person role
+Name            | Email                     | Role
+:---            | :---                      | :---
+Moses Mansaray  | <moses@doravnetures.com>  | Metadata backend development consultant

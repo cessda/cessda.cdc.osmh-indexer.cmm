@@ -1,44 +1,65 @@
-# Project Title
+# PaSC OSMH Handler OAI-PMH
 
-One Paragraph of project description goes here
+Cessda PaSC OSMH repository handler for harvesting OAI-PMH metadata format
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+These instructions will get you a copy of the project up and running on your local machine for development and testing 
+purposes. See deployment for notes on how to deploy the project on a live system.
 
+### Build it
+
+    mvn clean package 
+
+### Build install it with Sonar
+    mvn clean install sonar:sonar -Dsonar.host.url=http://localhost:9000
+
+### Run it 
+
+    java -Xms2G -Xmx4G -jar target/<artifactId>-*.jar 
+
+### Run it with profile
+    java -jar -Dspring.profiles.active=dev target/<artifactId>-*.jar
+    java -jar -Dspring.profiles.active=uat target/<artifactId>-*.jar
+    java -jar -Dspring.profiles.active=prod target/<artifactId>-*.jar
+
+Note if no profile flag is set the default profile will be used. Which is non.
+
+
+# Debug/Test it with Swagger UI API documentation
+   - [Localhost](http://localhost:<port>/<context-base>/swagger-ui.html#/)
+       
+    
 ### Prerequisites
 
-What things you need to install the software and how to install them
+The following is expected to be install before building running.  To install see your preferred package manager like.
+On mac this can be done with `brew`
+- Java JDK 8
+- Maven
 
-```
-Give examples
-```
+`brew tap caskroom/versions`
 
-### Installing
+`brew cask install java8`
 
-A step by step series of examples that tell you have to get a development env running
+`brew cask info java`  // To verify which version it will install.
 
-Say what the step will be
+`brew install maven`
 
-```
-Give the example
-```
+`mvn -version` // To verify which version it will install.
 
-And repeat
-
-```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo
 
 ## Running the tests
 
-Explain how to run the automated tests for this system
+### How to run the automated tests and sonar report in CI 
+
+`mvn clean install sonar:sonar -Dsonar.host.url=http://localhost:9000`
+
+
+# Further detailed notes
 
 ### Break down into end to end tests
 
-Explain what these tests test and why
+TODO: Explain what these tests test and why
 
 ```
 Give an example
@@ -46,7 +67,7 @@ Give an example
 
 ### And coding style tests
 
-Explain what these tests test and why
+TODO: Explain what these tests test and why
 
 ```
 Give an example
@@ -54,7 +75,20 @@ Give an example
 
 ## Deployment
 
-Add additional notes about how to deploy this on a live system
+### At startup
+Configuration is loaded and overwritten in this order
+* application-[dev,local,prod].yml
+* application.yml
+* CLI parameters e.g. `--logging.level.=DEBUG` sets logging level for all classes
+
+### At Runtime
+If the app is registered at a [spring boot admin server](https://github.com/codecentric/spring-boot-admin)
+all environment properties can be changed at runtime.
+
+**CHANGES MADE AT RUNTIME WILL BE**
+* **EFFECTIVE AFTER A CONTEXT RELOAD**
+* **LOST AFTER AN APPLICATION RESTART UNLESS PERSISTED IN APPLICATION.yml**
+ 
 
 ## Built With
 
@@ -62,13 +96,14 @@ Add additional notes about how to deploy this on a live system
 
 ## Contributing
 
-Please read [CESSDA Guideline for developpers](https://bitbucket.org/cessda/cessda.guidelines.cit/wiki/Developers) for details on our code of conduct, and the process for submitting pull requests to us.
+Please read [CESSDA Guideline for developpers](https://bitbucket.org/cessda/cessda.guidelines.cit/wiki/Developers) 
+for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Versioning
 
 ## Authors
 
-* **First Name - Last Name** - *Initial work*
+* **Moses Mansaray <moses@doraventures.com>** - *Initial work, first version release*
 
 You can find the list of all contributors [here](CONTRIBUTORS.md)
 
