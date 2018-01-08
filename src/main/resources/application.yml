@@ -19,14 +19,14 @@ logging:
 osmhhandler:
   oaiPmh:
     supportedApiVersions:
-    - v1.0
+      - v0
     supportedRecordTypes:
-    - Study
+      - Study
     repos:
-    - url: www.test-repo.com
-      preferredMetadataVersion: 2.5
-    - url: www.test-repo2.com
-      preferredMetadataVersion: 3.2
+      - url: www.test-repo.com
+        preferredMetadataVersion: 2.5
+      - url: www.test-repo2.com
+        preferredMetadataVersion: 3.2
 
 ---
 

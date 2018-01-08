@@ -8,25 +8,35 @@ These instructions will get you a copy of the project up and running on your loc
 purposes. See deployment for notes on how to deploy the project on a live system.
 
 ### Test it
+Runs all the Junit Test
 
     mvn clean test
 
 ### Sonar it
 
-Static code quality with verification with Sonar Qube
+Static code quality with verification with SonarQube
 
     mvn sonar:sonar \
       -Dsonar.host.url=http://localhost:9000 \
 
 ### Build it
+Prepares a clean jar package
 
     mvn clean package 
 
 ### Run it 
+Runs the built jar
 
     java -Xms2G -Xmx4G -jar target/pasc-osmh-handler.oai-pmh*.jar 
+    
+### Run it one-liner
+
+    mvn clean package && java -Xms2G -Xmx4G -jar target/pasc-osmh-handler.oai-pmh*.jar
+
 
 ### Run it - with profile
+The profile will apply the specified environment property for a given profile
+
     java -jar -Dspring.profiles.active=dev target/pasc-osmh-handler.oai-pmh*.jar
     java -jar -Dspring.profiles.active=uat target/pasc-osmh-handler.oai-pmh*.jar
     java -jar -Dspring.profiles.active=prod target/pasc-osmh-handler.oai-pmh*.jar
@@ -39,11 +49,10 @@ Note if no profile flag is set the default profile will be used. Which is non.
        
     
 ### Prerequisites
-
-The following is expected to be install before building running.  To install see your preferred package manager like.
+The following is expected to be install before building running.  To install see your preferred package manager.
 On mac this can be done with `brew`
-- Java JDK 8
-- Maven
+  - Java JDK 8
+  - Maven
 
 `brew tap caskroom/versions`
 

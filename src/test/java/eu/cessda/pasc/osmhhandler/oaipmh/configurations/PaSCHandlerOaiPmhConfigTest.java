@@ -16,19 +16,19 @@ import static org.assertj.core.api.BDDAssertions.then;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest()
-public class PascHandlerOaiPmhConfigTest {
+public class PaSCHandlerOaiPmhConfigTest {
 
   @Autowired
-  PascHandlerOaiPmhConfig pascHandlerOaiPmhConfig;
+  PaSCHandlerOaiPmhConfig paSCHandlerOaiPmhConfig;
 
   @Test
   public void shouldReturnConfigurationsForOSMHHandler() throws Exception {
 
-    OaiPmh oaiPmh = pascHandlerOaiPmhConfig.getOaiPmh();
+    OaiPmh oaiPmh = paSCHandlerOaiPmhConfig.getOaiPmh();
 
     then(oaiPmh).isNotNull();
     then(oaiPmh.getSupportedApiVersions()).hasSize(1);
-    then(oaiPmh.getSupportedApiVersions()).contains("v1.0");
+    then(oaiPmh.getSupportedApiVersions()).contains("v0");
     then(oaiPmh.getSupportedRecordTypes()).hasSize(1);
     then(oaiPmh.getSupportedRecordTypes()).contains("Study");
 

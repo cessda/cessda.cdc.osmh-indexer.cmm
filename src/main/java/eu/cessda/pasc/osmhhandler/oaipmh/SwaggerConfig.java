@@ -9,6 +9,8 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.util.ArrayList;
+
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig {
@@ -19,17 +21,22 @@ public class SwaggerConfig {
         .select()
         .apis(RequestHandlerSelectors.basePackage("eu.cessda.pasc.osmhhandler.oaipmh.controller"))
         .build()
+        .useDefaultResponseMessages(false)
         .apiInfo(metaData());
   }
 
   private ApiInfo metaData() {
+
+    Contact contact = new Contact("Cessda PaSC", "https://www.cessda.eu/", "moses@doraventures.com");
+
     return new ApiInfo(
         "PaSC OSMH Handler OAI-PMH",
         "Cessda PaSC OSMH repository handler for harvesting OAI-PMH metadata format",
         "1.0.0",
-        "Terms of service",
-        new Contact("Cessda PaSC", "https://www.cessda.eu/", "moses@doraventures.com"),
+        "https://www.ukdataservice.ac.uk/conditions",
+        contact,
         "Apache License Version 2.0",
-        "https://www.apache.org/licenses/LICENSE-2.0");
+        "https://www.apache.org/licenses/LICENSE-2.0",
+        new ArrayList<>());
   }
 }

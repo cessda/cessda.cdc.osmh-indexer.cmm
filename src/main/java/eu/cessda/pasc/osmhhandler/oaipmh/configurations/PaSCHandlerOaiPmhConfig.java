@@ -13,14 +13,13 @@ import org.springframework.context.annotation.EnableMBeanExport;
  *
  * @author moses@doraventures.com
  */
-@Configuration
-@EnableConfigurationProperties
-@EnableMBeanExport
-@Qualifier("PascHandlerOaiPmhConfig")
 @Slf4j
+@Configuration
+@EnableMBeanExport
+@EnableConfigurationProperties
 @ConfigurationProperties(prefix = "osmhhandler")
-
-public class PascHandlerOaiPmhConfig {
+@Qualifier("PaSCHandlerOaiPmhConfig")
+public class PaSCHandlerOaiPmhConfig {
 
   private OaiPmh oaiPmh = new OaiPmh();
 
@@ -28,5 +27,4 @@ public class PascHandlerOaiPmhConfig {
 
     return oaiPmh;
   }
-
 }
