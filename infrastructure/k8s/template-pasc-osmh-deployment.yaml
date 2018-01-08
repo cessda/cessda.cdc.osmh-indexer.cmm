@@ -1,0 +1,21 @@
+whaapiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: DEPLOYMENTNAME
+  labels:
+    app: DEPLOYMENTNAME
+  namespace: NAMESPACE
+spec:
+  template:
+    metadata:
+      labels:
+        app: DEPLOYMENTNAME
+    spec:
+      containers:
+      - name: DEPLOYMENTNAME
+        image: eu.gcr.io/cessda-development/pasc-indexer:latest
+        ports:
+        - containerPort: 8082
+          name: osmh-cport
+      nodeSelector:
+        app: global
