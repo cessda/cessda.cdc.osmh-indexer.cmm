@@ -22,6 +22,10 @@ osmhhandler:
       - v0
     supportedRecordTypes:
       - Study
+      - StudyGroup
+      - Variable
+      - Question
+      - CMM
     repos:
       - url: www.test-repo.com
         preferredMetadataVersion: 2.5

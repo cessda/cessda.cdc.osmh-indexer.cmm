@@ -1,7 +1,8 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.cessda.pasc.osmhhandler.oaipmh.configurations.PaSCHandlerOaiPmhConfig;
+import eu.cessda.pasc.osmhhandler.oaipmh.configuration.PaSCHandlerOaiPmhConfig;
+import eu.cessda.pasc.osmhhandler.oaipmh.service.APISupportedServiceImpl;
 import org.hamcrest.core.IsNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,21 +29,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author moses@doraventures.com
  */
 @RunWith(SpringRunner.class)
-@WebMvcTest(SupportedVersionsController.class)
-@Import(PaSCHandlerOaiPmhConfig.class)
-public class SupportedVersionsControllerTest {
+@WebMvcTest(SupportedAPIVersionsController.class)
+@Import({APISupportedServiceImpl.class, PaSCHandlerOaiPmhConfig.class})
+public class SupportedAPIVersionsControllerTest {
 
   @Autowired
   private MockMvc mockMvc;
   private static final ObjectMapper MAPPER = new ObjectMapper();
 
   @Test
-  public void shouldReturnTheSupportedVersionsWithSuccessfully() throws Exception {
+  public void shouldReturnTheSupportedVersionsSuccessfully() throws Exception {
 
     // Given
     List<String> mockVersionList = new ArrayList<>();
     mockVersionList.add("v0");
-    String mockVersions = MAPPER.writeValueAsString(mockVersionList);
+    String expectedVersions = MAPPER.writeValueAsString(mockVersionList);
 
     // When
     this.mockMvc.perform(get("/SupportedVersions").accept(MediaType.APPLICATION_JSON_VALUE))
@@ -50,23 +51,23 @@ public class SupportedVersionsControllerTest {
         // Then
         .andExpect(status().isOk())
         .andExpect(status().reason(new IsNull<>()))
-        .andExpect(content().json(mockVersions));
+        .andExpect(content().json(expectedVersions));
   }
 
   @Test
   public void shouldReturnUnSuccessfulResponsePathsBeyondTheSupportedVersionsPath() throws Exception {
 
     // Given
-    Map<String, String> message = new HashMap();
+    Map<String, String> message = new HashMap<>();
     message.put("message", "The given url is not found!");
-    String messageString = MAPPER.writeValueAsString(message);
+    String expectedMessage = MAPPER.writeValueAsString(message);
 
     // When
-    this.mockMvc.perform(get("/SupportedVersions/sasfdasf").accept(MediaType.APPLICATION_JSON_VALUE))
+    this.mockMvc.perform(get("/SupportedVersions/invalid_path").accept(MediaType.APPLICATION_JSON_VALUE))
 
         // Then
         .andExpect(status().isNotFound())
         .andExpect(status().reason(new IsNull<>()))
-        .andExpect(content().json(messageString));
+        .andExpect(content().json(expectedMessage));
   }
 }

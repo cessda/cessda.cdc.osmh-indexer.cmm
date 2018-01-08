@@ -1,7 +1,7 @@
-package eu.cessda.pasc.osmhhandler.oaipmh.configurations;
+package eu.cessda.pasc.osmhhandler.oaipmh.configuration;
 
-import eu.cessda.pasc.osmhhandler.oaipmh.models.config.OaiPmh;
-import lombok.extern.slf4j.Slf4j;
+import eu.cessda.pasc.osmhhandler.oaipmh.models.configuration.OaiPmh;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -13,18 +13,13 @@ import org.springframework.context.annotation.EnableMBeanExport;
  *
  * @author moses@doraventures.com
  */
-@Slf4j
 @Configuration
 @EnableMBeanExport
 @EnableConfigurationProperties
 @ConfigurationProperties(prefix = "osmhhandler")
 @Qualifier("PaSCHandlerOaiPmhConfig")
+@Getter
 public class PaSCHandlerOaiPmhConfig {
 
   private OaiPmh oaiPmh = new OaiPmh();
-
-  public OaiPmh getOaiPmh() {
-
-    return oaiPmh;
-  }
 }

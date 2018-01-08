@@ -1,12 +1,13 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.models.errors;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author moses@doraventures.com
  */
-@Data
+@Setter
+@Getter
 public class ErrorMessage {
   String message;
-
 }
