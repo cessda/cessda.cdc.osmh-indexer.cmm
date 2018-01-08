@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: DEPLOYMENTNAME
-        image: eu.gcr.io/cessda-development/pasc-indexer:latest
+        image: eu.gcr.io/cessda-development/pasc-osmh:latest
         ports:
         - containerPort: 9091
           name: osmh-cport
