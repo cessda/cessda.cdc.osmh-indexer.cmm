@@ -1,4 +1,4 @@
-whaapiVersion: extensions/v1beta1
+apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: DEPLOYMENTNAME
@@ -15,7 +15,7 @@ spec:
       - name: DEPLOYMENTNAME
         image: eu.gcr.io/cessda-development/pasc-indexer:latest
         ports:
-        - containerPort: 8082
+        - containerPort: 9091
           name: osmh-cport
       nodeSelector:
         app: global
