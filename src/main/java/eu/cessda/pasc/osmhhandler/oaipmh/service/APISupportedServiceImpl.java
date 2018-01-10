@@ -30,5 +30,4 @@ public class APISupportedServiceImpl implements APISupportedService {
   public List<String> getSupportedRecordTypes() {
     return pmhConfig.getOaiPmh().getSupportedRecordTypes();
   }
-
 }

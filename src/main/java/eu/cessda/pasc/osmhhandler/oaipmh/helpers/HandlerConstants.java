@@ -1,14 +1,16 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 
 /**
- * General constants
+ * Harvester (OSMH) Handler concept Constants
  *
  * @author moses@doraventures.com
  */
 public class HandlerConstants {
 
+  public static final String STUDY = "Study";
+
   private HandlerConstants() {
-    // Private to keep class for static constants only
+    // Hides implicit public constructor | For static constants only
   }
 
   public static final String UNSUPPORTED_API_VERSION = "Unsupported API-version";
@@ -19,5 +21,6 @@ public class HandlerConstants {
   public static final String THE_GIVEN_URL_IS_NOT_FOUND = "The given url is not found!";
 
   public static final String RETURN_404_FOR_OTHER_PATHS = "Return 404 for other paths.";
-  static final String MESSAGE = "message";
+  public static final String MESSAGE = "message";
+  public static final String RECORD_HEADER = "RecordHeader";
 }
