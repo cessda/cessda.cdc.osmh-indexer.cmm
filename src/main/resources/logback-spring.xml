@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <contextName>pasc-harvester</contextName>
+  <contextName>pasc-osmh-handler.oai-pmh</contextName>
   <include resource="org/springframework/boot/logging/logback/base.xml"/>
   <jmxConfigurator/>
 </configuration>

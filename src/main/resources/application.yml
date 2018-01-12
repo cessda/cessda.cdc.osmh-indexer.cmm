@@ -1,6 +1,37 @@
 ---
 server:
   port: 9091
+security:
+  user:
+    name: user
+    password: pass
+  basic.enabled: false            # Public API disable security on non-admin endpoints
+management.security.enabled: true # Enable security on admin endpoints
+endpoints.shutdown.enabled: true
+spring:
+  output:
+    ansi:
+      enabled: DETECT
+  devtools:
+    restart:
+      enabled: false
+  application:
+    name: pasc-osmh-handler.oai-pmh
+  jmx:
+    default-domain: pasc-osmh-handler.oai-pmh
+  boot:
+    admin:
+      url: http://localhost:8087
+      username: user
+      password: pass
+      client.name: pasc-osmh-handler.oai-pmh
+      turbine:
+        clusters: default
+        url: http://localhost:8989/turbine.stream
+      routes:
+        endpoints: env,metrics,log,trace,dump,jolokia,info,configprops,trace,logfile,refresh,flyway,liquibase,heapdump
+      auto-deregistration: true
+      auto-registration: true
 logging:
   file: ${user.home}${file.separator}pasc-osmh-handler${file.separator}pasc-osmh-handler.oai-pmh.log
   pattern:
