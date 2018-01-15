@@ -6,12 +6,7 @@ pipeline {
     namespace = "cessda-pasc"
     image_tag = "eu.gcr.io/${project_name}/${app_name}:v${env.BUILD_NUMBER}"
   }
-
-  properties([
-    [$class: 'jenkins.model.BuildDiscarderProperty', strategy: [$class: 'LogRotator', numToKeepStr: '96']],
-    pipelineTriggers([[$class:"SCMTrigger", scmpoll_spec:"H/10 * * * *"]]),
-  ])
-
+  
   agent any
 
   stages {
