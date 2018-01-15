@@ -9,10 +9,12 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhHelpers.appendListRecordResumptionToken;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.mockito.BDDMockito.given;
 
@@ -22,6 +24,7 @@ import static org.mockito.BDDMockito.given;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@ActiveProfiles("test")
 public class ListRecordHeadersServiceImplTest {
 
   @MockBean
@@ -56,17 +59,19 @@ public class ListRecordHeadersServiceImplTest {
     String identifiersXML = RecordHeadersMock.getListIdentifiersXML();
 
     String resumptionToken01 = "0/3/7/ddi/null/2016-06-01/null";
+    String repoUrlWithResumptionToken01 = appendListRecordResumptionToken(repoBaseUrl, resumptionToken01);
     String identifiersXMLWithResumption = RecordHeadersMock.getListIdentifiersXMLWithResumption();
 
     String resumptionToken02 = "3/6/7/ddi/null/2017-01-01/null";
+    String repoUrlWithResumptionToken02 = appendListRecordResumptionToken(repoBaseUrl, resumptionToken02);
     String identifiersXMLWithResumptionLastList = RecordHeadersMock.getListIdentifiersXMLWithResumptionLastList();
 
     given(listRecordHeadersDao.listRecordHeaders(repoBaseUrl)).willReturn(identifiersXML);
 
-    given(listRecordHeadersDao.listRecordHeadersResumption(repoBaseUrl, resumptionToken01))
+    given(listRecordHeadersDao.listRecordHeadersResumption(repoUrlWithResumptionToken01))
         .willReturn(identifiersXMLWithResumption);
 
-    given(listRecordHeadersDao.listRecordHeadersResumption(repoBaseUrl, resumptionToken02))
+    given(listRecordHeadersDao.listRecordHeadersResumption(repoUrlWithResumptionToken02))
         .willReturn(identifiersXMLWithResumptionLastList);
 
     // When

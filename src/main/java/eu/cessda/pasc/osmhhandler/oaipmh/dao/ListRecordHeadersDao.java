@@ -11,5 +11,5 @@ public interface ListRecordHeadersDao {
 
   String listRecordHeaders(String baseRepoUrl) throws InternalSystemException;
 
-  String listRecordHeadersResumption(String baseRepoUrl, String resumptionToken) throws InternalSystemException;
+  String listRecordHeadersResumption(String baseRepoUrl) throws InternalSystemException;
 }

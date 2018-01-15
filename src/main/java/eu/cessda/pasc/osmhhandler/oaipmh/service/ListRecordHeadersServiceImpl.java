@@ -22,6 +22,7 @@ import java.util.List;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.RECORD_HEADER;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.STUDY;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhHelpers.appendListRecordResumptionToken;
 import static eu.cessda.pasc.osmhhandler.oaipmh.models.response.RecordHeader.*;
 
 /**
@@ -74,8 +75,9 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
     parseRecordHeaders(recordHeaders, doc);
     String resumptionToken = parseResumptionToken(doc);
     if (!resumptionToken.isEmpty()) {
-      String resumedXMLDoc = listRecordHeadersDao.listRecordHeadersResumption(baseRepoUrl, resumptionToken);
-      log.info("Looping for [{}/{}].", baseRepoUrl, resumptionToken);
+      String repoUrlWithResumptionToken = appendListRecordResumptionToken(baseRepoUrl, resumptionToken);
+      String resumedXMLDoc = listRecordHeadersDao.listRecordHeadersResumption(repoUrlWithResumptionToken);
+      log.info("Looping for [{}].", repoUrlWithResumptionToken);
       retrieveRecordHeaders(recordHeaders, getDocument(resumedXMLDoc), baseRepoUrl);
     }
     return recordHeaders;
