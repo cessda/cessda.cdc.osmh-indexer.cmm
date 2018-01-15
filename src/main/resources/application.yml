@@ -16,15 +16,15 @@ spring:
     restart:
       enabled: false
   application:
-    name: pasc-osmh-handler.oai-pmh
+    name: pasc-osmh-handler-oai-pmh
   jmx:
-    default-domain: pasc-osmh-handler.oai-pmh
+    default-domain: pasc-osmh-handler-oai-pmh
   boot:
     admin:
       url: http://localhost:8087
       username: user
       password: pass
-      client.name: pasc-osmh-handler.oai-pmh
+      client.name: pasc-osmh-handler-oai-pmh
       turbine:
         clusters: default
         url: http://localhost:8989/turbine.stream

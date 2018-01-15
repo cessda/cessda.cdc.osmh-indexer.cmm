@@ -7,6 +7,11 @@ pipeline {
     image_tag = "eu.gcr.io/${project_name}/${app_name}:v${env.BUILD_NUMBER}"
   }
 
+  properties([
+    [$class: 'jenkins.model.BuildDiscarderProperty', strategy: [$class: 'LogRotator', numToKeepStr: '96']],
+    pipelineTriggers([[$class:"SCMTrigger", scmpoll_spec:"H/10 * * * *"]]),
+  ])
+
   agent any
 
   stages {
@@ -19,6 +24,13 @@ pipeline {
         echo "namespace = ${namespace}"
         echo "JOB_NAME = ${JOB_NAME}"
         echo "image_tag = ${image_tag}"
+      }
+    }
+    stage('Prepare Application for registration with Spring Boot Admin') {
+      steps {
+        dir('./infrastructure/gcp/') {
+          sh("bash pasc-osmh-registration.sh")
+        }
       }
     }
     stage('Build Project and start Sonar scan') {
