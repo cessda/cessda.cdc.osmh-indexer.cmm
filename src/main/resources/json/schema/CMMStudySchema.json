@@ -14,7 +14,7 @@
       "type": "string",
       "description": "A studyNumber that uniquely identifies the CMMStudy within a repository."
     },
-    "abstracts": {
+    "abstract": {
       "type": "object",
       "patternProperties": {
         "^[a-z]{2}$": {
@@ -47,7 +47,7 @@
         "type": "string",
         "description": "A CMMStudy timedimension."
       },
-      "description": "An array of Time Dimension for this CMMStudy."
+      "description": "An array of Time Dimensions for this CMMStudy."
     },
     "studyAreaCountries": {
       "type": "array",
@@ -57,7 +57,7 @@
       },
       "description": "An array of Countries for this CMMStudy."
     },
-    "unitType": {
+    "unitTypes": {
       "type": "array",
       "items": {
         "type": "string",
@@ -84,7 +84,7 @@
       "type": "number",
       "description": "Year of publication (by publisher) of the study (for citation) - [YYYY]"
     },
-    "pidStudy": {
+    "pidStudies": {
       "type": "array",
       "items": {
         "type": "string",
@@ -104,11 +104,11 @@
       },
       "description": "An array of Associated Institutions for this CMMStudy."
     },
-    "fileLanguage": {
+    "fileLanguages": {
       "type": "array",
       "items": {
         "type": "string",
-        "description": "A CMMStudy File Language (standardised ISO) ."
+        "description": "A CMMStudy File Language (standardised ISO)."
       },
       "description": "An array of File Languages (standardised ISO) for this CMMStudy."
     },
@@ -116,9 +116,9 @@
       "type": "array",
       "items": {
         "type": "string",
-        "description": "Reference to an person that is a principal investigator."
+        "description": "Reference to a person that was a principal investigator."
       },
-      "description": "An array of Reference to an person that is a principal investigator."
+      "description": "An array of Reference to people were a principal investigator."
     },
     "classIdentifier": {
       "type": "string",
@@ -180,11 +180,11 @@
       "type": "array",
       "items": {
         "type": "string",
-        "description": "Reference to an organization that is a principal investigator"
+        "description": "Reference to an organization that was a principal investigator"
       },
-      "description": "An array of Reference to organization that is a principal investigator."
+      "description": "An array of Reference to organizations that were a principal investigator."
     },
-    "institutionFullNames": {
+    "institutionFullName": {
       "type": "object",
       "patternProperties": {
         "^[a-z]{2}$": {
