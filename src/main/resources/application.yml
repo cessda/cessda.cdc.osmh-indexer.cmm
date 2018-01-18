@@ -79,6 +79,9 @@ osmhhandler:
         preferredMetadataParam: ddi
       - url: www.test-repo2.com
         preferredMetadataParam: 3.2
+    metadataParsingDefaultLang:
+      active: true
+      lang: en
 
 ---
 spring:
