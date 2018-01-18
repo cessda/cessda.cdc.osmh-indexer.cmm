@@ -52,16 +52,10 @@ osmhhandler:
     supportedApiVersions:
       - v0
     supportedRecordTypes:
-      - Study
-      - StudyGroup
-      - Variable
-      - Question
-      - CMM
+      - CMMStudy
     repos:
-      - url: www.test-repo.com
-        preferredMetadataVersion: 2.5
-      - url: www.test-repo2.com
-        preferredMetadataVersion: 3.2
+      - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
+        preferredMetadataParam: ddi
   restTemplateProps:
     connTimeout: 5000
     connRequestTimeout: 5000
@@ -72,6 +66,19 @@ spring:
   profiles: test
   main:
         banner-mode: "off"
+osmhhandler:
+  oaiPmh:
+    supportedRecordTypes:
+      - Study
+      - StudyGroup
+      - Variable
+      - Question
+      - CMM
+    repos:
+      - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
+        preferredMetadataParam: ddi
+      - url: www.test-repo2.com
+        preferredMetadataParam: 3.2
 
 ---
 spring:

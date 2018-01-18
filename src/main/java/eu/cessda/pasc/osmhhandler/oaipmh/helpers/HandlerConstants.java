@@ -13,7 +13,7 @@ public class HandlerConstants {
     // Hides implicit public constructor | For static constants only
   }
 
-  public static final String UNSUPPORTED_API_VERSION = "Unsupported API-version";
+  public static final String UNSUPPORTED_API_VERSION = "Unsupported API-version [%s]";
   public static final String SYSTEM_ERROR = "System error!";
   public static final String SUCCESSFUL_OPERATION = "Successful operation!";
   public static final String BAD_REQUEST = "Bad request!";

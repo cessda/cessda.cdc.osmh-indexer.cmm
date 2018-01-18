@@ -13,7 +13,7 @@ import lombok.Setter;
 public class Repo {
 
   private String url;
-  private String preferredMetadataVersion;
+  private String preferredMetadataParam;
 
   public String getUrl() {
     return url;

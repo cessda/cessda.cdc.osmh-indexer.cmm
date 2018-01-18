@@ -35,7 +35,7 @@ public class PaSCHandlerOaiPmhConfigTest {
 
     then(oaiPmh.getRepos()).isNotNull();
     then(oaiPmh.getRepos()).hasSize(2);
-    then(oaiPmh.getRepos().get(0).getUrl()).isEqualTo("www.test-repo.com");
-    then(oaiPmh.getRepos().get(0).getPreferredMetadataVersion()).isEqualTo("2.5");
+    then(oaiPmh.getRepos().get(0).getUrl()).isEqualTo("https://oai.ukdataservice.ac.uk:8443/oai/provider");
+    then(oaiPmh.getRepos().get(0).getPreferredMetadataParam()).isEqualTo("ddi");
   }
 }
