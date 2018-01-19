@@ -17,5 +17,6 @@ public class OaiPmh {
   private List<String> supportedApiVersions;
   private List<String> supportedRecordTypes;
   private List<Repo> repos;
+  private Integer publicationYearDefault;
   private MetadataParsingDefaultLang metadataParsingDefaultLang;
 }

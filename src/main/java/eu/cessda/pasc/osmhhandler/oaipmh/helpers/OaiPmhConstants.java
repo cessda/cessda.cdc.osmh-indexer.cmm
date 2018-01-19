@@ -12,24 +12,27 @@ public class OaiPmhConstants {
   public static final String LIST_RECORD_HEADERS_URL_TEMPLATE = "%s?%s=%s&%s=%s";
   public static final String LIST_RECORD_HEADERS_RESUMPTION_URL_TEMPLATE = "%s?%s=%s&%s=%s";
   public static final String COMPLETE_LIST_SIZE = "completeListSize";
+
   public static final String OAI_NS_PATH = "http://www.openarchives.org/OAI/2.0/";
   public static final String DDI_NS_PATH = "ddi:codebook:2_5";
+
   public static final Namespace XML_NS = Namespace.getNamespace("xml", "http://www.w3.org/XML/1998/namespace");
   public static final Namespace OAI_NS = Namespace.getNamespace("oai", OaiPmhConstants.OAI_NS_PATH);
   public static final Namespace DDI_NS = Namespace.getNamespace("ddi", DDI_NS_PATH);
   public static final Namespace[] OAI_AND_DDI_NS = {OAI_NS, DDI_NS};
+
   public static final String STUDY_CITATION_XPATH = "//ddi:stdyDscr/ddi:citation";
   public static final String IDENTIFIER_XPATH = "//oai:header/oai:identifier";
-  public static final String TITLE_STMT = "titlStmt";
-  public static final String TITLE = "titl";
-  public static final String UNKNOWN_LANG = "xx";
-  public static final String LANG = "lang";
-
-  private OaiPmhConstants() {
-    // Hides implicit public constructor | For static constants only
-  }
+  public static final String YEAR_OF_PUB_XPATH = "//ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:distDate[1]";
+  public static final String PID_STUDY_XPATH = "//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo";
+  public static final String PERSON_NAME_XPATH = "//ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty[1]";
+  public static final String INST_FULL_NAME_XPATH = "//ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty";
 
   // Elements
+  public static final String TITLE_STMT = "titlStmt";
+  public static final String UNKNOWN_LANG = "xx";
+  public static final String LANG = "lang";
+  public static final String TITLE = "titl";
   public static final String IDENTIFIER_ELEMENT = "identifier";
   public static final String DATESTAMP_ELEMENT = "datestamp";
   public static final String SET_SPEC_ELEMENT = "setSpec";
@@ -45,4 +48,10 @@ public class OaiPmhConstants {
   public static final String RESUMPTION_TOKEN_KEY = "resumptionToken";
   public static final String LIST_IDENTIFIERS_VALUE = "ListIdentifiers";
   public static final String METADATA_DDI_2_5_VALUE = "ddi";
+
+
+
+  private OaiPmhConstants() {
+    // Hides implicit public constructor | For static constants only
+  }
 }

@@ -82,6 +82,7 @@ osmhhandler:
     metadataParsingDefaultLang:
       active: true
       lang: 'en'
+    publicationYearDefault: 1970
 
 ---
 spring:

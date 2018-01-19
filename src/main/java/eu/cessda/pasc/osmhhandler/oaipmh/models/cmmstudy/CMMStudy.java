@@ -50,7 +50,7 @@ public class CMMStudy {
   private Map<String, String> institutionFullName;
   private String[] principalInvestigatorPeople;
   private String dataCollectionPeriodStartdate;
-  private Double publicationYear;
+  private int publicationYear;
   private String[] typeOfModeOfCollections;
   private String[] keywords;
   private RecordType recordType;
@@ -107,9 +107,9 @@ public class CMMStudy {
   public void setDataCollectionPeriodStartdate(String value) { this.dataCollectionPeriodStartdate = value; }
 
   @JsonProperty("publicationYear")
-  public Double getPublicationYear() { return publicationYear; }
+  public int getPublicationYear() { return publicationYear; }
   @JsonProperty("publicationYear")
-  public void setPublicationYear(Double value) { this.publicationYear = value; }
+  public void setPublicationYear(int value) { this.publicationYear = value; }
 
   @JsonProperty("typeOfModeOfCollections")
   public String[] getTypeOfModeOfCollections() { return typeOfModeOfCollections; }

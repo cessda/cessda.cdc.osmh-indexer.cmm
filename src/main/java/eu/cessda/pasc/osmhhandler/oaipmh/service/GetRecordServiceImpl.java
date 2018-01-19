@@ -3,7 +3,9 @@ package eu.cessda.pasc.osmhhandler.oaipmh.service;
 import eu.cessda.pasc.osmhhandler.oaipmh.configuration.PaSCHandlerOaiPmhConfig;
 import eu.cessda.pasc.osmhhandler.oaipmh.dao.GetRecordDoa;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.InternalSystemException;
+import eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMStudy;
+import eu.cessda.pasc.osmhhandler.oaipmh.models.configuration.OaiPmh;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
@@ -56,15 +58,32 @@ public class GetRecordServiceImpl implements GetRecordService {
   private void mapDDIRecordToCMMStudy(String recordXML, CMMStudy.CMMStudyBuilder builder)
       throws JDOMException, IOException {
 
+    OaiPmh oaiPmh = handlerConfig.getOaiPmh();
     InputStream recordXMLStream = IOUtils.toInputStream(recordXML, Charsets.UTF_8);
     SAXBuilder saxBuilder = new SAXBuilder();
     Document document = saxBuilder.build(recordXMLStream);
 
     parseHeaderElement(builder, document, X_FACTORY);
     parseStudyCitationElement(builder, document, X_FACTORY);
-    parseStudyInfoElement(builder, document, X_FACTORY);
+    parseYrOfPublication(builder, document, X_FACTORY, oaiPmh);
+    parsePidStudy(builder, document, X_FACTORY);
+    parsePersonName(builder, document, X_FACTORY);
+    parseInstitutionFullName(builder, document, X_FACTORY, oaiPmh);
   }
 
+  /**
+   * NOTE: Extracts the Study Number from the header element
+   * <p>
+   * Original specified path cant be relied on (/codeBook/stdyDscr/citation/titlStmt/IDNo)
+   * <ul>
+   * <li>It may have multiple identifiers for different agency.</li>
+   * <li>Where as The header will by default specify the unique code identifier
+   * for the repo(agency) we are querying
+   * </li>
+   * <p>
+   * </ul>
+   * Actual path used: /record/header/identifier
+   */
   private void parseHeaderElement(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
     XPathExpression<Element> expr2 = xFactory.compile(IDENTIFIER_XPATH, Filters.element(), null, OAI_NS);
     Element identifier = expr2.evaluateFirst(document);
@@ -72,10 +91,11 @@ public class GetRecordServiceImpl implements GetRecordService {
   }
 
   /**
-   * Extracts all the CMM fields under path /codeBook/stdyDscr/citation/<xxx> .
+   * Extracts all the CMM fields under path {@value OaiPmhConstants#STUDY_CITATION_XPATH } .
    */
   private void parseStudyCitationElement(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
-    XPathExpression<Element> xPathExpression = xFactory.compile(STUDY_CITATION_XPATH, Filters.element(), null, OAI_AND_DDI_NS);
+    XPathExpression<Element> xPathExpression = xFactory
+        .compile(STUDY_CITATION_XPATH, Filters.element(), null, OAI_AND_DDI_NS);
     Element citationElement = xPathExpression.evaluateFirst(document);
 
     List<Element> citationElementChildren = citationElement.getChildren();
@@ -83,31 +103,100 @@ public class GetRecordServiceImpl implements GetRecordService {
       String citationElementName = citationElementChild.getName();
 
       if (TITLE_STMT.equalsIgnoreCase(citationElementName)) {
-        processTitleStmt(builder, citationElementChild, handlerConfig);
+        processTitleStmt(builder, citationElementChild, handlerConfig.getOaiPmh());
+        continue; //FIXME: use xpath to extract title by itself alone...
       }
     }
   }
 
   /**
-   * Lets process /codeBook/stdyDscr/citation/titlStmt .
+   * Processes elements under /codeBook/stdyDscr/citation/titlStmt .
+   * FIXME: Use Xpath
    */
-  private static void processTitleStmt(CMMStudy.CMMStudyBuilder builder, Element citationElementChild, PaSCHandlerOaiPmhConfig handlerConfig) {
+  private static void processTitleStmt(CMMStudy.CMMStudyBuilder builder, Element citationElementChild, OaiPmh config) {
+
+    //Processes elements under /codeBook/stdyDscr/citation/titlStmt/titl
     List<Element> titles = citationElementChild.getChildren(TITLE, DDI_NS);
-
-    Map<String, String> titlesMap = new HashMap<>();
-    for (Element title : titles) {
-
-      if (null != title.getAttribute(LANG, XML_NS) && !title.getAttribute(LANG, XML_NS).getValue().isEmpty()) {
-        titlesMap.put(title.getAttribute(LANG, XML_NS).getValue(), title.getValue());
-      } else if (handlerConfig.getOaiPmh().getMetadataParsingDefaultLang().isActive()) {
-        titlesMap.put(handlerConfig.getOaiPmh().getMetadataParsingDefaultLang().getLang(), title.getValue());
-      } else {
-        titlesMap.put(UNKNOWN_LANG, title.getValue()); // UNKNOWN_LANG(XX) = to signify title for non specified lang tag
-      }
-    }
+    Map<String, String> titlesMap = getKeyValuePairsFromElementWithLang(config, titles);
     builder.titleStudy(titlesMap);
   }
 
-  private void parseStudyInfoElement(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
+
+  /**
+   * parses Year of Publication from
+   * <p>
+   * Xpath = {@value OaiPmhConstants#YEAR_OF_PUB_XPATH }
+   */
+  private static void parseYrOfPublication(
+      CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
+
+    XPathExpression<Element> xPathExpression = xFactory
+        .compile(YEAR_OF_PUB_XPATH, Filters.element(), null, OAI_AND_DDI_NS);
+    List<Element> distDateElements = xPathExpression.evaluate(document);
+
+    for (Element distDateElement : distDateElements) {
+      try {
+        builder.publicationYear(Integer.parseInt(distDateElement.getValue()));
+      } catch (NumberFormatException e) {
+        log.warn("Could not parse year to Int. Defaulting to 1970");
+        builder.publicationYear(config.getPublicationYearDefault());
+      }
+    }
+  }
+
+  /**
+   * Parses PID Study(s) from
+   * <p>
+   * Xpath = {@value OaiPmhConstants#PID_STUDY_XPATH }
+   */
+  private static void parsePidStudy(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
+
+    XPathExpression<Element> expression = xFactory.compile(PID_STUDY_XPATH, Filters.element(), null, OAI_AND_DDI_NS);
+    List<Element> pidStudyElements = expression.evaluate(document);
+    String[] pidStudies = pidStudyElements.stream().map(Element::getValue).toArray(String[]::new);
+    builder.pidStudies(pidStudies);
+  }
+
+  /**
+   * Parses Person Name from
+   * <p>
+   * Xpath = {@value OaiPmhConstants#PERSON_NAME_XPATH }
+   */
+  private static void parsePersonName(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
+
+    XPathExpression<Element> expression = xFactory.compile(PERSON_NAME_XPATH, Filters.element(), null, OAI_AND_DDI_NS);
+    List<Element> personNameElements = expression.evaluate(document);
+    personNameElements.stream().findFirst().ifPresent(element -> builder.personName(element.getValue()));
+  }
+
+  /**
+   * Parses parse Institution Full Name from
+   * <p>
+   * Xpath = {@value OaiPmhConstants#INST_FULL_NAME_XPATH }
+   */
+  private static void parseInstitutionFullName(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
+
+    XPathExpression<Element> expression = xFactory.compile(
+        INST_FULL_NAME_XPATH, Filters.element(), null, OAI_AND_DDI_NS);
+
+    List<Element> institutions = expression.evaluate(document);
+    Map<String, String> titlesMap = getKeyValuePairsFromElementWithLang(config, institutions);
+    builder.institutionFullName(titlesMap);
+  }
+
+  private static Map<String, String> getKeyValuePairsFromElementWithLang(OaiPmh config, List<Element> elements) {
+
+    Map<String, String> titlesMap = new HashMap<>();
+
+    for (Element element : elements) {
+      if (null != element.getAttribute(LANG, XML_NS) && !element.getAttribute(LANG, XML_NS).getValue().isEmpty()) {
+        titlesMap.put(element.getAttribute(LANG, XML_NS).getValue(), element.getValue());
+      } else if (config.getMetadataParsingDefaultLang().isActive()) {
+        titlesMap.put(config.getMetadataParsingDefaultLang().getLang(), element.getValue());
+      } else {
+        titlesMap.put(UNKNOWN_LANG, element.getValue()); // UNKNOWN_LANG(XX)
+      }
+    }
+    return titlesMap;
   }
 }

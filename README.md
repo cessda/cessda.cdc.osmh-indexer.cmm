@@ -130,3 +130,13 @@ This project is licensed under the Apache 2 License - see the [LICENSE](LICENSE)
 
 ## Acknowledgments
 
+
+
+## Edge Case and Assumptions:
+
+- If publicationYear cannot be parsed to an Int we default to epoch year 1970
+
+## TODO 
+
+- Should map out PID Study alongside their Agency name.
+- Remove Principal Investigator
