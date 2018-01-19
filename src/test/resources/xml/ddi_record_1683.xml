@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-stylesheet type='text/xsl' href='oai2.xsl' ?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
+ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+  <responseDate>2018-01-17T17:34:04Z</responseDate>
+  <request verb="GetRecord" identifier="1683" metadataPrefix="ddi">https://oai.ukdataservice.ac.uk:8443/oai/provider</request>
+  <GetRecord>
+    <record>
+      <header>
+        <identifier>1683</identifier>
+        <datestamp>2017-08-10T06:40:45Z</datestamp>
+        <setSpec>DataCollections</setSpec>
+      </header>
+      <metadata>
+        <codeBook xsi:schemaLocation="ddi:codebook:2_5 http://www.ddialliance.org/Specification/DDI-Codebook/2.5/XMLSchema/codebook.xsd" version="2.5" xmlns="ddi:codebook:2_5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <docDscr>
+            <citation>
+              <titlStmt>
+                <titl>DDI2.5 XML CODEBOOK RECORD FOR STUDY NUMBER 1683</titl>
+              </titlStmt>
+              <prodStmt>
+                <prodDate>2017-08-09T12:01:16Z</prodDate>
+              </prodStmt>
+            </citation>
+          </docDscr>
+          <stdyDscr>
+            <citation>
+              <titlStmt>
+                <titl>Machinery of Government, 1976-1977</titl>
+                <titl xml:lang="no">Et Machinery of Government, 1976-1977</titl>
+                <titl xml:lang="no">Et Machinery of Government2, 1976-1977</titl>
+                <IDNo agency="UKDA">1683</IDNo>
+                <IDNo agency="datacite">10.5255/UKDA-SN-1683-1</IDNo>
+              </titlStmt>
+              <rspStmt>
+                <AuthEnty>Hood, C.C., University of York. Institute of Social and Economic Research</AuthEnty>
+                <AuthEnty>Dunsire, A., University of York. Institute of Social and Economic Research</AuthEnty>
+                <AuthEnty>Thomson, K.S., University of York. Institute of Social and Economic Research</AuthEnty>
+              </rspStmt>
+              <prodStmt>
+                <copyright>Copyright C.C. Hood, A. Dunsire and K.S. Thomson</copyright>
+                <fundAg>Economic and Social Research Council</fundAg>
+              </prodStmt>
+              <distStmt>
+                <distrbtr>UK Data Service</distrbtr>
+                <depositr>Sutcliffe, E.M., University of York. Institute of Social and Economic Research</depositr>
+                <depDate date="1982-01-01T00:00:00Z">1982</depDate>
+                <distDate date="1982-01-01T00:00:00Z">1982</distDate>
+              </distStmt>
+              <verStmt>
+                <version date="1982-01-01T00:00:00Z">1</version>
+              </verStmt>
+              <holdings URI="http://dx.doi.org/10.5255/UKDA-SN-1683-1" />
+            </citation>
+            <stdyInfo>
+              <subject>
+                <keyword>1976</keyword>
+                <keyword>1977</keyword>
+                <keyword vocabURI="http://lod.data-archive.ac.uk/skoshasset/9e7cc815-90cb-4f96-b8ff-a0a44ab25ea9">BUDGETS</keyword>
+                <keyword vocabURI="http://lod.data-archive.ac.uk/skoshasset/209e0ca3-1f3a-4034-b762-744692a9258c">BUREAUCRACY</keyword>
+                <keyword vocabURI="http://lod.data-archive.ac.uk/skoshasset/0a4ca3b1-1da3-4752-9074-e14ebbfa7dcd">CENTRAL GOVERNMENT</keyword>
+                <keyword vocabURI="http://lod.data-archive.ac.uk/skoshasset/0a9e181b-54f7-456e-911d-75e42dc52bbf">CIVIL SERVICE</keyword>
+                <keyword vocabURI="http://lod.data-archive.ac.uk/skoshasset/416c9ed0-a256-4aed-b81c-a1ab1ac8a2ac">GOVERNMENT DEPARTMENTS</keyword>
+                <keyword vocabURI="http://lod.data-archive.ac.uk/skoshasset/3a49ce91-4b6f-42ba-918b-07a3a55961f6">GRANTS</keyword>
+                <keyword vocabURI="http://lod.data-archive.ac.uk/skoshasset/af82c5dc-19be-4ad3-8f0a-612f314e1436">GREAT BRITAIN</keyword>
+                <keyword vocabURI="http://lod.data-archive.ac.uk/skoshasset/109136cf-0d85-40d0-96de-e2584bbc42ef">OCCUPATIONS</keyword>
+                <keyword vocabURI="http://lod.data-archive.ac.uk/skoshasset/d9893276-de95-4bef-a38d-95a85fdd67f5">PERSONNEL</keyword>
+                <keyword vocabURI="http://lod.data-archive.ac.uk/skoshasset/19754f6d-6c61-44e0-b406-b776712424a9">PUBLIC EXPENDITURE</keyword>
+                <keyword vocabURI="http://lod.data-archive.ac.uk/skoshasset/96c7c14b-f933-418f-81a0-29330e85acf7">PURCHASING</keyword>
+                <keyword vocabURI="http://lod.data-archive.ac.uk/skoshasset/c00fd314-8751-4f9a-8862-6b9880f38148">WAGES</keyword>
+                <topcClas>Government and political systems - Politics</topcClas>
+                <topcClas>Management and organisation - Industry and management</topcClas>
+              </subject>
+              <sumDscr>
+                <timePrd event="start" date="1976-01-01T00:00:00Z">1976</timePrd>
+                <timePrd event="end" date="1977-01-01T00:00:00Z">1977</timePrd>
+                <nation>Great Britain</nation>
+                <geogUnit>No spatial unit</geogUnit>
+                <anlyUnit>Institutions/organisations</anlyUnit>
+                <universe>National</universe>
+                <universe>Government departments</universe>
+                <universe>Central government departments of Great Britain</universe>
+              </sumDscr>
+            </stdyInfo>
+            <method>
+              <dataColl>
+                <timeMeth>Cross-sectional (one-time) study</timeMeth>
+                <sampProc>No sampling (total universe)</sampProc>
+                <collMode>Compilation or synthesis of existing material</collMode>
+                <sources>
+                  <dataSrc>Published source material</dataSrc>
+                </sources>
+                <weight>No weighting variables in data, but weighted indices included in master data file.</weight>
+              </dataColl>
+            </method>
+            <dataAccs>
+              <setAvail>
+                <accsPlac>UK Data Service</accsPlac>
+                <collSize>Number of Cases: 69 cases   &lt;br&gt;
+                  ; Variables per Case: 9 variables per case   &lt;br&gt;
+                </collSize>
+              </setAvail>
+              <useStmt>
+                <specPerm>Safeguarded</specPerm>
+                <restrctn>The depositor has specified that registration is required and standard conditions of use apply. The depositor may be informed about usage. See &lt;a href=http://ukdataservice.ac.uk/get-data/how-to-access/conditions.aspx&gt;terms and conditions of access&lt;/a&gt; for further information.</restrctn>
+                <contact>&lt;a href=http://www.ukdataservice.ac.uk/help/get-in-touch.aspx&gt;Get in touch&lt;/a&gt;</contact>
+              </useStmt>
+            </dataAccs>
+            <othrStdyMat>
+              <relPubl>Hood, C., and Dunsire, A. (1981) &lt;i&gt;Bureaumetrics&lt;/i&gt;, London: Gower. ISBN 0-566-00311-2.&lt;br&gt;</relPubl>
+              <relPubl>
+              </relPubl>
+              <othRefs>Language Of Study Description: English</othRefs>
+              <othRefs>Language Of Study Documentation: English</othRefs>
+            </othrStdyMat>
+          </stdyDscr>
+        </codeBook>
+      </metadata>
+    </record>
+  </GetRecord>
+</OAI-PMH>

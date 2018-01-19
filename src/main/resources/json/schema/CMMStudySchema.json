@@ -6,7 +6,7 @@
   "type": "object",
   "required": [
     "studyNumber",
-    "title"
+    "isActive"
   ],
   "additionalProperties": false,
   "properties": {
@@ -206,6 +206,11 @@
       "enum": [
         "CMMStudy"
       ]
+    },
+    "isActive": {
+      "type": "boolean",
+      "description": "Is the record marked as deleted. If record is deleted this = false",
+      "default": true
     }
   }
 }

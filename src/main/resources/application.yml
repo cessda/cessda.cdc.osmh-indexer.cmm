@@ -81,7 +81,7 @@ osmhhandler:
         preferredMetadataParam: 3.2
     metadataParsingDefaultLang:
       active: true
-      lang: en
+      lang: 'en'
 
 ---
 spring:

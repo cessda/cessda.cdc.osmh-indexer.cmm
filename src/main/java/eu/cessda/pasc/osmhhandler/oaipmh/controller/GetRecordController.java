@@ -1,6 +1,7 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMConverter;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.errors.ErrorMessage;
 import eu.cessda.pasc.osmhhandler.oaipmh.service.APISupportedService;
@@ -63,7 +64,7 @@ public class GetRecordController {
       }
 
       CMMStudy cmmStudy = recordService.getRecord(repository, study_id);
-      String valueAsString = objectMapper.writeValueAsString(cmmStudy);
+      String valueAsString = CMMConverter.toJsonString(cmmStudy);
       return new ResponseEntity<>(valueAsString, HttpStatus.OK);
     } catch (Exception e) {
 
