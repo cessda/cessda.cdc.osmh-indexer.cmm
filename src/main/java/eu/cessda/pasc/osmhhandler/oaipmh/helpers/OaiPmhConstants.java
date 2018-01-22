@@ -20,6 +20,7 @@ public class OaiPmhConstants {
   public static final Namespace OAI_NS = Namespace.getNamespace("oai", OaiPmhConstants.OAI_NS_PATH);
   public static final Namespace DDI_NS = Namespace.getNamespace("ddi", DDI_NS_PATH);
   public static final Namespace[] OAI_AND_DDI_NS = {OAI_NS, DDI_NS};
+  public static final Namespace[] DDI_AND_XML_NS = {DDI_NS, XML_NS};
 
   public static final String STUDY_CITATION_XPATH = "//ddi:stdyDscr/ddi:citation";
   public static final String IDENTIFIER_XPATH = "//oai:header/oai:identifier";
@@ -31,9 +32,16 @@ public class OaiPmhConstants {
   public static final String ACCESS_CLASS_XPATH = "//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:restrctn[1]";
   public static final String DATA_ACCESS_XPATH = "//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:conditions[1]";
   public static final String DATA_COLLECTION_PERIODS_PATH = "//ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate[position()<3]";
-//  public static final String TYPE_OF_MODE_OF_COLLECTIONS_PATH = "//ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate";
-
-
+  public static final String CLASSIFICATIONS_XPATH = "//ddi:subject/ddi:topcClas";
+  public static final String KEYWORDS_XPATH = "//ddi:subject/ddi:keyword";
+  public static final String TYPE_OF_TIME_METHOD_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:timeMeth";
+  public static final String STUDY_AREA_COUNTRIES_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:nation";
+  public static final String UNIT_TYPE_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:anlyUnit";
+  public static final String PUBLISHER_XPATH = "//ddi:codeBook/ddi:docDscr/ddi:citation/ddi:prodStmt/ddi:producer";
+  public static final String FILE_LANGUAGES_XPATH = "//ddi:codeBook/ddi:fileDscr/ddi:fileTxt/@xml:lang";
+  public static final String TYPE_OF_SAMPLING_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:sampProc";
+  public static final String SAMPLING_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:sampProc";
+  public static final String TYPE_OF_MODE_OF_COLLECTION_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:collMode";
   public static final String INST_FULL_NAME_XPATH = "//ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty";
 
   // Elements
@@ -56,7 +64,7 @@ public class OaiPmhConstants {
   // URL Paths tokens
   public static final String VERB_PARAM_KEY = "verb";
   public static final String METADATA_PREFIX_PARAM_KEY = "metadataPrefix";
-  public static final String RESUMPTION_TOKEN_KEY = "resumptionToken";
+  public static final String RESUMPTION_TOKEN_KEY = RESUMPTION_TOKEN_ELEMENT;
   public static final String LIST_IDENTIFIERS_VALUE = "ListIdentifiers";
   public static final String METADATA_DDI_2_5_VALUE = "ddi";
 

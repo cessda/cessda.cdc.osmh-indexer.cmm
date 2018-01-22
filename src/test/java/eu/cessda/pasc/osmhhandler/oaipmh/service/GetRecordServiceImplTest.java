@@ -65,10 +65,8 @@ public class GetRecordServiceImplTest {
   private void validateCMMStudyAgainstSchema(CMMStudy record) throws IOException, ProcessingException, JSONException {
 
     String jsonString = CMMConverter.toJsonString(record);
-
     JSONObject json = new JSONObject(jsonString); // Convert text to object
     System.out.println("RETRIEVED STUDY JSON: \n" + json.toString(4));
-
 
     JsonNode jsonNodeRecord = JsonLoader.fromString(jsonString);
     final JsonSchema schema = JsonSchemaFactory.byDefault().getJsonSchema("resource:/json/schema/CMMStudySchema.json");
