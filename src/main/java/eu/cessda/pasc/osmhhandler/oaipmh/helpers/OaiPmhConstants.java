@@ -24,32 +24,44 @@ public class OaiPmhConstants {
   public static final String STUDY_CITATION_XPATH = "//ddi:stdyDscr/ddi:citation";
   public static final String IDENTIFIER_XPATH = "//oai:header/oai:identifier";
   public static final String YEAR_OF_PUB_XPATH = "//ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:distDate[1]";
+  public static final String ABSTRACT_XPATH = "//ddi:stdyInfo/ddi:abstract";
+
   public static final String PID_STUDY_XPATH = "//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo";
   public static final String PERSON_NAME_XPATH = "//ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty[1]";
+  public static final String ACCESS_CLASS_XPATH = "//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:restrctn[1]";
+  public static final String DATA_ACCESS_XPATH = "//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:conditions[1]";
+  public static final String DATA_COLLECTION_PERIODS_PATH = "//ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate[position()<3]";
+//  public static final String TYPE_OF_MODE_OF_COLLECTIONS_PATH = "//ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate";
+
+
   public static final String INST_FULL_NAME_XPATH = "//ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty";
 
   // Elements
   public static final String TITLE_STMT = "titlStmt";
-  public static final String UNKNOWN_LANG = "xx";
-  public static final String LANG = "lang";
+  public static final String LANG_ATTR = "lang";
   public static final String TITLE = "titl";
   public static final String IDENTIFIER_ELEMENT = "identifier";
   public static final String DATESTAMP_ELEMENT = "datestamp";
   public static final String SET_SPEC_ELEMENT = "setSpec";
   public static final String HEADER_ELEMENT = "header";
   public static final String RESUMPTION_TOKEN_ELEMENT = "resumptionToken";
+  public static final String DATE_ATTR = "date";
+  public static final String END_ATTR = "end";
+  public static final String START_ATTR = "start";
+  public static final String SINGLE_ATTR = "single";
 
   // Encoding
   public static final String UTF_8 = "UTF-8";
 
-  // Paths
+  // URL Paths tokens
   public static final String VERB_PARAM_KEY = "verb";
   public static final String METADATA_PREFIX_PARAM_KEY = "metadataPrefix";
   public static final String RESUMPTION_TOKEN_KEY = "resumptionToken";
   public static final String LIST_IDENTIFIERS_VALUE = "ListIdentifiers";
   public static final String METADATA_DDI_2_5_VALUE = "ddi";
 
-
+  public static final String UNKNOWN_LANG = "xx";
+  public static final String EVENT_ATTR = "event";
 
   private OaiPmhConstants() {
     // Hides implicit public constructor | For static constants only

@@ -12,6 +12,8 @@ import eu.cessda.pasc.osmhhandler.oaipmh.helpers.FileHandler;
 import eu.cessda.pasc.osmhhandler.oaipmh.mock.data.CMMStudyMock;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMConverter;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMStudy;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +46,8 @@ public class GetRecordServiceImplTest {
   FileHandler fileHandler;
 
   @Test
-  public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord() throws IOException, ProcessingException, InternalSystemException {
+  public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord()
+      throws IOException, ProcessingException, InternalSystemException, JSONException {
 
     // Given
     String repoUrl = "";
@@ -59,10 +62,14 @@ public class GetRecordServiceImplTest {
     validateCMMStudyAgainstSchema(record);
   }
 
-  private void validateCMMStudyAgainstSchema(CMMStudy record) throws IOException, ProcessingException {
+  private void validateCMMStudyAgainstSchema(CMMStudy record) throws IOException, ProcessingException, JSONException {
 
     String jsonString = CMMConverter.toJsonString(record);
-    System.out.println("RETRIEVED STUDY JSON: \n" + jsonString);
+
+    JSONObject json = new JSONObject(jsonString); // Convert text to object
+    System.out.println("RETRIEVED STUDY JSON: \n" + json.toString(4));
+
+
     JsonNode jsonNodeRecord = JsonLoader.fromString(jsonString);
     final JsonSchema schema = JsonSchemaFactory.byDefault().getJsonSchema("resource:/json/schema/CMMStudySchema.json");
 

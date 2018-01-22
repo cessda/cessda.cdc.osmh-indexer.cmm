@@ -65,10 +65,19 @@ public class GetRecordServiceImpl implements GetRecordService {
 
     parseHeaderElement(builder, document, X_FACTORY);
     parseStudyCitationElement(builder, document, X_FACTORY);
+    parseAbstract(builder, document, X_FACTORY, oaiPmh);
     parseYrOfPublication(builder, document, X_FACTORY, oaiPmh);
-    parsePidStudy(builder, document, X_FACTORY);
+    parsePidStudies(builder, document, X_FACTORY);
     parsePersonName(builder, document, X_FACTORY);
+    parseAccessClass(builder, document, X_FACTORY);
+    parseDataAccess(builder, document, X_FACTORY, oaiPmh);
+    parseDataCollectionPeriods(builder, document, X_FACTORY);
     parseInstitutionFullName(builder, document, X_FACTORY, oaiPmh);
+
+
+//    parseTypeOfModeOfCollections(builder, document, X_FACTORY);
+
+    //Access Class
   }
 
   /**
@@ -117,80 +126,143 @@ public class GetRecordServiceImpl implements GetRecordService {
 
     //Processes elements under /codeBook/stdyDscr/citation/titlStmt/titl
     List<Element> titles = citationElementChild.getChildren(TITLE, DDI_NS);
-    Map<String, String> titlesMap = getKeyValuePairsFromElementWithLang(config, titles);
+    Map<String, String> titlesMap = getLanguageKeyValuePairs(config, titles);
     builder.titleStudy(titlesMap);
   }
 
 
   /**
-   * parses Year of Publication from
+   * parses Abstract
+   * <p>
+   * Xpath = {@value OaiPmhConstants#ABSTRACT_XPATH }
+   */
+  private static void parseAbstract(
+      CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
+
+    List<Element> elements = getElements(document, xFactory, ABSTRACT_XPATH);
+    Map<String, String> titlesMap = getLanguageKeyValuePairs(config, elements);
+    builder.abstractField(titlesMap);
+  }
+
+
+  /**
+   * parses Year of Publication from:
    * <p>
    * Xpath = {@value OaiPmhConstants#YEAR_OF_PUB_XPATH }
    */
   private static void parseYrOfPublication(
       CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
 
-    XPathExpression<Element> xPathExpression = xFactory
-        .compile(YEAR_OF_PUB_XPATH, Filters.element(), null, OAI_AND_DDI_NS);
-    List<Element> distDateElements = xPathExpression.evaluate(document);
-
-    for (Element distDateElement : distDateElements) {
+    List<Element> elements = getElements(document, xFactory, YEAR_OF_PUB_XPATH);
+    elements.stream().findFirst().ifPresent(distDateElement -> {
       try {
         builder.publicationYear(Integer.parseInt(distDateElement.getValue()));
       } catch (NumberFormatException e) {
         log.warn("Could not parse year to Int. Defaulting to 1970");
         builder.publicationYear(config.getPublicationYearDefault());
       }
-    }
+    });
   }
 
   /**
-   * Parses PID Study(s) from
+   * Parses PID Study(s) from:
    * <p>
    * Xpath = {@value OaiPmhConstants#PID_STUDY_XPATH }
    */
-  private static void parsePidStudy(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
+  private static void parsePidStudies(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
 
-    XPathExpression<Element> expression = xFactory.compile(PID_STUDY_XPATH, Filters.element(), null, OAI_AND_DDI_NS);
-    List<Element> pidStudyElements = expression.evaluate(document);
-    String[] pidStudies = pidStudyElements.stream().map(Element::getValue).toArray(String[]::new);
+    List<Element> elements = getElements(document, xFactory, PID_STUDY_XPATH);
+    String[] pidStudies = elements.stream().map(Element::getValue).toArray(String[]::new);
     builder.pidStudies(pidStudies);
   }
 
   /**
-   * Parses Person Name from
+   * Parses Person Name from:
    * <p>
    * Xpath = {@value OaiPmhConstants#PERSON_NAME_XPATH }
    */
   private static void parsePersonName(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
 
-    XPathExpression<Element> expression = xFactory.compile(PERSON_NAME_XPATH, Filters.element(), null, OAI_AND_DDI_NS);
-    List<Element> personNameElements = expression.evaluate(document);
-    personNameElements.stream().findFirst().ifPresent(element -> builder.personName(element.getValue()));
+    List<Element> elements = getElements(document, xFactory, PERSON_NAME_XPATH);
+    elements.stream().findFirst().ifPresent(element -> builder.personName(element.getValue()));
   }
 
   /**
-   * Parses parse Institution Full Name from
+   * Access Class Name from:
+   * <p>
+   * Xpath = {@value OaiPmhConstants#ACCESS_CLASS_XPATH }
+   */
+  private static void parseAccessClass(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
+
+    List<Element> elements = getElements(document, xFactory, ACCESS_CLASS_XPATH);
+    elements.stream().findFirst().ifPresent(element -> builder.accessClass(element.getValue()));
+  }
+
+
+  /**
+   * Parses Person Name from:
+   * <p>
+   * Xpath = {@value OaiPmhConstants#DATA_ACCESS_XPATH }
+   */
+  private static void parseDataAccess(
+      CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
+
+    List<Element> elements = getElements(document, xFactory, DATA_ACCESS_XPATH);
+    Map<String, String> valuePairs = getLanguageKeyValuePairs(config, elements);
+    builder.dataAccess(valuePairs);
+  }
+
+
+  /**
+   * Parses Data Collection Period End date from:
+   * <p>
+   * Xpath = {@value OaiPmhConstants#DATA_COLLECTION_PERIODS_PATH }
+   */
+  private static void parseDataCollectionPeriods(
+      CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
+
+    List<Element> elements = getElements(document, xFactory, DATA_COLLECTION_PERIODS_PATH);
+    for (Element element : elements) {
+      if (SINGLE_ATTR.equalsIgnoreCase(element.getAttributeValue(EVENT_ATTR))) {
+        builder.dataCollectionPeriodStartdate(element.getAttributeValue(DATE_ATTR));
+      } else if (START_ATTR.equalsIgnoreCase(element.getAttributeValue(EVENT_ATTR))) {
+        builder.dataCollectionPeriodStartdate(element.getAttributeValue(DATE_ATTR));
+      } else if (END_ATTR.equalsIgnoreCase(element.getAttributeValue(EVENT_ATTR))) {
+        builder.dataCollectionPeriodEnddate(element.getAttributeValue(DATE_ATTR));
+      }
+    }
+  }
+
+  /**
+   * Parses parse Institution Full Name from:
    * <p>
    * Xpath = {@value OaiPmhConstants#INST_FULL_NAME_XPATH }
    */
-  private static void parseInstitutionFullName(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
+  private static void parseInstitutionFullName(
+      CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
 
-    XPathExpression<Element> expression = xFactory.compile(
-        INST_FULL_NAME_XPATH, Filters.element(), null, OAI_AND_DDI_NS);
-
-    List<Element> institutions = expression.evaluate(document);
-    Map<String, String> titlesMap = getKeyValuePairsFromElementWithLang(config, institutions);
+    List<Element> elements = getElements(document, xFactory, INST_FULL_NAME_XPATH);
+    Map<String, String> titlesMap = getLanguageKeyValuePairs(config, elements);
     builder.institutionFullName(titlesMap);
   }
 
-  private static Map<String, String> getKeyValuePairsFromElementWithLang(OaiPmh config, List<Element> elements) {
+  private static List<Element> getElements(Document document, XPathFactory xFactory, String xPathToElement) {
+    XPathExpression<Element> expression = xFactory.compile(xPathToElement, Filters.element(), null, OAI_AND_DDI_NS);
+    return expression.evaluate(document);
+  }
+
+  /**
+   * Parses value of given Element for every given xml@lang attributed.
+   * <p>
+   * If no lang is found attempts to default to a configured xml@lang
+   */
+  private static Map<String, String> getLanguageKeyValuePairs(OaiPmh config, List<Element> elements) {
 
     Map<String, String> titlesMap = new HashMap<>();
 
     for (Element element : elements) {
-      if (null != element.getAttribute(LANG, XML_NS) && !element.getAttribute(LANG, XML_NS).getValue().isEmpty()) {
-        titlesMap.put(element.getAttribute(LANG, XML_NS).getValue(), element.getValue());
+      if (null != element.getAttribute(LANG_ATTR, XML_NS) && !element.getAttribute(LANG_ATTR, XML_NS).getValue().isEmpty()) {
+        titlesMap.put(element.getAttribute(LANG_ATTR, XML_NS).getValue(), element.getValue());
       } else if (config.getMetadataParsingDefaultLang().isActive()) {
         titlesMap.put(config.getMetadataParsingDefaultLang().getLang(), element.getValue());
       } else {

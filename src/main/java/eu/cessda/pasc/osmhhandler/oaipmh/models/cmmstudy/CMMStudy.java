@@ -43,13 +43,13 @@ import java.util.Map;
 })
 @Builder
 public class CMMStudy {
-  private String dataCollectionPeriodEnddate;
   private String personName;
   private String classIdentifier;
   private String[] associatedInstitutions;
   private Map<String, String> institutionFullName;
   private String[] principalInvestigatorPeople;
   private String dataCollectionPeriodStartdate;
+  private String dataCollectionPeriodEnddate;
   private int publicationYear;
   private String[] typeOfModeOfCollections;
   private String[] keywords;
