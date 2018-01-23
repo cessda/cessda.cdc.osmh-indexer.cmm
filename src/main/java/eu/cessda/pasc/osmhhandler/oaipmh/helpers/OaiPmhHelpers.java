@@ -17,7 +17,7 @@ public class OaiPmhHelpers {
   }
 
   public static String appendListRecordResumptionToken(String baseRepoUrl, String resumptionToken) {
-    return String.format(LIST_RECORD_HEADERS_RESUMPTION_URL_TEMPLATE, baseRepoUrl,
+    return String.format(LIST_RECORD_HEADERS_URL_TEMPLATE, baseRepoUrl,
         VERB_PARAM_KEY, LIST_IDENTIFIERS_VALUE, RESUMPTION_TOKEN_KEY, resumptionToken);
   }
 }

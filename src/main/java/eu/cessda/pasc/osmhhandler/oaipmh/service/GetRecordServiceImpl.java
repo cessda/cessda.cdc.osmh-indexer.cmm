@@ -57,7 +57,7 @@ public class GetRecordServiceImpl implements GetRecordService {
     Document document = saxBuilder.build(recordXMLStream);
 
     parseHeaderElement(builder, document, X_FACTORY);
-    parseStudyCitationElement(builder, document, X_FACTORY, oaiPmh);
+    parseStudyTitle(builder, document, X_FACTORY, oaiPmh);
     parseAbstract(builder, document, X_FACTORY, oaiPmh);
     parseYrOfPublication(builder, document, X_FACTORY, oaiPmh);
     parsePidStudies(builder, document, X_FACTORY);

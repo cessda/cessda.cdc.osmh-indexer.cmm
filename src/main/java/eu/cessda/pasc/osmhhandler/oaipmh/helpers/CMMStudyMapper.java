@@ -78,37 +78,16 @@ public class CMMStudyMapper {
   }
 
   /**
-   * Extracts all the CMM fields under path {@value OaiPmhConstants#STUDY_CITATION_XPATH } .
+   * Parses Study Title.
+   * <p>
+   * Xpath = {@value OaiPmhConstants#TITLE_XPATH }
    */
-  public static void parseStudyCitationElement(
-      CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh oaiPmh) {
+  public static void parseStudyTitle(
+      CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
 
-    XPathExpression<Element> expr = xFactory.compile(STUDY_CITATION_XPATH, Filters.element(), null, OAI_AND_DDI_NS);
-    Element citationElement = expr.evaluateFirst(document);
-
-    if (null != citationElement) {
-      List<Element> citationElementChildren = citationElement.getChildren();
-      for (Element citationElementChild : citationElementChildren) {
-        String citationElementName = citationElementChild.getName();
-
-        if (TITLE_STMT.equalsIgnoreCase(citationElementName)) {
-          processTitleStmt(builder, citationElementChild, oaiPmh);
-          continue; //FIXME: use xpath to extract title by itself alone...
-        }
-      }
-    }
-  }
-
-  /**
-   * Processes elements under /codeBook/stdyDscr/citation/titlStmt .
-   * FIXME: Use Xpath
-   */
-  public static void processTitleStmt(CMMStudy.CMMStudyBuilder builder, Element citationElementChild, OaiPmh config) {
-
-    //Processes elements under /codeBook/stdyDscr/citation/titlStmt/titl
-    List<Element> titles = citationElementChild.getChildren(TITLE, DDI_NS);
-    Map<String, String> titlesMap = getLanguageKeyValuePairs(config, titles);
-    builder.titleStudy(titlesMap);
+    List<Element> elements = getElements(document, xFactory, TITLE_XPATH);
+    Map<String, String> studyTitles = getLanguageKeyValuePairs(config, elements);
+    builder.titleStudy(studyTitles);
   }
 
   /**
@@ -120,8 +99,8 @@ public class CMMStudyMapper {
       CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
 
     List<Element> elements = getElements(document, xFactory, ABSTRACT_XPATH);
-    Map<String, String> titlesMap = getLanguageKeyValuePairs(config, elements);
-    builder.abstractField(titlesMap);
+    Map<String, String> abstracts = getLanguageKeyValuePairs(config, elements);
+    builder.abstractField(abstracts);
   }
 
 

@@ -125,7 +125,7 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
           break;
         case SET_SPEC_ELEMENT:
           // FixMe: 1 There might be multiple SetSpec: https://www.oaforum.org/tutorial/english/page3.htm#section7
-          // FixMe: 2 Depending on feedback from John Shepherdson set record type based on the SetSpec
+          // 2 Depending on feedback from John Shepherdson set record type based on the SetSpec
           // For instance for UKDA - DataCollections = Study
           // For now we assume all setSpec are a Study as UKDA endpoint repo only holds Studies, SAME for others?
           recordHeaderBuilder.type(STUDY);
