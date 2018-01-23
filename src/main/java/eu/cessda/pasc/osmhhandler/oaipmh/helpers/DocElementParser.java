@@ -19,7 +19,7 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
  *
  * @author moses@doraventures.com
  */
-public class DocElementParser {
+class DocElementParser {
 
   private DocElementParser() throws RuntimeException {
     throw new IllegalStateException("Utility class, instantiation not allow");
@@ -28,31 +28,35 @@ public class DocElementParser {
   /**
    * Parses the array values of elements
    *
-   * @param document the document to parse
-   * @param xFactory the xFactory
+   * @param document             the document to parse
+   * @param xFactory             the xFactory
    * @param classificationsXpath the Element parent node to retrieve
-   * @return Array String Values of the Element
+   * @return String[] Values of the Element
    */
-  public static String[] getElementValues(Document document, XPathFactory xFactory, String classificationsXpath) {
+  static String[] getElementValues(Document document, XPathFactory xFactory, String classificationsXpath) {
     List<Element> elements = getElements(document, xFactory, classificationsXpath);
     return elements.stream().map(Element::getValue).toArray(String[]::new);
   }
 
-  public static List<Element> getElements(Document document, XPathFactory xFactory, String xPathToElement) {
+  static List<Element> getElements(Document document, XPathFactory xFactory, String xPathToElement) {
     XPathExpression<Element> expression = xFactory.compile(xPathToElement, Filters.element(), null, OAI_AND_DDI_NS);
     return expression.evaluate(document);
   }
 
+  static Element getFirstElements(Document document, XPathFactory xFactory, String xPathToElement) {
+    XPathExpression<Element> expression = xFactory.compile(xPathToElement, Filters.element(), null, OAI_AND_DDI_NS);
+    return expression.evaluateFirst(document);
+  }
 
   /**
    * Parses the array values of attributes of a given elements
    *
-   * @param document the document to parse
-   * @param xFactory the xFactory
+   * @param document             the document to parse
+   * @param xFactory             the xFactory
    * @param classificationsXpath the Element parent node to retrieve
    * @return Array String Values of the attributes
    */
-  public static String[] getAttributeValues(Document document, XPathFactory xFactory, String classificationsXpath) {
+  static String[] getAttributeValues(Document document, XPathFactory xFactory, String classificationsXpath) {
     List<Attribute> attributes = getAttributes(document, xFactory, classificationsXpath);
     return attributes.stream().map(Attribute::getValue).toArray(String[]::new);
   }
@@ -65,9 +69,11 @@ public class DocElementParser {
   /**
    * Parses value of given Element for every given xml@lang attributed.
    * <p>
-   * If no lang is found attempts to default to a configured xml@lang
+   * If no lang is found attempts to default to a configured xml@lang.
+   * <p>
+   * If configuration is set to not default to a given lang, effect is this element is not extracted.
    */
-  public static Map<String, String> getLanguageKeyValuePairs(OaiPmh config, List<Element> elements) {
+  static Map<String, String> getLanguageKeyValuePairs(OaiPmh config, List<Element> elements) {
 
     Map<String, String> titlesMap = new HashMap<>();
 
@@ -76,8 +82,6 @@ public class DocElementParser {
         titlesMap.put(element.getAttribute(LANG_ATTR, XML_NS).getValue(), element.getValue());
       } else if (config.getMetadataParsingDefaultLang().isActive()) {
         titlesMap.put(config.getMetadataParsingDefaultLang().getLang(), element.getValue());
-      } else {
-        titlesMap.put(UNKNOWN_LANG, element.getValue()); // UNKNOWN_LANG(XX)
       }
     }
     return titlesMap;

@@ -62,10 +62,29 @@ public class GetRecordServiceImplTest {
     validateCMMStudyAgainstSchema(record);
   }
 
+  @Test()
+  public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord_MarkedAsNotActive()
+      throws InternalSystemException {
+
+    // Given
+    String repoUrl = "";
+    String studyIdentifier = "";
+
+    given(getRecordDoa.getRecordXML(repoUrl, studyIdentifier)).willReturn(CMMStudyMock.getDdiRecord1031());
+
+    // When
+    CMMStudy record = recordService.getRecord(repoUrl, studyIdentifier);
+
+    then(record).isNotNull();
+    then(record.isActive()).isFalse();
+  }
+
   private void validateCMMStudyAgainstSchema(CMMStudy record) throws IOException, ProcessingException, JSONException {
 
+    then(record.isActive()).isTrue(); // No need to carry on validating other fields if marked as inActive
+
     String jsonString = CMMConverter.toJsonString(record);
-    JSONObject json = new JSONObject(jsonString); // Convert text to object
+    JSONObject json = new JSONObject(jsonString);
     System.out.println("RETRIEVED STUDY JSON: \n" + json.toString(4));
 
     JsonNode jsonNodeRecord = JsonLoader.fromString(jsonString);

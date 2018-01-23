@@ -23,7 +23,9 @@ public class OaiPmhConstants {
   public static final Namespace[] DDI_AND_XML_NS = {DDI_NS, XML_NS};
 
   public static final String STUDY_CITATION_XPATH = "//ddi:stdyDscr/ddi:citation";
-  public static final String IDENTIFIER_XPATH = "//oai:header/oai:identifier";
+  public static final String IDENTIFIER_XPATH = "//oai:header/oai:identifier[1]";
+  public static final String RECORD_STATUS_XPATH = "//oai:header/@status";
+  public static final String LAST_MODIFIED_DATE_XPATH = "//oai:header/datestamp[1]";
   public static final String YEAR_OF_PUB_XPATH = "//ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:distDate[1]";
   public static final String ABSTRACT_XPATH = "//ddi:stdyInfo/ddi:abstract";
 
@@ -68,7 +70,6 @@ public class OaiPmhConstants {
   public static final String LIST_IDENTIFIERS_VALUE = "ListIdentifiers";
   public static final String METADATA_DDI_2_5_VALUE = "ddi";
 
-  public static final String UNKNOWN_LANG = "xx";
   public static final String EVENT_ATTR = "event";
 
   private OaiPmhConstants() {

@@ -26,8 +26,22 @@ public class CMMStudyMock {
     return builder.build();
   }
 
+  /**
+   * Loads up a valid xml record example.
+   *
+   * @return the xml String
+   */
   public static String getDdiRecord1683() {
     FileHandler fileHandler = new FileHandler();
     return fileHandler.getFileWithUtil("xml/ddi_record_1683.xml");
+  }
+
+  /**
+   * Loads up a valid but deleted xml record example
+   * @return the xml String
+   */
+  public static String getDdiRecord1031() {
+    FileHandler fileHandler = new FileHandler();
+    return fileHandler.getFileWithUtil("xml/ddi_record_1031_delted.xml");
   }
 }

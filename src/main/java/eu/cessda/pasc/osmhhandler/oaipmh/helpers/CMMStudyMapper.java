@@ -3,6 +3,7 @@ package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.configuration.OaiPmh;
 import lombok.extern.slf4j.Slf4j;
+import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.filter.Filters;
@@ -42,9 +43,38 @@ public class CMMStudyMapper {
    * Actual path used: /record/header/identifier
    */
   public static void parseHeaderElement(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
-    XPathExpression<Element> expr2 = xFactory.compile(IDENTIFIER_XPATH, Filters.element(), null, OAI_NS);
-    Element identifier = expr2.evaluateFirst(document);
-    builder.studyNumber(identifier.getValue());
+    parseStudyNumber(builder, document, xFactory);
+    parseLastModified(builder, document, xFactory);
+    parseRecordStatus(builder, document, xFactory);
+  }
+
+  /**
+   * Pass records status.
+   * <p>
+   * Defaults to false at initialisation. No need for set false on an else block.
+   */
+  private static void parseRecordStatus(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
+    XPathExpression<Attribute> attributeExpression = xFactory.compile(RECORD_STATUS_XPATH, Filters.attribute(), null, OAI_NS);
+    Attribute status = attributeExpression.evaluateFirst(document);
+    if (null == status || !"deleted".equalsIgnoreCase(status.getValue())) builder.isActive(true);
+  }
+
+  /**
+   * Parse last Modified.
+   */
+  private static void parseLastModified(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
+    XPathExpression<Element> elementExpression = xFactory.compile(LAST_MODIFIED_DATE_XPATH, Filters.element(), null, OAI_NS);
+    Element element = elementExpression.evaluateFirst(document);
+    if (null != element) builder.lastModified(element.getValue());
+  }
+
+  /**
+   * Parse study number.
+   */
+  private static void parseStudyNumber(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
+    XPathExpression<Element> elementExpression = xFactory.compile(IDENTIFIER_XPATH, Filters.element(), null, OAI_NS);
+    Element element = elementExpression.evaluateFirst(document);
+    if (null != element) builder.studyNumber(element.getValue());
   }
 
   /**
@@ -53,17 +83,18 @@ public class CMMStudyMapper {
   public static void parseStudyCitationElement(
       CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh oaiPmh) {
 
-    XPathExpression<Element> xPathExpression = xFactory
-        .compile(STUDY_CITATION_XPATH, Filters.element(), null, OAI_AND_DDI_NS);
-    Element citationElement = xPathExpression.evaluateFirst(document);
+    XPathExpression<Element> expr = xFactory.compile(STUDY_CITATION_XPATH, Filters.element(), null, OAI_AND_DDI_NS);
+    Element citationElement = expr.evaluateFirst(document);
 
-    List<Element> citationElementChildren = citationElement.getChildren();
-    for (Element citationElementChild : citationElementChildren) {
-      String citationElementName = citationElementChild.getName();
+    if (null != citationElement) {
+      List<Element> citationElementChildren = citationElement.getChildren();
+      for (Element citationElementChild : citationElementChildren) {
+        String citationElementName = citationElementChild.getName();
 
-      if (TITLE_STMT.equalsIgnoreCase(citationElementName)) {
-        processTitleStmt(builder, citationElementChild, oaiPmh);
-        continue; //FIXME: use xpath to extract title by itself alone...
+        if (TITLE_STMT.equalsIgnoreCase(citationElementName)) {
+          processTitleStmt(builder, citationElementChild, oaiPmh);
+          continue; //FIXME: use xpath to extract title by itself alone...
+        }
       }
     }
   }
@@ -102,15 +133,15 @@ public class CMMStudyMapper {
   public static void parseYrOfPublication(
       CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
 
-    List<Element> elements = getElements(document, xFactory, YEAR_OF_PUB_XPATH);
-    elements.stream().findFirst().ifPresent(distDateElement -> {
+    Element yrOfPublicationDate = getFirstElements(document, xFactory, YEAR_OF_PUB_XPATH);
+    if (null != yrOfPublicationDate){
       try {
-        builder.publicationYear(Integer.parseInt(distDateElement.getValue()));
+        builder.publicationYear(Integer.parseInt(yrOfPublicationDate.getValue()));
       } catch (NumberFormatException e) {
         log.warn("Could not parse year to Int. Defaulting to 1970");
         builder.publicationYear(config.getPublicationYearDefault());
       }
-    });
+    }
   }
 
   /**
