@@ -56,7 +56,7 @@ public class CMMStudyMapper {
   private static void parseRecordStatus(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
     XPathExpression<Attribute> attributeExpression = xFactory.compile(RECORD_STATUS_XPATH, Filters.attribute(), null, OAI_NS);
     Attribute status = attributeExpression.evaluateFirst(document);
-    if (null == status || !"deleted".equalsIgnoreCase(status.getValue())) builder.isActive(true);
+    if (null == status || !"deleted".equalsIgnoreCase(status.getValue())) builder.active(true);
   }
 
   /**
