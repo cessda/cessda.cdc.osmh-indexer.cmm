@@ -21,7 +21,7 @@ spring:
     default-domain: pasc-osmh-handler.oai-pmh
   boot:
     admin:
-#      url: http://localhost:8087
+      url: http://localhost:8087
       username: user
       password: pass
       client.name: pasc-osmh-handler.oai-pmh
