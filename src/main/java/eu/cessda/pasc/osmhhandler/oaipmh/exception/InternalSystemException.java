@@ -7,7 +7,13 @@ package eu.cessda.pasc.osmhhandler.oaipmh.exception;
  */
 public class InternalSystemException extends Exception{
 
+  private static final long serialVersionUID = -1848837478104997356L;
+
   public InternalSystemException(String message) {
     super(message);
+  }
+
+  public InternalSystemException(String message, Throwable cause) {
+    super(message, cause);
   }
 }

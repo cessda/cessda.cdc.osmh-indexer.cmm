@@ -22,7 +22,7 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
 class DocElementParser {
 
   private DocElementParser() throws RuntimeException {
-    throw new IllegalStateException("Utility class, instantiation not allow");
+    throw new UnsupportedOperationException("Utility class, instantiation not allow");
   }
 
   /**

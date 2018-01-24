@@ -56,6 +56,10 @@ public class GetRecordServiceImpl implements GetRecordService {
     SAXBuilder saxBuilder = new SAXBuilder();
     Document document = saxBuilder.build(recordXMLStream);
 
+    // TODO:  Does it have an <Error> extract message and throw custom ExternalSystemError with message
+    // use test payload "exampleXMLWithError()" to test this scenario
+
+    // validateForError((builder, document, X_FACTORY);
     parseHeaderElement(builder, document, X_FACTORY);
     parseStudyTitle(builder, document, X_FACTORY, oaiPmh);
     parseAbstract(builder, document, X_FACTORY, oaiPmh);

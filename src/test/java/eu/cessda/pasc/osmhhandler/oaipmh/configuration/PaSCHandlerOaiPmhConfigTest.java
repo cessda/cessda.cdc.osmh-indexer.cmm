@@ -29,6 +29,7 @@ public class PaSCHandlerOaiPmhConfigTest {
     OaiPmh oaiPmh = paSCHandlerOaiPmhConfig.getOaiPmh();
 
     then(oaiPmh).isNotNull();
+
     then(oaiPmh.getSupportedApiVersions()).hasSize(1);
     then(oaiPmh.getSupportedApiVersions()).contains("v0");
     then(oaiPmh.getSupportedRecordTypes()).hasSize(5);

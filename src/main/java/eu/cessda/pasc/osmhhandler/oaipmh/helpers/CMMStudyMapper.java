@@ -25,9 +25,8 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
 public class CMMStudyMapper {
 
   private CMMStudyMapper() {
-    throw new IllegalStateException("Utility class, instantiation not allow");
+    throw new UnsupportedOperationException("Utility class, instantiation not allow");
   }
-
 
   /**
    * NOTE: Extracts the Study Number from the header element
@@ -103,7 +102,6 @@ public class CMMStudyMapper {
     builder.abstractField(abstracts);
   }
 
-
   /**
    * Parses Year of Publication from:
    * <p>
@@ -132,7 +130,6 @@ public class CMMStudyMapper {
     String[] pidStudies = getElementValues(document, xFactory, PID_STUDY_XPATH);
     builder.pidStudies(pidStudies);
   }
-
 
   /**
    * Parses PID Study(s) from:
@@ -184,7 +181,6 @@ public class CMMStudyMapper {
     builder.unitTypes(typeOfTimeMethods);
   }
 
-
   /**
    * Parses Type Of Sampling Procedure(s) from:
    * <p>
@@ -195,7 +191,6 @@ public class CMMStudyMapper {
     String[] elementValues = getElementValues(document, xFactory, TYPE_OF_SAMPLING_XPATH);
     builder.typeOfSamplingProcedures(elementValues);
   }
-
 
   /**
    * Parses Sampling Procedure(s) from:

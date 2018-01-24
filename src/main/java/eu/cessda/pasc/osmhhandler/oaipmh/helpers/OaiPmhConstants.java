@@ -10,6 +10,7 @@ import org.jdom2.Namespace;
 public class OaiPmhConstants {
 
   static final String LIST_RECORD_HEADERS_URL_TEMPLATE = "%s?%s=%s&%s=%s";
+  static final String GET_RECORD_URL_TEMPLATE = "%s?%s=%s&%s=%s&%s=%s";
   public static final String COMPLETE_LIST_SIZE = "completeListSize";
 
   private static final String OAI_NS_PATH = "http://www.openarchives.org/OAI/2.0/";
@@ -20,7 +21,6 @@ public class OaiPmhConstants {
   static final Namespace DDI_NS = Namespace.getNamespace("ddi", DDI_NS_PATH);
   static final Namespace[] OAI_AND_DDI_NS = {OAI_NS, DDI_NS};
 
-  static final String STUDY_CITATION_XPATH = "//ddi:stdyDscr/ddi:citation";
   static final String IDENTIFIER_XPATH = "//oai:header/oai:identifier[1]";
   static final String RECORD_STATUS_XPATH = "//oai:header/@status";
   static final String LAST_MODIFIED_DATE_XPATH = "//oai:header/datestamp[1]";
@@ -46,9 +46,7 @@ public class OaiPmhConstants {
   static final String INST_FULL_NAME_XPATH = "//ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty";
 
   // Elements
-  static final String TITLE_STMT = "titlStmt";
   static final String LANG_ATTR = "lang";
-  static final String TITLE = "titl";
   public static final String IDENTIFIER_ELEMENT = "identifier";
   public static final String DATESTAMP_ELEMENT = "datestamp";
   public static final String SET_SPEC_ELEMENT = "setSpec";
@@ -65,12 +63,14 @@ public class OaiPmhConstants {
   // URL Paths tokens
   static final String VERB_PARAM_KEY = "verb";
   static final String METADATA_PREFIX_PARAM_KEY = "metadataPrefix";
+  static final String IDENTIFIER_PARAM_KEY = IDENTIFIER_ELEMENT;
   static final String RESUMPTION_TOKEN_KEY = RESUMPTION_TOKEN_ELEMENT;
   static final String LIST_IDENTIFIERS_VALUE = "ListIdentifiers";
+  static final String GET_RECORD_VALUE = "GetRecord";
   static final String METADATA_DDI_2_5_VALUE = "ddi";
   static final String EVENT_ATTR = "event";
 
   private OaiPmhConstants() {
-    // Hides implicit public constructor | For static constants only
+    throw new UnsupportedOperationException("Utility class, instantiation not allow");
   }
 }

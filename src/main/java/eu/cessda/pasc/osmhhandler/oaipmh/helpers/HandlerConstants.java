@@ -8,6 +8,8 @@ package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 public class HandlerConstants {
 
   public static final String STUDY = "Study";
+  // TODO: users of this below should be throwing Custom ExternalSystemError
+  public static final String UNSUCCESSFUL_RESPONSE = "Unsuccessful response from remote repository.";
 
   private HandlerConstants() {
     // Hides implicit public constructor | For static constants only
@@ -21,6 +23,6 @@ public class HandlerConstants {
   public static final String THE_GIVEN_URL_IS_NOT_FOUND = "The given url is not found!";
 
   public static final String RETURN_404_FOR_OTHER_PATHS = "Return 404 for other paths.";
-  public static final String MESSAGE = "message";
+  static final String MESSAGE = "message";
   public static final String RECORD_HEADER = "RecordHeader";
 }

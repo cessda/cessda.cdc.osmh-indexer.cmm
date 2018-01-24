@@ -21,7 +21,7 @@ import java.util.Map;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.THE_GIVEN_URL_IS_NOT_FOUND;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.UNSUPPORTED_API_VERSION;
-import static eu.cessda.pasc.osmhhandler.oaipmh.mock.data.CMMStudyMock.getCMMStudy;
+import static eu.cessda.pasc.osmhhandler.oaipmh.mock.data.CMMStudyTestData.getCMMStudy;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -42,13 +42,13 @@ public class GetRecordControllerTest {
   private static final ObjectMapper MAPPER = new ObjectMapper();
 
   @MockBean
-  GetRecordService recordService;
+  GetRecordService getRecordService;
 
   @Test
-  public void shouldReturnListRecordHeadersSuccessfully() throws Exception {
+  public void shouldReturnRecordSuccessfully() throws Exception {
 
     // Given
-    given(this.recordService.getRecord("http://kirkedata.nsd.uib.no", "StudyID222"))
+    given(this.getRecordService.getRecord("http://kirkedata.nsd.uib.no", "StudyID222"))
         .willReturn(getCMMStudy());
 
     String expectedCMMStudyJsonString = MAPPER.writeValueAsString(getCMMStudy());
@@ -96,7 +96,6 @@ public class GetRecordControllerTest {
     this.mockMvc.perform(
         get("/" + invalidVersion + "/GetRecord/CMMInvalid/StudyID222/?Repository=http://kirkedata.nsd.uib.no")
             .accept(MediaType.APPLICATION_JSON_VALUE))
-
 
         // Then
         .andExpect(status().isNotFound())

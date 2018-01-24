@@ -1,5 +1,7 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.dao;
 
+import eu.cessda.pasc.osmhhandler.oaipmh.exception.InternalSystemException;
+
 /**
  * Data access for fetching Record from remote repositories
  *
@@ -7,5 +9,5 @@ package eu.cessda.pasc.osmhhandler.oaipmh.dao;
  */
 public interface GetRecordDoa {
 
-  String getRecordXML(String repoUrl, String studyIdentifier);
+  String getRecordXML(String repoUrl, String studyIdentifier) throws InternalSystemException;
 }

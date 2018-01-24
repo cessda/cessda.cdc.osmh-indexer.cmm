@@ -40,7 +40,7 @@ public class GetRecordController {
   APISupportedService apiSupportedService;
 
   @Autowired
-  GetRecordService recordService;
+  GetRecordService getRecordService;
 
   @Autowired
   ObjectMapper objectMapper;
@@ -63,7 +63,7 @@ public class GetRecordController {
         return new ResponseEntity<>(getSimpleResponseMessage(message), HttpStatus.BAD_REQUEST);
       }
 
-      CMMStudy cmmStudy = recordService.getRecord(repository, study_id);
+      CMMStudy cmmStudy = getRecordService.getRecord(repository, study_id);
       String valueAsString = CMMConverter.toJsonString(cmmStudy);
       return new ResponseEntity<>(valueAsString, HttpStatus.OK);
     } catch (Exception e) {
@@ -81,7 +81,6 @@ public class GetRecordController {
       @ApiResponse(code = 404, message = NOT_FOUND, response = ErrorMessage.class)
   })
   public ResponseEntity<String> getRecordHeadersForOtherPaths() {
-
     return new ResponseEntity<>(getSimpleResponseMessage(THE_GIVEN_URL_IS_NOT_FOUND), HttpStatus.NOT_FOUND);
   }
 }

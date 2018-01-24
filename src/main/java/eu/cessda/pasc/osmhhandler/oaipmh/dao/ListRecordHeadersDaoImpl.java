@@ -1,12 +1,7 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.dao;
 
-import eu.cessda.pasc.osmhhandler.oaipmh.configuration.PaSCHandlerOaiPmhConfig;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.InternalSystemException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.client.RestTemplate;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhHelpers.appendListRecordParams;
 
@@ -16,43 +11,16 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhHelpers.appendList
  * @author moses@doraventures.com
  */
 @Repository
-public class ListRecordHeadersDaoImpl implements ListRecordHeadersDao {
-
-  @Autowired
-  RestTemplate restTemplate;
-
-  @Autowired
-  @Qualifier("restTemplateWithNoSSLVerification")
-  RestTemplate restTemplateWithNoSSLVerification;
-
-  @Autowired
-  PaSCHandlerOaiPmhConfig handlerOaiPmhConfig;
+public class ListRecordHeadersDaoImpl extends DaoBase implements ListRecordHeadersDao {
 
   @Override
   public String listRecordHeaders(String baseRepoUrl) throws InternalSystemException {
-
     String finalListRecordUrl = appendListRecordParams(baseRepoUrl);
-    ResponseEntity<String> responseEntity = getRestTemplate().getForEntity(finalListRecordUrl, String.class);
-    if (responseEntity.getStatusCode().is2xxSuccessful()) {
-      return responseEntity.getBody();
-    }
-    throw new InternalSystemException("Did not receive a successful response from remote repository.");
+    return postForStringResponse(finalListRecordUrl);
   }
 
   @Override
   public String listRecordHeadersResumption(String repoUrlWithResumptionToken) throws InternalSystemException {
-
-    ResponseEntity<String> responseEntity = getRestTemplate().getForEntity(repoUrlWithResumptionToken, String.class);
-    if (responseEntity.getStatusCode().is2xxSuccessful()) {
-      return responseEntity.getBody();
-    }
-    throw new InternalSystemException("Did not receive a successful response from remote repository.");
-  }
-
-  private RestTemplate getRestTemplate() {
-    if (handlerOaiPmhConfig.getRestTemplateProps().isVerifySSL()) {
-      return restTemplate;
-    }
-    return restTemplateWithNoSSLVerification;
+    return postForStringResponse(repoUrlWithResumptionToken);
   }
 }

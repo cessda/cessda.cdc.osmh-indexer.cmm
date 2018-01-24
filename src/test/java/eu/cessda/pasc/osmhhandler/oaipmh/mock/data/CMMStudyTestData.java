@@ -12,7 +12,7 @@ import java.util.Map;
  *
  * @author moses@doraventures.com
  */
-public class CMMStudyMock {
+public class CMMStudyTestData {
 
   public static CMMStudy getCMMStudy() {
 

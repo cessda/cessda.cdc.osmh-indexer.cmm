@@ -1,6 +1,7 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -29,6 +30,7 @@ import static org.apache.http.ssl.SSLContexts.custom;
  * @author moses@doraventures.com
  */
 @Configuration
+@Slf4j
 public class UtilitiesConfiguration {
 
   @Autowired
@@ -48,7 +50,7 @@ public class UtilitiesConfiguration {
 
   @Bean
   public RestTemplate restTemplate() {
-      return new RestTemplate(getClientHttpRequestFactory());
+    return new RestTemplate(getClientHttpRequestFactory());
   }
 
   @Bean
@@ -65,7 +67,7 @@ public class UtilitiesConfiguration {
     return clientHttpRequestFactory;
   }
 
-   // FIXME:  A "temp" to work around untrusted certificate for UKDA oai-pmh endpoint
+  // FIXME:  A "temp" to work around untrusted certificate for UKDA oai-pmh endpoint
   /**
    * Builds a {@link ClientHttpRequestFactory} with ssl off.
    */
@@ -83,5 +85,18 @@ public class UtilitiesConfiguration {
     requestFactory.setConnectionRequestTimeout(paSCHandlerOaiPmhConfig.getRestTemplateProps().getConnRequestTimeout());
     requestFactory.setHttpClient(httpClient);
     return requestFactory;
+  }
+
+  public RestTemplate getRestTemplate() {
+    if (paSCHandlerOaiPmhConfig.getRestTemplateProps().isVerifySSL()) {
+      return restTemplate();
+    }
+
+    try {
+      return restTemplateWithNoSSLVerification();
+    } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
+      log.error("Failed to build restTemplate with SSL off, building and return default Template with SSL on");
+      return restTemplate();
+    }
   }
 }
