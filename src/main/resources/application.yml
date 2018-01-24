@@ -60,6 +60,7 @@ osmhhandler:
     connTimeout: 5000
     connRequestTimeout: 5000
     readTimeout: 5000
+    verifySSL: false
 
 ---
 spring:

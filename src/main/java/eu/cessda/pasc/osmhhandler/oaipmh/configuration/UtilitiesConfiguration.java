@@ -21,6 +21,8 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 
+import static org.apache.http.ssl.SSLContexts.custom;
+
 /**
  * Extra Util configuration
  *
@@ -46,19 +48,30 @@ public class UtilitiesConfiguration {
 
   @Bean
   public RestTemplate restTemplate() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+    if (paSCHandlerOaiPmhConfig.getRestTemplateProps().isVerifySSL()) {
+      return new RestTemplate(getClientHttpRequestFactory());
+    }
     return new RestTemplate(getClientHttpRequestFactoryWithoutSSL());
   }
 
+  private ClientHttpRequestFactory getClientHttpRequestFactory() {
+    HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
+    clientHttpRequestFactory.setConnectTimeout(paSCHandlerOaiPmhConfig.getRestTemplateProps().getConnTimeout());
+    clientHttpRequestFactory.setReadTimeout(paSCHandlerOaiPmhConfig.getRestTemplateProps().getReadTimeout());
+    clientHttpRequestFactory.setConnectionRequestTimeout(paSCHandlerOaiPmhConfig.getRestTemplateProps()
+        .getConnRequestTimeout());
+    return clientHttpRequestFactory;
+  }
+
+   // FIXME:  A "temp" to work around untrusted certificate for UKDA oai-pmh endpoint
   /**
    * Builds a {@link ClientHttpRequestFactory} with ssl off.
-   * FIXME:  A "temp" to work around untrusted certificate for UKDA oai-pmh endpoint
    */
   private ClientHttpRequestFactory getClientHttpRequestFactoryWithoutSSL()
       throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
 
     TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
-    SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom()
-        .loadTrustMaterial(null, acceptingTrustStrategy).build();
+    SSLContext sslContext = custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
     SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
     CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(csf).build();
 
@@ -67,7 +80,6 @@ public class UtilitiesConfiguration {
     requestFactory.setReadTimeout(paSCHandlerOaiPmhConfig.getRestTemplateProps().getReadTimeout());
     requestFactory.setConnectionRequestTimeout(paSCHandlerOaiPmhConfig.getRestTemplateProps().getConnRequestTimeout());
     requestFactory.setHttpClient(httpClient);
-
     return requestFactory;
   }
 }
