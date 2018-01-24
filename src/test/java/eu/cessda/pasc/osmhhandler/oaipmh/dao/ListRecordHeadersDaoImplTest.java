@@ -29,7 +29,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 public class ListRecordHeadersDaoImplTest {
 
   @Autowired
-  RestTemplate restTemplate;
+  RestTemplate restTemplateWithNoSSLVerification;
 
   @Autowired
   ListRecordHeadersDao listRecordHeadersDao;
@@ -38,7 +38,7 @@ public class ListRecordHeadersDaoImplTest {
 
   @Before
   public void setUp() {
-    server = MockRestServiceServer.bindTo(restTemplate).build();
+    server = MockRestServiceServer.bindTo(restTemplateWithNoSSLVerification).build();
   }
 
 

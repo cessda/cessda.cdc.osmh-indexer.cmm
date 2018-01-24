@@ -47,10 +47,12 @@ public class UtilitiesConfiguration {
   }
 
   @Bean
-  public RestTemplate restTemplate() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
-    if (paSCHandlerOaiPmhConfig.getRestTemplateProps().isVerifySSL()) {
+  public RestTemplate restTemplate() {
       return new RestTemplate(getClientHttpRequestFactory());
-    }
+  }
+
+  @Bean
+  public RestTemplate restTemplateWithNoSSLVerification() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
     return new RestTemplate(getClientHttpRequestFactoryWithoutSSL());
   }
 
