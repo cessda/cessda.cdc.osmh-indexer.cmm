@@ -1,0 +1,227 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "CMMStudy",
+  "version": "v0",
+  "description": "This schema defines the format of the CMMStudy record type.",
+  "type": "object",
+  "required": [
+    "studyNumber",
+    "isActive"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "studyNumber": {
+      "type": "string",
+      "description": "A studyNumber that uniquely identifies the CMMStudy within a repository."
+    },
+    "abstract": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "string",
+          "description": "A CMMStudy abstract for the given language code."
+        }
+      },
+      "additionalProperties": false,
+      "description": "An object containing an abstract in various languages. Uses language code properties and abstract values. E.g. {'en': 'An abstract', 'no': 'Et sammendrag'}"
+    },
+    "classifications": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "A CMMStudy topic."
+      },
+      "description": "An array of topics for this CMMStudy."
+    },
+    "keywords": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "A CMMStudy keyword."
+      },
+      "description": "An array of keywords for this CMMStudy."
+    },
+    "typeOfTimeMethods": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "A CMMStudy timedimension."
+      },
+      "description": "An array of Time Dimensions for this CMMStudy."
+    },
+    "studyAreaCountries": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "A CMMStudy country."
+      },
+      "description": "An array of Countries for this CMMStudy."
+    },
+    "unitTypes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "A CMMStudy AnalysisUnit."
+      },
+      "description": "An array of AnalysisUnits for this CMMStudy."
+    },
+    "titleStudy": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "string",
+          "description": "A CMMStudy studyTitle for the given language code."
+        }
+      },
+      "additionalProperties": false,
+      "description": "An object containing Study Titles in various languages. Uses language code properties and abstract values. E.g. {'en': 'An studyTitle', 'no': 'Et studyTitle'}"
+    },
+    "publisher": {
+      "type": "string",
+      "description": "Name of the institution publishing the research data."
+    },
+    "publicationYear": {
+      "type": "number",
+      "description": "Year of publication (by publisher) of the study (for citation) - [YYYY]"
+    },
+    "pidStudies": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "A CMMStudy Study Persistent Identifier."
+      },
+      "description": "An array of Persistent Identifiers for this CMMStudy."
+    },
+    "personName": {
+      "type": "string",
+      "description": "Name of the person the metadata information refer to."
+    },
+    "associatedInstitutions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "A CMMStudy Associated Institution ."
+      },
+      "description": "An array of Associated Institutions for this CMMStudy."
+    },
+    "fileLanguages": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "A CMMStudy File Language (standardised ISO)."
+      },
+      "description": "An array of File Languages (standardised ISO) for this CMMStudy."
+    },
+    "principalInvestigatorPeople": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "Reference to a person that was a principal investigator."
+      },
+      "description": "An array of Reference to people were a principal investigator."
+    },
+    "classIdentifier": {
+      "type": "string",
+      "description": "Unique identifier of class/category within the classification system."
+    },
+    "typeOfSamplingProcedures": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "Type of sampling procedure used for data collection. Controlled vocabulary Includes a typology of sampling methods."
+      },
+      "description": "An array of sampling procedures used for data collection."
+    },
+    "samplingProcedure": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "string",
+          "description": "Freetext description of the type of sampling procedure used for data collection."
+        }
+      },
+      "additionalProperties": false,
+      "description": "An object containing Freetext description of the type of sampling procedure used for data collection. E.g. {'en': 'An sampling procedure a', 'no': 'Et sampling procedure a'}."
+    },
+    "typeOfModeOfCollections": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "Description of the method of data collection - the procedure, technique, or mode of inquiry used to attain the data."
+      },
+      "description": "An array of description of the methods of data collection."
+    },
+    "dataCollectionPeriodStartdate": {
+      "type": "string",
+      "description": "A JSON date string in ISO 8601 format, e.g. 2012-04-23T18:25:43.511Z.",
+      "format": "date-time"
+    },
+    "dataCollectionPeriodEnddate": {
+      "type": "string",
+      "description": "A JSON date string in ISO 8601 format, e.g. 2012-04-23T18:25:43.511Z.",
+      "format": "date-time"
+    },
+    "dataAccess": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "string",
+          "description": "Freetext description of possibilities to access data."
+        }
+      },
+      "additionalProperties": false,
+      "description": "An object containing Freetext description of possibilities to access data. E.g. {'en': 'via web', 'no': 'Et via web'}."
+    },
+    "accessClass": {
+      "type": "string",
+      "description": "Class of availability of the research data."
+    },
+    "principalInvestigatorInstitutes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "Reference to an organization that was a principal investigator"
+      },
+      "description": "An array of Reference to organizations that were a principal investigator."
+    },
+    "creator": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "string",
+          "description": "Creator of study."
+        }
+      },
+      "additionalProperties": false,
+      "description": "An object containing Freetext description of possibilities to access data. E.g. {'en': 'via web', 'no': 'Et via web'}."
+    },
+    "creatorAffiliation": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "string",
+          "description": "Creators affiliation."
+        }
+      },
+      "additionalProperties": false,
+      "description": "An object containing Freetext description of possibilities to access data. E.g. {'en': 'via web', 'no': 'Et via web'}."
+    },
+    "lastModified": {
+      "type": "string",
+      "description": "A JSON date string in ISO 8601 format, e.g. 2012-04-23T18:25:43.511Z.",
+      "format": "date-time"
+    },
+    "recordType": {
+      "type": "string",
+      "description": "The type of record, i.e.'CMMStudy'.",
+      "enum": [
+        "CMMStudy"
+      ]
+    },
+    "isActive": {
+      "type": "boolean",
+      "description": "Is the record marked as deleted. If record is deleted this = false",
+      "default": true
+    }
+  }
+}
