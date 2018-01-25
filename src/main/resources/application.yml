@@ -21,7 +21,7 @@ spring:
     default-domain: pasc-osmh-handler.oai-pmh
   boot:
     admin:
-      url: http://localhost:8087
+#     url: http://localhost:8087 For dev, stg & prod set this at the specific active profile. Run app with profile set
       username: user
       password: pass
       client.name: pasc-osmh-handler.oai-pmh
@@ -56,6 +56,12 @@ osmhhandler:
     repos:
       - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
         preferredMetadataParam: ddi
+      - url: www.test-repo2.com
+        preferredMetadataParam: 3.2
+    metadataParsingDefaultLang:
+      active: true
+      lang: 'en'
+    publicationYearDefault: 1970
   restTemplateProps:
     connTimeout: 5000
     connRequestTimeout: 5000
@@ -84,6 +90,16 @@ osmhhandler:
       active: true
       lang: 'en'
     publicationYearDefault: 1970
+
+---
+spring:
+  profiles: local
+  boot:
+    admin:
+      url:
+logging:
+  pattern:
+    console: '%message%n'
 
 ---
 spring:
