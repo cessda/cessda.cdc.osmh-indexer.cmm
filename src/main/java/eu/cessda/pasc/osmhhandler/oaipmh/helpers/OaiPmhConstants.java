@@ -29,7 +29,7 @@ public class OaiPmhConstants {
   static final String TITLE_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:titl";
 
   static final String PID_STUDY_XPATH = "//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo";
-  static final String PERSON_NAME_XPATH = "//ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty[1]";
+  static final String CREATORS_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty";
   static final String ACCESS_CLASS_XPATH = "//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:restrctn[1]";
   static final String DATA_ACCESS_XPATH = "//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:conditions[1]";
   static final String DATA_COLLECTION_PERIODS_PATH = "//ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate[position()<3]";
@@ -56,6 +56,8 @@ public class OaiPmhConstants {
   static final String END_ATTR = "end";
   static final String START_ATTR = "start";
   static final String SINGLE_ATTR = "single";
+  static final String EVENT_ATTR = "event";
+  static final String CREATOR_AFFILIATION_ATTR = "affiliation";
 
   // Encoding
   public static final String UTF_8 = "UTF-8";
@@ -68,7 +70,6 @@ public class OaiPmhConstants {
   static final String LIST_IDENTIFIERS_VALUE = "ListIdentifiers";
   static final String GET_RECORD_VALUE = "GetRecord";
   static final String METADATA_DDI_2_5_VALUE = "ddi";
-  static final String EVENT_ATTR = "event";
 
   private OaiPmhConstants() {
     throw new UnsupportedOperationException("Utility class, instantiation not allow");

@@ -10,6 +10,7 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -111,7 +112,7 @@ public class CMMStudyMapper {
       CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
 
     Element yrOfPublicationDate = getFirstElements(document, xFactory, YEAR_OF_PUB_XPATH);
-    if (null != yrOfPublicationDate){
+    if (null != yrOfPublicationDate) {
       try {
         builder.publicationYear(Integer.parseInt(yrOfPublicationDate.getValue()));
       } catch (NumberFormatException e) {
@@ -129,6 +130,21 @@ public class CMMStudyMapper {
   public static void parsePidStudies(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
     String[] pidStudies = getElementValues(document, xFactory, PID_STUDY_XPATH);
     builder.pidStudies(pidStudies);
+  }
+
+  /**
+   * Parses PID Study(s) from:
+   * <p>
+   * Xpath = {@value OaiPmhConstants#CREATORS_XPATH }
+   */
+  public static void parseCreator(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
+    List<Element> elements = getElements(document, xFactory, CREATORS_XPATH);
+    List<String> creators = new ArrayList<>();
+    for (Element element : elements) {
+      String affiliationAttr = element.getAttributeValue(CREATOR_AFFILIATION_ATTR);
+      creators.add(null == affiliationAttr ? element.getValue() : element.getValue() + "(" + affiliationAttr + ")");
+    }
+    builder.creators(creators.toArray(new String[0]));
   }
 
   /**
@@ -224,16 +240,6 @@ public class CMMStudyMapper {
   public static void parseFileLanguages(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
     String[] typeOfTimeMethods = getAttributeValues(document, xFactory, FILE_LANGUAGES_XPATH);
     builder.unitTypes(typeOfTimeMethods);
-  }
-
-  /**
-   * Parses Person Name from:
-   * <p>
-   * Xpath = {@value OaiPmhConstants#PERSON_NAME_XPATH }
-   */
-  public static void parsePersonName(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
-    List<Element> people = getElements(document, xFactory, PERSON_NAME_XPATH);
-    people.stream().findFirst().ifPresent(element -> builder.personName(element.getValue()));
   }
 
   /**

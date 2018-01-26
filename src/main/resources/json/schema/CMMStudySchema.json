@@ -92,10 +92,6 @@
       },
       "description": "An array of Persistent Identifiers for this CMMStudy."
     },
-    "personName": {
-      "type": "string",
-      "description": "Name of the person the metadata information refer to."
-    },
     "associatedInstitutions": {
       "type": "array",
       "items": {
@@ -111,14 +107,6 @@
         "description": "A CMMStudy File Language (standardised ISO)."
       },
       "description": "An array of File Languages (standardised ISO) for this CMMStudy."
-    },
-    "principalInvestigatorPeople": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "description": "Reference to a person that was a principal investigator."
-      },
-      "description": "An array of Reference to people were a principal investigator."
     },
     "classIdentifier": {
       "type": "string",
@@ -176,13 +164,13 @@
       "type": "string",
       "description": "Class of availability of the research data."
     },
-    "principalInvestigatorInstitutes": {
+    "creators": {
       "type": "array",
       "items": {
         "type": "string",
-        "description": "Reference to an organization that was a principal investigator"
+        "description": "Reference to a creator alongside her/his affiliation eg \"Ami Doe(University of DV)\"."
       },
-      "description": "An array of Reference to organizations that were a principal investigator."
+      "description": "An array of Reference to creators."
     },
     "institutionFullName": {
       "type": "object",

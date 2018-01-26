@@ -58,14 +58,14 @@ public class GetRecordServiceImpl implements GetRecordService {
 
     // TODO:  Does it have an <Error> extract message and throw custom ExternalSystemError with message
     // use test payload "exampleXMLWithError()" to test this scenario
-
     // validateForError((builder, document, X_FACTORY);
+
     parseHeaderElement(builder, document, X_FACTORY);
     parseStudyTitle(builder, document, X_FACTORY, oaiPmh);
     parseAbstract(builder, document, X_FACTORY, oaiPmh);
     parseYrOfPublication(builder, document, X_FACTORY, oaiPmh);
     parsePidStudies(builder, document, X_FACTORY);
-    parsePersonName(builder, document, X_FACTORY);
+    parseCreator(builder, document, X_FACTORY);
     parseAccessClass(builder, document, X_FACTORY);
     parseDataAccess(builder, document, X_FACTORY, oaiPmh);
     parseDataCollectionPeriods(builder, document, X_FACTORY);

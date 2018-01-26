@@ -41,7 +41,7 @@
               </titlStmt>
               <rspStmt>
                 <AuthEnty>Hood, C.C., University of York. Institute of Social and Economic Research</AuthEnty>
-                <AuthEnty>Dunsire, A., University of York. Institute of Social and Economic Research</AuthEnty>
+                <AuthEnty affiliation="institution">Dunsire, A.</AuthEnty>
                 <AuthEnty>Thomson, K.S., University of York. Institute of Social and Economic Research</AuthEnty>
               </rspStmt>
               <prodStmt>

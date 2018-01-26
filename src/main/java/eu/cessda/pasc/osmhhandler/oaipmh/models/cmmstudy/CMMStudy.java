@@ -27,10 +27,9 @@ import java.util.Map;
     "publisher",
     "publicationYear",
     "pidStudies",
-    "personName",
     "associatedInstitutions",
     "fileLanguages",
-    "principalInvestigatorPeople",
+    "creators",
     "classIdentifier",
     "typeOfSamplingProcedures",
     "samplingProcedure",
@@ -39,7 +38,6 @@ import java.util.Map;
     "dataCollectionPeriodEnddate",
     "dataAccess",
     "accessClass",
-    "principalInvestigatorInstitutes",
     "institutionFullName",
     "lastModified",
     "isActive",
@@ -48,9 +46,6 @@ import java.util.Map;
 @Builder
 @Getter
 public class CMMStudy {
-
-  @JsonProperty("personName")
-  private String personName;
 
   @JsonProperty("classIdentifier")
   private String classIdentifier;
@@ -61,8 +56,8 @@ public class CMMStudy {
   @JsonProperty("institutionFullName")
   private Map<String, String> institutionFullName;
 
-  @JsonProperty("principalInvestigatorPeople")
-  private String[] principalInvestigatorPeople;
+  @JsonProperty("creators")
+  private String[] creators;
 
   @JsonProperty("dataCollectionPeriodStartdate")
   private String dataCollectionPeriodStartdate;
@@ -109,8 +104,6 @@ public class CMMStudy {
   @JsonProperty("accessClass")
   private String accessClass;
 
-  @JsonProperty("principalInvestigatorInstitutes")
-  private String[] principalInvestigatorInstitutes;
 
   @JsonProperty("typeOfSamplingProcedures")
   private String[] typeOfSamplingProcedures;
