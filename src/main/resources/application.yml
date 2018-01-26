@@ -61,6 +61,9 @@ osmhhandler:
     metadataParsingDefaultLang:
       active: true
       lang: 'en'
+    # Temp future to concatenate repeated elements with xml:langs or not - TODO: Remove this feature before GO live!
+    concatenateRepeatedElements: true
+    concatenateSeparator: "+<br>"
     publicationYearDefault: 1970
   restTemplateProps:
     connTimeout: 5000

@@ -85,7 +85,7 @@ public class CMMStudyMapper {
       CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
 
     List<Element> elements = getElements(document, xFactory, TITLE_XPATH);
-    Map<String, String> studyTitles = getLanguageKeyValuePairs(config, elements);
+    Map<String, String> studyTitles = getLanguageKeyValuePairs(config, elements, false);
     builder.titleStudy(studyTitles);
   }
 
@@ -98,7 +98,7 @@ public class CMMStudyMapper {
       CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
 
     List<Element> elements = getElements(document, xFactory, ABSTRACT_XPATH);
-    Map<String, String> abstracts = getLanguageKeyValuePairs(config, elements);
+    Map<String, String> abstracts = getLanguageKeyValuePairs(config, elements, true);
     builder.abstractField(abstracts);
   }
 
@@ -201,8 +201,8 @@ public class CMMStudyMapper {
       CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
 
     List<Element> elements = getElements(document, xFactory, SAMPLING_XPATH);
-    Map<String, String> languageKeyValuePairs = getLanguageKeyValuePairs(config, elements);
-    builder.samplingProcedure(languageKeyValuePairs);
+    Map<String, String> samplingProcedures = getLanguageKeyValuePairs(config, elements, false);
+    builder.samplingProcedure(samplingProcedures);
   }
 
   /**
@@ -265,8 +265,8 @@ public class CMMStudyMapper {
       CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
 
     List<Element> elements = getElements(document, xFactory, DATA_ACCESS_XPATH);
-    Map<String, String> valuePairs = getLanguageKeyValuePairs(config, elements);
-    builder.dataAccess(valuePairs);
+    Map<String, String> dataAccess = getLanguageKeyValuePairs(config, elements, false);
+    builder.dataAccess(dataAccess);
   }
 
   /**
@@ -298,7 +298,7 @@ public class CMMStudyMapper {
       CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
 
     List<Element> elements = getElements(document, xFactory, INST_FULL_NAME_XPATH);
-    Map<String, String> titlesMap = getLanguageKeyValuePairs(config, elements);
-    builder.institutionFullName(titlesMap);
+    Map<String, String> institutionFullNames = getLanguageKeyValuePairs(config, elements, true);
+    builder.institutionFullName(institutionFullNames);
   }
 }

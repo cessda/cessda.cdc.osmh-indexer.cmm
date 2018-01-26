@@ -24,5 +24,4 @@ public class PaSCHandlerOaiPmhConfig {
 
   private OaiPmh oaiPmh = new OaiPmh();
   private RestTemplateProps restTemplateProps = new RestTemplateProps();
-
 }

@@ -73,17 +73,38 @@ class DocElementParser {
    * <p>
    * If configuration is set to not default to a given lang, effect is this element is not extracted.
    */
-  static Map<String, String> getLanguageKeyValuePairs(OaiPmh config, List<Element> elements) {
+  static Map<String, String> getLanguageKeyValuePairs(OaiPmh config, List<Element> elements, boolean isConcatenating) {
 
     Map<String, String> titlesMap = new HashMap<>();
-
     for (Element element : elements) {
       if (null != element.getAttribute(LANG_ATTR, XML_NS) && !element.getAttribute(LANG_ATTR, XML_NS).getValue().isEmpty()) {
         titlesMap.put(element.getAttribute(LANG_ATTR, XML_NS).getValue(), element.getValue());
       } else if (config.getMetadataParsingDefaultLang().isActive()) {
-        titlesMap.put(config.getMetadataParsingDefaultLang().getLang(), element.getValue());
+        if (isConcatenating && config.isConcatenateRepeatedElements()) {
+          concatenateRepeatedElements(config, titlesMap, element);
+        } else {
+          titlesMap.put(config.getMetadataParsingDefaultLang().getLang(), element.getValue()); // Else keep overriding
+        }
       }
     }
     return titlesMap;
+  }
+
+  /**
+   * TODO: remove/raise questions!
+   * <p>
+   * Temp request from PUG to concatenate repeated elements.  This is to be removed once SPs start tagging their data
+   * with the xml:lang tags.  This will then be extracted to key (lang e.g. en) : value (abstract content).
+   * <p>
+   * Current toggle is osmhhandler.oaiPmh.concatenateRepeatedElements property.
+   */
+  private static void concatenateRepeatedElements(OaiPmh config, Map<String, String> titlesMap, Element element) {
+    if (titlesMap.containsKey(config.getMetadataParsingDefaultLang().getLang())) {
+      String previousContent = titlesMap.get(config.getMetadataParsingDefaultLang().getLang());
+      String concatenatedContent = previousContent + config.getConcatenateSeparator() + element.getValue();
+      titlesMap.put(config.getMetadataParsingDefaultLang().getLang(), concatenatedContent); // keep concatenating
+    } else {
+      titlesMap.put(config.getMetadataParsingDefaultLang().getLang(), element.getValue()); // set first
+    }
   }
 }

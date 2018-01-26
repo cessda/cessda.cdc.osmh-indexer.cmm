@@ -42,6 +42,6 @@ public class CMMStudyTestData {
    */
   public static String getDdiRecord1031() {
     FileHandler fileHandler = new FileHandler();
-    return fileHandler.getFileWithUtil("xml/ddi_record_1031_delted.xml");
+    return fileHandler.getFileWithUtil("xml/ddi_record_1031_deleted.xml");
   }
 }
