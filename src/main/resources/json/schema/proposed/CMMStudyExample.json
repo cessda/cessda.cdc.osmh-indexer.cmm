@@ -1,0 +1,37 @@
+{
+  "studyNumber": "ukda:classic:duik345324",
+  "abstract": {
+    "en": " abstract text",
+    "no": " abstract text"
+  },
+  "topics": [
+    {
+      "id": "",
+      "systemName": "",
+      "topic": {
+        "no": "term",
+        "en": "term"
+      }
+    }
+  ],
+  "keywords": [
+    {
+      "id": "",
+      "systemName": "",
+      "keyword": {
+        "no": "term",
+        "en": "term"
+      }
+    }
+  ],
+  "vocabularyElement": [
+    {
+      "vocabularyId": "",
+      "conceptId": "",
+      "concept": {
+        "no": "dfdf",
+        "en": "term"
+      }
+    }
+  ]
+}
