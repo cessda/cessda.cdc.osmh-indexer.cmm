@@ -1,6 +1,6 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMConverter;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.errors.ErrorMessage;
@@ -19,7 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.*;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerErrorMessageUtil.getSimpleResponseMessage;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 /**
  * Controller to handle request for getting a remote Record.
@@ -32,7 +32,7 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerErrorMessageUtil.
     tags = {"GetRecord"})
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 @Slf4j
-public class GetRecordController {
+public class GetRecordController extends ControllerBase {
 
   private static final String GETS_A_RECORD = "Gets a Record with the given identifier";
 
@@ -42,10 +42,7 @@ public class GetRecordController {
   @Autowired
   GetRecordService getRecordService;
 
-  @Autowired
-  ObjectMapper objectMapper;
-
-  @RequestMapping(value = "/CMMStudy/{study_id}", method = RequestMethod.GET)
+  @RequestMapping(value = "/CMMStudy/{studyId}", method = RequestMethod.GET)
   @ApiOperation(value = GETS_A_RECORD,
       response = String.class, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponses(value = {
@@ -55,22 +52,19 @@ public class GetRecordController {
       @ApiResponse(code = 500, message = SYSTEM_ERROR, response = ErrorMessage.class)
   })
   public ResponseEntity<String> getRecordHeaders(
-      @PathVariable String version, @PathVariable String study_id, @RequestParam("Repository") String repository) {
+      @PathVariable String version, @PathVariable String studyId, @RequestParam("Repository") String repository) {
 
     try {
       if (!apiSupportedService.isSupportedVersion(version)) {
-        String message = String.format(UNSUPPORTED_API_VERSION, version);
-        return new ResponseEntity<>(getSimpleResponseMessage(message), HttpStatus.BAD_REQUEST);
+        return getResponseEntityMessage(String.format(UNSUPPORTED_API_VERSION, version), HttpStatus.BAD_REQUEST);
       }
-
-      CMMStudy cmmStudy = getRecordService.getRecord(repository, study_id);
+      CMMStudy cmmStudy = getRecordService.getRecord(repository, studyId);
       String valueAsString = CMMConverter.toJsonString(cmmStudy);
-      return new ResponseEntity<>(valueAsString, HttpStatus.OK);
+      return getResponseEntity(valueAsString, HttpStatus.OK);
+    } catch (CustomHandlerException e) {
+      return logAndGetResponseEntityMessage(e.getClass().getName() + ": " + e.getMessage(), INTERNAL_SERVER_ERROR);
     } catch (Exception e) {
-
-      log.debug(SYSTEM_ERROR, e.getMessage());
-      return new ResponseEntity<>(
-          getSimpleResponseMessage(SYSTEM_ERROR + " " + e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+      return logAndGetResponseEntityMessage(SYSTEM_ERROR + ": " + e.getMessage(), INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -81,6 +75,6 @@ public class GetRecordController {
       @ApiResponse(code = 404, message = NOT_FOUND, response = ErrorMessage.class)
   })
   public ResponseEntity<String> getRecordHeadersForOtherPaths() {
-    return new ResponseEntity<>(getSimpleResponseMessage(THE_GIVEN_URL_IS_NOT_FOUND), HttpStatus.NOT_FOUND);
+    return getResponseEntityMessage(THE_GIVEN_URL_IS_NOT_FOUND, HttpStatus.NOT_FOUND);
   }
 }

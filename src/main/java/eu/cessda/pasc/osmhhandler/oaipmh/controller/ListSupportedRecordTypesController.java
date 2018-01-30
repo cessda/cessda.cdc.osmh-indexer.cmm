@@ -1,7 +1,6 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.errors.ErrorMessage;
 import eu.cessda.pasc.osmhhandler.oaipmh.service.APISupportedService;
 import io.swagger.annotations.Api;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.*;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerErrorMessageUtil.getSimpleResponseMessage;
 
 /**
  * Controller to handle request for supported Record Types per supported API version.
@@ -33,15 +31,12 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerErrorMessageUtil.
     tags = {"ListSupportedRecordTypes"})
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 @Slf4j
-public class ListSupportedRecordTypesController {
+public class ListSupportedRecordTypesController extends ControllerBase{
 
   private static final String GETS_A_LIST_OF_SUPPORTED_RECORD_TYPES = "Gets a list of Supported Record Types.";
 
   @Autowired
   APISupportedService apiSupportedService;
-
-  @Autowired
-  ObjectMapper objectMapper;
 
   @RequestMapping(method = RequestMethod.GET)
   @ApiOperation(value = GETS_A_LIST_OF_SUPPORTED_RECORD_TYPES,
@@ -59,10 +54,9 @@ public class ListSupportedRecordTypesController {
         String valueAsString = objectMapper.writeValueAsString(apiSupportedService.getSupportedRecordTypes());
         return new ResponseEntity<>(valueAsString, HttpStatus.OK);
       }
-      return new ResponseEntity<>(getSimpleResponseMessage(UNSUPPORTED_API_VERSION), HttpStatus.BAD_REQUEST);
+      return getResponseEntityMessage(UNSUPPORTED_API_VERSION, HttpStatus.BAD_REQUEST);
     } catch (JsonProcessingException e) {
-      log.debug(SYSTEM_ERROR, e.getMessage());
-      return new ResponseEntity<>(getSimpleResponseMessage(SYSTEM_ERROR), HttpStatus.INTERNAL_SERVER_ERROR);
+      return logAndGetResponseEntityMessage(SYSTEM_ERROR + ": " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -74,7 +68,7 @@ public class ListSupportedRecordTypesController {
   })
   public ResponseEntity<String> getSupportedRecordTypesForOtherPaths(@PathVariable String version) {
 
-    return new ResponseEntity<>(getSimpleResponseMessage(THE_GIVEN_URL_IS_NOT_FOUND), HttpStatus.NOT_FOUND);
+    return getResponseEntityMessage(THE_GIVEN_URL_IS_NOT_FOUND, HttpStatus.NOT_FOUND);
   }
 
 }

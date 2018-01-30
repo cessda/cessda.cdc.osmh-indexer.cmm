@@ -23,6 +23,6 @@ public class HandlerConstants {
   public static final String THE_GIVEN_URL_IS_NOT_FOUND = "The given url is not found!";
 
   public static final String RETURN_404_FOR_OTHER_PATHS = "Return 404 for other paths.";
-  static final String MESSAGE = "message";
+  public static final String MESSAGE = "message";
   public static final String RECORD_HEADER = "RecordHeader";
 }

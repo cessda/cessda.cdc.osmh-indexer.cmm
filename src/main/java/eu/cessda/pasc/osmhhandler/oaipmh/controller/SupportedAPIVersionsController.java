@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.*;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerErrorMessageUtil.getSimpleResponseMessage;
 
 /**
  * Controller to handle request for services, versions and metadata formats supported by this api
@@ -29,7 +28,7 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerErrorMessageUtil.
 @RequestMapping("/SupportedVersions")
 @Api(value = "SupportedVersions", description = "REST API for supported api versions", tags = {"SupportedVersions"})
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class SupportedAPIVersionsController {
+public class SupportedAPIVersionsController extends ControllerBase{
 
   @Autowired
   APISupportedService apiSupportedService;
@@ -47,7 +46,6 @@ public class SupportedAPIVersionsController {
     return new ResponseEntity<>(apiSupportedService.getSupportedVersion(), HttpStatus.OK);
   }
 
-
   @RequestMapping(path = "*", method = RequestMethod.GET)
   @ApiOperation(value = RETURN_404_FOR_OTHER_PATHS,
       response = String.class, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -56,6 +54,6 @@ public class SupportedAPIVersionsController {
   })
   public ResponseEntity<String> getSupportedVersionForOtherPaths() {
 
-    return new ResponseEntity<>(getSimpleResponseMessage(THE_GIVEN_URL_IS_NOT_FOUND), HttpStatus.NOT_FOUND);
+    return getResponseEntityMessage(THE_GIVEN_URL_IS_NOT_FOUND, HttpStatus.NOT_FOUND);
   }
 }
