@@ -40,8 +40,17 @@ public class CMMStudyTestData {
    * Loads up a valid but deleted xml record example
    * @return the xml String
    */
-  public static String getDdiRecord1031() {
+  public static String getDdiRecord1031Deleted() {
     FileHandler fileHandler = new FileHandler();
     return fileHandler.getFileWithUtil("xml/ddi_record_1031_deleted.xml");
+  }
+
+  /**
+   * Loads up a record with an <error> element
+   * @return the xml String
+   */
+  public static String getDdiRecordWithError() {
+    FileHandler fileHandler = new FileHandler();
+    return fileHandler.getFileWithUtil("xml/ddi_record_WithError.xml");
   }
 }

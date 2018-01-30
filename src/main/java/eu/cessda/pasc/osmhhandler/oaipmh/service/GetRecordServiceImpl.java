@@ -2,9 +2,12 @@ package eu.cessda.pasc.osmhhandler.oaipmh.service;
 
 import eu.cessda.pasc.osmhhandler.oaipmh.configuration.PaSCHandlerOaiPmhConfig;
 import eu.cessda.pasc.osmhhandler.oaipmh.dao.GetRecordDoa;
+import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
+import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.InternalSystemException;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.configuration.OaiPmh;
+import eu.cessda.pasc.osmhhandler.oaipmh.models.errors.ErrorStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
@@ -21,6 +24,8 @@ import java.io.InputStream;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.*;
 
 /**
+ * Service Class responsible for querying the repository to fetch remote records.
+ *
  * @author moses@doraventures.com
  */
 @Service
@@ -36,7 +41,7 @@ public class GetRecordServiceImpl implements GetRecordService {
   private static final XPathFactory X_FACTORY = XPathFactory.instance();
 
   @Override
-  public CMMStudy getRecord(String repository, String studyId) throws InternalSystemException {
+  public CMMStudy getRecord(String repository, String studyId) throws CustomHandlerException {
     CMMStudy.CMMStudyBuilder builder = CMMStudy.builder();
     String recordXML = getRecordDoa.getRecordXML(repository, studyId);
 
@@ -49,36 +54,41 @@ public class GetRecordServiceImpl implements GetRecordService {
   }
 
   private void mapDDIRecordToCMMStudy(String recordXML, CMMStudy.CMMStudyBuilder builder)
-      throws JDOMException, IOException {
+      throws JDOMException, IOException, ExternalSystemException {
 
     OaiPmh oaiPmh = handlerConfig.getOaiPmh();
     InputStream recordXMLStream = IOUtils.toInputStream(recordXML, Charsets.UTF_8);
     SAXBuilder saxBuilder = new SAXBuilder();
     Document document = saxBuilder.build(recordXMLStream);
 
-    // TODO:  Does it have an <Error> extract message and throw custom ExternalSystemError with message
-    // use test payload "exampleXMLWithError()" to test this scenario
-    // validateForError((builder, document, X_FACTORY);
+    // We exit if the record has an <error> element
+    ErrorStatus errorStatus = validateRecord(document, X_FACTORY);
+    if (errorStatus.isHasError()) {
+      throw new ExternalSystemException(errorStatus.getMessage());
+    }
 
-    parseHeaderElement(builder, document, X_FACTORY);
-    parseStudyTitle(builder, document, X_FACTORY, oaiPmh);
-    parseAbstract(builder, document, X_FACTORY, oaiPmh);
-    parseYrOfPublication(builder, document, X_FACTORY, oaiPmh);
-    parsePidStudies(builder, document, X_FACTORY);
-    parseCreator(builder, document, X_FACTORY);
-    parseAccessClass(builder, document, X_FACTORY);
-    parseDataAccess(builder, document, X_FACTORY, oaiPmh);
-    parseDataCollectionPeriods(builder, document, X_FACTORY);
-    parseInstitutionFullName(builder, document, X_FACTORY, oaiPmh);
-    parseClassifications(builder, document, X_FACTORY);
-    parseKeywords(builder, document, X_FACTORY);
-    parseTypeOfTimeMethod(builder, document, X_FACTORY);
-    parseStudyAreaCountries(builder, document, X_FACTORY);
-    parseUnitTypes(builder, document, X_FACTORY);
-    parsePublisher(builder, document, X_FACTORY);
-    parseFileLanguages(builder, document, X_FACTORY);
-    parseTypeOfSamplingProcedure(builder, document, X_FACTORY);
-    parseSamplingProcedure(builder, document, X_FACTORY, oaiPmh);
-    parseTypeOfModeOfCollection(builder, document, X_FACTORY);
+    // Short-Circuit. We carry on to parse beyond the headers only if record is active
+    boolean isActiveRecord = parseHeaderElement(builder, document, X_FACTORY);
+    if (isActiveRecord) {
+      parseStudyTitle(builder, document, X_FACTORY, oaiPmh);
+      parseAbstract(builder, document, X_FACTORY, oaiPmh);
+      parseYrOfPublication(builder, document, X_FACTORY, oaiPmh);
+      parsePidStudies(builder, document, X_FACTORY);
+      parseCreator(builder, document, X_FACTORY);
+      parseAccessClass(builder, document, X_FACTORY);
+      parseDataAccess(builder, document, X_FACTORY, oaiPmh);
+      parseDataCollectionPeriods(builder, document, X_FACTORY);
+      parseInstitutionFullName(builder, document, X_FACTORY, oaiPmh);
+      parseClassifications(builder, document, X_FACTORY);
+      parseKeywords(builder, document, X_FACTORY);
+      parseTypeOfTimeMethod(builder, document, X_FACTORY);
+      parseStudyAreaCountries(builder, document, X_FACTORY);
+      parseUnitTypes(builder, document, X_FACTORY);
+      parsePublisher(builder, document, X_FACTORY);
+      parseFileLanguages(builder, document, X_FACTORY);
+      parseTypeOfSamplingProcedure(builder, document, X_FACTORY);
+      parseSamplingProcedure(builder, document, X_FACTORY, oaiPmh);
+      parseTypeOfModeOfCollection(builder, document, X_FACTORY);
+    }
   }
 }

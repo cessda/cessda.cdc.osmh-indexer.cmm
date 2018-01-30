@@ -2,6 +2,7 @@ package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.configuration.OaiPmh;
+import eu.cessda.pasc.osmhhandler.oaipmh.models.errors.ErrorStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
@@ -41,22 +42,45 @@ public class CMMStudyMapper {
    * <p>
    * </ul>
    * Actual path used: /record/header/identifier
+   *
+   * @param builder  the document builder
+   * @param document the document to parse
+   * @param xFactory the xFactory
+   * @return true if record is active
    */
-  public static void parseHeaderElement(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
+  public static boolean parseHeaderElement(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
     parseStudyNumber(builder, document, xFactory);
     parseLastModified(builder, document, xFactory);
-    parseRecordStatus(builder, document, xFactory);
+    return parseRecordStatus(builder, document, xFactory);
   }
 
   /**
    * Pass records status.
-   * <p>
-   * Defaults to false at initialisation. No need for set false on an else block.
    */
-  private static void parseRecordStatus(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
+  private static boolean parseRecordStatus(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
     XPathExpression<Attribute> attributeExpression = xFactory.compile(RECORD_STATUS_XPATH, Filters.attribute(), null, OAI_NS);
     Attribute status = attributeExpression.evaluateFirst(document);
-    if (null == status || !"deleted".equalsIgnoreCase(status.getValue())) builder.active(true);
+    boolean isActive = null == status || !"deleted".equalsIgnoreCase(status.getValue());
+    builder.active(isActive);
+    return isActive;
+  }
+
+  /**
+   * Checks if the record has an <error> element.
+   *
+   * @param document the document to map to.
+   * @param xFactory the Path Factory.
+   * @return ErrorStatus of the record.
+   */
+  public static ErrorStatus validateRecord(Document document, XPathFactory xFactory) {
+
+    ErrorStatus.ErrorStatusBuilder statusBuilder = ErrorStatus.builder();
+    Element firstElements = getFirstElements(document, xFactory, "//oai:error");
+    if (null != firstElements) {
+      statusBuilder.hasError(true);
+      statusBuilder.message(firstElements.getValue());
+    }
+    return statusBuilder.build();
   }
 
   /**

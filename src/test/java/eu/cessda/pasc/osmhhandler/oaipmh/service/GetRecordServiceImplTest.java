@@ -7,7 +7,8 @@ import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import eu.cessda.pasc.osmhhandler.oaipmh.dao.GetRecordDoa;
-import eu.cessda.pasc.osmhhandler.oaipmh.exception.InternalSystemException;
+import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
+import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
 import eu.cessda.pasc.osmhhandler.oaipmh.helpers.FileHandler;
 import eu.cessda.pasc.osmhhandler.oaipmh.mock.data.CMMStudyTestData;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMConverter;
@@ -47,7 +48,7 @@ public class GetRecordServiceImplTest {
 
   @Test
   public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord()
-      throws IOException, ProcessingException, InternalSystemException, JSONException {
+      throws IOException, ProcessingException, CustomHandlerException, JSONException {
 
     // Given
     String repoUrl = "";
@@ -64,19 +65,34 @@ public class GetRecordServiceImplTest {
 
   @Test()
   public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord_MarkedAsNotActive()
-      throws InternalSystemException {
+      throws CustomHandlerException {
 
     // Given
     String repoUrl = "";
     String studyIdentifier = "";
 
-    given(getRecordDoa.getRecordXML(repoUrl, studyIdentifier)).willReturn(CMMStudyTestData.getDdiRecord1031());
+    given(getRecordDoa.getRecordXML(repoUrl, studyIdentifier)).willReturn(CMMStudyTestData.getDdiRecord1031Deleted());
 
     // When
     CMMStudy record = recordService.getRecord(repoUrl, studyIdentifier);
 
     then(record).isNotNull();
     then(record.isActive()).isFalse();
+  }
+
+  @Test(expected = ExternalSystemException.class)
+  public void shouldThrowExceptionForRecordWithErrorElement() throws CustomHandlerException {
+
+    // Given
+    String repoUrl = "www.myurl.com";
+    String studyIdentifier = "Id12214";
+
+    given(getRecordDoa.getRecordXML(repoUrl, studyIdentifier)).willReturn(CMMStudyTestData.getDdiRecordWithError());
+
+    // When
+    recordService.getRecord(repoUrl, studyIdentifier);
+
+    // Then an exception is thrown.
   }
 
   private void validateCMMStudyAgainstSchema(CMMStudy record) throws IOException, ProcessingException, JSONException {

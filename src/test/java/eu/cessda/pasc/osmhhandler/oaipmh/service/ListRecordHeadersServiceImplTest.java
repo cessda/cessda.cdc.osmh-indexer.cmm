@@ -84,23 +84,4 @@ public class ListRecordHeadersServiceImplTest {
         .containsOnly("2017-11-20T10:37:18Z", "2018-01-11T07:43:20Z", "2018-01-11T07:43:39Z");
     then(recordHeaders).extracting("type").containsOnly("Study");
   }
-
-
-
-
-  //TODO: Should catch error in xml response and process accordingly...
-  String exampleXMLWithError =
-      "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
-          "<?xml-stylesheet type='text/xsl' href='oai2.xsl' ?>\n" +
-          "<OAI-PMH xmlns=\"http://www.openarchives.org/OAI/2.0/\"\n" +
-          " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-          " xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/\n" +
-          " http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd\">\n" +
-          "    <responseDate>2018-01-12T09:56:40Z</responseDate>\n" +
-          "    <request verb=\"ListIdentifiers\" metadataPrefix=\"ddiff\" " +
-          "from=\"2017-01-01\">https://oai.ukdataservice.ac.uk:8443/oai/provider</request>\n" +
-          "    <error code=\"cannotDisseminateFormat\">This repository has no items available in " +
-          "format &#39;ddiff&#39;</error>\n" +
-          "</OAI-PMH>";
-
 }
