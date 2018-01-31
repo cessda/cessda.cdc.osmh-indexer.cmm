@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: SERVICENAME
+  namespace: NAMESPACE
+  labels:
+    app: SERVICENAME
+spec:
+  selector:
+    app: SERVICENAME
+  ports:
+    - port: 9091
+      protocol: TCP
+      targetPort: osmh-indexer-cport
+  type: LoadBalancer
