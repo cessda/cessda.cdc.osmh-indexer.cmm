@@ -9,7 +9,7 @@ spec:
   selector:
     app: SERVICENAME
   ports:
-    - port: 9091
+    - port: 9092
       protocol: TCP
       targetPort: osmh-indexer-cport
   type: LoadBalancer

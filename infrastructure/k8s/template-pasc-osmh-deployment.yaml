@@ -15,7 +15,7 @@ spec:
       - name: DEPLOYMENTNAME
         image: eu.gcr.io/cessda-development/pasc-osmh-indexer:latest
         ports:
-        - containerPort: 9091
+        - containerPort: 9092
           name: osmh-indexer-cport
       nodeSelector:
         app: global
