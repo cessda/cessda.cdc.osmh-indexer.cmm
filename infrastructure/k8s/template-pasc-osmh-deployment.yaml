@@ -16,6 +16,6 @@ spec:
         image: eu.gcr.io/cessda-development/pasc-osmh:latest
         ports:
         - containerPort: 9091
-          name: osmh-cport
+          name: osmh-rep-cport
       nodeSelector:
         app: global
