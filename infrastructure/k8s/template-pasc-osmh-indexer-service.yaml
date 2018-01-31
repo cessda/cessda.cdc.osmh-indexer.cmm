@@ -11,5 +11,5 @@ spec:
   ports:
     - port: 9092
       protocol: TCP
-      targetPort: osmh-indexer-cport
+      targetPort: osmh-ind-cport
   type: LoadBalancer
