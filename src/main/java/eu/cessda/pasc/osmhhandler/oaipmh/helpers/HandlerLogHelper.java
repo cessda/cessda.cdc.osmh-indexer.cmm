@@ -14,6 +14,8 @@ import java.time.LocalDateTime;
  */
 public class HandlerLogHelper {
 
+  private static final String ERROR = "ERROR";
+
   private HandlerLogHelper() {
     throw new UnsupportedOperationException("Hides implicit public constructor | For static constants only");
   }
@@ -26,13 +28,9 @@ public class HandlerLogHelper {
         .responseMessage(statusCode.getReasonPhrase())
         .occurredAt(LocalDateTime.now()).build().toString();
 
-    switch (logLevel.toString()) {
-      case "ERROR":
-        log.error(msg);
-        break;
-      case "WARN":
-        log.warn(msg);
-        break;
+    String s = logLevel.toString();
+    if (ERROR.equals(s)) {
+      log.error(msg);
     }
   }
 }

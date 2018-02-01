@@ -18,6 +18,7 @@ import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.test.web.client.ExpectedCount.once;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 /**
@@ -58,5 +59,18 @@ public class GetRecordDoaImplTest {
     then(responseXMLRecord).isNotEmpty();
     then(responseXMLRecord).isNotBlank();
     then(responseXMLRecord).isEqualToIgnoringCase(CMMStudyTestData.getDdiRecord1683());
+  }
+
+  @Test(expected = ExternalSystemException.class)
+  public void shouldThrowExceptionWhenRemoteServerResponseIsNotSuccessful() throws ExternalSystemException {
+
+    // Given
+    String expected_url = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=GetRecord&identifier=1683&metadataPrefix=ddi";
+    mockRestServiceServer.expect(once(), requestTo(expected_url))
+        .andExpect(method(GET))
+        .andRespond(withBadRequest());
+
+    // When
+    recordDoa.getRecordXML("https://oai.ukdataservice.ac.uk:8443/oai/provider", "1683");
   }
 }

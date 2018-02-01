@@ -30,16 +30,10 @@ public class DaoBase {
 
     try {
       responseEntity = configuration.getRestTemplate().getForEntity(fullUrl, String.class);
-    } catch (RestClientException e) {
-      throw new ExternalSystemException(UNSUCCESSFUL_RESPONSE, e.getCause());
-    }
-
-    HttpStatus statusCode = responseEntity.getStatusCode();
-    if (statusCode.is2xxSuccessful()) {
       return responseEntity.getBody();
-    } else {
-      logResponse(statusCode, log, LogLevel.ERROR);
-      throw new ExternalSystemException(UNSUCCESSFUL_RESPONSE);
+    } catch (RestClientException e) {
+      logResponse(HttpStatus.NOT_ACCEPTABLE, log, LogLevel.ERROR);
+      throw new ExternalSystemException(UNSUCCESSFUL_RESPONSE, e.getCause());
     }
   }
 }

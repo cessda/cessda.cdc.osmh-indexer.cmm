@@ -21,7 +21,7 @@ public class FileHandler {
     ClassLoader classLoader = getClass().getClassLoader();
     try {
       result = IOUtils.toString(classLoader.getResourceAsStream(fileName));
-    } catch (IOException e) {
+    } catch (IOException | NullPointerException e) {
       log.error("Could not read file successfully [{}]", e.getMessage());
     }
     return result;
