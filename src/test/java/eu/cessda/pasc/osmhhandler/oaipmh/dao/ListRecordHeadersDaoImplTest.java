@@ -1,6 +1,6 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.dao;
 
-import eu.cessda.pasc.osmhhandler.oaipmh.exception.InternalSystemException;
+import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,7 +43,7 @@ public class ListRecordHeadersDaoImplTest {
 
 
   @Test
-  public void shouldReturnXmlPayloadOfRecordHeadersFromRemoteRepository() throws InternalSystemException {
+  public void shouldReturnXmlPayloadOfRecordHeadersFromRemoteRepository() throws CustomHandlerException {
 
     // Given
     String expected_url= "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=ListIdentifiers&metadataPrefix=ddi";

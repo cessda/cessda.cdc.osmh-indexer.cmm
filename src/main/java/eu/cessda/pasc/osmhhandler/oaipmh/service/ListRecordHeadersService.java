@@ -1,6 +1,6 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.service;
 
-import eu.cessda.pasc.osmhhandler.oaipmh.exception.InternalSystemException;
+import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.response.RecordHeader;
 
 import java.util.List;
@@ -11,5 +11,5 @@ import java.util.List;
  * @author moses@doraventures.com
  */
 public interface ListRecordHeadersService {
-  List<RecordHeader> getRecordHeaders(String baseRepoUrl) throws InternalSystemException;
+  List<RecordHeader> getRecordHeaders(String baseRepoUrl) throws CustomHandlerException;
 }

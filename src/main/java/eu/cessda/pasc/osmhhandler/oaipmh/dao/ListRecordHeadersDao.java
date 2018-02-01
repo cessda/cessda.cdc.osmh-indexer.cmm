@@ -1,6 +1,6 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.dao;
 
-import eu.cessda.pasc.osmhhandler.oaipmh.exception.InternalSystemException;
+import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
 
 /**
  * Data access object Contract for querying remote repository for RecordHeaders
@@ -9,7 +9,7 @@ import eu.cessda.pasc.osmhhandler.oaipmh.exception.InternalSystemException;
  */
 public interface ListRecordHeadersDao {
 
-  String listRecordHeaders(String baseRepoUrl) throws InternalSystemException;
+  String listRecordHeaders(String baseRepoUrl) throws ExternalSystemException;
 
-  String listRecordHeadersResumption(String baseRepoUrl) throws InternalSystemException;
+  String listRecordHeadersResumption(String baseRepoUrl) throws ExternalSystemException;
 }

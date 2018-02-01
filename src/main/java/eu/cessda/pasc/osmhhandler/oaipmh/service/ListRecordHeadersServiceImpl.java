@@ -1,6 +1,7 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.service;
 
 import eu.cessda.pasc.osmhhandler.oaipmh.dao.ListRecordHeadersDao;
+import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.InternalSystemException;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.response.RecordHeader;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +42,7 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
   private DocumentBuilder builder;
 
   @Override
-  public List<RecordHeader> getRecordHeaders(String baseRepoUrl) throws InternalSystemException {
+  public List<RecordHeader> getRecordHeaders(String baseRepoUrl) throws CustomHandlerException {
 
     String recordHeadersXMLString = listRecordHeadersDao.listRecordHeaders(baseRepoUrl);
     Document doc = getDocument(recordHeadersXMLString);
@@ -70,7 +71,7 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
   }
 
   private List<RecordHeader> retrieveRecordHeaders(List<RecordHeader> recordHeaders, Document doc, String baseRepoUrl)
-      throws InternalSystemException {
+      throws CustomHandlerException {
 
     parseRecordHeaders(recordHeaders, doc);
     String resumptionToken = parseResumptionToken(doc);

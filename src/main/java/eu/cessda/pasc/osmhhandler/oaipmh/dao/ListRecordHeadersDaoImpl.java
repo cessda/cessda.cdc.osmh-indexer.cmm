@@ -1,5 +1,6 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.dao;
 
+import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.InternalSystemException;
 import org.springframework.stereotype.Repository;
 
@@ -14,13 +15,13 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhHelpers.appendList
 public class ListRecordHeadersDaoImpl extends DaoBase implements ListRecordHeadersDao {
 
   @Override
-  public String listRecordHeaders(String baseRepoUrl) throws InternalSystemException {
+  public String listRecordHeaders(String baseRepoUrl) throws ExternalSystemException {
     String finalListRecordUrl = appendListRecordParams(baseRepoUrl);
     return postForStringResponse(finalListRecordUrl);
   }
 
   @Override
-  public String listRecordHeadersResumption(String repoUrlWithResumptionToken) throws InternalSystemException {
+  public String listRecordHeadersResumption(String repoUrlWithResumptionToken) throws ExternalSystemException {
     return postForStringResponse(repoUrlWithResumptionToken);
   }
 }

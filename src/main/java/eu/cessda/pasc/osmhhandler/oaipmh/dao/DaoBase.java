@@ -1,7 +1,7 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.dao;
 
 import eu.cessda.pasc.osmhhandler.oaipmh.configuration.UtilitiesConfiguration;
-import eu.cessda.pasc.osmhhandler.oaipmh.exception.InternalSystemException;
+import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.logging.LogLevel;
@@ -25,13 +25,13 @@ public class DaoBase {
   @Autowired
   UtilitiesConfiguration configuration;
 
-  String postForStringResponse(String fullUrl) throws InternalSystemException {
+  String postForStringResponse(String fullUrl) throws ExternalSystemException {
     ResponseEntity<String> responseEntity;
 
     try {
       responseEntity = configuration.getRestTemplate().getForEntity(fullUrl, String.class);
     } catch (RestClientException e) {
-      throw new InternalSystemException(UNSUCCESSFUL_RESPONSE, e.getCause());
+      throw new ExternalSystemException(UNSUCCESSFUL_RESPONSE, e.getCause());
     }
 
     HttpStatus statusCode = responseEntity.getStatusCode();
@@ -39,7 +39,7 @@ public class DaoBase {
       return responseEntity.getBody();
     } else {
       logResponse(statusCode, log, LogLevel.ERROR);
-      throw new InternalSystemException(UNSUCCESSFUL_RESPONSE);
+      throw new ExternalSystemException(UNSUCCESSFUL_RESPONSE);
     }
   }
 }

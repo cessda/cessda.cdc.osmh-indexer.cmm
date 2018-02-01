@@ -23,7 +23,7 @@ public class OaiPmhConstants {
 
   static final String IDENTIFIER_XPATH = "//oai:header/oai:identifier[1]";
   static final String RECORD_STATUS_XPATH = "//oai:header/@status";
-  static final String LAST_MODIFIED_DATE_XPATH = "//oai:header/datestamp[1]";
+  static final String LAST_MODIFIED_DATE_XPATH = "//oai:header/oai:datestamp[1]";
   static final String YEAR_OF_PUB_XPATH = "//ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:distDate[1]";
   static final String ABSTRACT_XPATH = "//ddi:stdyInfo/ddi:abstract";
   static final String TITLE_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:titl";
@@ -70,6 +70,7 @@ public class OaiPmhConstants {
   static final String LIST_IDENTIFIERS_VALUE = "ListIdentifiers";
   static final String GET_RECORD_VALUE = "GetRecord";
   static final String METADATA_DDI_2_5_VALUE = "ddi";
+  static final String ERROR_PATH = "//oai:error";
 
   private OaiPmhConstants() {
     throw new UnsupportedOperationException("Utility class, instantiation not allow");

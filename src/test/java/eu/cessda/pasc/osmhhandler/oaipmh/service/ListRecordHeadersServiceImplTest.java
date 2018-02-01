@@ -1,7 +1,7 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.service;
 
 import eu.cessda.pasc.osmhhandler.oaipmh.dao.ListRecordHeadersDao;
-import eu.cessda.pasc.osmhhandler.oaipmh.exception.InternalSystemException;
+import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
 import eu.cessda.pasc.osmhhandler.oaipmh.mock.data.RecordHeadersMock;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.response.RecordHeader;
 import org.junit.Test;
@@ -34,7 +34,7 @@ public class ListRecordHeadersServiceImplTest {
   ListRecordHeadersService listRecordHeadersService;
 
   @Test
-  public void shouldReturnRecordHeadersForGivenRepo() throws InternalSystemException {
+  public void shouldReturnRecordHeadersForGivenRepo() throws CustomHandlerException {
 
     // Given
     String repoUrl = "www.my-fake-url.com";
@@ -52,7 +52,7 @@ public class ListRecordHeadersServiceImplTest {
 
   @Test
   public void shouldRecursivelyLoopThroughTheOaiPMHResponseResumptionTokenToRetrieveReposCompleteListSize()
-      throws InternalSystemException {
+      throws CustomHandlerException {
 
     // Given
     String repoBaseUrl = "www.my-fake-url.com";

@@ -11,9 +11,10 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.DocElementParser.*;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
@@ -75,11 +76,11 @@ public class CMMStudyMapper {
   public static ErrorStatus validateRecord(Document document, XPathFactory xFactory) {
 
     ErrorStatus.ErrorStatusBuilder statusBuilder = ErrorStatus.builder();
-    Element firstElements = getFirstElements(document, xFactory, "//oai:error");
-    if (null != firstElements) {
-      statusBuilder.hasError(true);
-      statusBuilder.message(firstElements.getValue());
-    }
+    getFirstElement(document, xFactory, ERROR_PATH)
+        .ifPresent((Element element) ->
+            statusBuilder.hasError(true).message(element.getValue())
+        );
+
     return statusBuilder.build();
   }
 
@@ -87,18 +88,36 @@ public class CMMStudyMapper {
    * Parse last Modified.
    */
   private static void parseLastModified(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
-    XPathExpression<Element> elementExpression = xFactory.compile(LAST_MODIFIED_DATE_XPATH, Filters.element(), null, OAI_NS);
-    Element element = elementExpression.evaluateFirst(document);
-    if (null != element) builder.lastModified(element.getValue());
+    getFirstElement(document, xFactory, LAST_MODIFIED_DATE_XPATH)
+        .ifPresent((Element element) -> builder.lastModified(element.getValue()));
   }
 
   /**
    * Parse study number.
    */
   private static void parseStudyNumber(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
-    XPathExpression<Element> elementExpression = xFactory.compile(IDENTIFIER_XPATH, Filters.element(), null, OAI_NS);
-    Element element = elementExpression.evaluateFirst(document);
-    if (null != element) builder.studyNumber(element.getValue());
+    getFirstElement(document, xFactory, IDENTIFIER_XPATH)
+        .ifPresent((Element element) -> builder.studyNumber(element.getValue()));
+  }
+
+  /**
+   * Access Class Name from:
+   * <p>
+   * Xpath = {@value OaiPmhConstants#ACCESS_CLASS_XPATH }
+   */
+  public static void parseAccessClass(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
+    getFirstElement(document, xFactory, ACCESS_CLASS_XPATH)
+        .ifPresent(element -> builder.accessClass(element.getValue()));
+  }
+
+  /**
+   * Parse Publisher from:
+   * <p>
+   * Xpath = {@value OaiPmhConstants#PUBLISHER_XPATH }
+   */
+  public static void parsePublisher(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
+    getFirstElement(document, xFactory, PUBLISHER_XPATH)
+        .ifPresent(element -> builder.publisher(element.getValue()));
   }
 
   /**
@@ -135,15 +154,15 @@ public class CMMStudyMapper {
   public static void parseYrOfPublication(
       CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
 
-    Element yrOfPublicationDate = getFirstElements(document, xFactory, YEAR_OF_PUB_XPATH);
-    if (null != yrOfPublicationDate) {
+    Optional<Element> yrOfPublicationDate = getFirstElement(document, xFactory, YEAR_OF_PUB_XPATH);
+    yrOfPublicationDate.ifPresent((Element element) -> {
       try {
-        builder.publicationYear(Integer.parseInt(yrOfPublicationDate.getValue()));
+        builder.publicationYear(Integer.parseInt(element.getValue()));
       } catch (NumberFormatException e) {
         log.warn("Could not parse year to Int. Defaulting to 1970");
         builder.publicationYear(config.getPublicationYearDefault());
       }
-    }
+    });
   }
 
   /**
@@ -162,13 +181,14 @@ public class CMMStudyMapper {
    * Xpath = {@value OaiPmhConstants#CREATORS_XPATH }
    */
   public static void parseCreator(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
+
     List<Element> elements = getElements(document, xFactory, CREATORS_XPATH);
-    List<String> creators = new ArrayList<>();
-    for (Element element : elements) {
-      String affiliationAttr = element.getAttributeValue(CREATOR_AFFILIATION_ATTR);
-      creators.add(null == affiliationAttr ? element.getValue() : element.getValue() + "(" + affiliationAttr + ")");
-    }
-    builder.creators(creators.toArray(new String[0]));
+    String[] myFinalList = elements.stream()
+        .filter(Objects::nonNull)
+        .map(DocElementParser::extractCreatorWithAffiliation)
+        .toArray(String[]::new);
+
+    builder.creators(myFinalList);
   }
 
   /**
@@ -264,26 +284,6 @@ public class CMMStudyMapper {
   public static void parseFileLanguages(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
     String[] typeOfTimeMethods = getAttributeValues(document, xFactory, FILE_LANGUAGES_XPATH);
     builder.unitTypes(typeOfTimeMethods);
-  }
-
-  /**
-   * Access Class Name from:
-   * <p>
-   * Xpath = {@value OaiPmhConstants#ACCESS_CLASS_XPATH }
-   */
-  public static void parseAccessClass(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
-    List<Element> accessClasses = getElements(document, xFactory, ACCESS_CLASS_XPATH);
-    accessClasses.stream().findFirst().ifPresent(element -> builder.accessClass(element.getValue()));
-  }
-
-  /**
-   * Access Class Name from:
-   * <p>
-   * Xpath = {@value OaiPmhConstants#PUBLISHER_XPATH }
-   */
-  public static void parsePublisher(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
-    List<Element> accessClasses = getElements(document, xFactory, PUBLISHER_XPATH);
-    accessClasses.stream().findFirst().ifPresent(element -> builder.publisher(element.getValue()));
   }
 
   /**

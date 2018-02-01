@@ -8,11 +8,10 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Helper methods for extracting values from a {@link org.jdom2.Document }
@@ -35,17 +34,25 @@ class DocElementParser {
    */
   static String[] getElementValues(Document document, XPathFactory xFactory, String classificationsXpath) {
     List<Element> elements = getElements(document, xFactory, classificationsXpath);
-    return elements.stream().map(Element::getValue).toArray(String[]::new);
+    return elements.stream().filter(Objects::nonNull).map(Element::getValue).toArray(String[]::new);
   }
 
+  /**
+   * Extracts elements from doc
+   *
+   * @param document       the document to parse
+   * @param xFactory       the xFactory
+   * @param xPathToElement the xPath
+   * @return nonNull list of {@link Element}
+   */
   static List<Element> getElements(Document document, XPathFactory xFactory, String xPathToElement) {
     XPathExpression<Element> expression = xFactory.compile(xPathToElement, Filters.element(), null, OAI_AND_DDI_NS);
-    return expression.evaluate(document);
+    return expression.evaluate(document).stream().filter(Objects::nonNull).collect(toList());
   }
 
-  static Element getFirstElements(Document document, XPathFactory xFactory, String xPathToElement) {
+  static Optional<Element> getFirstElement(Document document, XPathFactory xFactory, String xPathToElement) {
     XPathExpression<Element> expression = xFactory.compile(xPathToElement, Filters.element(), null, OAI_AND_DDI_NS);
-    return expression.evaluateFirst(document);
+    return Optional.ofNullable(expression.evaluateFirst(document));
   }
 
   /**
@@ -106,5 +113,10 @@ class DocElementParser {
     } else {
       titlesMap.put(config.getMetadataParsingDefaultLang().getLang(), element.getValue()); // set first
     }
+  }
+
+  public static String extractCreatorWithAffiliation(Element element) {
+    String affiliationAttr = element.getAttributeValue(CREATOR_AFFILIATION_ATTR);
+    return (null == affiliationAttr) ? element.getValue() : (element.getValue() + "(" + affiliationAttr + ")");
   }
 }
