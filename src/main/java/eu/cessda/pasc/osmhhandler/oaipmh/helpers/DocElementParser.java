@@ -34,7 +34,11 @@ class DocElementParser {
    */
   static String[] getElementValues(Document document, XPathFactory xFactory, String classificationsXpath) {
     List<Element> elements = getElements(document, xFactory, classificationsXpath);
-    return elements.stream().filter(Objects::nonNull).map(Element::getValue).toArray(String[]::new);
+    return elements.stream()
+        .filter(Objects::nonNull)
+        .map(Element::getValue)
+        .filter(s -> !s.isEmpty())
+        .toArray(String[]::new);
   }
 
   /**
@@ -117,6 +121,6 @@ class DocElementParser {
 
   public static String extractCreatorWithAffiliation(Element element) {
     String affiliationAttr = element.getAttributeValue(CREATOR_AFFILIATION_ATTR);
-    return (null == affiliationAttr) ? element.getValue() : (element.getValue() + "(" + affiliationAttr + ")");
+    return (null == affiliationAttr) ? element.getValue() : (element.getValue() + " (" + affiliationAttr + ")");
   }
 }
