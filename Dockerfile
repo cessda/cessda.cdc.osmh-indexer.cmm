@@ -12,4 +12,4 @@ ADD ./target/pasc-osmh-handler.oai-pmh*.jar pasc-osmh-handler.oai-pmh.jar
 ENV JAVA_OPTS ""
 
 # Entrypoint - Start Admin
-ENTRYPOINT exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /pasc-osmh-handler.oai-pmh.jar -Dspring.profiles.active=dev
+ENTRYPOINT exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar -Dspring.profiles.active=dev /pasc-osmh-handler.oai-pmh.jar
