@@ -20,7 +20,7 @@ import static java.util.stream.Collectors.toList;
  */
 class DocElementParser {
 
-  private DocElementParser() throws RuntimeException {
+  private DocElementParser() {
     throw new UnsupportedOperationException("Utility class, instantiation not allow");
   }
 

@@ -27,22 +27,24 @@ Prepares a clean jar package
 ### Run it 
 Runs the built jar
 
-    java -Xms2G -Xmx4G -jar target/pasc-osmh-handler.oai-pmh*.jar 
+    java -Xms2G -Xmx4G -jar target/pasc-osmh-handler-oai-pmh*.jar 
     
 ### Run it one-liner
 
-    mvn clean package && java -Xms2G -Xmx4G -jar target/pasc-osmh-handler.oai-pmh*.jar
+    mvn clean package && java -Xms2G -Xmx4G -jar target/pasc-osmh-handler-oai-pmh*.jar
 
 
 ### Run it - with profile
 The profile will apply the specified environment property for a given profile
 
-    java -jar -Dspring.profiles.active=dev target/pasc-osmh-handler.oai-pmh*.jar
-    java -jar -Dspring.profiles.active=uat target/pasc-osmh-handler.oai-pmh*.jar
-    java -jar -Dspring.profiles.active=prod target/pasc-osmh-handler.oai-pmh*.jar
+    java -jar -Dspring.profiles.active=dev target/pasc-osmh-handler-oai-pmh*.jar
+    java -jar -Dspring.profiles.active=uat target/pasc-osmh-handler-oai-pmh*.jar
+    java -jar -Dspring.profiles.active=prod target/pasc-osmh-handler-oai-pmh*.jar
 
 Note if no profile flag is set the default profile will be used. Which is non.
 
+### Run it development
+    mvn spring-boot:run
 
 # Debug/Test it with Swagger UI API documentation
    - [Localhost](http://localhost:9091/swagger-ui.html#/) http://localhost:<port>/<context-base>/swagger-ui.html#/

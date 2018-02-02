@@ -43,6 +43,7 @@ public class GetRecordServiceImpl implements GetRecordService {
   @Override
   public CMMStudy getRecord(String repository, String studyId) throws CustomHandlerException {
     CMMStudy.CMMStudyBuilder builder = CMMStudy.builder();
+    log.debug("Querying Repo [{}] for StudyID [{}]", repository, studyId);
     String recordXML = getRecordDoa.getRecordXML(repository, studyId);
 
     try {
@@ -61,9 +62,14 @@ public class GetRecordServiceImpl implements GetRecordService {
     SAXBuilder saxBuilder = new SAXBuilder();
     Document document = saxBuilder.build(recordXMLStream);
 
+    if (log.isTraceEnabled()) {
+      log.trace("Record XML String [{}]", document.toString());
+    }
+
     // We exit if the record has an <error> element
     ErrorStatus errorStatus = validateRecord(document, X_FACTORY);
     if (errorStatus.isHasError()) {
+      log.debug("Returned Record has error message [{}] ", errorStatus.getMessage());
       throw new ExternalSystemException(errorStatus.getMessage());
     }
 
@@ -89,6 +95,7 @@ public class GetRecordServiceImpl implements GetRecordService {
       parseTypeOfSamplingProcedure(builder, document, X_FACTORY);
       parseSamplingProcedure(builder, document, X_FACTORY, oaiPmh);
       parseTypeOfModeOfCollection(builder, document, X_FACTORY);
+      log.debug("Successfully parsed record with no known errors");
     }
   }
 }

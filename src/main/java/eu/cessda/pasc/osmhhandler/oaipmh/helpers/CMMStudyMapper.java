@@ -78,7 +78,7 @@ public class CMMStudyMapper {
     ErrorStatus.ErrorStatusBuilder statusBuilder = ErrorStatus.builder();
     getFirstElement(document, xFactory, ERROR_PATH)
         .ifPresent((Element element) ->
-            statusBuilder.hasError(true).message(element.getValue())
+            statusBuilder.hasError(true).message(element.getAttributeValue(CODE_ATTR) + ": " + element.getValue())
         );
 
     return statusBuilder.build();

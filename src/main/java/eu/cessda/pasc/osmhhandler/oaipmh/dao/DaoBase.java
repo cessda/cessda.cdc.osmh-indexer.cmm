@@ -29,7 +29,9 @@ public class DaoBase {
     ResponseEntity<String> responseEntity;
 
     try {
+      log.debug("Sending request to remote SP  for [{}]", fullUrl);
       responseEntity = configuration.getRestTemplate().getForEntity(fullUrl, String.class);
+      log.debug("Got response for [{}] as [{}]", fullUrl, responseEntity.getStatusCodeValue());
       return responseEntity.getBody();
     } catch (RestClientException e) {
       logResponse(HttpStatus.NOT_ACCEPTABLE, log, LogLevel.ERROR);

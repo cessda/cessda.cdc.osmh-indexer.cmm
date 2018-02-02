@@ -16,15 +16,15 @@ spring:
     restart:
       enabled: false
   application:
-    name: pasc-osmh-handler.oai-pmh
+    name: pasc-osmh-handler-oai-pmh
   jmx:
-    default-domain: pasc-osmh-handler.oai-pmh
+    default-domain: pasc-osmh-handler-oai-pmh
   boot:
     admin:
 #     url: http://localhost:8087 For dev, stg & prod set this at the specific active profile. Run app with profile set
       username: user
       password: pass
-      client.name: pasc-osmh-handler.oai-pmh
+      client.name: pasc-osmh-handler-oai-pmh
       turbine:
         clusters: default
         url: http://localhost:8989/turbine.stream
@@ -33,20 +33,21 @@ spring:
       auto-deregistration: true
       auto-registration: true
 logging:
-  file: ${user.home}${file.separator}pasc-osmh-handler${file.separator}pasc-osmh-handler.oai-pmh.log
+  file: ${user.home}${file.separator}pasc-osmh-handler${file.separator}pasc-osmh-handler-oai-pmh.log
   pattern:
     console: '%d{yyyy-dd-MM HH:mm:ss.SSS} %highlight(%-5level) %30.30((%M\)) %40.40((%file:%line\))
       - %message%n'
     file: '%d{yyyy-dd-MM HH:mm:ss.SSS}  %-5level  %30.30((%M\)) %40.40((%file:%line\))
       - %message%n'
   level:
-    .: DEBUG
+    .: WARN
     org: ERROR
+    eu.cessda.pasc: DEBUG
+    eu.cessda.pasc.osmhhandler.oaipmh.controller: DEBUG
+    eu.cessda.pasc.osmhhandler.oaipmh.service: DEBUG
+    eu.cessda.pasc.osmhhandler.oaipmh.helpers: DEBUG
     net: WARN
     com: ERROR
-    de: INFO
-    eu.cessda.pasc.harvesting: WARN
-    eu.cessda.pasc.harvesting.HarvesterReport: INFO
 osmhhandler:
   oaiPmh:
     supportedApiVersions:
@@ -94,10 +95,6 @@ spring:
   boot:
     admin:
       url:
-logging:
-  pattern:
-    console: '%message%n'
-
 ---
 spring:
   profiles: dev
@@ -106,6 +103,3 @@ spring:
   boot:
     admin:
       url: http://localhost:8087
-logging:
-  pattern:
-    console: '%message%n'

@@ -44,6 +44,7 @@ public class OaiPmhConstants {
   static final String SAMPLING_XPATH = TYPE_OF_SAMPLING_XPATH;
   static final String TYPE_OF_MODE_OF_COLLECTION_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:collMode";
   static final String INST_FULL_NAME_XPATH = "//ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty";
+  static final String ERROR_PATH = "//oai:error";
 
   // Elements
   static final String LANG_ATTR = "lang";
@@ -57,6 +58,7 @@ public class OaiPmhConstants {
   static final String START_ATTR = "start";
   static final String SINGLE_ATTR = "single";
   static final String EVENT_ATTR = "event";
+  static final String CODE_ATTR = "code";
   static final String CREATOR_AFFILIATION_ATTR = "affiliation";
 
   // Encoding
@@ -70,7 +72,6 @@ public class OaiPmhConstants {
   static final String LIST_IDENTIFIERS_VALUE = "ListIdentifiers";
   static final String GET_RECORD_VALUE = "GetRecord";
   static final String METADATA_DDI_2_5_VALUE = "ddi";
-  static final String ERROR_PATH = "//oai:error";
 
   private OaiPmhConstants() {
     throw new UnsupportedOperationException("Utility class, instantiation not allow");

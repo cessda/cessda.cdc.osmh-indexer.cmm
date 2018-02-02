@@ -62,8 +62,10 @@ public class GetRecordController extends ControllerBase {
       String valueAsString = CMMConverter.toJsonString(cmmStudy);
       return getResponseEntity(valueAsString, HttpStatus.OK);
     } catch (CustomHandlerException e) {
+      log.debug("[{}] [{}]", e.getClass().getName(), e.getMessage(), e);
       return logAndGetResponseEntityMessage(e.getClass().getName() + ": " + e.getMessage(), INTERNAL_SERVER_ERROR, log);
     } catch (Exception e) {
+      log.debug("[{}] [{}]", e.getClass().getName(), e.getMessage(), e);
       return logAndGetResponseEntityMessage(SYSTEM_ERROR + ": " + e.getMessage(), INTERNAL_SERVER_ERROR, log);
     }
   }
