@@ -45,6 +45,8 @@ Note if no profile flag is set the default profile will be used. Which is non.
 
 ### Run it development
     mvn spring-boot:run
+    mvn spring-boot:run -Drun.profiles=dev
+    mvn spring-boot:run -Drun.jvmArguments="-Dspring.profiles.active=dev"
 
 # Debug/Test it with Swagger UI API documentation
    - [Localhost](http://localhost:9091/swagger-ui.html#/) http://localhost:<port>/<context-base>/swagger-ui.html#/

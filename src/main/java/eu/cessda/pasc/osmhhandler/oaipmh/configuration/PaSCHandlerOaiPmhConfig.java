@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableMBeanExport;
 
 /**
  * Loads Configurations from application*.yml
@@ -15,7 +14,6 @@ import org.springframework.context.annotation.EnableMBeanExport;
  * @author moses@doraventures.com
  */
 @Configuration
-@EnableMBeanExport
 @EnableConfigurationProperties
 @ConfigurationProperties(prefix = "osmhhandler")
 @Qualifier("PaSCHandlerOaiPmhConfig")
