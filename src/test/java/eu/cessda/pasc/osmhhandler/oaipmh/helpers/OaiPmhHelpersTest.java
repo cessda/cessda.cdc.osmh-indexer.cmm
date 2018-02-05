@@ -9,6 +9,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhHelpers.appendGetRecordParams;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhHelpers.decodeStudyNumber;
 import static org.assertj.core.api.BDDAssertions.then;
 
 /**
@@ -62,5 +63,17 @@ public class OaiPmhHelpersTest {
     String builtUrl = appendGetRecordParams(fsdEndpoint, "15454", paSCHandlerOaiPmhConfig.getOaiPmh());
 
     then(builtUrl).isEqualTo(expectedReqUrl);
+  }
+
+  @Test
+  public void shouldDecodeStudyNumberSpecialCharactersBackToOriginalForm() {
+
+    // Given
+    String studyNumberWithRestCharactersEncoded = "oai_cl_dbk_dt_gesis_dt_org_cl_DBK_sl_ZA0001";
+
+    // When
+    String result = decodeStudyNumber(studyNumberWithRestCharactersEncoded);
+
+    then(result).isEqualTo("oai:dbk.gesis.org:DBK/ZA0001");
   }
 }

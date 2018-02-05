@@ -49,4 +49,10 @@ public class OaiPmhHelpers {
         METADATA_PREFIX_PARAM_KEY, metadata //&metadataPrefix=ddi
     );
   }
+
+  public static String decodeStudyNumber(String encodedStudyNumber){
+    return encodedStudyNumber.replaceAll("_dt_", ".")
+        .replaceAll("_sl_", "/")
+        .replaceAll("_cl_", ":");
+  }
 }

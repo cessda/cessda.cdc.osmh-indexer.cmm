@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhHelpers.appendGetRecordParams;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhHelpers.decodeStudyNumber;
 
 /**
  * Data access object for fetching Record from remote repositories implementation
@@ -20,7 +21,9 @@ public class GetRecordDoaImpl extends DaoBase implements GetRecordDoa {
 
   @Override
   public String getRecordXML(String repoUrl, String studyIdentifier) throws ExternalSystemException {
-    final String fullUrl = appendGetRecordParams(repoUrl, studyIdentifier, oaiPmhConfig.getOaiPmh());
+
+    String decodedStudyId = decodeStudyNumber(studyIdentifier);
+    final String fullUrl = appendGetRecordParams(repoUrl, decodedStudyId, oaiPmhConfig.getOaiPmh());
     return postForStringResponse(fullUrl);
   }
 }

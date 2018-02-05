@@ -59,6 +59,8 @@ osmhhandler:
         preferredMetadataParam: ddi
       - url: http://services.fsd.uta.fi/v0/oai
         preferredMetadataParam: ddi_c
+      - url: https://dbk.gesis.org/dbkoai
+        preferredMetadataParam: oai_ddi25
     metadataParsingDefaultLang:
       active: true
       lang: 'en'
