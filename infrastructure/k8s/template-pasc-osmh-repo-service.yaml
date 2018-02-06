@@ -12,4 +12,3 @@ spec:
     - port: 9091
       protocol: TCP
       targetPort: osmh-rep-cport
-  type: LoadBalancer
