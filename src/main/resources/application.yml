@@ -61,11 +61,13 @@ osmhhandler:
         preferredMetadataParam: ddi_c
       - url: https://dbk.gesis.org/dbkoai
         preferredMetadataParam: oai_ddi25
+      - url: https://dbk.gesis.org/dbkoai_de
+        preferredMetadataParam: oai_ddi25-de
     metadataParsingDefaultLang:
       active: true
       lang: 'en'
-    concatenateRepeatedElements: true
-    concatenateSeparator: "+<br>"
+    concatRepeatedElements: true
+    concatSeparator: "+<br>"
     publicationYearDefault: 1970
   restTemplateProps:
     connTimeout: 5000

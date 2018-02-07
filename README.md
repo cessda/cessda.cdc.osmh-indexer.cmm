@@ -48,10 +48,27 @@ Note if no profile flag is set the default profile will be used. Which is non.
     mvn spring-boot:run -Drun.profiles=dev
     mvn spring-boot:run -Drun.jvmArguments="-Dspring.profiles.active=dev"
 
+### Run it local docker as in CI
+
+Log into GCR to be able to download the default java image (note the personal user token after `-p` flag)
+    
+    docker login -u _json_key -p "$(cat dev_files/Technical-Infrastructure-f626925a1edb.json)" https://eu.gcr.io
+    
+Then test you can manually download the image
+    
+    docker pull eu.gcr.io/cessda-development/cessda-java:latest
+  
+If successful then build image with docker file in the root `dir`
+
+    docker build . 
+
+Run the docker image
+
+    docker run -p 9091:9091 <image_id>  
+
 # Debug/Test it with Swagger UI API documentation
    - [Localhost](http://localhost:9091/swagger-ui.html#/) http://localhost:<port>/<context-base>/swagger-ui.html#/
-       
-    
+
 ### Prerequisites
 The following is expected to be install before building running.  To install see your preferred package manager.
 On mac this can be done with `brew`

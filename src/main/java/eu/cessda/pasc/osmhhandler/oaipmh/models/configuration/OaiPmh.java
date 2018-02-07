@@ -19,6 +19,6 @@ public class OaiPmh {
   private List<Repo> repos;
   private Integer publicationYearDefault;
   private MetadataParsingDefaultLang metadataParsingDefaultLang;
-  private boolean concatenateRepeatedElements;
-  private String concatenateSeparator;
+  private boolean concatRepeatedElements;
+  private String concatSeparator;
 }

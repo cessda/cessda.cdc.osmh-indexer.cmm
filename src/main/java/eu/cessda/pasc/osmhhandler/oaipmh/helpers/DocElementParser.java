@@ -94,14 +94,14 @@ class DocElementParser {
       Attribute langAttribute = element.getAttribute(LANG_ATTR, XML_NS);
       if (null == langAttribute || langAttribute.getValue().isEmpty()) {
         if (isDefaultingLang) { // If defaulting lang is not configured we skip. We do not know the lang
-          if (isConcatenating && config.isConcatenateRepeatedElements()) {
-            concatenateRepeatedElements(config.getConcatenateSeparator(), titlesMap, element, defaultingLang);
+          if (isConcatenating && config.isConcatRepeatedElements()) {
+            concatRepeatedElements(config.getConcatSeparator(), titlesMap, element, defaultingLang);
           } else {
             titlesMap.put(defaultingLang, element.getValue()); // Else keep overriding
           }
         }
       } else if (isConcatenating) {
-        concatenateRepeatedElements(config.getConcatenateSeparator(), titlesMap, element, langAttribute.getValue());
+        concatRepeatedElements(config.getConcatSeparator(), titlesMap, element, langAttribute.getValue());
       } else {
         titlesMap.put(langAttribute.getValue(), element.getValue());
       }
@@ -113,9 +113,9 @@ class DocElementParser {
    * Temp request from PUG to concatenate repeated elements.
    * <p>
    */
-  private static void concatenateRepeatedElements(String separator, Map<String, String> titlesMap, Element element, String xmlLang) {
+  private static void concatRepeatedElements(String separator, Map<String, String> titlesMap, Element element, String xmlLang) {
     String currentElementContent = element.getValue();
-    
+
     if (titlesMap.containsKey(xmlLang)) {
       String previousElementContent = titlesMap.get(xmlLang);
       String concatenatedContent = previousElementContent + separator + currentElementContent;
