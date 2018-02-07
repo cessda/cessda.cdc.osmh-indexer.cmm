@@ -26,14 +26,14 @@ public class CMMStudyTestData {
     return builder.build();
   }
 
-  /**
-   * Loads up a valid xml record example.
-   *
-   * @return the xml String
-   */
   public static String getDdiRecord1683() {
     FileHandler fileHandler = new FileHandler();
     return fileHandler.getFileWithUtil("xml/ddi_record_1683.xml");
+  }
+
+  public static String getDdiRecordWithRepeatedAbstract() {
+    FileHandler fileHandler = new FileHandler();
+    return fileHandler.getFileWithUtil("xml/ddi_record_2305_fsd_repeat_abstract.xml");
   }
 
   /**

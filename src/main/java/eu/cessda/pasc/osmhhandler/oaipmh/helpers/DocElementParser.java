@@ -86,36 +86,42 @@ class DocElementParser {
    */
   static Map<String, String> getLanguageKeyValuePairs(OaiPmh config, List<Element> elements, boolean isConcatenating) {
 
+    boolean isDefaultingLang = config.getMetadataParsingDefaultLang().isActive();
+    String defaultingLang = config.getMetadataParsingDefaultLang().getLang();
     Map<String, String> titlesMap = new HashMap<>();
+
     for (Element element : elements) {
-      if (null != element.getAttribute(LANG_ATTR, XML_NS) && !element.getAttribute(LANG_ATTR, XML_NS).getValue().isEmpty()) {
-        titlesMap.put(element.getAttribute(LANG_ATTR, XML_NS).getValue(), element.getValue());
-      } else if (config.getMetadataParsingDefaultLang().isActive()) {
-        if (isConcatenating && config.isConcatenateRepeatedElements()) {
-          concatenateRepeatedElements(config, titlesMap, element);
-        } else {
-          titlesMap.put(config.getMetadataParsingDefaultLang().getLang(), element.getValue()); // Else keep overriding
+      Attribute langAttribute = element.getAttribute(LANG_ATTR, XML_NS);
+      if (null == langAttribute || langAttribute.getValue().isEmpty()) {
+        if (isDefaultingLang) { // If defaulting lang is not configured we skip. We do not know the lang
+          if (isConcatenating && config.isConcatenateRepeatedElements()) {
+            concatenateRepeatedElements(config.getConcatenateSeparator(), titlesMap, element, defaultingLang);
+          } else {
+            titlesMap.put(defaultingLang, element.getValue()); // Else keep overriding
+          }
         }
+      } else if (isConcatenating) {
+        concatenateRepeatedElements(config.getConcatenateSeparator(), titlesMap, element, langAttribute.getValue());
+      } else {
+        titlesMap.put(langAttribute.getValue(), element.getValue());
       }
     }
     return titlesMap;
   }
 
   /**
-   * TODO: remove/raise questions!
+   * Temp request from PUG to concatenate repeated elements.
    * <p>
-   * Temp request from PUG to concatenate repeated elements.  This is to be removed once SPs start tagging their data
-   * with the xml:lang tags.  This will then be extracted to key (lang e.g. en) : value (abstract content).
-   * <p>
-   * Current toggle is osmhhandler.oaiPmh.concatenateRepeatedElements property.
    */
-  private static void concatenateRepeatedElements(OaiPmh config, Map<String, String> titlesMap, Element element) {
-    if (titlesMap.containsKey(config.getMetadataParsingDefaultLang().getLang())) {
-      String previousContent = titlesMap.get(config.getMetadataParsingDefaultLang().getLang());
-      String concatenatedContent = previousContent + config.getConcatenateSeparator() + element.getValue();
-      titlesMap.put(config.getMetadataParsingDefaultLang().getLang(), concatenatedContent); // keep concatenating
+  private static void concatenateRepeatedElements(String separator, Map<String, String> titlesMap, Element element, String xmlLang) {
+    String currentElementContent = element.getValue();
+    
+    if (titlesMap.containsKey(xmlLang)) {
+      String previousElementContent = titlesMap.get(xmlLang);
+      String concatenatedContent = previousElementContent + separator + currentElementContent;
+      titlesMap.put(xmlLang, concatenatedContent); // keep concatenating
     } else {
-      titlesMap.put(config.getMetadataParsingDefaultLang().getLang(), element.getValue()); // set first
+      titlesMap.put(xmlLang, currentElementContent); // set first
     }
   }
 

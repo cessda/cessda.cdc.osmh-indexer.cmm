@@ -24,6 +24,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.api.BDDAssertions.then;
@@ -60,6 +62,26 @@ public class GetRecordServiceImplTest {
     CMMStudy record = recordService.getRecord(repoUrl, studyIdentifier);
 
     then(record).isNotNull();
+    validateCMMStudyAgainstSchema(record);
+  }
+
+  @Test
+  public void shouldReturnCMMStudyRecordWithRepeatedAbstractConcatenated()
+      throws IOException, ProcessingException, CustomHandlerException, JSONException {
+
+    Map<String, String> expectedAbstract = new HashMap<>();
+    expectedAbstract.put("de","de de");
+    expectedAbstract.put("fi","Haastattelu+<br>Jyväskylä");
+    expectedAbstract.put("en","1. The data+<br>2. The datafiles");
+
+    given(getRecordDoa.getRecordXML("", "")).willReturn(CMMStudyTestData.getDdiRecordWithRepeatedAbstract());
+
+    // When
+    CMMStudy record = recordService.getRecord("", "");
+
+    then(record).isNotNull();
+    then(record.getAbstractField().size()).isEqualTo(3);
+    then(record.getAbstractField()).isEqualTo(expectedAbstract);
     validateCMMStudyAgainstSchema(record);
   }
 
