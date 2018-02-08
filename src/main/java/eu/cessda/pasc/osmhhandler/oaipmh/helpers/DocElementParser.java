@@ -1,5 +1,6 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 
+import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.Classification;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.configuration.OaiPmh;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
@@ -54,6 +55,56 @@ class DocElementParser {
     return expression.evaluate(document).stream().filter(Objects::nonNull).collect(toList());
   }
 
+  static Map<String, List<Classification>> extractClassification(OaiPmh config, List<Element> classificationsElements) {
+    Map<String, List<Classification>> langClassifications = new HashMap<>();
+
+    classificationsElements.forEach(element -> {
+      Classification currentClassification = parseClassification(element);
+      Attribute langAttribute = element.getAttribute(LANG_ATTR, XML_NS);
+
+      // TODO: potential @FunctionalInterface from this if()
+      if (null == langAttribute || langAttribute.getValue().isEmpty()) {
+        boolean isDefaultingLang = config.getMetadataParsingDefaultLang().isActive();
+        if (isDefaultingLang) { // If defaulting lang is not configured we skip. We do not know the lang
+          String defaultingLang = config.getMetadataParsingDefaultLang().getLang();
+          buildLanguageClassifications(langClassifications, currentClassification, defaultingLang);
+        }
+      } else {
+        buildLanguageClassifications(langClassifications, currentClassification, langAttribute.getValue());
+      }
+    });
+    return langClassifications;
+  }
+
+  // TODO: potential @FunctionalInterface
+  private static void buildLanguageClassifications(Map<String, List<Classification>> langClassifications, Classification currentClassification, String defaultingLang) {
+    if (langClassifications.containsKey(defaultingLang)) {
+      List<Classification> currentLangClassifications = langClassifications.get(defaultingLang);
+      currentLangClassifications.add(currentClassification);
+      langClassifications.put(defaultingLang, currentLangClassifications);
+    } else {
+      List<Classification> classifications = new ArrayList<>();
+      classifications.add(currentClassification);
+      langClassifications.put(defaultingLang, classifications); // set Afresh
+    }
+  }
+
+  // TODO: potential @FunctionalInterface
+  // For other types(like Classification)
+  // make a functional interface out of this below that takes an element and
+  // returns a <T> for the caller to correctly cast(inference) and use
+  private static Classification parseClassification(Element element) {
+    return Classification.builder()
+        .id(getAttributeValue(element, ID_ATTR).orElse(""))
+        .vocab(getAttributeValue(element, VOCAB_ATTR).orElse(""))
+        .vocabUri(getAttributeValue(element, VOCAB_URI_ATTR).orElse(""))
+        .term(element.getValue()).build();
+  }
+
+  private static Optional<String> getAttributeValue(Element element, String idAttr) {
+    return Optional.ofNullable(element.getAttributeValue(idAttr));
+  }
+
   static Optional<Element> getFirstElement(Document document, XPathFactory xFactory, String xPathToElement) {
     XPathExpression<Element> expression = xFactory.compile(xPathToElement, Filters.element(), null, OAI_AND_DDI_NS);
     return Optional.ofNullable(expression.evaluateFirst(document));
@@ -86,13 +137,13 @@ class DocElementParser {
    */
   static Map<String, String> getLanguageKeyValuePairs(OaiPmh config, List<Element> elements, boolean isConcatenating) {
 
-    boolean isDefaultingLang = config.getMetadataParsingDefaultLang().isActive();
     String defaultingLang = config.getMetadataParsingDefaultLang().getLang();
     Map<String, String> titlesMap = new HashMap<>();
 
     for (Element element : elements) {
       Attribute langAttribute = element.getAttribute(LANG_ATTR, XML_NS);
       if (null == langAttribute || langAttribute.getValue().isEmpty()) {
+        boolean isDefaultingLang = config.getMetadataParsingDefaultLang().isActive();
         if (isDefaultingLang) { // If defaulting lang is not configured we skip. We do not know the lang
           if (isConcatenating && config.isConcatRepeatedElements()) {
             concatRepeatedElements(config.getConcatSeparator(), titlesMap, element, defaultingLang);
@@ -126,7 +177,8 @@ class DocElementParser {
   }
 
   public static String extractCreatorWithAffiliation(Element element) {
-    String affiliationAttr = element.getAttributeValue(CREATOR_AFFILIATION_ATTR);
-    return (null == affiliationAttr) ? element.getValue() : (element.getValue() + " (" + affiliationAttr + ")");
+    return getAttributeValue(element, CREATOR_AFFILIATION_ATTR)
+        .map(s -> (element.getValue() + " (" + s + ")"))
+        .orElseGet(element::getValue);
   }
 }

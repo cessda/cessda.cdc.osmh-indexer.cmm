@@ -26,31 +26,8 @@ public class CMMStudyTestData {
     return builder.build();
   }
 
-  public static String getDdiRecord1683() {
+  public static String getXMLString(String s) {
     FileHandler fileHandler = new FileHandler();
-    return fileHandler.getFileWithUtil("xml/ddi_record_1683.xml");
-  }
-
-  public static String getDdiRecordWithRepeatedAbstract() {
-    FileHandler fileHandler = new FileHandler();
-    return fileHandler.getFileWithUtil("xml/ddi_record_2305_fsd_repeat_abstract.xml");
-  }
-
-  /**
-   * Loads up a valid but deleted xml record example
-   * @return the xml String
-   */
-  public static String getDdiRecord1031Deleted() {
-    FileHandler fileHandler = new FileHandler();
-    return fileHandler.getFileWithUtil("xml/ddi_record_1031_deleted.xml");
-  }
-
-  /**
-   * Loads up a record with an <error> element
-   * @return the xml String
-   */
-  public static String getDdiRecordWithError() {
-    FileHandler fileHandler = new FileHandler();
-    return fileHandler.getFileWithUtil("xml/ddi_record_WithError.xml");
+    return fileHandler.getFileWithUtil(s);
   }
 }

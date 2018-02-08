@@ -1,6 +1,7 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMStudy;
+import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.Classification;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.configuration.OaiPmh;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.errors.ErrorStatus;
 import lombok.extern.slf4j.Slf4j;
@@ -11,10 +12,7 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.DocElementParser.*;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
@@ -196,9 +194,11 @@ public class CMMStudyMapper {
    * <p>
    * Xpath = {@value OaiPmhConstants#CLASSIFICATIONS_XPATH }
    */
-  public static void parseClassifications(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
-    String[] classifications = getElementValues(document, xFactory, CLASSIFICATIONS_XPATH);
-    builder.classifications(classifications);
+  public static void parseClassifications(
+      CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
+    List<Element> classificationsElements = getElements(document, xFactory, CLASSIFICATIONS_XPATH);
+    Map<String, List<Classification>> langClassifications = extractClassification(config, classificationsElements);
+    builder.classifications(langClassifications);
   }
 
   /**

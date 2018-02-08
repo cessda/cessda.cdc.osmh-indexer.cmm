@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -81,7 +82,7 @@ public class CMMStudy {
   private Map<String, String> samplingProcedure;
 
   @JsonProperty("classifications")
-  private String[] classifications;
+  private Map<String, List<Classification>> classifications;
 
   @JsonProperty("dataAccess")
   private Map<String, String> dataAccess;

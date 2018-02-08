@@ -26,12 +26,34 @@
       "description": "An object containing an abstract in various languages. Uses language code properties and abstract values. E.g. {'en': 'An abstract', 'no': 'Et sammendrag'}"
     },
     "classifications": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "description": "A CMMStudy topic."
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "vocab": {
+                  "type": "string"
+                },
+                "vocabUri": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "term": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
       },
-      "description": "An array of topics for this CMMStudy."
+      "additionalProperties": false,
+      "description": "An array of topics(classifications) for this CMMStudy."
     },
     "keywords": {
       "type": "array",

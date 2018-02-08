@@ -1,6 +1,7 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jackson.JsonLoader;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
@@ -17,6 +18,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -49,6 +51,23 @@ public class GetRecordServiceImplTest {
   FileHandler fileHandler;
 
   @Test
+  public void shouldReturnValidCMMStudyRecordFromAFullyComplaintCmmDdiRecord()
+      throws IOException, ProcessingException, CustomHandlerException, JSONException {
+
+    // Given
+    given(getRecordDoa.getRecordXML("", "")).willReturn(
+        CMMStudyTestData.getXMLString("xml/ddi_record_synthetic_compliant_cmm.xml")
+    );
+
+    // When
+    CMMStudy record = recordService.getRecord("", "");
+
+    then(record).isNotNull();
+    validateCMMStudyAgainstSchema(record);
+    validateContentIsExtractedAsExpected(record);
+  }
+
+  @Test
   public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord()
       throws IOException, ProcessingException, CustomHandlerException, JSONException {
 
@@ -56,7 +75,9 @@ public class GetRecordServiceImplTest {
     String repoUrl = "";
     String studyIdentifier = "";
 
-    given(getRecordDoa.getRecordXML(repoUrl, studyIdentifier)).willReturn(CMMStudyTestData.getDdiRecord1683());
+    given(getRecordDoa.getRecordXML(repoUrl, studyIdentifier)).willReturn(
+        CMMStudyTestData.getXMLString("xml/ddi_record_1683.xml")
+    );
 
     // When
     CMMStudy record = recordService.getRecord(repoUrl, studyIdentifier);
@@ -70,11 +91,13 @@ public class GetRecordServiceImplTest {
       throws IOException, ProcessingException, CustomHandlerException, JSONException {
 
     Map<String, String> expectedAbstract = new HashMap<>();
-    expectedAbstract.put("de","de de");
-    expectedAbstract.put("fi","Haastattelu+<br>Jyväskylä");
-    expectedAbstract.put("en","1. The data+<br>2. The datafiles");
+    expectedAbstract.put("de", "de de");
+    expectedAbstract.put("fi", "Haastattelu+<br>Jyväskylä");
+    expectedAbstract.put("en", "1. The data+<br>2. The datafiles");
 
-    given(getRecordDoa.getRecordXML("", "")).willReturn(CMMStudyTestData.getDdiRecordWithRepeatedAbstract());
+    given(getRecordDoa.getRecordXML("", "")).willReturn(
+        CMMStudyTestData.getXMLString("xml/ddi_record_2305_fsd_repeat_abstract.xml")
+    );
 
     // When
     CMMStudy record = recordService.getRecord("", "");
@@ -93,7 +116,9 @@ public class GetRecordServiceImplTest {
     String repoUrl = "";
     String studyIdentifier = "";
 
-    given(getRecordDoa.getRecordXML(repoUrl, studyIdentifier)).willReturn(CMMStudyTestData.getDdiRecord1031Deleted());
+    given(getRecordDoa.getRecordXML(repoUrl, studyIdentifier)).willReturn(
+        CMMStudyTestData.getXMLString("xml/ddi_record_1031_deleted.xml")
+    );
 
     // When
     CMMStudy record = recordService.getRecord(repoUrl, studyIdentifier);
@@ -109,7 +134,9 @@ public class GetRecordServiceImplTest {
     String repoUrl = "www.myurl.com";
     String studyIdentifier = "Id12214";
 
-    given(getRecordDoa.getRecordXML(repoUrl, studyIdentifier)).willReturn(CMMStudyTestData.getDdiRecordWithError());
+    given(getRecordDoa.getRecordXML(repoUrl, studyIdentifier)).willReturn(
+        CMMStudyTestData.getXMLString("xml/ddi_record_WithError.xml")
+    );
 
     // When
     recordService.getRecord(repoUrl, studyIdentifier);
@@ -129,8 +156,23 @@ public class GetRecordServiceImplTest {
     final JsonSchema schema = JsonSchemaFactory.byDefault().getJsonSchema("resource:/json/schema/CMMStudySchema.json");
 
     ProcessingReport validate = schema.validate(jsonNodeRecord);
-    if (!validate.isSuccess()){
+    if (!validate.isSuccess()) {
       fail("Validation not successful : " + validate.toString());
     }
+  }
+
+  private void validateContentIsExtractedAsExpected(CMMStudy record) throws IOException, JSONException {
+    final ObjectMapper mapper = new ObjectMapper();
+
+    String jsonString = CMMConverter.toJsonString(record);
+    String expectedJson = CMMStudyTestData.getXMLString("json/expected_output_from_synthetic_compliant_record.json");
+    final JsonNode actualTree = mapper.readTree(jsonString);
+    final JsonNode expectedTree = mapper.readTree(expectedJson);
+
+    JSONAssert.assertEquals(
+        actualTree.get("classifications").toString(), expectedTree.get("classifications").toString(), true
+    );
+
+    // TODO repeat for each individual element.  Final goal is to use one single Uber Json compare
   }
 }

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+  <responseDate>2018-02-05T11:16:22Z</responseDate>
+  <request identifier="2305" verb="GetRecord">http://services.fsd.uta.fi/v0/oai</request>
+  <GetRecord>
+    <record>
+      <header>
+        <identifier>2305</identifier>
+        <datestamp>2017-11-17T08:08:11Z</datestamp>
+        <setSpec>language:fi</setSpec>
+        <setSpec>language:en</setSpec>
+        <setSpec>study_groups:laku</setSpec>
+      </header>
+      <metadata>
+        <codeBook xmlns="ddi:codebook:2_5" version="2.5" xsi:schemaLocation="ddi:codebook:2_5 http://www.ddialliance.org/Specification/DDI-Codebook/2.5/XMLSchema/codebook.xsd">
+          <docDscr>
+            <citation>
+              <titlStmt>
+                <titl/>
+              </titlStmt>
+              <prodStmt>
+                <producer xml:lang="en">Finnish Social Science Data Archive</producer>
+                <producer xml:lang="fi">Yhteiskuntatieteellinen tietoarkisto</producer>
+                <copyright xml:lang="en">Finnish Social Science Data Archive</copyright>
+                <copyright xml:lang="fi">Yhteiskuntatieteellinen tietoarkisto</copyright>
+              </prodStmt>
+            </citation>
+          </docDscr>
+          <stdyDscr>
+            <citation xml:lang="fi">
+              <titlStmt>
+                <titl xml:lang="fi">Lapsesta aikuiseksi: 14-vuotiaiden haastattelu 1974: tekstiaineisto</titl>
+                <parTitl xml:lang="fi">Lapsesta aikuiseksi: 14-vuotiaiden haastattelu 1974: tekstiaineisto</parTitl>
+                <IDNo>2305</IDNo>
+              </titlStmt>
+              <rspStmt>
+                <AuthEnty affiliation="Jyväskylän yliopisto. Psykologian laitos" xml:lang="fi">Pulkkinen, Lea</AuthEnty>
+              </rspStmt>
+              <prodStmt>
+              </prodStmt>
+              <distStmt>
+              </distStmt>
+              <serStmt>
+                <serName ID="laku" xml:lang="fi">Lapsesta aikuiseksi</serName>
+              </serStmt>
+              <verStmt>
+                <version date="2008-02-08" xml:lang="fi"/>
+              </verStmt>
+            </citation>
+            <citation xml:lang="en">
+              <titlStmt>
+                <titl xml:lang="en">Jyväskylä Longitudinal Study of Personality and Social Development (JYLS): Interviews of 14-Year-Olds 1974: Text Data</titl>
+                <parTitl xml:lang="en">Jyväskylä Longitudinal Study of Personality and Social Development (JYLS): Interviews of 14-Year-Olds 1974: Text Data</parTitl>
+                <IDNo>2305</IDNo>
+              </titlStmt>
+              <rspStmt>
+                <AuthEnty affiliation="University of Jyväskylä. Department of Psychology" xml:lang="en">Pulkkinen, Lea</AuthEnty>
+              </rspStmt>
+              <prodStmt>
+              </prodStmt>
+              <distStmt>
+              </distStmt>
+              <serStmt>
+                <serName ID="laku" xml:lang="en">Jyväskylä Longitudinal Study of Personality and Social Development (JYLS)</serName>
+              </serStmt>
+              <verStmt>
+                <version date="2008-02-08" xml:lang="en"/>
+              </verStmt>
+            </citation>
+            <stdyInfo>
+              <subject>
+                <keyword xml:lang="en" vocab="ELSST" ID="academic_achievement"/>
+                <keyword xml:lang="en" vocab="ELSST" ID="adolescents"/>
+                <keyword xml:lang="en" vocab="ELSST" ID="aggressiveness"/>
+                <keyword xml:lang="en" vocab="ELSST" ID="alcoholism"/>
+                <keyword xml:lang="en" vocab="ELSST" ID="child_day_care"/>
+                <keyword xml:lang="en" vocab="ELSST" ID="educational_sociology"/>
+                <keyword xml:lang="en" vocab="ELSST" ID="expectation"/>
+                <keyword xml:lang="en" vocab="ELSST" ID="families"/>
+                <keyword xml:lang="en" vocab="ELSST" ID="future"/>
+                <keyword xml:lang="en" vocab="ELSST" ID="hobbies"/>
+                <keyword xml:lang="en" vocab="ELSST" ID="housing"/>
+                <keyword xml:lang="en" vocab="ELSST" ID="leisure_time"/>
+                <keyword xml:lang="en" ID="parent-child_relationship"/>
+                <keyword xml:lang="en" vocab="ELSST" ID="parents"/>
+                <keyword xml:lang="en" vocab="ELSST" ID="personal_identity"/>
+                <keyword xml:lang="en" vocab="ELSST" ID="schools"/>
+                <keyword xml:lang="en" vocab="ELSST" ID="siblings"/>
+                <keyword xml:lang="en" vocab="ELSST" ID="smoking"/>
+                <keyword xml:lang="en" vocab="ELSST" ID="social_behaviour"/>
+                <keyword xml:lang="fi" vocab="YSA" ID="nuoret"/>
+                <keyword xml:lang="fi" vocab="YSA" ID="perhe"/>
+                <keyword xml:lang="fi" vocab="YSA" ID="vanhemmat"/>
+                <keyword xml:lang="fi" vocab="YSA" ID="sisarukset"/>
+                <keyword xml:lang="fi" vocab="YSA" ID="asuminen"/>
+                <keyword xml:lang="fi" vocab="YSA" ID="koulunkaeynti"/>
+                <keyword xml:lang="fi" vocab="YSA" ID="opintomenestys"/>
+                <keyword xml:lang="fi" vocab="YSA" ID="sosiaaliset_suhteet"/>
+                <keyword xml:lang="fi" vocab="YSA" ID="minaekuva"/>
+                <keyword xml:lang="fi" vocab="YSA" ID="aggressiivisuus"/>
+                <keyword xml:lang="fi" vocab="YSA" ID="vanhempi-lapsisuhde"/>
+                <keyword xml:lang="fi" vocab="YSA" ID="kasvatus"/>
+                <keyword xml:lang="fi" vocab="YSA" ID="paeivaehoito"/>
+                <keyword xml:lang="fi" vocab="YSA" ID="vapaa-aika"/>
+                <keyword xml:lang="fi" vocab="YSA" ID="harrastukset"/>
+                <keyword xml:lang="fi" vocab="YSA" ID="alkoholinkaeyttoe"/>
+                <keyword xml:lang="fi" vocab="YSA" ID="tupakointi"/>
+                <keyword xml:lang="fi" vocab="YSA" ID="tulevaisuus"/>
+                <keyword xml:lang="fi" vocab="YSA" ID="elaemaenodotukset"/>
+                <!-- Complaince Examples -->
+                <topcClas xml:lang="en" vocab="ZA Category System" ID="youth" vocabURI="https://oai.ukdataservice.ac.uk/Categories.htm">Political Issues</topcClas>
+                <topcClas xml:lang="de" vocab="CESSDA Topic Classification" ID="Housing" vocabURI="https://dbk.gesis.org/madeup.htm">Wohnraum</topcClas>
+                <topcClas xml:lang="de" vocab="CESSDA Topic Classification2" ID="Housing2" vocabURI="https://dbk.gesis.org/madeup2.htm">Wohnraum 2</topcClas>="psychology"/>
+                <!-- invalid examples but should extract what is there -->
+                <!-- From FSD -->
+                <topcClas xml:lang="fi" vocab="CESSDA" ID="nuoret"/>
+                <!-- From UKDA: Exatracting with default language-->
+                <topcClas>Housing</topcClas>
+              </subject>
+              <abstract xml:lang="en">The data are part of the Jyväskylä Longitudinal Study of Personality and Social Development (JYLS), in which the same individuals have been followed over 30 years. At this research stage, the data were collected using peer nominations and teacher ratings (FSD2073), a parent interview (FSD2074), and a theme interview. This dataset contains the transcribed responses to the questions presented in the theme interview. No predetermined response categories were used. The recorded interviews were classified only afterwards, when it was possible to observe the whole range of responses. The interview topics covered family and parents, school and education, housing, identity, use of alcohol and smoking, free time activities, and hobbies.</abstract>
+              <abstract xml:lang="fi">Haastattelu on osa Lapsesta aikuiseksi -tutkimusta, joka on jatkunut samojen henkilöiden seurantana yli 30 vuotta. Tämän tutkimusvaiheen tarkoituksena oli selvittää 14-vuotiaiden sosiaalista käyttäytymistä ja kasvuoloja. Tutkimusvaiheeseen kuuluivat myös toveri- ja opettaja-arvioinnit (FSD2073) sekä vanhemman haastattelu (FSD2074). Nuorten teemahaastatteluissa käsiteltiin mm. perhettä, asuntoa ja asuinympäristöä, koulunkäyntiä, minäkuvaa, päihteiden käyttöä, vapaa-ajanviettoa ja harrastuksia. Valmiita vastausluokkia ei käytetty. Nauhoitetut haastattelut luokiteltiin vasta jälkikäteen, kun nähtiin, minkälaista vaihtelua vastauksissa esiintyi. Ensin tiedusteltiin nuoren asumisoloja ja kysyttiin, keitä perheeseen kuuluu tai on kuulunut, miten hänen päivähoito oli pienenä järjestetty ja onko perheessä ollut apulaisia. Asunnon kokoa ja mielipidettä asuinympäristöstä selvitettiin. Koulunkäyntiin liittyen tiedusteltiin, kuinka pitkä nuoren koulumatka on ja miten hän sen kulkee. Lisäksi kysyttiin, pitääkö hän koulusta yleensä ja mistä aineista pitää eniten. Haastateltava kertoi, onko hän vaihtanut koulua, miltä se on tuntunut ja onko hänellä ollut läheistä opettajaa. Omaa koulumenestystä ja vanhempien suhtautumista siihen pyydettiin arvioimaan. Koulupinnauksesta esitettiin myös kysymyksiä. Edelleen selvitettiin, miten vanhemmat suhtautuvat koulutyöhön ja kertooko nuori kotona koulun tapahtumista. Haastateltavan kavereista, suunnitelmista peruskoulun jälkeen sekä vanhempien suhtautumisesta kavereiden valintaan ja seurusteluun kyseltiin. Niin ikään selvitettiin nuoren suhtautumista väkivaltaan ja vanhempien antamia ohjeita väkivallan suhteen. Haastateltavaa pyydettiin kuvailemaan omaa äitiään ja isäänsä ja kertomaan heidän työstään ja terveydestään. Pohdittiin, minkälaiset välit hänellä on vanhempiinsa ja kuinka usein he keskustelevat erilaisista asioista. Perheen ilmapiiriä kartoitettiin myös kysymällä, puuhasteleeko nuori jotain yhdessä vanhempien kanssa, syökö perhe ilta-ateriaa yhdessä ja onko isä tai äiti paljon poissa kotoa iltaisin. Lisäksi haastateltava kertoi, miten usein heillä on erimielisyyksiä, miten tottelemattomuudesta rankaistaan ja tietävätkö vanhemmat missä ja kenen kanssa hän viettää vapaa-aikaansa. Edelleen kyseltiin, mitä nuori harrastaa, onko hänellä kotiintuloaikoja ja mistä hän saa käyttörahansa. Tupakoinnista ja alkoholinkäytöstä esitettiin kysymyksiä. Haastatteluissa tietoa kerättiin myös ns. peilitekniikan avulla. Haastateltavaa pyydettiin kuvittelemaan, että hän on jo 65-vuotias eläkeläinen ja katselee elettyä elämäänsä taaksepäin. Häntä pyydettiin kertomaan esim. perheestään, avioliitostaan ja ammatistaan. Taustamuuttujana on haastateltavan sukupuoli.</abstract>
+              <sumDscr>
+                <nation xml:lang="en" abbr="FI">Finland</nation>
+                <nation xml:lang="fi" abbr="FI">Suomi</nation>
+                <universe xml:lang="en" clusion="I">Persons who were second grade students in a school in Jyväskylä at the time of the first data collection in 1968 and who continued to participate in the longitudinal study and had belonged to extreme groups of social behaviour at ages 8 and 14. The sample was collected both from the town centre and suburbs.</universe>
+                <universe xml:lang="fi" clusion="I">Otantahetkellä vuonna 1968 kansakoulun toisluokkalaiset keskisuomalaisen kaupungin oppilaat, jotka ovat edelleen mukana pitkittäistutkimuksessa ja kuuluivat 8- ja 14 -vuotiaana sosiaalisen käyttäytymisen ääriryhmiin.</universe>
+              </sumDscr>
+            </stdyInfo>
+            <dataAccs>
+              <useStmt>
+                <restrctn xml:lang="en">The dataset is (D) available only by permission from the data depositor/creator.</restrctn>
+                <restrctn xml:lang="fi">Aineisto on käytettävissä (D) vain luovuttajan luvalla.</restrctn>
+              </useStmt>
+            </dataAccs>
+            <othrStdyMat>
+            </othrStdyMat>
+          </stdyDscr>
+          <fileDscr>
+          </fileDscr>
+        </codeBook>
+      </metadata>
+    </record>
+  </GetRecord>
+</OAI-PMH>

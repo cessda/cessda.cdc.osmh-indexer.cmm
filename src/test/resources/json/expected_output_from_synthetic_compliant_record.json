@@ -1,0 +1,76 @@
+{
+  "institutionFullName": {
+    "fi": "Pulkkinen, Lea",
+    "en": "Pulkkinen, Lea"
+  },
+  "dataAccess": {},
+  "pidStudies": [
+    "2305",
+    "2305"
+  ],
+  "keywords": [],
+  "typeOfTimeMethods": [],
+  "creators": [
+    "Pulkkinen, Lea (Jyväskylän yliopisto. Psykologian laitos)",
+    "Pulkkinen, Lea (University of Jyväskylä. Department of Psychology)"
+  ],
+  "abstract": {
+    "fi": "Haastattelu on osa Lapsesta aikuiseksi -tutkimusta, joka on jatkunut samojen henkilöiden seurantana yli 30 vuotta. Tämän tutkimusvaiheen tarkoituksena oli selvittää 14-vuotiaiden sosiaalista käyttäytymistä ja kasvuoloja. Tutkimusvaiheeseen kuuluivat myös toveri- ja opettaja-arvioinnit (FSD2073) sekä vanhemman haastattelu (FSD2074). Nuorten teemahaastatteluissa käsiteltiin mm. perhettä, asuntoa ja asuinympäristöä, koulunkäyntiä, minäkuvaa, päihteiden käyttöä, vapaa-ajanviettoa ja harrastuksia. Valmiita vastausluokkia ei käytetty. Nauhoitetut haastattelut luokiteltiin vasta jälkikäteen, kun nähtiin, minkälaista vaihtelua vastauksissa esiintyi. Ensin tiedusteltiin nuoren asumisoloja ja kysyttiin, keitä perheeseen kuuluu tai on kuulunut, miten hänen päivähoito oli pienenä järjestetty ja onko perheessä ollut apulaisia. Asunnon kokoa ja mielipidettä asuinympäristöstä selvitettiin. Koulunkäyntiin liittyen tiedusteltiin, kuinka pitkä nuoren koulumatka on ja miten hän sen kulkee. Lisäksi kysyttiin, pitääkö hän koulusta yleensä ja mistä aineista pitää eniten. Haastateltava kertoi, onko hän vaihtanut koulua, miltä se on tuntunut ja onko hänellä ollut läheistä opettajaa. Omaa koulumenestystä ja vanhempien suhtautumista siihen pyydettiin arvioimaan. Koulupinnauksesta esitettiin myös kysymyksiä. Edelleen selvitettiin, miten vanhemmat suhtautuvat koulutyöhön ja kertooko nuori kotona koulun tapahtumista. Haastateltavan kavereista, suunnitelmista peruskoulun jälkeen sekä vanhempien suhtautumisesta kavereiden valintaan ja seurusteluun kyseltiin. Niin ikään selvitettiin nuoren suhtautumista väkivaltaan ja vanhempien antamia ohjeita väkivallan suhteen. Haastateltavaa pyydettiin kuvailemaan omaa äitiään ja isäänsä ja kertomaan heidän työstään ja terveydestään. Pohdittiin, minkälaiset välit hänellä on vanhempiinsa ja kuinka usein he keskustelevat erilaisista asioista. Perheen ilmapiiriä kartoitettiin myös kysymällä, puuhasteleeko nuori jotain yhdessä vanhempien kanssa, syökö perhe ilta-ateriaa yhdessä ja onko isä tai äiti paljon poissa kotoa iltaisin. Lisäksi haastateltava kertoi, miten usein heillä on erimielisyyksiä, miten tottelemattomuudesta rankaistaan ja tietävätkö vanhemmat missä ja kenen kanssa hän viettää vapaa-aikaansa. Edelleen kyseltiin, mitä nuori harrastaa, onko hänellä kotiintuloaikoja ja mistä hän saa käyttörahansa. Tupakoinnista ja alkoholinkäytöstä esitettiin kysymyksiä. Haastatteluissa tietoa kerättiin myös ns. peilitekniikan avulla. Haastateltavaa pyydettiin kuvittelemaan, että hän on jo 65-vuotias eläkeläinen ja katselee elettyä elämäänsä taaksepäin. Häntä pyydettiin kertomaan esim. perheestään, avioliitostaan ja ammatistaan. Taustamuuttujana on haastateltavan sukupuoli.",
+    "en": "The data are part of the Jyväskylä Longitudinal Study of Personality and Social Development (JYLS), in which the same individuals have been followed over 30 years. At this research stage, the data were collected using peer nominations and teacher ratings (FSD2073), a parent interview (FSD2074), and a theme interview. This dataset contains the transcribed responses to the questions presented in the theme interview. No predetermined response categories were used. The recorded interviews were classified only afterwards, when it was possible to observe the whole range of responses. The interview topics covered family and parents, school and education, housing, identity, use of alcohol and smoking, free time activities, and hobbies."
+  },
+  "studyAreaCountries": [
+    "Finland",
+    "Suomi"
+  ],
+  "samplingProcedure": {},
+  "isActive": true,
+  "classifications": {
+    "de": [
+      {
+        "vocabUri": "https:\/\/dbk.gesis.org\/madeup.htm",
+        "vocab": "CESSDA Topic Classification",
+        "term": "Wohnraum",
+        "id": "Housing"
+      },
+      {
+        "vocabUri": "https:\/\/dbk.gesis.org\/madeup2.htm",
+        "vocab": "CESSDA Topic Classification2",
+        "term": "Wohnraum 2",
+        "id": "Housing2"
+      }
+    ],
+    "fi": [
+      {
+        "vocabUri": "",
+        "vocab": "CESSDA",
+        "term": "",
+        "id": "nuoret"
+      }
+    ],
+    "en": [
+      {
+        "vocabUri": "https:\/\/oai.ukdataservice.ac.uk\/Categories.htm",
+        "vocab": "ZA Category System",
+        "term": "Political Issues",
+        "id": "youth"
+      },
+      {
+        "vocabUri": "",
+        "vocab": "",
+        "term": "Housing",
+        "id": ""
+      }
+    ]
+  },
+  "typeOfSamplingProcedures": [],
+  "titleStudy": {
+    "fi": "Lapsesta aikuiseksi: 14-vuotiaiden haastattelu 1974: tekstiaineisto",
+    "en": "Jyväskylä Longitudinal Study of Personality and Social Development (JYLS): Interviews of 14-Year-Olds 1974: Text Data"
+  },
+  "unitTypes": [],
+  "publisher": "Finnish Social Science Data Archive",
+  "publicationYear": 0,
+  "lastModified": "2017-11-17T08:08:11Z",
+  "accessClass": "The dataset is (D) available only by permission from the data depositor\/creator.",
+  "studyNumber": "2305"
+}

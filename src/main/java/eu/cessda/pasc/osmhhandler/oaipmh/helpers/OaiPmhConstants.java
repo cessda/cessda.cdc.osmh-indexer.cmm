@@ -25,15 +25,16 @@ public class OaiPmhConstants {
   static final String ERROR_PATH = "//oai:error";
 
   // Codebook Paths
-  static final String YEAR_OF_PUB_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:distDate[1]";
+  static final String YEAR_OF_PUB_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:distDate[1]"; // TODO: take @date instead
   static final String ABSTRACT_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:abstract";
   static final String TITLE_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:titl";
-  static final String PID_STUDY_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo";
+  static final String PID_STUDY_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo"; // TODO use @agency instead
   static final String CREATORS_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty";
   static final String ACCESS_CLASS_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:restrctn[1]";
   static final String DATA_ACCESS_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:conditions[1]";
   static final String DATA_COLLECTION_PERIODS_PATH = "//ddi:codeBook//ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate[position()<3]";
   static final String CLASSIFICATIONS_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:subject/ddi:topcClas";
+
   static final String KEYWORDS_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:subject/ddi:keyword";
   static final String TYPE_OF_TIME_METHOD_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:timeMeth";
   static final String STUDY_AREA_COUNTRIES_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:nation";
@@ -53,6 +54,8 @@ public class OaiPmhConstants {
   public static final String SET_SPEC_ELEMENT = "setSpec";
   public static final String HEADER_ELEMENT = "header";
   public static final String RESUMPTION_TOKEN_ELEMENT = "resumptionToken";
+
+  // Attributes
   static final String DATE_ATTR = "date";
   static final String END_ATTR = "end";
   static final String START_ATTR = "start";
@@ -60,6 +63,9 @@ public class OaiPmhConstants {
   static final String EVENT_ATTR = "event";
   static final String CODE_ATTR = "code";
   static final String CREATOR_AFFILIATION_ATTR = "affiliation";
+  static final String VOCAB_ATTR = "vocab";
+  static final String VOCAB_URI_ATTR = "vocabURI";
+  static final String ID_ATTR = "ID";
 
   // Encoding
   public static final String UTF_8 = "UTF-8";
