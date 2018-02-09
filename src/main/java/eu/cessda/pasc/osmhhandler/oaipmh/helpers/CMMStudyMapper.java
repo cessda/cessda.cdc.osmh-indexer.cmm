@@ -79,7 +79,7 @@ public class CMMStudyMapper {
     ErrorStatus.ErrorStatusBuilder statusBuilder = ErrorStatus.builder();
     getFirstElement(document, xFactory, ERROR_PATH)
         .ifPresent((Element element) ->
-            statusBuilder.hasError(true).message(element.getAttributeValue(CODE_ATTR) + ": " + element.getValue())
+            statusBuilder.hasError(true).message(element.getAttributeValue(CODE_ATTR) + ": " + element.getText())
         );
 
     return statusBuilder.build();
@@ -90,7 +90,7 @@ public class CMMStudyMapper {
    */
   private static void parseLastModified(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
     getFirstElement(document, xFactory, LAST_MODIFIED_DATE_XPATH)
-        .ifPresent((Element element) -> builder.lastModified(element.getValue()));
+        .ifPresent((Element element) -> builder.lastModified(element.getText()));
   }
 
   /**
@@ -98,7 +98,7 @@ public class CMMStudyMapper {
    */
   private static void parseStudyNumber(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
     getFirstElement(document, xFactory, IDENTIFIER_XPATH)
-        .ifPresent((Element element) -> builder.studyNumber(element.getValue()));
+        .ifPresent((Element element) -> builder.studyNumber(element.getText()));
   }
 
   /**
@@ -108,7 +108,7 @@ public class CMMStudyMapper {
    */
   public static void parseAccessClass(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
     getFirstElement(document, xFactory, ACCESS_CLASS_XPATH)
-        .ifPresent(element -> builder.accessClass(element.getValue()));
+        .ifPresent(element -> builder.accessClass(element.getText()));
   }
 
   /**
@@ -118,7 +118,7 @@ public class CMMStudyMapper {
    */
   public static void parsePublisher(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
     getFirstElement(document, xFactory, PUBLISHER_XPATH)
-        .ifPresent(element -> builder.publisher(element.getValue()));
+        .ifPresent(element -> builder.publisher(element.getText()));
   }
 
   /**
@@ -158,7 +158,7 @@ public class CMMStudyMapper {
     Optional<Element> yrOfPublicationDate = getFirstElement(document, xFactory, YEAR_OF_PUB_XPATH);
     yrOfPublicationDate.ifPresent((Element element) -> {
       try {
-        builder.publicationYear(Integer.parseInt(element.getValue()));
+        builder.publicationYear(Integer.parseInt(element.getText()));
       } catch (NumberFormatException e) {
         log.warn("Could not parse year to Int. Defaulting to 1970");
         builder.publicationYear(config.getPublicationYearDefault());
@@ -221,9 +221,12 @@ public class CMMStudyMapper {
    * <p>
    * Xpath = {@value OaiPmhConstants#TYPE_OF_TIME_METHOD_XPATH }
    */
-  public static void parseTypeOfTimeMethod(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
-    String[] typeOfTimeMethods = getElementValues(document, xFactory, TYPE_OF_TIME_METHOD_XPATH);
-    builder.typeOfTimeMethods(typeOfTimeMethods);
+  public static void parseTypeOfTimeMethod(
+      CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
+
+    List<Element> typeOfTimeMethodElements = getElements(document, xFactory, TYPE_OF_TIME_METHOD_XPATH);
+    Map<String, List<TermVocabAttributes>> termVocabAttributes = extractTermVocabAttributes(config, typeOfTimeMethodElements);
+    builder.typeOfTimeMethods(termVocabAttributes);
   }
 
   /**

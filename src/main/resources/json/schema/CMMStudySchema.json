@@ -53,7 +53,7 @@
         }
       },
       "additionalProperties": false,
-      "description": "An array of topics(classifications) for this CMMStudy."
+      "description": "Topics(classifications) for this CMMStudy in potentially multiple languages."
     },
     "keywords": {
       "type": "object",
@@ -85,15 +85,39 @@
         }
       },
       "additionalProperties": false,
-      "description": "An array of keywords for this CMMStudy. In multiple languages"
+      "description": "Keywords for this CMMStudy in potentially multiple languages."
     },
     "typeOfTimeMethods": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "description": "A CMMStudy timeDimension."
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "array",
+          "description": "An array of timeDimensions for this CMMStudy in this Given iso Language code.",
+          "items": [
+            {
+              "type": "object",
+              "description": "A CMMStudy Time Methods.",
+              "properties": {
+                "vocab": {
+                  "type": "string"
+                },
+                "vocabUri": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "term": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
       },
-      "description": "An array of Time Dimensions for this CMMStudy."
+      "additionalProperties": false,
+      "description": "Time Methods for this CMMStudy in potentially multiple languages."
     },
     "studyAreaCountries": {
       "type": "array",
@@ -120,7 +144,7 @@
         }
       },
       "additionalProperties": false,
-      "description": "An object containing Study Titles in various languages. Uses language code properties and abstract values. E.g. {'en': 'An studyTitle', 'no': 'Et studyTitle'}"
+      "description": "An object containing Study Titles in various languages. Uses language code properties and abstract values. E.g. {'en': 'An studyTitle', 'no': 'Et studyTitle'}."
     },
     "publisher": {
       "type": "string",
@@ -128,7 +152,7 @@
     },
     "publicationYear": {
       "type": "number",
-      "description": "Year of publication (by publisher) of the study (for citation) - [YYYY]"
+      "description": "Year of publication (by publisher) of the study (for citation) - [YYYY]."
     },
     "pidStudies": {
       "type": "array",
@@ -243,7 +267,7 @@
     },
     "isActive": {
       "type": "boolean",
-      "description": "Is the record marked as deleted. If record is deleted this = false",
+      "description": "Is the record marked as deleted. If record is deleted this = false.",
       "default": true
     }
   }

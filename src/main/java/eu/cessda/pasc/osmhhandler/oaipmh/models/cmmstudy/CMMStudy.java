@@ -97,7 +97,7 @@ public class CMMStudy {
   private String studyNumber;
 
   @JsonProperty("typeOfTimeMethods")
-  private String[] typeOfTimeMethods;
+  private Map<String, List<TermVocabAttributes>> typeOfTimeMethods;
 
   @JsonProperty("fileLanguages")
   private String[] fileLanguages;

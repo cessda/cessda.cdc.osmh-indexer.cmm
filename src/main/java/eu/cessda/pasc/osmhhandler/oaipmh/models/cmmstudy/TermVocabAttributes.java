@@ -4,7 +4,13 @@ import lombok.Builder;
 import lombok.Getter;
 
 /**
- * Topic classification pojo
+ * TermVocabAttributes pojo this represents the attributes and terms from such a element:
+ * <p>
+ * {@code
+ * <keyword xml:lang="sv" ID="w8357xx45" vocab="ELSST" vocabURI="http://sv.ac.sv">
+ * Nationellt val
+ * </keyword>
+ * }
  *
  * @author moses@doraventures.com
  */

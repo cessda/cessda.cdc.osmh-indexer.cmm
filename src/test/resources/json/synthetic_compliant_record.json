@@ -46,7 +46,30 @@
       }
     ]
   },
-  "typeOfTimeMethods": [],
+  "typeOfTimeMethods": {
+    "de": [
+      {
+        "vocabUri": "http:\/\/lod.data-archive.ac.uk",
+        "vocab": "DDI Time Method 1",
+        "term": "Longitudinal.Panel 1",
+        "id": "fake"
+      },
+      {
+        "vocabUri": "",
+        "vocab": "DDI Time Method 2",
+        "term": "Längsschnitt: Panel 2",
+        "id": ""
+      }
+    ],
+    "en": [
+      {
+        "vocabUri": "",
+        "vocab": "",
+        "term": "Repeated cross-sectional study",
+        "id": ""
+      }
+    ]
+  },
   "creators": [
     "Pulkkinen, Lea (Jyväskylän yliopisto. Psykologian laitos)",
     "Pulkkinen, Lea (University of Jyväskylä. Department of Psychology)"

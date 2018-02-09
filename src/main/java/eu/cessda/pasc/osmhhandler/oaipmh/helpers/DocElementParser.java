@@ -37,7 +37,7 @@ class DocElementParser {
     List<Element> elements = getElements(document, xFactory, elementXpath);
     return elements.stream()
         .filter(Objects::nonNull)
-        .map(Element::getValue)
+        .map(Element::getText)
         .filter(s -> !s.isEmpty())
         .toArray(String[]::new);
   }
@@ -59,25 +59,46 @@ class DocElementParser {
     Map<String, List<TermVocabAttributes>> langsTermVocabAttributes = new HashMap<>();
 
     termVocabElement.forEach(element -> {
-      TermVocabAttributes currentTermVocabAttributes = parseTermVocabAttrAndValues(element);
-      Attribute langAttribute = element.getAttribute(LANG_ATTR, XML_NS);
+      Optional<Element> concept = Optional.ofNullable(element.getChild("concept", DDI_NS));
+      TermVocabAttributes currentTermVocabAttributes = parseTermVocabAttrAndValues(element, concept.orElse(new Element("empty")));
 
-      // TODO: potential @FunctionalInterface from this if()
-      if (null == langAttribute || langAttribute.getValue().isEmpty()) {
+      Attribute langAttr = concept.isPresent()
+          ? concept.get().getAttribute(LANG_ATTR, XML_NS) : element.getAttribute(LANG_ATTR, XML_NS);
+
+      if (null == langAttr || langAttr.getValue().isEmpty()) {
         boolean isDefaultingLang = config.getMetadataParsingDefaultLang().isActive();
         if (isDefaultingLang) { // If defaulting lang is not configured we skip. We do not know the lang
           String defaultingLang = config.getMetadataParsingDefaultLang().getLang();
           buildLanguageTermVocabAttributes(langsTermVocabAttributes, currentTermVocabAttributes, defaultingLang);
         }
       } else {
-        buildLanguageTermVocabAttributes(langsTermVocabAttributes, currentTermVocabAttributes, langAttribute.getValue());
+        buildLanguageTermVocabAttributes(langsTermVocabAttributes, currentTermVocabAttributes, langAttr.getValue());
       }
     });
     return langsTermVocabAttributes;
   }
 
-  // TODO: potential @FunctionalInterface
+  private static TermVocabAttributes parseTermVocabAttrAndValues(Element element, Element concept) {
+
+    if ("empty".equals(concept.getName())) {
+      return buildTermVocabAttributes(element, element.getText());
+    }
+    // PUG requirement parent element Value of concept wins if it has a value.
+    String elementValue = (element.getText().isEmpty()) ? concept.getText() : element.getText();
+    return buildTermVocabAttributes(concept, elementValue);
+  }
+
+  private static TermVocabAttributes buildTermVocabAttributes(Element elementToProcess, String elementValue) {
+
+    return TermVocabAttributes.builder()
+        .id(getAttributeValue(elementToProcess, ID_ATTR).orElse(""))
+        .vocab(getAttributeValue(elementToProcess, VOCAB_ATTR).orElse(""))
+        .vocabUri(getAttributeValue(elementToProcess, VOCAB_URI_ATTR).orElse(""))
+        .term(elementValue).build();
+  }
+
   private static void buildLanguageTermVocabAttributes(Map<String, List<TermVocabAttributes>> termVocabAttributes, TermVocabAttributes currentTermVocabAttributes, String defaultingLang) {
+
     if (termVocabAttributes.containsKey(defaultingLang)) {
       List<TermVocabAttributes> currentLangTermVocabAttributes = termVocabAttributes.get(defaultingLang);
       currentLangTermVocabAttributes.add(currentTermVocabAttributes);
@@ -87,18 +108,6 @@ class DocElementParser {
       initialTermVocabAttributes.add(currentTermVocabAttributes);
       termVocabAttributes.put(defaultingLang, initialTermVocabAttributes); // set Afresh
     }
-  }
-
-  // TODO: potential @FunctionalInterface
-  // For other types(like TermVocabAttributes)
-  // make a functional interface out of this below that takes an element and
-  // returns a <T> for the caller to correctly cast(inference) and use
-  private static TermVocabAttributes parseTermVocabAttrAndValues(Element element) {
-    return TermVocabAttributes.builder()
-        .id(getAttributeValue(element, ID_ATTR).orElse(""))
-        .vocab(getAttributeValue(element, VOCAB_ATTR).orElse(""))
-        .vocabUri(getAttributeValue(element, VOCAB_URI_ATTR).orElse(""))
-        .term(element.getValue()).build();
   }
 
   private static Optional<String> getAttributeValue(Element element, String idAttr) {
@@ -148,13 +157,13 @@ class DocElementParser {
           if (isConcatenating && config.isConcatRepeatedElements()) {
             concatRepeatedElements(config.getConcatSeparator(), titlesMap, element, defaultingLang);
           } else {
-            titlesMap.put(defaultingLang, element.getValue()); // Else keep overriding
+            titlesMap.put(defaultingLang, element.getText()); // Else keep overriding
           }
         }
       } else if (isConcatenating) {
         concatRepeatedElements(config.getConcatSeparator(), titlesMap, element, langAttribute.getValue());
       } else {
-        titlesMap.put(langAttribute.getValue(), element.getValue());
+        titlesMap.put(langAttribute.getValue(), element.getText());
       }
     }
     return titlesMap;
@@ -165,7 +174,7 @@ class DocElementParser {
    * <p>
    */
   private static void concatRepeatedElements(String separator, Map<String, String> titlesMap, Element element, String xmlLang) {
-    String currentElementContent = element.getValue();
+    String currentElementContent = element.getText();
 
     if (titlesMap.containsKey(xmlLang)) {
       String previousElementContent = titlesMap.get(xmlLang);
@@ -178,7 +187,7 @@ class DocElementParser {
 
   public static String extractCreatorWithAffiliation(Element element) {
     return getAttributeValue(element, CREATOR_AFFILIATION_ATTR)
-        .map(s -> (element.getValue() + " (" + s + ")"))
-        .orElseGet(element::getValue);
+        .map(s -> (element.getText() + " (" + s + ")"))
+        .orElseGet(element::getText);
   }
 }

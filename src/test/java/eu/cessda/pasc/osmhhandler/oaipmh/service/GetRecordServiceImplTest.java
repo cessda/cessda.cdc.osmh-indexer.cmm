@@ -171,6 +171,7 @@ public class GetRecordServiceImplTest {
 
     assertEquals(actualTree.get("classifications").toString(), expectedTree.get("classifications").toString(), true);
     assertEquals(actualTree.get("keywords").toString(), expectedTree.get("keywords").toString(), true);
+    assertEquals(actualTree.get("typeOfTimeMethods").toString(), expectedTree.get("typeOfTimeMethods").toString(), true);
 
     // TODO repeat for each individual element.  Final goal is to use one single Uber Json compare
   }

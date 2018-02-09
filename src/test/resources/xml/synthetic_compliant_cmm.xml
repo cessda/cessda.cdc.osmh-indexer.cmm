@@ -96,6 +96,23 @@
                 <universe xml:lang="fi" clusion="I">Otantahetkellä vuonna 1968 kansakoulun toisluokkalaiset keskisuomalaisen kaupungin oppilaat, jotka ovat edelleen mukana pitkittäistutkimuksessa ja kuuluivat 8- ja 14 -vuotiaana sosiaalisen käyttäytymisen ääriryhmiin.</universe>
               </sumDscr>
             </stdyInfo>
+            <method>
+              <dataColl>
+                <!-- 100% Compliance-->
+                <timeMeth><concept xml:lang="de" vocab="DDI Time Method 1" vocabURI="http://lod.data-archive.ac.uk" ID="fake" >Longitudinal.Panel 1</concept></timeMeth>
+                <!-- Suggested by PUG: Element value/term in "timeMethod" wins over "concept" -->
+                <timeMeth><concept xml:lang="de" vocab="DDI Time Method 2">Longitudinal.Panel 2</concept>Längsschnitt: Panel 2</timeMeth>
+                <!--UKDS-->
+                <timeMeth>Repeated cross-sectional study</timeMeth>
+                <dataCollector>National Centre for Social Research</dataCollector>
+                <sampProc>Multi-stage stratified random sample</sampProc>
+                <deviat>6,708 cases</deviat>
+                <collMode>Face-to-face interview</collMode>
+                <sources />
+                <weight>Weighting used. See documentation for details.</weight>
+                <cleanOps>B</cleanOps>
+              </dataColl>
+            </method>
             <dataAccs>
               <useStmt>
                 <restrctn xml:lang="en">The dataset is (D) available only by permission from the data depositor/creator.</restrctn>
