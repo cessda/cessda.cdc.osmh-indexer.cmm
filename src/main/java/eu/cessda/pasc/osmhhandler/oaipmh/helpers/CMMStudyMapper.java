@@ -1,7 +1,7 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMStudy;
-import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.Classification;
+import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.TermVocabAttributes;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.configuration.OaiPmh;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.errors.ErrorStatus;
 import lombok.extern.slf4j.Slf4j;
@@ -197,7 +197,7 @@ public class CMMStudyMapper {
   public static void parseClassifications(
       CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
     List<Element> classificationsElements = getElements(document, xFactory, CLASSIFICATIONS_XPATH);
-    Map<String, List<Classification>> langClassifications = extractClassification(config, classificationsElements);
+    Map<String, List<TermVocabAttributes>> langClassifications = extractClassification(config, classificationsElements);
     builder.classifications(langClassifications);
   }
 

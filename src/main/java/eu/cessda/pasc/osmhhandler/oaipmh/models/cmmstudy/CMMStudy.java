@@ -82,7 +82,7 @@ public class CMMStudy {
   private Map<String, String> samplingProcedure;
 
   @JsonProperty("classifications")
-  private Map<String, List<Classification>> classifications;
+  private Map<String, List<TermVocabAttributes>> classifications;
 
   @JsonProperty("dataAccess")
   private Map<String, String> dataAccess;

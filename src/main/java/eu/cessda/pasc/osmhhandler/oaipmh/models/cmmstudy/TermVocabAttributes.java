@@ -10,7 +10,7 @@ import lombok.Getter;
  */
 @Builder
 @Getter
-public class Classification {
+public class TermVocabAttributes {
 
   private String vocab;
   private String vocabUri;

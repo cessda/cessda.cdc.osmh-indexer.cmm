@@ -1,6 +1,6 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 
-import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.Classification;
+import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.TermVocabAttributes;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.configuration.OaiPmh;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
@@ -55,11 +55,11 @@ class DocElementParser {
     return expression.evaluate(document).stream().filter(Objects::nonNull).collect(toList());
   }
 
-  static Map<String, List<Classification>> extractClassification(OaiPmh config, List<Element> classificationsElements) {
-    Map<String, List<Classification>> langClassifications = new HashMap<>();
+  static Map<String, List<TermVocabAttributes>> extractClassification(OaiPmh config, List<Element> classificationsElements) {
+    Map<String, List<TermVocabAttributes>> langClassifications = new HashMap<>();
 
     classificationsElements.forEach(element -> {
-      Classification currentClassification = parseClassification(element);
+      TermVocabAttributes currentTermVocabAttributes = parseClassification(element);
       Attribute langAttribute = element.getAttribute(LANG_ATTR, XML_NS);
 
       // TODO: potential @FunctionalInterface from this if()
@@ -67,34 +67,34 @@ class DocElementParser {
         boolean isDefaultingLang = config.getMetadataParsingDefaultLang().isActive();
         if (isDefaultingLang) { // If defaulting lang is not configured we skip. We do not know the lang
           String defaultingLang = config.getMetadataParsingDefaultLang().getLang();
-          buildLanguageClassifications(langClassifications, currentClassification, defaultingLang);
+          buildLanguageClassifications(langClassifications, currentTermVocabAttributes, defaultingLang);
         }
       } else {
-        buildLanguageClassifications(langClassifications, currentClassification, langAttribute.getValue());
+        buildLanguageClassifications(langClassifications, currentTermVocabAttributes, langAttribute.getValue());
       }
     });
     return langClassifications;
   }
 
   // TODO: potential @FunctionalInterface
-  private static void buildLanguageClassifications(Map<String, List<Classification>> langClassifications, Classification currentClassification, String defaultingLang) {
+  private static void buildLanguageClassifications(Map<String, List<TermVocabAttributes>> langClassifications, TermVocabAttributes currentTermVocabAttributes, String defaultingLang) {
     if (langClassifications.containsKey(defaultingLang)) {
-      List<Classification> currentLangClassifications = langClassifications.get(defaultingLang);
-      currentLangClassifications.add(currentClassification);
-      langClassifications.put(defaultingLang, currentLangClassifications);
+      List<TermVocabAttributes> currentLangTermVocabAttributes = langClassifications.get(defaultingLang);
+      currentLangTermVocabAttributes.add(currentTermVocabAttributes);
+      langClassifications.put(defaultingLang, currentLangTermVocabAttributes);
     } else {
-      List<Classification> classifications = new ArrayList<>();
-      classifications.add(currentClassification);
-      langClassifications.put(defaultingLang, classifications); // set Afresh
+      List<TermVocabAttributes> termVocabAttributes = new ArrayList<>();
+      termVocabAttributes.add(currentTermVocabAttributes);
+      langClassifications.put(defaultingLang, termVocabAttributes); // set Afresh
     }
   }
 
   // TODO: potential @FunctionalInterface
-  // For other types(like Classification)
+  // For other types(like TermVocabAttributes)
   // make a functional interface out of this below that takes an element and
   // returns a <T> for the caller to correctly cast(inference) and use
-  private static Classification parseClassification(Element element) {
-    return Classification.builder()
+  private static TermVocabAttributes parseClassification(Element element) {
+    return TermVocabAttributes.builder()
         .id(getAttributeValue(element, ID_ATTR).orElse(""))
         .vocab(getAttributeValue(element, VOCAB_ATTR).orElse(""))
         .vocabUri(getAttributeValue(element, VOCAB_URI_ATTR).orElse(""))
