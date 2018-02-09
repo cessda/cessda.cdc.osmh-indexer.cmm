@@ -56,18 +56,42 @@
       "description": "An array of topics(classifications) for this CMMStudy."
     },
     "keywords": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "description": "A CMMStudy keyword."
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "array",
+          "description": "An array of Keywords for this CMMStudy in this Given iso Language code",
+          "items": [
+            {
+              "type": "object",
+              "description": "A CMMStudy keyword.",
+              "properties": {
+                "vocab": {
+                  "type": "string"
+                },
+                "vocabUri": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "term": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
       },
-      "description": "An array of keywords for this CMMStudy."
+      "additionalProperties": false,
+      "description": "An array of keywords for this CMMStudy. In multiple languages"
     },
     "typeOfTimeMethods": {
       "type": "array",
       "items": {
         "type": "string",
-        "description": "A CMMStudy timedimension."
+        "description": "A CMMStudy timeDimension."
       },
       "description": "An array of Time Dimensions for this CMMStudy."
     },

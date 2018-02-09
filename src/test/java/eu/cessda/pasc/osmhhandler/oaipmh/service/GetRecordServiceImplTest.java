@@ -18,7 +18,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -32,6 +31,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.mockito.BDDMockito.given;
+import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 /**
  * @author moses@doraventures.com
@@ -56,7 +56,7 @@ public class GetRecordServiceImplTest {
 
     // Given
     given(getRecordDoa.getRecordXML("", "")).willReturn(
-        CMMStudyTestData.getXMLString("xml/ddi_record_synthetic_compliant_cmm.xml")
+        CMMStudyTestData.getXMLString("xml/synthetic_compliant_cmm.xml")
     );
 
     // When
@@ -165,13 +165,12 @@ public class GetRecordServiceImplTest {
     final ObjectMapper mapper = new ObjectMapper();
 
     String jsonString = CMMConverter.toJsonString(record);
-    String expectedJson = CMMStudyTestData.getXMLString("json/expected_output_from_synthetic_compliant_record.json");
+    String expectedJson = CMMStudyTestData.getXMLString("json/synthetic_compliant_record.json");
     final JsonNode actualTree = mapper.readTree(jsonString);
     final JsonNode expectedTree = mapper.readTree(expectedJson);
 
-    JSONAssert.assertEquals(
-        actualTree.get("classifications").toString(), expectedTree.get("classifications").toString(), true
-    );
+    assertEquals(actualTree.get("classifications").toString(), expectedTree.get("classifications").toString(), true);
+    assertEquals(actualTree.get("keywords").toString(), expectedTree.get("keywords").toString(), true);
 
     // TODO repeat for each individual element.  Final goal is to use one single Uber Json compare
   }

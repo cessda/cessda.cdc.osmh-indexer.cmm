@@ -28,13 +28,13 @@ class DocElementParser {
   /**
    * Parses the array values of elements
    *
-   * @param document             the document to parse
-   * @param xFactory             the xFactory
-   * @param classificationsXpath the Element parent node to retrieve
+   * @param document     the document to parse
+   * @param xFactory     the xFactory
+   * @param elementXpath the Element parent node to retrieve
    * @return String[] Values of the Element
    */
-  static String[] getElementValues(Document document, XPathFactory xFactory, String classificationsXpath) {
-    List<Element> elements = getElements(document, xFactory, classificationsXpath);
+  static String[] getElementValues(Document document, XPathFactory xFactory, String elementXpath) {
+    List<Element> elements = getElements(document, xFactory, elementXpath);
     return elements.stream()
         .filter(Objects::nonNull)
         .map(Element::getValue)
@@ -55,11 +55,11 @@ class DocElementParser {
     return expression.evaluate(document).stream().filter(Objects::nonNull).collect(toList());
   }
 
-  static Map<String, List<TermVocabAttributes>> extractClassification(OaiPmh config, List<Element> classificationsElements) {
-    Map<String, List<TermVocabAttributes>> langClassifications = new HashMap<>();
+  static Map<String, List<TermVocabAttributes>> extractTermVocabAttributes(OaiPmh config, List<Element> termVocabElement) {
+    Map<String, List<TermVocabAttributes>> langsTermVocabAttributes = new HashMap<>();
 
-    classificationsElements.forEach(element -> {
-      TermVocabAttributes currentTermVocabAttributes = parseClassification(element);
+    termVocabElement.forEach(element -> {
+      TermVocabAttributes currentTermVocabAttributes = parseTermVocabAttrAndValues(element);
       Attribute langAttribute = element.getAttribute(LANG_ATTR, XML_NS);
 
       // TODO: potential @FunctionalInterface from this if()
@@ -67,25 +67,25 @@ class DocElementParser {
         boolean isDefaultingLang = config.getMetadataParsingDefaultLang().isActive();
         if (isDefaultingLang) { // If defaulting lang is not configured we skip. We do not know the lang
           String defaultingLang = config.getMetadataParsingDefaultLang().getLang();
-          buildLanguageClassifications(langClassifications, currentTermVocabAttributes, defaultingLang);
+          buildLanguageTermVocabAttributes(langsTermVocabAttributes, currentTermVocabAttributes, defaultingLang);
         }
       } else {
-        buildLanguageClassifications(langClassifications, currentTermVocabAttributes, langAttribute.getValue());
+        buildLanguageTermVocabAttributes(langsTermVocabAttributes, currentTermVocabAttributes, langAttribute.getValue());
       }
     });
-    return langClassifications;
+    return langsTermVocabAttributes;
   }
 
   // TODO: potential @FunctionalInterface
-  private static void buildLanguageClassifications(Map<String, List<TermVocabAttributes>> langClassifications, TermVocabAttributes currentTermVocabAttributes, String defaultingLang) {
-    if (langClassifications.containsKey(defaultingLang)) {
-      List<TermVocabAttributes> currentLangTermVocabAttributes = langClassifications.get(defaultingLang);
+  private static void buildLanguageTermVocabAttributes(Map<String, List<TermVocabAttributes>> termVocabAttributes, TermVocabAttributes currentTermVocabAttributes, String defaultingLang) {
+    if (termVocabAttributes.containsKey(defaultingLang)) {
+      List<TermVocabAttributes> currentLangTermVocabAttributes = termVocabAttributes.get(defaultingLang);
       currentLangTermVocabAttributes.add(currentTermVocabAttributes);
-      langClassifications.put(defaultingLang, currentLangTermVocabAttributes);
+      termVocabAttributes.put(defaultingLang, currentLangTermVocabAttributes);
     } else {
-      List<TermVocabAttributes> termVocabAttributes = new ArrayList<>();
-      termVocabAttributes.add(currentTermVocabAttributes);
-      langClassifications.put(defaultingLang, termVocabAttributes); // set Afresh
+      List<TermVocabAttributes> initialTermVocabAttributes = new ArrayList<>();
+      initialTermVocabAttributes.add(currentTermVocabAttributes);
+      termVocabAttributes.put(defaultingLang, initialTermVocabAttributes); // set Afresh
     }
   }
 
@@ -93,7 +93,7 @@ class DocElementParser {
   // For other types(like TermVocabAttributes)
   // make a functional interface out of this below that takes an element and
   // returns a <T> for the caller to correctly cast(inference) and use
-  private static TermVocabAttributes parseClassification(Element element) {
+  private static TermVocabAttributes parseTermVocabAttrAndValues(Element element) {
     return TermVocabAttributes.builder()
         .id(getAttributeValue(element, ID_ATTR).orElse(""))
         .vocab(getAttributeValue(element, VOCAB_ATTR).orElse(""))
@@ -113,13 +113,13 @@ class DocElementParser {
   /**
    * Parses the array values of attributes of a given elements
    *
-   * @param document             the document to parse
-   * @param xFactory             the xFactory
-   * @param classificationsXpath the Element parent node to retrieve
+   * @param document     the document to parse
+   * @param xFactory     the xFactory
+   * @param elementXpath the Element parent node to retrieve
    * @return Array String Values of the attributes
    */
-  static String[] getAttributeValues(Document document, XPathFactory xFactory, String classificationsXpath) {
-    List<Attribute> attributes = getAttributes(document, xFactory, classificationsXpath);
+  static String[] getAttributeValues(Document document, XPathFactory xFactory, String elementXpath) {
+    List<Attribute> attributes = getAttributes(document, xFactory, elementXpath);
     return attributes.stream().map(Attribute::getValue).toArray(String[]::new);
   }
 

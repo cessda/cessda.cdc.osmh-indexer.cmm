@@ -8,7 +8,44 @@
     "2305",
     "2305"
   ],
-  "keywords": [],
+  "keywords": {
+    "sv": [
+      {
+        "vocabUri": "http:\/\/sv.ac.sv",
+        "vocab": "ELSST",
+        "term": "Nationellt val",
+        "id": "w8357xx45"
+      }
+    ],
+    "fi": [
+      {
+        "vocabUri": "http:\/\/fi.ac.fi",
+        "vocab": "CESSDA",
+        "term": "et Nationellt val",
+        "id": "wxFAKE"
+      }
+    ],
+    "en": [
+      {
+        "vocabUri": "",
+        "vocab": "ELSST",
+        "term": "",
+        "id": "adolescents"
+      },
+      {
+        "vocabUri": "",
+        "vocab": "",
+        "term": "1976",
+        "id": ""
+      },
+      {
+        "vocabUri": "http:\/\/lod.data-archive.ac.uk\/skoshasset\/9e7cc815-90cb-4f96-b8ff-a0a44ab25ea9",
+        "vocab": "",
+        "term": "BUDGETS",
+        "id": ""
+      }
+    ]
+  },
   "typeOfTimeMethods": [],
   "creators": [
     "Pulkkinen, Lea (Jyväskylän yliopisto. Psykologian laitos)",

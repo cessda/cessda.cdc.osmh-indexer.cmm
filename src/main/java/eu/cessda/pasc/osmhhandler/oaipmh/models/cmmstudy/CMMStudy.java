@@ -73,7 +73,7 @@ public class CMMStudy {
   private String[] typeOfModeOfCollections;
 
   @JsonProperty("keywords")
-  private String[] keywords;
+  private Map<String, List<TermVocabAttributes>> keywords;
 
   @JsonProperty("recordType")
   private RecordType recordType;

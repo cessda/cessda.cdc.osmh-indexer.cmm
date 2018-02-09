@@ -12,7 +12,10 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.DocElementParser.*;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
@@ -197,7 +200,7 @@ public class CMMStudyMapper {
   public static void parseClassifications(
       CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
     List<Element> classificationsElements = getElements(document, xFactory, CLASSIFICATIONS_XPATH);
-    Map<String, List<TermVocabAttributes>> langClassifications = extractClassification(config, classificationsElements);
+    Map<String, List<TermVocabAttributes>> langClassifications = extractTermVocabAttributes(config, classificationsElements);
     builder.classifications(langClassifications);
   }
 
@@ -206,9 +209,11 @@ public class CMMStudyMapper {
    * <p>
    * Xpath = {@value OaiPmhConstants#KEYWORDS_XPATH }
    */
-  public static void parseKeywords(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
-    String[] keywords = getElementValues(document, xFactory, KEYWORDS_XPATH);
-    builder.keywords(keywords);
+  public static void parseKeywords(
+      CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
+    List<Element> keywordElements = getElements(document, xFactory, KEYWORDS_XPATH);
+    Map<String, List<TermVocabAttributes>> termVocabAttributes = extractTermVocabAttributes(config, keywordElements);
+    builder.keywords(termVocabAttributes);
   }
 
   /**
