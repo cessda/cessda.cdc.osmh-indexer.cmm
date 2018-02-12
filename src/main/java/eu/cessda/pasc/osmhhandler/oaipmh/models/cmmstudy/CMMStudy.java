@@ -113,7 +113,7 @@ public class CMMStudy {
   private String publisher;
 
   @JsonProperty("studyAreaCountries")
-  private String[] studyAreaCountries;
+  private Map<String, List<Country>> studyAreaCountries;
 
   @JsonProperty("unitTypes")
   private String[] unitTypes;

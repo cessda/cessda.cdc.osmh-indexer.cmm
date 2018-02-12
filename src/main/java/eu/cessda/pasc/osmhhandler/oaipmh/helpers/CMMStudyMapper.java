@@ -1,6 +1,7 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMStudy;
+import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.Country;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.TermVocabAttributes;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.configuration.OaiPmh;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.errors.ErrorStatus;
@@ -200,7 +201,7 @@ public class CMMStudyMapper {
   public static void parseClassifications(
       CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
     List<Element> classificationsElements = getElements(document, xFactory, CLASSIFICATIONS_XPATH);
-    Map<String, List<TermVocabAttributes>> langClassifications = extractTermVocabAttributes(config, classificationsElements);
+    Map<String, List<TermVocabAttributes>> langClassifications = extractVocabValueAttrsForEachLang(config, classificationsElements);
     builder.classifications(langClassifications);
   }
 
@@ -212,7 +213,7 @@ public class CMMStudyMapper {
   public static void parseKeywords(
       CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
     List<Element> keywordElements = getElements(document, xFactory, KEYWORDS_XPATH);
-    Map<String, List<TermVocabAttributes>> termVocabAttributes = extractTermVocabAttributes(config, keywordElements);
+    Map<String, List<TermVocabAttributes>> termVocabAttributes = extractVocabValueAttrsForEachLang(config, keywordElements);
     builder.keywords(termVocabAttributes);
   }
 
@@ -225,7 +226,7 @@ public class CMMStudyMapper {
       CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
 
     List<Element> typeOfTimeMethodElements = getElements(document, xFactory, TYPE_OF_TIME_METHOD_XPATH);
-    Map<String, List<TermVocabAttributes>> termVocabAttributes = extractTermVocabAttributes(config, typeOfTimeMethodElements);
+    Map<String, List<TermVocabAttributes>> termVocabAttributes = extractVocabValueAttrsForEachLang(config, typeOfTimeMethodElements);
     builder.typeOfTimeMethods(termVocabAttributes);
   }
 
@@ -234,9 +235,11 @@ public class CMMStudyMapper {
    * <p>
    * Xpath = {@value OaiPmhConstants#STUDY_AREA_COUNTRIES_XPATH }
    */
-  public static void parseStudyAreaCountries(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
-    String[] typeOfTimeMethods = getElementValues(document, xFactory, STUDY_AREA_COUNTRIES_XPATH);
-    builder.studyAreaCountries(typeOfTimeMethods);
+  public static void parseStudyAreaCountries(
+      CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
+    List<Element> typeOfTimeMethodElements = getElements(document, xFactory, STUDY_AREA_COUNTRIES_XPATH);
+    Map<String, List<Country>> valueAndAttrsOfCountries  = extractMetadataForEachLang(config, typeOfTimeMethodElements);
+    builder.studyAreaCountries(valueAndAttrsOfCountries);
   }
 
   /**

@@ -120,12 +120,30 @@
       "description": "Time Methods for this CMMStudy in potentially multiple languages."
     },
     "studyAreaCountries": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "description": "A CMMStudy country."
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "array",
+          "description": "An array of Countries for this CMMStudy in this Given iso Language code.",
+          "items": [
+            {
+              "type": "object",
+              "description": "A CMMStudy Country.",
+              "properties": {
+                "abbr": {
+                  "type": "string"
+                },
+                "country": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
       },
-      "description": "An array of Countries for this CMMStudy."
+      "additionalProperties": false,
+      "description": "Countries for this CMMStudy in potentially multiple languages."
     },
     "unitTypes": {
       "type": "array",

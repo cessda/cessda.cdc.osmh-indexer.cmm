@@ -66,6 +66,7 @@ public class OaiPmhConstants {
   static final String VOCAB_ATTR = "vocab";
   static final String VOCAB_URI_ATTR = "vocabURI";
   static final String ID_ATTR = "ID";
+  static final String ABBR_ATTR = "abbr";
 
   // Encoding
   public static final String UTF_8 = "UTF-8";

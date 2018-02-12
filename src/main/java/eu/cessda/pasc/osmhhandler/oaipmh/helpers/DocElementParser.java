@@ -1,5 +1,6 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 
+import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.Country;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.TermVocabAttributes;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.configuration.OaiPmh;
 import org.jdom2.Attribute;
@@ -55,12 +56,14 @@ class DocElementParser {
     return expression.evaluate(document).stream().filter(Objects::nonNull).collect(toList());
   }
 
-  static Map<String, List<TermVocabAttributes>> extractTermVocabAttributes(OaiPmh config, List<Element> termVocabElement) {
-    Map<String, List<TermVocabAttributes>> langsTermVocabAttributes = new HashMap<>();
+  static Map<String, List<TermVocabAttributes>> extractVocabValueAttrsForEachLang(
+      OaiPmh config, List<Element> elements) {
+    Map<String, List<TermVocabAttributes>> languageVocabValueAttrs = new HashMap<>();
 
-    termVocabElement.forEach(element -> {
+    elements.forEach(element -> {
       Optional<Element> concept = Optional.ofNullable(element.getChild("concept", DDI_NS));
-      TermVocabAttributes currentTermVocabAttributes = parseTermVocabAttrAndValues(element, concept.orElse(new Element("empty")));
+      TermVocabAttributes vocabValueAttrs =
+          parseTermVocabAttrAndValues(element, concept.orElse(new Element("empty")));
 
       Attribute langAttr = concept.isPresent()
           ? concept.get().getAttribute(LANG_ATTR, XML_NS) : element.getAttribute(LANG_ATTR, XML_NS);
@@ -69,35 +72,28 @@ class DocElementParser {
         boolean isDefaultingLang = config.getMetadataParsingDefaultLang().isActive();
         if (isDefaultingLang) { // If defaulting lang is not configured we skip. We do not know the lang
           String defaultingLang = config.getMetadataParsingDefaultLang().getLang();
-          buildLanguageTermVocabAttributes(langsTermVocabAttributes, currentTermVocabAttributes, defaultingLang);
+          buildLanguageTermVocabAttributes(languageVocabValueAttrs, vocabValueAttrs, defaultingLang);
         }
       } else {
-        buildLanguageTermVocabAttributes(langsTermVocabAttributes, currentTermVocabAttributes, langAttr.getValue());
+        buildLanguageTermVocabAttributes(languageVocabValueAttrs, vocabValueAttrs, langAttr.getValue());
       }
     });
-    return langsTermVocabAttributes;
+    return languageVocabValueAttrs;
   }
 
   private static TermVocabAttributes parseTermVocabAttrAndValues(Element element, Element concept) {
 
     if ("empty".equals(concept.getName())) {
-      return buildTermVocabAttributes(element, element.getText());
+      return parseTermVocabAttrAndValues(element, element.getText());
     }
     // PUG requirement parent element Value of concept wins if it has a value.
     String elementValue = (element.getText().isEmpty()) ? concept.getText() : element.getText();
-    return buildTermVocabAttributes(concept, elementValue);
+    return parseTermVocabAttrAndValues(concept, elementValue);
   }
 
-  private static TermVocabAttributes buildTermVocabAttributes(Element elementToProcess, String elementValue) {
-
-    return TermVocabAttributes.builder()
-        .id(getAttributeValue(elementToProcess, ID_ATTR).orElse(""))
-        .vocab(getAttributeValue(elementToProcess, VOCAB_ATTR).orElse(""))
-        .vocabUri(getAttributeValue(elementToProcess, VOCAB_URI_ATTR).orElse(""))
-        .term(elementValue).build();
-  }
-
-  private static void buildLanguageTermVocabAttributes(Map<String, List<TermVocabAttributes>> termVocabAttributes, TermVocabAttributes currentTermVocabAttributes, String defaultingLang) {
+  private static void buildLanguageTermVocabAttributes(Map<String, List<TermVocabAttributes>> termVocabAttributes,
+                                                       TermVocabAttributes currentTermVocabAttributes,
+                                                       String defaultingLang) {
 
     if (termVocabAttributes.containsKey(defaultingLang)) {
       List<TermVocabAttributes> currentLangTermVocabAttributes = termVocabAttributes.get(defaultingLang);
@@ -108,6 +104,57 @@ class DocElementParser {
       initialTermVocabAttributes.add(currentTermVocabAttributes);
       termVocabAttributes.put(defaultingLang, initialTermVocabAttributes); // set Afresh
     }
+  }
+
+  static Map<String, List<Country>> extractMetadataForEachLang(OaiPmh config, List<Element> elements) {
+    Map<String, List<Country>> languageVocabValueAttrs = new HashMap<>();
+
+    elements.forEach(element -> {
+      Country valuesAndAttrsObject = parseValuesAndAttrsObject(element);
+      Attribute langAttr = element.getAttribute(LANG_ATTR, XML_NS);
+      String langCode;
+
+      if (null != langAttr && !langAttr.getValue().isEmpty()) {
+        langCode = langAttr.getValue();
+      } else {
+        if (config.getMetadataParsingDefaultLang().isActive()) {
+          langCode = config.getMetadataParsingDefaultLang().getLang();
+        }else{
+          return; // If defaulting lang is not configured we skip. We do not know the lang
+        }
+      }
+      mapMetadataToLanguageCode(languageVocabValueAttrs, valuesAndAttrsObject, langCode);
+    });
+    return languageVocabValueAttrs;
+  }
+
+  private static void mapMetadataToLanguageCode(Map<String, List<Country>> mapOfMetadataToLanguageCode,
+                                                Country valuesAndAttrsObject,
+                                                String languageCode) {
+
+    if (mapOfMetadataToLanguageCode.containsKey(languageCode)) {
+      List<Country> currentLangTermVocabAttributes = mapOfMetadataToLanguageCode.get(languageCode);
+      currentLangTermVocabAttributes.add(valuesAndAttrsObject);
+      mapOfMetadataToLanguageCode.put(languageCode, currentLangTermVocabAttributes);
+    } else {
+      List<Country> initialTermVocabAttributes = new ArrayList<>();
+      initialTermVocabAttributes.add(valuesAndAttrsObject);
+      mapOfMetadataToLanguageCode.put(languageCode, initialTermVocabAttributes); // set Afresh
+    }
+  }
+
+  private static Country parseValuesAndAttrsObject(Element elementToProcess) {
+    return Country.builder()
+        .iso2LetterCode(getAttributeValue(elementToProcess, ABBR_ATTR).orElse(""))
+        .countryName(elementToProcess.getText()).build();
+  }
+
+  private static TermVocabAttributes parseTermVocabAttrAndValues(Element elementToProcess, String elementValue) {
+    return TermVocabAttributes.builder()
+        .id(getAttributeValue(elementToProcess, ID_ATTR).orElse(""))
+        .vocab(getAttributeValue(elementToProcess, VOCAB_ATTR).orElse(""))
+        .vocabUri(getAttributeValue(elementToProcess, VOCAB_URI_ATTR).orElse(""))
+        .term(elementValue).build();
   }
 
   private static Optional<String> getAttributeValue(Element element, String idAttr) {
@@ -173,7 +220,9 @@ class DocElementParser {
    * Temp request from PUG to concatenate repeated elements.
    * <p>
    */
-  private static void concatRepeatedElements(String separator, Map<String, String> titlesMap, Element element, String xmlLang) {
+  private static void concatRepeatedElements(
+      String separator, Map<String, String> titlesMap, Element element, String xmlLang) {
+
     String currentElementContent = element.getText();
 
     if (titlesMap.containsKey(xmlLang)) {
