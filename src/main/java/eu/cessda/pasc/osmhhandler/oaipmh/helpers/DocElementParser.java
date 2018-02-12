@@ -1,6 +1,5 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 
-import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.Country;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.TermVocabAttributes;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.configuration.OaiPmh;
 import org.jdom2.Attribute;
@@ -11,6 +10,7 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 
 import java.util.*;
+import java.util.function.Function;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
 import static java.util.stream.Collectors.toList;
@@ -106,11 +106,13 @@ class DocElementParser {
     }
   }
 
-  static Map<String, List<Country>> extractMetadataForEachLang(OaiPmh config, List<Element> elements) {
-    Map<String, List<Country>> languageVocabValueAttrs = new HashMap<>();
+  static <T> Map<String, List<T>> extractMetadataForEachLang(
+      OaiPmh config, List<Element> elements, Function<Element, T> parserStrategy) {
+
+    Map<String, List<T>> mapOfMetadataToLanguageCode = new HashMap<>();
 
     elements.forEach(element -> {
-      Country valuesAndAttrsObject = parseValuesAndAttrsObject(element);
+      T parsedMetadataPojo = parserStrategy.apply(element);
       Attribute langAttr = element.getAttribute(LANG_ATTR, XML_NS);
       String langCode;
 
@@ -119,34 +121,27 @@ class DocElementParser {
       } else {
         if (config.getMetadataParsingDefaultLang().isActive()) {
           langCode = config.getMetadataParsingDefaultLang().getLang();
-        }else{
+        } else {
           return; // If defaulting lang is not configured we skip. We do not know the lang
         }
       }
-      mapMetadataToLanguageCode(languageVocabValueAttrs, valuesAndAttrsObject, langCode);
+      mapMetadataToLanguageCode(mapOfMetadataToLanguageCode, parsedMetadataPojo, langCode);
     });
-    return languageVocabValueAttrs;
+    return mapOfMetadataToLanguageCode;
   }
 
-  private static void mapMetadataToLanguageCode(Map<String, List<Country>> mapOfMetadataToLanguageCode,
-                                                Country valuesAndAttrsObject,
-                                                String languageCode) {
+  private static <T> void mapMetadataToLanguageCode(Map<String, List<T>> mapOfMetadataToLanguageCode,
+                                                    T metadataPojo, String languageCode) {
 
     if (mapOfMetadataToLanguageCode.containsKey(languageCode)) {
-      List<Country> currentLangTermVocabAttributes = mapOfMetadataToLanguageCode.get(languageCode);
-      currentLangTermVocabAttributes.add(valuesAndAttrsObject);
-      mapOfMetadataToLanguageCode.put(languageCode, currentLangTermVocabAttributes);
+      List<T> currentLanguageMetadataList = mapOfMetadataToLanguageCode.get(languageCode);
+      currentLanguageMetadataList.add(metadataPojo);
+      mapOfMetadataToLanguageCode.put(languageCode, currentLanguageMetadataList);
     } else {
-      List<Country> initialTermVocabAttributes = new ArrayList<>();
-      initialTermVocabAttributes.add(valuesAndAttrsObject);
-      mapOfMetadataToLanguageCode.put(languageCode, initialTermVocabAttributes); // set Afresh
+      List<T> initialLanguageMetadataList = new ArrayList<>();
+      initialLanguageMetadataList.add(metadataPojo);
+      mapOfMetadataToLanguageCode.put(languageCode, initialLanguageMetadataList); // set Afresh
     }
-  }
-
-  private static Country parseValuesAndAttrsObject(Element elementToProcess) {
-    return Country.builder()
-        .iso2LetterCode(getAttributeValue(elementToProcess, ABBR_ATTR).orElse(""))
-        .countryName(elementToProcess.getText()).build();
   }
 
   private static TermVocabAttributes parseTermVocabAttrAndValues(Element elementToProcess, String elementValue) {
@@ -157,7 +152,7 @@ class DocElementParser {
         .term(elementValue).build();
   }
 
-  private static Optional<String> getAttributeValue(Element element, String idAttr) {
+  static Optional<String> getAttributeValue(Element element, String idAttr) {
     return Optional.ofNullable(element.getAttributeValue(idAttr));
   }
 

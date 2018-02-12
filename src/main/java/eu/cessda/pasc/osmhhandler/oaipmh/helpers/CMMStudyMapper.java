@@ -20,6 +20,7 @@ import java.util.Optional;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.DocElementParser.*;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.ParsingStrategies.countryParserStrategyFunction;
 
 /**
  * Responsible for Mapping oai-pmh fields to a CMMStudy
@@ -231,19 +232,20 @@ public class CMMStudyMapper {
   }
 
   /**
-   * Parses Type Of Time Method(s) from:
+   * Parses area Countries covered by a study:
    * <p>
    * Xpath = {@value OaiPmhConstants#STUDY_AREA_COUNTRIES_XPATH }
    */
   public static void parseStudyAreaCountries(
       CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
     List<Element> typeOfTimeMethodElements = getElements(document, xFactory, STUDY_AREA_COUNTRIES_XPATH);
-    Map<String, List<Country>> valueAndAttrsOfCountries  = extractMetadataForEachLang(config, typeOfTimeMethodElements);
+    Map<String, List<Country>> valueAndAttrsOfCountries =
+        extractMetadataForEachLang(config, typeOfTimeMethodElements, countryParserStrategyFunction());
     builder.studyAreaCountries(valueAndAttrsOfCountries);
   }
 
   /**
-   * Parses Type Of Time Method(s) from:
+   * Parses Unit Type(s) from:
    * <p>
    * Xpath = {@value OaiPmhConstants#UNIT_TYPE_XPATH }
    */
@@ -288,7 +290,7 @@ public class CMMStudyMapper {
   }
 
   /**
-   * Parses Type Of Time Method(s) from:
+   * Parses File Language(s) from:
    * <p>
    * Xpath = {@value OaiPmhConstants#FILE_LANGUAGES_XPATH }
    */
