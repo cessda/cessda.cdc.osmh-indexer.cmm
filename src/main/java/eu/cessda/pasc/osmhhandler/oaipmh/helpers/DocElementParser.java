@@ -66,7 +66,7 @@ class DocElementParser {
     return parseTermVocabAttrAndValues(concept, elementValue);
   }
 
-  static <T> Map<String, List<T>> extractMetadataForEachLang(
+  static <T> Map<String, List<T>> extractMetadataObjectListForEachLang(
       OaiPmh config, Document document, XPathFactory xFactory, String xPath, Function<Element, T> parserStrategy) {
 
     Map<String, List<T>> mapOfMetadataToLanguageCode = new HashMap<>();
@@ -76,6 +76,22 @@ class DocElementParser {
           Optional<String> langCode = getParseLanguageCode(config, element);
           langCode.ifPresent(s ->
               mapMetadataToLanguageCode(mapOfMetadataToLanguageCode, parsedMetadataPojo, s));
+        }
+    );
+
+    return mapOfMetadataToLanguageCode;
+  }
+
+  static <T> Map<String, T> extractMetadataObjectForEachLang(
+      OaiPmh config, Document document, XPathFactory xFactory, String xPath, Function<Element, T> parserStrategy) {
+
+    Map<String, T> mapOfMetadataToLanguageCode = new HashMap<>();
+    List<Element> elements = getElements(document, xFactory, xPath);
+    elements.forEach(element -> {
+          T parsedMetadataPojo = parserStrategy.apply(element);
+          Optional<String> langCode = getParseLanguageCode(config, element);
+          langCode.ifPresent(languageIsoCode ->
+              mapOfMetadataToLanguageCode.put(languageIsoCode, parsedMetadataPojo)); //Overrides duplicates, last wins.
         }
     );
 

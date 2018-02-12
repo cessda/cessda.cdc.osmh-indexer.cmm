@@ -123,19 +123,6 @@ public class CMMStudyMapper {
   }
 
   /**
-   * Parses Study Title.
-   * <p>
-   * Xpath = {@value OaiPmhConstants#TITLE_XPATH }
-   */
-  public static void parseStudyTitle(
-      CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
-
-    List<Element> elements = getElements(document, xFactory, TITLE_XPATH);
-    Map<String, String> studyTitles = getLanguageKeyValuePairs(config, elements, false);
-    builder.titleStudy(studyTitles);
-  }
-
-  /**
    * Parses Abstract
    * <p>
    * Xpath = {@value OaiPmhConstants#ABSTRACT_XPATH }
@@ -201,7 +188,7 @@ public class CMMStudyMapper {
   public static void parseClassifications(CMMStudy.CMMStudyBuilder builder, Document doc, XPathFactory xFactory,
                                           OaiPmh config) {
     builder.classifications(
-        extractMetadataForEachLang(
+        extractMetadataObjectListForEachLang(
             config, doc, xFactory, CLASSIFICATIONS_XPATH, termVocabAttributeStrategyFunction()));
   }
 
@@ -213,7 +200,7 @@ public class CMMStudyMapper {
   public static void parseKeywords(CMMStudy.CMMStudyBuilder builder, Document doc, XPathFactory xFactory,
                                    OaiPmh config) {
     builder.keywords(
-        extractMetadataForEachLang(
+        extractMetadataObjectListForEachLang(
             config, doc, xFactory, KEYWORDS_XPATH, termVocabAttributeStrategyFunction()));
   }
 
@@ -226,7 +213,7 @@ public class CMMStudyMapper {
                                            OaiPmh config) {
 
     builder.typeOfTimeMethods(
-        extractMetadataForEachLang(
+        extractMetadataObjectListForEachLang(
             config, doc, xFactory, TYPE_OF_TIME_METHOD_XPATH, termVocabAttributeStrategyFunction()));
   }
 
@@ -238,8 +225,21 @@ public class CMMStudyMapper {
   public static void parseStudyAreaCountries(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory,
                                              OaiPmh config) {
     builder.studyAreaCountries(
-        extractMetadataForEachLang(
+        extractMetadataObjectListForEachLang(
             config, document, xFactory, STUDY_AREA_COUNTRIES_XPATH, countryStrategyFunction()));
+  }
+
+  /**
+   * Parses Study Title.
+   * <p>
+   * Xpath = {@value OaiPmhConstants#TITLE_XPATH }
+   */
+  public static void parseStudyTitle(
+      CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
+
+    List<Element> elements = getElements(document, xFactory, TITLE_XPATH);
+    Map<String, String> studyTitles = getLanguageKeyValuePairs(config, elements, false);
+    builder.titleStudy(studyTitles);
   }
 
   /**
@@ -250,7 +250,7 @@ public class CMMStudyMapper {
   public static void parseUnitTypes(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory,
                                     OaiPmh config) {
     builder.unitTypes(
-        extractMetadataForEachLang(
+        extractMetadataObjectListForEachLang(
             config, document, xFactory, UNIT_TYPE_XPATH, termVocabAttributeStrategyFunction()));
   }
 
