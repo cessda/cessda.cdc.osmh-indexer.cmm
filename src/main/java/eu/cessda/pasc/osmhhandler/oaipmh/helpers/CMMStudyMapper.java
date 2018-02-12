@@ -247,9 +247,11 @@ public class CMMStudyMapper {
    * <p>
    * Xpath = {@value OaiPmhConstants#UNIT_TYPE_XPATH }
    */
-  public static void parseUnitTypes(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
-    String[] typeOfTimeMethods = getElementValues(document, xFactory, UNIT_TYPE_XPATH);
-    builder.unitTypes(typeOfTimeMethods);
+  public static void parseUnitTypes(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory,
+                                    OaiPmh config) {
+    builder.unitTypes(
+        extractMetadataForEachLang(
+            config, document, xFactory, UNIT_TYPE_XPATH, termVocabAttributeStrategyFunction()));
   }
 
   /**
@@ -294,7 +296,7 @@ public class CMMStudyMapper {
    */
   public static void parseFileLanguages(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
     String[] typeOfTimeMethods = getAttributeValues(document, xFactory, FILE_LANGUAGES_XPATH);
-    builder.unitTypes(typeOfTimeMethods);
+    builder.fileLanguages(typeOfTimeMethods);
   }
 
   /**

@@ -7,10 +7,10 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
+import eu.cessda.pasc.osmhhandler.oaipmh.FileHandler;
 import eu.cessda.pasc.osmhhandler.oaipmh.dao.GetRecordDoa;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
-import eu.cessda.pasc.osmhhandler.oaipmh.FileHandler;
 import eu.cessda.pasc.osmhhandler.oaipmh.mock.data.CMMStudyTestData;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMConverter;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMStudy;
@@ -51,8 +51,7 @@ public class GetRecordServiceImplTest {
   FileHandler fileHandler;
 
   @Test
-  public void shouldReturnValidCMMStudyRecordFromAFullyComplaintCmmDdiRecord()
-      throws IOException, ProcessingException, CustomHandlerException, JSONException {
+  public void shouldReturnValidCMMStudyRecordFromAFullyComplaintCmmDdiRecord() throws Exception {
 
     // Given
     given(getRecordDoa.getRecordXML("", "")).willReturn(
@@ -67,9 +66,25 @@ public class GetRecordServiceImplTest {
     validateContentIsExtractedAsExpected(record);
   }
 
+private void validateContentIsExtractedAsExpected(CMMStudy record) throws IOException, JSONException {
+    final ObjectMapper mapper = new ObjectMapper();
+
+    String jsonString = CMMConverter.toJsonString(record);
+    String expectedJson = CMMStudyTestData.getXMLString("json/synthetic_compliant_record.json");
+    final JsonNode actualTree = mapper.readTree(jsonString);
+    final JsonNode expectedTree = mapper.readTree(expectedJson);
+
+    assertEquals(actualTree.get("classifications").toString(), expectedTree.get("classifications").toString(), true);
+    assertEquals(actualTree.get("keywords").toString(), expectedTree.get("keywords").toString(), true);
+    assertEquals(actualTree.get("typeOfTimeMethods").toString(), expectedTree.get("typeOfTimeMethods").toString(), true);
+    assertEquals(actualTree.get("studyAreaCountries").toString(), expectedTree.get("studyAreaCountries").toString(), true);
+    assertEquals(actualTree.get("unitTypes").toString(), expectedTree.get("unitTypes").toString(), true);
+
+    // TODO repeat for each individual element.  Final goal is to use one single Uber Json compare
+  }
+
   @Test
-  public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord()
-      throws IOException, ProcessingException, CustomHandlerException, JSONException {
+  public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord() throws Exception {
 
     // Given
     String repoUrl = "";
@@ -87,8 +102,7 @@ public class GetRecordServiceImplTest {
   }
 
   @Test
-  public void shouldReturnCMMStudyRecordWithRepeatedAbstractConcatenated()
-      throws IOException, ProcessingException, CustomHandlerException, JSONException {
+  public void shouldReturnCMMStudyRecordWithRepeatedAbstractConcatenated()throws Exception {
 
     Map<String, String> expectedAbstract = new HashMap<>();
     expectedAbstract.put("de", "de de");
@@ -161,19 +175,4 @@ public class GetRecordServiceImplTest {
     }
   }
 
-  private void validateContentIsExtractedAsExpected(CMMStudy record) throws IOException, JSONException {
-    final ObjectMapper mapper = new ObjectMapper();
-
-    String jsonString = CMMConverter.toJsonString(record);
-    String expectedJson = CMMStudyTestData.getXMLString("json/synthetic_compliant_record.json");
-    final JsonNode actualTree = mapper.readTree(jsonString);
-    final JsonNode expectedTree = mapper.readTree(expectedJson);
-
-    assertEquals(actualTree.get("classifications").toString(), expectedTree.get("classifications").toString(), true);
-    assertEquals(actualTree.get("keywords").toString(), expectedTree.get("keywords").toString(), true);
-    assertEquals(actualTree.get("typeOfTimeMethods").toString(), expectedTree.get("typeOfTimeMethods").toString(), true);
-    assertEquals(actualTree.get("studyAreaCountries").toString(), expectedTree.get("studyAreaCountries").toString(), true);
-
-    // TODO repeat for each individual element.  Final goal is to use one single Uber Json compare
-  }
 }

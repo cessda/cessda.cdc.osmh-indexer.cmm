@@ -116,7 +116,7 @@ public class CMMStudy {
   private Map<String, List<Country>> studyAreaCountries;
 
   @JsonProperty("unitTypes")
-  private String[] unitTypes;
+  private Map<String, List<TermVocabAttributes>> unitTypes;
 
   @JsonProperty("pidStudies")
   private String[] pidStudies;

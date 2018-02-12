@@ -98,6 +98,12 @@
                 <nation xml:lang="fr" abbr="FR">la France</nation>
                 <nation xml:lang="fi" abbr="FR">Ranska</nation>
                 <nation xml:lang="se" abbr="FR">Frankrike</nation>
+                <!--Expected-->
+                <anlyUnit>Geographische Einheit <concept xml:lang="de" vocab="DDI Analysis Unit">GeographicUnit</concept></anlyUnit>
+                <anlyUnit>Made Up<concept xml:lang="en" vocab="DDI Made Up" vocabURI="https://dbk.gesis.org/madeup.htm">MadeUpUnit</concept></anlyUnit>
+                <anlyUnit>Made Up 2<concept xml:lang="en" vocab="DDI Made Up 2" vocabURI="https://dbk.gesis.org/madeup2.htm">MadeUpUnit 2</concept></anlyUnit>
+                <!-- UkDA-->
+                <anlyUnit>Institutions/organisations</anlyUnit>
                 <universe xml:lang="en" clusion="I">Persons who were second grade students in a school in Jyväskylä at the time of the first data collection in 1968 and who continued to participate in the longitudinal study and had belonged to extreme groups of social behaviour at ages 8 and 14. The sample was collected both from the town centre and suburbs.</universe>
                 <universe xml:lang="fi" clusion="I">Otantahetkellä vuonna 1968 kansakoulun toisluokkalaiset keskisuomalaisen kaupungin oppilaat, jotka ovat edelleen mukana pitkittäistutkimuksessa ja kuuluivat 8- ja 14 -vuotiaana sosiaalisen käyttäytymisen ääriryhmiin.</universe>
               </sumDscr>

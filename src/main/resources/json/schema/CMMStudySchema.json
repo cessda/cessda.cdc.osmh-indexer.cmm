@@ -146,12 +146,36 @@
       "description": "Countries for this CMMStudy in potentially multiple languages."
     },
     "unitTypes": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "description": "A CMMStudy AnalysisUnit."
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "array",
+          "description": "An array of Analysis Units for this CMMStudy in this Given iso Language code.",
+          "items": [
+            {
+              "type": "object",
+              "description": "A CMMStudy Analysis Unit.",
+              "properties": {
+                "vocab": {
+                  "type": "string"
+                },
+                "vocabUri": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "term": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
       },
-      "description": "An array of AnalysisUnits for this CMMStudy."
+      "additionalProperties": false,
+      "description": "Analysis Units for this CMMStudy in potentially multiple languages."
     },
     "titleStudy": {
       "type": "object",
