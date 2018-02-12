@@ -17,7 +17,7 @@ public class HandlerLogHelper {
   private static final String ERROR = "ERROR";
 
   private HandlerLogHelper() {
-    throw new UnsupportedOperationException("Hides implicit public constructor | For static constants only");
+    throw new UnsupportedOperationException("Utility class, instantiation not allow");
   }
 
   public static void logResponse(HttpStatus statusCode, Logger log, LogLevel logLevel) {

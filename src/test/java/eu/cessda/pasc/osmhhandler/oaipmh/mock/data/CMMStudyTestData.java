@@ -1,7 +1,7 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.mock.data;
 
 
-import eu.cessda.pasc.osmhhandler.oaipmh.helpers.FileHandler;
+import eu.cessda.pasc.osmhhandler.oaipmh.FileHandler;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMStudy;
 import org.assertj.core.util.Maps;
 

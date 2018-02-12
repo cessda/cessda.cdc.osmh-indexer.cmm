@@ -56,32 +56,7 @@ class DocElementParser {
     return expression.evaluate(document).stream().filter(Objects::nonNull).collect(toList());
   }
 
-  static Map<String, List<TermVocabAttributes>> extractVocabValueAttrsForEachLang(
-      OaiPmh config, List<Element> elements) {
-    Map<String, List<TermVocabAttributes>> languageVocabValueAttrs = new HashMap<>();
-
-    elements.forEach(element -> {
-      Optional<Element> concept = Optional.ofNullable(element.getChild("concept", DDI_NS));
-      TermVocabAttributes vocabValueAttrs =
-          parseTermVocabAttrAndValues(element, concept.orElse(new Element("empty")));
-
-      Attribute langAttr = concept.isPresent()
-          ? concept.get().getAttribute(LANG_ATTR, XML_NS) : element.getAttribute(LANG_ATTR, XML_NS);
-
-      if (null == langAttr || langAttr.getValue().isEmpty()) {
-        boolean isDefaultingLang = config.getMetadataParsingDefaultLang().isActive();
-        if (isDefaultingLang) { // If defaulting lang is not configured we skip. We do not know the lang
-          String defaultingLang = config.getMetadataParsingDefaultLang().getLang();
-          buildLanguageTermVocabAttributes(languageVocabValueAttrs, vocabValueAttrs, defaultingLang);
-        }
-      } else {
-        buildLanguageTermVocabAttributes(languageVocabValueAttrs, vocabValueAttrs, langAttr.getValue());
-      }
-    });
-    return languageVocabValueAttrs;
-  }
-
-  private static TermVocabAttributes parseTermVocabAttrAndValues(Element element, Element concept) {
+  static TermVocabAttributes parseTermVocabAttrAndValues(Element element, Element concept) {
 
     if ("empty".equals(concept.getName())) {
       return parseTermVocabAttrAndValues(element, element.getText());
@@ -91,43 +66,37 @@ class DocElementParser {
     return parseTermVocabAttrAndValues(concept, elementValue);
   }
 
-  private static void buildLanguageTermVocabAttributes(Map<String, List<TermVocabAttributes>> termVocabAttributes,
-                                                       TermVocabAttributes currentTermVocabAttributes,
-                                                       String defaultingLang) {
-
-    if (termVocabAttributes.containsKey(defaultingLang)) {
-      List<TermVocabAttributes> currentLangTermVocabAttributes = termVocabAttributes.get(defaultingLang);
-      currentLangTermVocabAttributes.add(currentTermVocabAttributes);
-      termVocabAttributes.put(defaultingLang, currentLangTermVocabAttributes);
-    } else {
-      List<TermVocabAttributes> initialTermVocabAttributes = new ArrayList<>();
-      initialTermVocabAttributes.add(currentTermVocabAttributes);
-      termVocabAttributes.put(defaultingLang, initialTermVocabAttributes); // set Afresh
-    }
-  }
-
   static <T> Map<String, List<T>> extractMetadataForEachLang(
-      OaiPmh config, List<Element> elements, Function<Element, T> parserStrategy) {
+      OaiPmh config, Document document, XPathFactory xFactory, String xPath, Function<Element, T> parserStrategy) {
 
     Map<String, List<T>> mapOfMetadataToLanguageCode = new HashMap<>();
-
+    List<Element> elements = getElements(document, xFactory, xPath);
     elements.forEach(element -> {
-      T parsedMetadataPojo = parserStrategy.apply(element);
-      Attribute langAttr = element.getAttribute(LANG_ATTR, XML_NS);
-      String langCode;
-
-      if (null != langAttr && !langAttr.getValue().isEmpty()) {
-        langCode = langAttr.getValue();
-      } else {
-        if (config.getMetadataParsingDefaultLang().isActive()) {
-          langCode = config.getMetadataParsingDefaultLang().getLang();
-        } else {
-          return; // If defaulting lang is not configured we skip. We do not know the lang
+          T parsedMetadataPojo = parserStrategy.apply(element);
+          Optional<String> langCode = getParseLanguageCode(config, element);
+          langCode.ifPresent(s ->
+              mapMetadataToLanguageCode(mapOfMetadataToLanguageCode, parsedMetadataPojo, s));
         }
-      }
-      mapMetadataToLanguageCode(mapOfMetadataToLanguageCode, parsedMetadataPojo, langCode);
-    });
+    );
+
     return mapOfMetadataToLanguageCode;
+  }
+
+  private static Optional<String> getParseLanguageCode(OaiPmh config, Element element) {
+
+    Optional<Element> concept = Optional.ofNullable(element.getChild("concept", DDI_NS));
+
+    Attribute langAttr = concept.isPresent() ? concept.get().getAttribute(LANG_ATTR, XML_NS) :
+        element.getAttribute(LANG_ATTR, XML_NS);
+
+    Optional<String> langCode = Optional.empty();
+    if (null != langAttr && !langAttr.getValue().isEmpty()) {
+      langCode = Optional.ofNullable(langAttr.getValue());
+    } else if (config.getMetadataParsingDefaultLang().isActive()) {
+      langCode = Optional.ofNullable(config.getMetadataParsingDefaultLang().getLang());
+    }
+
+    return langCode;
   }
 
   private static <T> void mapMetadataToLanguageCode(Map<String, List<T>> mapOfMetadataToLanguageCode,

@@ -10,7 +10,7 @@ import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import eu.cessda.pasc.osmhhandler.oaipmh.dao.GetRecordDoa;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
-import eu.cessda.pasc.osmhhandler.oaipmh.helpers.FileHandler;
+import eu.cessda.pasc.osmhhandler.oaipmh.FileHandler;
 import eu.cessda.pasc.osmhhandler.oaipmh.mock.data.CMMStudyTestData;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMConverter;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMStudy;

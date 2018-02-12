@@ -1,5 +1,6 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 
+import eu.cessda.pasc.osmhhandler.oaipmh.FileHandler;
 import org.junit.Test;
 
 import static org.assertj.core.api.BDDAssertions.then;

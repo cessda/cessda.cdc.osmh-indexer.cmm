@@ -1,4 +1,4 @@
-package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
+package eu.cessda.pasc.osmhhandler.oaipmh;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;

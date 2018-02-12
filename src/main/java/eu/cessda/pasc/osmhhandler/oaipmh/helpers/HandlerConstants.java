@@ -8,11 +8,10 @@ package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 public class HandlerConstants {
 
   public static final String STUDY = "Study";
-  // TODO: users of this below should be throwing Custom ExternalSystemError
   public static final String UNSUCCESSFUL_RESPONSE = "Unsuccessful response from remote repository.";
 
   private HandlerConstants() {
-    // Hides implicit public constructor | For static constants only
+    throw new UnsupportedOperationException("Utility class, instantiation not allow");
   }
 
   public static final String UNSUPPORTED_API_VERSION = "Unsupported API-version [%s]";
