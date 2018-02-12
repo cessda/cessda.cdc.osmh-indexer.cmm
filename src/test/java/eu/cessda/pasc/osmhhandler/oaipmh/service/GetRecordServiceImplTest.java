@@ -80,6 +80,7 @@ private void validateContentIsExtractedAsExpected(CMMStudy record) throws IOExce
     assertEquals(actualTree.get("studyAreaCountries").toString(), expectedTree.get("studyAreaCountries").toString(), true);
     assertEquals(actualTree.get("unitTypes").toString(), expectedTree.get("unitTypes").toString(), true);
     assertEquals(actualTree.get("titleStudy").toString(), expectedTree.get("titleStudy").toString(), true);
+    assertEquals(actualTree.get("publisher").toString(), expectedTree.get("publisher").toString(), true);
 
     // TODO repeat for each individual element.  Final goal is to use one single Uber Json compare
   }

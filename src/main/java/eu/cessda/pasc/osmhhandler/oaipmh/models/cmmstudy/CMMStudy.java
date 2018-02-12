@@ -110,7 +110,7 @@ public class CMMStudy {
   private String[] typeOfSamplingProcedures;
 
   @JsonProperty("publisher")
-  private String publisher;
+  private Map<String, Publisher> publisher;
 
   @JsonProperty("studyAreaCountries")
   private Map<String, List<Country>> studyAreaCountries;

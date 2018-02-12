@@ -19,8 +19,11 @@
                 <titl/>
               </titlStmt>
               <prodStmt>
-                <producer xml:lang="en">Finnish Social Science Data Archive</producer>
-                <producer xml:lang="fi">Yhteiskuntatieteellinen tietoarkisto</producer>
+                <!--Compliance Example-->
+                <producer xml:lang="fi" abbr="FSD">Yhteiskuntatieteellinen tietoarkisto</producer>
+                <producer xml:lang="en" abbr="FSD">Finnish Social Science Data Archive</producer>
+                <!--UKDS Example : Should extra all there is-->
+                <producer xml:lang="se">Samhällsdatablad</producer>
                 <copyright xml:lang="en">Finnish Social Science Data Archive</copyright>
                 <copyright xml:lang="fi">Yhteiskuntatieteellinen tietoarkisto</copyright>
               </prodStmt>

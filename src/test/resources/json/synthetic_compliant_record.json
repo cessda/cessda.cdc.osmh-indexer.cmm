@@ -195,7 +195,20 @@
       }
     ]
   },
-  "publisher": "Finnish Social Science Data Archive",
+  "publisher": {
+    "se": {
+      "publisher": "Samhällsdatablad",
+      "abbr": "not available"
+    },
+    "fi": {
+      "publisher": "Yhteiskuntatieteellinen tietoarkisto",
+      "abbr": "FSD"
+    },
+    "en": {
+      "publisher": "Finnish Social Science Data Archive",
+      "abbr": "FSD"
+    }
+  },
   "publicationYear": 0,
   "lastModified": "2017-11-17T08:08:11Z",
   "accessClass": "The dataset is (D) available only by permission from the data depositor\/creator.",

@@ -9,6 +9,7 @@ public class HandlerConstants {
 
   public static final String STUDY = "Study";
   public static final String UNSUCCESSFUL_RESPONSE = "Unsuccessful response from remote repository.";
+  static final String NOT_AVAIL = "not available";
 
   private HandlerConstants() {
     throw new UnsupportedOperationException("Utility class, instantiation not allow");

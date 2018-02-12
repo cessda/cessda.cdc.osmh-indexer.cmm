@@ -189,8 +189,24 @@
       "description": "An object containing Study Titles in various languages. Uses language code properties and abstract values. E.g. {'en': 'An studyTitle', 'no': 'Et studyTitle'}."
     },
     "publisher": {
-      "type": "string",
-      "description": "Name of the institution publishing the research data."
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "object",
+          "description": "A CMMStudy institution publishing the research data for the given language code.",
+          "properties": {
+            "abbr": {
+              "type": "string"
+            },
+            "publisher": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false,
+      "description": "An object containing Study Titles in various languages. Uses language code properties and abstract values. E.g. {'en': 'An studyTitle', 'no': 'Et studyTitle'}."
     },
     "publicationYear": {
       "type": "number",

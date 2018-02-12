@@ -90,7 +90,7 @@ public class GetRecordServiceImpl implements GetRecordService {
       parseTypeOfTimeMethod(builder, document, X_FACTORY, oaiPmh);
       parseStudyAreaCountries(builder, document, X_FACTORY, oaiPmh);
       parseUnitTypes(builder, document, X_FACTORY, oaiPmh);
-      parsePublisher(builder, document, X_FACTORY);
+      parsePublisher(builder, document, X_FACTORY, oaiPmh);
       parseFileLanguages(builder, document, X_FACTORY);
       parseTypeOfSamplingProcedure(builder, document, X_FACTORY);
       parseSamplingProcedure(builder, document, X_FACTORY, oaiPmh);

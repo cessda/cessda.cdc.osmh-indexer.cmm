@@ -18,8 +18,7 @@ import java.util.Optional;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.DocElementParser.*;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.ParsingStrategies.countryStrategyFunction;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.ParsingStrategies.termVocabAttributeStrategyFunction;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.ParsingStrategies.*;
 
 /**
  * Responsible for Mapping oai-pmh fields to a CMMStudy
@@ -110,16 +109,6 @@ public class CMMStudyMapper {
   public static void parseAccessClass(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
     getFirstElement(document, xFactory, ACCESS_CLASS_XPATH)
         .ifPresent(element -> builder.accessClass(element.getText()));
-  }
-
-  /**
-   * Parse Publisher from:
-   * <p>
-   * Xpath = {@value OaiPmhConstants#PUBLISHER_XPATH }
-   */
-  public static void parsePublisher(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
-    getFirstElement(document, xFactory, PUBLISHER_XPATH)
-        .ifPresent(element -> builder.publisher(element.getText()));
   }
 
   /**
@@ -224,9 +213,19 @@ public class CMMStudyMapper {
    */
   public static void parseStudyAreaCountries(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory,
                                              OaiPmh config) {
-    builder.studyAreaCountries(
-        extractMetadataObjectListForEachLang(
+    builder.studyAreaCountries(extractMetadataObjectListForEachLang(
             config, document, xFactory, STUDY_AREA_COUNTRIES_XPATH, countryStrategyFunction()));
+  }
+
+  /**
+   * Parse Publisher from:
+   * <p>
+   * Xpath = {@value OaiPmhConstants#PUBLISHER_XPATH }
+   */
+  public static void parsePublisher(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory,
+                                    OaiPmh config) {
+    builder.publisher(extractMetadataObjectForEachLang(
+        config, document, xFactory, PUBLISHER_XPATH, publisherStrategyFunction()));
   }
 
   /**
