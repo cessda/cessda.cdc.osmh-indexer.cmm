@@ -42,6 +42,7 @@
               <prodStmt>
               </prodStmt>
               <distStmt>
+                <distDate date="1982-01-01T00:00:00Z">1982</distDate>
               </distStmt>
               <serStmt>
                 <serName ID="laku" xml:lang="fi">Lapsesta aikuiseksi</serName>

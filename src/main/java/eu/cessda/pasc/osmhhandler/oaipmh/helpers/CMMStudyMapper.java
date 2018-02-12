@@ -129,18 +129,9 @@ public class CMMStudyMapper {
    * <p>
    * Xpath = {@value OaiPmhConstants#YEAR_OF_PUB_XPATH }
    */
-  public static void parseYrOfPublication(
-      CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
-
-    Optional<Element> yrOfPublicationDate = getFirstElement(document, xFactory, YEAR_OF_PUB_XPATH);
-    yrOfPublicationDate.ifPresent((Element element) -> {
-      try {
-        builder.publicationYear(Integer.parseInt(element.getText()));
-      } catch (NumberFormatException e) {
-        log.warn("Could not parse year to Int. Defaulting to 1970");
-        builder.publicationYear(config.getPublicationYearDefault());
-      }
-    });
+  public static void parseYrOfPublication(CMMStudy.CMMStudyBuilder builder, Document document,XPathFactory xFactory) {
+    Optional<Attribute> yrOfPublicationDate = getFirstAttribute(document, xFactory, YEAR_OF_PUB_XPATH);
+    yrOfPublicationDate.ifPresent(attribute -> builder.publicationYear(attribute.getValue()));
   }
 
   /**
@@ -214,7 +205,7 @@ public class CMMStudyMapper {
   public static void parseStudyAreaCountries(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory,
                                              OaiPmh config) {
     builder.studyAreaCountries(extractMetadataObjectListForEachLang(
-            config, document, xFactory, STUDY_AREA_COUNTRIES_XPATH, countryStrategyFunction()));
+        config, document, xFactory, STUDY_AREA_COUNTRIES_XPATH, countryStrategyFunction()));
   }
 
   /**

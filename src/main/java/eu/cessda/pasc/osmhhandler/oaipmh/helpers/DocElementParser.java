@@ -146,6 +146,11 @@ class DocElementParser {
     return Optional.ofNullable(expression.evaluateFirst(document));
   }
 
+  static Optional<Attribute> getFirstAttribute(Document document, XPathFactory xFactory, String xPathToElement) {
+    XPathExpression<Attribute> expression = xFactory.compile(xPathToElement, Filters.attribute(), null, OAI_AND_DDI_NS);
+    return Optional.ofNullable(expression.evaluateFirst(document));
+  }
+
   /**
    * Parses the array values of attributes of a given elements
    *

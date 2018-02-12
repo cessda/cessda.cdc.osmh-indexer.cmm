@@ -78,7 +78,6 @@ public class GetRecordServiceImpl implements GetRecordService {
     if (isActiveRecord) {
       parseStudyTitle(builder, document, X_FACTORY, oaiPmh);
       parseAbstract(builder, document, X_FACTORY, oaiPmh);
-      parseYrOfPublication(builder, document, X_FACTORY, oaiPmh);
       parsePidStudies(builder, document, X_FACTORY);
       parseCreator(builder, document, X_FACTORY);
       parseAccessClass(builder, document, X_FACTORY);
@@ -91,6 +90,7 @@ public class GetRecordServiceImpl implements GetRecordService {
       parseStudyAreaCountries(builder, document, X_FACTORY, oaiPmh);
       parseUnitTypes(builder, document, X_FACTORY, oaiPmh);
       parsePublisher(builder, document, X_FACTORY, oaiPmh);
+      parseYrOfPublication(builder, document, X_FACTORY);
       parseFileLanguages(builder, document, X_FACTORY);
       parseTypeOfSamplingProcedure(builder, document, X_FACTORY);
       parseSamplingProcedure(builder, document, X_FACTORY, oaiPmh);

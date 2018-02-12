@@ -25,7 +25,7 @@ public class OaiPmhConstants {
   static final String ERROR_PATH = "//oai:error";
 
   // Codebook Paths
-  static final String YEAR_OF_PUB_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:distDate[1]"; // TODO: take @date instead
+  static final String YEAR_OF_PUB_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:distDate[1]/@date";
   static final String ABSTRACT_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:abstract";
   static final String TITLE_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:titl";
   static final String PID_STUDY_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo"; // TODO use @agency instead

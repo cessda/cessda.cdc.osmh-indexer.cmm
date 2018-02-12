@@ -67,7 +67,7 @@ public class CMMStudy {
   private String dataCollectionPeriodEnddate;
 
   @JsonProperty("publicationYear")
-  private int publicationYear;
+  private String publicationYear;
 
   @JsonProperty("typeOfModeOfCollections")
   private String[] typeOfModeOfCollections;
