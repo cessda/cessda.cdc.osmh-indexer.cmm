@@ -176,29 +176,36 @@ class DocElementParser {
    * <p>
    * If configuration is set to not default to a given lang, effect is this element is not extracted.
    */
-  static Map<String, String> getLanguageKeyValuePairs(OaiPmh config, List<Element> elements, boolean isConcatenating) {
+  static Map<String, String> getLanguageKeyValuePairs(OaiPmh config, List<Element> elements, boolean isConcatenating,
+                                                      Function<Element, String> textExtractionStrategy) {
 
     String defaultingLang = config.getMetadataParsingDefaultLang().getLang();
     Map<String, String> titlesMap = new HashMap<>();
 
     for (Element element : elements) {
+      String elementText = textExtractionStrategy.apply(element);
       Attribute langAttribute = element.getAttribute(LANG_ATTR, XML_NS);
       if (null == langAttribute || langAttribute.getValue().isEmpty()) {
-        boolean isDefaultingLang = config.getMetadataParsingDefaultLang().isActive();
-        if (isDefaultingLang) { // If defaulting lang is not configured we skip. We do not know the lang
-          if (isConcatenating && config.isConcatRepeatedElements()) {
-            concatRepeatedElements(config.getConcatSeparator(), titlesMap, element, defaultingLang);
-          } else {
-            titlesMap.put(defaultingLang, element.getText()); // Else keep overriding
-          }
-        }
+        mapToADefaultingLang(config, isConcatenating, defaultingLang, titlesMap, element, elementText);
       } else if (isConcatenating) {
         concatRepeatedElements(config.getConcatSeparator(), titlesMap, element, langAttribute.getValue());
       } else {
-        titlesMap.put(langAttribute.getValue(), element.getText());
+        titlesMap.put(langAttribute.getValue(), elementText);
       }
     }
     return titlesMap;
+  }
+
+  private static void mapToADefaultingLang(OaiPmh config, boolean isConcatenating, String defaultingLang,
+                                           Map<String, String> titlesMap, Element element, String elementText) {
+    boolean isDefaultingLang = config.getMetadataParsingDefaultLang().isActive();
+    if (isDefaultingLang) { // If defaulting lang is not configured we skip. We do not know the lang
+      if (isConcatenating && config.isConcatRepeatedElements()) {
+        concatRepeatedElements(config.getConcatSeparator(), titlesMap, element, defaultingLang);
+      } else {
+        titlesMap.put(defaultingLang, elementText); // Else keep overriding
+      }
+    }
   }
 
   /**

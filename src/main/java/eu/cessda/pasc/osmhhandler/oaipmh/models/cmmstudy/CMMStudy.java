@@ -58,7 +58,7 @@ public class CMMStudy {
   private Map<String, String> institutionFullName;
 
   @JsonProperty("creators")
-  private String[] creators;
+  private Map<String, String> creators;
 
   @JsonProperty("dataCollectionPeriodStartdate")
   private String dataCollectionPeriodStartdate;

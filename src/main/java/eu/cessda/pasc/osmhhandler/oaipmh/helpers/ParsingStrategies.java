@@ -13,6 +13,7 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.DocElementParser.getAttr
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.DocElementParser.parseTermVocabAttrAndValues;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.NOT_AVAIL;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.ABBR_ATTR;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.CREATOR_AFFILIATION_ATTR;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.DDI_NS;
 
 /**
@@ -38,6 +39,18 @@ class ParsingStrategies {
     return element -> (T) Pid.builder()
         .agency(getAttributeValue(element, "agency").orElse(NOT_AVAIL))
         .pid(element.getText()).build();
+  }
+
+  @SuppressWarnings("unchecked")
+  static Function<Element, String> creatorStrategyFunction() {
+    return element -> getAttributeValue(element, CREATOR_AFFILIATION_ATTR)
+        .map(s -> (element.getText() + " (" + s + ")"))
+        .orElseGet(element::getText);
+  }
+
+  @SuppressWarnings("unchecked")
+  static Function<Element, String> rawTextStrategyFunction() {
+    return Element::getText;
   }
 
   @SuppressWarnings("unchecked")

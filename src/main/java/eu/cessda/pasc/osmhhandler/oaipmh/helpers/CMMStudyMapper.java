@@ -13,7 +13,6 @@ import org.jdom2.xpath.XPathFactory;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.DocElementParser.*;
@@ -60,7 +59,8 @@ public class CMMStudyMapper {
    * Pass records status.
    */
   private static boolean parseRecordStatus(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
-    XPathExpression<Attribute> attributeExpression = xFactory.compile(RECORD_STATUS_XPATH, Filters.attribute(), null, OAI_NS);
+    XPathExpression<Attribute> attributeExpression = xFactory
+        .compile(RECORD_STATUS_XPATH, Filters.attribute(), null, OAI_NS);
     Attribute status = attributeExpression.evaluateFirst(document);
     boolean isActive = null == status || !"deleted".equalsIgnoreCase(status.getValue());
     builder.active(isActive);
@@ -120,7 +120,7 @@ public class CMMStudyMapper {
       CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
 
     List<Element> elements = getElements(document, xFactory, ABSTRACT_XPATH);
-    Map<String, String> abstracts = getLanguageKeyValuePairs(config, elements, true);
+    Map<String, String> abstracts = getLanguageKeyValuePairs(config, elements, true, creatorStrategyFunction());
     builder.abstractField(abstracts);
   }
 
@@ -129,7 +129,7 @@ public class CMMStudyMapper {
    * <p>
    * Xpath = {@value OaiPmhConstants#YEAR_OF_PUB_XPATH }
    */
-  public static void parseYrOfPublication(CMMStudy.CMMStudyBuilder builder, Document document,XPathFactory xFactory) {
+  public static void parseYrOfPublication(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
     Optional<Attribute> yrOfPublicationDate = getFirstAttribute(document, xFactory, YEAR_OF_PUB_XPATH);
     yrOfPublicationDate.ifPresent(attribute -> builder.publicationYear(attribute.getValue()));
   }
@@ -150,15 +150,12 @@ public class CMMStudyMapper {
    * <p>
    * Xpath = {@value OaiPmhConstants#CREATORS_XPATH }
    */
-  public static void parseCreator(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
+  public static void parseCreator(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory,
+                                  OaiPmh config) {
 
     List<Element> elements = getElements(document, xFactory, CREATORS_XPATH);
-    String[] myFinalList = elements.stream()
-        .filter(Objects::nonNull)
-        .map(DocElementParser::extractCreatorWithAffiliation)
-        .toArray(String[]::new);
-
-    builder.creators(myFinalList);
+    Map<String, String> creatorsInLangs = getLanguageKeyValuePairs(config, elements, false, creatorStrategyFunction());
+    builder.creators(creatorsInLangs);
   }
 
   /**
@@ -229,7 +226,7 @@ public class CMMStudyMapper {
       CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
 
     List<Element> elements = getElements(document, xFactory, TITLE_XPATH);
-    Map<String, String> studyTitles = getLanguageKeyValuePairs(config, elements, false);
+    Map<String, String> studyTitles = getLanguageKeyValuePairs(config, elements, false, rawTextStrategyFunction());
     builder.titleStudy(studyTitles);
   }
 
@@ -265,8 +262,8 @@ public class CMMStudyMapper {
       CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
 
     List<Element> elements = getElements(document, xFactory, SAMPLING_XPATH);
-    Map<String, String> samplingProcedures = getLanguageKeyValuePairs(config, elements, false);
-    builder.samplingProcedure(samplingProcedures);
+    Map<String, String> langSamplingProcs = getLanguageKeyValuePairs(config, elements, false, rawTextStrategyFunction());
+    builder.samplingProcedure(langSamplingProcs);
   }
 
   /**
@@ -299,7 +296,7 @@ public class CMMStudyMapper {
       CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
 
     List<Element> elements = getElements(document, xFactory, DATA_ACCESS_XPATH);
-    Map<String, String> dataAccess = getLanguageKeyValuePairs(config, elements, false);
+    Map<String, String> dataAccess = getLanguageKeyValuePairs(config, elements, false, creatorStrategyFunction());
     builder.dataAccess(dataAccess);
   }
 
@@ -321,18 +318,5 @@ public class CMMStudyMapper {
         builder.dataCollectionPeriodEnddate(element.getAttributeValue(DATE_ATTR));
       }
     }
-  }
-
-  /**
-   * Parses parse Institution Full Name from:
-   * <p>
-   * Xpath = {@value OaiPmhConstants#INST_FULL_NAME_XPATH }
-   */
-  public static void parseInstitutionFullName(
-      CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
-
-    List<Element> elements = getElements(document, xFactory, INST_FULL_NAME_XPATH);
-    Map<String, String> institutionFullNames = getLanguageKeyValuePairs(config, elements, true);
-    builder.institutionFullName(institutionFullNames);
   }
 }

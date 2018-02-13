@@ -213,14 +213,6 @@
       "description": "Year of publication (by publisher) of the study (for citation) - [YYYY] or the whole [YYYY-MM-DD]."
     },
     "pidStudies": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "description": "A CMMStudy Study Persistent Identifier."
-      },
-      "description": "An array of Persistent Identifiers for this CMMStudy."
-    },
-    "pidStudies": {
       "type": "object",
       "patternProperties": {
         "^[a-z]{2}$": {
@@ -319,23 +311,15 @@
       "description": "Class of availability of the research data."
     },
     "creators": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "description": "Reference to a creator alongside her/his affiliation eg \"Ami Doe(University of DV)\"."
-      },
-      "description": "An array of Reference to creators."
-    },
-    "institutionFullName": {
       "type": "object",
       "patternProperties": {
         "^[a-z]{2}$": {
           "type": "string",
-          "description": "Freetext description of possibilities to access data."
+          "description": "Reference to a creator alongside her/his affiliation eg \"Ami Doe(University of DV)\"."
         }
       },
       "additionalProperties": false,
-      "description": "An object containing Freetext description of possibilities to access data. E.g. {'en': 'via web', 'no': 'Et via web'}."
+      "description": "An object containing creators in various languages. Uses language code properties and abstract values. E.g. {'en': 'Ami Doe(University of DV)', 'no': 'Ami Doe(ET University of DV)'}"
     },
     "lastModified": {
       "type": "string",
