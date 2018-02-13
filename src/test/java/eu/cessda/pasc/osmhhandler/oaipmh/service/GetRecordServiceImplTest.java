@@ -85,6 +85,7 @@ private void validateContentIsExtractedAsExpected(CMMStudy record) throws IOExce
     assertEquals(expectedTree.get("publisher").toString(), actualTree.get("publisher").toString(), true);
     assertEquals(expectedTree.get("samplingProcedure").toString(), actualTree.get("samplingProcedure").toString(), true);
     assertEquals(expectedTree.get("creators").toString(), actualTree.get("creators").toString(), true);
+    assertEquals(expectedTree.get("fileLanguages").toString(), actualTree.get("fileLanguages").toString(), true);
     then(expectedTree.get("publicationYear").toString()).isEqualTo(actualTree.get("publicationYear").toString());
 
     // TODO repeat for each individual element.  Final goal is to use one single Uber Json compare
@@ -181,5 +182,4 @@ private void validateContentIsExtractedAsExpected(CMMStudy record) throws IOExce
       fail("Validation not successful : " + validate.toString());
     }
   }
-
 }

@@ -9,6 +9,7 @@ import lombok.Getter;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Model representing a CMMStudy.
@@ -100,7 +101,7 @@ public class CMMStudy {
   private Map<String, List<TermVocabAttributes>> typeOfTimeMethods;
 
   @JsonProperty("fileLanguages")
-  private String[] fileLanguages;
+  private Set<String> fileLanguages;
 
   @JsonProperty("accessClass")
   private String accessClass;

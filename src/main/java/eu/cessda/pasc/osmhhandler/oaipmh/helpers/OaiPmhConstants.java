@@ -41,7 +41,8 @@ public class OaiPmhConstants {
   static final String UNIT_TYPE_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:anlyUnit";
 
   static final String PUBLISHER_XPATH = "//ddi:codeBook/ddi:docDscr/ddi:citation/ddi:prodStmt/ddi:producer";
-  static final String FILE_LANGUAGES_XPATH = "//ddi:codeBook/ddi:fileDscr/ddi:fileTxt/@xml:lang";
+  static final String FILE_TXT_LANGUAGES_XPATH = "//ddi:codeBook/ddi:fileDscr/ddi:fileTxt/@xml:lang";
+  static final String FILENAME_LANGUAGES_XPATH = "//ddi:codeBook/ddi:fileDscr/ddi:fileTxt/ddi:fileName/@xml:lang";
   static final String TYPE_OF_SAMPLING_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:sampProc";
   static final String SAMPLING_XPATH = TYPE_OF_SAMPLING_XPATH;
   static final String TYPE_OF_MODE_OF_COLLECTION_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:collMode";

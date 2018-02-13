@@ -11,9 +11,9 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.DocElementParser.*;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
@@ -280,11 +280,14 @@ public class CMMStudyMapper {
   /**
    * Parses File Language(s) from:
    * <p>
-   * Xpath = {@value OaiPmhConstants#FILE_LANGUAGES_XPATH }
+   * Xpath = {@value OaiPmhConstants#FILE_TXT_LANGUAGES_XPATH }
    */
   public static void parseFileLanguages(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
-    String[] typeOfTimeMethods = getAttributeValues(document, xFactory, FILE_LANGUAGES_XPATH);
-    builder.fileLanguages(typeOfTimeMethods);
+    String[] fileTxtAttrs = getAttributeValues(document, xFactory, FILE_TXT_LANGUAGES_XPATH);
+    String[] fileNameAttrs = getAttributeValues(document, xFactory, FILENAME_LANGUAGES_XPATH);
+    String[] allLangs = Stream.of(fileTxtAttrs, fileNameAttrs).flatMap(Stream::of).toArray(String[]::new);
+    Set<String> languageFilesSet = Arrays.stream(allLangs).collect(Collectors.toSet());
+    builder.fileLanguages(languageFilesSet);
   }
 
   /**

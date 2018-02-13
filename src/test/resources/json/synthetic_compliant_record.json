@@ -209,6 +209,11 @@
       }
     ]
   },
+  "fileLanguages": [
+    "aa",
+    "ee",
+    "bb"
+  ],
   "publisher": {
     "se": {
       "publisher": "Samhällsdatablad",

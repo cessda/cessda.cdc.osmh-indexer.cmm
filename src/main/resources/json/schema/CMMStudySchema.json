@@ -240,11 +240,11 @@
     },
     "associatedInstitutions": {
       "type": "array",
+      "description": "An array of Associated Institutions for this CMMStudy.",
       "items": {
         "type": "string",
         "description": "A CMMStudy Associated Institution ."
-      },
-      "description": "An array of Associated Institutions for this CMMStudy."
+      }
     },
     "fileLanguages": {
       "type": "array",
@@ -260,11 +260,11 @@
     },
     "typeOfSamplingProcedures": {
       "type": "array",
+      "description": "An array of sampling procedures used for data collection.",
       "items": {
         "type": "string",
         "description": "Type of sampling procedure used for data collection. Controlled vocabulary Includes a typology of sampling methods."
-      },
-      "description": "An array of sampling procedures used for data collection."
+      }
     },
     "samplingProcedure": {
       "type": "object",
