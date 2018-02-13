@@ -220,6 +220,32 @@
       },
       "description": "An array of Persistent Identifiers for this CMMStudy."
     },
+    "pidStudies": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "array",
+          "description": "An array of Persistent Identifiers for this CMMStudy in this Given iso Language code.",
+          "items": [
+            {
+              "type": "object",
+              "description": "A CMMStudy Persistent Identifier.",
+              "properties": {
+                "agency": {
+                  "type": "string"
+                },
+                "pid": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "description": "Persistent Identifiers for this CMMStudy in potentially multiple languages."
+    },
     "associatedInstitutions": {
       "type": "array",
       "items": {

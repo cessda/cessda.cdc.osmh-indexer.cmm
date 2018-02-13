@@ -139,9 +139,10 @@ public class CMMStudyMapper {
    * <p>
    * Xpath = {@value OaiPmhConstants#PID_STUDY_XPATH }
    */
-  public static void parsePidStudies(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
-    String[] pidStudies = getElementValues(document, xFactory, PID_STUDY_XPATH);
-    builder.pidStudies(pidStudies);
+  public static void parsePidStudies(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory,
+                                     OaiPmh oaiPmh) {
+    builder.pidStudies(extractMetadataObjectListForEachLang(
+        oaiPmh, document, xFactory, PID_STUDY_XPATH, pidStrategyFunction()));
   }
 
   /**

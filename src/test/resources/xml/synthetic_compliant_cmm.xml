@@ -34,6 +34,10 @@
               <titlStmt>
                 <titl xml:lang="fi">Lapsesta aikuiseksi: 14-vuotiaiden haastattelu 1974: tekstiaineisto.</titl>
                 <parTitl xml:lang="fi">Lapsesta aikuiseksi: 14-vuotiaiden haastattelu 1974: tekstiaineisto</parTitl>
+                <!-- Complaint - UKDS examples-->
+                <IDNo agency="UKDA">2305</IDNo>
+                <IDNo agency="datacite">10.5255/UKDA-FAKE-2305-1</IDNo>
+                <!-- Missing lang - FSD -->
                 <IDNo>2305</IDNo>
               </titlStmt>
               <rspStmt>

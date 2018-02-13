@@ -1,6 +1,7 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.Country;
+import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.Pid;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.Publisher;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.TermVocabAttributes;
 import org.jdom2.Element;
@@ -30,6 +31,13 @@ class ParsingStrategies {
     return element -> (T) Country.builder()
         .iso2LetterCode(getAttributeValue(element, ABBR_ATTR).orElse(NOT_AVAIL))
         .countryName(element.getText()).build();
+  }
+
+  @SuppressWarnings("unchecked")
+  static <T> Function<Element, T> pidStrategyFunction() {
+    return element -> (T) Pid.builder()
+        .agency(getAttributeValue(element, "agency").orElse(NOT_AVAIL))
+        .pid(element.getText()).build();
   }
 
   @SuppressWarnings("unchecked")

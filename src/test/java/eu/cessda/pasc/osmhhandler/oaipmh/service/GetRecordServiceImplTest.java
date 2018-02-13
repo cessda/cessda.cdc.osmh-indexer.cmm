@@ -74,14 +74,15 @@ private void validateContentIsExtractedAsExpected(CMMStudy record) throws IOExce
     final JsonNode actualTree = mapper.readTree(jsonString);
     final JsonNode expectedTree = mapper.readTree(expectedJson);
 
-    assertEquals(actualTree.get("classifications").toString(), expectedTree.get("classifications").toString(), true);
-    assertEquals(actualTree.get("keywords").toString(), expectedTree.get("keywords").toString(), true);
-    assertEquals(actualTree.get("typeOfTimeMethods").toString(), expectedTree.get("typeOfTimeMethods").toString(), true);
-    assertEquals(actualTree.get("studyAreaCountries").toString(), expectedTree.get("studyAreaCountries").toString(), true);
-    assertEquals(actualTree.get("unitTypes").toString(), expectedTree.get("unitTypes").toString(), true);
-    assertEquals(actualTree.get("titleStudy").toString(), expectedTree.get("titleStudy").toString(), true);
-    assertEquals(actualTree.get("publisher").toString(), expectedTree.get("publisher").toString(), true);
-    then(actualTree.get("publicationYear").toString()).isEqualTo(expectedTree.get("publicationYear").toString());
+    assertEquals(expectedTree.get("classifications").toString(), actualTree.get("classifications").toString(), true);
+    assertEquals(expectedTree.get("keywords").toString(), actualTree.get("keywords").toString(), true);
+    assertEquals(expectedTree.get("typeOfTimeMethods").toString(), actualTree.get("typeOfTimeMethods").toString(), true);
+    assertEquals(expectedTree.get("studyAreaCountries").toString(), actualTree.get("studyAreaCountries").toString(), true);
+    assertEquals(expectedTree.get("pidStudies").toString(), actualTree.get("pidStudies").toString(), true);
+    assertEquals(expectedTree.get("unitTypes").toString(), actualTree.get("unitTypes").toString(), true);
+    assertEquals(expectedTree.get("titleStudy").toString(), actualTree.get("titleStudy").toString(), true);
+    assertEquals(expectedTree.get("publisher").toString(), actualTree.get("publisher").toString(), true);
+    then(expectedTree.get("publicationYear").toString()).isEqualTo(actualTree.get("publicationYear").toString());
 
     // TODO repeat for each individual element.  Final goal is to use one single Uber Json compare
   }

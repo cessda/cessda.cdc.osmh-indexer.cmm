@@ -119,7 +119,7 @@ public class CMMStudy {
   private Map<String, List<TermVocabAttributes>> unitTypes;
 
   @JsonProperty("pidStudies")
-  private String[] pidStudies;
+  private Map<String, List<Pid>> pidStudies;
 
   @JsonProperty("lastModified")
   private String lastModified;

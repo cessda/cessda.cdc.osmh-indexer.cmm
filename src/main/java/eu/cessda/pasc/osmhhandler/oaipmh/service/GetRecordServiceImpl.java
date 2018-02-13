@@ -78,7 +78,7 @@ public class GetRecordServiceImpl implements GetRecordService {
     if (isActiveRecord) {
       parseStudyTitle(builder, document, X_FACTORY, oaiPmh);
       parseAbstract(builder, document, X_FACTORY, oaiPmh);
-      parsePidStudies(builder, document, X_FACTORY);
+      parsePidStudies(builder, document, X_FACTORY, oaiPmh);
       parseCreator(builder, document, X_FACTORY);
       parseAccessClass(builder, document, X_FACTORY);
       parseDataAccess(builder, document, X_FACTORY, oaiPmh);
