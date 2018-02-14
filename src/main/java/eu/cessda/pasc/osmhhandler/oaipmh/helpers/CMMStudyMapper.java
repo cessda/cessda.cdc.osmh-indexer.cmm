@@ -270,10 +270,11 @@ public class CMMStudyMapper {
    * <p>
    * Xpath = {@value OaiPmhConstants#TYPE_OF_MODE_OF_COLLECTION_XPATH }
    */
-  public static void parseTypeOfModeOfCollection(
-      CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
-    String[] elementValues = getElementValues(document, xFactory, TYPE_OF_MODE_OF_COLLECTION_XPATH);
-    builder.typeOfModeOfCollections(elementValues);
+  public static void parseTypeOfModeOfCollection(CMMStudy.CMMStudyBuilder builder, Document doc,
+                                                 XPathFactory xFactory, OaiPmh config) {
+    builder.typeOfModeOfCollections(
+        extractMetadataObjectListForEachLang(
+            config, doc, xFactory, TYPE_OF_MODE_OF_COLLECTION_XPATH, termVocabAttributeStrategyFunction()));
   }
 
   /**

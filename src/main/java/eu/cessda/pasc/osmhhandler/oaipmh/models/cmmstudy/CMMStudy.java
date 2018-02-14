@@ -71,7 +71,7 @@ public class CMMStudy {
   private String publicationYear;
 
   @JsonProperty("typeOfModeOfCollections")
-  private String[] typeOfModeOfCollections;
+  private Map<String, List<TermVocabAttributes>> typeOfModeOfCollections;
 
   @JsonProperty("keywords")
   private Map<String, List<TermVocabAttributes>> keywords;

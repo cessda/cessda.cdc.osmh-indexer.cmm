@@ -206,7 +206,38 @@
         "id": ""
       }
     ]
-  },  "titleStudy": {
+  },
+  "typeOfModeOfCollections": {
+    "en": [
+      {
+        "vocabUri": "urn:ddi-cv:ModeOfCollection:3.0",
+        "vocab": "DDI Mode Of Collection",
+        "term": "Telephone interview.",
+        "id": ""
+      },
+      {
+        "vocabUri": "urn:ddi-cv:ModeOfCollection:3.0",
+        "vocab": "DDI Mode Of Collection",
+        "term": "Telephone Survey",
+        "id": ""
+      },
+      {
+        "vocabUri": "",
+        "vocab": "",
+        "term": "Face-to-face interview",
+        "id": ""
+      }
+    ],
+    "fr": [
+      {
+        "vocabUri": "urn:ddi-cv:ModeOfCollection:3.0",
+        "vocab": "DDI Mode Of Collection",
+        "term": "Enquête téléphonique",
+        "id": ""
+      }
+    ]
+  },
+  "titleStudy": {
     "fi": "Lapsesta aikuiseksi: 14-vuotiaiden haastattelu 1974: tekstiaineisto.",
     "en": "Jyväskylä Longitudinal Study of Personality and Social Development (JYLS): Interviews of 14-Year-Olds 1974: Text Data."
   },

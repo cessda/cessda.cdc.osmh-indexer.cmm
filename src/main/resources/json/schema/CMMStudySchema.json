@@ -307,12 +307,36 @@
       "additionalProperties": false
     },
     "typeOfModeOfCollections": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "description": "Description of the method of data collection - the procedure, technique, or mode of inquiry used to attain the data."
+      "type": "object",
+      "description": "A collection of description of the methods of data collection in Potentially many languages",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "array",
+          "description": "A collection of description of methods for this given language",
+          "items": [
+            {
+              "type": "object",
+              "description": "A Description of the method of data collection",
+              "properties": {
+                "vocab": {
+                  "type": "string"
+                },
+                "vocabUri": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "term": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
       },
-      "description": "An array of description of the methods of data collection."
+      "additionalProperties": false
     },
     "dataCollectionPeriodStartdate": {
       "type": "string",

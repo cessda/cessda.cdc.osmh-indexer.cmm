@@ -86,8 +86,12 @@ public class GetRecordServiceImplTest {
     assertEquals(expectedTree.get("publisher").toString(), actualTree.get("publisher").toString(), true);
     assertEquals(expectedTree.get("creators").toString(), actualTree.get("creators").toString(), true);
     assertEquals(expectedTree.get("fileLanguages").toString(), actualTree.get("fileLanguages").toString(), true);
-    assertEquals(expectedTree.get("typeOfSamplingProcedures").toString(), actualTree.get("typeOfSamplingProcedures").toString(), true);
-    assertEquals(expectedTree.get("samplingProcedureFreeTexts").toString(), actualTree.get("samplingProcedureFreeTexts").toString(), true);
+    assertEquals(expectedTree
+        .get("typeOfSamplingProcedures").toString(), actualTree.get("typeOfSamplingProcedures").toString(), true);
+    assertEquals(expectedTree
+        .get("samplingProcedureFreeTexts").toString(), actualTree.get("samplingProcedureFreeTexts").toString(), true);
+    assertEquals(expectedTree
+        .get("typeOfModeOfCollections").toString(), actualTree.get("typeOfModeOfCollections").toString(), true);
 
     // TODO repeat for each individual element.  Final goal is to use one single Uber Json compare
   }
