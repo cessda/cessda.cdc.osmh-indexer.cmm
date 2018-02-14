@@ -129,8 +129,12 @@
                 <sampProc><concept xml:lang="en" ID="madeUp" vocab="DDI Sampling Procedure" vocabURI="urn:ddi-cv:SamplingProcedure:1.1">Probability.Stratified 1</concept></sampProc>
                 <sampProc><concept xml:lang="en" vocab="DDI Sampling Procedure" vocabURI="urn:ddi-cv:SamplingProcedure:1.1">Probability.Stratified 2</concept></sampProc>
                 <sampProc><concept xml:lang="fi" vocab="fi DDI Sampling Procedure" vocabURI="fi:urn:ddi-cv:SamplingProcedure:1.1">et Probability.Stratified</concept></sampProc>
-                <!-- FSD example: if concept element is missing, this must not be extracted -->
-                <sampProc>Should ignore elements without a concept</sampProc>
+                <!-- FSD example: if concept element is missing, this must not be extracted TypeOfSamplingProcedure-->
+                <sampProc>Should ignore elements without a concept by TypeOfSamplingProcedures</sampProc>
+                <!-- Examples from PUG for valid element for SamplingProcedure extraction-->
+                <sampProc xml:lang="sv">Sannolikhetsurval: stratifierat urval</sampProc>
+                <sampProc xml:lang="fr">Quelque chose</sampProc>
+                <sampProc xml:lang="sv">Undersökningen bygger på program sända i SVT1, SVT2, SVT24, Barnkanalen, Kunskapskanalen, TV4, Sjuan, TV3, Kanal 5, TV6 och TV8 under 12 veckor 2015. Urvalet av veckor skedde obundet och slumpmässigt och stratifierades efter säsong.</sampProc>
                 <deviat>6,708 cases</deviat>
                 <collMode>Face-to-face interview</collMode>
                 <sources />

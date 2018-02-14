@@ -34,7 +34,7 @@ import java.util.Set;
     "creators",
     "classIdentifier",
     "typeOfSamplingProcedures",
-    "samplingProcedure",
+    "samplingProcedureFreeTexts",
     "typeOfModeOfCollections",
     "dataCollectionPeriodStartdate",
     "dataCollectionPeriodEnddate",
@@ -79,8 +79,8 @@ public class CMMStudy {
   @JsonProperty("recordType")
   private RecordType recordType;
 
-  @JsonProperty("samplingProcedure")
-  private Map<String, String> samplingProcedure;
+  @JsonProperty("samplingProcedureFreeTexts")
+  private Map<String, List<String>> samplingProcedureFreeTexts;
 
   @JsonProperty("classifications")
   private Map<String, List<TermVocabAttributes>> classifications;

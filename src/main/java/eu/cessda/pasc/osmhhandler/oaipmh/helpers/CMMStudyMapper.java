@@ -259,12 +259,10 @@ public class CMMStudyMapper {
    * <p>
    * Xpath = {@value OaiPmhConstants#SAMPLING_XPATH }
    */
-  public static void parseSamplingProcedure(
-      CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
-
-    List<Element> elements = getElements(document, xFactory, SAMPLING_XPATH);
-    Map<String, String> langSamplingProcs = getLanguageKeyValuePairs(config, elements, false, rawTextStrategyFunction());
-    builder.samplingProcedure(langSamplingProcs);
+  public static void parseSamplingProcedureFreeTexts(CMMStudy.CMMStudyBuilder builder, Document doc,
+                                                     XPathFactory xFactory, OaiPmh config) {
+    builder.samplingProcedureFreeTexts(
+        extractMetadataObjectListForEachLang(config, doc, xFactory, SAMPLING_XPATH, samplingProcStrategyFunction()));
   }
 
   /**

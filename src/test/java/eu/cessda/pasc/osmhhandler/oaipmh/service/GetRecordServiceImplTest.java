@@ -66,7 +66,7 @@ public class GetRecordServiceImplTest {
     validateContentIsExtractedAsExpected(record);
   }
 
-private void validateContentIsExtractedAsExpected(CMMStudy record) throws IOException, JSONException {
+  private void validateContentIsExtractedAsExpected(CMMStudy record) throws IOException, JSONException {
     final ObjectMapper mapper = new ObjectMapper();
 
     String jsonString = CMMConverter.toJsonString(record);
@@ -87,7 +87,7 @@ private void validateContentIsExtractedAsExpected(CMMStudy record) throws IOExce
     assertEquals(expectedTree.get("creators").toString(), actualTree.get("creators").toString(), true);
     assertEquals(expectedTree.get("fileLanguages").toString(), actualTree.get("fileLanguages").toString(), true);
     assertEquals(expectedTree.get("typeOfSamplingProcedures").toString(), actualTree.get("typeOfSamplingProcedures").toString(), true);
-//    assertEquals(expectedTree.get("samplingProcedure").toString(), actualTree.get("samplingProcedure").toString(), true);
+    assertEquals(expectedTree.get("samplingProcedureFreeTexts").toString(), actualTree.get("samplingProcedureFreeTexts").toString(), true);
 
     // TODO repeat for each individual element.  Final goal is to use one single Uber Json compare
   }
@@ -111,7 +111,7 @@ private void validateContentIsExtractedAsExpected(CMMStudy record) throws IOExce
   }
 
   @Test
-  public void shouldReturnCMMStudyRecordWithRepeatedAbstractConcatenated()throws Exception {
+  public void shouldReturnCMMStudyRecordWithRepeatedAbstractConcatenated() throws Exception {
 
     Map<String, String> expectedAbstract = new HashMap<>();
     expectedAbstract.put("de", "de de");

@@ -289,16 +289,22 @@
       },
       "additionalProperties": false
     },
-    "samplingProcedure": {
+    "samplingProcedureFreeTexts": {
       "type": "object",
+      "description": "Sampling procedures freeText description for data collection.",
       "patternProperties": {
         "^[a-z]{2}$": {
-          "type": "string",
-          "description": "Freetext description of the type of sampling procedure used for data collection."
+          "type": "array",
+          "items": [
+            {
+              "type": "string",
+              "description": "A Sampling procedure freeText description for data collection.",
+              "additionalProperties": false
+            }
+          ]
         }
       },
-      "additionalProperties": false,
-      "description": "An object containing Freetext description of the type of sampling procedure used for data collection. E.g. {'en': 'An sampling procedure a', 'no': 'Et sampling procedure a'}."
+      "additionalProperties": false
     },
     "typeOfModeOfCollections": {
       "type": "array",

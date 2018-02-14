@@ -11,7 +11,7 @@ import java.util.function.Function;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.DocElementParser.getAttributeValue;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.DocElementParser.parseTermVocabAttrAndValues;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.*;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.EMPTY_EL;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.NOT_AVAIL;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
 
@@ -33,7 +33,7 @@ class ParsingStrategies {
           .iso2LetterCode(getAttributeValue(element, ABBR_ATTR).orElse(NOT_AVAIL))
           .countryName(element.getText())
           .build();
-      return Optional.ofNullable((T) country);
+      return Optional.of((T) country);
     };
   }
 
@@ -44,7 +44,17 @@ class ParsingStrategies {
           .agency(getAttributeValue(element, AGENCY_ATTR).orElse(NOT_AVAIL))
           .pid(element.getText())
           .build();
-      return Optional.ofNullable((T) agency);
+      return Optional.of((T) agency);
+    };
+  }
+
+  @SuppressWarnings("unchecked")
+  static <T> Function<Element, Optional<T>> samplingProcStrategyFunction() {
+    return element -> {
+      String value = element.getText();
+      return (value.isEmpty())
+          ? Optional.empty() :
+          Optional.of((T) value);
     };
   }
 
@@ -72,7 +82,7 @@ class ParsingStrategies {
     return element -> {
       Optional<Element> concept = Optional.ofNullable(element.getChild(CONCEPT_EL, DDI_NS));
       TermVocabAttributes vocabValueAttrs = parseTermVocabAttrAndValues(element, concept.orElse(new Element(EMPTY_EL)));
-      return Optional.ofNullable((T) vocabValueAttrs);
+      return Optional.of((T) vocabValueAttrs);
     };
   }
 
@@ -81,14 +91,14 @@ class ParsingStrategies {
 
     return element -> {
 
-      Optional<T> vocabValueAttrs1 = Optional.empty();
+      Optional<T> vocabValueAttrsOpt = Optional.empty();
       Optional<Element> concept = Optional.ofNullable(element.getChild(CONCEPT_EL, DDI_NS));
       if (concept.isPresent()) {
         TermVocabAttributes vocabValueAttrs = parseTermVocabAttrAndValues(element, concept.orElse(new Element(EMPTY_EL)));
-        vocabValueAttrs1 = Optional.ofNullable((T) vocabValueAttrs);
+        vocabValueAttrsOpt = Optional.of((T) vocabValueAttrs);
       }
 
-      return vocabValueAttrs1;
+      return vocabValueAttrsOpt;
     };
   }
 }

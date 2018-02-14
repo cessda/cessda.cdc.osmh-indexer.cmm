@@ -132,7 +132,7 @@
       },
       "description": "An array of sampling procedures used for data collection."
     },
-    "samplingProcedure": {
+    "samplingProcedureFreeTexts": {
       "type": "object",
       "patternProperties": {
         "^[a-z]{2}$": {

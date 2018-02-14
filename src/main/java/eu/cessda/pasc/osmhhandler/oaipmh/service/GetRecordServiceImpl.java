@@ -92,8 +92,8 @@ public class GetRecordServiceImpl implements GetRecordService {
       parseYrOfPublication(builder, document, X_FACTORY);
       parseFileLanguages(builder, document, X_FACTORY);
       parseTypeOfSamplingProcedure(builder, document, X_FACTORY, oaiPmh);
+      parseSamplingProcedureFreeTexts(builder, document, X_FACTORY, oaiPmh);
       parseTypeOfModeOfCollection(builder, document, X_FACTORY);
-      parseSamplingProcedure(builder, document, X_FACTORY, oaiPmh);
       log.debug("Successfully parsed record with no known errors");
     }
   }
