@@ -82,7 +82,6 @@ public class GetRecordServiceImpl implements GetRecordService {
       parseCreator(builder, document, X_FACTORY, oaiPmh);
       parseAccessClass(builder, document, X_FACTORY);
       parseDataAccess(builder, document, X_FACTORY, oaiPmh);
-      parseDataCollectionPeriods(builder, document, X_FACTORY);
       parseClassifications(builder, document, X_FACTORY, oaiPmh);
       parseKeywords(builder, document, X_FACTORY, oaiPmh);
       parseTypeOfTimeMethod(builder, document, X_FACTORY, oaiPmh);
@@ -94,6 +93,7 @@ public class GetRecordServiceImpl implements GetRecordService {
       parseTypeOfSamplingProcedure(builder, document, X_FACTORY, oaiPmh);
       parseSamplingProcedureFreeTexts(builder, document, X_FACTORY, oaiPmh);
       parseTypeOfModeOfCollection(builder, document, X_FACTORY, oaiPmh);
+      parseDataCollectionDates(builder, document, X_FACTORY);
       log.debug("Successfully parsed record with no known errors");
     }
   }

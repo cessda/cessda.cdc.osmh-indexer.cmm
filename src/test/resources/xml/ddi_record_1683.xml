@@ -82,7 +82,8 @@
                 <timePrd event="start" date="1976-01-01T00:00:00Z">1976</timePrd>
                 <timePrd event="end" date="1977-01-01T00:00:00Z">1977</timePrd>
                 <!-- Added not originally part of this record-->
-                <collDate event="start" date="1976-01-01T00:00:00Z">1976</collDate>
+                <collDate event="start" date="1976-02-01T00:00:00Z">1976</collDate>
+                <collDate event="single" date="1976-01-01T00:00:00Z">1976</collDate>
                 <collDate event="end" date="1977-01-01T00:00:00Z">1977</collDate>
                 <!-- Added End-->
                 <nation>Great Britain</nation>

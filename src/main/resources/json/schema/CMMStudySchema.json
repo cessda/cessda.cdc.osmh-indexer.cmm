@@ -340,13 +340,11 @@
     },
     "dataCollectionPeriodStartdate": {
       "type": "string",
-      "description": "A JSON date string in ISO 8601 format, e.g. 2012-04-23T18:25:43.511Z.",
-      "format": "date-time"
+      "description": "A JSON date string in ISO 8601 format, e.g. 2012-04-23T18:25:43.511Z. In future restrict to [\"format\": \"date-time\" or \"date\"]"
     },
     "dataCollectionPeriodEnddate": {
       "type": "string",
-      "description": "A JSON date string in ISO 8601 format, e.g. 2012-04-23T18:25:43.511Z.",
-      "format": "date-time"
+      "description": "A JSON date string in ISO 8601 format, e.g. 2012-04-23T18:25:43.511Z. In future restrict to [\"format\": \"date-time\" or \"date\"]"
     },
     "dataAccess": {
       "type": "object",

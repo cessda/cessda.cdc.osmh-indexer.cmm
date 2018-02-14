@@ -11,6 +11,7 @@ import org.jdom2.xpath.XPathFactory;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
 import static java.util.stream.Collectors.toList;
@@ -164,6 +165,13 @@ class DocElementParser {
   static String[] getAttributeValues(Document document, XPathFactory xFactory, String elementXpath) {
     List<Attribute> attributes = getAttributes(document, xFactory, elementXpath);
     return attributes.stream().map(Attribute::getValue).toArray(String[]::new);
+  }
+
+  static Map<String, String> getDateElementAttributesValueMap(Document document, XPathFactory xFactory, String elementXpath) {
+    List<Element> elements = getElements(document, xFactory, elementXpath);
+    return elements.stream().collect(Collectors.toMap(element ->
+        element.getAttributeValue(EVENT_ATTR), element ->
+        element.getAttributeValue(DATE_ATTR)));
   }
 
   private static List<Attribute> getAttributes(Document document, XPathFactory xFactory, String xPathToElement) {

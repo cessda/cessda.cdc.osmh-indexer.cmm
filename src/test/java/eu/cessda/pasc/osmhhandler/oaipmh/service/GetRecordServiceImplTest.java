@@ -66,6 +66,28 @@ public class GetRecordServiceImplTest {
     validateContentIsExtractedAsExpected(record);
   }
 
+  @Test
+  public void shouldOnlyExtractSingleDateAsStartDateForRecordsWithASingleDateAttr() throws Exception {
+
+    // Given
+    given(getRecordDoa.getRecordXML("", "")).willReturn(
+        CMMStudyTestData.getXMLString("xml/ddi_record_1683.xml")
+    );
+
+    // When
+    CMMStudy record = recordService.getRecord("", "");
+
+    then(record).isNotNull();
+    validateCMMStudyAgainstSchema(record);
+    final ObjectMapper mapper = new ObjectMapper();
+
+    String jsonString = CMMConverter.toJsonString(record);
+    final JsonNode actualTree = mapper.readTree(jsonString);
+
+    then(actualTree.get("dataCollectionPeriodStartdate").asText()).isEqualTo("1976-01-01T00:00:00Z");
+    then(actualTree.get("dataCollectionPeriodEnddate")).isNull();
+  }
+
   private void validateContentIsExtractedAsExpected(CMMStudy record) throws IOException, JSONException {
     final ObjectMapper mapper = new ObjectMapper();
 
@@ -75,6 +97,8 @@ public class GetRecordServiceImplTest {
     final JsonNode expectedTree = mapper.readTree(expectedJson);
 
     then(expectedTree.get("publicationYear").toString()).isEqualTo(actualTree.get("publicationYear").toString());
+    then(expectedTree.get("dataCollectionPeriodStartdate").toString()).isEqualTo(actualTree.get("dataCollectionPeriodStartdate").toString());
+    then(expectedTree.get("dataCollectionPeriodEnddate").toString()).isEqualTo(actualTree.get("dataCollectionPeriodEnddate").toString());
     assertEquals(expectedTree.get("abstract").toString(), actualTree.get("abstract").toString(), true);
     assertEquals(expectedTree.get("classifications").toString(), actualTree.get("classifications").toString(), true);
     assertEquals(expectedTree.get("keywords").toString(), actualTree.get("keywords").toString(), true);

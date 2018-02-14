@@ -278,6 +278,27 @@ public class CMMStudyMapper {
   }
 
   /**
+   * Parses Data Collection Period dates from:
+   * <p>
+   * Xpath = {@value OaiPmhConstants#DATA_COLLECTION_PERIODS_PATH}
+   */
+  public static void parseDataCollectionDates(CMMStudy.CMMStudyBuilder builder, Document doc,
+                                              XPathFactory xFactory) {
+    Map<String, String> dateAttrs = getDateElementAttributesValueMap(doc, xFactory, DATA_COLLECTION_PERIODS_PATH);
+
+    if (dateAttrs.containsKey(SINGLE_ATTR)) {
+      builder.dataCollectionPeriodStartdate(dateAttrs.get(SINGLE_ATTR));
+    } else {
+      if (dateAttrs.containsKey(START_ATTR)) {
+        builder.dataCollectionPeriodStartdate(dateAttrs.get(START_ATTR));
+      }
+      if (dateAttrs.containsKey(END_ATTR)) {
+        builder.dataCollectionPeriodEnddate(dateAttrs.get(END_ATTR));
+      }
+    }
+  }
+
+  /**
    * Parses File Language(s) from:
    * <p>
    * Xpath = {@value OaiPmhConstants#FILE_TXT_LANGUAGES_XPATH }
@@ -301,25 +322,5 @@ public class CMMStudyMapper {
     List<Element> elements = getElements(document, xFactory, DATA_ACCESS_XPATH);
     Map<String, String> dataAccess = getLanguageKeyValuePairs(config, elements, false, creatorStrategyFunction());
     builder.dataAccess(dataAccess);
-  }
-
-  /**
-   * Parses Data Collection Period End date from:
-   * <p>
-   * Xpath = {@value OaiPmhConstants#DATA_COLLECTION_PERIODS_PATH }
-   */
-  public static void parseDataCollectionPeriods(
-      CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
-
-    List<Element> elements = getElements(document, xFactory, DATA_COLLECTION_PERIODS_PATH);
-    for (Element element : elements) {
-      if (SINGLE_ATTR.equalsIgnoreCase(element.getAttributeValue(EVENT_ATTR))) {
-        builder.dataCollectionPeriodStartdate(element.getAttributeValue(DATE_ATTR));
-      } else if (START_ATTR.equalsIgnoreCase(element.getAttributeValue(EVENT_ATTR))) {
-        builder.dataCollectionPeriodStartdate(element.getAttributeValue(DATE_ATTR));
-      } else if (END_ATTR.equalsIgnoreCase(element.getAttributeValue(EVENT_ATTR))) {
-        builder.dataCollectionPeriodEnddate(element.getAttributeValue(DATE_ATTR));
-      }
-    }
   }
 }

@@ -32,7 +32,7 @@ public class OaiPmhConstants {
   static final String CREATORS_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty";
   static final String ACCESS_CLASS_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:restrctn[1]";
   static final String DATA_ACCESS_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:conditions[1]";
-  static final String DATA_COLLECTION_PERIODS_PATH = "//ddi:codeBook//ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate[position()<3]";
+  static final String DATA_COLLECTION_PERIODS_PATH = "//ddi:codeBook//ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate";
   static final String CLASSIFICATIONS_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:subject/ddi:topcClas";
 
   static final String KEYWORDS_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:subject/ddi:keyword";

@@ -212,7 +212,7 @@
       {
         "vocabUri": "urn:ddi-cv:ModeOfCollection:3.0",
         "vocab": "DDI Mode Of Collection",
-        "term": "Telephone interview.",
+        "term": "Telephone interview",
         "id": ""
       },
       {
@@ -293,5 +293,7 @@
   "publicationYear": "1982-01-01T00:00:00Z",
   "lastModified": "2017-11-17T08:08:11Z",
   "accessClass": "The dataset is (D) available only by permission from the data depositor\/creator.",
-  "studyNumber": "2305"
+  "studyNumber": "2305",
+  "dataCollectionPeriodStartdate": "2018-09-20",
+  "dataCollectionPeriodEnddate": "2018-10-21T00:00:00Z"
 }
