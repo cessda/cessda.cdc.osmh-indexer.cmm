@@ -125,7 +125,12 @@
                 <!--UKDS-->
                 <timeMeth>Repeated cross-sectional study</timeMeth>
                 <dataCollector>National Centre for Social Research</dataCollector>
-                <sampProc>Multi-stage stratified random sample</sampProc>
+                <!-- Compliant example-->
+                <sampProc><concept xml:lang="en" ID="madeUp" vocab="DDI Sampling Procedure" vocabURI="urn:ddi-cv:SamplingProcedure:1.1">Probability.Stratified 1</concept></sampProc>
+                <sampProc><concept xml:lang="en" vocab="DDI Sampling Procedure" vocabURI="urn:ddi-cv:SamplingProcedure:1.1">Probability.Stratified 2</concept></sampProc>
+                <sampProc><concept xml:lang="fi" vocab="fi DDI Sampling Procedure" vocabURI="fi:urn:ddi-cv:SamplingProcedure:1.1">et Probability.Stratified</concept></sampProc>
+                <!-- FSD example: if concept element is missing, this must not be extracted -->
+                <sampProc>Should ignore elements without a concept</sampProc>
                 <deviat>6,708 cases</deviat>
                 <collMode>Face-to-face interview</collMode>
                 <sources />

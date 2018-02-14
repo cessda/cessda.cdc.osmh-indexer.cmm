@@ -106,9 +106,8 @@ public class CMMStudy {
   @JsonProperty("accessClass")
   private String accessClass;
 
-
   @JsonProperty("typeOfSamplingProcedures")
-  private String[] typeOfSamplingProcedures;
+  private Map<String, List<TermVocabAttributes>> typeOfSamplingProcedures;
 
   @JsonProperty("publisher")
   private Map<String, Publisher> publisher;

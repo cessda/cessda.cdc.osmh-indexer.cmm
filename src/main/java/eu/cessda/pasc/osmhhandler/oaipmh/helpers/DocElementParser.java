@@ -67,15 +67,17 @@ class DocElementParser {
   }
 
   static <T> Map<String, List<T>> extractMetadataObjectListForEachLang(
-      OaiPmh config, Document document, XPathFactory xFactory, String xPath, Function<Element, T> parserStrategy) {
+      OaiPmh config, Document document, XPathFactory xFactory, String xPath, Function<Element, Optional<T>> parserStrategy) {
 
     Map<String, List<T>> mapOfMetadataToLanguageCode = new HashMap<>();
     List<Element> elements = getElements(document, xFactory, xPath);
     elements.forEach(element -> {
-          T parsedMetadataPojo = parserStrategy.apply(element);
-          Optional<String> langCode = getParseLanguageCode(config, element);
-          langCode.ifPresent(s ->
-              mapMetadataToLanguageCode(mapOfMetadataToLanguageCode, parsedMetadataPojo, s));
+          Optional<T> parsedMetadataPojo = parserStrategy.apply(element);
+          parsedMetadataPojo.ifPresent(parsedMetadataPojoValue -> {
+            Optional<String> langCode = getParseLanguageCode(config, element);
+            langCode.ifPresent(code ->
+                mapMetadataToLanguageCode(mapOfMetadataToLanguageCode, parsedMetadataPojoValue, code));
+          });
         }
     );
 

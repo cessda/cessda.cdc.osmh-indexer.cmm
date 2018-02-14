@@ -259,12 +259,35 @@
       "description": "Unique identifier of class/category within the classification system."
     },
     "typeOfSamplingProcedures": {
-      "type": "array",
-      "description": "An array of sampling procedures used for data collection.",
-      "items": {
-        "type": "string",
-        "description": "Type of sampling procedure used for data collection. Controlled vocabulary Includes a typology of sampling methods."
-      }
+      "type": "object",
+      "description": "Sampling procedures used for data collection.",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "description": "Type of sampling procedure used for data collection. Controlled vocabulary Includes a typology of sampling methods.",
+              "properties": {
+                "vocab": {
+                  "type": "string"
+                },
+                "vocabUri": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "term": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
     },
     "samplingProcedure": {
       "type": "object",

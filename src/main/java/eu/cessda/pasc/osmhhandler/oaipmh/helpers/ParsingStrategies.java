@@ -11,10 +11,9 @@ import java.util.function.Function;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.DocElementParser.getAttributeValue;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.DocElementParser.parseTermVocabAttrAndValues;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.*;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.NOT_AVAIL;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.ABBR_ATTR;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.CREATOR_AFFILIATION_ATTR;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.DDI_NS;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
 
 /**
  * Placeholder for various strategies to use to extract metadata for each field type
@@ -28,17 +27,25 @@ class ParsingStrategies {
   }
 
   @SuppressWarnings("unchecked")
-  static <T> Function<Element, T> countryStrategyFunction() {
-    return element -> (T) Country.builder()
-        .iso2LetterCode(getAttributeValue(element, ABBR_ATTR).orElse(NOT_AVAIL))
-        .countryName(element.getText()).build();
+  static <T> Function<Element, Optional<T>> countryStrategyFunction() {
+    return element -> {
+      Country country = Country.builder()
+          .iso2LetterCode(getAttributeValue(element, ABBR_ATTR).orElse(NOT_AVAIL))
+          .countryName(element.getText())
+          .build();
+      return Optional.ofNullable((T) country);
+    };
   }
 
   @SuppressWarnings("unchecked")
-  static <T> Function<Element, T> pidStrategyFunction() {
-    return element -> (T) Pid.builder()
-        .agency(getAttributeValue(element, "agency").orElse(NOT_AVAIL))
-        .pid(element.getText()).build();
+  static <T> Function<Element, Optional<T>> pidStrategyFunction() {
+    return element -> {
+      Pid agency = Pid.builder()
+          .agency(getAttributeValue(element, AGENCY_ATTR).orElse(NOT_AVAIL))
+          .pid(element.getText())
+          .build();
+      return Optional.ofNullable((T) agency);
+    };
   }
 
   @SuppressWarnings("unchecked")
@@ -61,13 +68,27 @@ class ParsingStrategies {
   }
 
   @SuppressWarnings("unchecked")
-  static <T> Function<Element, T> termVocabAttributeStrategyFunction() {
+  static <T> Function<Element, Optional<T>> termVocabAttributeStrategyFunction() {
     return element -> {
-      Optional<Element> concept = Optional.ofNullable(element.getChild("concept", DDI_NS));
-      TermVocabAttributes vocabValueAttrs =
-          parseTermVocabAttrAndValues(element, concept.orElse(new Element("empty")));
+      Optional<Element> concept = Optional.ofNullable(element.getChild(CONCEPT_EL, DDI_NS));
+      TermVocabAttributes vocabValueAttrs = parseTermVocabAttrAndValues(element, concept.orElse(new Element(EMPTY_EL)));
+      return Optional.ofNullable((T) vocabValueAttrs);
+    };
+  }
 
-      return (T)vocabValueAttrs;
+  @SuppressWarnings("unchecked")
+  static <T> Function<Element, Optional<T>> samplingTermVocabAttributeStrategyFunction() {
+
+    return element -> {
+
+      Optional<T> vocabValueAttrs1 = Optional.empty();
+      Optional<Element> concept = Optional.ofNullable(element.getChild(CONCEPT_EL, DDI_NS));
+      if (concept.isPresent()) {
+        TermVocabAttributes vocabValueAttrs = parseTermVocabAttrAndValues(element, concept.orElse(new Element(EMPTY_EL)));
+        vocabValueAttrs1 = Optional.ofNullable((T) vocabValueAttrs);
+      }
+
+      return vocabValueAttrs1;
     };
   }
 }

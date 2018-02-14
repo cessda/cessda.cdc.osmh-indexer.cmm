@@ -74,6 +74,7 @@ private void validateContentIsExtractedAsExpected(CMMStudy record) throws IOExce
     final JsonNode actualTree = mapper.readTree(jsonString);
     final JsonNode expectedTree = mapper.readTree(expectedJson);
 
+    then(expectedTree.get("publicationYear").toString()).isEqualTo(actualTree.get("publicationYear").toString());
     assertEquals(expectedTree.get("abstract").toString(), actualTree.get("abstract").toString(), true);
     assertEquals(expectedTree.get("classifications").toString(), actualTree.get("classifications").toString(), true);
     assertEquals(expectedTree.get("keywords").toString(), actualTree.get("keywords").toString(), true);
@@ -83,10 +84,10 @@ private void validateContentIsExtractedAsExpected(CMMStudy record) throws IOExce
     assertEquals(expectedTree.get("unitTypes").toString(), actualTree.get("unitTypes").toString(), true);
     assertEquals(expectedTree.get("titleStudy").toString(), actualTree.get("titleStudy").toString(), true);
     assertEquals(expectedTree.get("publisher").toString(), actualTree.get("publisher").toString(), true);
-    assertEquals(expectedTree.get("samplingProcedure").toString(), actualTree.get("samplingProcedure").toString(), true);
     assertEquals(expectedTree.get("creators").toString(), actualTree.get("creators").toString(), true);
     assertEquals(expectedTree.get("fileLanguages").toString(), actualTree.get("fileLanguages").toString(), true);
-    then(expectedTree.get("publicationYear").toString()).isEqualTo(actualTree.get("publicationYear").toString());
+    assertEquals(expectedTree.get("typeOfSamplingProcedures").toString(), actualTree.get("typeOfSamplingProcedures").toString(), true);
+//    assertEquals(expectedTree.get("samplingProcedure").toString(), actualTree.get("samplingProcedure").toString(), true);
 
     // TODO repeat for each individual element.  Final goal is to use one single Uber Json compare
   }

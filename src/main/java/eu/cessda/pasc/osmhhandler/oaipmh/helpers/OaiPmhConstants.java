@@ -85,6 +85,8 @@ public class OaiPmhConstants {
   static final String GET_RECORD_URL_TEMPLATE = "%s?%s=%s&%s=%s&%s=%s";
 
   public static final String COMPLETE_LIST_SIZE = "completeListSize";
+  static final String AGENCY_ATTR = "agency";
+  static final String CONCEPT_EL = "concept";
 
   private OaiPmhConstants() {
     throw new UnsupportedOperationException("Utility class, instantiation not allow");
