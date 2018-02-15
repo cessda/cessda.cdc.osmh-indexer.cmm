@@ -295,5 +295,17 @@
   "accessClass": "The dataset is (D) available only by permission from the data depositor\/creator.",
   "studyNumber": "2305",
   "dataCollectionPeriodStartdate": "2018-09-20",
-  "dataCollectionPeriodEnddate": "2018-10-21T00:00:00Z"
+  "dataCollectionPeriodEnddate": "2018-10-21T00:00:00Z",
+  "dataCollectionFreeTexts": {
+    "en": [
+      {
+        "dataCollectionFreeText": "Spring 2018",
+        "event": "start"
+      },
+      {
+        "dataCollectionFreeText": "Christmas 2018",
+        "event": "end"
+      }
+    ]
+  }
 }

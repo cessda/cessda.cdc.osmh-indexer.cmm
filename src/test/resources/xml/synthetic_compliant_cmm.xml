@@ -114,8 +114,12 @@
                 <anlyUnit>Institutions/organisations</anlyUnit>
                 <universe xml:lang="en" clusion="I">Persons who were second grade students in a school in Jyväskylä at the time of the first data collection in 1968 and who continued to participate in the longitudinal study and had belonged to extreme groups of social behaviour at ages 8 and 14. The sample was collected both from the town centre and suburbs.</universe>
                 <universe xml:lang="fi" clusion="I">Otantahetkellä vuonna 1968 kansakoulun toisluokkalaiset keskisuomalaisen kaupungin oppilaat, jotka ovat edelleen mukana pitkittäistutkimuksessa ja kuuluivat 8- ja 14 -vuotiaana sosiaalisen käyttäytymisen ääriryhmiin.</universe>
+                <!-- Valid Iso Date-->
+                <collDate date="2018-10-21T00:00:00Z" event="end">End of October(has a @Date = not be extracted)</collDate>
                 <collDate date="2018-09-20" event="start" />
-                <collDate date="2018-10-21T00:00:00Z" event="end" />
+                <!-- Valid Data Collection FreeText description. Extract only when there is no @date -->
+                <collDate event="start">Spring 2018</collDate>
+                <collDate event="end">Christmas 2018</collDate>
               </sumDscr>
             </stdyInfo>
             <method>

@@ -1,5 +1,6 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 
+import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.DataCollectionFreeText;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.TermVocabAttributes;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.configuration.OaiPmh;
 import org.jdom2.Attribute;
@@ -57,6 +58,23 @@ class DocElementParser {
     return expression.evaluate(document).stream().filter(Objects::nonNull).collect(toList());
   }
 
+  /**
+   * Extracts Date elements from doc that has @date
+   *
+   * @param document       the document to parse
+   * @param xFactory       the xFactory
+   * @param xPathToElement the xPath
+   * @return nonNull list of {@link Element}
+   */
+  private static List<Element> getElementsWithDateAttr(Document document, XPathFactory xFactory, String xPathToElement) {
+    XPathExpression<Element> expression = xFactory.compile(xPathToElement, Filters.element(), null, OAI_AND_DDI_NS);
+    return expression.evaluate(document).stream()
+        .filter(Objects::nonNull)
+        .filter(element -> getAttributeValue(element, DATE_ATTR)
+            .isPresent()) //PUG requirement: we only care about those with @date CV
+        .collect(toList());
+  }
+
   static TermVocabAttributes parseTermVocabAttrAndValues(Element element, Element concept) {
 
     if ("empty".equals(concept.getName())) {
@@ -67,8 +85,9 @@ class DocElementParser {
     return parseTermVocabAttrAndValues(concept, elementValue);
   }
 
-  static <T> Map<String, List<T>> extractMetadataObjectListForEachLang(
-      OaiPmh config, Document document, XPathFactory xFactory, String xPath, Function<Element, Optional<T>> parserStrategy) {
+  static <T> Map<String, List<T>> extractMetadataObjectListForEachLang(OaiPmh config, Document document,
+                                                                       XPathFactory xFactory, String xPath,
+                                                                       Function<Element, Optional<T>> parserStrategy) {
 
     Map<String, List<T>> mapOfMetadataToLanguageCode = new HashMap<>();
     List<Element> elements = getElements(document, xFactory, xPath);
@@ -167,8 +186,9 @@ class DocElementParser {
     return attributes.stream().map(Attribute::getValue).toArray(String[]::new);
   }
 
-  static Map<String, String> getDateElementAttributesValueMap(Document document, XPathFactory xFactory, String elementXpath) {
-    List<Element> elements = getElements(document, xFactory, elementXpath);
+  static Map<String, String> getDateElementAttributesValueMap(Document document, XPathFactory xFactory,
+                                                              String elementXpath) {
+    List<Element> elements = getElementsWithDateAttr(document, xFactory, elementXpath);
     return elements.stream().collect(Collectors.toMap(element ->
         element.getAttributeValue(EVENT_ATTR), element ->
         element.getAttributeValue(DATE_ATTR)));
@@ -186,7 +206,8 @@ class DocElementParser {
    * <p>
    * If configuration is set to not default to a given lang, effect is this element is not extracted.
    */
-  static Map<String, String> getLanguageKeyValuePairs(OaiPmh config, List<Element> elements, boolean isConcatenating,
+  static Map<String, String> getLanguageKeyValuePairs(OaiPmh config, List<Element> elements,
+                                                      boolean isConcatenating,
                                                       Function<Element, String> textExtractionStrategy) {
 
     String defaultingLang = config.getMetadataParsingDefaultLang().getLang();

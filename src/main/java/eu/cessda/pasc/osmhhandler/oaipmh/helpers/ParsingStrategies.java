@@ -1,9 +1,6 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 
-import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.Country;
-import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.Pid;
-import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.Publisher;
-import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.TermVocabAttributes;
+import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.*;
 import org.jdom2.Element;
 
 import java.util.Optional;
@@ -90,15 +87,33 @@ class ParsingStrategies {
   static <T> Function<Element, Optional<T>> samplingTermVocabAttributeStrategyFunction() {
 
     return element -> {
-
       Optional<T> vocabValueAttrsOpt = Optional.empty();
       Optional<Element> concept = Optional.ofNullable(element.getChild(CONCEPT_EL, DDI_NS));
       if (concept.isPresent()) {
         TermVocabAttributes vocabValueAttrs = parseTermVocabAttrAndValues(element, concept.orElse(new Element(EMPTY_EL)));
         vocabValueAttrsOpt = Optional.of((T) vocabValueAttrs);
       }
-
       return vocabValueAttrsOpt;
+    };
+  }
+
+  @SuppressWarnings("unchecked")
+  static <T> Function<Element, Optional<T>> dataCollFreeTextStrategyFunction() {
+
+    return element -> {
+
+      Optional<T> dataCollFTxt = Optional.empty();
+      Optional<String> dateAttrValue = getAttributeValue(element, DATE_ATTR);
+
+      // PUG requirement:  Only extract if there is no @date in <collDate>
+      if (!dateAttrValue.isPresent()) {
+        dataCollFTxt = Optional.of((T) DataCollectionFreeText.builder()
+            .event(getAttributeValue(element, EVENT_ATTR).orElse(NOT_AVAIL))
+            .dataCollectionFreeText(element.getText())
+            .build());
+      }
+
+      return dataCollFTxt;
     };
   }
 }

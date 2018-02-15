@@ -299,6 +299,17 @@ public class CMMStudyMapper {
   }
 
   /**
+   * Parses area Countries covered by a study:
+   * <p>
+   * Xpath = {@value OaiPmhConstants#DATA_COLLECTION_PERIODS_PATH }
+   */
+  public static void parseDataCollectionFreeTexts(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory,
+                                                  OaiPmh config) {
+    builder.dataCollectionFreeTexts(extractMetadataObjectListForEachLang(
+        config, document, xFactory, DATA_COLLECTION_PERIODS_PATH, dataCollFreeTextStrategyFunction()));
+  }
+
+  /**
    * Parses File Language(s) from:
    * <p>
    * Xpath = {@value OaiPmhConstants#FILE_TXT_LANGUAGES_XPATH }
