@@ -118,6 +118,8 @@ public class GetRecordServiceImplTest {
         .get("typeOfModeOfCollections").toString(), actualTree.get("typeOfModeOfCollections").toString(), true);
     assertEquals(expectedTree
         .get("dataCollectionFreeTexts").toString(), actualTree.get("dataCollectionFreeTexts").toString(), true);
+    assertEquals(expectedTree
+        .get("dataAccessFreeTexts").toString(), actualTree.get("dataAccessFreeTexts").toString(), true);
 
     // TODO repeat for each individual element.  Final goal is to use one single Uber Json compare
   }

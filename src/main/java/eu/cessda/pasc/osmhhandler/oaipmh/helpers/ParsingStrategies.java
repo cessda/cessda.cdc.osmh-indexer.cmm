@@ -3,7 +3,11 @@ package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.*;
 import org.jdom2.Element;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.DocElementParser.getAttributeValue;
@@ -114,6 +118,20 @@ class ParsingStrategies {
       }
 
       return dataCollFTxt;
+    };
+  }
+
+  static BiFunction<Map<String, List<String>>, Map<String, List<String>>, Map<String, List<String>>> mergeMaps() {
+
+    return (Map<String, List<String>> map1, Map<String, List<String>> map2) -> {
+      Map<String, List<String>> mergedMapped = new HashMap<>(map1);
+      map2.forEach((String k, List<String> v) -> mergedMapped.merge(k, v, (strings, strings2) -> {
+            strings.addAll(strings2);
+            return strings;
+          }
+          )
+      );
+      return mergedMapped;
     };
   }
 }

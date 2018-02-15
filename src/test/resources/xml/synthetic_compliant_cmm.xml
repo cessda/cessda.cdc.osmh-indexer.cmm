@@ -155,9 +155,16 @@
             </method>
             <dataAccs>
               <useStmt>
-                <restrctn xml:lang="en">The dataset is (D) available only by permission from the data depositor/creator.</restrctn>
-                <restrctn xml:lang="fi">Aineisto on käytettävissä (D) vain luovuttajan luvalla.</restrctn>
+                <restrctn xml:lang="en">Restriction Text en</restrctn>
+                <restrctn xml:lang="fi">Restriction Text fi</restrctn>
+                <conditions xml:lang="en">Conditions Text en</conditions>
+                <specPerm xml:lang="en">SpecPerm Text en</specPerm>
+                <specPerm xml:lang="fi">SpecPerm Text fi</specPerm>
               </useStmt>
+              <setAvail>
+                <avlStatus xml:lang="en">AvlStatus Text en</avlStatus>
+                <avlStatus xml:lang="fi">AvlStatus Text fi</avlStatus>
+              </setAvail>
             </dataAccs>
             <othrStdyMat>
             </othrStdyMat>

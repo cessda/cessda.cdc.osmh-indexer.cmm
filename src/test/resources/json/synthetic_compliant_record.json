@@ -307,5 +307,18 @@
         "event": "end"
       }
     ]
+  },
+  "dataAccessFreeTexts": {
+    "fi": [
+      "SpecPerm Text fi",
+      "Restriction Text fi",
+      "AvlStatus Text fi"
+    ],
+    "en": [
+      "SpecPerm Text en",
+      "Restriction Text en",
+      "Conditions Text en",
+      "AvlStatus Text en"
+    ]
   }
 }

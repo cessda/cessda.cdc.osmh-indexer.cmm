@@ -266,6 +266,29 @@ public class CMMStudyMapper {
   }
 
   /**
+   * Parses Sampling Procedure(s) from:
+   * <p>
+   * Xpath = {@value OaiPmhConstants#SAMPLING_XPATH }
+   */
+  public static void parseDataAccessFreeText(CMMStudy.CMMStudyBuilder builder, Document doc,
+                                             XPathFactory xFactory, OaiPmh config) {
+
+    Map<String, List<String>> specPermEl = extractMetadataObjectListForEachLang(
+        config, doc, xFactory, DATA_SPEC_PERM_XPATH, samplingProcStrategyFunction());
+    Map<String, List<String>> restrictionEl = extractMetadataObjectListForEachLang(
+        config, doc, xFactory, DATA_RESTRCTN_XPATH, samplingProcStrategyFunction());
+    Map<String, List<String>> conditionsEl = extractMetadataObjectListForEachLang(
+        config, doc, xFactory, DATA_CONDITIONS_XPATH, samplingProcStrategyFunction());
+    Map<String, List<String>> avlStatusEl = extractMetadataObjectListForEachLang(
+        config, doc, xFactory, DATA_AVL_STATUS_XPATH, samplingProcStrategyFunction());
+
+    Map<String, List<String>> mergedMapped = mergeMaps().apply(specPermEl, restrictionEl);
+    mergedMapped =  mergeMaps().apply(mergedMapped, conditionsEl);
+    mergedMapped =  mergeMaps().apply(mergedMapped, avlStatusEl);
+    builder.dataAccessFreeTexts(mergedMapped);
+  }
+
+  /**
    * Parses Type Of Mode Of Collection(s) from:
    * <p>
    * Xpath = {@value OaiPmhConstants#TYPE_OF_MODE_OF_COLLECTION_XPATH }

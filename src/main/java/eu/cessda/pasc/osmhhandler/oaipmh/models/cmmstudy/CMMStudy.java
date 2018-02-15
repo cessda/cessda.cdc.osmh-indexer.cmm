@@ -40,6 +40,7 @@ import java.util.Set;
     "dataCollectionPeriodEnddate",
     "dataCollectionFreeTexts",
     "dataAccess",
+    "dataAccessFreeTexts",
     "accessClass",
     "institutionFullName",
     "lastModified",
@@ -70,6 +71,9 @@ public class CMMStudy {
 
   @JsonProperty("dataCollectionFreeTexts")
   private Map<String, List<DataCollectionFreeText>>  dataCollectionFreeTexts;
+
+  @JsonProperty("dataAccessFreeTexts")
+  private Map<String, List<String>> dataAccessFreeTexts;
 
   @JsonProperty("publicationYear")
   private String publicationYear;

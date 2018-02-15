@@ -372,6 +372,23 @@
       },
       "additionalProperties": false
     },
+    "dataAccessFreeTexts": {
+      "type": "object",
+      "description": "A Collection of Data Access Free Texts descriptions for data collection. In potentially translated in multiple languages",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "array",
+          "items": [
+            {
+              "type": "string",
+              "description": "A Data Access Free Texts description for data collection.",
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
     "dataAccess": {
       "type": "object",
       "patternProperties": {
