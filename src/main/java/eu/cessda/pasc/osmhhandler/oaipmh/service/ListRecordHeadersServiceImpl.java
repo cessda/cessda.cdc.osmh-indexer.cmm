@@ -61,7 +61,7 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
       Node item = resumptionToken.item(0);
       NamedNodeMap attributes = item.getAttributes();
       for (int attributeIndex = 0; attributeIndex < attributes.getLength(); attributeIndex++) {
-        if (attributes.item(attributeIndex).getNodeName().equalsIgnoreCase(COMPLETE_LIST_SIZE)) {
+        if (attributes.item(attributeIndex).getNodeName().equalsIgnoreCase(COMPLETE_LIST_SIZE_ATTR)) {
           return Integer.parseInt(attributes.item(attributeIndex).getTextContent());
         }
       }

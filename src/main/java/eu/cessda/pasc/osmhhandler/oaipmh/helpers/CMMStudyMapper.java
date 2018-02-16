@@ -102,16 +102,6 @@ public class CMMStudyMapper {
   }
 
   /**
-   * Access Class Name from:
-   * <p>
-   * Xpath = {@value OaiPmhConstants#ACCESS_CLASS_XPATH }
-   */
-  public static void parseAccessClass(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory) {
-    getFirstElement(document, xFactory, ACCESS_CLASS_XPATH)
-        .ifPresent(element -> builder.accessClass(element.getText()));
-  }
-
-  /**
    * Parses Abstract
    * <p>
    * Xpath = {@value OaiPmhConstants#ABSTRACT_XPATH }
@@ -343,18 +333,5 @@ public class CMMStudyMapper {
     String[] allLangs = Stream.of(fileTxtAttrs, fileNameAttrs).flatMap(Stream::of).toArray(String[]::new);
     Set<String> languageFilesSet = Arrays.stream(allLangs).collect(Collectors.toSet());
     builder.fileLanguages(languageFilesSet);
-  }
-
-  /**
-   * Parses Data Access from:
-   * <p>
-   * Xpath = {@value OaiPmhConstants#DATA_ACCESS_XPATH }
-   */
-  public static void parseDataAccess(
-      CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
-
-    List<Element> elements = getElements(document, xFactory, DATA_ACCESS_XPATH);
-    Map<String, String> dataAccess = getLanguageKeyValuePairs(config, elements, false, creatorStrategyFunction());
-    builder.dataAccess(dataAccess);
   }
 }

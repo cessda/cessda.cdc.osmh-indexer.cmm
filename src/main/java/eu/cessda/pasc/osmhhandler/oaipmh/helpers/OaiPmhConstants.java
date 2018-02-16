@@ -30,8 +30,6 @@ public class OaiPmhConstants {
   static final String TITLE_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:titl";
   static final String PID_STUDY_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo"; // TODO use @agency instead
   static final String CREATORS_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty";
-  static final String ACCESS_CLASS_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:restrctn[1]";
-  static final String DATA_ACCESS_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:conditions[1]";
   static final String DATA_RESTRCTN_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:restrctn";
   static final String DATA_CONDITIONS_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:conditions";
   static final String DATA_SPEC_PERM_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:specPerm";
@@ -50,7 +48,6 @@ public class OaiPmhConstants {
   static final String TYPE_OF_SAMPLING_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:sampProc";
   static final String SAMPLING_XPATH = TYPE_OF_SAMPLING_XPATH;
   static final String TYPE_OF_MODE_OF_COLLECTION_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:collMode";
-  static final String INST_FULL_NAME_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty";
 
   // Elements
   static final String LANG_ATTR = "lang";
@@ -72,6 +69,9 @@ public class OaiPmhConstants {
   static final String VOCAB_URI_ATTR = "vocabURI";
   static final String ID_ATTR = "ID";
   static final String ABBR_ATTR = "abbr";
+  static final String AGENCY_ATTR = "agency";
+  static final String CONCEPT_EL = "concept";
+  public static final String COMPLETE_LIST_SIZE_ATTR = "completeListSize";
 
   // Encoding
   public static final String UTF_8 = "UTF-8";
@@ -87,10 +87,6 @@ public class OaiPmhConstants {
 
   static final String LIST_RECORD_HEADERS_URL_TEMPLATE = "%s?%s=%s&%s=%s";
   static final String GET_RECORD_URL_TEMPLATE = "%s?%s=%s&%s=%s&%s=%s";
-
-  public static final String COMPLETE_LIST_SIZE = "completeListSize";
-  static final String AGENCY_ATTR = "agency";
-  static final String CONCEPT_EL = "concept";
 
   private OaiPmhConstants() {
     throw new UnsupportedOperationException("Utility class, instantiation not allow");

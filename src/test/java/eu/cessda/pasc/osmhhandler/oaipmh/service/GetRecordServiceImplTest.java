@@ -59,11 +59,11 @@ public class GetRecordServiceImplTest {
     );
 
     // When
-    CMMStudy record = recordService.getRecord("", "");
+    CMMStudy result = recordService.getRecord("", "");
 
-    then(record).isNotNull();
-    validateCMMStudyAgainstSchema(record);
-    validateContentIsExtractedAsExpected(record);
+    then(result).isNotNull();
+    validateCMMStudyResultAgainstSchema(result);
+    assertFieldsAreExtractedAsExpected(result);
   }
 
   @Test
@@ -76,11 +76,9 @@ public class GetRecordServiceImplTest {
 
     // When
     CMMStudy record = recordService.getRecord("", "");
-
     then(record).isNotNull();
-    validateCMMStudyAgainstSchema(record);
+    validateCMMStudyResultAgainstSchema(record);
     final ObjectMapper mapper = new ObjectMapper();
-
     String jsonString = CMMConverter.toJsonString(record);
     final JsonNode actualTree = mapper.readTree(jsonString);
 
@@ -88,14 +86,16 @@ public class GetRecordServiceImplTest {
     then(actualTree.get("dataCollectionPeriodEnddate")).isNull();
   }
 
-  private void validateContentIsExtractedAsExpected(CMMStudy record) throws IOException, JSONException {
-    final ObjectMapper mapper = new ObjectMapper();
+  private void assertFieldsAreExtractedAsExpected(CMMStudy record) throws IOException, JSONException {
 
+    final ObjectMapper mapper = new ObjectMapper();
     String jsonString = CMMConverter.toJsonString(record);
     String expectedJson = CMMStudyTestData.getXMLString("json/synthetic_compliant_record.json");
     final JsonNode actualTree = mapper.readTree(jsonString);
     final JsonNode expectedTree = mapper.readTree(expectedJson);
 
+    // This following could be compared with one single Uber Json compare, but probably best this way to easily know
+    // which field test assertion line below that fails.
     then(expectedTree.get("publicationYear").toString()).isEqualTo(actualTree.get("publicationYear").toString());
     then(expectedTree.get("dataCollectionPeriodStartdate").toString()).isEqualTo(actualTree.get("dataCollectionPeriodStartdate").toString());
     then(expectedTree.get("dataCollectionPeriodEnddate").toString()).isEqualTo(actualTree.get("dataCollectionPeriodEnddate").toString());
@@ -120,8 +120,6 @@ public class GetRecordServiceImplTest {
         .get("dataCollectionFreeTexts").toString(), actualTree.get("dataCollectionFreeTexts").toString(), true);
     assertEquals(expectedTree
         .get("dataAccessFreeTexts").toString(), actualTree.get("dataAccessFreeTexts").toString(), true);
-
-    // TODO repeat for each individual element.  Final goal is to use one single Uber Json compare
   }
 
   @Test
@@ -139,7 +137,7 @@ public class GetRecordServiceImplTest {
     CMMStudy record = recordService.getRecord(repoUrl, studyIdentifier);
 
     then(record).isNotNull();
-    validateCMMStudyAgainstSchema(record);
+    validateCMMStudyResultAgainstSchema(record);
   }
 
   @Test
@@ -160,7 +158,7 @@ public class GetRecordServiceImplTest {
     then(record).isNotNull();
     then(record.getAbstractField().size()).isEqualTo(3);
     then(record.getAbstractField()).isEqualTo(expectedAbstract);
-    validateCMMStudyAgainstSchema(record);
+    validateCMMStudyResultAgainstSchema(record);
   }
 
   @Test()
@@ -199,7 +197,7 @@ public class GetRecordServiceImplTest {
     // Then an exception is thrown.
   }
 
-  private void validateCMMStudyAgainstSchema(CMMStudy record) throws IOException, ProcessingException, JSONException {
+  private void validateCMMStudyResultAgainstSchema(CMMStudy record) throws IOException, ProcessingException, JSONException {
 
     then(record.isActive()).isTrue(); // No need to carry on validating other fields if marked as inActive
 

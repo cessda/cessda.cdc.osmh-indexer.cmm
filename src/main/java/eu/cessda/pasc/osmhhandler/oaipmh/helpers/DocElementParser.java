@@ -1,6 +1,5 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 
-import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.DataCollectionFreeText;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.TermVocabAttributes;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.configuration.OaiPmh;
 import org.jdom2.Attribute;
@@ -26,23 +25,6 @@ class DocElementParser {
 
   private DocElementParser() {
     throw new UnsupportedOperationException("Utility class, instantiation not allow");
-  }
-
-  /**
-   * Parses the array values of elements
-   *
-   * @param document     the document to parse
-   * @param xFactory     the xFactory
-   * @param elementXpath the Element parent node to retrieve
-   * @return String[] Values of the Element
-   */
-  static String[] getElementValues(Document document, XPathFactory xFactory, String elementXpath) {
-    List<Element> elements = getElements(document, xFactory, elementXpath);
-    return elements.stream()
-        .filter(Objects::nonNull)
-        .map(Element::getText)
-        .filter(s -> !s.isEmpty())
-        .toArray(String[]::new);
   }
 
   /**
@@ -255,11 +237,5 @@ class DocElementParser {
     } else {
       titlesMap.put(xmlLang, currentElementContent); // set first
     }
-  }
-
-  public static String extractCreatorWithAffiliation(Element element) {
-    return getAttributeValue(element, CREATOR_AFFILIATION_ATTR)
-        .map(s -> (element.getText() + " (" + s + ")"))
-        .orElseGet(element::getText);
   }
 }
