@@ -1,6 +1,7 @@
 package eu.cessda.pasc.osmhhandler.oaipmh;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -21,6 +22,9 @@ public class SwaggerConfig {
   @Autowired
   private ServletContext servletContext;
 
+  @Value("${osmhhandler.baseEndpoint}")
+  private String baseEndpoint;
+
   @Bean
   public Docket api() {
     return new Docket(DocumentationType.SWAGGER_2)
@@ -31,7 +35,7 @@ public class SwaggerConfig {
         .pathProvider(new RelativePathProvider(servletContext) {
           @Override
           public String getApplicationBasePath() {
-            return "/osmh-repo";
+            return baseEndpoint;
           }
         })
         .apiInfo(metaData());

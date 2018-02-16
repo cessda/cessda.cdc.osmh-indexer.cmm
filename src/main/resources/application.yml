@@ -1,7 +1,7 @@
 ---
 server:
   port: 9091
-  context-path: '/osmh-repo'
+#  context-path: '/osmh-repo'
 security:
   user:
     name: user
@@ -50,6 +50,7 @@ logging:
     net: WARN
     com: ERROR
 osmhhandler:
+  baseEndpoint: '/'
   oaiPmh:
     supportedApiVersions:
       - v0
@@ -96,15 +97,11 @@ osmhhandler:
 
 ---
 spring:
-  profiles: local
-  boot:
-    admin:
-      url:
----
-spring:
   profiles: dev
   main:
         banner-mode: "off"
   boot:
     admin:
       url: http://localhost:8087
+osmhhandler:
+  baseEndpoint: '/osmh-repo'
