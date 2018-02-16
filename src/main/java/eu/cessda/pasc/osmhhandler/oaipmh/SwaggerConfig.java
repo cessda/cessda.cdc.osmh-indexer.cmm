@@ -1,19 +1,25 @@
 package eu.cessda.pasc.osmhhandler.oaipmh;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.paths.RelativePathProvider;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import javax.servlet.ServletContext;
 import java.util.ArrayList;
 
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig {
+
+  @Autowired
+  private ServletContext servletContext;
 
   @Bean
   public Docket api() {
@@ -22,6 +28,12 @@ public class SwaggerConfig {
         .apis(RequestHandlerSelectors.basePackage("eu.cessda.pasc.osmhhandler.oaipmh.controller"))
         .build()
         .useDefaultResponseMessages(false)
+        .pathProvider(new RelativePathProvider(servletContext) {
+          @Override
+          public String getApplicationBasePath() {
+            return "/osmh-repo";
+          }
+        })
         .apiInfo(metaData());
   }
 

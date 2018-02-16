@@ -1,6 +1,7 @@
 ---
 server:
   port: 9091
+  context-path: '/osmh-repo'
 security:
   user:
     name: user
