@@ -80,7 +80,7 @@
             <stdyInfo>
               <subject>
                 <!-- Compliance Examples -->
-                <keyword xml:lang="sv" ID="w8357xx45" vocab="ELSST" vocabURI="http://sv.ac.sv">Nationellt val</keyword>
+                <keyword xml:lang="sv" ID="The Id" vocab="ELSST" vocabURI="http://sv.ac.sv">The Term</keyword>
                 <keyword xml:lang="fi" ID="wxFAKE" vocab="CESSDA" vocabURI="http://fi.ac.fi">et Nationellt val</keyword>
                 <!--FSD-->
                 <keyword xml:lang="en" vocab="ELSST" ID="adolescents"/>
@@ -88,7 +88,7 @@
                 <keyword>1976</keyword>
                 <keyword vocabURI="http://lod.data-archive.ac.uk/skoshasset/9e7cc815-90cb-4f96-b8ff-a0a44ab25ea9">BUDGETS</keyword>
                 <!-- Compliance Examples -->
-                <topcClas xml:lang="en" vocab="ZA Category System" ID="youth" vocabURI="https://oai.ukdataservice.ac.uk/Categories.htm">Political Issues</topcClas>
+                <topcClas xml:lang="en" vocab="ZA Category System" ID="This it the ID" vocabURI="https://oai.ukdataservice.ac.uk/Categories.htm">This is the Term</topcClas>
                 <topcClas xml:lang="de" vocab="CESSDA Topic Classification" ID="Housing" vocabURI="https://dbk.gesis.org/madeup.htm">Wohnraum</topcClas>
                 <topcClas xml:lang="de" vocab="CESSDA Topic Classification2" ID="Housing2" vocabURI="https://dbk.gesis.org/madeup2.htm">Wohnraum 2</topcClas>="psychology"/>
                 <!-- invalid examples but should extract what is there -->
@@ -109,7 +109,7 @@
                 <nation xml:lang="fi" abbr="FR">Ranska</nation>
                 <nation xml:lang="se" abbr="FR">Frankrike</nation>
                 <!--Expected-->
-                <anlyUnit>Geographische Einheit <concept xml:lang="de" vocab="DDI Analysis Unit">GeographicUnit</concept></anlyUnit>
+                <anlyUnit>This is the term<concept xml:lang="de" vocab="DDI Analysis Unit">This is the id</concept></anlyUnit>
                 <anlyUnit>Made Up<concept xml:lang="en" vocab="DDI Made Up" vocabURI="https://dbk.gesis.org/madeup.htm">MadeUpUnit</concept></anlyUnit>
                 <anlyUnit>Made Up 2<concept xml:lang="en" vocab="DDI Made Up 2" vocabURI="https://dbk.gesis.org/madeup2.htm">MadeUpUnit 2</concept></anlyUnit>
                 <!-- UkDA-->
@@ -127,15 +127,15 @@
             <method>
               <dataColl>
                 <!-- 100% Compliance-->
-                <timeMeth><concept xml:lang="de" vocab="DDI Time Method 1" vocabURI="http://lod.data-archive.ac.uk" ID="fake" >Longitudinal.Panel 1</concept></timeMeth>
-                <!-- Suggested by PUG: Element value/term in "timeMethod" wins over "concept" -->
-                <timeMeth><concept xml:lang="de" vocab="DDI Time Method 2">Longitudinal.Panel 2</concept>Längsschnitt: Panel 2</timeMeth>
+                <timeMeth>This is the term<concept xml:lang="de" vocab="DDI Time Method 1" vocabURI="http://lod.data-archive.ac.uk" ID="fake" >This is the Id</concept></timeMeth>
+              <!-- Suggested by PUG: Element value/term in "timeMethod" wins over "concept" -->
+                <timeMeth>Längsschnitt: Panel 2<concept xml:lang="de" vocab="DDI Time Method 2">Longitudinal.Panel 2</concept></timeMeth>
                 <!--UKDS-->
                 <timeMeth>Repeated cross-sectional study</timeMeth>
                 <dataCollector>National Centre for Social Research</dataCollector>
                 <!-- Compliant example-->
-                <sampProc><concept xml:lang="en" ID="madeUp" vocab="DDI Sampling Procedure" vocabURI="urn:ddi-cv:SamplingProcedure:1.1">Probability.Stratified 1</concept></sampProc>
-                <sampProc><concept xml:lang="en" vocab="DDI Sampling Procedure" vocabURI="urn:ddi-cv:SamplingProcedure:1.1">Probability.Stratified 2</concept></sampProc>
+                <sampProc>This is the term<concept xml:lang="en" ID="madeUp" vocab="DDI Sampling Procedure" vocabURI="urn:ddi-cv:SamplingProcedure:1.1">This is the id</concept></sampProc>
+                <sampProc>This is the term 2<concept xml:lang="en" vocab="DDI Sampling Procedure" vocabURI="urn:ddi-cv:SamplingProcedure:1.1">Probability.Stratified 2</concept></sampProc>
                 <sampProc><concept xml:lang="fi" vocab="fi DDI Sampling Procedure" vocabURI="fi:urn:ddi-cv:SamplingProcedure:1.1">et Probability.Stratified</concept></sampProc>
                 <!-- FSD example: if concept element is missing, this must not be extracted TypeOfSamplingProcedure-->
                 <sampProc>Should ignore elements without a concept by TypeOfSamplingProcedures</sampProc>
@@ -145,8 +145,8 @@
                 <sampProc xml:lang="sv">Undersökningen bygger på program sända i SVT1, SVT2, SVT24, Barnkanalen, Kunskapskanalen, TV4, Sjuan, TV3, Kanal 5, TV6 och TV8 under 12 veckor 2015. Urvalet av veckor skedde obundet och slumpmässigt och stratifierades efter säsong.</sampProc>
                 <deviat>6,708 cases</deviat>
                 <!--Compliant-->
-                <collMode>Telephone interview<concept xml:lang="en" vocab="DDI Mode Of Collection" vocabURI="urn:ddi-cv:ModeOfCollection:3.0">Interview.Telephone-concept</concept></collMode>
-                <collMode>Telephone Survey<concept xml:lang="en" vocab="DDI Mode Of Collection" vocabURI="urn:ddi-cv:ModeOfCollection:3.0">Interview.Survey-concept</concept></collMode>
+                <collMode>This is the Term<concept xml:lang="en" vocab="DDI Mode Of Collection" vocabURI="urn:ddi-cv:ModeOfCollection:3.0">This is the Id</concept></collMode>
+                <collMode>This is the Term 2<concept xml:lang="en" vocab="DDI Mode Of Collection" vocabURI="urn:ddi-cv:ModeOfCollection:3.0">Interview.Survey-concept</concept></collMode>
                 <collMode>Enquête téléphonique<concept xml:lang="fr" vocab="DDI Mode Of Collection" vocabURI="urn:ddi-cv:ModeOfCollection:3.0">Enquête téléphonique -concept</concept></collMode>
                 <!-- non fully complaince FSD-->
                 <collMode>Face-to-face interview</collMode>

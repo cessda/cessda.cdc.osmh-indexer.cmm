@@ -80,8 +80,6 @@ public class GetRecordServiceImpl implements GetRecordService {
       parseAbstract(builder, document, X_FACTORY, oaiPmh);
       parsePidStudies(builder, document, X_FACTORY, oaiPmh);
       parseCreator(builder, document, X_FACTORY, oaiPmh);
-//      parseAccessClass(builder, document, X_FACTORY);
-//      parseDataAccess(builder, document, X_FACTORY, oaiPmh);
       parseDataAccessFreeText(builder, document, X_FACTORY, oaiPmh);
       parseClassifications(builder, document, X_FACTORY, oaiPmh);
       parseKeywords(builder, document, X_FACTORY, oaiPmh);

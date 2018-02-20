@@ -1,6 +1,7 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.TermVocabAttributes;
+import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.VocabAttributes;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.configuration.OaiPmh;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
@@ -57,14 +58,34 @@ class DocElementParser {
         .collect(toList());
   }
 
-  static TermVocabAttributes parseTermVocabAttrAndValues(Element element, Element concept) {
+  static TermVocabAttributes parseTermVocabAttrAndValues(Element parentElement, Element concept, boolean hasControlledValue) {
+    TermVocabAttributes.TermVocabAttributesBuilder builder = TermVocabAttributes.builder();
+    builder.term(parentElement.getText());
 
-    if ("empty".equals(concept.getName())) {
-      return parseTermVocabAttrAndValues(element, element.getText());
+    if (hasControlledValue) {
+      builder.vocab(getAttributeValue(concept, VOCAB_ATTR).orElse(""))
+          .vocabUri(getAttributeValue(concept, VOCAB_URI_ATTR).orElse(""))
+          .id(concept.getText());
+    } else {
+      builder.vocab(getAttributeValue(parentElement, VOCAB_ATTR).orElse(""))
+          .vocabUri(getAttributeValue(parentElement, VOCAB_URI_ATTR).orElse(""))
+          .id(getAttributeValue(parentElement, ID_ATTR).orElse(""));
     }
-    // PUG requirement parent element Value of concept wins if it has a value.
-    String elementValue = (element.getText().isEmpty()) ? concept.getText() : element.getText();
-    return parseTermVocabAttrAndValues(concept, elementValue);
+    return builder.build();
+  }
+
+  static VocabAttributes parseVocabAttrAndValues(Element parentElement, Element concept, boolean hasControlledValue) {
+    VocabAttributes.VocabAttributesBuilder builder = VocabAttributes.builder();
+    if (hasControlledValue) {
+      builder.vocab(getAttributeValue(concept, VOCAB_ATTR).orElse(""))
+          .vocabUri(getAttributeValue(concept, VOCAB_URI_ATTR).orElse(""))
+          .id(concept.getText());
+    } else {
+      builder.vocab(getAttributeValue(parentElement, VOCAB_ATTR).orElse(""))
+          .vocabUri(getAttributeValue(parentElement, VOCAB_URI_ATTR).orElse(""))
+          .id(getAttributeValue(parentElement, ID_ATTR).orElse(""));
+    }
+    return builder.build();
   }
 
   static <T> Map<String, List<T>> extractMetadataObjectListForEachLang(OaiPmh config, Document document,
@@ -131,14 +152,6 @@ class DocElementParser {
       initialLanguageMetadataList.add(metadataPojo);
       mapOfMetadataToLanguageCode.put(languageCode, initialLanguageMetadataList); // set Afresh
     }
-  }
-
-  private static TermVocabAttributes parseTermVocabAttrAndValues(Element elementToProcess, String elementValue) {
-    return TermVocabAttributes.builder()
-        .id(getAttributeValue(elementToProcess, ID_ATTR).orElse(""))
-        .vocab(getAttributeValue(elementToProcess, VOCAB_ATTR).orElse(""))
-        .vocabUri(getAttributeValue(elementToProcess, VOCAB_URI_ATTR).orElse(""))
-        .term(elementValue).build();
   }
 
   static Optional<String> getAttributeValue(Element element, String idAttr) {

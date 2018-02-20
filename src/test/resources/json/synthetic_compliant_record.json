@@ -25,8 +25,8 @@
       {
         "vocabUri": "http:\/\/sv.ac.sv",
         "vocab": "ELSST",
-        "term": "Nationellt val",
-        "id": "w8357xx45"
+        "term": "The Term",
+        "id": "The Id"
       }
     ],
     "fi": [
@@ -63,14 +63,14 @@
       {
         "vocabUri": "http:\/\/lod.data-archive.ac.uk",
         "vocab": "DDI Time Method 1",
-        "term": "Longitudinal.Panel 1",
-        "id": "fake"
+        "term": "This is the term",
+        "id": "This is the Id"
       },
       {
         "vocabUri": "",
         "vocab": "DDI Time Method 2",
         "term": "Längsschnitt: Panel 2",
-        "id": ""
+        "id": "Longitudinal.Panel 2"
       }
     ],
     "en": [
@@ -144,6 +144,8 @@
       "Undersökningen bygger på program sända i SVT1, SVT2, SVT24, Barnkanalen, Kunskapskanalen, TV4, Sjuan, TV3, Kanal 5, TV6 och TV8 under 12 veckor 2015. Urvalet av veckor skedde obundet och slumpmässigt och stratifierades efter säsong."
     ],
     "en": [
+      "This is the term",
+      "This is the term 2",
       "Should ignore elements without a concept by TypeOfSamplingProcedures"
     ],
     "fr": [
@@ -178,8 +180,8 @@
       {
         "vocabUri": "https:\/\/oai.ukdataservice.ac.uk\/Categories.htm",
         "vocab": "ZA Category System",
-        "term": "Political Issues",
-        "id": "youth"
+        "term": "This is the Term",
+        "id": "This it the ID"
       },
       {
         "vocabUri": "",
@@ -194,22 +196,19 @@
       {
         "vocabUri": "fi:urn:ddi-cv:SamplingProcedure:1.1",
         "vocab": "fi DDI Sampling Procedure",
-        "term": "et Probability.Stratified",
-        "id": ""
+        "id": "et Probability.Stratified"
       }
     ],
     "en": [
       {
         "vocabUri": "urn:ddi-cv:SamplingProcedure:1.1",
         "vocab": "DDI Sampling Procedure",
-        "term": "Probability.Stratified 1",
-        "id": "madeUp"
+        "id": "This is the id"
       },
       {
         "vocabUri": "urn:ddi-cv:SamplingProcedure:1.1",
         "vocab": "DDI Sampling Procedure",
-        "term": "Probability.Stratified 2",
-        "id": ""
+        "id": "Probability.Stratified 2"
       }
     ]
   },
@@ -218,14 +217,14 @@
       {
         "vocabUri": "urn:ddi-cv:ModeOfCollection:3.0",
         "vocab": "DDI Mode Of Collection",
-        "term": "Telephone interview",
-        "id": ""
+        "term": "This is the Term",
+        "id": "This is the Id"
       },
       {
         "vocabUri": "urn:ddi-cv:ModeOfCollection:3.0",
         "vocab": "DDI Mode Of Collection",
-        "term": "Telephone Survey",
-        "id": ""
+        "term": "This is the Term 2",
+        "id": "Interview.Survey-concept"
       },
       {
         "vocabUri": "",
@@ -239,7 +238,7 @@
         "vocabUri": "urn:ddi-cv:ModeOfCollection:3.0",
         "vocab": "DDI Mode Of Collection",
         "term": "Enquête téléphonique",
-        "id": ""
+        "id": "Enquête téléphonique -concept"
       }
     ]
   },
@@ -252,8 +251,8 @@
       {
         "vocabUri": "",
         "vocab": "DDI Analysis Unit",
-        "term": "Geographische Einheit ",
-        "id": ""
+        "term": "This is the term",
+        "id": "This is the id"
       }
     ],
     "en": [
@@ -261,13 +260,13 @@
         "vocabUri": "https:\/\/dbk.gesis.org\/madeup.htm",
         "vocab": "DDI Made Up",
         "term": "Made Up",
-        "id": ""
+        "id": "MadeUpUnit"
       },
       {
         "vocabUri": "https:\/\/dbk.gesis.org\/madeup2.htm",
         "vocab": "DDI Made Up 2",
         "term": "Made Up 2",
-        "id": ""
+        "id": "MadeUpUnit 2"
       },
       {
         "vocabUri": "",

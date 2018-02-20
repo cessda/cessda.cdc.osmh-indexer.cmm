@@ -158,7 +158,8 @@ public class CMMStudyMapper {
                                           OaiPmh config) {
     builder.classifications(
         extractMetadataObjectListForEachLang(
-            config, doc, xFactory, CLASSIFICATIONS_XPATH, termVocabAttributeStrategyFunction()));
+            config, doc, xFactory, CLASSIFICATIONS_XPATH,
+            termVocabAttributeStrategyFunction(false)));
   }
 
   /**
@@ -170,7 +171,7 @@ public class CMMStudyMapper {
                                    OaiPmh config) {
     builder.keywords(
         extractMetadataObjectListForEachLang(
-            config, doc, xFactory, KEYWORDS_XPATH, termVocabAttributeStrategyFunction()));
+            config, doc, xFactory, KEYWORDS_XPATH, termVocabAttributeStrategyFunction(false)));
   }
 
   /**
@@ -183,7 +184,45 @@ public class CMMStudyMapper {
 
     builder.typeOfTimeMethods(
         extractMetadataObjectListForEachLang(
-            config, doc, xFactory, TYPE_OF_TIME_METHOD_XPATH, termVocabAttributeStrategyFunction()));
+            config, doc, xFactory, TYPE_OF_TIME_METHOD_XPATH,
+            termVocabAttributeStrategyFunction(true)));
+  }
+
+  /**
+   * Parses Type Of Mode Of Collection(s) from:
+   * <p>
+   * Xpath = {@value OaiPmhConstants#TYPE_OF_MODE_OF_COLLECTION_XPATH }
+   */
+  public static void parseTypeOfModeOfCollection(CMMStudy.CMMStudyBuilder builder, Document doc,
+                                                 XPathFactory xFactory, OaiPmh config) {
+    builder.typeOfModeOfCollections(
+        extractMetadataObjectListForEachLang(
+            config, doc, xFactory, TYPE_OF_MODE_OF_COLLECTION_XPATH,
+            termVocabAttributeStrategyFunction(true)));
+  }
+
+  /**
+   * Parses Unit Type(s) from:
+   * <p>
+   * Xpath = {@value OaiPmhConstants#UNIT_TYPE_XPATH }
+   */
+  public static void parseUnitTypes(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory,
+                                    OaiPmh config) {
+    builder.unitTypes(
+        extractMetadataObjectListForEachLang(
+            config, document, xFactory, UNIT_TYPE_XPATH, termVocabAttributeStrategyFunction(true)));
+  }
+
+  /**
+   * Parses Type Of Sampling Procedure(s) from:
+   * <p>
+   * Xpath = {@value OaiPmhConstants#TYPE_OF_SAMPLING_XPATH }
+   */
+  public static void parseTypeOfSamplingProcedure(CMMStudy.CMMStudyBuilder builder, Document doc,
+                                                  XPathFactory xFactory, OaiPmh config) {
+    builder.typeOfSamplingProcedures(
+        extractMetadataObjectListForEachLang(
+            config, doc, xFactory, TYPE_OF_SAMPLING_XPATH, samplingTermVocabAttributeStrategyFunction(true)));
   }
 
   /**
@@ -191,8 +230,8 @@ public class CMMStudyMapper {
    * <p>
    * Xpath = {@value OaiPmhConstants#STUDY_AREA_COUNTRIES_XPATH }
    */
-  public static void parseStudyAreaCountries(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory,
-                                             OaiPmh config) {
+  public static void parseStudyAreaCountries(CMMStudy.CMMStudyBuilder builder, Document document,
+                                             XPathFactory xFactory,OaiPmh config) {
     builder.studyAreaCountries(extractMetadataObjectListForEachLang(
         config, document, xFactory, STUDY_AREA_COUNTRIES_XPATH, countryStrategyFunction()));
   }
@@ -222,30 +261,6 @@ public class CMMStudyMapper {
   }
 
   /**
-   * Parses Unit Type(s) from:
-   * <p>
-   * Xpath = {@value OaiPmhConstants#UNIT_TYPE_XPATH }
-   */
-  public static void parseUnitTypes(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory,
-                                    OaiPmh config) {
-    builder.unitTypes(
-        extractMetadataObjectListForEachLang(
-            config, document, xFactory, UNIT_TYPE_XPATH, termVocabAttributeStrategyFunction()));
-  }
-
-  /**
-   * Parses Type Of Sampling Procedure(s) from:
-   * <p>
-   * Xpath = {@value OaiPmhConstants#TYPE_OF_SAMPLING_XPATH }
-   */
-  public static void parseTypeOfSamplingProcedure(CMMStudy.CMMStudyBuilder builder, Document doc,
-                                                  XPathFactory xFactory, OaiPmh config) {
-    builder.typeOfSamplingProcedures(
-        extractMetadataObjectListForEachLang(
-            config, doc, xFactory, TYPE_OF_SAMPLING_XPATH, samplingTermVocabAttributeStrategyFunction()));
-  }
-
-  /**
    * Parses Sampling Procedure(s) from:
    * <p>
    * Xpath = {@value OaiPmhConstants#SAMPLING_XPATH }
@@ -253,7 +268,8 @@ public class CMMStudyMapper {
   public static void parseSamplingProcedureFreeTexts(CMMStudy.CMMStudyBuilder builder, Document doc,
                                                      XPathFactory xFactory, OaiPmh config) {
     builder.samplingProcedureFreeTexts(
-        extractMetadataObjectListForEachLang(config, doc, xFactory, SAMPLING_XPATH, nullableElementValueStrategyFunction()));
+        extractMetadataObjectListForEachLang(
+            config, doc, xFactory, SAMPLING_XPATH, nullableElementValueStrategyFunction()));
   }
 
   /**
@@ -266,18 +282,6 @@ public class CMMStudyMapper {
     Map<String, List<String>> restrictionLanguageMap = extractMetadataObjectListForEachLang(
         config, doc, xFactory, DATA_RESTRCTN_XPATH, nullableElementValueStrategyFunction());
     builder.dataAccessFreeTexts(restrictionLanguageMap);
-  }
-
-  /**
-   * Parses Type Of Mode Of Collection(s) from:
-   * <p>
-   * Xpath = {@value OaiPmhConstants#TYPE_OF_MODE_OF_COLLECTION_XPATH }
-   */
-  public static void parseTypeOfModeOfCollection(CMMStudy.CMMStudyBuilder builder, Document doc,
-                                                 XPathFactory xFactory, OaiPmh config) {
-    builder.typeOfModeOfCollections(
-        extractMetadataObjectListForEachLang(
-            config, doc, xFactory, TYPE_OF_MODE_OF_COLLECTION_XPATH, termVocabAttributeStrategyFunction()));
   }
 
   /**
@@ -306,8 +310,8 @@ public class CMMStudyMapper {
    * <p>
    * Xpath = {@value OaiPmhConstants#DATA_COLLECTION_PERIODS_PATH }
    */
-  public static void parseDataCollectionFreeTexts(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory,
-                                                  OaiPmh config) {
+  public static void parseDataCollectionFreeTexts(CMMStudy.CMMStudyBuilder builder, Document document,
+                                                  XPathFactory xFactory, OaiPmh config) {
     builder.dataCollectionFreeTexts(extractMetadataObjectListForEachLang(
         config, document, xFactory, DATA_COLLECTION_PERIODS_PATH, dataCollFreeTextStrategyFunction()));
   }

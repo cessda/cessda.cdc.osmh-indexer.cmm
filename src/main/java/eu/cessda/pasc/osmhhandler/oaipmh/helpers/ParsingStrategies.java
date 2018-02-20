@@ -6,8 +6,7 @@ import org.jdom2.Element;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.DocElementParser.getAttributeValue;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.DocElementParser.parseTermVocabAttrAndValues;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.DocElementParser.*;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.EMPTY_EL;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.NOT_AVAIL;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
@@ -71,22 +70,24 @@ class ParsingStrategies {
   }
 
   @SuppressWarnings("unchecked")
-  static <T> Function<Element, Optional<T>> termVocabAttributeStrategyFunction() {
+  static <T> Function<Element, Optional<T>> termVocabAttributeStrategyFunction(boolean hasControlledValue) {
     return element -> {
       Optional<Element> concept = Optional.ofNullable(element.getChild(CONCEPT_EL, DDI_NS));
-      TermVocabAttributes vocabValueAttrs = parseTermVocabAttrAndValues(element, concept.orElse(new Element(EMPTY_EL)));
+      Element conceptVal = concept.orElse(new Element(EMPTY_EL));
+      TermVocabAttributes vocabValueAttrs = parseTermVocabAttrAndValues(element, conceptVal, hasControlledValue);
       return Optional.of((T) vocabValueAttrs);
     };
   }
 
   @SuppressWarnings("unchecked")
-  static <T> Function<Element, Optional<T>> samplingTermVocabAttributeStrategyFunction() {
+  static <T> Function<Element, Optional<T>> samplingTermVocabAttributeStrategyFunction(boolean hasControlledValue) {
 
     return element -> {
       Optional<T> vocabValueAttrsOpt = Optional.empty();
       Optional<Element> concept = Optional.ofNullable(element.getChild(CONCEPT_EL, DDI_NS));
-      if (concept.isPresent()) {
-        TermVocabAttributes vocabValueAttrs = parseTermVocabAttrAndValues(element, concept.orElse(new Element(EMPTY_EL)));
+      if (concept.isPresent()) {  //PUG req. only process if element has a <concept>
+        Element conceptVal = concept.orElse(new Element(EMPTY_EL));
+        VocabAttributes vocabValueAttrs = parseVocabAttrAndValues(element, conceptVal, hasControlledValue);
         vocabValueAttrsOpt = Optional.of((T) vocabValueAttrs);
       }
       return vocabValueAttrsOpt;
