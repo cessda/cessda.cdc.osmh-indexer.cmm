@@ -110,7 +110,7 @@ public class CMMStudyMapper {
       CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
 
     List<Element> elements = getElements(document, xFactory, ABSTRACT_XPATH);
-    Map<String, String> abstracts = getLanguageKeyValuePairs(config, elements, true, creatorStrategyFunction());
+    Map<String, String> abstracts = getLanguageKeyValuePairs(config, elements, true, Element::getText);
     builder.abstractField(abstracts);
   }
 
@@ -140,11 +140,12 @@ public class CMMStudyMapper {
    * <p>
    * Xpath = {@value OaiPmhConstants#CREATORS_XPATH }
    */
-  public static void parseCreator(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory,
+  public static void parseCreator(CMMStudy.CMMStudyBuilder builder, Document doc, XPathFactory xFactory,
                                   OaiPmh config) {
 
-    List<Element> elements = getElements(document, xFactory, CREATORS_XPATH);
-    Map<String, String> creatorsInLangs = getLanguageKeyValuePairs(config, elements, false, creatorStrategyFunction());
+    Map<String, List<String>> creatorsInLangs = extractMetadataObjectListForEachLang(
+        config, doc, xFactory, CREATORS_XPATH, creatorStrategyFunction());
+
     builder.creators(creatorsInLangs);
   }
 
@@ -216,7 +217,7 @@ public class CMMStudyMapper {
       CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
 
     List<Element> elements = getElements(document, xFactory, TITLE_XPATH);
-    Map<String, String> studyTitles = getLanguageKeyValuePairs(config, elements, false, rawTextStrategyFunction());
+    Map<String, String> studyTitles = getLanguageKeyValuePairs(config, elements, false, Element::getText);
     builder.titleStudy(studyTitles);
   }
 
@@ -252,7 +253,7 @@ public class CMMStudyMapper {
   public static void parseSamplingProcedureFreeTexts(CMMStudy.CMMStudyBuilder builder, Document doc,
                                                      XPathFactory xFactory, OaiPmh config) {
     builder.samplingProcedureFreeTexts(
-        extractMetadataObjectListForEachLang(config, doc, xFactory, SAMPLING_XPATH, samplingProcStrategyFunction()));
+        extractMetadataObjectListForEachLang(config, doc, xFactory, SAMPLING_XPATH, nullableElementValueStrategyFunction()));
   }
 
   /**
@@ -264,13 +265,13 @@ public class CMMStudyMapper {
                                              XPathFactory xFactory, OaiPmh config) {
 
     Map<String, List<String>> specPermEl = extractMetadataObjectListForEachLang(
-        config, doc, xFactory, DATA_SPEC_PERM_XPATH, samplingProcStrategyFunction());
+        config, doc, xFactory, DATA_SPEC_PERM_XPATH, nullableElementValueStrategyFunction());
     Map<String, List<String>> restrictionEl = extractMetadataObjectListForEachLang(
-        config, doc, xFactory, DATA_RESTRCTN_XPATH, samplingProcStrategyFunction());
+        config, doc, xFactory, DATA_RESTRCTN_XPATH, nullableElementValueStrategyFunction());
     Map<String, List<String>> conditionsEl = extractMetadataObjectListForEachLang(
-        config, doc, xFactory, DATA_CONDITIONS_XPATH, samplingProcStrategyFunction());
+        config, doc, xFactory, DATA_CONDITIONS_XPATH, nullableElementValueStrategyFunction());
     Map<String, List<String>> avlStatusEl = extractMetadataObjectListForEachLang(
-        config, doc, xFactory, DATA_AVL_STATUS_XPATH, samplingProcStrategyFunction());
+        config, doc, xFactory, DATA_AVL_STATUS_XPATH, nullableElementValueStrategyFunction());
 
     Map<String, List<String>> mergedMapped = mergeMaps().apply(specPermEl, restrictionEl);
     mergedMapped =  mergeMaps().apply(mergedMapped, conditionsEl);

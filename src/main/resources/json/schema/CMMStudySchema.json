@@ -406,14 +406,21 @@
     },
     "creators": {
       "type": "object",
+      "description": "A Collection of Creators(affiliation) eg \"Ami Doe(University of DV)\". Potentially in many translated languages",
       "patternProperties": {
         "^[a-z]{2}$": {
-          "type": "string",
-          "description": "Reference to a creator alongside her/his affiliation eg \"Ami Doe(University of DV)\"."
+          "type": "array",
+          "description": "A Collection of Creators(affiliation) translated in this language",
+          "items": [
+            {
+              "type": "string",
+              "description": "A Creators(affiliation).",
+              "additionalProperties": false
+            }
+          ]
         }
       },
-      "additionalProperties": false,
-      "description": "An object containing creators in various languages. Uses language code properties and abstract values. E.g. {'en': 'Ami Doe(University of DV)', 'no': 'Ami Doe(ET University of DV)'}"
+      "additionalProperties": false
     },
     "lastModified": {
       "type": "string",

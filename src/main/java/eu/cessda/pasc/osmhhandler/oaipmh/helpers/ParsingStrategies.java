@@ -50,7 +50,7 @@ class ParsingStrategies {
   }
 
   @SuppressWarnings("unchecked")
-  static <T> Function<Element, Optional<T>> samplingProcStrategyFunction() {
+  static <T> Function<Element, Optional<T>> nullableElementValueStrategyFunction() {
     return element -> {
       String value = element.getText();
       return (value.isEmpty())
@@ -60,15 +60,11 @@ class ParsingStrategies {
   }
 
   @SuppressWarnings("unchecked")
-  static Function<Element, String> creatorStrategyFunction() {
-    return element -> getAttributeValue(element, CREATOR_AFFILIATION_ATTR)
-        .map(s -> (element.getText() + " (" + s + ")"))
-        .orElseGet(element::getText);
-  }
-
-  @SuppressWarnings("unchecked")
-  static Function<Element, String> rawTextStrategyFunction() {
-    return Element::getText;
+  static Function<Element, Optional<String>> creatorStrategyFunction() {
+    return element -> Optional.of(
+        getAttributeValue(element, CREATOR_AFFILIATION_ATTR).map(
+            valueString -> (element.getText() + " (" + valueString + ")")).orElseGet(element::getText)
+    );
   }
 
   @SuppressWarnings("unchecked")
