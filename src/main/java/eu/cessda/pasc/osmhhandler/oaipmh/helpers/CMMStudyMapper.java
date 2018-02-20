@@ -263,20 +263,9 @@ public class CMMStudyMapper {
    */
   public static void parseDataAccessFreeText(CMMStudy.CMMStudyBuilder builder, Document doc,
                                              XPathFactory xFactory, OaiPmh config) {
-
-    Map<String, List<String>> specPermEl = extractMetadataObjectListForEachLang(
-        config, doc, xFactory, DATA_SPEC_PERM_XPATH, nullableElementValueStrategyFunction());
-    Map<String, List<String>> restrictionEl = extractMetadataObjectListForEachLang(
+    Map<String, List<String>> restrictionLanguageMap = extractMetadataObjectListForEachLang(
         config, doc, xFactory, DATA_RESTRCTN_XPATH, nullableElementValueStrategyFunction());
-    Map<String, List<String>> conditionsEl = extractMetadataObjectListForEachLang(
-        config, doc, xFactory, DATA_CONDITIONS_XPATH, nullableElementValueStrategyFunction());
-    Map<String, List<String>> avlStatusEl = extractMetadataObjectListForEachLang(
-        config, doc, xFactory, DATA_AVL_STATUS_XPATH, nullableElementValueStrategyFunction());
-
-    Map<String, List<String>> mergedMapped = mergeMaps().apply(specPermEl, restrictionEl);
-    mergedMapped =  mergeMaps().apply(mergedMapped, conditionsEl);
-    mergedMapped =  mergeMaps().apply(mergedMapped, avlStatusEl);
-    builder.dataAccessFreeTexts(mergedMapped);
+    builder.dataAccessFreeTexts(restrictionLanguageMap);
   }
 
   /**

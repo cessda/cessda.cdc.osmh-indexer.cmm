@@ -157,7 +157,8 @@
             </method>
             <dataAccs>
               <useStmt>
-                <restrctn xml:lang="en">Restriction Text en</restrctn>
+                <restrctn xml:lang="en">1 Restriction Text en</restrctn>
+                <restrctn xml:lang="en">2 Restriction Text en</restrctn>
                 <restrctn xml:lang="fi">Restriction Text fi</restrctn>
                 <conditions xml:lang="en">Conditions Text en</conditions>
                 <specPerm xml:lang="en">SpecPerm Text en</specPerm>
