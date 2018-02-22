@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <contextName>pasc-osmh-indexer</contextName>
+  <contextName>pasc-oci</contextName>
   <include resource="org/springframework/boot/logging/logback/base.xml"/>
   <jmxConfigurator/>
 </configuration>

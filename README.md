@@ -1,49 +1,6 @@
-<<<<<<< HEAD
-# Project Title
+# PaSC - OSMH Consumer Indexer (PaSC-OCI)
 
-One Paragraph of project description goes here
-
-## Getting Started
-
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
-
-### Prerequisites
-
-What things you need to install the software and how to install them
-
-```
-Give examples
-```
-
-### Installing
-
-A step by step series of examples that tell you have to get a development env running
-
-Say what the step will be
-
-```
-Give the example
-```
-
-And repeat
-
-```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo
-
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-=======
-# Cessda PaSC OSMH Indexer
-
-Cessda PaSC Indexer (OSMH Consumer) for harvested Metadata ingestion into Elasticsearch.
+Cessda PaSC Consumer Indexer (an OSMH Consumer) for Metadata harvesting  and ingestion into Elasticsearch.
 See the 
 [OSMH System Architecture Document](https://docs.google.com/document/d/1RrXjpbyUGdd5FKSjrnQmRdbzaCQzE2W-92lYKs1KeCA/edit)
 for more information about The Open Source Metadata Harvester (OSMH).
@@ -70,12 +27,12 @@ Static code quality with verification with SonarQube
 
 ### Run it 
 
-    java -Xms2G -Xmx4G -jar target/pasc-osmh-indexer*.jar 
+    java -Xms2G -Xmx4G -jar target/pasc-oci*.jar 
 
 ### Run it - with profile
-    java -jar -Dspring.profiles.active=dev target/pasc-osmh-indexer*.jar
-    java -jar -Dspring.profiles.active=uat target/pasc-osmh-indexer*.jar
-    java -jar -Dspring.profiles.active=prod target/pasc-osmh-indexer*.jar
+    java -jar -Dspring.profiles.active=dev target/pasc-oci*.jar
+    java -jar -Dspring.profiles.active=uat target/pasc-oci*.jar
+    java -jar -Dspring.profiles.active=prod target/pasc-oci*.jar
 
 Note if no profile flag is set the default profile will be used. Which is non.
 
@@ -110,7 +67,6 @@ On mac this can be done with `brew`
 ### Break down into end to end tests
 
 TODO: Explain what these tests test and why
->>>>>>> master
 
 ```
 Give an example
@@ -118,11 +74,7 @@ Give an example
 
 ### And coding style tests
 
-<<<<<<< HEAD
-Explain what these tests test and why
-=======
 TODO: Explain what these tests test and why
->>>>>>> master
 
 ```
 Give an example
@@ -130,9 +82,6 @@ Give an example
 
 ## Deployment
 
-<<<<<<< HEAD
-Add additional notes about how to deploy this on a live system
-=======
 ### At startup
 Configuration is loaded and overwritten in this order
 * application-[dev,local,prod].yml
@@ -147,7 +96,6 @@ all environment properties can be changed at runtime.
 * **EFFECTIVE AFTER A CONTEXT RELOAD**
 * **LOST AFTER AN APPLICATION RESTART UNLESS PERSISTED IN APPLICATION.yml**
  
->>>>>>> master
 
 ## Built With
 
@@ -155,22 +103,14 @@ all environment properties can be changed at runtime.
 
 ## Contributing
 
-<<<<<<< HEAD
-Please read [CESSDA Guideline for developpers](https://bitbucket.org/cessda/cessda.guidelines.cit/wiki/Developers) for details on our code of conduct, and the process for submitting pull requests to us.
-=======
 Please read [CESSDA Guideline for developpers](https://bitbucket.org/cessda/cessda.guidelines.cit/wiki/Developers) 
 for details on our code of conduct, and the process for submitting pull requests to us.
->>>>>>> master
 
 ## Versioning
 
 ## Authors
 
-<<<<<<< HEAD
-* **First Name - Last Name** - *Initial work*
-=======
 * **Moses Mansaray <moses@doraventures.com>** - *Initial work, first version release*
->>>>>>> master
 
 You can find the list of all contributors [here](CONTRIBUTORS.md)
 
