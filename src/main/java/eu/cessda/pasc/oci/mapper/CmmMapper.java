@@ -1,4 +1,4 @@
-package eu.cessda.pasc.osmh.indexer.mapper;
+package eu.cessda.pasc.oci.mapper;
 
 /**
  * Responsible fo mapping CMMStudy response Json Payload to the Elasticsearch CMM Document

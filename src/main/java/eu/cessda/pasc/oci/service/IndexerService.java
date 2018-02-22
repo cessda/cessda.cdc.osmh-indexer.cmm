@@ -1,4 +1,4 @@
-package eu.cessda.pasc.osmh.indexer.service;
+package eu.cessda.pasc.oci.service;
 
 /**
  * Service responsible for triggering harvesting and Metadata ingestion to the search engine
@@ -6,4 +6,5 @@ package eu.cessda.pasc.osmh.indexer.service;
  * @author moses@doraventures.com
  */
 public class IndexerService {
+
 }
