@@ -1,15 +1,14 @@
-package eu.cessda.pasc.osmh.indexer.configurations;
+package eu.cessda.pasc.oci.configurations;
 
-import eu.cessda.pasc.osmh.indexer.models.config.Repo;
+import eu.cessda.pasc.oci.models.configurations.Harvester;
+import eu.cessda.pasc.oci.models.configurations.OaiPmh;
+import eu.cessda.pasc.oci.models.configurations.RestTemplateProps;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableMBeanExport;
-
-import java.util.List;
 
 /**
  * Loads Configurations from application*.yml
@@ -20,13 +19,11 @@ import java.util.List;
 @EnableConfigurationProperties
 @EnableMBeanExport
 @Qualifier("PascOsmhIndexerConfig")
-@ConfigurationProperties(prefix = "osmhIndexer")
+@ConfigurationProperties(prefix = "osmhConsumer")
 @Getter
-@Setter
-public class PascOsmhIndexerConfig {
+public class PascOciConfig {
 
-  private String osmhHarvesterUrl;
-  private String incrementalPeriod;
-  private String fullRun;
-  private List<Repo> repos;
+  private OaiPmh oaiPmh = new OaiPmh();
+  private RestTemplateProps restTemplateProps = new RestTemplateProps();
+  private Harvester harvester = new Harvester();
 }

@@ -1,4 +1,4 @@
-package eu.cessda.pasc.osmh.indexer.models.config;
+package eu.cessda.pasc.oci.models.configurations;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -13,5 +13,6 @@ import lombok.Setter;
 public class Repo {
 
   private String url;
-  private String serviceProviderName;
+  private String name;
+  private String handler;
 }
