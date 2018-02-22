@@ -6,10 +6,10 @@ MAINTAINER CESSDA-ERIC "support@cessda.eu"
 
 # Create Volume tmp and add JAR artifacts
 VOLUME /tmp
-ADD ./target/pasc-osmh-indexer*.jar pasc-osmh-indexer.jar
+ADD ./target/pasc-oci*.jar pasc-oci.jar
 
 # Java options
 ENV JAVA_OPTS ""
 
 # Entrypoint - Start Admin
-ENTRYPOINT exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /pasc-osmh-indexer.jar -Dspring.profiles.active=dev
+ENTRYPOINT exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /pasc-oci.jar -Dspring.profiles.active=dev

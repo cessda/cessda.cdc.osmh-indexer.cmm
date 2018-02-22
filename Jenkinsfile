@@ -1,7 +1,7 @@
 pipeline {
   environment {
     project_name = "cessda-development"
-    app_name = "pasc-osmh-indexer"
+    app_name = "pasc-oci"
     feSvc_name = "${app_name}-service"
     namespace = "cessda-pasc"
     image_tag = "eu.gcr.io/${project_name}/${app_name}:v${env.BUILD_NUMBER}"
