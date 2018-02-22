@@ -1,5 +1,6 @@
 package eu.cessda.pasc.oci.dao;
 
+import eu.cessda.pasc.oci.FileHandler;
 import eu.cessda.pasc.oci.data.ReposTestData;
 import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
 import org.junit.Before;
@@ -13,7 +14,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
 import org.springframework.web.client.RestTemplate;
 
-import static eu.cessda.pasc.oci.data.RecordHeadersTestData.LIST_RECORDER_HEADERS_BODY_EXAMPLE;
+import static eu.cessda.pasc.oci.data.RecordTestData.LIST_RECORDER_HEADERS_BODY_EXAMPLE;
 import static org.assertj.core.api.Java6BDDAssertions.then;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.test.web.client.ExpectedCount.once;
@@ -44,7 +45,7 @@ public class PascHarvesterDaoTest {
   }
 
   @Test
-  public void shouldReturnSuccessfulHttpResponse() throws ExternalSystemException {
+  public void shouldReturnSuccessfulHttpResponseListRecord() throws ExternalSystemException {
 
     // Given
     String expected_url =
@@ -59,5 +60,26 @@ public class PascHarvesterDaoTest {
     String recordHeaders = pascHarvesterDao.listRecordHeaders(ReposTestData.getUKDSRepo().getUrl());
 
     then(recordHeaders).isEqualTo(LIST_RECORDER_HEADERS_BODY_EXAMPLE);
+  }
+
+  @Test
+  public void shouldReturnSuccessfulHttpResponseForGetRecord() throws ExternalSystemException {
+
+    // Given
+    FileHandler fileHandler = new FileHandler();
+    String studyNumber = "998";
+    String recordUkds998 = fileHandler.getFileWithUtil("record_ukds_998.json");
+    String expected_url =
+        "http://localhost:9091/v0/GetRecord/CMMStudy/998?Repository=https://oai.ukdataservice.ac.uk:8443/oai/provider";
+
+    serverMock.expect(once(), requestTo(expected_url))
+        .andExpect(method(GET))
+        .andRespond(MockRestResponseCreators.withSuccess(recordUkds998, MediaType.APPLICATION_JSON)
+        );
+
+    // When
+    String record = pascHarvesterDao.getRecord(ReposTestData.getUKDSRepo().getUrl(), studyNumber);
+
+    then(record).isEqualTo(recordUkds998);
   }
 }

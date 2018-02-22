@@ -3,9 +3,9 @@ package eu.cessda.pasc.oci.data;
 /**
  * @author moses@doraventures.com
  */
-public class RecordHeadersTestData {
+public class RecordTestData {
 
-  private RecordHeadersTestData() {
+  private RecordTestData() {
     throw new UnsupportedOperationException("Utility class, instantiation not allow");
   }
 

@@ -8,5 +8,6 @@ import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
  * @author moses@doraventures.com
  */
 public interface HarvesterDao {
-  String listRecordHeaders(String repository) throws ExternalSystemException;
+  String listRecordHeaders(String spRepository) throws ExternalSystemException;
+  String getRecord(String spRepository, String studyNumber) throws ExternalSystemException;
 }

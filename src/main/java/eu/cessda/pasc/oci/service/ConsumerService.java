@@ -1,9 +1,11 @@
 package eu.cessda.pasc.oci.service;
 
 import eu.cessda.pasc.oci.models.RecordHeader;
+import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service responsible for consuming harvested and Metadata via OSMH Harvester
@@ -12,4 +14,5 @@ import java.util.List;
  */
 public interface ConsumerService {
   List<RecordHeader> listRecorderHeadersBody(Repo repo);
+  Optional<CMMStudy> getRecord(Repo repo, String StudyNumber);
 }

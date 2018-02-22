@@ -1,0 +1,487 @@
+{
+  "studyNumber": "998",
+  "titleStudy": {
+    "en": "National Readership Surveys, 1974 4th Quarter"
+  },
+  "abstract": {
+    "en": "<p>Abstract copyright UK Data Service and data collection copyright owner.</p>The National Readership Surveys are conducted quarterly either by the British Market Research Bureau or by Research Services Ltd. (1956 - 1959 Research Services Ltd; 1960 - 1967 British Market Research Bureau; 1968 - 1973 Research Services Ltd; 1974 - 1976 British Market Research Bureau; from 1977 onwards Research Services Ltd.). These surveys are designed principally to provide detailed information about the newspaper and magazine reading habits of the British people.<br>\nThe sponsors are virtually all the leading newspaper proprietors and advertising agencies in the country; many leading manufacturers were also consulted over the plan of the surveys.<br>\nAll surveys are substantially the same in form and content. Further details are available from the Archive upon application.+<br><B>Main Topics</B>:<br> Variables<br>\nRegion and polling district; town size; % Labour to Conservative in constituency; % jurors to electorate in polling district*; classification of informant & household; social grade of household; household composition; age; age when finished full-time education; type of school/college last attended*; qualifications obtained*; accent of informant*; whether informant occupied; occupation of informant/head of household; smoking habits*; drinking habits*; camera usage*; use of cosmetics*; monthly general magazine readership; monthly women's magazine readership; national Sunday newspaper - detailed reading habits (where read, who pays, no. times read in week)*; daily national newspaper - detailed reading habits (where read, who pays, no. times read in day)*; cinema visiting; TV viewing; Radio Luxembourg listening*; national morning newspaper readership; provincial morning newspaper readership; evening newspaper readership; Sunday national newspaper readership; household composition (detailed); no. electors in household/institution*; home tenure; description of dwelling; household status of informant; sex and marital status; occupational details (i.e. industry, social grade etc.); income cohort; whether has PO savings or bank account; ownership of stocks shares or holdings in a unit trust; ownership of selected durable goods; car ownership; whether informant buys most petrol; selected publications, detailed reading habits (who pays, where read, no. times read)*; whether informant DIY person*; ownership of household pets (cats, dogs, birds)*; holiday away from home; holiday abroad; Sunday provincial newspaper readership.<br>\n<br>\n*<i>earlier surveys only</i>."
+  },
+  "classifications": {
+    "en": [
+      {
+        "vocab": "",
+        "vocabUri": "",
+        "id": "",
+        "term": "Consumer behaviour - Economics"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "",
+        "id": "",
+        "term": "Mass media - Media, communication and language"
+      }
+    ]
+  },
+  "keywords": {
+    "en": [
+      {
+        "vocab": "",
+        "vocabUri": "",
+        "id": "",
+        "term": "1974"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/a052aa62-26fb-487d-9505-fe0b0ffc5a84",
+        "id": "",
+        "term": "ADMINISTRATIVE AREAS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/e53409ed-4ff4-4c89-bb8c-a9a1f1b0e9ee",
+        "id": "",
+        "term": "AGE"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/6110ca84-43ab-4a34-8ed3-2d7e84cbeee9",
+        "id": "",
+        "term": "BANK ACCOUNTS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/631c3b7d-3513-4ffa-9ab1-c3ca9db6f6b9",
+        "id": "",
+        "term": "CENTRAL HEATING"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/155a0de5-979d-4666-80e8-6ffc67a20bb0",
+        "id": "",
+        "term": "CHIEF INCOME EARNERS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/45100da9-69d4-4eb9-b55c-cc81bf6e5125",
+        "id": "",
+        "term": "CHILDREN"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/d67900a4-bc27-44c8-b384-fca052b057d6",
+        "id": "",
+        "term": "CINEMA ATTENDANCE"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/7e780ed5-9c2e-4c86-a51c-c52443245169",
+        "id": "",
+        "term": "COLOUR TELEVISION RECEIVERS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/71aedab2-4671-4184-b401-5cfbcabab834",
+        "id": "",
+        "term": "CONSUMER GOODS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/68637d03-163c-431a-b9a5-de7f0319891b",
+        "id": "",
+        "term": "CONSUMERS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/fcafed1e-763d-49f7-ab39-c1ef2f7760c3",
+        "id": "",
+        "term": "CONSUMPTION"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/093bc0d8-7ff8-4824-bb16-0bbb815bef23",
+        "id": "",
+        "term": "CREDIT CARD USE"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/e1e65f51-154e-42c2-8d2e-613639f2a1e0",
+        "id": "",
+        "term": "DISTANCE MEASUREMENT"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/36a93c63-5cba-41d0-98d4-83219147ca24",
+        "id": "",
+        "term": "DOMESTIC APPLIANCES"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/12cc6932-ad12-4171-9e3f-ed5d51f51d56",
+        "id": "",
+        "term": "DOMESTIC RESPONSIBILITIES"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/1f1f395c-b401-4728-87e7-bc9740a0956c",
+        "id": "",
+        "term": "DRIVING"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/90e01ff5-d79e-45aa-beaf-513569d3d9c2",
+        "id": "",
+        "term": "ECONOMIC ACTIVITY"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/1856e186-3ee6-4c35-8584-d76b4a52b7a5",
+        "id": "",
+        "term": "EDUCATIONAL BACKGROUND"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/61a206ee-9f6e-41ac-bef1-cfb586bcf482",
+        "id": "",
+        "term": "EMPLOYMENT"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/5ca0c958-8909-4b48-8117-952ff0f08f27",
+        "id": "",
+        "term": "EXPENDITURE"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/7bbe0529-a566-40e4-babe-3c01fe7a92a5",
+        "id": "",
+        "term": "FUELS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/08cfea62-6fd2-4328-8e1c-cf48e0ba3b80",
+        "id": "",
+        "term": "GARDEN EQUIPMENT"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/12ceb9b9-9d15-4962-828e-35f4fc10083c",
+        "id": "",
+        "term": "GENDER"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/af82c5dc-19be-4ad3-8f0a-612f314e1436",
+        "id": "",
+        "term": "GREAT BRITAIN"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/3c651dfe-c39f-43e7-96ad-d7bbf3b89907",
+        "id": "",
+        "term": "HEADS OF HOUSEHOLD"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/53e7bcd0-e71d-4059-9cff-a20912b45696",
+        "id": "",
+        "term": "HOLIDAYS ABROAD"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/50f52844-6420-4380-84cb-03533150f2c0",
+        "id": "",
+        "term": "HOLIDAYS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/9fd7078c-3c84-49e9-ae03-7a255fcc5302",
+        "id": "",
+        "term": "HOME OWNERSHIP"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/10ed2233-7048-4964-8285-93a8099a86a0",
+        "id": "",
+        "term": "HOUSEHOLDS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/84667b89-edbb-43fd-9c3d-be4a4f7de303",
+        "id": "",
+        "term": "HOUSEWIVES"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/b264b36b-5945-42a4-aa33-36e3ff28e0ca",
+        "id": "",
+        "term": "HOUSING TENURE"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/616272a6-b024-480f-892d-b31378aa0a82",
+        "id": "",
+        "term": "HOUSING"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/de77333c-b254-41d5-b54a-37a60d3277ea",
+        "id": "",
+        "term": "HUMAN SETTLEMENT"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/818b9280-52d0-4235-bdd5-f543055bf3ff",
+        "id": "",
+        "term": "INCOME"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/31321e29-5b9c-477d-8d2e-36a6434628cf",
+        "id": "",
+        "term": "MARITAL STATUS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/062b9d44-2ad6-4b5a-bd5a-7fb99e86f473",
+        "id": "",
+        "term": "MOTOR VEHICLES"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/817dde15-9de1-46cb-b9d1-d73faf5c1af1",
+        "id": "",
+        "term": "NEWSPAPER READERSHIP"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/53327c44-cdfa-4f87-986f-a986f53f6610",
+        "id": "",
+        "term": "NEWSPAPERS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/109136cf-0d85-40d0-96de-e2584bbc42ef",
+        "id": "",
+        "term": "OCCUPATIONS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/3daaf82e-f102-4865-870b-8f3795356919",
+        "id": "",
+        "term": "PACKAGE HOLIDAYS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/f6188f9f-83b5-4b47-ac8a-d703232e4a97",
+        "id": "",
+        "term": "PERIODICALS READERSHIP"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/3c8ddb4b-dcf3-4077-8622-8ec9236d91d0",
+        "id": "",
+        "term": "PERIODICALS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/0650c50f-9de1-465b-ae20-5a0d518160d4",
+        "id": "",
+        "term": "PETROL"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/4bf2c24e-9f2b-4d2a-969f-f981490be0cc",
+        "id": "",
+        "term": "POWER TOOLS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/96c7c14b-f933-418f-81a0-29330e85acf7",
+        "id": "",
+        "term": "PURCHASING"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/0d09656f-4274-4c57-b54e-3202820530d8",
+        "id": "",
+        "term": "RECORD PLAYERS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/0bab8626-cead-4532-b4fd-2575850aabfb",
+        "id": "",
+        "term": "RENTED ACCOMMODATION"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/b435faa9-1db0-4a03-9574-62bd20af4bd1",
+        "id": "",
+        "term": "RESIDENTIAL MOBILITY"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/7d55baae-3655-489b-95dc-088729769e94",
+        "id": "",
+        "term": "RESIDENTS OF INSTITUTIONS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/824c7373-d165-4d7c-9eea-151c4a08eb95",
+        "id": "",
+        "term": "ROAD VEHICLE MAINTENANCE"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/0ca8d2f0-32b4-4347-9bbc-5bd200acf430",
+        "id": "",
+        "term": "ROOMS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/fd92b5ca-c544-409b-a43f-fe8581bdca7f",
+        "id": "",
+        "term": "SHARES"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/8140852c-eb80-4941-bf04-e8219c547676",
+        "id": "",
+        "term": "SOCIAL CLASS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/b107a5a7-1a30-469f-bd5f-af9411d52da0",
+        "id": "",
+        "term": "SOCIAL HOUSING"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/f703d8ac-baf6-4bd4-b4b9-296b4efe431e",
+        "id": "",
+        "term": "SOCIO-ECONOMIC STATUS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/bdab2d4e-55d3-4080-b009-297b93d6587f",
+        "id": "",
+        "term": "TELEPHONES"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/18f03575-7426-40fb-a7c2-239bbba66aef",
+        "id": "",
+        "term": "TELEVISION CHANNELS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/d6ad859e-efb9-4a1b-80b9-150b70da87e2",
+        "id": "",
+        "term": "TELEVISION RECEIVERS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/ce1b9706-06f7-4008-9ef2-24ef86318481",
+        "id": "",
+        "term": "TELEVISION REGIONS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/cc3aeddc-d14b-428e-8183-af61490636fb",
+        "id": "",
+        "term": "TELEVISION VIEWING"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/fcb15013-d175-4d8d-9bec-f836bb7e2cca",
+        "id": "",
+        "term": "TEXTILE MACHINERY"
+      }
+    ]
+  },
+  "typeOfTimeMethods": {
+    "en": [
+      {
+        "vocab": "",
+        "vocabUri": "",
+        "id": "",
+        "term": "Repeated cross-sectional study"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "",
+        "id": "",
+        "term": "quarterly"
+      }
+    ]
+  },
+  "studyAreaCountries": {
+    "en": [
+      {
+        "abbr": "not available",
+        "country": "Great Britain"
+      }
+    ]
+  },
+  "unitTypes": {
+    "en": [
+      {
+        "vocab": "",
+        "vocabUri": "",
+        "id": "",
+        "term": "Individuals"
+      }
+    ]
+  },
+  "publisher": {},
+  "publicationYear": "1978-01-01T00:00:00Z",
+  "pidStudies": {
+    "en": [
+      {
+        "agency": "UKDA",
+        "pid": "998"
+      },
+      {
+        "agency": "datacite",
+        "pid": "10.5255/UKDA-SN-998-1"
+      }
+    ]
+  },
+  "fileLanguages": [],
+  "creators": {
+    "en": [
+      "JICNARS"
+    ]
+  },
+  "typeOfSamplingProcedures": {},
+  "samplingProcedureFreeTexts": {
+    "en": [
+      "See documentation for details"
+    ]
+  },
+  "typeOfModeOfCollections": {
+    "en": [
+      {
+        "vocab": "",
+        "vocabUri": "",
+        "id": "",
+        "term": "Face-to-face interview"
+      }
+    ]
+  },
+  "dataCollectionPeriodStartdate": "1974-01-01T00:00:00Z",
+  "dataCollectionFreeTexts": {
+    "en": [
+      {
+        "dataCollectionFreeText": "4th Quarter",
+        "event": "not available"
+      }
+    ]
+  },
+  "dataAccessFreeTexts": {
+    "en": [
+      "The depositor has specified that registration is required and standard conditions of use apply. The depositor may be informed about usage.See <a href=http://ukdataservice.ac.uk/get-data/how-to-access/conditions.aspx>terms and conditions of access</a> for further information.<br/><br/>In addition, the UK Data Service is required to request permission from the depositor prior to supplying the data."
+    ]
+  },
+  "lastModified": "2018-02-22T07:48:38Z",
+  "isActive": true
+}
