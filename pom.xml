@@ -4,12 +4,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>eu.cessda.pasc</groupId>
-  <artifactId>pasc-osmh-indexer</artifactId>
+  <artifactId>pasc-oci</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>pasc-osmh-indexer</name>
-  <description>Cessda PaSC OSMH Indexer for harvested Metadata</description>
+  <name>pasc-oci</name>
+  <description>Cessda PaSC OSMH Consumer Indexer (pasc-oci) for harvested Metadata</description>
 
   <parent>
     <groupId>org.springframework.boot</groupId>

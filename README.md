@@ -1,6 +1,6 @@
-# Cessda PaSC OSMH Indexer
+# PaSC - OSMH Consumer Indexer (PaSC-OCI)
 
-Cessda PaSC Indexer (OSMH Consumer) for harvested Metadata ingestion into Elasticsearch.
+Cessda PaSC Consumer Indexer (an OSMH Consumer) for Metadata harvesting  and ingestion into Elasticsearch.
 See the 
 [OSMH System Architecture Document](https://docs.google.com/document/d/1RrXjpbyUGdd5FKSjrnQmRdbzaCQzE2W-92lYKs1KeCA/edit)
 for more information about The Open Source Metadata Harvester (OSMH).
@@ -27,12 +27,12 @@ Static code quality with verification with SonarQube
 
 ### Run it 
 
-    java -Xms2G -Xmx4G -jar target/pasc-osmh-indexer*.jar 
+    java -Xms2G -Xmx4G -jar target/pasc-oci*.jar 
 
 ### Run it - with profile
-    java -jar -Dspring.profiles.active=dev target/pasc-osmh-indexer*.jar
-    java -jar -Dspring.profiles.active=uat target/pasc-osmh-indexer*.jar
-    java -jar -Dspring.profiles.active=prod target/pasc-osmh-indexer*.jar
+    java -jar -Dspring.profiles.active=dev target/pasc-oci*.jar
+    java -jar -Dspring.profiles.active=uat target/pasc-oci*.jar
+    java -jar -Dspring.profiles.active=prod target/pasc-oci*.jar
 
 Note if no profile flag is set the default profile will be used. Which is non.
 

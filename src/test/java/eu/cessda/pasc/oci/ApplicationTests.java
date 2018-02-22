@@ -1,4 +1,4 @@
-package eu.cessda.pasc.osmh.indexer;
+package eu.cessda.pasc.oci;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
