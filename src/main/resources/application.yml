@@ -50,6 +50,7 @@ logging:
     net: WARN
     com: ERROR
 osmhConsumer:
+  languages: ['en']
   harvester:
     url: 'http://localhost:9091'
     version: 'v0'

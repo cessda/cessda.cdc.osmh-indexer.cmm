@@ -10,6 +10,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableMBeanExport;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Loads Configurations from application*.yml
  *
@@ -26,4 +29,6 @@ public class PascOciConfig {
   private OaiPmh oaiPmh = new OaiPmh();
   private RestTemplateProps restTemplateProps = new RestTemplateProps();
   private Harvester harvester = new Harvester();
+  private List<String> languages = new ArrayList<>();
+
 }

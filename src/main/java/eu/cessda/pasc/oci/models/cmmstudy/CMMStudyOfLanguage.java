@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -45,10 +44,10 @@ import java.util.Set;
 @Builder
 @Getter
 @ToString
-public class CMMStudy {
+public class CMMStudyOfLanguage {
 
   @JsonProperty("creators")
-  private Map<String, List<String>> creators;
+  private List<String> creators;
 
   @JsonProperty("dataCollectionPeriodStartdate")
   private String dataCollectionPeriodStartdate;
@@ -57,55 +56,55 @@ public class CMMStudy {
   private String dataCollectionPeriodEnddate;
 
   @JsonProperty("dataCollectionFreeTexts")
-  private Map<String, List<DataCollectionFreeText>> dataCollectionFreeTexts;
+  private List<DataCollectionFreeText> dataCollectionFreeTexts;
 
   @JsonProperty("dataAccessFreeTexts")
-  private Map<String, List<String>> dataAccessFreeTexts;
+  private List<String> dataAccessFreeTexts;
 
   @JsonProperty("publicationYear")
   private String publicationYear;
 
   @JsonProperty("typeOfModeOfCollections")
-  private Map<String, List<TermVocabAttributes>> typeOfModeOfCollections;
+  private List<TermVocabAttributes> typeOfModeOfCollections;
 
   @JsonProperty("keywords")
-  private Map<String, List<TermVocabAttributes>> keywords;
+  private List<TermVocabAttributes> keywords;
 
   @JsonProperty("samplingProcedureFreeTexts")
-  private Map<String, List<String>> samplingProcedureFreeTexts;
+  private List<String> samplingProcedureFreeTexts;
 
   @JsonProperty("classifications")
-  private Map<String, List<TermVocabAttributes>> classifications;
+  private List<TermVocabAttributes> classifications;
 
   @JsonProperty("abstract")
-  private Map<String, String> abstractField;
+  private String abstractField;
 
   @JsonProperty("titleStudy")
-  private Map<String, String> titleStudy;
+  private String titleStudy;
 
   @JsonProperty("studyNumber")
   private String studyNumber;
 
   @JsonProperty("typeOfTimeMethods")
-  private Map<String, List<TermVocabAttributes>> typeOfTimeMethods;
+  private List<TermVocabAttributes> typeOfTimeMethods;
 
   @JsonProperty("fileLanguages")
   private Set<String> fileLanguages;
 
   @JsonProperty("typeOfSamplingProcedures")
-  private Map<String, List<VocabAttributes>> typeOfSamplingProcedures;
+  private List<VocabAttributes> typeOfSamplingProcedures;
 
   @JsonProperty("publisher")
-  private Map<String, Publisher> publisher;
+  private Publisher publisher;
 
   @JsonProperty("studyAreaCountries")
-  private Map<String, List<Country>> studyAreaCountries;
+  private List<Country> studyAreaCountries;
 
   @JsonProperty("unitTypes")
-  private Map<String, List<TermVocabAttributes>> unitTypes;
+  private List<TermVocabAttributes> unitTypes;
 
   @JsonProperty("pidStudies")
-  private Map<String, List<Pid>> pidStudies;
+  private List<Pid> pidStudies;
 
   @JsonProperty("lastModified")
   private String lastModified;
