@@ -84,6 +84,8 @@ spring:
   profiles: test
   main:
         banner-mode: "off"
+osmhConsumer:
+  languages: ['en', 'fi', 'sv', 'de']
 
 ---
 spring:

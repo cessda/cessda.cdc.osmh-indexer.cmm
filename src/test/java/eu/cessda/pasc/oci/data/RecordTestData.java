@@ -1,5 +1,15 @@
 package eu.cessda.pasc.oci.data;
 
+import eu.cessda.pasc.oci.FileHandler;
+import eu.cessda.pasc.oci.models.cmmstudy.CMMConverter;
+import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.fail;
+
 /**
  * @author moses@doraventures.com
  */
@@ -26,4 +36,16 @@ public class RecordTestData {
       "]";
 
 
+  public static List<CMMStudy> getASingleSyntheticCMMStudyAsList() {
+    List<CMMStudy> cmmStudies = new ArrayList<>();
+    String cmmStudyString = new FileHandler().getFileWithUtil("synthetic_compliant_record.json");
+
+    try {
+      CMMStudy cmmStudy = CMMConverter.fromJsonString(cmmStudyString);
+      cmmStudies.add(cmmStudy);
+    } catch (IOException e) {
+      fail("Unable to parse Study string to CMMStudy Object");
+    }
+    return cmmStudies;
+  }
 }
