@@ -1,4 +1,4 @@
-package eu.cessda.pasc.oci.service;
+package eu.cessda.pasc.oci.service.helpers;
 
 import eu.cessda.pasc.oci.configurations.PascOciConfig;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
@@ -28,14 +28,16 @@ public class LanguageDocumentExtractor {
    * @param cmmStudies raw list of studies which generally holds fields for all languages.
    * @return map extracted documents for each language iso code.
    */
-  public Map<String, List<CMMStudyOfLanguage>> mapLanguageDoc(List<CMMStudy> cmmStudies) {
+  public Map<String, List<CMMStudyOfLanguage>> mapLanguageDoc(List<CMMStudy> cmmStudies, String spName) {
     Map<String, List<CMMStudyOfLanguage>> languageDocMap = new HashMap<>();
+    String idPrefix = spName.trim().replace(" ", "-") + "__"; // UK Data Service = UK-Data-Service__
 
     List<String> languages = pascOciConfig.getLanguages();
     languages.forEach(languageIsoCode -> {
           List<CMMStudyOfLanguage> collectLanguageCmmStudy = cmmStudies
               .parallelStream()
               .map(cmmStudy -> CMMStudyOfLanguage.builder()
+                  .id(idPrefix + cmmStudy.getStudyNumber())
                   .studyNumber(cmmStudy.getStudyNumber())
                   .titleStudy(cmmStudy.getTitleStudy().get(languageIsoCode))
                   .abstractField(cmmStudy.getAbstractField().get(languageIsoCode))

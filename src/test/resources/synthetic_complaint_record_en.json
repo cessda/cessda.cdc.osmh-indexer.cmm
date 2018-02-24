@@ -1,0 +1,165 @@
+{
+  "id": "UK-Data-Service__2305",
+  "studyNumber": "2305",
+  "titleStudy": "Jyväskylä Longitudinal Study of Personality and Social Development (JYLS): Interviews of 14-Year-Olds 1974: Text Data.",
+  "abstract": "The data are part of the Jyväskylä Longitudinal Study of Personality and Social Development (JYLS), in which the same individuals have been followed over 30 years. At this research stage, the data were collected using peer nominations and teacher ratings (FSD2073), a parent interview (FSD2074), and a theme interview. This dataset contains the transcribed responses to the questions presented in the theme interview. No predetermined response categories were used. The recorded interviews were classified only afterwards, when it was possible to observe the whole range of responses. The interview topics covered family and parents, school and education, housing, identity, use of alcohol and smoking, free time activities, and hobbies.",
+  "classifications": [
+    {
+      "vocab": "ZA Category System",
+      "vocabUri": "https://oai.ukdataservice.ac.uk/Categories.htm",
+      "id": "This it the ID",
+      "term": "This is the Term"
+    },
+    {
+      "vocab": "",
+      "vocabUri": "",
+      "id": "",
+      "term": "Housing"
+    }
+  ],
+  "keywords": [
+    {
+      "vocab": "ELSST",
+      "vocabUri": "",
+      "id": "adolescents",
+      "term": ""
+    },
+    {
+      "vocab": "",
+      "vocabUri": "",
+      "id": "",
+      "term": "1976"
+    },
+    {
+      "vocab": "",
+      "vocabUri": "http://lod.data-archive.ac.uk/skoshasset/9e7cc815-90cb-4f96-b8ff-a0a44ab25ea9",
+      "id": "",
+      "term": "BUDGETS"
+    }
+  ],
+  "typeOfTimeMethods": [
+    {
+      "vocab": "",
+      "vocabUri": "",
+      "id": "",
+      "term": "Repeated cross-sectional study"
+    }
+  ],
+  "studyAreaCountries": [
+    {
+      "abbr": "FI",
+      "country": "Finland"
+    },
+    {
+      "abbr": "FR",
+      "country": "France"
+    }
+  ],
+  "unitTypes": [
+    {
+      "vocab": "DDI Made Up",
+      "vocabUri": "https://dbk.gesis.org/madeup.htm",
+      "id": "MadeUpUnit",
+      "term": "Made Up"
+    },
+    {
+      "vocab": "DDI Made Up 2",
+      "vocabUri": "https://dbk.gesis.org/madeup2.htm",
+      "id": "MadeUpUnit 2",
+      "term": "Made Up 2"
+    },
+    {
+      "vocab": "",
+      "vocabUri": "",
+      "id": "",
+      "term": "Institutions/organisations"
+    }
+  ],
+  "publisher": {
+    "abbr": "FSD",
+    "publisher": "Finnish Social Science Data Archive"
+  },
+  "publicationYear": "1982-01-01T00:00:00Z",
+  "pidStudies": [
+    {
+      "agency": "UKDA",
+      "pid": "2305"
+    },
+    {
+      "agency": "datacite",
+      "pid": "10.5255/UKDA-FAKE-2305-1"
+    },
+    {
+      "agency": "not available",
+      "pid": "2305"
+    },
+    {
+      "agency": "not available",
+      "pid": "2305"
+    }
+  ],
+  "fileLanguages": [
+    "aa",
+    "ee",
+    "bb"
+  ],
+  "creators": [
+    "En Pulkkinen, Lea (University of Jyväskylä. Department of Psychology)",
+    "David Brook (University of Essex. Department of Psychology)"
+  ],
+  "typeOfSamplingProcedures": [
+    {
+      "vocab": "DDI Sampling Procedure",
+      "vocabUri": "urn:ddi-cv:SamplingProcedure:1.1",
+      "id": "This is the id"
+    },
+    {
+      "vocab": "DDI Sampling Procedure",
+      "vocabUri": "urn:ddi-cv:SamplingProcedure:1.1",
+      "id": "Probability.Stratified 2"
+    }
+  ],
+  "samplingProcedureFreeTexts": [
+    "This is the term",
+    "This is the term 2",
+    "Should ignore elements without a concept by TypeOfSamplingProcedures"
+  ],
+  "typeOfModeOfCollections": [
+    {
+      "vocab": "DDI Mode Of Collection",
+      "vocabUri": "urn:ddi-cv:ModeOfCollection:3.0",
+      "id": "This is the Id",
+      "term": "This is the Term"
+    },
+    {
+      "vocab": "DDI Mode Of Collection",
+      "vocabUri": "urn:ddi-cv:ModeOfCollection:3.0",
+      "id": "Interview.Survey-concept",
+      "term": "This is the Term 2"
+    },
+    {
+      "vocab": "",
+      "vocabUri": "",
+      "id": "",
+      "term": "Face-to-face interview"
+    }
+  ],
+  "dataCollectionPeriodStartdate": "2018-09-20",
+  "dataCollectionPeriodEnddate": "2018-10-21T00:00:00Z",
+  "dataCollectionFreeTexts": [
+    {
+      "dataCollectionFreeText": "Spring 2018",
+      "event": "start"
+    },
+    {
+      "dataCollectionFreeText": "Christmas 2018",
+      "event": "end"
+    }
+  ],
+  "dataAccessFreeTexts": [
+    "1 Restriction Text en",
+    "2 Restriction Text en"
+  ],
+  "lastModified": "2017-11-17T08:08:11Z",
+  "isActive": true
+}

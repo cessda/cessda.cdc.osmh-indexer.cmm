@@ -21,7 +21,7 @@ import java.util.Optional;
  *
  * @author moses@doraventures.com
  */
-public class CMMConverter {
+public class CMMStudyConverter {
 
   // Serialize/deserialize helpers
 

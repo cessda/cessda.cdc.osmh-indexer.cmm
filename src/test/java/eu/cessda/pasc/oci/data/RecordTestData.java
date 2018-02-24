@@ -1,8 +1,10 @@
 package eu.cessda.pasc.oci.data;
 
 import eu.cessda.pasc.oci.FileHandler;
-import eu.cessda.pasc.oci.models.cmmstudy.CMMConverter;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
+import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
+import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
+import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,11 +43,24 @@ public class RecordTestData {
     String cmmStudyString = new FileHandler().getFileWithUtil("synthetic_compliant_record.json");
 
     try {
-      CMMStudy cmmStudy = CMMConverter.fromJsonString(cmmStudyString);
+      CMMStudy cmmStudy = CMMStudyConverter.fromJsonString(cmmStudyString);
       cmmStudies.add(cmmStudy);
     } catch (IOException e) {
       fail("Unable to parse Study string to CMMStudy Object");
     }
     return cmmStudies;
+  }
+
+  public static List<CMMStudyOfLanguage> getCmmStudyOfLanguageCodeEn() throws IOException {
+    List<CMMStudyOfLanguage> studyOfLanguages = new ArrayList<>();
+    String syntheticRecordEn = getSyntheticCMMStudyInEn();
+    CMMStudyOfLanguage cmmStudyOfLanguage = CMMStudyOfLanguageConverter.fromJsonString(syntheticRecordEn);
+    studyOfLanguages.add(cmmStudyOfLanguage);
+    return studyOfLanguages;
+  }
+
+  public static String getSyntheticCMMStudyInEn() {
+    FileHandler fileHandler = new FileHandler();
+    return fileHandler.getFileWithUtil("synthetic_complaint_record_en.json");
   }
 }

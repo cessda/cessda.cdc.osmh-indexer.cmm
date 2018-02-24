@@ -5,8 +5,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.ToString;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.Document;
 
 import java.util.List;
 import java.util.Set;
@@ -42,9 +43,12 @@ import java.util.Set;
     "isActive"
 })
 @Builder
-@Getter
 @ToString
+@Document(indexName = "test")
 public class CMMStudyOfLanguage {
+
+  @Id
+  private String id;
 
   @JsonProperty("creators")
   private List<String> creators;
@@ -111,4 +115,8 @@ public class CMMStudyOfLanguage {
 
   @JsonProperty("isActive")
   private boolean active;
+
+  public String getId() {
+    return id;
+  }
 }

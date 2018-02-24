@@ -1,4 +1,4 @@
-package eu.cessda.pasc.oci.dao;
+package eu.cessda.pasc.oci.repository;
 
 import eu.cessda.pasc.oci.configurations.PascOciConfig;
 import eu.cessda.pasc.oci.helpers.FakeHarvester;

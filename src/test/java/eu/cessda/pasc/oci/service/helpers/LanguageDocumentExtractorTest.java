@@ -1,7 +1,8 @@
-package eu.cessda.pasc.oci.service;
+package eu.cessda.pasc.oci.service.helpers;
 
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
+import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static eu.cessda.pasc.oci.data.RecordTestData.getASingleSyntheticCMMStudyAsList;
 import static org.assertj.core.api.Java6BDDAssertions.then;
@@ -33,7 +35,8 @@ public class LanguageDocumentExtractorTest {
     List<CMMStudy> studies = getASingleSyntheticCMMStudyAsList();
 
     // When
-    Map<String, List<CMMStudyOfLanguage>> languageDocMap = languageDocumentExtractor.mapLanguageDoc(studies);
+    Map<String, List<CMMStudyOfLanguage>> languageDocMap =
+        languageDocumentExtractor.mapLanguageDoc(studies, "UK Data Service");
 
     then(languageDocMap).isNotNull();
     then(languageDocMap).hasSize(4);
@@ -42,5 +45,9 @@ public class LanguageDocumentExtractorTest {
     then(languageDocMap.get("fi")).hasSize(1);
     then(languageDocMap.get("sv")).hasSize(1);
     then(languageDocMap.get("de")).hasSize(1);
+
+    List<CMMStudyOfLanguage> enStudy = languageDocMap.get("en");
+    Optional<String> s = CMMStudyOfLanguageConverter.toJsonString(enStudy.get(0));
+    s.ifPresent(System.out::println);
   }
 }

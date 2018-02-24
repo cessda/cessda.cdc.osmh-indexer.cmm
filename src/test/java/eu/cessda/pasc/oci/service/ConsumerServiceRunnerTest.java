@@ -1,9 +1,10 @@
 package eu.cessda.pasc.oci.service;
 
 import eu.cessda.pasc.oci.models.RecordHeader;
-import eu.cessda.pasc.oci.models.cmmstudy.CMMConverter;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
+import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.configurations.Repo;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,6 +26,7 @@ import static eu.cessda.pasc.oci.data.ReposTestData.getUKDSRepo;
 @SpringBootTest
 @TestPropertySource(properties = "report-subscriber=tester@example.com")
 @Ignore("Ignoring: For manual Integration testing only")
+@Slf4j
 public class ConsumerServiceRunnerTest {
 
   @Autowired
@@ -39,16 +41,12 @@ public class ConsumerServiceRunnerTest {
 //    assertThat(recordHeaders).hasSize(2);
     List<RecordHeader> top3RecordHeaders = recordHeaders.stream().skip(1000).limit(3).collect(Collectors.toList());
     top3RecordHeaders.forEach(recordHeader -> {
-      System.out.println("|----------------------------------------------------------------------|");
-      System.out.println("|--- Record Header");
-      System.out.println(recordHeader);
+      log.info("|------------------------------Record Header----------------------------------------|");
+      log.info(recordHeader.toString());
 
-      System.out.println("|--- Record CmmStudy");
+      log.info("|------------------------------Record CmmStudy----------------------------------------|");
       Optional<CMMStudy> optionalCmmStudy = consumerService.getRecord(repo, recordHeader.getIdentifier());
-      optionalCmmStudy.ifPresent(s -> {
-        CMMConverter.toJsonString(s)
-            .ifPresent(System.out::println);
-      });
+      optionalCmmStudy.ifPresent(s -> CMMStudyConverter.toJsonString(s).ifPresent(System.out::println));
     });
   }
 }

@@ -1,4 +1,4 @@
-package eu.cessda.pasc.oci.dao;
+package eu.cessda.pasc.oci.repository;
 
 import eu.cessda.pasc.oci.helpers.AppConstants;
 import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;

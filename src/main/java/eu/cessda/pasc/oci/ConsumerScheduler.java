@@ -1,7 +1,7 @@
 package eu.cessda.pasc.oci;
 
 /**
- * Service responsible for scheduling the harvesting Full Run and Incremental; runs
+ * Service responsible for triggering harvesting and Metadata ingestion to the search engine
  *
  * @author moses@doraventures.com
  */

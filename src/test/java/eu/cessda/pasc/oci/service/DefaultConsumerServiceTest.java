@@ -1,7 +1,7 @@
 package eu.cessda.pasc.oci.service;
 
 import eu.cessda.pasc.oci.FileHandler;
-import eu.cessda.pasc.oci.dao.HarvesterDao;
+import eu.cessda.pasc.oci.repository.HarvesterDao;
 import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;

@@ -3,7 +3,6 @@ package eu.cessda.pasc.oci.models.cmmstudy;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
 
 /**
  * DataCollectionFreeText pojo to hold
@@ -13,7 +12,6 @@ import lombok.Getter;
  * @author moses@doraventures.com
  */
 @Builder
-@Getter
 @AllArgsConstructor
 public class DataCollectionFreeText {
 

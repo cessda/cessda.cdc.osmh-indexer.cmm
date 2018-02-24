@@ -2,10 +2,10 @@ package eu.cessda.pasc.oci.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
-import eu.cessda.pasc.oci.dao.HarvesterDao;
+import eu.cessda.pasc.oci.repository.HarvesterDao;
 import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
 import eu.cessda.pasc.oci.models.RecordHeader;
-import eu.cessda.pasc.oci.models.cmmstudy.CMMConverter;
+import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +57,7 @@ public class DefaultConsumerService implements ConsumerService {
 
     try {
       String recordHeadersJsonString = harvesterDao.getRecord(repo.getUrl(), studyNumber);
-      return Optional.ofNullable(CMMConverter.fromJsonString(recordHeadersJsonString));
+      return Optional.ofNullable(CMMStudyConverter.fromJsonString(recordHeadersJsonString));
     } catch (ExternalSystemException e) {
       log.error("ExternalSystemException, Unable to GetRecord response. Error[{}]", e.getMessage(), e);
     } catch (IOException e) {
