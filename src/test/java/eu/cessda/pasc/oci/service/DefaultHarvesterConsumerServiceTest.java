@@ -29,15 +29,15 @@ import static org.mockito.Mockito.when;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class DefaultConsumerServiceTest {
+public class DefaultHarvesterConsumerServiceTest {
 
   @Mock
   private HarvesterDao harvesterDao;
 
   @InjectMocks
   @Autowired
-//  ConsumerService consumerService;
-  DefaultConsumerService consumerService;
+//  HarvesterConsumerService consumerService;
+      DefaultHarvesterConsumerService consumerService;
 
   @Test
   public void shouldReturnASuccessfulResponseForListingRecordHeaders() throws ExternalSystemException {

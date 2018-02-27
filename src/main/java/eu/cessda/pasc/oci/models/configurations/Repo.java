@@ -2,6 +2,7 @@ package eu.cessda.pasc.oci.models.configurations;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Repo configuration model
@@ -10,6 +11,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@ToString
 public class Repo {
 
   private String url;

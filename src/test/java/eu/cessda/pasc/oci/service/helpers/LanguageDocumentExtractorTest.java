@@ -32,7 +32,7 @@ public class LanguageDocumentExtractorTest {
   public void shouldReturnMapOfExtractedDocInThereRespectiveLangDocuments() {
 
     // Given
-    List<CMMStudy> studies = getASingleSyntheticCMMStudyAsList();
+    List<Optional<CMMStudy>> studies = getASingleSyntheticCMMStudyAsList();
 
     // When
     Map<String, List<CMMStudyOfLanguage>> languageDocMap =

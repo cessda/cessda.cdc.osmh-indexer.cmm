@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -28,7 +29,7 @@ public class LanguageDocumentExtractor {
    * @param cmmStudies raw list of studies which generally holds fields for all languages.
    * @return map extracted documents for each language iso code.
    */
-  public Map<String, List<CMMStudyOfLanguage>> mapLanguageDoc(List<CMMStudy> cmmStudies, String spName) {
+  public Map<String, List<CMMStudyOfLanguage>> mapLanguageDoc(List<Optional<CMMStudy>> cmmStudies, String spName) {
     Map<String, List<CMMStudyOfLanguage>> languageDocMap = new HashMap<>();
     String idPrefix = spName.trim().replace(" ", "-") + "__"; // UK Data Service = UK-Data-Service__
 
@@ -36,6 +37,8 @@ public class LanguageDocumentExtractor {
     languages.forEach(languageIsoCode -> {
           List<CMMStudyOfLanguage> collectLanguageCmmStudy = cmmStudies
               .parallelStream()
+              .filter(Optional::isPresent)
+              .map(Optional::get)
               .map(cmmStudy -> CMMStudyOfLanguage.builder()
                   .id(idPrefix + cmmStudy.getStudyNumber())
                   .studyNumber(cmmStudy.getStudyNumber())

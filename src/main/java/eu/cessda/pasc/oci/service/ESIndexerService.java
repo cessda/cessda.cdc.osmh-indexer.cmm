@@ -19,7 +19,7 @@ import java.util.Map;
  */
 @Service
 @Slf4j
-public class IndexerService {
+public class ESIndexerService {
 
   private static final String INDEX_NAME_TEMPLATE = "cmmstudy_%s";
   private static final String INDEX_TYPE = "cmmstudy";
@@ -27,12 +27,13 @@ public class IndexerService {
   private ElasticsearchTemplate elasticsearchTemplate;
 
   @Autowired
-  public IndexerService(ElasticsearchTemplate elasticsearchTemplate) {
+  public ESIndexerService(ElasticsearchTemplate elasticsearchTemplate) {
     this.elasticsearchTemplate = elasticsearchTemplate;
   }
 
-  public void bulkIndex(List<CMMStudyOfLanguage> languageCMMStudiesMap, String languageIsoCode) {
+  public boolean bulkIndex(List<CMMStudyOfLanguage> languageCMMStudiesMap, String languageIsoCode) {
     String indexName = String.format(INDEX_NAME_TEMPLATE, languageIsoCode);
+    boolean isSuccessful = true;
     int counter = 0;
     try {
 
@@ -63,7 +64,9 @@ public class IndexerService {
       log.info("[{}] BulkIndex completed");
     } catch (Exception e) {
       log.error("[{}] Encountered an exception [{}]", indexName, e.getMessage(), e);
+      isSuccessful = false;
     }
+    return isSuccessful;
   }
 
   private void executeBulk(List<IndexQuery> queries) {

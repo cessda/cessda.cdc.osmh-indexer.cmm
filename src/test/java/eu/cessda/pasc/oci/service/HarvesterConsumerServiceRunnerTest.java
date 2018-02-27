@@ -27,10 +27,10 @@ import static eu.cessda.pasc.oci.data.ReposTestData.getUKDSRepo;
 @TestPropertySource(properties = "report-subscriber=tester@example.com")
 @Ignore("Ignoring: For manual Integration testing only")
 @Slf4j
-public class ConsumerServiceRunnerTest {
+public class HarvesterConsumerServiceRunnerTest {
 
   @Autowired
-  DefaultConsumerService consumerService;
+  DefaultHarvesterConsumerService consumerService;
 
   @Test
   public void shouldReturnASuccessfulResponse() {

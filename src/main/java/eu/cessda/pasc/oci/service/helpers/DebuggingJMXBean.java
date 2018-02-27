@@ -68,7 +68,7 @@ public class DebuggingJMXBean {
           String.format("\t Repo [%s] url [%s] handler[%s] %n", repo.getName(), repo.getUrl(), repo.getHandler()));
     }
     String reposStr = reposStrBuilder.toString();
-    log.info("Repos: [\n{}]", reposStr);
+    log.info("Configured Repos: [\n{}]", reposStr);
     return reposStr;
   }
 }

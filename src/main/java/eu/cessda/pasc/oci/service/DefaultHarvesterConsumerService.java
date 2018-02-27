@@ -24,13 +24,13 @@ import java.util.Optional;
  */
 @Service
 @Slf4j
-public class DefaultConsumerService implements ConsumerService {
+public class DefaultHarvesterConsumerService implements HarvesterConsumerService {
 
   private HarvesterDao harvesterDao;
   private ObjectMapper mapper;
 
   @Autowired
-  public DefaultConsumerService(HarvesterDao harvesterDao, ObjectMapper mapper) {
+  public DefaultHarvesterConsumerService(HarvesterDao harvesterDao, ObjectMapper mapper) {
     this.harvesterDao = harvesterDao;
     this.mapper = mapper;
   }

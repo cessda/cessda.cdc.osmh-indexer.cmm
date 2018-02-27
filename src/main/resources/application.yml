@@ -51,7 +51,7 @@ spring:
         endpoints: env,metrics,log,trace,dump,jolokia,info,configprops,trace,logfile,refresh,flyway,liquibase,heapdump
       auto-deregistration: true
       auto-registration: true
-      period: 60000
+      period: 30000
 elasticsearch:
   clustername: elasticsearch
   host: 127.0.0.1
