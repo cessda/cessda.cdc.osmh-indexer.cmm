@@ -6,13 +6,13 @@ import lombok.Setter;
 import java.util.List;
 
 /**
- * OaiPmh configuration model
+ * Endpoints configuration model
  *
  * @author moses@doraventures.com
  */
 @Getter
 @Setter
-public class OaiPmh {
+public class Endpoints {
 
   private List<String> supportedApiVersions;
   private List<String> supportedRecordTypes;

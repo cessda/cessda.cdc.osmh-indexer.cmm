@@ -2,10 +2,8 @@ package eu.cessda.pasc.oci.service;
 
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.cluster.health.ClusterIndexHealth;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.elasticsearch.ElasticsearchException;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.stereotype.Service;
@@ -19,8 +17,8 @@ import java.util.Map;
  *
  * @author moses@doraventures.com
  */
-@Slf4j
 @Service
+@Slf4j
 public class IndexerService {
 
   private static final String INDEX_NAME_TEMPLATE = "cmmstudy_%s";
@@ -29,7 +27,7 @@ public class IndexerService {
   private ElasticsearchTemplate elasticsearchTemplate;
 
   @Autowired
-  public IndexerService( ElasticsearchTemplate elasticsearchTemplate) {
+  public IndexerService(ElasticsearchTemplate elasticsearchTemplate) {
     this.elasticsearchTemplate = elasticsearchTemplate;
   }
 
@@ -51,7 +49,7 @@ public class IndexerService {
         indexQuery.setType(INDEX_TYPE);
         queries.add(indexQuery);
         if (counter % INDEX_COMMIT_SIZE == 0) {
-          elasticsearchTemplate.bulkIndex(queries);
+          executeBulk(queries);
           queries.clear();
           log.info("[{}] Indexing current bulkIndex counter [{}] ", indexName + counter);
         }
@@ -59,44 +57,25 @@ public class IndexerService {
       }
 
       if (!queries.isEmpty()) {
-        elasticsearchTemplate.bulkIndex(queries);
+        executeBulk(queries);
       }
       elasticsearchTemplate.refresh(indexName);
       log.info("[{}] BulkIndex completed");
     } catch (Exception e) {
-      log.info("[{}] Encountered an exception [{}]", indexName, e.getMessage(), e);
+      log.error("[{}] Encountered an exception [{}]", indexName, e.getMessage(), e);
     }
   }
 
-  // For debug, print elastic search details
-  String printElasticSearchInfo() {
-
-    log.info("ElasticSearch Client Detail: Starts--");
-    Client client = elasticsearchTemplate.getClient();
-    Map<String, String> asMap = client.settings().getAsMap();
-
-    asMap.forEach((k, v) -> log.info(k + " = " + v));
-    log.info("ElasticSearch Client Details: End--");
-
-    log.info("ElasticSearch Cluster Health Report: Start--");
-    ClusterHealthResponse healths = client.admin().cluster().prepareHealth().get();
-    client.admin().cluster().prepareHealth().get();
-    log.info("Cluster Name [{}]", healths.getClusterName());
-    log.info("NumberOfDataNodes [{}]", healths.getNumberOfDataNodes());
-    log.info("NumberOfNodes [{}]", healths.getNumberOfNodes());
-
-
-    log.info("ElasticSearch Cluster Nodes Report: Start--");
-    log.info("NumberOfNodes [{}]", healths.getNumberOfNodes());
-    for (ClusterIndexHealth health : healths.getIndices().values()) {
-      log.info("Current Index [{}]", health.getIndex());
-      log.info("NumberOfShards [{}]", health.getNumberOfShards());
-      log.info("NumberOfReplicas [{}]", health.getNumberOfReplicas());
-      log.info("Status [{}]", health.getStatus());
+  private void executeBulk(List<IndexQuery> queries) {
+    try {
+      elasticsearchTemplate.bulkIndex(queries);
+    } catch (ElasticsearchException e) {
+      log.error("BulkIndexing ElasticsearchException with message [{}]", e.getMessage());
+      if (log.isInfoEnabled()) {
+        log.error("BulkIndexing ElasticsearchException: Printing failed documents' Id and Message", e.getMessage());
+        Map<String, String> failedDocs = e.getFailedDocuments();
+        failedDocs.forEach((key, value) -> log.info("Id [{}], message [{}]", key, value));
+      }
     }
-    log.info("ElasticSearch Cluster Nodes Report: End--");
-    log.info("ElasticSearch Cluster Health Report: End--");
-
-    return "Printed Health";
   }
 }

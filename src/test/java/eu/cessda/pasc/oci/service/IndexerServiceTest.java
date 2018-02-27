@@ -10,6 +10,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.json.JSONException;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,7 +57,7 @@ public class IndexerServiceTest extends EmbeddedElasticsearchServer {
     indexerService = new IndexerService(elasticsearchTemplate);
   }
 
-//  @After
+  @After
   public void shutdown() {
     log.info("---------Closing node---------");
     closeNodeResources();
@@ -69,12 +70,9 @@ public class IndexerServiceTest extends EmbeddedElasticsearchServer {
     // Given
     String language = "en";
     List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEn();
-    log.info("---------Printing health next---------");
-    then(indexerService.printElasticSearchInfo()).isEqualTo("Printed Health");
 
     // When
     this.indexerService.bulkIndex(studyOfLanguages, language);
-
 
     // Then
     SearchResponse response = getClient().prepareSearch(INDEX_NAME)
@@ -89,7 +87,6 @@ public class IndexerServiceTest extends EmbeddedElasticsearchServer {
     assertEquals(expectedTree.toString(), actualTree.toString(), true);
 
     log.info("Printing hits");
-    Arrays.asList(response.getHits().getHits()).forEach(hit-> log.info(hit.getSourceAsString()));
+    Arrays.asList(response.getHits().getHits()).forEach(hit -> log.info(hit.getSourceAsString()));
   }
-
 }

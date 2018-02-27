@@ -32,7 +32,7 @@ public class PascOciConfigTest {
     then(pascOciConfig.getHarvester().getUrl()).isEqualTo("http://localhost:9091");
     then(pascOciConfig.getHarvester().getVersion()).isEqualTo("v0");
 
-    List<Repo> repos = pascOciConfig.getOaiPmh().getRepos();
+    List<Repo> repos = pascOciConfig.getEndpoints().getRepos();
     then(repos).isNotNull();
     then(repos).hasSize(4);
 

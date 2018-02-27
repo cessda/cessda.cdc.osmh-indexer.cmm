@@ -28,7 +28,7 @@ public class FakeHarvester {
   private PascOciConfig pascOciConfig;
 
   public Optional<Repo> getUrlToCall(String repositoryUrl) {
-    return pascOciConfig.getOaiPmh().getRepos()
+    return pascOciConfig.getEndpoints().getRepos()
         .stream()
         .filter(repo -> repo.getUrl().equalsIgnoreCase(repositoryUrl))
         .findFirst();
