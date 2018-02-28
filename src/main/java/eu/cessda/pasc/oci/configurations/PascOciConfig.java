@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableMBeanExport;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +19,7 @@ import java.util.List;
  */
 @Configuration
 @EnableConfigurationProperties
-@EnableMBeanExport
+//@EnableMBeanExport
 @Qualifier("PascOsmhIndexerConfig")
 @ConfigurationProperties(prefix = "osmhConsumer")
 @Getter

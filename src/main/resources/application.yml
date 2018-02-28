@@ -105,3 +105,20 @@ spring:
   boot:
     admin:
       url: http://localhost:8087
+osmhConsumer:
+  languages: ['en', 'fi']
+  endpoints:
+    repos:
+      - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
+        name: 'UK Data Service'
+        handler: 'https://pasc-dev.cessda.eu/osmh-repo'
+#        handler: 'https://pasc-dev.cessda.eu/osmh-repo'
+#      - url: http://services.fsd.uta.fi/v0/oai
+#        name: 'Finish Data Services'
+#        handler: 'https://pasc-dev.cessda.eu/osmh-repo/'
+#      - url: https://dbk.gesis.org/dbkoai
+#        name: 'GESIS'
+#        handler: 'https://pasc-dev.cessda.eu/osmh-repo/'
+#      - url: https://dbk.gesis.org/dbkoai_de
+#        name: 'GESIS'
+#        handler: 'https://pasc-dev.cessda.eu/osmh-repo/'

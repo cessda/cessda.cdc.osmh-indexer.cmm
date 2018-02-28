@@ -52,7 +52,7 @@ public class ESIndexerService {
         if (counter % INDEX_COMMIT_SIZE == 0) {
           executeBulk(queries);
           queries.clear();
-          log.info("[{}] Indexing current bulkIndex counter [{}] ", indexName + counter);
+          log.info("[{}] Indexing current bulkIndex counter [{}] ", indexName, counter);
         }
         counter++;
       }
@@ -61,9 +61,9 @@ public class ESIndexerService {
         executeBulk(queries);
       }
       elasticsearchTemplate.refresh(indexName);
-      log.info("[{}] BulkIndex completed");
+      log.info("[{}] BulkIndex completed", languageIsoCode);
     } catch (Exception e) {
-      log.error("[{}] Encountered an exception [{}]", indexName, e.getMessage(), e);
+      log.error("[{}] Encountered an exception [{}]", indexName, e.getMessage());
       isSuccessful = false;
     }
     return isSuccessful;
@@ -74,11 +74,9 @@ public class ESIndexerService {
       elasticsearchTemplate.bulkIndex(queries);
     } catch (ElasticsearchException e) {
       log.error("BulkIndexing ElasticsearchException with message [{}]", e.getMessage());
-      if (log.isInfoEnabled()) {
-        log.error("BulkIndexing ElasticsearchException: Printing failed documents' Id and Message", e.getMessage());
-        Map<String, String> failedDocs = e.getFailedDocuments();
-        failedDocs.forEach((key, value) -> log.info("Id [{}], message [{}]", key, value));
-      }
+      log.error("BulkIndexing ElasticsearchException: Printing failed documents' Id and Message");
+      Map<String, String> failedDocs = e.getFailedDocuments();
+      failedDocs.forEach((key, value) -> log.info("Id [{}], message [{}]", key, value));
     }
   }
 }

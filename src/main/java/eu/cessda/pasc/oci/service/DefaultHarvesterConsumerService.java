@@ -2,12 +2,12 @@ package eu.cessda.pasc.oci.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
-import eu.cessda.pasc.oci.repository.HarvesterDao;
 import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
 import eu.cessda.pasc.oci.models.RecordHeader;
-import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
+import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.configurations.Repo;
+import eu.cessda.pasc.oci.repository.HarvesterDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -59,7 +59,7 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
       String recordHeadersJsonString = harvesterDao.getRecord(repo.getUrl(), studyNumber);
       return Optional.ofNullable(CMMStudyConverter.fromJsonString(recordHeadersJsonString));
     } catch (ExternalSystemException e) {
-      log.error("ExternalSystemException, Unable to GetRecord response. Error[{}]", e.getMessage(), e);
+      log.error("Exception msg[{}]. External system response body[{}]", e.getMessage(), e.getExternalResponseBody());
     } catch (IOException e) {
       log.error("Error, Unable to pass GetRecord response error[{}]", e.getMessage(), e);
     }
