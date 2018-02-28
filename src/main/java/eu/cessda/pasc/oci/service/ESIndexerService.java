@@ -52,7 +52,7 @@ public class ESIndexerService {
         if (counter % INDEX_COMMIT_SIZE == 0) {
           executeBulk(queries);
           queries.clear();
-          log.info("[{}] Indexing current bulkIndex counter [{}] ", indexName, counter);
+          log.info("Indexing [{}] index, current bulkIndex counter [{}] ", indexName, counter);
         }
         counter++;
       }

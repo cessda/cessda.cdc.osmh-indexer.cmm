@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,35 +39,56 @@ public class LanguageDocumentExtractor {
 
     log.info("Mapping CMMStudy to CMMStudyOfLanguage for SP[{}] with [{}] records", spName, cmmStudies.size());
     Map<String, List<CMMStudyOfLanguage>> languageDocMap = new HashMap<>();
-
     String idPrefix = spName.trim().replace(" ", "-") + "__"; // UK Data Service = UK-Data-Service__
 
-    // TODO REFACTOR this for a single pass on the date list instead
-    pascOciConfig.getLanguages()
-        .forEach(languageIsoCode -> {
-
-              long startTime = System.currentTimeMillis();
-              log.info("Extract CMMStudyOfLanguage for [{}] language code - STARTED", languageIsoCode);
-              List<CMMStudyOfLanguage> collectLanguageCmmStudy = cmmStudies
-                  .stream()
-                  .filter(Optional::isPresent)
-                  .map(Optional::get)
-                  .map(cmmStudy -> getCmmStudyOfLanguage(idPrefix, languageIsoCode, cmmStudy))
-                  .collect(Collectors.toList());
-              languageDocMap.put(languageIsoCode, collectLanguageCmmStudy);
-
-              long took = System.currentTimeMillis() - startTime / 1000;
-          String formatMsg = "Extract CMMStudyOfLanguage for [{}] language code - COMPLETED in [{}]Seconds";
-          log.info(formatMsg, languageIsoCode, took);
-            }
-        );
+    // TODO REFACTOR this for a single pass or - make handler return records with langCode as top node
+    // with record embedded to each langCode, so that one can easily grab all records more efficiently for a langCode
+    pascOciConfig.getLanguages().forEach(langCode -> {
+          Instant start = Instant.now();
+          log.info("Extract CMMStudyOfLanguage for [{}] language code - STARTED", langCode);
+          List<CMMStudyOfLanguage> collectLanguageCmmStudy = getCmmStudiesOfLangCode(cmmStudies, idPrefix, langCode);
+          languageDocMap.put(langCode, collectLanguageCmmStudy);
+          logTimeTook(langCode, start);
+        }
+    );
 
     logDetailedExtractionsReport(languageDocMap);
     return languageDocMap;
   }
 
+  private List<CMMStudyOfLanguage> getCmmStudiesOfLangCode(List<Optional<CMMStudy>> cmmStudies, String idPrefix,
+                                                           String languageIsoCode) {
+    return cmmStudies.stream()
+        .filter(cmmStudy -> isValidCMMStudyForLang(languageIsoCode, cmmStudy))
+        .map(Optional::get)
+        .map(cmmStudy -> getCmmStudyOfLanguage(idPrefix, languageIsoCode, cmmStudy))
+        .collect(Collectors.toList());
+  }
+
+  private boolean isValidCMMStudyForLang(String languageIsoCode, Optional<CMMStudy> cmmStudy) {
+
+    if (!cmmStudy.isPresent()) {
+      return false;
+    } else {
+
+      //Must have titleStudy
+      Optional<Map<String, String>> titleStudy = ofNullable(cmmStudy.get().getTitleStudy());
+      if (!titleStudy.isPresent() || !ofNullable(titleStudy.get().get(languageIsoCode)).isPresent()) {
+        return false;
+      }
+
+      //Must have abstract
+      Optional<Map<String, String>> abstractField = ofNullable(cmmStudy.get().getAbstractField());
+      return abstractField.isPresent() && ofNullable(abstractField.get().get(languageIsoCode)).isPresent();
+    }
+  }
+
   private CMMStudyOfLanguage getCmmStudyOfLanguage(String idPrefix, String lang, CMMStudy cmmStudy) {
-    log.debug("Extracting CMMStudyOfLanguage from CMMStudyNumber [{}] for lang [{}]", cmmStudy.getStudyNumber(), lang);
+
+    if (log.isTraceEnabled()) {
+      log.trace("Extracting CMMStudyOfLang from CMMStudyNumber [{}] for lang [{}]", cmmStudy.getStudyNumber(), lang);
+    }
+
     CMMStudyOfLanguage.CMMStudyOfLanguageBuilder builder = CMMStudyOfLanguage.builder();
 
     builder.id(idPrefix + cmmStudy.getStudyNumber())
@@ -77,7 +100,6 @@ public class LanguageDocumentExtractor {
         .dataCollectionPeriodStartdate(cmmStudy.getDataCollectionPeriodStartdate())
         .dataCollectionPeriodEnddate(cmmStudy.getDataCollectionPeriodEnddate());
 
-    log.trace("StudyNumber Record [{}]: Deal with retrieval from nullable fields", cmmStudy.getStudyNumber());
     ofNullable(cmmStudy.getTitleStudy()).ifPresent(map -> builder.titleStudy(map.get(lang)));
     ofNullable(cmmStudy.getAbstractField()).ifPresent(map -> builder.abstractField(map.get(lang)));
     ofNullable(cmmStudy.getKeywords()).ifPresent(map -> builder.keywords(map.get(lang)));
@@ -94,12 +116,17 @@ public class LanguageDocumentExtractor {
     ofNullable(cmmStudy.getTitleStudy()).ifPresent(map -> builder.titleStudy(map.get(lang)));
     ofNullable(cmmStudy.getDataCollectionFreeTexts()).ifPresent(map -> builder.dataCollectionFreeTexts(map.get(lang)));
     ofNullable(cmmStudy.getDataAccessFreeTexts()).ifPresent(map -> builder.dataAccessFreeTexts(map.get(lang)));
-    log.trace("Extracted StudyNumber Record [{}]", cmmStudy.getStudyNumber());
 
     return builder.build();
   }
 
-  private void logDetailedExtractionsReport(Map<String, List<CMMStudyOfLanguage>> languageDocMap) {
+  private static void logTimeTook(String langCode, Instant startTime) {
+    String formatMsg = "Extract CMMStudyOfLanguage for [{}] language code - COMPLETED. Duration [{}]";
+    Instant end = Instant.now();
+    log.info(formatMsg, langCode, Duration.between(startTime, end));
+  }
+
+  private static void logDetailedExtractionsReport(Map<String, List<CMMStudyOfLanguage>> languageDocMap) {
     if (log.isDebugEnabled()) {
       languageDocMap.forEach((langIsoCode, cmmStudyOfLanguages) -> {
         String formatTemplate = "langIsoCode [{}] has [{}] records passed";

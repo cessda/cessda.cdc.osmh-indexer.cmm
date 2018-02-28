@@ -14,6 +14,7 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -57,11 +58,11 @@ public class ConsumerScheduler {
   @Scheduled(cron = "0 0 09 * * *")
   @ManagedOperation(description = "Manual Trigger to retrieve(harvest) and Ingest records for Configured All SPs Repos")
   public void harvestAndIngestRecordsForAllConfiguredSPsRepos() {
-    long startTimeMillis = System.currentTimeMillis();
-    LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTimeMillis), ZoneId.systemDefault());
+    Instant startTime = Instant.now();
+    LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime.toEpochMilli()), ZoneId.systemDefault());
     logStartStatus(date);
     execute();
-    logEndStatus(date, startTimeMillis);
+    logEndStatus(date, startTime);
   }
 
   private void execute() {
@@ -84,17 +85,20 @@ public class ConsumerScheduler {
     log.info("Repo returned with [{}] record headers", recordHeadersSize);
 
     //TODO: disable below line override. For manual test only!
-//    int limitSize = 500;
-//    if (recordHeadersSize > 1020) {
-//      log.info("**********************");
-//      log.info("********************** Test *********************************** Truncating records.");
-//      log.info("**********************");
-//      recordHeaders = recordHeaders.stream().skip(1000).limit(limitSize).collect(Collectors.toList());
-//    }
+   /* int limitSize = 500;
+    if (recordHeadersSize > 1020) {
+      log.info("**********************");
+      log.info("********************** Test *********************************** Truncating records.");
+      log.info("**********************");
+      recordHeaders = recordHeaders.stream().skip(1000).limit(limitSize).collect(Collectors.toList());
+    }*/
 
     //or
-//    log.info("TEST - Limiting to [" + limitSize + "] record headers");
-//    recordHeaders = recordHeaders.stream().limit(limitSize).collect(Collectors.toList());
+    /*int limitSize = 1000;
+    log.info("TEST - Limiting to [" + limitSize + "] record headers");
+    recordHeaders = recordHeaders.stream().limit(limitSize).collect(Collectors.toList());*/
+    // or end
+
     List<Optional<CMMStudy>> cMMStudiesOptions = recordHeaders.stream()
         .map(recordHeader -> defaultConsumerService.getRecord(repo, recordHeader.getIdentifier()))
         .collect(Collectors.toList());
@@ -114,9 +118,8 @@ public class ConsumerScheduler {
 
   }
 
-  private void logEndStatus(LocalDateTime localDateTime, long startTimeMillis) {
-    long timeTakeMin = (System.currentTimeMillis() - startTimeMillis) / 60_000;
-    log.info("Consumer and Ingest All SPs Repos Schedule for once a day : Ended at [{}], Took [{}minutes]",
-        localDateTime, timeTakeMin);
+  private void logEndStatus(LocalDateTime localDateTime, Instant startTime) {
+    String formatMsg = "Consumer and Ingest All SPs Repos Schedule for once a day : Ended at [{}], Duration [{}]";
+    log.info(formatMsg, localDateTime, Duration.between(startTime, Instant.now()));
   }
 }
