@@ -1,5 +1,6 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 
+import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.logging.RemoteResponse;
 import org.slf4j.Logger;
 import org.springframework.boot.logging.LogLevel;
@@ -20,12 +21,12 @@ public class HandlerLogHelper {
     throw new UnsupportedOperationException("Utility class, instantiation not allow");
   }
 
-  public static void logResponse(HttpStatus statusCode, Logger log, LogLevel logLevel) {
+  public static void logResponse(HttpStatus statusCode, ExternalSystemException exception, Logger log, LogLevel logLevel) {
 
     String msg = RemoteResponse.builder()
         .logLevel(logLevel)
         .responseCode(statusCode.value())
-        .responseMessage(statusCode.getReasonPhrase())
+        .responseMessage(exception.getExternalResponseBody())
         .occurredAt(LocalDateTime.now()).build().toString();
 
     String s = logLevel.toString();

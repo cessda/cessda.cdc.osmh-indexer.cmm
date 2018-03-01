@@ -8,6 +8,7 @@ import org.springframework.boot.logging.LogLevel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.UNSUCCESSFUL_RESPONSE;
@@ -34,8 +35,15 @@ public class DaoBase {
       log.debug("Got response for [{}] as [{}]", fullUrl, responseEntity.getStatusCodeValue());
       return responseEntity.getBody();
     } catch (RestClientException e) {
-      logResponse(HttpStatus.NOT_ACCEPTABLE, log, LogLevel.ERROR);
-      throw new ExternalSystemException(UNSUCCESSFUL_RESPONSE, e.getCause());
+      ExternalSystemException exception = new ExternalSystemException(UNSUCCESSFUL_RESPONSE, e.getCause());
+      try {
+        exception.setExternalResponseBody((((HttpServerErrorException) e).getResponseBodyAsString()));
+      } catch (Exception e1) {
+        exception.setExternalResponseBody(e.getMessage());
+      }
+
+      logResponse(HttpStatus.NOT_ACCEPTABLE, exception, log, LogLevel.ERROR);
+      throw exception;
     }
   }
 }
