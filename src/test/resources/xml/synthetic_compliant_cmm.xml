@@ -19,10 +19,10 @@
                 <titl/>
               </titlStmt>
               <prodStmt>
-                <!--Compliance Example-->
+                <!--Compliant examples -->
                 <producer xml:lang="fi" abbr="FSD">Yhteiskuntatieteellinen tietoarkisto</producer>
                 <producer xml:lang="en" abbr="FSD">Finnish Social Science Data Archive</producer>
-                <!--UKDS Example : Should extra all there is-->
+                <!--FSD example: Should extract all there is here -->
                 <producer xml:lang="se">Samhällsdatablad</producer>
                 <copyright xml:lang="en">Finnish Social Science Data Archive</copyright>
                 <copyright xml:lang="fi">Yhteiskuntatieteellinen tietoarkisto</copyright>
@@ -34,10 +34,10 @@
               <titlStmt>
                 <titl xml:lang="fi">Lapsesta aikuiseksi: 14-vuotiaiden haastattelu 1974: tekstiaineisto.</titl>
                 <parTitl xml:lang="fi">Lapsesta aikuiseksi: 14-vuotiaiden haastattelu 1974: tekstiaineisto</parTitl>
-                <!-- Complaint - UKDS examples-->
+                <!-- Compliant UKDS examples -->
                 <IDNo agency="UKDA">2305</IDNo>
                 <IDNo agency="datacite">10.5255/UKDA-FAKE-2305-1</IDNo>
-                <!-- Missing lang - FSD -->
+                <!-- FSD example: missing lang -->
                 <IDNo>2305</IDNo>
               </titlStmt>
               <rspStmt>
@@ -79,22 +79,22 @@
             </citation>
             <stdyInfo>
               <subject>
-                <!-- Compliance Examples -->
+                <!-- Compliant examples -->
                 <keyword xml:lang="sv" ID="The Id" vocab="ELSST" vocabURI="http://sv.ac.sv">The Term</keyword>
                 <keyword xml:lang="fi" ID="wxFAKE" vocab="CESSDA" vocabURI="http://fi.ac.fi">et Nationellt val</keyword>
-                <!--FSD-->
+                <!-- FSD example -->
                 <keyword xml:lang="en" vocab="ELSST" ID="adolescents"/>
-                <!-- From UKDS: Exatracting with default language-->
+                <!-- UKDS example: Extracting with default language -->
                 <keyword>1976</keyword>
                 <keyword vocabURI="http://lod.data-archive.ac.uk/skoshasset/9e7cc815-90cb-4f96-b8ff-a0a44ab25ea9">BUDGETS</keyword>
-                <!-- Compliance Examples -->
+                <!-- Compliant examples -->
                 <topcClas xml:lang="en" vocab="ZA Category System" ID="This it the ID" vocabURI="https://oai.ukdataservice.ac.uk/Categories.htm">This is the Term</topcClas>
                 <topcClas xml:lang="de" vocab="CESSDA Topic Classification" ID="Housing" vocabURI="https://dbk.gesis.org/madeup.htm">Wohnraum</topcClas>
                 <topcClas xml:lang="de" vocab="CESSDA Topic Classification2" ID="Housing2" vocabURI="https://dbk.gesis.org/madeup2.htm">Wohnraum 2</topcClas>="psychology"/>
-                <!-- invalid examples but should extract what is there -->
-                <!-- From FSD -->
+                <!-- Non-compliant examples (but should extract what is there) -->
+                <!-- FSD NC example -->
                 <topcClas xml:lang="fi" vocab="CESSDA" ID="nuoret"/>
-                <!-- From UKDS: Exatracting with default language-->
+                <!-- UKDS NC example: Extracting with default language -->
                 <topcClas>Housing</topcClas>
               </subject>
               <abstract xml:lang="en">The data are part of the Jyväskylä Longitudinal Study of Personality and Social Development (JYLS), in which the same individuals have been followed over 30 years. At this research stage, the data were collected using peer nominations and teacher ratings (FSD2073), a parent interview (FSD2074), and a theme interview. This dataset contains the transcribed responses to the questions presented in the theme interview. No predetermined response categories were used. The recorded interviews were classified only afterwards, when it was possible to observe the whole range of responses. The interview topics covered family and parents, school and education, housing, identity, use of alcohol and smoking, free time activities, and hobbies.</abstract>
@@ -108,16 +108,16 @@
                 <nation xml:lang="fr" abbr="FR">la France</nation>
                 <nation xml:lang="fi" abbr="FR">Ranska</nation>
                 <nation xml:lang="se" abbr="FR">Frankrike</nation>
-                <!--Expected-->
+                <!-- Compliant examples -->
                 <anlyUnit>This is the term<concept xml:lang="de" vocab="DDI Analysis Unit">This is the id</concept></anlyUnit>
                 <anlyUnit>Made Up<concept xml:lang="en" vocab="DDI Made Up" vocabURI="https://dbk.gesis.org/madeup.htm">MadeUpUnit</concept></anlyUnit>
                 <anlyUnit>Made Up 2<concept xml:lang="en" vocab="DDI Made Up 2" vocabURI="https://dbk.gesis.org/madeup2.htm">MadeUpUnit 2</concept></anlyUnit>
-                <!-- UkDA-->
+                <!-- UKDS example -->
                 <anlyUnit>Institutions/organisations</anlyUnit>
                 <universe xml:lang="en" clusion="I">Persons who were second grade students in a school in Jyväskylä at the time of the first data collection in 1968 and who continued to participate in the longitudinal study and had belonged to extreme groups of social behaviour at ages 8 and 14. The sample was collected both from the town centre and suburbs.</universe>
                 <universe xml:lang="fi" clusion="I">Otantahetkellä vuonna 1968 kansakoulun toisluokkalaiset keskisuomalaisen kaupungin oppilaat, jotka ovat edelleen mukana pitkittäistutkimuksessa ja kuuluivat 8- ja 14 -vuotiaana sosiaalisen käyttäytymisen ääriryhmiin.</universe>
-                <!-- Valid Iso Date-->
-                <collDate date="2018-10-21T00:00:00Z" event="end">End of October(has a @Date = not be extracted)</collDate>
+                <!-- Valid ISO Date-->
+                <collDate date="2018-10-21T00:00:00Z" event="end">End of October(has an @Date = not be extracted)</collDate>
                 <collDate date="2018-09-20" event="start" />
                 <!-- Valid Data Collection FreeText description. Extract only when there is no @date -->
                 <collDate event="start">Spring 2018</collDate>
@@ -126,29 +126,29 @@
             </stdyInfo>
             <method>
               <dataColl>
-                <!-- 100% Compliance-->
+                <!-- 100% Compliance -->
                 <timeMeth>This is the term<concept xml:lang="de" vocab="DDI Time Method 1" vocabURI="http://lod.data-archive.ac.uk" ID="fake" >This is the Id</concept></timeMeth>
               <!-- Suggested by PUG: Element value/term in "timeMethod" wins over "concept" -->
                 <timeMeth>Längsschnitt: Panel 2<concept xml:lang="de" vocab="DDI Time Method 2">Longitudinal.Panel 2</concept></timeMeth>
-                <!--UKDS-->
+                <!-- UKDS example -->
                 <timeMeth>Repeated cross-sectional study</timeMeth>
                 <dataCollector>National Centre for Social Research</dataCollector>
-                <!-- Compliant example-->
+                <!-- Compliant examples -->
                 <sampProc>This is the term<concept xml:lang="en" ID="madeUp" vocab="DDI Sampling Procedure" vocabURI="urn:ddi-cv:SamplingProcedure:1.1">This is the id</concept></sampProc>
                 <sampProc>This is the term 2<concept xml:lang="en" vocab="DDI Sampling Procedure" vocabURI="urn:ddi-cv:SamplingProcedure:1.1">Probability.Stratified 2</concept></sampProc>
                 <sampProc><concept xml:lang="fi" vocab="fi DDI Sampling Procedure" vocabURI="fi:urn:ddi-cv:SamplingProcedure:1.1">et Probability.Stratified</concept></sampProc>
-                <!-- FSD example: if concept element is missing, this must not be extracted TypeOfSamplingProcedure-->
+                <!-- FSD example: if concept element is missing, this must not be extracted TypeOfSamplingProcedure -->
                 <sampProc>Should ignore elements without a concept by TypeOfSamplingProcedures</sampProc>
-                <!-- Examples from PUG for valid element for SamplingProcedure extraction-->
+                <!-- PUG examples: valid element for SamplingProcedure extraction -->
                 <sampProc xml:lang="sv">Sannolikhetsurval: stratifierat urval</sampProc>
                 <sampProc xml:lang="fr">Quelque chose</sampProc>
                 <sampProc xml:lang="sv">Undersökningen bygger på program sända i SVT1, SVT2, SVT24, Barnkanalen, Kunskapskanalen, TV4, Sjuan, TV3, Kanal 5, TV6 och TV8 under 12 veckor 2015. Urvalet av veckor skedde obundet och slumpmässigt och stratifierades efter säsong.</sampProc>
                 <deviat>6,708 cases</deviat>
-                <!--Compliant-->
+                <!--Compliant -->
                 <collMode>This is the Term<concept xml:lang="en" vocab="DDI Mode Of Collection" vocabURI="urn:ddi-cv:ModeOfCollection:3.0">This is the Id</concept></collMode>
                 <collMode>This is the Term 2<concept xml:lang="en" vocab="DDI Mode Of Collection" vocabURI="urn:ddi-cv:ModeOfCollection:3.0">Interview.Survey-concept</concept></collMode>
                 <collMode>Enquête téléphonique<concept xml:lang="fr" vocab="DDI Mode Of Collection" vocabURI="urn:ddi-cv:ModeOfCollection:3.0">Enquête téléphonique -concept</concept></collMode>
-                <!-- non fully complaince FSD-->
+                <!-- FSD NC example -->
                 <collMode>Face-to-face interview</collMode>
                 <sources />
                 <weight>Weighting used. See documentation for details.</weight>
@@ -173,10 +173,10 @@
             </othrStdyMat>
           </stdyDscr>
           <fileDscr>
-            <!-- This following two are complaint-->
+            <!-- Compliant examples -->
             <fileTxt xml:lang="aa"><fileName>daF2252.por</fileName></fileTxt>
             <fileTxt><fileName xml:lang="bb">daF2252.por</fileName></fileTxt>
-            <!-- Made up-->
+            <!-- Made up -->
             <fileTxt><fileName xml:lang="bb"></fileName></fileTxt>
             <fileTxt xml:lang="ee"/>
           </fileDscr>
