@@ -27,8 +27,7 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.RECORD_
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.STUDY;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhHelpers.appendListRecordResumptionToken;
-import static eu.cessda.pasc.osmhhandler.oaipmh.models.response.RecordHeader.RecordHeaderBuilder;
-import static eu.cessda.pasc.osmhhandler.oaipmh.models.response.RecordHeader.builder;
+import static eu.cessda.pasc.osmhhandler.oaipmh.models.response.RecordHeader.*;
 
 /**
  * Service implementation to handle Listing Record Headers
