@@ -1,13 +1,12 @@
 package eu.cessda.pasc.oci.service.helpers;
 
+import eu.cessda.pasc.oci.AbstractSpringTestProfileContext;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
@@ -21,9 +20,7 @@ import static org.assertj.core.api.Java6BDDAssertions.then;
  * @author moses@doraventures.com
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest
-@ActiveProfiles("test")
-public class LanguageDocumentExtractorTest {
+public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileContext {
 
   @Autowired
   LanguageDocumentExtractor languageDocumentExtractor;
@@ -43,11 +40,11 @@ public class LanguageDocumentExtractorTest {
     then(languageDocMap).containsOnlyKeys("en", "fi", "sv", "de");
     then(languageDocMap.get("en")).hasSize(1);
     then(languageDocMap.get("fi")).hasSize(1);
-    then(languageDocMap.get("sv")).hasSize(1);
+    then(languageDocMap.get("sv")).hasSize(0); //Synthetic doc does not have a studyTitle or abstract, so sv is skipped
     then(languageDocMap.get("de")).hasSize(1);
 
     List<CMMStudyOfLanguage> enStudy = languageDocMap.get("en");
-    Optional<String> s = CMMStudyOfLanguageConverter.toJsonString(enStudy.get(0));
-    s.ifPresent(System.out::println);
+    Optional<String> enCMMStudyJsonStringOpt = CMMStudyOfLanguageConverter.toJsonString(enStudy.get(0));
+    enCMMStudyJsonStringOpt.ifPresent(System.out::println);
   }
 }

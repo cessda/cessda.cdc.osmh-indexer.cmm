@@ -1,6 +1,6 @@
 package eu.cessda.pasc.oci.service;
 
-import eu.cessda.pasc.oci.configurations.PascOciConfig;
+import eu.cessda.pasc.oci.configurations.PaSCOciConfigurationProperties;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
@@ -34,19 +34,19 @@ import java.util.stream.Collectors;
 public class ConsumerScheduler {
 
   private DebuggingJMXBean debuggingJMXBean;
-  private PascOciConfig pascOciConfig;
+  private PaSCOciConfigurationProperties paSCOciConfigurationProperties;
   private DefaultHarvesterConsumerService defaultConsumerService;
   private ESIndexerService esIndexerService;
   private LanguageDocumentExtractor extractor;
 
   @Autowired
   public ConsumerScheduler(DebuggingJMXBean debuggingJMXBean,
-                           PascOciConfig pascOciConfig,
+                           PaSCOciConfigurationProperties paSCOciConfigurationProperties,
                            DefaultHarvesterConsumerService consumerService,
                            ESIndexerService esIndexerService,
                            LanguageDocumentExtractor extractor) {
     this.debuggingJMXBean = debuggingJMXBean;
-    this.pascOciConfig = pascOciConfig;
+    this.paSCOciConfigurationProperties = paSCOciConfigurationProperties;
     this.defaultConsumerService = consumerService;
     this.esIndexerService = esIndexerService;
     this.extractor = extractor;
@@ -66,7 +66,7 @@ public class ConsumerScheduler {
   }
 
   private void execute() {
-    List<Repo> repos = pascOciConfig.getEndpoints().getRepos();
+    List<Repo> repos = paSCOciConfigurationProperties.getEndpoints().getRepos();
     repos.forEach(repo -> {
       Map<String, List<CMMStudyOfLanguage>> langStudies = getCmmStudiesOfEachLangIsoCodeMap(repo);
       langStudies.forEach((langIsoCode, cmmStudies) -> {
@@ -94,7 +94,7 @@ public class ConsumerScheduler {
     }*/
 
     //or
-    /*int limitSize = 1000;
+/*    int limitSize = 500;
     log.info("TEST - Limiting to [" + limitSize + "] record headers");
     recordHeaders = recordHeaders.stream().limit(limitSize).collect(Collectors.toList());*/
     // or end

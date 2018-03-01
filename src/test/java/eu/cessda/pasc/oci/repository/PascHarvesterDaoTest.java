@@ -1,5 +1,6 @@
 package eu.cessda.pasc.oci.repository;
 
+import eu.cessda.pasc.oci.AbstractSpringTestProfileContext;
 import eu.cessda.pasc.oci.FileHandler;
 import eu.cessda.pasc.oci.data.ReposTestData;
 import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
@@ -7,7 +8,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -28,8 +28,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
  * @author moses@doraventures.com
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest
-public class PascHarvesterDaoTest {
+public class PascHarvesterDaoTest extends AbstractSpringTestProfileContext {
 
   @Autowired
   private RestTemplate restTemplate;

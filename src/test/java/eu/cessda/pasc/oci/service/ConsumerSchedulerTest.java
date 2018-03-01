@@ -2,7 +2,8 @@ package eu.cessda.pasc.oci.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
-import eu.cessda.pasc.oci.configurations.PascOciConfig;
+import eu.cessda.pasc.oci.AbstractSpringTestProfileContext;
+import eu.cessda.pasc.oci.configurations.PaSCOciConfigurationProperties;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.configurations.Repo;
@@ -12,8 +13,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
@@ -33,15 +32,12 @@ import static org.mockito.Mockito.*;
  * @author moses@doraventures.com
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest()
-//@SpringBootTest(classes = TestApplication.class)
-@ActiveProfiles("test")
-public class ConsumerSchedulerTest {
+public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
   // Class under test
   private ConsumerScheduler scheduler;
   private DebuggingJMXBean debuggingJMXBean;
   private DefaultHarvesterConsumerService defaultConsumerService;
-  private PascOciConfig pascOciConfig;
+  private PaSCOciConfigurationProperties paSCOciConfigurationProperties;
   private ESIndexerService esIndexer;
   @Autowired
   private LanguageDocumentExtractor extractor;
@@ -60,8 +56,8 @@ public class ConsumerSchedulerTest {
     when(debuggingJMXBean.printElasticSearchInfo()).thenReturn("printed ES Info");
 
     // mock for configuration of our repos
-    pascOciConfig = mock(PascOciConfig.class);
-    when(pascOciConfig.getEndpoints()).thenReturn(getEndpoints());
+    paSCOciConfigurationProperties = mock(PaSCOciConfigurationProperties.class);
+    when(paSCOciConfigurationProperties.getEndpoints()).thenReturn(getEndpoints());
 
     // mock for our record headers
     defaultConsumerService = mock(DefaultHarvesterConsumerService.class);
@@ -82,7 +78,7 @@ public class ConsumerSchedulerTest {
   @Test
   public void shouldIndexAllMetadataInit() {
     // Given
-    scheduler = new ConsumerScheduler(debuggingJMXBean, pascOciConfig, defaultConsumerService, esIndexer, extractor);
+    scheduler = new ConsumerScheduler(debuggingJMXBean, paSCOciConfigurationProperties, defaultConsumerService, esIndexer, extractor);
 
     // When
     scheduler.harvestAndIngestRecordsForAllConfiguredSPsRepos();
@@ -91,8 +87,8 @@ public class ConsumerSchedulerTest {
     verify(debuggingJMXBean, times(1)).printCurrentlyConfiguredRepoEndpoints();
     verifyNoMoreInteractions(debuggingJMXBean);
 
-    verify(pascOciConfig, times(1)).getEndpoints();
-    verifyNoMoreInteractions(pascOciConfig);
+    verify(paSCOciConfigurationProperties, times(1)).getEndpoints();
+    verifyNoMoreInteractions(paSCOciConfigurationProperties);
 
     verify(defaultConsumerService, times(1)).listRecorderHeadersBody(any(Repo.class));
     verify(defaultConsumerService, times(2)).getRecord(any(Repo.class), anyString());

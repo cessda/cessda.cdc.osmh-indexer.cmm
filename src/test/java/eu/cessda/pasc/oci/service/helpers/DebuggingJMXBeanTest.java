@@ -1,6 +1,6 @@
 package eu.cessda.pasc.oci.service.helpers;
 
-import eu.cessda.pasc.oci.configurations.PascOciConfig;
+import eu.cessda.pasc.oci.configurations.PaSCOciConfigurationProperties;
 import org.assertj.core.api.Java6BDDAssertions;
 import org.junit.After;
 import org.junit.Before;
@@ -25,13 +25,13 @@ public class DebuggingJMXBeanTest extends EmbeddedElasticsearchServer {
   // Class under test
   private DebuggingJMXBean debuggingJMXBean;
   @Autowired
-  private PascOciConfig pascOciConfig;
+  private PaSCOciConfigurationProperties paSCOciConfigurationProperties;
 
   @Before
   public void init() {
     startup(ELASTICSEARCH_HOME);
     ElasticsearchTemplate elasticsearchTemplate = new ElasticsearchTemplate(getClient());
-    debuggingJMXBean = new DebuggingJMXBean(elasticsearchTemplate, pascOciConfig);
+    debuggingJMXBean = new DebuggingJMXBean(elasticsearchTemplate, paSCOciConfigurationProperties);
   }
 
   @After

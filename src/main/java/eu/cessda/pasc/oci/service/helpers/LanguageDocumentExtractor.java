@@ -1,6 +1,6 @@
 package eu.cessda.pasc.oci.service.helpers;
 
-import eu.cessda.pasc.oci.configurations.PascOciConfig;
+import eu.cessda.pasc.oci.configurations.PaSCOciConfigurationProperties;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,7 @@ import static java.util.Optional.ofNullable;
 public class LanguageDocumentExtractor {
 
   @Autowired
-  private PascOciConfig pascOciConfig;
+  private PaSCOciConfigurationProperties paSCOciConfigurationProperties;
 
   /**
    * Extracts a custom document for each language IsoCode found in the config.
@@ -43,7 +43,7 @@ public class LanguageDocumentExtractor {
 
     // TODO REFACTOR this for a single pass or - make handler return records with langCode as top node
     // with record embedded to each langCode, so that one can easily grab all records more efficiently for a langCode
-    pascOciConfig.getLanguages().forEach(langCode -> {
+    paSCOciConfigurationProperties.getLanguages().forEach(langCode -> {
           Instant start = Instant.now();
           log.info("Extract CMMStudyOfLanguage for [{}] language code - STARTED", langCode);
           List<CMMStudyOfLanguage> collectLanguageCmmStudy = getCmmStudiesOfLangCode(cmmStudies, idPrefix, langCode);

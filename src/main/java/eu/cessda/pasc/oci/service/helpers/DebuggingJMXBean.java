@@ -1,6 +1,6 @@
 package eu.cessda.pasc.oci.service.helpers;
 
-import eu.cessda.pasc.oci.configurations.PascOciConfig;
+import eu.cessda.pasc.oci.configurations.PaSCOciConfigurationProperties;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
@@ -9,7 +9,6 @@ import org.elasticsearch.cluster.health.ClusterIndexHealth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.jmx.export.annotation.ManagedOperation;
-import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -20,18 +19,17 @@ import java.util.stream.Collectors;
  *
  * @author moses@doraventures.com
  */
-@ManagedResource
 @Component
 @Slf4j
 public class DebuggingJMXBean {
 
   private ElasticsearchTemplate elasticsearchTemplate;
-  private PascOciConfig pascOciConfig;
+  private PaSCOciConfigurationProperties paSCOciConfigurationProperties;
 
   @Autowired
-  public DebuggingJMXBean(ElasticsearchTemplate elasticsearchTemplate, PascOciConfig pascOciConfig) {
+  public DebuggingJMXBean(ElasticsearchTemplate elasticsearchTemplate, PaSCOciConfigurationProperties paSCOciConfigurationProperties) {
     this.elasticsearchTemplate = elasticsearchTemplate;
-    this.pascOciConfig = pascOciConfig;
+    this.paSCOciConfigurationProperties = paSCOciConfigurationProperties;
   }
 
   @ManagedOperation(description = "Prints to log the Elasticsearch server state.")
@@ -65,7 +63,7 @@ public class DebuggingJMXBean {
   public String printCurrentlyConfiguredRepoEndpoints() {
 
     StringBuilder reposStrBuilder = new StringBuilder();
-    for (Repo repo : pascOciConfig.getEndpoints().getRepos()) {
+    for (Repo repo : paSCOciConfigurationProperties.getEndpoints().getRepos()) {
       reposStrBuilder.append(
           String.format("\t Repo [%s] url [%s] handler[%s] %n", repo.getName(), repo.getUrl(), repo.getHandler()));
     }

@@ -1,17 +1,17 @@
 package eu.cessda.pasc.oci.service;
 
+import eu.cessda.pasc.oci.AbstractSpringTestProfileContext;
 import eu.cessda.pasc.oci.FileHandler;
-import eu.cessda.pasc.oci.repository.HarvesterDao;
 import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.configurations.Repo;
+import eu.cessda.pasc.oci.repository.HarvesterDao;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
@@ -28,8 +28,7 @@ import static org.mockito.Mockito.when;
  * @author moses@doraventures.com
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest
-public class DefaultHarvesterConsumerServiceTest {
+public class SpringTestProfileHarvesterConsumerServiceTest extends AbstractSpringTestProfileContext {
 
   @Mock
   private HarvesterDao harvesterDao;

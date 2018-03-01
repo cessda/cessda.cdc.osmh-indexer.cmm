@@ -39,7 +39,7 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 @SpringBootTest
 @ActiveProfiles("test")
 @Slf4j
-public class ESIndexerServiceTest extends EmbeddedElasticsearchServer {
+public class ESIndexerServiceTest extends EmbeddedElasticsearchServer{
 
   private static final String INDEX_NAME = "cmmstudy_en";
   private static final String INDEX_TYPE = "cmmstudy";

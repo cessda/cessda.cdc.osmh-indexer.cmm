@@ -1,6 +1,6 @@
 package eu.cessda.pasc.oci.repository;
 
-import eu.cessda.pasc.oci.configurations.PascOciConfig;
+import eu.cessda.pasc.oci.configurations.PaSCOciConfigurationProperties;
 import eu.cessda.pasc.oci.helpers.FakeHarvester;
 import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
 import eu.cessda.pasc.oci.models.configurations.Repo;
@@ -24,7 +24,7 @@ public class PascHarvesterDao extends DaoBase implements HarvesterDao {
   private FakeHarvester fakeHarvester;
 
   @Autowired
-  private PascOciConfig pascOciConfig;
+  private PaSCOciConfigurationProperties paSCOciConfigurationProperties;
 
   @Override
   public String listRecordHeaders(String spRepository) throws ExternalSystemException {
@@ -45,7 +45,7 @@ public class PascHarvesterDao extends DaoBase implements HarvesterDao {
       return String.format(LIST_RECORD_TEMPLATE,
           //pascOciConfig.getHarvesterUrl(),  Fixme: reeanable and remove the fake following urls
           tempDirectHandlerUrlInPlaceForHarvester.get().getHandler(),
-          pascOciConfig.getHarvester().getVersion(),
+          paSCOciConfigurationProperties.getHarvester().getVersion(),
           repositoryUrl);
     }
     return "";
@@ -57,7 +57,7 @@ public class PascHarvesterDao extends DaoBase implements HarvesterDao {
       return String.format(GET_RECORD_TEMPLATE,
           //pascOciConfig.getHarvesterUrl(),  Fixme: reeanable and remove the fake following urls
           tempDirectHandlerUrlInPlaceForHarvester.get().getHandler(),
-          pascOciConfig.getHarvester().getVersion(),
+          paSCOciConfigurationProperties.getHarvester().getVersion(),
           studyNumber,
           repositoryUrl);
     }
