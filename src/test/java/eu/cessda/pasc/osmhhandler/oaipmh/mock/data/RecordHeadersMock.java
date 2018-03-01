@@ -178,4 +178,13 @@ public class RecordHeadersMock {
             "    </ListIdentifiers>\n" +
             "</OAI-PMH>";
   }
+
+  public static String getListIdentifiersXMLWithInvalidMetadataTokenError(){
+    return
+        "<OAI-PMH xmlns=\"http://www.openarchives.org/OAI/2.0/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd\">\n" +
+            "  <responseDate>2018-03-01T14:29:31Z</responseDate>\n" +
+            "  <request>http://services.fsd.uta.fi/v0/oai</request>\n" +
+            "  <error code=\"cannotDisseminateFormat\">Metadata format not supported by this repository</error>\n" +
+            "</OAI-PMH>";
+  }
 }

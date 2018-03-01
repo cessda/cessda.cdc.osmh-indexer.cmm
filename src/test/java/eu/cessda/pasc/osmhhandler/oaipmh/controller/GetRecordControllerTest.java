@@ -1,7 +1,7 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.cessda.pasc.osmhhandler.oaipmh.configuration.PaSCHandlerOaiPmhConfig;
+import eu.cessda.pasc.osmhhandler.oaipmh.configuration.HandlerConfigurationProperties;
 import eu.cessda.pasc.osmhhandler.oaipmh.service.APISupportedServiceImpl;
 import eu.cessda.pasc.osmhhandler.oaipmh.service.GetRecordService;
 import org.hamcrest.core.IsNull;
@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @RunWith(SpringRunner.class)
 @WebMvcTest(GetRecordController.class)
-@Import({APISupportedServiceImpl.class, PaSCHandlerOaiPmhConfig.class})
+@Import({APISupportedServiceImpl.class, HandlerConfigurationProperties.class})
 @ActiveProfiles("test")
 public class GetRecordControllerTest {
 

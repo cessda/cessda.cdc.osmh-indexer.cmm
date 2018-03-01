@@ -72,6 +72,8 @@ public class OaiPmhConstants {
   static final String AGENCY_ATTR = "agency";
   static final String CONCEPT_EL = "concept";
   public static final String COMPLETE_LIST_SIZE_ATTR = "completeListSize";
+  public static final String OAI_PMH = "OAI-PMH";
+  public static final String ERROR = "error";
 
   // Encoding
   public static final String UTF_8 = "UTF-8";

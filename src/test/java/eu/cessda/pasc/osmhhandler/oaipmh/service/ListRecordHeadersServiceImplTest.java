@@ -2,6 +2,7 @@ package eu.cessda.pasc.osmhhandler.oaipmh.service;
 
 import eu.cessda.pasc.osmhhandler.oaipmh.dao.ListRecordHeadersDao;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
+import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
 import eu.cessda.pasc.osmhhandler.oaipmh.mock.data.RecordHeadersMock;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.response.RecordHeader;
 import org.junit.Test;
@@ -83,5 +84,17 @@ public class ListRecordHeadersServiceImplTest {
     then(recordHeaders).extracting("lastModified")
         .containsOnly("2017-11-20T10:37:18Z", "2018-01-11T07:43:20Z", "2018-01-11T07:43:39Z");
     then(recordHeaders).extracting("type").containsOnly("Study");
+  }
+
+  @Test(expected = ExternalSystemException.class)
+  public void shouldThrowExceptionForRecordHeadersInvalidMetadataToken() throws CustomHandlerException {
+
+    // Given
+    String repoUrl = "www.my-fake-url.com/WithInvalidToken";
+    String mockRecordHeadersXml = RecordHeadersMock.getListIdentifiersXMLWithInvalidMetadataTokenError();
+    given(listRecordHeadersDao.listRecordHeaders(repoUrl)).willReturn(mockRecordHeadersXml);
+
+    // When
+    listRecordHeadersService.getRecordHeaders(repoUrl);
   }
 }

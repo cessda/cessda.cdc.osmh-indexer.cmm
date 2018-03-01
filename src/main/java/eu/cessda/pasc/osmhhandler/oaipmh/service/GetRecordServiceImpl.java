@@ -1,6 +1,6 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.service;
 
-import eu.cessda.pasc.osmhhandler.oaipmh.configuration.PaSCHandlerOaiPmhConfig;
+import eu.cessda.pasc.osmhhandler.oaipmh.configuration.HandlerConfigurationProperties;
 import eu.cessda.pasc.osmhhandler.oaipmh.dao.GetRecordDoa;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.*;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.RecordResponseValidator.validateResponse;
 
 /**
  * Service Class responsible for querying the repository to fetch remote records.
@@ -36,7 +37,7 @@ public class GetRecordServiceImpl implements GetRecordService {
   GetRecordDoa getRecordDoa;
 
   @Autowired
-  PaSCHandlerOaiPmhConfig handlerConfig;
+  HandlerConfigurationProperties handlerConfig;
 
   private static final XPathFactory X_FACTORY = XPathFactory.instance();
 
@@ -67,7 +68,7 @@ public class GetRecordServiceImpl implements GetRecordService {
     }
 
     // We exit if the record has an <error> element
-    ErrorStatus errorStatus = validateRecord(document, X_FACTORY);
+    ErrorStatus errorStatus = validateResponse(document, X_FACTORY);
     if (errorStatus.isHasError()) {
       log.debug("Returned Record has error message [{}] ", errorStatus.getMessage());
       throw new ExternalSystemException(errorStatus.getMessage());

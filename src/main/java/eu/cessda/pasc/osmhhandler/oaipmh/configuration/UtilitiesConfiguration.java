@@ -34,7 +34,7 @@ import static org.apache.http.ssl.SSLContexts.custom;
 public class UtilitiesConfiguration {
 
   @Autowired
-  PaSCHandlerOaiPmhConfig paSCHandlerOaiPmhConfig;
+  HandlerConfigurationProperties handlerConfigurationProperties;
 
   @Bean
   public ObjectMapper objectMapper() {
@@ -60,9 +60,9 @@ public class UtilitiesConfiguration {
 
   private ClientHttpRequestFactory getClientHttpRequestFactory() {
     HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
-    clientHttpRequestFactory.setConnectTimeout(paSCHandlerOaiPmhConfig.getRestTemplateProps().getConnTimeout());
-    clientHttpRequestFactory.setReadTimeout(paSCHandlerOaiPmhConfig.getRestTemplateProps().getReadTimeout());
-    clientHttpRequestFactory.setConnectionRequestTimeout(paSCHandlerOaiPmhConfig.getRestTemplateProps()
+    clientHttpRequestFactory.setConnectTimeout(handlerConfigurationProperties.getRestTemplateProps().getConnTimeout());
+    clientHttpRequestFactory.setReadTimeout(handlerConfigurationProperties.getRestTemplateProps().getReadTimeout());
+    clientHttpRequestFactory.setConnectionRequestTimeout(handlerConfigurationProperties.getRestTemplateProps()
         .getConnRequestTimeout());
     return clientHttpRequestFactory;
   }
@@ -80,15 +80,15 @@ public class UtilitiesConfiguration {
     CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(csf).build();
 
     HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-    requestFactory.setConnectTimeout(paSCHandlerOaiPmhConfig.getRestTemplateProps().getConnTimeout());
-    requestFactory.setReadTimeout(paSCHandlerOaiPmhConfig.getRestTemplateProps().getReadTimeout());
-    requestFactory.setConnectionRequestTimeout(paSCHandlerOaiPmhConfig.getRestTemplateProps().getConnRequestTimeout());
+    requestFactory.setConnectTimeout(handlerConfigurationProperties.getRestTemplateProps().getConnTimeout());
+    requestFactory.setReadTimeout(handlerConfigurationProperties.getRestTemplateProps().getReadTimeout());
+    requestFactory.setConnectionRequestTimeout(handlerConfigurationProperties.getRestTemplateProps().getConnRequestTimeout());
     requestFactory.setHttpClient(httpClient);
     return requestFactory;
   }
 
   public RestTemplate getRestTemplate() {
-    if (paSCHandlerOaiPmhConfig.getRestTemplateProps().isVerifySSL()) {
+    if (handlerConfigurationProperties.getRestTemplateProps().isVerifySSL()) {
       return restTemplate();
     }
 

@@ -18,15 +18,15 @@ import static org.assertj.core.api.BDDAssertions.then;
 @RunWith(SpringRunner.class)
 @SpringBootTest()
 @ActiveProfiles("test")
-public class PaSCHandlerOaiPmhConfigTest {
+public class HandlerConfigurationPropertiesTest {
 
   @Autowired
-  PaSCHandlerOaiPmhConfig paSCHandlerOaiPmhConfig;
+  HandlerConfigurationProperties handlerConfigurationProperties;
 
   @Test
   public void shouldReturnConfigurationsForOSMHHandler() {
 
-    OaiPmh oaiPmh = paSCHandlerOaiPmhConfig.getOaiPmh();
+    OaiPmh oaiPmh = handlerConfigurationProperties.getOaiPmh();
 
     then(oaiPmh).isNotNull();
 

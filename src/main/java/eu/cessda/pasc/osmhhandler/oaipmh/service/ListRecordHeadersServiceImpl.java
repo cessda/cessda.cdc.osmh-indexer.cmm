@@ -2,7 +2,10 @@ package eu.cessda.pasc.osmhhandler.oaipmh.service;
 
 import eu.cessda.pasc.osmhhandler.oaipmh.dao.ListRecordHeadersDao;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
+import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.InternalSystemException;
+import eu.cessda.pasc.osmhhandler.oaipmh.helpers.ListIdentifiersResponseValidator;
+import eu.cessda.pasc.osmhhandler.oaipmh.models.errors.ErrorStatus;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.response.RecordHeader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +27,8 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.RECORD_
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.STUDY;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhHelpers.appendListRecordResumptionToken;
-import static eu.cessda.pasc.osmhhandler.oaipmh.models.response.RecordHeader.*;
+import static eu.cessda.pasc.osmhhandler.oaipmh.models.response.RecordHeader.RecordHeaderBuilder;
+import static eu.cessda.pasc.osmhhandler.oaipmh.models.response.RecordHeader.builder;
 
 /**
  * Service implementation to handle Listing Record Headers
@@ -46,6 +50,13 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
 
     String recordHeadersXMLString = listRecordHeadersDao.listRecordHeaders(baseRepoUrl);
     Document doc = getDocument(recordHeadersXMLString);
+
+    // We exit if the response has an <error> element
+    ErrorStatus errorStatus = ListIdentifiersResponseValidator.validateResponse(doc);
+    if (errorStatus.isHasError()) {
+      log.debug("Returned response has error message [{}] ", errorStatus.getMessage());
+      throw new ExternalSystemException(errorStatus.getMessage());
+    }
 
     log.info("ParseRecordHeaders Start:  For {}.", baseRepoUrl);
     List<RecordHeader> recordHeaders = retrieveRecordHeaders(new ArrayList<>(), doc, baseRepoUrl);

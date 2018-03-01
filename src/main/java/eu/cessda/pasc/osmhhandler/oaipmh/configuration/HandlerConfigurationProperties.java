@@ -16,9 +16,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableConfigurationProperties
 @ConfigurationProperties(prefix = "osmhhandler")
-@Qualifier("PaSCHandlerOaiPmhConfig")
+@Qualifier("HandlerConfigurationProperties")
 @Getter
-public class PaSCHandlerOaiPmhConfig {
+public class HandlerConfigurationProperties {
 
   private OaiPmh oaiPmh = new OaiPmh();
   private RestTemplateProps restTemplateProps = new RestTemplateProps();

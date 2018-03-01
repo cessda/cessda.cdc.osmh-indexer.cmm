@@ -1,6 +1,6 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 
-import eu.cessda.pasc.osmhhandler.oaipmh.configuration.PaSCHandlerOaiPmhConfig;
+import eu.cessda.pasc.osmhhandler.oaipmh.configuration.HandlerConfigurationProperties;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ public class OaiPmhHelpersTest {
 
 
   @Autowired
-  private PaSCHandlerOaiPmhConfig paSCHandlerOaiPmhConfig;
+  private HandlerConfigurationProperties handlerConfigurationProperties;
 
   @Test
   public void ShouldAppendMetaDataPrefixForGivenFSD() {
@@ -34,7 +34,7 @@ public class OaiPmhHelpersTest {
     String expectedReqUrl = "http://services.fsd.uta.fi/v0/oai?verb=GetRecord&identifier=15454&metadataPrefix=ddi_c";
 
     // When
-    String builtUrl = appendGetRecordParams(fsdEndpoint, "15454", paSCHandlerOaiPmhConfig.getOaiPmh());
+    String builtUrl = appendGetRecordParams(fsdEndpoint, "15454", handlerConfigurationProperties.getOaiPmh());
 
     then(builtUrl).isEqualTo(expectedReqUrl);
   }
@@ -47,7 +47,7 @@ public class OaiPmhHelpersTest {
     String expectedReqUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=GetRecord&identifier=15454&metadataPrefix=ddi";
 
     // When
-    String builtUrl = appendGetRecordParams(fsdEndpoint, "15454", paSCHandlerOaiPmhConfig.getOaiPmh());
+    String builtUrl = appendGetRecordParams(fsdEndpoint, "15454", handlerConfigurationProperties.getOaiPmh());
 
     then(builtUrl).isEqualTo(expectedReqUrl);
   }
@@ -60,7 +60,7 @@ public class OaiPmhHelpersTest {
     String expectedReqUrl = "http://services.inthe.future/v0/oai?verb=GetRecord&identifier=15454&metadataPrefix=ddi";
 
     // When
-    String builtUrl = appendGetRecordParams(fsdEndpoint, "15454", paSCHandlerOaiPmhConfig.getOaiPmh());
+    String builtUrl = appendGetRecordParams(fsdEndpoint, "15454", handlerConfigurationProperties.getOaiPmh());
 
     then(builtUrl).isEqualTo(expectedReqUrl);
   }
