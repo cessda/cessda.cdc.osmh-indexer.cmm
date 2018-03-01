@@ -2,7 +2,6 @@ package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.configuration.OaiPmh;
-import eu.cessda.pasc.osmhhandler.oaipmh.models.errors.ErrorStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
@@ -65,24 +64,6 @@ public class CMMStudyMapper {
     boolean isActive = null == status || !"deleted".equalsIgnoreCase(status.getValue());
     builder.active(isActive);
     return isActive;
-  }
-
-  /**
-   * Checks if the record has an <error> element.
-   *
-   * @param document the document to map to.
-   * @param xFactory the Path Factory.
-   * @return ErrorStatus of the record.
-   */
-  public static ErrorStatus validateRecord(Document document, XPathFactory xFactory) {
-
-    ErrorStatus.ErrorStatusBuilder statusBuilder = ErrorStatus.builder();
-    getFirstElement(document, xFactory, ERROR_PATH)
-        .ifPresent((Element element) ->
-            statusBuilder.hasError(true).message(element.getAttributeValue(CODE_ATTR) + ": " + element.getText())
-        );
-
-    return statusBuilder.build();
   }
 
   /**

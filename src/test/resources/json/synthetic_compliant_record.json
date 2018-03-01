@@ -1,5 +1,4 @@
 {
-  "dataAccess": {},
   "pidStudies": {
     "en": [
       {
@@ -58,6 +57,7 @@
       }
     ]
   },
+  "dataCollectionPeriodStartdate": "2018-09-20",
   "typeOfTimeMethods": {
     "de": [
       {
@@ -90,6 +90,25 @@
     "en": [
       "En Pulkkinen, Lea (University of Jyväskylä. Department of Psychology)",
       "David Brook (University of Essex. Department of Psychology)"
+    ]
+  },
+  "fileLanguages": [
+    "aa",
+    "ee",
+    "bb"
+  ],
+  "samplingProcedureFreeTexts": {
+    "sv": [
+      "Sannolikhetsurval: stratifierat urval",
+      "Undersökningen bygger på program sända i SVT1, SVT2, SVT24, Barnkanalen, Kunskapskanalen, TV4, Sjuan, TV3, Kanal 5, TV6 och TV8 under 12 veckor 2015. Urvalet av veckor skedde obundet och slumpmässigt och stratifierades efter säsong."
+    ],
+    "en": [
+      "This is the term",
+      "This is the term 2",
+      "Should ignore elements without a concept by TypeOfSamplingProcedures"
+    ],
+    "fr": [
+      "Quelque chose"
     ]
   },
   "abstract": {
@@ -138,21 +157,28 @@
       }
     ]
   },
-  "samplingProcedureFreeTexts": {
-    "sv": [
-      "Sannolikhetsurval: stratifierat urval",
-      "Undersökningen bygger på program sända i SVT1, SVT2, SVT24, Barnkanalen, Kunskapskanalen, TV4, Sjuan, TV3, Kanal 5, TV6 och TV8 under 12 veckor 2015. Urvalet av veckor skedde obundet och slumpmässigt och stratifierades efter säsong."
-    ],
+  "isActive": true,
+  "dataCollectionFreeTexts": {
     "en": [
-      "This is the term",
-      "This is the term 2",
-      "Should ignore elements without a concept by TypeOfSamplingProcedures"
-    ],
-    "fr": [
-      "Quelque chose"
+      {
+        "dataCollectionFreeText": "Spring 2018",
+        "event": "start"
+      },
+      {
+        "dataCollectionFreeText": "Christmas 2018",
+        "event": "end"
+      }
     ]
   },
-  "isActive": true,
+  "dataAccessFreeTexts": {
+    "fi": [
+      "Restriction Text fi"
+    ],
+    "en": [
+      "1 Restriction Text en",
+      "2 Restriction Text en"
+    ]
+  },
   "classifications": {
     "de": [
       {
@@ -212,36 +238,6 @@
       }
     ]
   },
-  "typeOfModeOfCollections": {
-    "en": [
-      {
-        "vocabUri": "urn:ddi-cv:ModeOfCollection:3.0",
-        "vocab": "DDI Mode Of Collection",
-        "term": "This is the Term",
-        "id": "This is the Id"
-      },
-      {
-        "vocabUri": "urn:ddi-cv:ModeOfCollection:3.0",
-        "vocab": "DDI Mode Of Collection",
-        "term": "This is the Term 2",
-        "id": "Interview.Survey-concept"
-      },
-      {
-        "vocabUri": "",
-        "vocab": "",
-        "term": "Face-to-face interview",
-        "id": ""
-      }
-    ],
-    "fr": [
-      {
-        "vocabUri": "urn:ddi-cv:ModeOfCollection:3.0",
-        "vocab": "DDI Mode Of Collection",
-        "term": "Enquête téléphonique",
-        "id": "Enquête téléphonique -concept"
-      }
-    ]
-  },
   "titleStudy": {
     "fi": "Lapsesta aikuiseksi: 14-vuotiaiden haastattelu 1974: tekstiaineisto.",
     "en": "Jyväskylä Longitudinal Study of Personality and Social Development (JYLS): Interviews of 14-Year-Olds 1974: Text Data."
@@ -276,11 +272,7 @@
       }
     ]
   },
-  "fileLanguages": [
-    "aa",
-    "ee",
-    "bb"
-  ],
+  "dataCollectionPeriodEnddate": "2018-10-21T00:00:00Z",
   "publisher": {
     "se": {
       "publisher": "Samhällsdatablad",
@@ -297,29 +289,35 @@
   },
   "publicationYear": "1982-01-01T00:00:00Z",
   "lastModified": "2017-11-17T08:08:11Z",
-  "accessClass": "The dataset is (D) available only by permission from the data depositor\/creator.",
   "studyNumber": "2305",
-  "dataCollectionPeriodStartdate": "2018-09-20",
-  "dataCollectionPeriodEnddate": "2018-10-21T00:00:00Z",
-  "dataCollectionFreeTexts": {
+  "typeOfModeOfCollections": {
     "en": [
       {
-        "dataCollectionFreeText": "Spring 2018",
-        "event": "start"
+        "vocabUri": "urn:ddi-cv:ModeOfCollection:3.0",
+        "vocab": "DDI Mode Of Collection",
+        "term": "This is the Term",
+        "id": "This is the Id"
       },
       {
-        "dataCollectionFreeText": "Christmas 2018",
-        "event": "end"
+        "vocabUri": "urn:ddi-cv:ModeOfCollection:3.0",
+        "vocab": "DDI Mode Of Collection",
+        "term": "This is the Term 2",
+        "id": "Interview.Survey-concept"
+      },
+      {
+        "vocabUri": "",
+        "vocab": "",
+        "term": "Face-to-face interview",
+        "id": ""
       }
-    ]
-  },
-  "dataAccessFreeTexts": {
-    "fi": [
-      "Restriction Text fi"
     ],
-    "en": [
-      "1 Restriction Text en",
-      "2 Restriction Text en"
+    "fr": [
+      {
+        "vocabUri": "urn:ddi-cv:ModeOfCollection:3.0",
+        "vocab": "DDI Mode Of Collection",
+        "term": "Enquête téléphonique",
+        "id": "Enquête téléphonique -concept"
+      }
     ]
   }
 }
