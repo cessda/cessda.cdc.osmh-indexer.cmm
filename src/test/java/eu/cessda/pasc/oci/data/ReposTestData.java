@@ -39,7 +39,7 @@ public class ReposTestData {
   public static Repo getGesisDeRepo() {
     Repo repo = new Repo();
     repo.setName("GESIS De");
-    repo.setUrl("https://dbk.gesis.org/dbkoai_de");
+    repo.setUrl("https://dbk.gesis.org/dbkoai/");
     repo.setHandler("http://localhost:9091");
     return repo;
   }
