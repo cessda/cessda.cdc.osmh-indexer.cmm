@@ -95,7 +95,8 @@ spring:
   boot:
     admin:
       url: http://localhost:8087
-
+elasticsearch:
+  host: http://35.195.82.45
 ---
 spring:
   profiles: local
