@@ -63,7 +63,8 @@ osmhhandler:
         preferredMetadataParam: ddi_c
       - url: https://dbk.gesis.org/dbkoai
         preferredMetadataParam: oai_ddi25
-      - url: https://dbk.gesis.org/dbkoai_de
+      #** Note dirty extra "/" workaround for GESIS who separate records to different metadata prefix per language ***#
+      - url: https://dbk.gesis.org/dbkoai/
         preferredMetadataParam: oai_ddi25-de
     metadataParsingDefaultLang:
       active: true

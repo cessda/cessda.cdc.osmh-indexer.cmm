@@ -156,6 +156,12 @@ This project is licensed under the Apache 2 License - see the [LICENSE](LICENSE)
 ## Edge Case and Assumptions:
 
 - If publicationYear cannot be parsed to an Int we default to epoch year 1970
+- Note the dirty extra "/" workaround in the [application.yml](src/main/resources/application.yml) repository
+ configuration for GESIS (and GESIS DE) who separate records to different metadata prefix per language hosted
+ with the same repository url.  This url in a way act as a key, so the extra "/" distinguishes the two for the specific 
+ metadataPrefix to be retrieved.  There must be a better way to handle this edge case that is specific to GESIS.  
+ Not seen other SPs with this implementation that separate records in different languages by using a different 
+ metadataPrefix, so leaving this as is for now. This workaround affects this project and the pasc-oci
 
 ## TODO 
 
