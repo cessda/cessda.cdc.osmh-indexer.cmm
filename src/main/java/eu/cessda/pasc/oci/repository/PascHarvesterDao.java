@@ -4,10 +4,13 @@ import eu.cessda.pasc.oci.configurations.PaSCOciConfigurationProperties;
 import eu.cessda.pasc.oci.helpers.FakeHarvester;
 import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
 import eu.cessda.pasc.oci.models.configurations.Repo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+
+import static eu.cessda.pasc.oci.repository.StudyIdentifierEncoder.encodeStudyIdentifier;
 
 /**
  * A Pasc Harvester Service implementation
@@ -15,6 +18,7 @@ import java.util.Optional;
  * @author moses@doraventures.com
  */
 @Service
+@Slf4j
 public class PascHarvesterDao extends DaoBase implements HarvesterDao {
 
   private static final String LIST_RECORD_TEMPLATE = "%s/%s/ListRecordHeaders?Repository=%s";
@@ -40,27 +44,37 @@ public class PascHarvesterDao extends DaoBase implements HarvesterDao {
   }
 
   private String constructListRecordUrl(String repositoryUrl) {
-    Optional<Repo> tempDirectHandlerUrlInPlaceForHarvester = fakeHarvester.getUrlToCall(repositoryUrl);
-    if (tempDirectHandlerUrlInPlaceForHarvester.isPresent()) {
-      return String.format(LIST_RECORD_TEMPLATE,
-          //pascOciConfig.getHarvesterUrl(),  Fixme: reeanable and remove the fake following urls
-          tempDirectHandlerUrlInPlaceForHarvester.get().getHandler(),
+    //pascOciConfig.getHarvesterUrl(),  Fixme: reeanable and remove the fake following urls
+
+    String finalUrl = "replace_me";
+    Optional<Repo> repoOptional = fakeHarvester.getRepoConfigurationProperties(repositoryUrl);
+
+    if (repoOptional.isPresent()) {
+      finalUrl = String.format(LIST_RECORD_TEMPLATE,
+          repoOptional.get().getHandler(),
           paSCOciConfigurationProperties.getHarvester().getVersion(),
           repositoryUrl);
     }
-    return "";
+
+    log.info("[{}] Final ListHeaders Handler url [{}]", repositoryUrl, finalUrl);
+    return finalUrl;
   }
 
   private String constructGetRecordUrl(String repositoryUrl, String studyNumber) {
-    Optional<Repo> tempDirectHandlerUrlInPlaceForHarvester = fakeHarvester.getUrlToCall(repositoryUrl);
-    if (tempDirectHandlerUrlInPlaceForHarvester.isPresent()) {
-      return String.format(GET_RECORD_TEMPLATE,
-          //pascOciConfig.getHarvesterUrl(),  Fixme: reeanable and remove the fake following urls
-          tempDirectHandlerUrlInPlaceForHarvester.get().getHandler(),
+    //pascOciConfig.getHarvesterUrl(),  Fixme: reeanable and remove the fake following urls
+
+    String finalUrl = "replace_me";
+    Optional<Repo> repoOptional = fakeHarvester.getRepoConfigurationProperties(repositoryUrl);
+    String encodedStudyID = encodeStudyIdentifier().apply(studyNumber);
+
+    if (repoOptional.isPresent()) {
+      finalUrl = String.format(GET_RECORD_TEMPLATE,
+          repoOptional.get().getHandler(),
           paSCOciConfigurationProperties.getHarvester().getVersion(),
-          studyNumber,
+          encodedStudyID,
           repositoryUrl);
     }
-    return "";
+    log.trace("[{}] Final GetRecord Handler url [{}]", repositoryUrl, finalUrl);
+    return finalUrl;
   }
 }

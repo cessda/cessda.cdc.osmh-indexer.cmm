@@ -19,6 +19,31 @@ public class ReposTestData {
     return repo;
   }
 
+  // TODO: review FSD resumption token as requests for resumptions are not working.
+  public static Repo getFSDRepo() {
+    Repo repo = new Repo();
+    repo.setName("FSD");
+    repo.setUrl("http://services.fsd.uta.fi/v0/oai");
+    repo.setHandler("http://localhost:9091");
+    return repo;
+  }
+
+  public static Repo getGesisEnRepo() {
+    Repo repo = new Repo();
+    repo.setName("GESIS");
+    repo.setUrl("https://dbk.gesis.org/dbkoai");
+    repo.setHandler("http://localhost:9091");
+    return repo;
+  }
+
+  public static Repo getGesisDeRepo() {
+    Repo repo = new Repo();
+    repo.setName("GESIS De");
+    repo.setUrl("https://dbk.gesis.org/dbkoai_de");
+    repo.setHandler("http://localhost:9091");
+    return repo;
+  }
+
   public static Endpoints getEndpoints() {
     Endpoints endpoints = new Endpoints();
     endpoints.setRepos(Arrays.asList(getUKDSRepo()));

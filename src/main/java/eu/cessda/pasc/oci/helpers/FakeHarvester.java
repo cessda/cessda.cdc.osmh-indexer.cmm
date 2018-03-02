@@ -27,7 +27,7 @@ public class FakeHarvester {
   @Autowired
   private PaSCOciConfigurationProperties paSCOciConfigurationProperties;
 
-  public Optional<Repo> getUrlToCall(String repositoryUrl) {
+  public Optional<Repo> getRepoConfigurationProperties(String repositoryUrl) {
     return paSCOciConfigurationProperties.getEndpoints().getRepos()
         .stream()
         .filter(repo -> repo.getUrl().equalsIgnoreCase(repositoryUrl))

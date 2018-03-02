@@ -9,6 +9,7 @@ import org.elasticsearch.cluster.health.ClusterIndexHealth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.jmx.export.annotation.ManagedOperation;
+import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
  * @author moses@doraventures.com
  */
 @Component
+@ManagedResource
 @Slf4j
 public class DebuggingJMXBean {
 

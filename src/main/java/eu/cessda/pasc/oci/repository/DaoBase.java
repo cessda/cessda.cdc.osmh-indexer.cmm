@@ -37,7 +37,11 @@ public class DaoBase {
     } catch (RestClientException e) {
       logResponse(HttpStatus.NOT_ACCEPTABLE, log, LogLevel.ERROR);
       ExternalSystemException exception = new ExternalSystemException(AppConstants.UNSUCCESSFUL_RESPONSE, e.getCause());
-      exception.setExternalResponseBody((((HttpServerErrorException) e).getResponseBodyAsString()));
+      try {
+        exception.setExternalResponseBody((((HttpServerErrorException) e).getResponseBodyAsString()));
+      } catch (Exception e1) {
+        exception.setExternalResponseBody(e.getMessage());
+      }
       throw exception;
     }
   }
