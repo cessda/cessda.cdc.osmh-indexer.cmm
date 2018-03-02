@@ -64,7 +64,7 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
     return recordHeaders;
   }
 
-  private int getRecordHeadersCount(Document doc) throws InternalSystemException {
+  private int getRecordHeadersCount(Document doc) {
 
     NodeList resumptionToken = doc.getElementsByTagName(RESUMPTION_TOKEN_ELEMENT);
     if (resumptionToken.getLength() > 0) {
@@ -77,7 +77,8 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
       }
     }
     // Should not reach here for valid oai-pmh xml responses
-    throw new InternalSystemException("Unable to parse RecordHeadersCount from oai-pmh xml response.");
+    log.info("Unable to parse RecordHeadersCount from oai-pmh xml response.");
+    return -1;
   }
 
   private List<RecordHeader> retrieveRecordHeaders(List<RecordHeader> recordHeaders, Document doc, String baseRepoUrl)
