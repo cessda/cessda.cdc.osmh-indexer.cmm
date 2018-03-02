@@ -52,6 +52,7 @@ public class HarvesterConsumerServiceRunnerTest {
     countReport.putAll(processAndVerify(getUKDSRepo()));
     countReport.putAll(processAndVerify(getGesisEnRepo()));
     countReport.putAll(processAndVerify(getGesisDeRepo()));
+    // countReport.putAll(processAndVerify(getFSDRepo()));  //TODO: Investigate FSD Resumption token bug.
 
     System.out.println("############################################################################################");
     System.out.println("Printing Report for all repos");
