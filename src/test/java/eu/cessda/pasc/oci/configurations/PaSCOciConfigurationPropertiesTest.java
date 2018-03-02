@@ -42,7 +42,7 @@ public class PaSCOciConfigurationPropertiesTest extends AbstractSpringTestProfil
             "https://oai.ukdataservice.ac.uk:8443/oai/provider",
             "http://services.fsd.uta.fi/v0/oai",
             "https://dbk.gesis.org/dbkoai",
-            "https://dbk.gesis.org/dbkoai_de"
+            "https://dbk.gesis.org/dbkoai/"
         ).doesNotContain(
         "http://services/othertest"
     );

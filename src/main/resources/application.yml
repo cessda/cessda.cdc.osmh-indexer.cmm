@@ -21,7 +21,7 @@ logging:
     org: ERROR
     eu.cessda.pasc: DEBUG
     eu.cessda.pasc.oci.service: DEBUG
-    eu.cessda.pasc.oci.handler: DEBUG
+    eu.cessda.pasc.oci.repository: DEBUG
     eu.cessda.pasc.oci.helpers: DEBUG
     net: WARN
     com: ERROR
@@ -58,7 +58,7 @@ elasticsearch:
   port: 9300
 
 osmhConsumer:
-  languages: ['en']
+  languages: ['en', 'fi', 'de']
   harvester:
     url: 'http://localhost:9091'
     version: 'v0'
@@ -67,37 +67,6 @@ osmhConsumer:
       - v0
     supportedRecordTypes:
       - CMMStudy
-    repos:
-      - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
-        name: 'UK Data Service'
-        handler: 'http://localhost:9091'
-#        handler: 'https://pasc-dev.cessda.eu/osmh-repo'
-      - url: http://services.fsd.uta.fi/v0/oai
-        name: 'Finish Data Services'
-        handler: 'http://localhost:9091/'
-      - url: https://dbk.gesis.org/dbkoai
-        name: 'GESIS'
-        handler: 'http://localhost:9091/'
-      - url: https://dbk.gesis.org/dbkoai_de
-        name: 'GESIS'
-        handler: 'http://localhost:9091/'
-  restTemplateProps:
-    connTimeout: 5000
-    connRequestTimeout: 5000
-    readTimeout: 120000
-    verifySSL: false
-
----
-spring:
-  profiles: dev
-  main:
-        banner-mode: "off"
-  boot:
-    admin:
-      url: http://localhost:8087
-osmhConsumer:
-  languages: ['en', 'fi']
-  endpoints:
     repos:
       - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
         name: 'UK Data Service'
@@ -112,12 +81,29 @@ osmhConsumer:
       - url: https://dbk.gesis.org/dbkoai/
         name: 'GESIS De'
         handler: 'https://pasc-dev.cessda.eu/osmh-repo'
+  restTemplateProps:
+    connTimeout: 5000
+    connRequestTimeout: 5000
+    readTimeout: 120000
+    verifySSL: false
+
+---
+spring:
+  profiles: dev
+  main:
+        banner-mode: "off"
+  boot:
+    admin:
+      url: http://localhost:8087
 
 ---
 spring:
   profiles: local
   main:
         banner-mode: "off"
+  boot:
+    admin:
+      url: http://localhost:8087
 osmhConsumer:
   languages: ['en', 'fi', 'de']
   endpoints:

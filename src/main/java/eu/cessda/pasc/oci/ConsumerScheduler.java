@@ -1,10 +1,12 @@
-package eu.cessda.pasc.oci.service;
+package eu.cessda.pasc.oci;
 
 import eu.cessda.pasc.oci.configurations.PaSCOciConfigurationProperties;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.configurations.Repo;
+import eu.cessda.pasc.oci.service.DefaultHarvesterConsumerService;
+import eu.cessda.pasc.oci.service.ESIndexerService;
 import eu.cessda.pasc.oci.service.helpers.DebuggingJMXBean;
 import eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,29 +36,30 @@ import java.util.stream.Collectors;
 public class ConsumerScheduler {
 
   private DebuggingJMXBean debuggingJMXBean;
-  private PaSCOciConfigurationProperties paSCOciConfigurationProperties;
+  private PaSCOciConfigurationProperties configurationProperties;
   private DefaultHarvesterConsumerService defaultConsumerService;
   private ESIndexerService esIndexerService;
   private LanguageDocumentExtractor extractor;
 
   @Autowired
-  public ConsumerScheduler(DebuggingJMXBean debuggingJMXBean,
-                           PaSCOciConfigurationProperties paSCOciConfigurationProperties,
+  public ConsumerScheduler(DebuggingJMXBean debuggingJMXBean, PaSCOciConfigurationProperties configurationProperties,
                            DefaultHarvesterConsumerService consumerService,
                            ESIndexerService esIndexerService,
                            LanguageDocumentExtractor extractor) {
     this.debuggingJMXBean = debuggingJMXBean;
-    this.paSCOciConfigurationProperties = paSCOciConfigurationProperties;
+    this.configurationProperties = configurationProperties;
     this.defaultConsumerService = consumerService;
     this.esIndexerService = esIndexerService;
     this.extractor = extractor;
   }
 
   /**
-   * run once a day at 9am
+   * Auto Starts after delay of 1min at startup
+   *
+   * TODO: incremental run that start at @Scheduled(cron = "0 10 18 * * *") // Everyday at 02:10am
    */
-  @Scheduled(cron = "0 0 09 * * *")
   @ManagedOperation(description = "Manual Trigger to retrieve(harvest) and Ingest records for Configured All SPs Repos")
+  @Scheduled(initialDelay = 60_000L, fixedDelay = 315_360_000_000L) // Auto Starts after delay of 1min at startup
   public void harvestAndIngestRecordsForAllConfiguredSPsRepos() {
     Instant startTime = Instant.now();
     LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime.toEpochMilli()), ZoneId.systemDefault());
@@ -66,7 +69,7 @@ public class ConsumerScheduler {
   }
 
   private void execute() {
-    List<Repo> repos = paSCOciConfigurationProperties.getEndpoints().getRepos();
+    List<Repo> repos = configurationProperties.getEndpoints().getRepos();
     repos.forEach(repo -> {
       Map<String, List<CMMStudyOfLanguage>> langStudies = getCmmStudiesOfEachLangIsoCodeMap(repo);
       langStudies.forEach((langIsoCode, cmmStudies) -> {
@@ -111,11 +114,10 @@ public class ConsumerScheduler {
   }
 
   private void logStartStatus(LocalDateTime localDateTime) {
-    log.info("Consumer and Ingest All SPs Repos Schedule for once a day : Started at [{}]", localDateTime);
+    log.info("Full Run - Consume and Ingest All SPs Repos : Started at [{}]", localDateTime);
     log.info("Currents state before run:");
     debuggingJMXBean.printCurrentlyConfiguredRepoEndpoints();
     debuggingJMXBean.printElasticSearchInfo();
-
   }
 
   private void logEndStatus(LocalDateTime localDateTime, Instant startTime) {
