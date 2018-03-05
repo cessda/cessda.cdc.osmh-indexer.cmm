@@ -188,6 +188,17 @@
       "additionalProperties": false,
       "description": "An object containing Study Titles in various languages. Uses language code properties and abstract values. E.g. {'en': 'An studyTitle', 'no': 'Et studyTitle'}."
     },
+    "studyUrl": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "string",
+          "description": "A CMMStudy study Url for the given language code."
+        }
+      },
+      "additionalProperties": false,
+      "description": "An object containing CmmStudy Urls in various languages."
+    },
     "publisher": {
       "type": "object",
       "patternProperties": {

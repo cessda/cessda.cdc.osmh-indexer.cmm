@@ -251,6 +251,27 @@ public class CMMStudyMapper {
   }
 
   /**
+   * Parses parse Study Url from two plausible allowed xPaths
+   * <p>
+   * Xpath = {@value OaiPmhConstants#STUDY_URL_DOC_DSCR_XPATH }
+   * Xpath = {@value OaiPmhConstants#STUDY_URL_STDY_DSCR_XPATH }
+   */
+  public static void parseStudyUrl(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory,
+                                   OaiPmh config, String langCode) {
+
+    List<Element> docDscrElement = getElements(document, xFactory, STUDY_URL_DOC_DSCR_XPATH);
+    List<Element> stdyDscrElements = getElements(document, xFactory, STUDY_URL_STDY_DSCR_XPATH);
+    Map<String, String> urlFromDocDscr =
+        getLanguageKeyValuePairs(config, docDscrElement, false, langCode, uriStrategyFunction());
+    Map<String, String> urlFromStdyDscr =
+        getLanguageKeyValuePairs(config, stdyDscrElements, false, langCode, uriStrategyFunction());
+
+    Map<String, String> mergedStudyUrls = new HashMap<>(urlFromDocDscr);
+    urlFromStdyDscr.forEach((k, v) -> mergedStudyUrls.merge(k, v, (docDscrValue, stdyDscrValue) -> docDscrValue));
+    builder.studyUrl(mergedStudyUrls);
+  }
+
+  /**
    * Parses Sampling Procedure(s) from:
    * <p>
    * Xpath = {@value OaiPmhConstants#SAMPLING_XPATH }

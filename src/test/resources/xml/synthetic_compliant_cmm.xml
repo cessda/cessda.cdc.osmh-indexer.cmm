@@ -27,10 +27,18 @@
                 <copyright xml:lang="en">Finnish Social Science Data Archive</copyright>
                 <copyright xml:lang="fi">Yhteiskuntatieteellinen tietoarkisto</copyright>
               </prodStmt>
+              <!-- One of two possible location for study url-->
+              <holdings URI="http://urn.fi/urn:nbn:fi:fsd:T-FSD3052" xml:lang="fi"/>
+              <holdings URI="http://doi.org/10.5255/UKDA-SN-7615-2" xml:lang="en"/>
             </citation>
           </docDscr>
           <stdyDscr>
             <citation xml:lang="fi">
+              <!-- One of two possible location for study url-->
+              <holdings URI="http://urn.fi/urn:nbn:fi:fsd:T-FSD3052_stdyDscr" xml:lang="de"/>
+              <holdings URI="http://doi.org/10.5255/UKDA-SN-7615-2_stdyDscr" xml:lang="se"/>
+              <!-- Caution when duplicated! "en" was already declared above and only one will be taken-->
+              <holdings URI="http://doi.org/10.5255/UKDA-SN-7615-2_stdyDscr2" xml:lang="en"/>
               <titlStmt>
                 <titl xml:lang="fi">Lapsesta aikuiseksi: 14-vuotiaiden haastattelu 1974: tekstiaineisto.</titl>
                 <parTitl xml:lang="fi">Lapsesta aikuiseksi: 14-vuotiaiden haastattelu 1974: tekstiaineisto</parTitl>

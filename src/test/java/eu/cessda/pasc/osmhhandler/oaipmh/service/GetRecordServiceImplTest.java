@@ -230,5 +230,7 @@ public class GetRecordServiceImplTest {
         .get("dataCollectionFreeTexts").toString(), actualTree.get("dataCollectionFreeTexts").toString(), true);
     assertEquals(expectedTree
         .get("dataAccessFreeTexts").toString(), actualTree.get("dataAccessFreeTexts").toString(), true);
+    assertEquals(expectedTree
+        .get("studyUrl").toString(), actualTree.get("studyUrl").toString(), true);
   }
 }

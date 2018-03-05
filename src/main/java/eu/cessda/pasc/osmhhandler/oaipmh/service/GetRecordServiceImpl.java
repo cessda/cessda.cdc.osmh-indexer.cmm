@@ -79,6 +79,7 @@ public class GetRecordServiceImpl implements GetRecordService {
     if (isActiveRecord) {
       String defaultLangIsoCode = parseDefaultLanguage(builder, document, X_FACTORY, oaiPmh);
       parseStudyTitle(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
+      parseStudyUrl(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
       parseAbstract(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
       parsePidStudies(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
       parseCreator(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);

@@ -10,6 +10,7 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.DocElementParser.*;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.EMPTY_EL;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.NOT_AVAIL;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
+import static java.util.Optional.ofNullable;
 
 /**
  * Placeholder for various strategies to use to extract metadata for each field type
@@ -72,11 +73,15 @@ class ParsingStrategies {
   @SuppressWarnings("unchecked")
   static <T> Function<Element, Optional<T>> termVocabAttributeStrategyFunction(boolean hasControlledValue) {
     return element -> {
-      Optional<Element> concept = Optional.ofNullable(element.getChild(CONCEPT_EL, DDI_NS));
+      Optional<Element> concept = ofNullable(element.getChild(CONCEPT_EL, DDI_NS));
       Element conceptVal = concept.orElse(new Element(EMPTY_EL));
       TermVocabAttributes vocabValueAttrs = parseTermVocabAttrAndValues(element, conceptVal, hasControlledValue);
       return Optional.of((T) vocabValueAttrs);
     };
+  }
+
+  static Function<Element, String> uriStrategyFunction() {
+    return element -> ofNullable(element.getAttributeValue(URI_ATTR)).orElse("");
   }
 
   @SuppressWarnings("unchecked")
@@ -84,7 +89,7 @@ class ParsingStrategies {
 
     return element -> {
       Optional<T> vocabValueAttrsOpt = Optional.empty();
-      Optional<Element> concept = Optional.ofNullable(element.getChild(CONCEPT_EL, DDI_NS));
+      Optional<Element> concept = ofNullable(element.getChild(CONCEPT_EL, DDI_NS));
       if (concept.isPresent()) {  //PUG req. only process if element has a <concept>
         Element conceptVal = concept.orElse(new Element(EMPTY_EL));
         VocabAttributes vocabValueAttrs = parseVocabAttrAndValues(element, conceptVal, hasControlledValue);
