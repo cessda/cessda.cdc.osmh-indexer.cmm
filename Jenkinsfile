@@ -19,11 +19,13 @@ pipeline {
         echo "namespace = ${namespace}"
         echo "JOB_NAME = ${JOB_NAME}"
         echo "image_tag = ${image_tag}"
+        sh("ls -la")
       }
     }
     stage('Prepare Application for registration with Spring Boot Admin') {
       steps {
         dir('./infrastructure/gcp/') {
+          sh("ls -la")
           sh("bash pasc-osmh-registration.sh")
         }
       }
