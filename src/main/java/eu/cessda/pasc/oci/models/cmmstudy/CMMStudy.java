@@ -41,6 +41,7 @@ import java.util.Set;
     "dataCollectionFreeTexts",
     "dataAccessFreeTexts",
     "lastModified",
+    "studyUrl",
     "isActive"
 })
 @Builder
@@ -83,6 +84,9 @@ public class CMMStudy {
 
   @JsonProperty("titleStudy")
   private Map<String, String> titleStudy;
+
+  @JsonProperty("studyUrl")
+  private Map<String, String> studyUrl;
 
   @Setter
   @JsonProperty("studyNumber")

@@ -88,6 +88,9 @@ public class CMMStudyOfLanguage {
   @JsonProperty("titleStudy")
   private String titleStudy;
 
+  @JsonProperty("studyUrl")
+  private String studyUrl;
+
   @JsonProperty("studyNumber")
   private String studyNumber;
 
