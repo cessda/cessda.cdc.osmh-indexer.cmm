@@ -18,6 +18,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -55,7 +56,7 @@ public class GetRecordServiceImplTest {
 
     // Given
     given(getRecordDoa.getRecordXML("", "")).willReturn(
-        CMMStudyTestData.getXMLString("xml/synthetic_compliant_cmm.xml")
+        CMMStudyTestData.getContent("xml/synthetic_compliant_cmm.xml")
     );
 
     // When
@@ -67,11 +68,29 @@ public class GetRecordServiceImplTest {
   }
 
   @Test
+  public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord() throws Exception {
+
+    // Given
+    String repoUrl = "";
+    String studyIdentifier = "";
+
+    given(getRecordDoa.getRecordXML(repoUrl, studyIdentifier)).willReturn(
+        CMMStudyTestData.getContent("xml/ddi_record_1683.xml")
+    );
+
+    // When
+    CMMStudy record = recordService.getRecord(repoUrl, studyIdentifier);
+
+    then(record).isNotNull();
+    validateCMMStudyResultAgainstSchema(record);
+  }
+
+  @Test
   public void shouldOnlyExtractSingleDateAsStartDateForRecordsWithASingleDateAttr() throws Exception {
 
     // Given
     given(getRecordDoa.getRecordXML("", "")).willReturn(
-        CMMStudyTestData.getXMLString("xml/ddi_record_1683.xml")
+        CMMStudyTestData.getContent("xml/ddi_record_1683.xml")
     );
 
     // When
@@ -86,11 +105,102 @@ public class GetRecordServiceImplTest {
     then(actualTree.get("dataCollectionPeriodEnddate")).isNull();
   }
 
+  @Test
+  public void shouldExtractDefaultLanguageFromCodebookXMLLagIfPresent() throws Exception {
+
+    // Given
+    String expectedCmmStudyJsonString = CMMStudyTestData.getContent("json/ddi_record_1683_with_codebookXmlLag.json");
+    given(getRecordDoa.getRecordXML("", "")).willReturn(
+        CMMStudyTestData.getContent("xml/ddi_record_1683_with_codebookXmlLag.xml")
+    );
+
+    // When
+    CMMStudy record = recordService.getRecord("", "");
+    String actualCmmStudyJsonString = CMMConverter.toJsonString(record);
+
+    // then
+    JSONAssert.assertEquals(expectedCmmStudyJsonString, actualCmmStudyJsonString, false);
+  }
+
+  @Test
+  public void shouldReturnCMMStudyRecordWithRepeatedAbstractConcatenated() throws Exception {
+
+    Map<String, String> expectedAbstract = new HashMap<>();
+    expectedAbstract.put("de", "de de");
+    expectedAbstract.put("fi", "Haastattelu+<br>Jyväskylä");
+    expectedAbstract.put("en", "1. The data+<br>2. The datafiles");
+
+    given(getRecordDoa.getRecordXML("", "")).willReturn(
+        CMMStudyTestData.getContent("xml/ddi_record_2305_fsd_repeat_abstract.xml")
+    );
+
+    // When
+    CMMStudy record = recordService.getRecord("", "");
+
+    then(record).isNotNull();
+    then(record.getAbstractField().size()).isEqualTo(3);
+    then(record.getAbstractField()).isEqualTo(expectedAbstract);
+    validateCMMStudyResultAgainstSchema(record);
+  }
+
+  @Test()
+  public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord_MarkedAsNotActive()
+      throws CustomHandlerException {
+
+    // Given
+    String repoUrl = "";
+    String studyIdentifier = "";
+
+    given(getRecordDoa.getRecordXML(repoUrl, studyIdentifier)).willReturn(
+        CMMStudyTestData.getContent("xml/ddi_record_1031_deleted.xml")
+    );
+
+    // When
+    CMMStudy record = recordService.getRecord(repoUrl, studyIdentifier);
+
+    then(record).isNotNull();
+    then(record.isActive()).isFalse();
+  }
+
+  @Test(expected = ExternalSystemException.class)
+  public void shouldThrowExceptionForRecordWithErrorElement() throws CustomHandlerException {
+
+    // Given
+    String repoUrl = "www.myurl.com";
+    String studyIdentifier = "Id12214";
+
+    given(getRecordDoa.getRecordXML(repoUrl, studyIdentifier)).willReturn(
+        CMMStudyTestData.getContent("xml/ddi_record_WithError.xml")
+    );
+
+    // When
+    recordService.getRecord(repoUrl, studyIdentifier);
+
+    // Then an exception is thrown.
+  }
+
+  private void validateCMMStudyResultAgainstSchema(CMMStudy record) throws IOException, ProcessingException, JSONException {
+
+    then(record.isActive()).isTrue(); // No need to carry on validating other fields if marked as inActive
+
+    String jsonString = CMMConverter.toJsonString(record);
+    JSONObject json = new JSONObject(jsonString);
+    System.out.println("RETRIEVED STUDY JSON: \n" + json.toString(4));
+
+    JsonNode jsonNodeRecord = JsonLoader.fromString(jsonString);
+    final JsonSchema schema = JsonSchemaFactory.byDefault().getJsonSchema("resource:/json/schema/CMMStudySchema.json");
+
+    ProcessingReport validate = schema.validate(jsonNodeRecord);
+    if (!validate.isSuccess()) {
+      fail("Validation not successful : " + validate.toString());
+    }
+  }
+
   private void assertFieldsAreExtractedAsExpected(CMMStudy record) throws IOException, JSONException {
 
     final ObjectMapper mapper = new ObjectMapper();
     String jsonString = CMMConverter.toJsonString(record);
-    String expectedJson = CMMStudyTestData.getXMLString("json/synthetic_compliant_record.json");
+    String expectedJson = CMMStudyTestData.getContent("json/synthetic_compliant_record.json");
     final JsonNode actualTree = mapper.readTree(jsonString);
     final JsonNode expectedTree = mapper.readTree(expectedJson);
 
@@ -120,97 +230,5 @@ public class GetRecordServiceImplTest {
         .get("dataCollectionFreeTexts").toString(), actualTree.get("dataCollectionFreeTexts").toString(), true);
     assertEquals(expectedTree
         .get("dataAccessFreeTexts").toString(), actualTree.get("dataAccessFreeTexts").toString(), true);
-  }
-
-  @Test
-  public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord() throws Exception {
-
-    // Given
-    String repoUrl = "";
-    String studyIdentifier = "";
-
-    given(getRecordDoa.getRecordXML(repoUrl, studyIdentifier)).willReturn(
-        CMMStudyTestData.getXMLString("xml/ddi_record_1683.xml")
-    );
-
-    // When
-    CMMStudy record = recordService.getRecord(repoUrl, studyIdentifier);
-
-    then(record).isNotNull();
-    validateCMMStudyResultAgainstSchema(record);
-  }
-
-  @Test
-  public void shouldReturnCMMStudyRecordWithRepeatedAbstractConcatenated() throws Exception {
-
-    Map<String, String> expectedAbstract = new HashMap<>();
-    expectedAbstract.put("de", "de de");
-    expectedAbstract.put("fi", "Haastattelu+<br>Jyväskylä");
-    expectedAbstract.put("en", "1. The data+<br>2. The datafiles");
-
-    given(getRecordDoa.getRecordXML("", "")).willReturn(
-        CMMStudyTestData.getXMLString("xml/ddi_record_2305_fsd_repeat_abstract.xml")
-    );
-
-    // When
-    CMMStudy record = recordService.getRecord("", "");
-
-    then(record).isNotNull();
-    then(record.getAbstractField().size()).isEqualTo(3);
-    then(record.getAbstractField()).isEqualTo(expectedAbstract);
-    validateCMMStudyResultAgainstSchema(record);
-  }
-
-  @Test()
-  public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord_MarkedAsNotActive()
-      throws CustomHandlerException {
-
-    // Given
-    String repoUrl = "";
-    String studyIdentifier = "";
-
-    given(getRecordDoa.getRecordXML(repoUrl, studyIdentifier)).willReturn(
-        CMMStudyTestData.getXMLString("xml/ddi_record_1031_deleted.xml")
-    );
-
-    // When
-    CMMStudy record = recordService.getRecord(repoUrl, studyIdentifier);
-
-    then(record).isNotNull();
-    then(record.isActive()).isFalse();
-  }
-
-  @Test(expected = ExternalSystemException.class)
-  public void shouldThrowExceptionForRecordWithErrorElement() throws CustomHandlerException {
-
-    // Given
-    String repoUrl = "www.myurl.com";
-    String studyIdentifier = "Id12214";
-
-    given(getRecordDoa.getRecordXML(repoUrl, studyIdentifier)).willReturn(
-        CMMStudyTestData.getXMLString("xml/ddi_record_WithError.xml")
-    );
-
-    // When
-    recordService.getRecord(repoUrl, studyIdentifier);
-
-    // Then an exception is thrown.
-  }
-
-  private void validateCMMStudyResultAgainstSchema(CMMStudy record) throws IOException, ProcessingException, JSONException {
-
-    then(record.isActive()).isTrue(); // No need to carry on validating other fields if marked as inActive
-
-    String jsonString = CMMConverter.toJsonString(record);
-    JSONObject json = new JSONObject(jsonString);
-    System.out.println("RETRIEVED STUDY JSON: \n" + json.toString(4));
-
-    JsonNode jsonNodeRecord = JsonLoader.fromString(jsonString);
-    final JsonSchema schema = JsonSchemaFactory.byDefault().getJsonSchema("resource:/json/schema/CMMStudySchema.json");
-
-    ProcessingReport validate = schema.validate(jsonNodeRecord);
-    if (!validate.isSuccess()) {
-      fail("Validation not successful : " + validate.toString());
-    }
   }
 }

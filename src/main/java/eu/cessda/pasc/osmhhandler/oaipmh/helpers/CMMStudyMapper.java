@@ -54,6 +54,15 @@ public class CMMStudyMapper {
     return parseRecordStatus(builder, document, xFactory);
   }
 
+  public static String parseDefaultLanguage(CMMStudy.CMMStudyBuilder builder, Document document,
+                                            XPathFactory xFactory, OaiPmh oaiPmh) {
+    XPathExpression<Attribute> attributeExpression = xFactory
+        .compile(RECORD_DEFAULT_LANGUAGE, Filters.attribute(), null, OAI_AND_DDI_NS);
+    Optional<Attribute> codeBookLang = Optional.ofNullable(attributeExpression.evaluateFirst(document));
+    return (codeBookLang.isPresent() && !codeBookLang.get().getValue().trim().isEmpty()) ?
+        codeBookLang.get().getValue().trim() : oaiPmh.getMetadataParsingDefaultLang().getLang();
+  }
+
   /**
    * Pass records status.
    */
@@ -88,10 +97,10 @@ public class CMMStudyMapper {
    * Xpath = {@value OaiPmhConstants#ABSTRACT_XPATH }
    */
   public static void parseAbstract(
-      CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
+      CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config, String langCode) {
 
     List<Element> elements = getElements(document, xFactory, ABSTRACT_XPATH);
-    Map<String, String> abstracts = getLanguageKeyValuePairs(config, elements, true, Element::getText);
+    Map<String, String> abstracts = getLanguageKeyValuePairs(config, elements, true, langCode, Element::getText);
     builder.abstractField(abstracts);
   }
 
@@ -111,9 +120,9 @@ public class CMMStudyMapper {
    * Xpath = {@value OaiPmhConstants#PID_STUDY_XPATH }
    */
   public static void parsePidStudies(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory,
-                                     OaiPmh oaiPmh) {
+                                     OaiPmh oaiPmh, String defaultLangIsoCode) {
     builder.pidStudies(extractMetadataObjectListForEachLang(
-        oaiPmh, document, xFactory, PID_STUDY_XPATH, pidStrategyFunction()));
+        oaiPmh, defaultLangIsoCode, document, xFactory, PID_STUDY_XPATH, pidStrategyFunction()));
   }
 
   /**
@@ -122,10 +131,10 @@ public class CMMStudyMapper {
    * Xpath = {@value OaiPmhConstants#CREATORS_XPATH }
    */
   public static void parseCreator(CMMStudy.CMMStudyBuilder builder, Document doc, XPathFactory xFactory,
-                                  OaiPmh config) {
+                                  OaiPmh config, String defaultLangIsoCode) {
 
     Map<String, List<String>> creatorsInLangs = extractMetadataObjectListForEachLang(
-        config, doc, xFactory, CREATORS_XPATH, creatorStrategyFunction());
+        config, defaultLangIsoCode, doc, xFactory, CREATORS_XPATH, creatorStrategyFunction());
 
     builder.creators(creatorsInLangs);
   }
@@ -136,10 +145,10 @@ public class CMMStudyMapper {
    * Xpath = {@value OaiPmhConstants#CLASSIFICATIONS_XPATH }
    */
   public static void parseClassifications(CMMStudy.CMMStudyBuilder builder, Document doc, XPathFactory xFactory,
-                                          OaiPmh config) {
+                                          OaiPmh config, String defaultLangIsoCode) {
     builder.classifications(
         extractMetadataObjectListForEachLang(
-            config, doc, xFactory, CLASSIFICATIONS_XPATH,
+            config, defaultLangIsoCode, doc, xFactory, CLASSIFICATIONS_XPATH,
             termVocabAttributeStrategyFunction(false)));
   }
 
@@ -149,10 +158,10 @@ public class CMMStudyMapper {
    * Xpath = {@value OaiPmhConstants#KEYWORDS_XPATH }
    */
   public static void parseKeywords(CMMStudy.CMMStudyBuilder builder, Document doc, XPathFactory xFactory,
-                                   OaiPmh config) {
+                                   OaiPmh config, String defaultLangIsoCode) {
     builder.keywords(
         extractMetadataObjectListForEachLang(
-            config, doc, xFactory, KEYWORDS_XPATH, termVocabAttributeStrategyFunction(false)));
+            config, defaultLangIsoCode, doc, xFactory, KEYWORDS_XPATH, termVocabAttributeStrategyFunction(false)));
   }
 
   /**
@@ -161,11 +170,11 @@ public class CMMStudyMapper {
    * Xpath = {@value OaiPmhConstants#TYPE_OF_TIME_METHOD_XPATH }
    */
   public static void parseTypeOfTimeMethod(CMMStudy.CMMStudyBuilder builder, Document doc, XPathFactory xFactory,
-                                           OaiPmh config) {
+                                           OaiPmh config, String defaultLangIsoCode) {
 
     builder.typeOfTimeMethods(
         extractMetadataObjectListForEachLang(
-            config, doc, xFactory, TYPE_OF_TIME_METHOD_XPATH,
+            config, defaultLangIsoCode, doc, xFactory, TYPE_OF_TIME_METHOD_XPATH,
             termVocabAttributeStrategyFunction(true)));
   }
 
@@ -175,10 +184,10 @@ public class CMMStudyMapper {
    * Xpath = {@value OaiPmhConstants#TYPE_OF_MODE_OF_COLLECTION_XPATH }
    */
   public static void parseTypeOfModeOfCollection(CMMStudy.CMMStudyBuilder builder, Document doc,
-                                                 XPathFactory xFactory, OaiPmh config) {
+                                                 XPathFactory xFactory, OaiPmh config, String defaultLangIsoCode) {
     builder.typeOfModeOfCollections(
         extractMetadataObjectListForEachLang(
-            config, doc, xFactory, TYPE_OF_MODE_OF_COLLECTION_XPATH,
+            config, defaultLangIsoCode, doc, xFactory, TYPE_OF_MODE_OF_COLLECTION_XPATH,
             termVocabAttributeStrategyFunction(true)));
   }
 
@@ -188,10 +197,10 @@ public class CMMStudyMapper {
    * Xpath = {@value OaiPmhConstants#UNIT_TYPE_XPATH }
    */
   public static void parseUnitTypes(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory,
-                                    OaiPmh config) {
+                                    OaiPmh config, String defaultLangIsoCode) {
     builder.unitTypes(
         extractMetadataObjectListForEachLang(
-            config, document, xFactory, UNIT_TYPE_XPATH, termVocabAttributeStrategyFunction(true)));
+            config, defaultLangIsoCode, document, xFactory, UNIT_TYPE_XPATH, termVocabAttributeStrategyFunction(true)));
   }
 
   /**
@@ -200,10 +209,10 @@ public class CMMStudyMapper {
    * Xpath = {@value OaiPmhConstants#TYPE_OF_SAMPLING_XPATH }
    */
   public static void parseTypeOfSamplingProcedure(CMMStudy.CMMStudyBuilder builder, Document doc,
-                                                  XPathFactory xFactory, OaiPmh config) {
+                                                  XPathFactory xFactory, OaiPmh config, String defaultLangIsoCode) {
     builder.typeOfSamplingProcedures(
-        extractMetadataObjectListForEachLang(
-            config, doc, xFactory, TYPE_OF_SAMPLING_XPATH, samplingTermVocabAttributeStrategyFunction(true)));
+        extractMetadataObjectListForEachLang(config, defaultLangIsoCode, doc, xFactory, TYPE_OF_SAMPLING_XPATH,
+            samplingTermVocabAttributeStrategyFunction(true)));
   }
 
   /**
@@ -212,9 +221,9 @@ public class CMMStudyMapper {
    * Xpath = {@value OaiPmhConstants#STUDY_AREA_COUNTRIES_XPATH }
    */
   public static void parseStudyAreaCountries(CMMStudy.CMMStudyBuilder builder, Document document,
-                                             XPathFactory xFactory,OaiPmh config) {
+                                             XPathFactory xFactory, OaiPmh config, String defaultLangIsoCode) {
     builder.studyAreaCountries(extractMetadataObjectListForEachLang(
-        config, document, xFactory, STUDY_AREA_COUNTRIES_XPATH, countryStrategyFunction()));
+        config, defaultLangIsoCode, document, xFactory, STUDY_AREA_COUNTRIES_XPATH, countryStrategyFunction()));
   }
 
   /**
@@ -223,9 +232,9 @@ public class CMMStudyMapper {
    * Xpath = {@value OaiPmhConstants#PUBLISHER_XPATH }
    */
   public static void parsePublisher(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory,
-                                    OaiPmh config) {
+                                    OaiPmh config, String defaultLangIsoCode) {
     builder.publisher(extractMetadataObjectForEachLang(
-        config, document, xFactory, PUBLISHER_XPATH, publisherStrategyFunction()));
+        config, defaultLangIsoCode, document, xFactory, PUBLISHER_XPATH, publisherStrategyFunction()));
   }
 
   /**
@@ -233,11 +242,11 @@ public class CMMStudyMapper {
    * <p>
    * Xpath = {@value OaiPmhConstants#TITLE_XPATH }
    */
-  public static void parseStudyTitle(
-      CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config) {
+  public static void parseStudyTitle(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory,
+                                     OaiPmh config, String langCode) {
 
     List<Element> elements = getElements(document, xFactory, TITLE_XPATH);
-    Map<String, String> studyTitles = getLanguageKeyValuePairs(config, elements, false, Element::getText);
+    Map<String, String> studyTitles = getLanguageKeyValuePairs(config, elements, false, langCode, Element::getText);
     builder.titleStudy(studyTitles);
   }
 
@@ -247,10 +256,10 @@ public class CMMStudyMapper {
    * Xpath = {@value OaiPmhConstants#SAMPLING_XPATH }
    */
   public static void parseSamplingProcedureFreeTexts(CMMStudy.CMMStudyBuilder builder, Document doc,
-                                                     XPathFactory xFactory, OaiPmh config) {
+                                                     XPathFactory xFactory, OaiPmh config, String defaultLangIsoCode) {
     builder.samplingProcedureFreeTexts(
         extractMetadataObjectListForEachLang(
-            config, doc, xFactory, SAMPLING_XPATH, nullableElementValueStrategyFunction()));
+            config, defaultLangIsoCode, doc, xFactory, SAMPLING_XPATH, nullableElementValueStrategyFunction()));
   }
 
   /**
@@ -259,9 +268,9 @@ public class CMMStudyMapper {
    * Xpath = {@value OaiPmhConstants#SAMPLING_XPATH }
    */
   public static void parseDataAccessFreeText(CMMStudy.CMMStudyBuilder builder, Document doc,
-                                             XPathFactory xFactory, OaiPmh config) {
+                                             XPathFactory xFactory, OaiPmh config, String defaultLangIsoCode) {
     Map<String, List<String>> restrictionLanguageMap = extractMetadataObjectListForEachLang(
-        config, doc, xFactory, DATA_RESTRCTN_XPATH, nullableElementValueStrategyFunction());
+        config, defaultLangIsoCode, doc, xFactory, DATA_RESTRCTN_XPATH, nullableElementValueStrategyFunction());
     builder.dataAccessFreeTexts(restrictionLanguageMap);
   }
 
@@ -292,9 +301,9 @@ public class CMMStudyMapper {
    * Xpath = {@value OaiPmhConstants#DATA_COLLECTION_PERIODS_PATH }
    */
   public static void parseDataCollectionFreeTexts(CMMStudy.CMMStudyBuilder builder, Document document,
-                                                  XPathFactory xFactory, OaiPmh config) {
+                                                  XPathFactory xFactory, OaiPmh config, String defaultLangIsoCode) {
     builder.dataCollectionFreeTexts(extractMetadataObjectListForEachLang(
-        config, document, xFactory, DATA_COLLECTION_PERIODS_PATH, dataCollFreeTextStrategyFunction()));
+        config, defaultLangIsoCode, document, xFactory, DATA_COLLECTION_PERIODS_PATH, dataCollFreeTextStrategyFunction()));
   }
 
   /**

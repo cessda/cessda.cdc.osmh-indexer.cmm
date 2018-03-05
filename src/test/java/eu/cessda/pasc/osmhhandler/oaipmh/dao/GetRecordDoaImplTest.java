@@ -49,7 +49,7 @@ public class GetRecordDoaImplTest {
 
     // Given
     String expected_url = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=GetRecord&identifier=1683&metadataPrefix=ddi";
-    String ddiRecord1683 = CMMStudyTestData.getXMLString("xml/ddi_record_1683.xml");
+    String ddiRecord1683 = CMMStudyTestData.getContent("xml/ddi_record_1683.xml");
     mockRestServiceServer.expect(once(), requestTo(expected_url))
         .andExpect(method(GET))
         .andRespond(withSuccess(ddiRecord1683, MediaType.TEXT_XML));

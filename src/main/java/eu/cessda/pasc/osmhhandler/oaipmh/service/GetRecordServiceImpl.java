@@ -77,24 +77,25 @@ public class GetRecordServiceImpl implements GetRecordService {
     // Short-Circuit. We carry on to parse beyond the headers only if record is active
     boolean isActiveRecord = parseHeaderElement(builder, document, X_FACTORY);
     if (isActiveRecord) {
-      parseStudyTitle(builder, document, X_FACTORY, oaiPmh);
-      parseAbstract(builder, document, X_FACTORY, oaiPmh);
-      parsePidStudies(builder, document, X_FACTORY, oaiPmh);
-      parseCreator(builder, document, X_FACTORY, oaiPmh);
-      parseDataAccessFreeText(builder, document, X_FACTORY, oaiPmh);
-      parseClassifications(builder, document, X_FACTORY, oaiPmh);
-      parseKeywords(builder, document, X_FACTORY, oaiPmh);
-      parseTypeOfTimeMethod(builder, document, X_FACTORY, oaiPmh);
-      parseStudyAreaCountries(builder, document, X_FACTORY, oaiPmh);
-      parseUnitTypes(builder, document, X_FACTORY, oaiPmh);
-      parsePublisher(builder, document, X_FACTORY, oaiPmh);
+      String defaultLangIsoCode = parseDefaultLanguage(builder, document, X_FACTORY, oaiPmh);
+      parseStudyTitle(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
+      parseAbstract(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
+      parsePidStudies(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
+      parseCreator(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
+      parseDataAccessFreeText(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
+      parseClassifications(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
+      parseKeywords(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
+      parseTypeOfTimeMethod(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
+      parseStudyAreaCountries(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
+      parseUnitTypes(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
+      parsePublisher(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
       parseYrOfPublication(builder, document, X_FACTORY);
       parseFileLanguages(builder, document, X_FACTORY);
-      parseTypeOfSamplingProcedure(builder, document, X_FACTORY, oaiPmh);
-      parseSamplingProcedureFreeTexts(builder, document, X_FACTORY, oaiPmh);
-      parseTypeOfModeOfCollection(builder, document, X_FACTORY, oaiPmh);
+      parseTypeOfSamplingProcedure(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
+      parseSamplingProcedureFreeTexts(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
+      parseTypeOfModeOfCollection(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
       parseDataCollectionDates(builder, document, X_FACTORY);
-      parseDataCollectionFreeTexts(builder, document, X_FACTORY, oaiPmh);
+      parseDataCollectionFreeTexts(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
       log.debug("Successfully parsed record with no known errors");
     }
   }

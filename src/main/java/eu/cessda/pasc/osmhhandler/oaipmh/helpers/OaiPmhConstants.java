@@ -25,6 +25,7 @@ public class OaiPmhConstants {
   static final String ERROR_PATH = "//oai:error";
 
   // Codebook Paths
+  static final String RECORD_DEFAULT_LANGUAGE= "//ddi:codeBook/@xml:lang";
   static final String YEAR_OF_PUB_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:distDate[1]/@date";
   static final String ABSTRACT_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:abstract";
   static final String TITLE_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:titl";

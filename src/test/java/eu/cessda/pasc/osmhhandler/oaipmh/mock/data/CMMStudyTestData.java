@@ -26,8 +26,8 @@ public class CMMStudyTestData {
     return builder.build();
   }
 
-  public static String getXMLString(String s) {
+  public static String getContent(String filePath) {
     FileHandler fileHandler = new FileHandler();
-    return fileHandler.getFileWithUtil(s);
+    return fileHandler.getFileWithUtil(filePath);
   }
 }
