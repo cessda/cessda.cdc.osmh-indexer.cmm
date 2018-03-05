@@ -20,14 +20,12 @@ pipeline {
         echo "JOB_NAME = ${JOB_NAME}"
         echo "image_tag = ${image_tag}"
         sh("ls -la")
-        sh("pwd")
       }
     }
     stage('Prepare Application for registration with Spring Boot Admin') {
       steps {
         dir('./infrastructure/gcp/') {
           sh("ls -la")
-          sh("pwd")
           sh("bash pasc-osmh-registration.sh")
         }
       }
