@@ -1,0 +1,176 @@
+{
+  "cmmstudy_en": {
+    "mappings": {
+      "cmmstudy": {
+        "properties": {
+          "abstract": {
+            "type": "string"
+          },
+          "classifications": {
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "term": {
+                "type": "string"
+              },
+              "vocab": {
+                "type": "string"
+              },
+              "vocabUri": {
+                "type": "string"
+              }
+            }
+          },
+          "creators": {
+            "type": "string"
+          },
+          "dataAccessFreeTexts": {
+            "type": "string"
+          },
+          "dataCollectionFreeTexts": {
+            "properties": {
+              "dataCollectionFreeText": {
+                "type": "string"
+              },
+              "event": {
+                "type": "string"
+              }
+            }
+          },
+          "dataCollectionPeriodEnddate": {
+            "type": "date",
+            "format": "strict_date_optional_time||epoch_millis"
+          },
+          "dataCollectionPeriodStartdate": {
+            "type": "date",
+            "format": "strict_date_optional_time||epoch_millis"
+          },
+          "fileLanguages": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "keywords": {
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "term": {
+                "type": "string"
+              },
+              "vocab": {
+                "type": "string"
+              },
+              "vocabUri": {
+                "type": "string"
+              }
+            }
+          },
+          "lastModified": {
+            "type": "date",
+            "format": "strict_date_optional_time||epoch_millis"
+          },
+          "pidStudies": {
+            "properties": {
+              "agency": {
+                "type": "string"
+              },
+              "pid": {
+                "type": "string"
+              }
+            }
+          },
+          "publicationYear": {
+            "type": "date",
+            "format": "strict_date_optional_time||epoch_millis"
+          },
+          "publisher": {
+            "properties": {
+              "abbr": {
+                "type": "string"
+              },
+              "publisher": {
+                "type": "string"
+              }
+            }
+          },
+          "samplingProcedureFreeTexts": {
+            "type": "string"
+          },
+          "studyAreaCountries": {
+            "properties": {
+              "abbr": {
+                "type": "string"
+              },
+              "country": {
+                "type": "string"
+              }
+            }
+          },
+          "studyNumber": {
+            "type": "string"
+          },
+          "studyUrl": {
+            "type": "string"
+          },
+          "titleStudy": {
+            "type": "string"
+          },
+          "typeOfModeOfCollections": {
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "term": {
+                "type": "string"
+              },
+              "vocab": {
+                "type": "string"
+              },
+              "vocabUri": {
+                "type": "string"
+              }
+            }
+          },
+          "typeOfTimeMethods": {
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "term": {
+                "type": "string"
+              },
+              "vocab": {
+                "type": "string"
+              },
+              "vocabUri": {
+                "type": "string"
+              }
+            }
+          },
+          "unitTypes": {
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "term": {
+                "type": "string"
+              },
+              "vocab": {
+                "type": "string"
+              },
+              "vocabUri": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

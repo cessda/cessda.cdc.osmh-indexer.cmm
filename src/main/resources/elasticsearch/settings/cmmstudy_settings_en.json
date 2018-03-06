@@ -1,0 +1,44 @@
+{
+  "index": {
+    "number_of_shards": "%s",
+    "number_of_replicas": "%s",
+    "refresh_interval" : "5s"
+  },
+  "analysis": {
+    "filter": {
+      "autocomplete_filter": {
+        "type": "edge_ngram",
+        "min_gram": 1,
+        "max_gram": 20
+      }
+    },
+    "analyzer": {
+      "pasc_indexing_standard_autocomplete": {
+        "type": "custom",
+        "tokenizer": "standard",
+        "filter": [
+          "lowercase",
+          "asciifolding",
+          "stop",
+          "autocomplete_filter"
+        ]
+      },
+      "pasc_indexing_standard_lowercase": {
+        "type": "custom",
+        "tokenizer": "standard",
+        "filter": [
+          "lowercase"
+        ]
+      },
+      "pasc_searching_standard": {
+        "type": "custom",
+        "tokenizer": "standard",
+        "filter": [
+          "lowercase",
+          "asciifolding",
+          "stop"
+        ]
+      }
+    }
+  }
+}
