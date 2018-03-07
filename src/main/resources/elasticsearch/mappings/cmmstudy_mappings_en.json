@@ -183,7 +183,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "index": "not_analyzed",
+            "index": "no",
             "ignore_above": 256
           },
           "term": {
