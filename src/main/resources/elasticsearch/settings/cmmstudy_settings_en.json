@@ -1,43 +1,38 @@
 {
-  "index": {
-    "number_of_shards": "%s",
-    "number_of_replicas": "%s",
-    "refresh_interval" : "5s"
-  },
+  "number_of_shards": "%s",
+  "number_of_replicas": "%s",
+  "refresh_interval": "10s",
   "analysis": {
+    "analyzer": {
+      "pasc_standard_analyzer": {
+        "type": "custom",
+        "tokenizer": "standard",
+        "filter": [
+          "lowercase",
+          "asciifolding",
+          "english_stop"
+        ]
+      },
+      "pasc_index_autocomplete_analyzer": {
+        "type": "custom",
+        "tokenizer": "standard",
+        "filter": [
+          "lowercase",
+          "asciifolding",
+          "english_stop",
+          "autocomplete_filter"
+        ]
+      }
+    },
     "filter": {
       "autocomplete_filter": {
         "type": "edge_ngram",
         "min_gram": 1,
         "max_gram": 20
-      }
-    },
-    "analyzer": {
-      "pasc_indexing_standard_autocomplete": {
-        "type": "custom",
-        "tokenizer": "standard",
-        "filter": [
-          "lowercase",
-          "asciifolding",
-          "stop",
-          "autocomplete_filter"
-        ]
       },
-      "pasc_indexing_standard_lowercase": {
-        "type": "custom",
-        "tokenizer": "standard",
-        "filter": [
-          "lowercase"
-        ]
-      },
-      "pasc_searching_standard": {
-        "type": "custom",
-        "tokenizer": "standard",
-        "filter": [
-          "lowercase",
-          "asciifolding",
-          "stop"
-        ]
+      "english_stop": {
+        "type": "stop",
+        "stopwords": "_english_"
       }
     }
   }

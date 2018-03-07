@@ -1,262 +1,305 @@
 {
-  "cmmstudy_en": {
-    "mappings": {
-      "cmmstudy": {
-        "_all": {
-          "enabled": true,
-          "analyzer": "pasc_indexing_standard_autocomplete",
-          "search_analyzer": "pasc_searching_standard"
-        },
-        "dynamic_templates": [
-          {
-            "template_id": {
-              "match": "*.id",
-              "match_mapping_type": "string",
-              "mapping": {
-                "type": "string",
-                "index": "not_analyzed",
-                "ignore_above": 256
-              }
-            }
-          },
-          {
-            "template_vocab": {
-              "match": "*.vocab",
-              "match_mapping_type": "string",
-              "mapping": {
-                "type": "string",
-                "index": "not_analyzed",
-                "ignore_above": 256
-              }
-            }
-          },
-          {
-            "template_vocabUri": {
-              "match": "*.vocabUri",
-              "match_mapping_type": "string",
-              "mapping": {
-                "type": "string",
-                "index": "not_analyzed",
-                "ignore_above": 256
-              }
-            }
-          },
-          {
-            "template_term": {
-              "match": "*.term",
-              "match_mapping_type": "string",
-              "mapping": {
-                "type": "string",
-                "term_vector": "yes"
-              }
-            }
+  "cmmstudy": {
+    "_all": {
+      "enabled": true,
+      "analyzer": "pasc_standard_analyzer"
+    },
+    "dynamic_templates": [
+      {
+        "template_id": {
+          "match": "*.id",
+          "match_mapping_type": "string",
+          "mapping": {
+            "type": "string",
+            "index": "not_analyzed",
+            "ignore_above": 256
           }
-        ],
+        }
+      },
+      {
+        "template_vocab": {
+          "match": "*.vocab",
+          "match_mapping_type": "string",
+          "mapping": {
+            "type": "string",
+            "index": "not_analyzed",
+            "ignore_above": 256
+          }
+        }
+      },
+      {
+        "template_vocabUri": {
+          "match": "*.vocabUri",
+          "match_mapping_type": "string",
+          "mapping": {
+            "type": "string",
+            "index": "not_analyzed",
+            "ignore_above": 256
+          }
+        }
+      },
+      {
+        "template_term": {
+          "match": "*.term",
+          "match_mapping_type": "string",
+          "mapping": {
+            "type": "string",
+            "analyzer": "pasc_standard_analyzer",
+            "term_vector": "yes"
+          }
+        }
+      }
+    ],
+    "properties": {
+      "titleStudy": {
+        "type": "string",
+        "analyzer": "pasc_index_autocomplete_analyzer",
+        "search_analyzer": "pasc_standard_analyzer",
+        "term_vector": "with_positions_offsets",
+        "boost": 3.5
+      },
+      "abstract": {
+        "type": "string",
+        "analyzer": "pasc_standard_analyzer",
+        "term_vector": "with_positions_offsets",
+        "boost": 2
+      },
+      "creators": {
+        "type": "string",
+        "analyzer": "pasc_standard_analyzer",
+        "term_vector": "with_positions_offsets",
+        "boost": 2
+      },
+      "dataAccessFreeTexts": {
+        "type": "string",
+        "analyzer": "pasc_standard_analyzer",
+        "term_vector": "with_positions_offsets"
+      },
+      "dataCollectionFreeTexts": {
+        "type": "nested",
         "properties": {
-          "titleStudy": {
+          "dataCollectionFreeText": {
             "type": "string",
-            "term_vector": "with_positions_offsets",
-            "boost": 3.5
-          },
-          "abstract": {
-            "type": "string",
-            "term_vector": "with_positions_offsets",
-            "boost": 2
-          },
-          "creators": {
-            "type": "string",
-            "term_vector": "with_positions_offsets",
-            "boost": 2
-
-          },
-          "dataAccessFreeTexts": {
-            "type": "string",
+            "analyzer": "pasc_standard_analyzer",
             "term_vector": "with_positions_offsets"
           },
-          "dataCollectionFreeTexts": {
-            "type": "nested",
-            "properties": {
-              "dataCollectionFreeText": {
-                "type": "string",
-                "term_vector": "with_positions_offsets"
-              },
-              "event": {
-                "type": "string"
-              }
-            }
-          },
-          "dataCollectionPeriodEnddate": {
-            "type": "date",
-            "format": "strict_date_optional_time||epoch_millis||year",
-            "ignore_malformed": true
-          },
-          "dataCollectionPeriodStartdate": {
-            "type": "date",
-            "format": "strict_date_optional_time||epoch_millis||year",
-            "ignore_malformed": true
-          },
-          "fileLanguages": {
+          "event": {
+            "type": "string",
+            "analyzer": "pasc_standard_analyzer"
+          }
+        }
+      },
+      "dataCollectionPeriodEnddate": {
+        "type": "date",
+        "format": "strict_date_optional_time||epoch_millis||year",
+        "ignore_malformed": true
+      },
+      "dataCollectionPeriodStartdate": {
+        "type": "date",
+        "format": "strict_date_optional_time||epoch_millis||year",
+        "ignore_malformed": true
+      },
+      "fileLanguages": {
+        "type": "string",
+        "index": "not_analyzed",
+        "ignore_above": 256
+      },
+      "id": {
+        "type": "string",
+        "index": "not_analyzed",
+        "ignore_above": 256
+      },
+      "isActive": {
+        "type": "boolean"
+      },
+      "lastModified": {
+        "type": "date",
+        "format": "strict_date_optional_time||epoch_millis"
+      },
+      "pidStudies": {
+        "type": "nested",
+        "properties": {
+          "agency": {
             "type": "string",
             "index": "not_analyzed",
             "ignore_above": 256
           },
+          "pid": {
+            "type": "string",
+            "index": "not_analyzed",
+            "ignore_above": 256
+          }
+        }
+      },
+      "publicationYear": {
+        "type": "date",
+        "format": "strict_date_optional_time||epoch_millis||year"
+      },
+      "publisher": {
+        "type": "nested",
+        "properties": {
+          "abbr": {
+            "type": "string",
+            "index": "not_analyzed",
+            "ignore_above": 256
+          },
+          "publisher": {
+            "type": "string"
+          }
+        }
+      },
+      "samplingProcedureFreeTexts": {
+        "type": "string",
+        "analyzer": "pasc_standard_analyzer",
+        "term_vector": "with_positions_offsets"
+      },
+      "studyAreaCountries": {
+        "type": "nested",
+        "properties": {
+          "abbr": {
+            "type": "string",
+            "index": "not_analyzed",
+            "ignore_above": 256
+          },
+          "country": {
+            "type": "string",
+            "index": "not_analyzed",
+            "ignore_above": 256
+          }
+        }
+      },
+      "studyNumber": {
+        "type": "string",
+        "index": "not_analyzed",
+        "ignore_above": 256
+      },
+      "studyUrl": {
+        "type": "string",
+        "index": "not_analyzed",
+        "ignore_above": 512
+      },
+      "keywords": {
+        "type": "nested",
+        "properties": {
           "id": {
             "type": "string",
             "index": "not_analyzed",
             "ignore_above": 256
           },
-          "isActive": {
-            "type": "boolean"
-          },
-          "lastModified": {
-            "type": "date",
-            "format": "strict_date_optional_time||epoch_millis"
-          },
-          "pidStudies": {
-            "type": "nested",
-            "properties": {
-              "agency": {
-                "type": "string",
-                "index": "not_analyzed",
-                "ignore_above": 256
-              },
-              "pid": {
-                "type": "string",
-                "index": "not_analyzed",
-                "ignore_above": 256
-              }
-            }
-          },
-          "publicationYear": {
-            "type": "date",
-            "format": "strict_date_optional_time||epoch_millis||year"
-          },
-          "publisher": {
-            "type": "nested",
-            "properties": {
-              "abbr": {
-                "type": "string",
-                "index": "not_analyzed",
-                "ignore_above": 256
-              },
-              "publisher": {
-                "type": "string"
-              }
-            }
-          },
-          "samplingProcedureFreeTexts": {
+          "term": {
             "type": "string",
+            "analyzer": "pasc_standard_analyzer",
             "term_vector": "with_positions_offsets"
           },
-          "studyAreaCountries": {
-            "type": "nested",
-            "properties": {
-              "abbr": {
-                "type": "string",
-                "index": "not_analyzed",
-                "ignore_above": 256
-              },
-              "country": {
-                "type": "string",
-                "index": "not_analyzed",
-                "ignore_above": 256
-              }
-            }
-          },
-          "studyNumber": {
+          "vocab": {
             "type": "string",
             "index": "not_analyzed",
             "ignore_above": 256
           },
-          "studyUrl": {
+          "vocabUri": {
             "type": "string",
             "index": "not_analyzed",
-            "ignore_above": 512
+            "ignore_above": 256
+          }
+        }
+      },
+      "typeOfModeOfCollections": {
+        "type": "nested",
+        "properties": {
+         "id": {
+            "type": "string",
+            "index": "not_analyzed",
+            "ignore_above": 256
           },
-          "keywords": {
-            "type": "nested",
-            "properties": {
-              "id": {
-                "type": "string"
-              },
-              "term": {
-                "type": "string"
-              },
-              "vocab": {
-                "type": "string"
-              },
-              "vocabUri": {
-                "type": "string"
-              }
-            }
+          "term": {
+            "type": "string",
+            "analyzer": "pasc_standard_analyzer",
+            "term_vector": "with_positions_offsets"
           },
-          "typeOfModeOfCollections": {
-            "type": "nested",
-            "properties": {
-              "id": {
-                "type": "string"
-              },
-              "term": {
-                "type": "string"
-              },
-              "vocab": {
-                "type": "string"
-              },
-              "vocabUri": {
-                "type": "string"
-              }
-            }
+          "vocab": {
+            "type": "string",
+            "index": "not_analyzed",
+            "ignore_above": 256
           },
-          "typeOfTimeMethods": {
-            "type": "nested",
-            "properties": {
-              "id": {
-                "type": "string"
-              },
-              "term": {
-                "type": "string"
-              },
-              "vocab": {
-                "type": "string"
-              },
-              "vocabUri": {
-                "type": "string"
-              }
-            }
+          "vocabUri": {
+            "type": "string",
+            "index": "not_analyzed",
+            "ignore_above": 256
+          }
+        }
+      },
+      "typeOfTimeMethods": {
+        "type": "nested",
+        "properties": {
+         "id": {
+            "type": "string",
+            "index": "not_analyzed",
+            "ignore_above": 256
           },
-          "unitTypes": {
-            "type": "nested",
-            "properties": {
-              "id": {
-                "type": "string"
-              },
-              "term": {
-                "type": "string"
-              },
-              "vocab": {
-                "type": "string"
-              },
-              "vocabUri": {
-                "type": "string"
-              }
-            },
-            "classifications": {
-              "type": "nested",
-              "properties": {
-                "id": {
-                  "type": "string"
-                },
-                "term": {
-                  "type": "string"
-                },
-                "vocab": {
-                  "type": "string"
-                },
-                "vocabUri": {
-                  "type": "string"
-                }
-              }
-            }
+          "term": {
+            "type": "string",
+            "analyzer": "pasc_standard_analyzer",
+            "term_vector": "with_positions_offsets"
+          },
+          "vocab": {
+            "type": "string",
+            "index": "not_analyzed",
+            "ignore_above": 256
+          },
+          "vocabUri": {
+            "type": "string",
+            "index": "not_analyzed",
+            "ignore_above": 256
+          }
+        }
+      },
+      "unitTypes": {
+        "type": "nested",
+        "properties": {
+         "id": {
+            "type": "string",
+            "index": "not_analyzed",
+            "ignore_above": 256
+          },
+          "term": {
+            "type": "string",
+            "analyzer": "pasc_standard_analyzer",
+            "term_vector": "with_positions_offsets"
+          },
+          "vocab": {
+            "type": "string",
+            "index": "not_analyzed",
+            "ignore_above": 256
+          },
+          "vocabUri": {
+            "type": "string",
+            "index": "not_analyzed",
+            "ignore_above": 256
+          }
+        }
+      },
+      "classifications": {
+        "type": "nested",
+        "properties": {
+         "id": {
+            "type": "string",
+            "index": "not_analyzed",
+            "ignore_above": 256
+          },
+          "term": {
+            "type": "string",
+            "analyzer": "pasc_standard_analyzer",
+            "term_vector": "with_positions_offsets"
+          },
+          "vocab": {
+            "type": "string",
+            "index": "not_analyzed",
+            "ignore_above": 256
+          },
+          "vocabUri": {
+            "type": "string",
+            "index": "not_analyzed",
+            "ignore_above": 256
           }
         }
       }
