@@ -1,7 +1,7 @@
 package eu.cessda.pasc.oci.service;
 
 import eu.cessda.pasc.oci.AbstractSpringTestProfileContext;
-import eu.cessda.pasc.oci.FileHandler;
+import eu.cessda.pasc.oci.helpers.FileHandler;
 import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
@@ -44,7 +44,7 @@ public class SpringTestProfileHarvesterConsumerServiceTest extends AbstractSprin
     when(harvesterDao.listRecordHeaders(anyString())).thenReturn(LIST_RECORDER_HEADERS_BODY_EXAMPLE);
     Repo repo = getUKDSRepo();
 
-    List<RecordHeader> recordHeaders = consumerService.listRecorderHeadersBody(repo);
+    List<RecordHeader> recordHeaders = consumerService.listRecordHeaders(repo);
     assertThat(recordHeaders).hasSize(2);
     recordHeaders.forEach(System.out::println);
   }

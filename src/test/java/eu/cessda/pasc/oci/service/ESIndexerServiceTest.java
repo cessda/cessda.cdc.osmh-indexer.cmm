@@ -2,6 +2,8 @@ package eu.cessda.pasc.oci.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.cessda.pasc.oci.configurations.ESConfigurationProperties;
+import eu.cessda.pasc.oci.helpers.FileHandler;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.service.helpers.EmbeddedElasticsearchServer;
 import lombok.extern.slf4j.Slf4j;
@@ -41,20 +43,25 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 @Slf4j
 public class ESIndexerServiceTest extends EmbeddedElasticsearchServer{
 
+  private ESIndexerService ESIndexerService; // Class under test
   private static final String INDEX_NAME = "cmmstudy_en";
   private static final String INDEX_TYPE = "cmmstudy";
-  private ESIndexerService ESIndexerService;
 
   @Autowired
   private ObjectMapper mapper;
 
+  @Autowired
+  private ESConfigurationProperties esConfigProp;
+
+  @Autowired
+  private FileHandler fileHandler;
 
   @Before
   public void init() {
     startup(ELASTICSEARCH_HOME);
     log.info("Embedded Server initiated");
     ElasticsearchTemplate elasticsearchTemplate = new ElasticsearchTemplate(getClient());
-    ESIndexerService = new ESIndexerService(elasticsearchTemplate);
+    ESIndexerService = new ESIndexerService(elasticsearchTemplate, fileHandler, esConfigProp);
   }
 
   @After

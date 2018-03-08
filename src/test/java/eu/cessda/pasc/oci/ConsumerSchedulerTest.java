@@ -2,7 +2,7 @@ package eu.cessda.pasc.oci;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
-import eu.cessda.pasc.oci.configurations.PaSCOciConfigurationProperties;
+import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.configurations.Repo;
@@ -38,7 +38,7 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
   private ConsumerScheduler scheduler;
   private DebuggingJMXBean debuggingJMXBean;
   private DefaultHarvesterConsumerService defaultConsumerService;
-  private PaSCOciConfigurationProperties paSCOciConfigurationProperties;
+  private AppConfigurationProperties appConfigurationProperties;
   private ESIndexerService esIndexer;
   @Autowired
   private LanguageDocumentExtractor extractor;
@@ -57,14 +57,14 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     when(debuggingJMXBean.printElasticSearchInfo()).thenReturn("printed ES Info");
 
     // mock for configuration of our repos
-    paSCOciConfigurationProperties = mock(PaSCOciConfigurationProperties.class);
-    when(paSCOciConfigurationProperties.getEndpoints()).thenReturn(getEndpoints());
+    appConfigurationProperties = mock(AppConfigurationProperties.class);
+    when(appConfigurationProperties.getEndpoints()).thenReturn(getEndpoints());
 
     // mock for our record headers
     defaultConsumerService = mock(DefaultHarvesterConsumerService.class);
     CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class);
     List<RecordHeader> recordHeaderList = objectMapper.readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE, collectionType);
-    when(defaultConsumerService.listRecorderHeadersBody(any(Repo.class))).thenReturn(recordHeaderList);
+    when(defaultConsumerService.listRecordHeaders(any(Repo.class))).thenReturn(recordHeaderList);
 
     // mock record requests from each header
     when(defaultConsumerService.getRecord(any(Repo.class), eq("998"))).thenReturn(getCmmStudy("998"));
@@ -79,7 +79,7 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
   @Test
   public void shouldIndexAllMetadataInit() {
     // Given
-    scheduler = new ConsumerScheduler(debuggingJMXBean, paSCOciConfigurationProperties, defaultConsumerService, esIndexer, extractor);
+    scheduler = new ConsumerScheduler(debuggingJMXBean, appConfigurationProperties, defaultConsumerService, esIndexer, extractor);
 
     // When
     scheduler.harvestAndIngestRecordsForAllConfiguredSPsRepos();
@@ -88,14 +88,15 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     verify(debuggingJMXBean, times(1)).printCurrentlyConfiguredRepoEndpoints();
     verifyNoMoreInteractions(debuggingJMXBean);
 
-    verify(paSCOciConfigurationProperties, times(1)).getEndpoints();
-    verifyNoMoreInteractions(paSCOciConfigurationProperties);
+    verify(appConfigurationProperties, times(1)).getEndpoints();
+    verifyNoMoreInteractions(appConfigurationProperties);
 
-    verify(defaultConsumerService, times(1)).listRecorderHeadersBody(any(Repo.class));
+    verify(defaultConsumerService, times(1)).listRecordHeaders(any(Repo.class));
     verify(defaultConsumerService, times(2)).getRecord(any(Repo.class), anyString());
     verifyNoMoreInteractions(defaultConsumerService);
 
-    verify(esIndexer, times(4)).bulkIndex(anyListOf(CMMStudyOfLanguage.class), anyString());
+    // No bulk attempt should have been made for "sv" as we dont have any records for "sv". We do for 'en', 'fi', 'de'
+    verify(esIndexer, times(3)).bulkIndex(anyListOf(CMMStudyOfLanguage.class), anyString());
     verifyNoMoreInteractions(esIndexer);
   }
 }

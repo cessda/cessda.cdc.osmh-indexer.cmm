@@ -1,6 +1,6 @@
 package eu.cessda.pasc.oci;
 
-import eu.cessda.pasc.oci.configurations.PaSCOciConfigurationProperties;
+import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +12,11 @@ import static org.assertj.core.api.Java6BDDAssertions.then;
 public class OCIApplicationTests extends AbstractSpringTestProfileContext {
 
   @Autowired
-  private PaSCOciConfigurationProperties paSCOciConfigurationProperties;
+  private AppConfigurationProperties appConfigurationProperties;
 
   @Test
 	public void contextLoads() {
-    then(paSCOciConfigurationProperties).isNotNull();
+    then(appConfigurationProperties).isNotNull();
 	}
 
 }

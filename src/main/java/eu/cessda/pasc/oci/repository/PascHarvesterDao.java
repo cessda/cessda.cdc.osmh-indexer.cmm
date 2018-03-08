@@ -1,6 +1,6 @@
 package eu.cessda.pasc.oci.repository;
 
-import eu.cessda.pasc.oci.configurations.PaSCOciConfigurationProperties;
+import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.helpers.FakeHarvester;
 import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
 import eu.cessda.pasc.oci.models.configurations.Repo;
@@ -28,7 +28,7 @@ public class PascHarvesterDao extends DaoBase implements HarvesterDao {
   private FakeHarvester fakeHarvester;
 
   @Autowired
-  private PaSCOciConfigurationProperties paSCOciConfigurationProperties;
+  private AppConfigurationProperties appConfigurationProperties;
 
   @Override
   public String listRecordHeaders(String spRepository) throws ExternalSystemException {
@@ -52,7 +52,7 @@ public class PascHarvesterDao extends DaoBase implements HarvesterDao {
     if (repoOptional.isPresent()) {
       finalUrl = String.format(LIST_RECORD_TEMPLATE,
           repoOptional.get().getHandler(),
-          paSCOciConfigurationProperties.getHarvester().getVersion(),
+          appConfigurationProperties.getHarvester().getVersion(),
           repositoryUrl);
     }
 
@@ -70,7 +70,7 @@ public class PascHarvesterDao extends DaoBase implements HarvesterDao {
     if (repoOptional.isPresent()) {
       finalUrl = String.format(GET_RECORD_TEMPLATE,
           repoOptional.get().getHandler(),
-          paSCOciConfigurationProperties.getHarvester().getVersion(),
+          appConfigurationProperties.getHarvester().getVersion(),
           encodedStudyID,
           repositoryUrl);
     }

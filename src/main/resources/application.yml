@@ -56,7 +56,8 @@ elasticsearch:
   clustername: elasticsearch
   host: 127.0.0.1
   port: 9300
-
+  numberOfShards: 5
+  numberOfReplicas: 0
 osmhConsumer:
   languages: ['en', 'fi', 'de']
   harvester:
@@ -85,6 +86,8 @@ osmhConsumer:
     connTimeout: 5000
     connRequestTimeout: 5000
     readTimeout: 120000
+#     Slow enough to harvest FSD 10(600_000ms) instead of 2 (120_000ms)
+#    readTimeout: 600000
     verifySSL: false
 
 ---

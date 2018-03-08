@@ -13,6 +13,6 @@ import java.util.Optional;
  * @author moses@doraventures.com
  */
 public interface HarvesterConsumerService {
-  List<RecordHeader> listRecorderHeadersBody(Repo repo);
+  List<RecordHeader> listRecordHeaders(Repo repo);
   Optional<CMMStudy> getRecord(Repo repo, String StudyNumber);
 }

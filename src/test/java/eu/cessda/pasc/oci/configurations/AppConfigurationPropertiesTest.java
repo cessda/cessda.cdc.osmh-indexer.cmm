@@ -18,18 +18,18 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
  * @author moses@doraventures.com
  */
 @RunWith(SpringRunner.class)
-public class PaSCOciConfigurationPropertiesTest extends AbstractSpringTestProfileContext{
+public class AppConfigurationPropertiesTest extends AbstractSpringTestProfileContext{
 
   @Autowired
-  PaSCOciConfigurationProperties paSCOciConfigurationProperties;
+  AppConfigurationProperties appConfigurationProperties;
 
   @Test
   public void shouldReturnConfigurationsForOSMHHandler() {
 
-    then(paSCOciConfigurationProperties.getHarvester().getUrl()).isEqualTo("http://localhost:9091");
-    then(paSCOciConfigurationProperties.getHarvester().getVersion()).isEqualTo("v0");
+    then(appConfigurationProperties.getHarvester().getUrl()).isEqualTo("http://localhost:9091");
+    then(appConfigurationProperties.getHarvester().getVersion()).isEqualTo("v0");
 
-    List<Repo> repos = paSCOciConfigurationProperties.getEndpoints().getRepos();
+    List<Repo> repos = appConfigurationProperties.getEndpoints().getRepos();
     then(repos).isNotNull();
     then(repos).hasSize(4);
 

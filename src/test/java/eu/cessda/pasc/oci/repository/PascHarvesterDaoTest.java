@@ -1,7 +1,7 @@
 package eu.cessda.pasc.oci.repository;
 
 import eu.cessda.pasc.oci.AbstractSpringTestProfileContext;
-import eu.cessda.pasc.oci.FileHandler;
+import eu.cessda.pasc.oci.helpers.FileHandler;
 import eu.cessda.pasc.oci.data.ReposTestData;
 import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
 import org.junit.Before;

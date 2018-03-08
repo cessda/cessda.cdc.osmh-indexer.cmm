@@ -1,4 +1,4 @@
-package eu.cessda.pasc.oci;
+package eu.cessda.pasc.oci.helpers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -22,7 +22,7 @@ public class FileHandler {
     try {
       result = IOUtils.toString(classLoader.getResourceAsStream(fileName));
     } catch (IOException | NullPointerException e) {
-      log.error("Could not read file successfully [{}]", e.getMessage());
+      log.error("Could not read file [{}]. Exception Message [{}]", fileName, e.getMessage());
     }
     return result;
   }

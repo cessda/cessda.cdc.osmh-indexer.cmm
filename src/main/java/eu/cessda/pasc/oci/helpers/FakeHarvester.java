@@ -1,6 +1,6 @@
 package eu.cessda.pasc.oci.helpers;
 
-import eu.cessda.pasc.oci.configurations.PaSCOciConfigurationProperties;
+import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,10 +25,10 @@ import java.util.Optional;
 public class FakeHarvester {
 
   @Autowired
-  private PaSCOciConfigurationProperties paSCOciConfigurationProperties;
+  private AppConfigurationProperties appConfigurationProperties;
 
   public Optional<Repo> getRepoConfigurationProperties(String repositoryUrl) {
-    return paSCOciConfigurationProperties.getEndpoints().getRepos()
+    return appConfigurationProperties.getEndpoints().getRepos()
         .stream()
         .filter(repo -> repo.getUrl().equalsIgnoreCase(repositoryUrl))
         .findFirst();

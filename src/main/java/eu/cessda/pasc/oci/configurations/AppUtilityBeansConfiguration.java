@@ -29,7 +29,7 @@ import java.net.InetAddress;
 @Configuration
 @EnableElasticsearchRepositories(basePackages = "eu.cessda.pasc.oci.repository")
 @Slf4j
-public class UtilitiesConfiguration {
+public class AppUtilityBeansConfiguration {
 
   @Value("${elasticsearch.host}")
   private String esHost;
@@ -41,7 +41,7 @@ public class UtilitiesConfiguration {
   private String esClusterName;
 
   @Autowired
-  PaSCOciConfigurationProperties paSCOciConfigurationProperties;
+  AppConfigurationProperties appConfigurationProperties;
 
   @Bean
   public ObjectMapper objectMapper() {
@@ -62,9 +62,9 @@ public class UtilitiesConfiguration {
 
   private ClientHttpRequestFactory getClientHttpRequestFactory() {
     HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
-    clientHttpRequestFactory.setConnectTimeout(paSCOciConfigurationProperties.getRestTemplateProps().getConnTimeout());
-    clientHttpRequestFactory.setReadTimeout(paSCOciConfigurationProperties.getRestTemplateProps().getReadTimeout());
-    clientHttpRequestFactory.setConnectionRequestTimeout(paSCOciConfigurationProperties.getRestTemplateProps()
+    clientHttpRequestFactory.setConnectTimeout(appConfigurationProperties.getRestTemplateProps().getConnTimeout());
+    clientHttpRequestFactory.setReadTimeout(appConfigurationProperties.getRestTemplateProps().getReadTimeout());
+    clientHttpRequestFactory.setConnectionRequestTimeout(appConfigurationProperties.getRestTemplateProps()
         .getConnRequestTimeout());
     return clientHttpRequestFactory;
   }

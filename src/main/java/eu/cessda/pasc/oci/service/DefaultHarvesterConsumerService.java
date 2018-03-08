@@ -36,7 +36,7 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
   }
 
   @Override
-  public List<RecordHeader> listRecorderHeadersBody(Repo repo) {
+  public List<RecordHeader> listRecordHeaders(Repo repo) {
     List<RecordHeader> recordHeaders = new ArrayList<>();
 
     try {
@@ -44,7 +44,7 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
       CollectionType collectionType = mapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class);
       recordHeaders = mapper.readValue(recordHeadersJsonString, collectionType);
     } catch (ExternalSystemException e) {
-      log.error("ExternalSystemException, Unable to List RecordHeaders response Error[{}]", e.getMessage(), e);
+      log.error("ExternalSystemException! ListRecordHeaders failed for repo [{}]. Error[{}]", repo, e.getMessage(), e);
     } catch (IOException e) {
       log.error("Error, Unable to pass ListRecordHeaders response error[{}]", e.getMessage(), e);
     }
@@ -59,7 +59,7 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
       String recordHeadersJsonString = harvesterDao.getRecord(repo.getUrl(), studyNumber);
       return Optional.ofNullable(CMMStudyConverter.fromJsonString(recordHeadersJsonString));
     } catch (ExternalSystemException e) {
-      log.error("Exception msg[{}]. External system response body[{}]", e.getMessage(), e.getExternalResponseBody());
+      log.warn("Exception msg[{}]. External system response body[{}]", e.getMessage(), e.getExternalResponseBody());
     } catch (IOException e) {
       log.error("Error, Unable to pass GetRecord response error[{}]", e.getMessage(), e);
     }

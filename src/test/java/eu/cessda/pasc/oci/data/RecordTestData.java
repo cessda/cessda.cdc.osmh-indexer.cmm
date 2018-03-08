@@ -1,6 +1,6 @@
 package eu.cessda.pasc.oci.data;
 
-import eu.cessda.pasc.oci.FileHandler;
+import eu.cessda.pasc.oci.helpers.FileHandler;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;

@@ -1,7 +1,6 @@
 {
   "number_of_shards": "%s",
   "number_of_replicas": "%s",
-  "refresh_interval": "10s",
   "analysis": {
     "analyzer": {
       "pasc_standard_analyzer": {

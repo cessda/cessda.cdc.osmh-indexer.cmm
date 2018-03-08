@@ -1,6 +1,6 @@
 package eu.cessda.pasc.oci;
 
-import eu.cessda.pasc.oci.configurations.PaSCOciConfigurationProperties;
+import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
@@ -36,13 +36,13 @@ import java.util.stream.Collectors;
 public class ConsumerScheduler {
 
   private DebuggingJMXBean debuggingJMXBean;
-  private PaSCOciConfigurationProperties configurationProperties;
+  private AppConfigurationProperties configurationProperties;
   private DefaultHarvesterConsumerService defaultConsumerService;
   private ESIndexerService esIndexerService;
   private LanguageDocumentExtractor extractor;
 
   @Autowired
-  public ConsumerScheduler(DebuggingJMXBean debuggingJMXBean, PaSCOciConfigurationProperties configurationProperties,
+  public ConsumerScheduler(DebuggingJMXBean debuggingJMXBean, AppConfigurationProperties configurationProperties,
                            DefaultHarvesterConsumerService consumerService,
                            ESIndexerService esIndexerService,
                            LanguageDocumentExtractor extractor) {
@@ -55,11 +55,11 @@ public class ConsumerScheduler {
 
   /**
    * Auto Starts after delay of 1min at startup
-   *
+   * <p>
    * TODO: incremental run that start at @Scheduled(cron = "0 10 18 * * *") // Everyday at 02:10am
    */
   @ManagedOperation(description = "Manual Trigger to retrieve(harvest) and Ingest records for Configured All SPs Repos")
-  @Scheduled(initialDelay = 60_000L, fixedDelay = 315_360_000_000L) // Auto Starts after delay of 1min at startup
+  @Scheduled(initialDelay = 60_000L, fixedDelay = 315_360_000_000L) // Auto Starts. Delay of 1min at startup.
   public void harvestAndIngestRecordsForAllConfiguredSPsRepos() {
     Instant startTime = Instant.now();
     LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime.toEpochMilli()), ZoneId.systemDefault());
@@ -72,29 +72,40 @@ public class ConsumerScheduler {
     List<Repo> repos = configurationProperties.getEndpoints().getRepos();
     repos.forEach(repo -> {
       Map<String, List<CMMStudyOfLanguage>> langStudies = getCmmStudiesOfEachLangIsoCodeMap(repo);
-      langStudies.forEach((langIsoCode, cmmStudies) -> {
-        log.info("BulkIndexing indexing [{}] index with [{}] CmmStudies", langIsoCode, cmmStudies.size());
-        boolean isSuccessful = esIndexerService.bulkIndex(cmmStudies, langIsoCode);
-        log.info("BulkIndexing was fully Successful [{}], See logs for Id of any failed document above", isSuccessful);
-      });
+      langStudies.forEach((langIsoCode, cmmStudies) -> executeBulk(repo, langIsoCode, cmmStudies));
     });
+  }
+
+  private void executeBulk(Repo repo, String langIsoCode, List<CMMStudyOfLanguage> cmmStudies) {
+    if (cmmStudies.isEmpty()) {
+      log.warn("Empty study list! Nothing to BulkIndex. For repo[{}].  LangIsoCode [{}].", repo, langIsoCode);
+    } else {
+      log.info("BulkIndexing [{}] index with [{}] CmmStudies", langIsoCode, cmmStudies.size());
+      boolean isSuccessful = esIndexerService.bulkIndex(cmmStudies, langIsoCode);
+      if (isSuccessful) {
+        log.info("BulkIndexing was Successful. For repo[{}].  LangIsoCode [{}].", repo, langIsoCode);
+      } else {
+        log.error("BulkIndexing was UnSuccessful. For repo[{}].  LangIsoCode [{}].", repo, langIsoCode);
+      }
+    }
   }
 
   private Map<String, List<CMMStudyOfLanguage>> getCmmStudiesOfEachLangIsoCodeMap(Repo repo) {
     log.info("Processing Repo [{}]", repo.toString());
-    List<RecordHeader> recordHeaders = defaultConsumerService.listRecorderHeadersBody(repo);
+    List<RecordHeader> recordHeaders = defaultConsumerService.listRecordHeaders(repo);
 
     int recordHeadersSize = recordHeaders.size();
     log.info("Repo returned with [{}] record headers", recordHeadersSize);
 
     //TODO: disable below line override. For manual test only!
-   /* int limitSize = 500;
-    if (recordHeadersSize > 1020) {
-      log.info("**********************");
-      log.info("********************** Test *********************************** Truncating records.");
-      log.info("**********************");
-      recordHeaders = recordHeaders.stream().skip(1000).limit(limitSize).collect(Collectors.toList());
-    }*/
+/*
+    if (recordHeadersSize >= 1020) {
+      int limitSize = 20;
+      int skipFirst = 1000;
+      log.info("********************** Test, Skipping first [{}] and limiting to [{}]", skipFirst, limitSize);
+      recordHeaders = recordHeaders.stream().skip(skipFirst).limit(limitSize).collect(Collectors.toList());
+    }
+*/
 
     //or
 /*    int limitSize = 500;
@@ -121,7 +132,7 @@ public class ConsumerScheduler {
   }
 
   private void logEndStatus(LocalDateTime localDateTime, Instant startTime) {
-    String formatMsg = "Consumer and Ingest All SPs Repos Schedule for once a day : Ended at [{}], Duration [{}]";
+    String formatMsg = "Consume and Ingest All SPs Repos Schedule for once a day : Ended at [{}], Duration [{}]";
     log.info(formatMsg, localDateTime, Duration.between(startTime, Instant.now()));
   }
 }

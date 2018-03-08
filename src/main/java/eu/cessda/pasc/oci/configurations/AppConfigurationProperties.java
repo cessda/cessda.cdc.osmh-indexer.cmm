@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Loads Configurations from application*.yml
+ * Loads Default Configurations from application*.yml
  *
  * @author moses@doraventures.com
  */
@@ -20,7 +20,7 @@ import java.util.List;
 @EnableConfigurationProperties
 @ConfigurationProperties(prefix = "osmhConsumer")
 @Getter
-public class PaSCOciConfigurationProperties {
+public class AppConfigurationProperties {
 
   private Endpoints endpoints = new Endpoints();
   private RestTemplateProps restTemplateProps = new RestTemplateProps();

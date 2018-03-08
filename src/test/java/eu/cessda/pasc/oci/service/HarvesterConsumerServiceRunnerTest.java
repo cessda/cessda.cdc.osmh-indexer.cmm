@@ -64,7 +64,7 @@ public class HarvesterConsumerServiceRunnerTest {
   }
 
   private Map<String, Integer> processAndVerify(Repo repo) {
-    List<RecordHeader> recordHeaders = consumerService.listRecorderHeadersBody(repo);
+    List<RecordHeader> recordHeaders = consumerService.listRecordHeaders(repo);
     System.out.println("############################################################################################");
     int size = recordHeaders.size();
     System.out.println(format("Total records found [%s]", size));

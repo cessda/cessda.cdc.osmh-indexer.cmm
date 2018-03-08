@@ -1,5 +1,7 @@
 package eu.cessda.pasc.oci.service;
 
+import eu.cessda.pasc.oci.configurations.ESConfigurationProperties;
+import eu.cessda.pasc.oci.helpers.FileHandler;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,54 +26,111 @@ public class ESIndexerService {
   private static final String INDEX_NAME_TEMPLATE = "cmmstudy_%s";
   private static final String INDEX_TYPE = "cmmstudy";
   private static final int INDEX_COMMIT_SIZE = 500;
-  private ElasticsearchTemplate elasticsearchTemplate;
+  private ElasticsearchTemplate esTemplate;
+  private FileHandler fileHandler;
+  private ESConfigurationProperties esConfig;
 
   @Autowired
-  public ESIndexerService(ElasticsearchTemplate elasticsearchTemplate) {
-    this.elasticsearchTemplate = elasticsearchTemplate;
+  public ESIndexerService(
+      ElasticsearchTemplate esTemplate, FileHandler fileHandler, ESConfigurationProperties esConfig) {
+
+    this.esTemplate = esTemplate;
+    this.fileHandler = fileHandler;
+    this.esConfig = esConfig;
   }
 
   public boolean bulkIndex(List<CMMStudyOfLanguage> languageCMMStudiesMap, String languageIsoCode) {
     String indexName = String.format(INDEX_NAME_TEMPLATE, languageIsoCode);
     boolean isSuccessful = true;
     int counter = 0;
-    try {
 
-      if (!elasticsearchTemplate.indexExists(indexName)) {
-        elasticsearchTemplate.createIndex(indexName);
-      }
-
-      List<IndexQuery> queries = new ArrayList<>();
-      for (CMMStudyOfLanguage cmmStudyOfLanguage : languageCMMStudiesMap) {
-        IndexQuery indexQuery = new IndexQuery();
-        indexQuery.setId(cmmStudyOfLanguage.getId());
-        indexQuery.setObject(cmmStudyOfLanguage);
-        indexQuery.setIndexName(indexName);
-        indexQuery.setType(INDEX_TYPE);
-        queries.add(indexQuery);
-        if (counter % INDEX_COMMIT_SIZE == 0) {
-          executeBulk(queries);
-          queries.clear();
-          log.info("Indexing [{}] index, current bulkIndex counter [{}] ", indexName, counter);
+    if (prepareIndex(indexName, esTemplate, fileHandler)) {
+      try {
+        List<IndexQuery> queries = new ArrayList<>();
+        for (CMMStudyOfLanguage cmmStudyOfLanguage : languageCMMStudiesMap) {
+          IndexQuery indexQuery = getIndexQuery(indexName, cmmStudyOfLanguage);
+          queries.add(indexQuery);
+          if (counter % INDEX_COMMIT_SIZE == 0) {
+            executeBulk(queries);
+            queries.clear();
+            log.info("Indexing [{}] index, current bulkIndex counter [{}] .", indexName, counter);
+          }
+          counter++;
         }
-        counter++;
-      }
 
-      if (!queries.isEmpty()) {
-        executeBulk(queries);
+        if (!queries.isEmpty()) {
+          executeBulk(queries);
+        }
+        esTemplate.refresh(indexName);
+        log.info("[{}] BulkIndex completed.", languageIsoCode);
+      } catch (Exception e) {
+        log.error("[{}] Encountered an exception [{}].", indexName, e.getMessage());
+        isSuccessful = false;
       }
-      elasticsearchTemplate.refresh(indexName);
-      log.info("[{}] BulkIndex completed", languageIsoCode);
-    } catch (Exception e) {
-      log.error("[{}] Encountered an exception [{}]", indexName, e.getMessage());
+    } else {
       isSuccessful = false;
     }
     return isSuccessful;
   }
 
+  private static IndexQuery getIndexQuery(String indexName, CMMStudyOfLanguage cmmStudyOfLanguage) {
+    IndexQuery indexQuery = new IndexQuery();
+    indexQuery.setId(cmmStudyOfLanguage.getId());
+    indexQuery.setObject(cmmStudyOfLanguage);
+    indexQuery.setIndexName(indexName);
+    indexQuery.setType(INDEX_TYPE);
+    return indexQuery;
+  }
+
+  private boolean prepareIndex(String indexName, ElasticsearchTemplate elasticsearchTemplate, FileHandler fileHandler) {
+
+    if (elasticsearchTemplate.indexExists(indexName)) {
+      log.info("Index [{}] Already Exist, Skipping creation.", indexName);
+      return true;
+    }
+
+    log.info("[{}] index does not exist.", indexName);
+    return createIndex(indexName, elasticsearchTemplate, fileHandler);
+  }
+
+  private boolean createIndex(String indexName, ElasticsearchTemplate elasticsearchTemplate, FileHandler fileHandler) {
+    String settingsPath = String.format("elasticsearch/settings/settings_%s.json", indexName);
+    String settingsTemplate = fileHandler.getFileWithUtil(settingsPath);
+    String settings = String.format(settingsTemplate, esConfig.getNumberOfShards(), esConfig.getNumberOfReplicas());
+    String mappingsPath = String.format("elasticsearch/mappings/mappings_%s.json", indexName);
+    String mappings = fileHandler.getFileWithUtil(mappingsPath);
+
+    if (settings.isEmpty() || mappings.isEmpty()) {
+      log.warn("Settings & Mappings must be define for a custom [{}] index creation.", indexName);
+      log.warn("Creating [{}] index with no custom settings or mappings.", indexName);
+      return (elasticsearchTemplate.createIndex(indexName));
+    }
+
+    log.debug("Creating custom [{}] index with settings from [{}]. Content [\n{}\n]",indexName, settingsPath, settings);
+    try {
+      if (!elasticsearchTemplate.createIndex(indexName, settings)) {
+        log.error("Failed custom [{}] index creation!", indexName);
+        return false;
+      } else {
+        log.info("Create custom [{}] index successfully!", indexName);
+        log.debug("Putting [{}] index mapping from [{}] with content [\n{}\n]", indexName, mappingsPath, mappings);
+        if (elasticsearchTemplate.putMapping(indexName, INDEX_TYPE, mappings)) {
+          log.info("Put [{}] index mapping for type [{}] was successful.", indexName, INDEX_TYPE);
+          return true;
+        } else {
+          log.error("Put [{}] index mapping for type [{}] was unsuccessful.", indexName, INDEX_TYPE);
+          return false;
+        }
+      }
+    } catch (Exception e) {
+      log.error("Custom [{}] Index creation failed. Message [{}]", indexName, e.getMessage(), e);
+      return false;
+    }
+  }
+
   private void executeBulk(List<IndexQuery> queries) {
     try {
-      elasticsearchTemplate.bulkIndex(queries);
+      esTemplate.bulkIndex(queries);
     } catch (ElasticsearchException e) {
       log.error("BulkIndexing ElasticsearchException with message [{}]", e.getMessage());
       log.error("BulkIndexing ElasticsearchException: Printing failed documents' Id and Message");

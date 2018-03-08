@@ -1,6 +1,6 @@
 package eu.cessda.pasc.oci.service.helpers;
 
-import eu.cessda.pasc.oci.configurations.PaSCOciConfigurationProperties;
+import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
@@ -26,12 +26,12 @@ import java.util.stream.Collectors;
 public class DebuggingJMXBean {
 
   private ElasticsearchTemplate elasticsearchTemplate;
-  private PaSCOciConfigurationProperties paSCOciConfigurationProperties;
+  private AppConfigurationProperties appConfigProps;
 
   @Autowired
-  public DebuggingJMXBean(ElasticsearchTemplate elasticsearchTemplate, PaSCOciConfigurationProperties paSCOciConfigurationProperties) {
+  public DebuggingJMXBean(ElasticsearchTemplate elasticsearchTemplate, AppConfigurationProperties appConfigProps) {
     this.elasticsearchTemplate = elasticsearchTemplate;
-    this.paSCOciConfigurationProperties = paSCOciConfigurationProperties;
+    this.appConfigProps = appConfigProps;
   }
 
   @ManagedOperation(description = "Prints to log the Elasticsearch server state.")
@@ -65,7 +65,7 @@ public class DebuggingJMXBean {
   public String printCurrentlyConfiguredRepoEndpoints() {
 
     StringBuilder reposStrBuilder = new StringBuilder();
-    for (Repo repo : paSCOciConfigurationProperties.getEndpoints().getRepos()) {
+    for (Repo repo : appConfigProps.getEndpoints().getRepos()) {
       reposStrBuilder.append(
           String.format("\t Repo [%s] url [%s] handler[%s] %n", repo.getName(), repo.getUrl(), repo.getHandler()));
     }
