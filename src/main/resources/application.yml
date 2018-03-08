@@ -98,6 +98,11 @@ osmhhandler:
 
 ---
 spring:
+  profiles: local
+  boot.admin.url: http://localhost:8087
+
+---
+spring:
   profiles: dev
   main:
         banner-mode: "off"

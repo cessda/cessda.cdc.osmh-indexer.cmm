@@ -54,7 +54,7 @@ public class OaiPmhHelpers {
     Optional<Repo> optRepo = oaiPmh.getRepos().stream()
         .filter(repo -> repo.getUrl().equalsIgnoreCase(repoUrl)).findFirst();
     String metadataPrefix = optRepo.map(Repo::getPreferredMetadataParam).orElse(METADATA_DDI_2_5_VALUE);
-    log.info("Configured Metadata format for [{}] as [{}]", repoUrl, metadataPrefix);
+    log.debug("Retrieved Metadata format for [{}] as [{}]", repoUrl, metadataPrefix);
     return metadataPrefix;
   }
 }

@@ -32,7 +32,7 @@ public class DaoBase {
     try {
       log.debug("Sending request to remote SP  for [{}]", fullUrl);
       responseEntity = configuration.getRestTemplate().getForEntity(fullUrl, String.class);
-      log.debug("Got response for [{}] as [{}]", fullUrl, responseEntity.getStatusCodeValue());
+      log.debug("Got response for [{}] responseCode [{}]", fullUrl, responseEntity.getStatusCodeValue());
       return responseEntity.getBody();
     } catch (RestClientException e) {
       ExternalSystemException exception = new ExternalSystemException(UNSUCCESSFUL_RESPONSE, e.getCause());
