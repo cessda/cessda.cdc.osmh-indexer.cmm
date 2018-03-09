@@ -106,7 +106,7 @@ public class ESIndexerService {
       return (elasticsearchTemplate.createIndex(indexName));
     }
 
-    log.debug("Creating custom [{}] index with settings from [{}]. Content [\n{}\n]",indexName, settingsPath, settings);
+    log.debug("Creating custom [{}] index with settings from [{}]. Content [\n{}\n]", indexName, settingsPath, settings);
     try {
       if (!elasticsearchTemplate.createIndex(indexName, settings)) {
         log.error("Failed custom [{}] index creation!", indexName);
@@ -135,7 +135,11 @@ public class ESIndexerService {
       log.error("BulkIndexing ElasticsearchException with message [{}]", e.getMessage());
       log.error("BulkIndexing ElasticsearchException: Printing failed documents' Id and Message");
       Map<String, String> failedDocs = e.getFailedDocuments();
-      failedDocs.forEach((key, value) -> log.info("Id [{}], message [{}]", key, value));
+
+      if (!failedDocs.isEmpty()) {
+        log.error("BulkIndexing failed to index all documents, see errors below alongside documents Ids");
+        failedDocs.forEach((key, value) -> log.error("Failed to index Id [{}], message [{}]", key, value));
+      }
     }
   }
 }

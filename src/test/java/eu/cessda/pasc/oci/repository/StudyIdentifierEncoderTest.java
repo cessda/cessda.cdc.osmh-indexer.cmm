@@ -22,4 +22,15 @@ public class StudyIdentifierEncoderTest {
 
     then(encodedId).isEqualTo(expectedEncodedId);
   }
+
+  @Test
+  public void printEncoding() {
+
+    // Given
+    String identifier = "oai:fsd.uta.fi:FSD2496";
+
+    // When
+    String encodedId = encodeStudyIdentifier().apply(identifier);
+    System.out.println(encodedId);
+  }
 }

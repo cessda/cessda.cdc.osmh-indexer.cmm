@@ -49,10 +49,10 @@ public class DebuggingJMXBeanTest extends EmbeddedElasticsearchServer {
   public void shouldPrintCurrentlyConfiguredRepoEndpoints() {
     String expectedRepos = "\t Repo [UK Data Service] url [https://oai.ukdataservice.ac.uk:8443/oai/provider] " +
         "handler[https://pasc-dev.cessda.eu/osmh-repo] \n" +
-        "\t Repo [Finish Data Services] url [http://services.fsd.uta.fi/v0/oai] " +
-        "handler[https://pasc-dev.cessda.eu/osmh-repo] \n" +
         "\t Repo [GESIS] url [https://dbk.gesis.org/dbkoai] handler[https://pasc-dev.cessda.eu/osmh-repo] \n" +
-        "\t Repo [GESIS De] url [https://dbk.gesis.org/dbkoai/] handler[https://pasc-dev.cessda.eu/osmh-repo] \n";
+        "\t Repo [GESIS De] url [https://dbk.gesis.org/dbkoai/] handler[https://pasc-dev.cessda.eu/osmh-repo] \n" +
+        "\t Repo [Finish Data Services] url [http://services.fsd.uta.fi/v0/oai] " +
+        "handler[https://pasc-dev.cessda.eu/osmh-repo] \n";
 
     // When
     String actualRepos = debuggingJMXBean.printCurrentlyConfiguredRepoEndpoints();
