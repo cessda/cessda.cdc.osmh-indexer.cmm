@@ -11,7 +11,9 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
@@ -184,7 +186,13 @@ class DocElementParser {
   static Map<String, String> getDateElementAttributesValueMap(Document document, XPathFactory xFactory,
                                                               String elementXpath) {
     List<Element> elements = getElementsWithDateAttr(document, xFactory, elementXpath);
-    return elements.stream().collect(Collectors.toMap(element ->
+    return elements.stream()
+        // If the same "event" type is defined for multiple languages the following filter will only allow the first.
+        // eg: <collDate xml:lang="en" date="2009-03-19" event="start"/>
+        //     <collDate xml:lang="fi" date="2009-03-19" event="start"/>
+        // Currently there is no requirement to extract dates of event per language.
+        .filter(distinctByKey(element -> element.getAttributeValue(EVENT_ATTR))) //
+        .collect(Collectors.toMap(element ->
         element.getAttributeValue(EVENT_ATTR), element ->
         element.getAttributeValue(DATE_ATTR)));
   }
@@ -248,5 +256,10 @@ class DocElementParser {
     } else {
       titlesMap.put(xmlLang, currentElementContent); // set first
     }
+  }
+
+  private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+    Map<Object,Boolean> seen = new ConcurrentHashMap<>();
+    return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
   }
 }
