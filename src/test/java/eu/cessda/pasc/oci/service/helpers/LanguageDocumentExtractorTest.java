@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static eu.cessda.pasc.oci.data.RecordTestData.getASingleSyntheticCMMStudyAsList;
+import static eu.cessda.pasc.oci.data.RecordTestData.getSyntheticCMMStudyAndADeletedRecordAsList;
 import static org.assertj.core.api.Java6BDDAssertions.then;
 
 /**
@@ -26,7 +27,7 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
   LanguageDocumentExtractor languageDocumentExtractor;
 
   @Test
-  public void shouldReturnMapOfExtractedDocInThereRespectiveLangDocuments() {
+  public void shouldReturnExtractedDocInThereRespectiveLangDocuments() {
 
     // Given
     List<Optional<CMMStudy>> studies = getASingleSyntheticCMMStudyAsList();
@@ -46,5 +47,32 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
     List<CMMStudyOfLanguage> enStudy = languageDocMap.get("en");
     Optional<String> enCMMStudyJsonStringOpt = CMMStudyOfLanguageConverter.toJsonString(enStudy.get(0));
     enCMMStudyJsonStringOpt.ifPresent(System.out::println);
+  }
+
+  @Test
+  public void shouldReturnExtractedDocInTheirRespectiveLangDocumentsIncludingDeletedRecordsMarkedAsInActive() {
+
+    // Given
+    List<Optional<CMMStudy>> studies = getSyntheticCMMStudyAndADeletedRecordAsList();
+
+    // When
+    Map<String, List<CMMStudyOfLanguage>> languageDocMap =
+        languageDocumentExtractor.mapLanguageDoc(studies, "UK Data Service");
+
+    then(languageDocMap).isNotNull();
+    then(languageDocMap).hasSize(4);
+    then(languageDocMap).containsOnlyKeys("en", "fi", "sv", "de");
+    then(languageDocMap.get("en")).hasSize(2); // a deleted record and an active record that is valid
+    then(languageDocMap.get("fi")).hasSize(2); // a deleted record and an active record that is valid
+    then(languageDocMap.get("sv")).hasSize(1); // a deleted record and an active record that is not valid for lang sv
+    then(languageDocMap.get("de")).hasSize(2); // a deleted record and an active record that is valid
+
+    List<CMMStudyOfLanguage> enStudy = languageDocMap.get("en");
+    System.out.println("Printing Records");
+    enStudy.forEach(cmmStudyOfLanguage -> {
+          Optional<String> enCMMStudyJsonStringOpt = CMMStudyOfLanguageConverter.toJsonString(cmmStudyOfLanguage);
+          enCMMStudyJsonStringOpt.ifPresent(System.out::println);
+        }
+    );
   }
 }

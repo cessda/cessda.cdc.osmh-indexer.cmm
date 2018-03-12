@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static eu.cessda.pasc.oci.data.RecordTestData.getCmmStudyOfLanguageCodeEn;
-import static eu.cessda.pasc.oci.data.RecordTestData.getSyntheticCMMStudyInEn;
+import static eu.cessda.pasc.oci.data.RecordTestData.getSyntheticCMMStudyOfLanguageEn;
 import static org.assertj.core.api.Java6BDDAssertions.then;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
@@ -91,7 +91,7 @@ public class ESIndexerServiceTest extends EmbeddedElasticsearchServer{
 
     // And Assert full json equality
     final JsonNode actualTree = mapper.readTree(response.getHits().getAt(0).getSourceAsString());
-    final JsonNode expectedTree = mapper.readTree(getSyntheticCMMStudyInEn());
+    final JsonNode expectedTree = mapper.readTree(getSyntheticCMMStudyOfLanguageEn());
     assertEquals(expectedTree.toString(), actualTree.toString(), true);
 
     log.info("Printing hits");

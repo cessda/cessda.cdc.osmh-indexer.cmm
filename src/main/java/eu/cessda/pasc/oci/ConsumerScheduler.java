@@ -113,14 +113,19 @@ public class ConsumerScheduler {
     recordHeaders = recordHeaders.stream().limit(limitSize).collect(Collectors.toList());*/
     // or end
 
-    List<Optional<CMMStudy>> cMMStudiesOptions = recordHeaders.stream()
+    List<Optional<CMMStudy>> cMMStudiesOptions = recordHeaders
+        .stream()
         .map(recordHeader -> defaultConsumerService.getRecord(repo, recordHeader.getIdentifier()))
         .collect(Collectors.toList());
 
-    List<Optional<CMMStudy>> presentCMMStudies = cMMStudiesOptions.stream()
-        .filter(Optional::isPresent).collect(Collectors.toList());
+    List<Optional<CMMStudy>> presentCMMStudies = cMMStudiesOptions
+        .stream()
+        .filter(Optional::isPresent)
+        .collect(Collectors.toList());
+
     String msgTemplate = "There are [{}] presentCMMStudies out of [{}] CMMStudiesOptions from [{}] RecordHeaders";
     log.info(msgTemplate, presentCMMStudies.size(), cMMStudiesOptions.size(), recordHeadersSize);
+
     return extractor.mapLanguageDoc(cMMStudiesOptions, repo.getName());
   }
 

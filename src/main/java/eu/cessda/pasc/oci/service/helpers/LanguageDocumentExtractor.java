@@ -69,15 +69,17 @@ public class LanguageDocumentExtractor {
 
     if (!cmmStudy.isPresent()) {
       return false;
+    } else if (!cmmStudy.get().isActive()) {
+      return true; // Inactive = deleted record
     } else {
 
-      //Must have titleStudy
+      // Active record Must have titleStudy
       Optional<Map<String, String>> titleStudy = ofNullable(cmmStudy.get().getTitleStudy());
       if (!titleStudy.isPresent() || !ofNullable(titleStudy.get().get(languageIsoCode)).isPresent()) {
         return false;
       }
 
-      //Must have abstract
+      // Active record Must have abstract
       Optional<Map<String, String>> abstractField = ofNullable(cmmStudy.get().getAbstractField());
       return abstractField.isPresent() && ofNullable(abstractField.get().get(languageIsoCode)).isPresent();
     }

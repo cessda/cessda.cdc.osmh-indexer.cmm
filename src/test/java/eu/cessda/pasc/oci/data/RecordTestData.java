@@ -42,8 +42,19 @@ public class RecordTestData {
   public static List<Optional<CMMStudy>> getASingleSyntheticCMMStudyAsList() {
     List<Optional<CMMStudy>> cmmStudies = new ArrayList<>();
     try {
-      Optional<CMMStudy> cmmStudy = getCmmStudy();
-      cmmStudies.add(cmmStudy);
+      cmmStudies.add(getCmmStudy());
+    } catch (IOException e) {
+      fail("Unable to parse Study string to CMMStudy Object");
+    }
+    return cmmStudies;
+  }
+
+
+  public static List<Optional<CMMStudy>> getSyntheticCMMStudyAndADeletedRecordAsList() {
+    List<Optional<CMMStudy>> cmmStudies = new ArrayList<>();
+    try {
+      cmmStudies.add(getCmmStudy());
+      cmmStudies.add(getDeletedCmmStudy());
     } catch (IOException e) {
       fail("Unable to parse Study string to CMMStudy Object");
     }
@@ -52,8 +63,8 @@ public class RecordTestData {
 
   public static List<CMMStudyOfLanguage> getCmmStudyOfLanguageCodeEn() throws IOException {
     List<CMMStudyOfLanguage> studyOfLanguages = new ArrayList<>();
-    String syntheticRecordEn = getSyntheticCMMStudyInEn();
-    CMMStudyOfLanguage cmmStudyOfLanguage = CMMStudyOfLanguageConverter.fromJsonString(syntheticRecordEn);
+    String syntheticCMMStudyOfLanguageEn = getSyntheticCMMStudyOfLanguageEn();
+    CMMStudyOfLanguage cmmStudyOfLanguage = CMMStudyOfLanguageConverter.fromJsonString(syntheticCMMStudyOfLanguageEn);
     studyOfLanguages.add(cmmStudyOfLanguage);
     return studyOfLanguages;
   }
@@ -63,13 +74,18 @@ public class RecordTestData {
     return Optional.ofNullable(CMMStudyConverter.fromJsonString(cmmStudyString));
   }
 
+  private static Optional<CMMStudy> getDeletedCmmStudy() throws IOException {
+    String cmmStudyString = new FileHandler().getFileWithUtil("record_ukds_1031_deleted.json");
+    return Optional.ofNullable(CMMStudyConverter.fromJsonString(cmmStudyString));
+  }
+
   public static Optional<CMMStudy> getCmmStudy(String identifier) throws IOException {
     Optional<CMMStudy> optionalCmmStudy = getCmmStudy();
     optionalCmmStudy.ifPresent(cmmStudy -> cmmStudy.setStudyNumber(identifier));
     return optionalCmmStudy;
   }
 
-  public static String getSyntheticCMMStudyInEn() {
+  public static String getSyntheticCMMStudyOfLanguageEn() {
     FileHandler fileHandler = new FileHandler();
     return fileHandler.getFileWithUtil("synthetic_complaint_record_en.json");
   }

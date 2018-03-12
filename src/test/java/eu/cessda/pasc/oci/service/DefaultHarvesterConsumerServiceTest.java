@@ -22,13 +22,14 @@ import static eu.cessda.pasc.oci.data.ReposTestData.getUKDSRepo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Java6BDDAssertions.then;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.matches;
 import static org.mockito.Mockito.when;
 
 /**
  * @author moses@doraventures.com
  */
 @RunWith(SpringRunner.class)
-public class SpringTestProfileHarvesterConsumerServiceTest extends AbstractSpringTestProfileContext {
+public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfileContext {
 
   @Mock
   private HarvesterDao harvesterDao;
@@ -65,5 +66,28 @@ public class SpringTestProfileHarvesterConsumerServiceTest extends AbstractSprin
     then(cmmStudy.get().getLastModified()).isEqualTo("2018-02-22T07:48:38Z");
     then(cmmStudy.get().getKeywords()).hasSize(1);
     then(cmmStudy.get().getKeywords().get("en")).hasSize(62);
+  }
+
+  @Test
+  public void shouldReturnDeletedRecordMarkedAsInactive() throws ExternalSystemException {
+    FileHandler fileHandler = new FileHandler();
+    String recordUkds1031 = fileHandler.getFileWithUtil("record_ukds_1031_deleted.json");
+    String recordID = "1031";
+
+    when(harvesterDao.getRecord(anyString(), matches(recordID))).thenReturn(recordUkds1031);
+    Repo repo = getUKDSRepo();
+
+    Optional<CMMStudy> cmmStudy = consumerService.getRecord(repo, recordID);
+
+    assertThat(cmmStudy.isPresent()).isTrue();
+    then(cmmStudy.get().getStudyNumber()).isEqualTo("1031");
+    then(cmmStudy.get().getLastModified()).isEqualTo("2017-05-02T08:31:32Z");
+    then(cmmStudy.get().isActive()).isFalse();
+    then(cmmStudy.get().getDataCollectionPeriodEnddate()).isNull();
+    then(cmmStudy.get().getAbstractField()).isNull();
+    then(cmmStudy.get().getTitleStudy()).isNull();
+    then(cmmStudy.get().getPublisher()).isNull();
+    then(cmmStudy.get().getKeywords()).isNull();
+    then(cmmStudy.get().getCreators()).isNull();
   }
 }
