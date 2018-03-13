@@ -18,9 +18,9 @@ import org.springframework.context.annotation.Configuration;
 @Setter
 public class ESConfigurationProperties {
 
-  private String clustername= "elasticsearch";
-  private String host = "127.0.0.1";
-  private String port = "9300";
+  private String clustername;
+  private String host;
+  private String port;
   private int numberOfShards = 1;
   private int numberOfReplicas = 1;
 }
