@@ -10,7 +10,8 @@
           "standard",
           "lowercase",
           "asciifolding",
-          "english_stop"
+          "german_stop",
+          "german_normalization"
         ]
       },
       "pasc_index_autocomplete_analyzer": {
@@ -20,7 +21,8 @@
           "standard",
           "lowercase",
           "asciifolding",
-          "english_stop",
+          "german_stop",
+          "german_normalization",
           "autocomplete_filter"
         ]
       }
@@ -29,11 +31,11 @@
       "autocomplete_filter": {
         "type": "edge_ngram",
         "min_gram": 1,
-        "max_gram": 20
+        "max_gram": 30
       },
-      "english_stop": {
+      "german_stop": {
         "type": "stop",
-        "stopwords": "_english_"
+        "stopwords": "_german_"
       }
     }
   }
