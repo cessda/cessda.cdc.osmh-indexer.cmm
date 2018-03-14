@@ -1,4 +1,4 @@
-package eu.cessda.pasc.oci.service;
+package eu.cessda.pasc.oci.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
@@ -8,11 +8,13 @@ import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.repository.HarvesterDao;
+import eu.cessda.pasc.oci.service.HarvesterConsumerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +38,7 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
   }
 
   @Override
-  public List<RecordHeader> listRecordHeaders(Repo repo) {
+  public List<RecordHeader> listRecordHeaders(Repo repo, LocalDateTime lastModifiedDate) {
     List<RecordHeader> recordHeaders = new ArrayList<>();
 
     try {

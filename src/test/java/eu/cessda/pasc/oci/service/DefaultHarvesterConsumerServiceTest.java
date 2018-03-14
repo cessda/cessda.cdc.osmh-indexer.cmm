@@ -7,6 +7,7 @@ import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.repository.HarvesterDao;
+import eu.cessda.pasc.oci.service.impl.DefaultHarvesterConsumerService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -36,8 +37,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
 
   @InjectMocks
   @Autowired
-//  HarvesterConsumerService consumerService;
-      DefaultHarvesterConsumerService consumerService;
+  DefaultHarvesterConsumerService defaultHarvesterConsumerService;
 
   @Test
   public void shouldReturnASuccessfulResponseForListingRecordHeaders() throws ExternalSystemException {
@@ -45,7 +45,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
     when(harvesterDao.listRecordHeaders(anyString())).thenReturn(LIST_RECORDER_HEADERS_BODY_EXAMPLE);
     Repo repo = getUKDSRepo();
 
-    List<RecordHeader> recordHeaders = consumerService.listRecordHeaders(repo);
+    List<RecordHeader> recordHeaders = defaultHarvesterConsumerService.listRecordHeaders(repo, null);
     assertThat(recordHeaders).hasSize(2);
     recordHeaders.forEach(System.out::println);
   }
@@ -59,7 +59,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
     when(harvesterDao.getRecord(anyString(), anyString())).thenReturn(recordUkds998);
     Repo repo = getUKDSRepo();
 
-    Optional<CMMStudy> cmmStudy = consumerService.getRecord(repo, recordID);
+    Optional<CMMStudy> cmmStudy = defaultHarvesterConsumerService.getRecord(repo, recordID);
 
     assertThat(cmmStudy.isPresent()).isTrue();
     then(cmmStudy.get().getStudyNumber()).isEqualTo("998");
@@ -77,7 +77,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
     when(harvesterDao.getRecord(anyString(), matches(recordID))).thenReturn(recordUkds1031);
     Repo repo = getUKDSRepo();
 
-    Optional<CMMStudy> cmmStudy = consumerService.getRecord(repo, recordID);
+    Optional<CMMStudy> cmmStudy = defaultHarvesterConsumerService.getRecord(repo, recordID);
 
     assertThat(cmmStudy.isPresent()).isTrue();
     then(cmmStudy.get().getStudyNumber()).isEqualTo("1031");

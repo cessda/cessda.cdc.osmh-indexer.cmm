@@ -5,7 +5,7 @@ import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.configurations.Repo;
-import eu.cessda.pasc.oci.service.DefaultHarvesterConsumerService;
+import eu.cessda.pasc.oci.service.HarvesterConsumerService;
 import eu.cessda.pasc.oci.service.IngestService;
 import eu.cessda.pasc.oci.service.helpers.DebuggingJMXBean;
 import eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor;
@@ -35,40 +35,53 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ConsumerScheduler {
 
+  private static final String FULL_RUN = "Full Run";
+  private static final String DAILY_INCREMENTAL_RUN = "Daily Incremental Run";
   private DebuggingJMXBean debuggingJMXBean;
   private AppConfigurationProperties configurationProperties;
-  private DefaultHarvesterConsumerService defaultConsumerService;
+  private HarvesterConsumerService harvesterConsumerService;
   private IngestService esIndexerService;
   private LanguageDocumentExtractor extractor;
 
   @Autowired
   public ConsumerScheduler(DebuggingJMXBean debuggingJMXBean, AppConfigurationProperties configurationProperties,
-                           DefaultHarvesterConsumerService consumerService,
+                           HarvesterConsumerService harvesterConsumerService,
                            IngestService esIndexerService,
                            LanguageDocumentExtractor extractor) {
     this.debuggingJMXBean = debuggingJMXBean;
     this.configurationProperties = configurationProperties;
-    this.defaultConsumerService = consumerService;
+    this.harvesterConsumerService = harvesterConsumerService;
     this.esIndexerService = esIndexerService;
     this.extractor = extractor;
   }
 
   /**
    * Auto Starts after delay of 1min at startup
-   * <p>
-   * TODO: incremental run that start at @Scheduled(cron = "0 10 18 * * *") // Everyday at 02:10am
    */
-  @ManagedOperation(description = "Manual Trigger to retrieve(harvest) and Ingest records for Configured All SPs Repos")
+  @ManagedOperation(description = "Manual trigger to do a full harvest and ingests run")
   @Scheduled(initialDelay = 60_000L, fixedDelay = 315_360_000_000L) // Auto Starts. Delay of 1min at startup.
   public void harvestAndIngestRecordsForAllConfiguredSPsRepos() {
     Instant startTime = Instant.now();
     LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime.toEpochMilli()), ZoneId.systemDefault());
-    logStartStatus(date);
-    execute();
-    logEndStatus(date, startTime);
+    logStartStatus(date, FULL_RUN);
+    executeFullRun();
+    logEndStatus(date, startTime, FULL_RUN);
   }
 
-  private void execute() {
+  /**
+   * Daily Harvest and Ingestion run.
+   */
+  @ManagedOperation(description = "Manual trigger to do an incremental harvest and ingest run")
+  @Scheduled(cron = "0 10 18 * * *") // Everyday at 02:10am
+  public void harvestAndIngestRecordsForAllConfiguredSPsReposDailyIncrement() {
+    Instant startTime = Instant.now();
+    LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime.toEpochMilli()), ZoneId.systemDefault());
+    logStartStatus(date, DAILY_INCREMENTAL_RUN);
+//    executeIncrimentalRun(); //TODO implement.
+    logEndStatus(date, startTime, DAILY_INCREMENTAL_RUN);
+  }
+
+  private void executeFullRun() {
     List<Repo> repos = configurationProperties.getEndpoints().getRepos();
     repos.forEach(repo -> {
       Map<String, List<CMMStudyOfLanguage>> langStudies = getCmmStudiesOfEachLangIsoCodeMap(repo);
@@ -92,7 +105,7 @@ public class ConsumerScheduler {
 
   private Map<String, List<CMMStudyOfLanguage>> getCmmStudiesOfEachLangIsoCodeMap(Repo repo) {
     log.info("Processing Repo [{}]", repo.toString());
-    List<RecordHeader> recordHeaders = defaultConsumerService.listRecordHeaders(repo);
+    List<RecordHeader> recordHeaders = harvesterConsumerService.listRecordHeaders(repo, null);
 
     int recordHeadersSize = recordHeaders.size();
     log.info("Repo returned with [{}] record headers", recordHeadersSize);
@@ -115,7 +128,7 @@ public class ConsumerScheduler {
 
     List<Optional<CMMStudy>> cMMStudiesOptions = recordHeaders
         .stream()
-        .map(recordHeader -> defaultConsumerService.getRecord(repo, recordHeader.getIdentifier()))
+        .map(recordHeader -> harvesterConsumerService.getRecord(repo, recordHeader.getIdentifier()))
         .collect(Collectors.toList());
 
     List<Optional<CMMStudy>> presentCMMStudies = cMMStudiesOptions
@@ -129,15 +142,15 @@ public class ConsumerScheduler {
     return extractor.mapLanguageDoc(cMMStudiesOptions, repo.getName());
   }
 
-  private void logStartStatus(LocalDateTime localDateTime) {
-    log.info("Full Run - Consume and Ingest All SPs Repos : Started at [{}]", localDateTime);
+  private void logStartStatus(LocalDateTime localDateTime, String runDescription) {
+    log.info("[{}] Consume and Ingest All SPs Repos : Started at [{}]", runDescription, localDateTime);
     log.info("Currents state before run:");
     debuggingJMXBean.printCurrentlyConfiguredRepoEndpoints();
     debuggingJMXBean.printElasticSearchInfo();
   }
 
-  private void logEndStatus(LocalDateTime localDateTime, Instant startTime) {
-    String formatMsg = "Consume and Ingest All SPs Repos Schedule for once a day : Ended at [{}], Duration [{}]";
-    log.info(formatMsg, localDateTime, Duration.between(startTime, Instant.now()));
+  private void logEndStatus(LocalDateTime localDateTime, Instant startTime, String runDescription) {
+    String formatMsg = "[{}] Consume and Ingest All SPs Repos Ended at [{}], Duration [{}]";
+    log.info(formatMsg, runDescription, localDateTime, Duration.between(startTime, Instant.now()));
   }
 }

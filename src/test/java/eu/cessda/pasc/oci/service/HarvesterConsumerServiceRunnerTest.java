@@ -43,7 +43,7 @@ import static org.junit.Assert.fail;
 public class HarvesterConsumerServiceRunnerTest {
 
   @Autowired
-  DefaultHarvesterConsumerService consumerService;
+  HarvesterConsumerService harvesterConsumerService;
 
   @Test
   public void shouldReturnASuccessfulResponseForUKDS() {
@@ -64,7 +64,7 @@ public class HarvesterConsumerServiceRunnerTest {
   }
 
   private Map<String, Integer> processAndVerify(Repo repo) {
-    List<RecordHeader> recordHeaders = consumerService.listRecordHeaders(repo);
+    List<RecordHeader> recordHeaders = harvesterConsumerService.listRecordHeaders(repo, null);
     System.out.println("############################################################################################");
     int size = recordHeaders.size();
     System.out.println(format("Total records found [%s]", size));
@@ -78,7 +78,7 @@ public class HarvesterConsumerServiceRunnerTest {
       log.info(recordHeader.toString());
 
       log.info("|------------------------------Record CmmStudy----------------------------------------|");
-      Optional<CMMStudy> optionalCmmStudy = consumerService.getRecord(repo, recordHeader.getIdentifier());
+      Optional<CMMStudy> optionalCmmStudy = harvesterConsumerService.getRecord(repo, recordHeader.getIdentifier());
 
       if (optionalCmmStudy.isPresent()) {
         Optional<String> cMMStudyConverterJsonString = CMMStudyConverter.toJsonString(optionalCmmStudy.get());
