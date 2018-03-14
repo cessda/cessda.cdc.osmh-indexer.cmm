@@ -41,9 +41,9 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 @SpringBootTest
 @ActiveProfiles("test")
 @Slf4j
-public class ESIndexerServiceTest extends EmbeddedElasticsearchServer{
+public class ESIngestServiceTest extends EmbeddedElasticsearchServer{
 
-  private ESIndexerService ESIndexerService; // Class under test
+  private IngestService eSIndexerService; // Class under test
   private static final String INDEX_NAME = "cmmstudy_en";
   private static final String INDEX_TYPE = "cmmstudy";
 
@@ -61,7 +61,7 @@ public class ESIndexerServiceTest extends EmbeddedElasticsearchServer{
     startup(ELASTICSEARCH_HOME);
     log.info("Embedded Server initiated");
     ElasticsearchTemplate elasticsearchTemplate = new ElasticsearchTemplate(getClient());
-    ESIndexerService = new ESIndexerService(elasticsearchTemplate, fileHandler, esConfigProp);
+    eSIndexerService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp);
   }
 
   @After
@@ -79,7 +79,7 @@ public class ESIndexerServiceTest extends EmbeddedElasticsearchServer{
     List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEn();
 
     // When
-    boolean isSuccessful = this.ESIndexerService.bulkIndex(studyOfLanguages, language);
+    boolean isSuccessful = this.eSIndexerService.bulkIndex(studyOfLanguages, language);
 
     // Then
     then(isSuccessful).isTrue();

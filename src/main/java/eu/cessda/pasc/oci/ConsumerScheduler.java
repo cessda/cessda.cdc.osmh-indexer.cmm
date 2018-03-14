@@ -6,7 +6,7 @@ import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.service.DefaultHarvesterConsumerService;
-import eu.cessda.pasc.oci.service.ESIndexerService;
+import eu.cessda.pasc.oci.service.IngestService;
 import eu.cessda.pasc.oci.service.helpers.DebuggingJMXBean;
 import eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,13 +38,13 @@ public class ConsumerScheduler {
   private DebuggingJMXBean debuggingJMXBean;
   private AppConfigurationProperties configurationProperties;
   private DefaultHarvesterConsumerService defaultConsumerService;
-  private ESIndexerService esIndexerService;
+  private IngestService esIndexerService;
   private LanguageDocumentExtractor extractor;
 
   @Autowired
   public ConsumerScheduler(DebuggingJMXBean debuggingJMXBean, AppConfigurationProperties configurationProperties,
                            DefaultHarvesterConsumerService consumerService,
-                           ESIndexerService esIndexerService,
+                           IngestService esIndexerService,
                            LanguageDocumentExtractor extractor) {
     this.debuggingJMXBean = debuggingJMXBean;
     this.configurationProperties = configurationProperties;

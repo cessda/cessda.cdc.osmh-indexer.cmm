@@ -10,6 +10,7 @@ import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,9 +22,10 @@ import java.util.Map;
  */
 @Service
 @Slf4j
-public class ESIndexerService {
+public class ESIngestService implements IngestService {
 
   private static final String INDEX_NAME_TEMPLATE = "cmmstudy_%s";
+  private static final String INDEX_NAME_PATTERN = "cmmstudy_*";
   private static final String INDEX_TYPE = "cmmstudy";
   private static final int INDEX_COMMIT_SIZE = 500;
   private ElasticsearchTemplate esTemplate;
@@ -31,7 +33,7 @@ public class ESIndexerService {
   private ESConfigurationProperties esConfig;
 
   @Autowired
-  public ESIndexerService(
+  public ESIngestService(
       ElasticsearchTemplate esTemplate, FileHandler fileHandler, ESConfigurationProperties esConfig) {
 
     this.esTemplate = esTemplate;
@@ -71,6 +73,11 @@ public class ESIndexerService {
       isSuccessful = false;
     }
     return isSuccessful;
+  }
+
+  @Override
+  public LocalDateTime getMostRecentLastModified(String indexPattern) {
+    return null;
   }
 
   private static IndexQuery getIndexQuery(String indexName, CMMStudyOfLanguage cmmStudyOfLanguage) {

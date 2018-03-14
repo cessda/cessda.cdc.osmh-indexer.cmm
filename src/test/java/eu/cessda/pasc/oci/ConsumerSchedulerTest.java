@@ -7,7 +7,7 @@ import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.service.DefaultHarvesterConsumerService;
-import eu.cessda.pasc.oci.service.ESIndexerService;
+import eu.cessda.pasc.oci.service.IngestService;
 import eu.cessda.pasc.oci.service.helpers.DebuggingJMXBean;
 import eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor;
 import org.junit.Before;
@@ -39,7 +39,7 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
   private DebuggingJMXBean debuggingJMXBean;
   private DefaultHarvesterConsumerService defaultConsumerService;
   private AppConfigurationProperties appConfigurationProperties;
-  private ESIndexerService esIndexer;
+  private IngestService esIndexer;
   @Autowired
   private LanguageDocumentExtractor extractor;
 
@@ -71,7 +71,7 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     when(defaultConsumerService.getRecord(any(Repo.class), eq("997"))).thenReturn(getCmmStudy("997"));
 
     // mock for ES bulking
-    esIndexer = mock(ESIndexerService.class);
+    esIndexer = mock(IngestService.class);
     when(esIndexer.bulkIndex(anyListOf(CMMStudyOfLanguage.class), anyString())).thenReturn(true);
   }
 
