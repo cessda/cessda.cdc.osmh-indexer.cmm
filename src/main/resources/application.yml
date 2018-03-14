@@ -86,7 +86,7 @@ osmhConsumer:
   restTemplateProps:
     connTimeout: 5000
     connRequestTimeout: 5000
-    readTimeout: 120000
+    readTimeout: 60000
 #     Slow enough to harvest FSD 10(600_000ms) instead of 2 (120_000ms)
 #    readTimeout: 600000
     verifySSL: false

@@ -16,10 +16,7 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -58,33 +55,33 @@ public class ConsumerScheduler {
   /**
    * Auto Starts after delay of 1min at startup
    */
-  @ManagedOperation(description = "Manual trigger to do a full harvest and ingests run")
+  @ManagedOperation(description = "Manual trigger to do a full harvest and ingestion run")
   @Scheduled(initialDelay = 60_000L, fixedDelay = 315_360_000_000L) // Auto Starts. Delay of 1min at startup.
-  public void harvestAndIngestRecordsForAllConfiguredSPsRepos() {
+  public void fullHarvestAndIngestionAllConfiguredSPsReposRecords() {
     Instant startTime = Instant.now();
     LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime.toEpochMilli()), ZoneId.systemDefault());
     logStartStatus(date, FULL_RUN);
-    executeFullRun();
+    executeHarvestAndIngest(null);
     logEndStatus(date, startTime, FULL_RUN);
   }
 
   /**
    * Daily Harvest and Ingestion run.
    */
-  @ManagedOperation(description = "Manual trigger to do an incremental harvest and ingest run")
-  @Scheduled(cron = "0 10 18 * * *") // Everyday at 02:10am
-  public void harvestAndIngestRecordsForAllConfiguredSPsReposDailyIncrement() {
+  @ManagedOperation(description = "Manual trigger to do an incremental harvest and ingestion run")
+  @Scheduled(cron = "0 15 03 * * *") // Everyday at 03:15am
+  public void dailyIncrementalHarvestAndIngestionAllConfiguredSPsReposRecords() {
     Instant startTime = Instant.now();
     LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime.toEpochMilli()), ZoneId.systemDefault());
     logStartStatus(date, DAILY_INCREMENTAL_RUN);
-//    executeIncrimentalRun(); //TODO implement.
+    executeHarvestAndIngest(esIndexerService.getMostRecentLastModified());
     logEndStatus(date, startTime, DAILY_INCREMENTAL_RUN);
   }
 
-  private void executeFullRun() {
+  private void executeHarvestAndIngest(LocalDateTime lastModifiedDateTime) {
     List<Repo> repos = configurationProperties.getEndpoints().getRepos();
     repos.forEach(repo -> {
-      Map<String, List<CMMStudyOfLanguage>> langStudies = getCmmStudiesOfEachLangIsoCodeMap(repo);
+      Map<String, List<CMMStudyOfLanguage>> langStudies = getCmmStudiesOfEachLangIsoCodeMap(repo, lastModifiedDateTime);
       langStudies.forEach((langIsoCode, cmmStudies) -> executeBulk(repo, langIsoCode, cmmStudies));
     });
   }
@@ -103,9 +100,9 @@ public class ConsumerScheduler {
     }
   }
 
-  private Map<String, List<CMMStudyOfLanguage>> getCmmStudiesOfEachLangIsoCodeMap(Repo repo) {
+  private Map<String, List<CMMStudyOfLanguage>> getCmmStudiesOfEachLangIsoCodeMap(Repo repo, LocalDateTime lastModifiedDateTime) {
     log.info("Processing Repo [{}]", repo.toString());
-    List<RecordHeader> recordHeaders = harvesterConsumerService.listRecordHeaders(repo, null);
+    List<RecordHeader> recordHeaders = harvesterConsumerService.listRecordHeaders(repo, lastModifiedDateTime);
 
     int recordHeadersSize = recordHeaders.size();
     log.info("Repo returned with [{}] record headers", recordHeadersSize);

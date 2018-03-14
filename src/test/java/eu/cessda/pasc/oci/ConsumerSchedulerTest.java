@@ -82,7 +82,7 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     scheduler = new ConsumerScheduler(debuggingJMXBean, appConfigurationProperties, harvesterConsumerService, esIndexer, extractor);
 
     // When
-    scheduler.harvestAndIngestRecordsForAllConfiguredSPsRepos();
+    scheduler.fullHarvestAndIngestionAllConfiguredSPsReposRecords();
 
     verify(debuggingJMXBean, times(1)).printElasticSearchInfo();
     verify(debuggingJMXBean, times(1)).printCurrentlyConfiguredRepoEndpoints();

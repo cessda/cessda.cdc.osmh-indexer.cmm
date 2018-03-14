@@ -76,8 +76,9 @@ public class ESIngestService implements IngestService {
   }
 
   @Override
-  public LocalDateTime getMostRecentLastModified(String indexPattern) {
-    return null;
+  public LocalDateTime getMostRecentLastModified() {
+    // TODO: esTemplate.q
+    throw new RuntimeException("Not yet Implemented");
   }
 
   private static IndexQuery getIndexQuery(String indexName, CMMStudyOfLanguage cmmStudyOfLanguage) {

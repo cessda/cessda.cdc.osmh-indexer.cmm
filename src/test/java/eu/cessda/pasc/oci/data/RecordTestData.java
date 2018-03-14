@@ -38,6 +38,68 @@ public class RecordTestData {
       "  }\n" +
       "]";
 
+  public static final String LIST_RECORDER_HEADERS_X6 = "" +
+      "[\n" +
+      "  {\n" +
+      "    \"lastModified\": \"2018-02-22T07:48:38Z\",\n" +
+      "    \"type\": \"Study\",\n" +
+      "    \"recordType\": \"RecordHeader\",\n" +
+      "    \"identifier\": \"997\"\n" +
+      "  },\n" +
+      "  {\n" +
+      "    \"lastModified\": \"2018-02-01T07:48:38Z\",\n" +
+      "    \"type\": \"Study\",\n" +
+      "    \"recordType\": \"RecordHeader\",\n" +
+      "    \"identifier\": \"999\"\n" +
+      "  },\n" +
+      "  {\n" +
+      "    \"lastModified\": \"2018-02-22T07:48:38Z\",\n" +
+      "    \"type\": \"Study\",\n" +
+      "    \"recordType\": \"RecordHeader\",\n" +
+      "    \"identifier\": \"998\"\n" +
+      "  },\n" +
+      "  {\n" +
+      "    \"lastModified\": \"2018-01-05T07:48:38Z\",\n" +
+      "    \"type\": \"Study\",\n" +
+      "    \"recordType\": \"RecordHeader\",\n" +
+      "    \"identifier\": \"1000\"\n" +
+      "  },\n" +
+      "  {\n" +
+      "    \"lastModified\": \"2018-01-15T07:48:38Z\",\n" +
+      "    \"type\": \"Study\",\n" +
+      "    \"recordType\": \"RecordHeader\",\n" +
+      "    \"identifier\": \"1001\"\n" +
+      "  },\n" +
+      "  {\n" +
+      "    \"lastModified\": \"2016-02-22T07:48:38Z\",\n" +
+      "    \"type\": \"Study\",\n" +
+      "    \"recordType\": \"RecordHeader\",\n" +
+      "    \"identifier\": \"1002\"\n" +
+      "  }\n" +
+      "]";
+
+  public static final String LIST_RECORDER_HEADERS_WITH_INVALID_DATETIME = "" +
+      "[\n" +
+      "  {\n" +
+      "    \"lastModified\": \"2018-02-22\",\n" +
+      "    \"type\": \"Study\",\n" +
+      "    \"recordType\": \"RecordHeader\",\n" +
+      "    \"identifier\": \"997\"\n" +
+      "  },\n" +
+      "  {\n" +
+      "    \"lastModified\": \"2018-02-01T07:48:38Z\",\n" +
+      "    \"type\": \"Study\",\n" +
+      "    \"recordType\": \"RecordHeader\",\n" +
+      "    \"identifier\": \"999\"\n" +
+      "  },\n" +
+      "  {\n" +
+      "    \"lastModified\": \"2018-00-00\",\n" +
+      "    \"type\": \"Study\",\n" +
+      "    \"recordType\": \"RecordHeader\",\n" +
+      "    \"identifier\": \"998\"\n" +
+      "  }\n" +
+      "]";
+
 
   public static List<Optional<CMMStudy>> getASingleSyntheticCMMStudyAsList() {
     List<Optional<CMMStudy>> cmmStudies = new ArrayList<>();

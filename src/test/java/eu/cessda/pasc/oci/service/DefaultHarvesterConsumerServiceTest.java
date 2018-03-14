@@ -2,6 +2,7 @@ package eu.cessda.pasc.oci.service;
 
 import eu.cessda.pasc.oci.AbstractSpringTestProfileContext;
 import eu.cessda.pasc.oci.helpers.FileHandler;
+import eu.cessda.pasc.oci.helpers.TimeUtility;
 import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
@@ -15,10 +16,11 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static eu.cessda.pasc.oci.data.RecordTestData.LIST_RECORDER_HEADERS_BODY_EXAMPLE;
+import static eu.cessda.pasc.oci.data.RecordTestData.*;
 import static eu.cessda.pasc.oci.data.ReposTestData.getUKDSRepo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Java6BDDAssertions.then;
@@ -47,7 +49,47 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
 
     List<RecordHeader> recordHeaders = defaultHarvesterConsumerService.listRecordHeaders(repo, null);
     assertThat(recordHeaders).hasSize(2);
-    recordHeaders.forEach(System.out::println);
+  }
+
+  @Test
+  public void shouldReturnFilterRecordHeadersByLastModifiedDate() throws ExternalSystemException {
+    Repo repo = getUKDSRepo();
+    LocalDateTime lastModifiedDateCutOff = TimeUtility.getLocalDateTime("2018-02-01T07:48:38Z").get();
+
+    when(harvesterDao.listRecordHeaders(anyString())).thenReturn(LIST_RECORDER_HEADERS_X6);
+    List<RecordHeader> recordHeaders = defaultHarvesterConsumerService.listRecordHeaders(repo, lastModifiedDateCutOff);
+
+    assertThat(recordHeaders).hasSize(2);
+    recordHeaders.forEach(recordHeader -> {
+      LocalDateTime currentLastModified = TimeUtility.getLocalDateTime(recordHeader.getLastModified()).orElse(null);
+      then(currentLastModified).isGreaterThan(lastModifiedDateCutOff);
+    });
+  }
+
+  @Test
+  public void shouldFilterRecordHeadersByLastModifiedDateAndInvalidLastDateTimeStrings() throws ExternalSystemException {
+    Repo repo = getUKDSRepo();
+    LocalDateTime lastModifiedCutOff = TimeUtility.getLocalDateTime("2018-02-10T07:48:38Z").orElse(null);
+
+    when(harvesterDao.listRecordHeaders(anyString())).thenReturn(LIST_RECORDER_HEADERS_WITH_INVALID_DATETIME);
+    List<RecordHeader> recordHeaders = defaultHarvesterConsumerService.listRecordHeaders(repo, lastModifiedCutOff);
+
+    assertThat(recordHeaders).hasSize(1);
+    recordHeaders.forEach(recordHeader -> {
+      LocalDateTime currentLastModified = TimeUtility.getLocalDateTime(recordHeader.getLastModified()).orElse(null);
+      then(currentLastModified).isGreaterThan(lastModifiedCutOff);
+    });
+  }
+
+  @Test
+  public void shouldReturnUnFilterRecordHeadersWhenLastModifiedDateIsNull() throws ExternalSystemException {
+
+    // FIXME: add more mocks to LIST_RECORDER_HEADERS_BODY_EXAMPLE with very old timestamps to filter out
+    when(harvesterDao.listRecordHeaders(anyString())).thenReturn(LIST_RECORDER_HEADERS_X6);
+    Repo repo = getUKDSRepo();
+
+    List<RecordHeader> recordHeaders = defaultHarvesterConsumerService.listRecordHeaders(repo, null);
+    assertThat(recordHeaders).hasSize(6);
   }
 
   @Test

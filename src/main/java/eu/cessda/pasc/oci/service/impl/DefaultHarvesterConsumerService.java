@@ -2,6 +2,7 @@ package eu.cessda.pasc.oci.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
+import eu.cessda.pasc.oci.helpers.TimeUtility;
 import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
@@ -18,6 +19,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Default OSMH Consumer Service implementation
@@ -39,19 +42,19 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
 
   @Override
   public List<RecordHeader> listRecordHeaders(Repo repo, LocalDateTime lastModifiedDate) {
-    List<RecordHeader> recordHeaders = new ArrayList<>();
+    List<RecordHeader> recordHeadersUnfiltered = new ArrayList<>();
 
     try {
       String recordHeadersJsonString = harvesterDao.listRecordHeaders(repo.getUrl());
       CollectionType collectionType = mapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class);
-      recordHeaders = mapper.readValue(recordHeadersJsonString, collectionType);
+      recordHeadersUnfiltered = mapper.readValue(recordHeadersJsonString, collectionType);
     } catch (ExternalSystemException e) {
       log.error("ExternalSystemException! ListRecordHeaders failed for repo [{}]. Error[{}]", repo, e.getMessage(), e);
     } catch (IOException e) {
       log.error("Error, Unable to pass ListRecordHeaders response error[{}]", e.getMessage(), e);
     }
 
-    return recordHeaders;
+    return filterRecords(recordHeadersUnfiltered, lastModifiedDate);
   }
 
   @Override
@@ -67,5 +70,26 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
     }
 
     return Optional.empty();
+  }
+
+  private List<RecordHeader> filterRecords(List<RecordHeader> recordHeadersUnfiltered, LocalDateTime ingestedLastModifiedDate) {
+
+    Optional<LocalDateTime> ingestedLastModifiedDateOption = Optional.ofNullable(ingestedLastModifiedDate);
+
+    return ingestedLastModifiedDateOption
+        .map(lastModifiedDate -> recordHeadersUnfiltered.stream()
+            .filter(isHeaderTimeGreater(ingestedLastModifiedDate))
+            .collect(Collectors.toList()))
+        .orElse(recordHeadersUnfiltered);
+  }
+
+  private Predicate<RecordHeader> isHeaderTimeGreater(LocalDateTime lastModifiedDate) {
+    return recordHeader -> {
+      String lastModified = recordHeader.getLastModified();
+      Optional<LocalDateTime> currentHeaderLastModified = TimeUtility.getLocalDateTime(lastModified);
+      return currentHeaderLastModified
+          .map(localDateTime -> localDateTime.isAfter(lastModifiedDate))
+          .orElse(false); // Could not parse lastDateModified therefore filtering out record header
+    };
   }
 }
