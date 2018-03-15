@@ -19,6 +19,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static eu.cessda.pasc.oci.data.RecordTestData.LIST_RECORDER_HEADERS_BODY_EXAMPLE;
 import static eu.cessda.pasc.oci.data.RecordTestData.LIST_RECORDER_HEADERS_BODY_EXAMPLE_WITH_INCREMENT;
@@ -120,7 +121,7 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     // mock for ES bulking
     esIndexer = mock(IngestService.class);
     when(esIndexer.bulkIndex(anyListOf(CMMStudyOfLanguage.class), anyString())).thenReturn(true);
-    when(esIndexer.getMostRecentLastModified()).thenReturn(LocalDateTime.parse("2018-02-20T07:48:38"));
+    when(esIndexer.getMostRecentLastModified()).thenReturn(Optional.of(LocalDateTime.parse("2018-02-20T07:48:38")));
     //----------------------------------------------------------------------------------------------------------------
 
     // Given

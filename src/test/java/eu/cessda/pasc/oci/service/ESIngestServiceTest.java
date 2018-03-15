@@ -26,6 +26,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static eu.cessda.pasc.oci.data.RecordTestData.*;
 import static org.assertj.core.api.Java6BDDAssertions.then;
@@ -121,9 +122,9 @@ public class ESIngestServiceTest extends EmbeddedElasticsearchServer{
     then(response.getHits().getAt(2).getId()).isEqualTo("UK-Data-Service__1000");
 
     // When
-    LocalDateTime mostRecentLastModified = this.eSIndexerService.getMostRecentLastModified();
+    Optional<LocalDateTime> mostRecentLastModified = this.eSIndexerService.getMostRecentLastModified();
 
     // Then
-    then(mostRecentLastModified).isEqualByComparingTo(LocalDateTime.parse("2017-11-17T08:08:11"));
+    then(mostRecentLastModified.orElse(null)).isEqualByComparingTo(LocalDateTime.parse("2017-11-17T08:08:11"));
   }
 }

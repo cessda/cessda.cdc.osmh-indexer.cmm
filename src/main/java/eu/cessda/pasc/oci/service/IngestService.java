@@ -3,8 +3,8 @@ package eu.cessda.pasc.oci.service;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service interface contract for data ingestion
@@ -30,5 +30,5 @@ public interface IngestService {
    *
    * @return LocalDateTime. The exact  most recent lastModified dateTime from the cluster for the indice pattern.
    */
-  LocalDateTime getMostRecentLastModified();
+  Optional<LocalDateTime> getMostRecentLastModified();
 }

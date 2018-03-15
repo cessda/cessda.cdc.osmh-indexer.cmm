@@ -85,7 +85,8 @@ public class ESIngestService implements IngestService {
   }
 
   @Override
-  public LocalDateTime getMostRecentLastModified() {
+  public Optional<LocalDateTime> getMostRecentLastModified() {
+    
     SearchResponse response = esTemplate.getClient().prepareSearch(INDEX_NAME_PATTERN)
         .setTypes(INDEX_TYPE)
         .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
@@ -99,10 +100,9 @@ public class ESIngestService implements IngestService {
     if (hits.length != 0) {
       Map<String, Object> source = hits[0].getSource();
       String lastModified = source.get(LAST_MODIFIED_FIELD).toString();
-      Optional<LocalDateTime> lastModifiedLocalDateTime = TimeUtility.getLocalDateTime(lastModified);
-      return lastModifiedLocalDateTime.orElse(null);
+      return TimeUtility.getLocalDateTime(lastModified);
     }else{
-      return null;
+      return Optional.empty();
     }
   }
 

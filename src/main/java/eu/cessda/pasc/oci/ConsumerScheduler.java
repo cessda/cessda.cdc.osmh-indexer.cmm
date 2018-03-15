@@ -74,7 +74,7 @@ public class ConsumerScheduler {
     Instant startTime = Instant.now();
     LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime.toEpochMilli()), ZoneId.systemDefault());
     logStartStatus(date, DAILY_INCREMENTAL_RUN);
-    executeHarvestAndIngest(esIndexerService.getMostRecentLastModified());
+    executeHarvestAndIngest(esIndexerService.getMostRecentLastModified().orElse(null));
     logEndStatus(date, startTime, DAILY_INCREMENTAL_RUN);
   }
 
