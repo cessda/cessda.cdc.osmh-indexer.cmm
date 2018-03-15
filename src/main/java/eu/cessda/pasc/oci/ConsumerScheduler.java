@@ -60,9 +60,7 @@ public class ConsumerScheduler {
    * Auto Starts after delay of 1min at startup
    */
   @ManagedOperation(description = "Manual trigger to do a full harvest and ingest run")
-  //TODO: revert back
-  // Auto Starts. Delay of 1min at startup. Then run every sun at 11:30
-  @Scheduled(initialDelay = 60_000L, cron = "* 50 19 * * FRI")
+  @Scheduled(initialDelay = 60_000L, fixedDelay = 315_360_000_000L) // Auto Starts. Delay of 1min at startup.
   public void fullHarvestAndIngestionAllConfiguredSPsReposRecords() {
     Instant startTime = Instant.now();
     LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime.toEpochMilli()), ZoneId.systemDefault());
@@ -76,6 +74,13 @@ public class ConsumerScheduler {
     } else {
       log.info("A Harvest and Ingest is already in progress cannot run.  Skipping");
     }
+  }
+
+  // TODO: Revert to : Then run every sun at 11:30
+  @Scheduled(cron = "* 05 20 * * FRI") //20:05 Fridays
+  public void cronFullHarvestAndIngestionAllConfiguredSPsReposRecords() {
+    log.info("Triggering Once a Week Full Run from cron");
+    fullHarvestAndIngestionAllConfiguredSPsReposRecords();
   }
 
   /**
