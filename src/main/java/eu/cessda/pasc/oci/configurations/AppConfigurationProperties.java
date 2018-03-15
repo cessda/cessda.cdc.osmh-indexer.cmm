@@ -26,5 +26,4 @@ public class AppConfigurationProperties {
   private RestTemplateProps restTemplateProps = new RestTemplateProps();
   private Harvester harvester = new Harvester();
   private List<String> languages = new ArrayList<>();
-
 }

@@ -2,7 +2,6 @@ package eu.cessda.pasc.oci.service;
 
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
-import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Ignore;
@@ -22,7 +21,6 @@ import java.util.stream.Collectors;
 import static eu.cessda.pasc.oci.data.ReposTestData.*;
 import static java.lang.String.format;
 import static org.assertj.core.api.Java6BDDAssertions.then;
-import static org.junit.Assert.fail;
 
 /**
  * Manual Consumer test class this can be used to explore end to end behavior of this consumer and to some extend some
@@ -79,18 +77,12 @@ public class HarvesterConsumerServiceRunnerTest {
 
       log.info("|------------------------------Record CmmStudy----------------------------------------|");
       Optional<CMMStudy> optionalCmmStudy = harvesterConsumerService.getRecord(repo, recordHeader.getIdentifier());
-
-      if (optionalCmmStudy.isPresent()) {
-        Optional<String> cMMStudyConverterJsonString = CMMStudyConverter.toJsonString(optionalCmmStudy.get());
-        then(cMMStudyConverterJsonString.isPresent()).isTrue();
-        then(cMMStudyConverterJsonString.get()).isNotEmpty();
-        System.out.println(cMMStudyConverterJsonString);
-      } else {
-        fail();
-      }
+      then(optionalCmmStudy.isPresent()).isTrue();
     });
+
     Map<String, Integer> repoHeadersCount = new HashMap<>();
     repoHeadersCount.put(repo.getName(), size);
+
     return repoHeadersCount;
   }
 }

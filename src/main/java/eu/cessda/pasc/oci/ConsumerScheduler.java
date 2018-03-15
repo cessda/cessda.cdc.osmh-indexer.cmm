@@ -77,18 +77,18 @@ public class ConsumerScheduler {
   }
 
   // TODO: Revert to : Then run every sun at 11:30
-  @Scheduled(cron = "* 05 20 * * FRI") //20:05 Fridays
+  @Scheduled(cron = "0 01 11 * * FRI")
   public void cronFullHarvestAndIngestionAllConfiguredSPsReposRecords() {
-    log.info("Triggering Once a Week Full Run from cron");
+    log.info("Once a Week Full Run. Triggered by cron - STARTED");
     fullHarvestAndIngestionAllConfiguredSPsReposRecords();
+    log.info("Once a Week Full Run. Triggered by cron - ENDED");
   }
 
   /**
    * Daily Harvest and Ingestion run.
    */
   @ManagedOperation(description = "Manual trigger to do an incremental harvest and ingest")
-  //TODO: revert back
-  @Scheduled(cron = "0 50 20 * * *") // Everyday at 03:15am
+  @Scheduled(cron = "0 48 11 * * *") // TODO: revert to Everyday at 02:30am
   public void dailyIncrementalHarvestAndIngestionAllConfiguredSPsReposRecords() {
     Instant startTime = Instant.now();
     LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime.toEpochMilli()), ZoneId.systemDefault());

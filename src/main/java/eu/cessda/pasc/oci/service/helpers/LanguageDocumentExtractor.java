@@ -87,9 +87,8 @@ public class LanguageDocumentExtractor {
 
   private CMMStudyOfLanguage getCmmStudyOfLanguage(String idPrefix, String lang, CMMStudy cmmStudy) {
 
-    if (log.isTraceEnabled()) {
-      log.trace("Extracting CMMStudyOfLang from CMMStudyNumber [{}] for lang [{}]", cmmStudy.getStudyNumber(), lang);
-    }
+    String formatMsg = "Extracting CMMStudyOfLang from CMMStudyNumber [{}] for lang [{}]";
+    if (log.isTraceEnabled()) log.trace(formatMsg, cmmStudy.getStudyNumber(), lang);
 
     CMMStudyOfLanguage.CMMStudyOfLanguageBuilder builder = CMMStudyOfLanguage.builder();
 

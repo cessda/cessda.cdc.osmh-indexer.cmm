@@ -9,10 +9,6 @@ public class CustomExceptionBase extends Exception{
 
   private static final long serialVersionUID = 5715687019114712665L;
 
-  CustomExceptionBase(String message) {
-    super(message);
-  }
-
   CustomExceptionBase(String message, Throwable cause) {
     super(message, cause);
   }

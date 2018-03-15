@@ -10,7 +10,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.List;
 
 import static org.assertj.core.api.BDDAssertions.then;
-import static org.assertj.core.api.Java6Assertions.assertThat;
 
 /**
  * Configurations loader tests
@@ -31,20 +30,6 @@ public class AppConfigurationPropertiesTest extends AbstractSpringTestProfileCon
 
     List<Repo> repos = appConfigurationProperties.getEndpoints().getRepos();
     then(repos).isNotNull();
-    then(repos).hasSize(4);
-
-    assertThat(repos).extracting("name")
-        .contains("UK Data Service", "Finish Data Services", "GESIS", "GESIS"
-        ).doesNotContain("othertest");
-
-    assertThat(repos).extracting("url")
-        .contains(
-            "https://oai.ukdataservice.ac.uk:8443/oai/provider",
-            "http://services.fsd.uta.fi/v0/oai",
-            "https://dbk.gesis.org/dbkoai",
-            "https://dbk.gesis.org/dbkoai/"
-        ).doesNotContain(
-        "http://services/othertest"
-    );
+    then(repos).hasAtLeastOneElementOfType(Repo.class);
   }
 }

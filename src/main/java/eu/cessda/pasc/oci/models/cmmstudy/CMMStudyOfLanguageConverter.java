@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -21,6 +22,7 @@ import java.util.Optional;
  *
  * @author moses@doraventures.com
  */
+@Slf4j
 public class CMMStudyOfLanguageConverter {
 
   // Serialize/deserialize helpers
@@ -33,6 +35,7 @@ public class CMMStudyOfLanguageConverter {
     try {
       return Optional.ofNullable(getObjectWriter().writeValueAsString(obj));
     } catch (JsonProcessingException e) {
+      log.error("Failed to write Object as string [{}].  Returning empty Option.", e.getMessage());
       return Optional.empty();
     }
   }

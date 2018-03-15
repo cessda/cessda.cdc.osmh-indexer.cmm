@@ -81,7 +81,15 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
             .filter(isHeaderTimeGreater(lastModifiedDate))
             .collect(Collectors.toList()));
 
-    return filteredRecordHeaders.orElse(unfilteredRecordHeaders);
+    if (filteredRecordHeaders.isPresent()) {
+      List<RecordHeader> filteredHeaders = filteredRecordHeaders.get();
+      String formatMsg = "Returning [{}] filtered recordHeaders  out of [{}] unfiltered by date greater than [{}]";
+      log.info(formatMsg, filteredHeaders.size(), unfilteredRecordHeaders.size(), ingestedLastModifiedDate);
+      return filteredHeaders;
+    }
+
+    log.info("Nothing filterable by date [{}]", ingestedLastModifiedDate);
+    return unfilteredRecordHeaders;
   }
 
   private Predicate<RecordHeader> isHeaderTimeGreater(LocalDateTime lastModifiedDate) {
