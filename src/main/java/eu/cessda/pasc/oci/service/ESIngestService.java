@@ -2,8 +2,14 @@ package eu.cessda.pasc.oci.service;
 
 import eu.cessda.pasc.oci.configurations.ESConfigurationProperties;
 import eu.cessda.pasc.oci.helpers.FileHandler;
+import eu.cessda.pasc.oci.helpers.TimeUtility;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.ElasticsearchException;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
@@ -14,6 +20,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
+import static eu.cessda.pasc.oci.helpers.AppConstants.LAST_MODIFIED_FIELD;
 
 /**
  * Service responsible for triggering harvesting and Metadata ingestion to the search engine
@@ -77,8 +86,24 @@ public class ESIngestService implements IngestService {
 
   @Override
   public LocalDateTime getMostRecentLastModified() {
-    // TODO: esTemplate.q
-    throw new RuntimeException("Not yet Implemented");
+    SearchResponse response = esTemplate.getClient().prepareSearch(INDEX_NAME_PATTERN)
+        .setTypes(INDEX_TYPE)
+        .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+        .setQuery(QueryBuilders.matchAllQuery())
+        .addSort(LAST_MODIFIED_FIELD, SortOrder.DESC)
+        .setSize(1)
+        .execute()
+        .actionGet();
+
+    SearchHit[] hits = response.getHits().getHits();
+    if (hits.length != 0) {
+      Map<String, Object> source = hits[0].getSource();
+      String lastModified = source.get(LAST_MODIFIED_FIELD).toString();
+      Optional<LocalDateTime> lastModifiedLocalDateTime = TimeUtility.getLocalDateTime(lastModified);
+      return lastModifiedLocalDateTime.orElse(null);
+    }else{
+      return null;
+    }
   }
 
   private static IndexQuery getIndexQuery(String indexName, CMMStudyOfLanguage cmmStudyOfLanguage) {

@@ -25,16 +25,38 @@ public class RecordTestData {
   public static final String LIST_RECORDER_HEADERS_BODY_EXAMPLE = "" +
       "[\n" +
       "  {\n" +
-      "    \"lastModified\": \"2018-02-22T07:48:38Z\",\n" +
+      "    \"lastModified\": \"2018-02-21T07:48:38Z\",\n" +
       "    \"type\": \"Study\",\n" +
       "    \"recordType\": \"RecordHeader\",\n" +
       "    \"identifier\": \"997\"\n" +
       "  },\n" +
       "  {\n" +
-      "    \"lastModified\": \"2018-02-22T07:48:38Z\",\n" +
+      "    \"lastModified\": \"2018-02-19\",\n" +
       "    \"type\": \"Study\",\n" +
       "    \"recordType\": \"RecordHeader\",\n" +
       "    \"identifier\": \"998\"\n" +
+      "  }\n" +
+      "]";
+
+  public static final String LIST_RECORDER_HEADERS_BODY_EXAMPLE_WITH_INCREMENT = "" +
+      "[\n" +
+      "  {\n" +
+      "    \"lastModified\": \"2018-02-21T07:48:38Z\",\n" +
+      "    \"type\": \"Study\",\n" +
+      "    \"recordType\": \"RecordHeader\",\n" +
+      "    \"identifier\": \"997\"\n" +
+      "  },\n" +
+      "  {\n" +
+      "    \"lastModified\": \"2018-03-22T07:48:38Z\",\n" +
+      "    \"type\": \"Study\",\n" +
+      "    \"recordType\": \"RecordHeader\",\n" +
+      "    \"identifier\": \"999\"\n" +
+      "  },\n" +
+      "  {\n" +
+      "    \"lastModified\": \"2018-02-23\",\n" +
+      "    \"type\": \"Study\",\n" +
+      "    \"recordType\": \"RecordHeader\",\n" +
+      "    \"identifier\": \"1000\"\n" +
       "  }\n" +
       "]";
 
@@ -123,11 +145,29 @@ public class RecordTestData {
     return cmmStudies;
   }
 
-  public static List<CMMStudyOfLanguage> getCmmStudyOfLanguageCodeEn() throws IOException {
+  public static List<CMMStudyOfLanguage> getCmmStudyOfLanguageCodeEnX1() throws IOException {
     List<CMMStudyOfLanguage> studyOfLanguages = new ArrayList<>();
     String syntheticCMMStudyOfLanguageEn = getSyntheticCMMStudyOfLanguageEn();
     CMMStudyOfLanguage cmmStudyOfLanguage = CMMStudyOfLanguageConverter.fromJsonString(syntheticCMMStudyOfLanguageEn);
     studyOfLanguages.add(cmmStudyOfLanguage);
+    return studyOfLanguages;
+  }
+
+  public static List<CMMStudyOfLanguage> getCmmStudyOfLanguageCodeEnX3() throws IOException {
+    List<CMMStudyOfLanguage> studyOfLanguages = new ArrayList<>();
+    String syntheticCMMStudyOfLanguageEn = getSyntheticCMMStudyOfLanguageEn();
+    studyOfLanguages.add(CMMStudyOfLanguageConverter.fromJsonString(syntheticCMMStudyOfLanguageEn));
+
+    CMMStudyOfLanguage cmmStudyOfLanguage2 = CMMStudyOfLanguageConverter.fromJsonString(syntheticCMMStudyOfLanguageEn);
+    cmmStudyOfLanguage2.setId("UK-Data-Service__999");
+    cmmStudyOfLanguage2.setLastModified("2017-11-15T08:08:11Z");
+    studyOfLanguages.add(cmmStudyOfLanguage2);
+
+    CMMStudyOfLanguage cmmStudyOfLanguage3 = CMMStudyOfLanguageConverter.fromJsonString(syntheticCMMStudyOfLanguageEn);
+    cmmStudyOfLanguage3.setId("UK-Data-Service__1000");
+    cmmStudyOfLanguage3.setLastModified("2017-04-05");
+    studyOfLanguages.add(cmmStudyOfLanguage3);
+
     return studyOfLanguages;
   }
 

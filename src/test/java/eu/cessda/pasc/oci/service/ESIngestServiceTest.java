@@ -11,6 +11,7 @@ import org.assertj.core.api.Java6BDDAssertions;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 import org.json.JSONException;
 import org.junit.After;
 import org.junit.Before;
@@ -23,11 +24,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.time.LocalDateTime;
 import java.util.List;
 
-import static eu.cessda.pasc.oci.data.RecordTestData.getCmmStudyOfLanguageCodeEn;
-import static eu.cessda.pasc.oci.data.RecordTestData.getSyntheticCMMStudyOfLanguageEn;
+import static eu.cessda.pasc.oci.data.RecordTestData.*;
 import static org.assertj.core.api.Java6BDDAssertions.then;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
@@ -76,7 +76,7 @@ public class ESIngestServiceTest extends EmbeddedElasticsearchServer{
 
     // Given
     String language = "en";
-    List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEn();
+    List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX1();
 
     // When
     boolean isSuccessful = this.eSIndexerService.bulkIndex(studyOfLanguages, language);
@@ -84,8 +84,11 @@ public class ESIngestServiceTest extends EmbeddedElasticsearchServer{
     // Then
     then(isSuccessful).isTrue();
     SearchResponse response = getClient().prepareSearch(INDEX_NAME)
-        .setTypes(INDEX_TYPE).setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setQuery(QueryBuilders.matchAllQuery())
-        .execute().actionGet();
+        .setTypes(INDEX_TYPE)
+        .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+        .setQuery(QueryBuilders.matchAllQuery())
+        .execute()
+        .actionGet();
     then(response.getHits().totalHits()).isEqualTo(1);
     then(response.getHits().getAt(0).getId()).isEqualTo("UK-Data-Service__2305");
 
@@ -93,8 +96,34 @@ public class ESIngestServiceTest extends EmbeddedElasticsearchServer{
     final JsonNode actualTree = mapper.readTree(response.getHits().getAt(0).getSourceAsString());
     final JsonNode expectedTree = mapper.readTree(getSyntheticCMMStudyOfLanguageEn());
     assertEquals(expectedTree.toString(), actualTree.toString(), true);
+  }
 
-    log.info("Printing hits");
-    Arrays.asList(response.getHits().getHits()).forEach(hit -> log.info(hit.getSourceAsString()));
+  @Test
+  public void shouldRetrieveTheMostRecentLastModifiedDate() throws IOException {
+
+    // Given
+    String language = "en";
+    List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
+    boolean isSuccessful = this.eSIndexerService.bulkIndex(studyOfLanguages, language);
+    then(isSuccessful).isTrue();
+    SearchResponse response = getClient().prepareSearch(INDEX_NAME)
+        .setTypes(INDEX_TYPE)
+        .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+        .setQuery(QueryBuilders.matchAllQuery())
+        .addSort("lastModified", SortOrder.DESC)
+        .execute()
+        .actionGet();
+
+    // And state is as expected
+    then(response.getHits().totalHits()).isEqualTo(3);
+    then(response.getHits().getAt(0).getId()).isEqualTo("UK-Data-Service__2305");
+    then(response.getHits().getAt(1).getId()).isEqualTo("UK-Data-Service__999");
+    then(response.getHits().getAt(2).getId()).isEqualTo("UK-Data-Service__1000");
+
+    // When
+    LocalDateTime mostRecentLastModified = this.eSIndexerService.getMostRecentLastModified();
+
+    // Then
+    then(mostRecentLastModified).isEqualByComparingTo(LocalDateTime.parse("2017-11-17T08:08:11"));
   }
 }
