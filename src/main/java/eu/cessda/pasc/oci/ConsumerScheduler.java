@@ -16,14 +16,17 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.*;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Service responsible for triggering harvesting and Metadata ingestion to the search engine
+ * Service responsible for triggering Metadata Harvesting and ingestion insto the search engine
  *
  * @author moses@doraventures.com
  */
@@ -39,6 +42,7 @@ public class ConsumerScheduler {
   private HarvesterConsumerService harvesterConsumerService;
   private IngestService esIndexerService;
   private LanguageDocumentExtractor extractor;
+  private boolean runInProgress = false;
 
   @Autowired
   public ConsumerScheduler(DebuggingJMXBean debuggingJMXBean, AppConfigurationProperties configurationProperties,
@@ -55,27 +59,44 @@ public class ConsumerScheduler {
   /**
    * Auto Starts after delay of 1min at startup
    */
-  @ManagedOperation(description = "Manual trigger to do a full harvest and ingestion run")
-  @Scheduled(initialDelay = 60_000L, fixedDelay = 315_360_000_000L) // Auto Starts. Delay of 1min at startup.
+  @ManagedOperation(description = "Manual trigger to do a full harvest and ingest run")
+  //TODO: revert back
+  // Auto Starts. Delay of 1min at startup. Then run every sun at 11:30
+  @Scheduled(initialDelay = 60_000L, cron = "* 50 19 * * FRI")
   public void fullHarvestAndIngestionAllConfiguredSPsReposRecords() {
     Instant startTime = Instant.now();
     LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime.toEpochMilli()), ZoneId.systemDefault());
     logStartStatus(date, FULL_RUN);
-    executeHarvestAndIngest(null);
-    logEndStatus(date, startTime, FULL_RUN);
+
+    if (!runInProgress) {
+      runInProgress = true;
+      executeHarvestAndIngest(null);
+      logEndStatus(date, startTime, FULL_RUN);
+      runInProgress = false;
+    } else {
+      log.info("A Harvest and Ingest is already in progress cannot run.  Skipping");
+    }
   }
 
   /**
    * Daily Harvest and Ingestion run.
    */
-  @ManagedOperation(description = "Manual trigger to do an incremental harvest and ingestion run")
-  @Scheduled(cron = "0 15 03 * * *") // Everyday at 03:15am
+  @ManagedOperation(description = "Manual trigger to do an incremental harvest and ingest")
+  //TODO: revert back
+  @Scheduled(cron = "0 50 20 * * *") // Everyday at 03:15am
   public void dailyIncrementalHarvestAndIngestionAllConfiguredSPsReposRecords() {
     Instant startTime = Instant.now();
     LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime.toEpochMilli()), ZoneId.systemDefault());
     logStartStatus(date, DAILY_INCREMENTAL_RUN);
-    executeHarvestAndIngest(esIndexerService.getMostRecentLastModified().orElse(null));
-    logEndStatus(date, startTime, DAILY_INCREMENTAL_RUN);
+
+    if (!runInProgress) {
+      runInProgress = true;
+      executeHarvestAndIngest(esIndexerService.getMostRecentLastModified().orElse(null));
+      logEndStatus(date, startTime, DAILY_INCREMENTAL_RUN);
+      runInProgress = false;
+    } else {
+      log.info("A Harvest and Ingest is already in progress cannot run.  Skipping");
+    }
   }
 
   private void executeHarvestAndIngest(LocalDateTime lastModifiedDateTime) {
@@ -107,29 +128,11 @@ public class ConsumerScheduler {
     int recordHeadersSize = recordHeaders.size();
     log.info("Repo returned with [{}] record headers", recordHeadersSize);
 
-    //TODO: disable below line override. For manual test only!
-/*
-    if (recordHeadersSize >= 1020) {
-      int limitSize = 20;
-      int skipFirst = 1000;
-      log.info("********************** Test, Skipping first [{}] and limiting to [{}]", skipFirst, limitSize);
-      recordHeaders = recordHeaders.stream().skip(skipFirst).limit(limitSize).collect(Collectors.toList());
-    }
-*/
-
-    //or
-/*    int limitSize = 500;
-    log.info("TEST - Limiting to [" + limitSize + "] record headers");
-    recordHeaders = recordHeaders.stream().limit(limitSize).collect(Collectors.toList());*/
-    // or end
-
-    List<Optional<CMMStudy>> cMMStudiesOptions = recordHeaders
-        .stream()
+    List<Optional<CMMStudy>> cMMStudiesOptions = recordHeaders.stream()
         .map(recordHeader -> harvesterConsumerService.getRecord(repo, recordHeader.getIdentifier()))
         .collect(Collectors.toList());
 
-    List<Optional<CMMStudy>> presentCMMStudies = cMMStudiesOptions
-        .stream()
+    List<Optional<CMMStudy>> presentCMMStudies = cMMStudiesOptions.stream()
         .filter(Optional::isPresent)
         .collect(Collectors.toList());
 

@@ -72,15 +72,16 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
     return Optional.empty();
   }
 
-  private List<RecordHeader> filterRecords(List<RecordHeader> recordHeadersUnfiltered, LocalDateTime ingestedLastModifiedDate) {
+  private List<RecordHeader> filterRecords(List<RecordHeader> unfilteredRecordHeaders, LocalDateTime ingestedLastModifiedDate) {
 
     Optional<LocalDateTime> ingestedLastModifiedDateOption = Optional.ofNullable(ingestedLastModifiedDate);
-    Optional<List<RecordHeader>> recordHeaders = ingestedLastModifiedDateOption
-        .map(lastModifiedDate -> recordHeadersUnfiltered.stream()
-            .filter(isHeaderTimeGreater(ingestedLastModifiedDate))
+    Optional<List<RecordHeader>> filteredRecordHeaders = ingestedLastModifiedDateOption.map(
+        lastModifiedDate -> unfilteredRecordHeaders
+            .stream()
+            .filter(isHeaderTimeGreater(lastModifiedDate))
             .collect(Collectors.toList()));
 
-    return recordHeaders.orElse(recordHeadersUnfiltered);
+    return filteredRecordHeaders.orElse(unfilteredRecordHeaders);
   }
 
   private Predicate<RecordHeader> isHeaderTimeGreater(LocalDateTime lastModifiedDate) {
