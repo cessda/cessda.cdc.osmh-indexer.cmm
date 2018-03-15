@@ -43,10 +43,10 @@ logging:
   level:
     .: WARN
     org: ERROR
-    eu.cessda.pasc: DEBUG
-    eu.cessda.pasc.osmhhandler.oaipmh.controller: DEBUG
-    eu.cessda.pasc.osmhhandler.oaipmh.service: DEBUG
-    eu.cessda.pasc.osmhhandler.oaipmh.helpers: DEBUG
+    eu.cessda.pasc: INFO
+    eu.cessda.pasc.osmhhandler.oaipmh.controller: INFO
+    eu.cessda.pasc.osmhhandler.oaipmh.service: INFO
+    eu.cessda.pasc.osmhhandler.oaipmh.helpers: INFO
     net: WARN
     com: ERROR
 osmhhandler:
@@ -75,7 +75,7 @@ osmhhandler:
   restTemplateProps:
     connTimeout: 5000
     connRequestTimeout: 5000
-    readTimeout: 120000
+    readTimeout: 60000 #every 1 minute (60_000ms)
     verifySSL: false
 
 ---
