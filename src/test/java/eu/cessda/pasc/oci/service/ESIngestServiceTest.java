@@ -125,6 +125,6 @@ public class ESIngestServiceTest extends EmbeddedElasticsearchServer{
     Optional<LocalDateTime> mostRecentLastModified = this.eSIndexerService.getMostRecentLastModified();
 
     // Then
-    then(mostRecentLastModified.orElse(null)).isEqualByComparingTo(LocalDateTime.parse("2017-11-17T08:08:11"));
+    then(mostRecentLastModified.orElse(null)).isEqualByComparingTo(LocalDateTime.parse("2017-11-17T00:00:00"));
   }
 }
