@@ -72,6 +72,9 @@ osmhConsumer:
       - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
         name: 'UK Data Service'
         handler: 'https://pasc-dev.cessda.eu/osmh-repo'
+      - url: http://services.fsd.uta.fi/v0/oai
+        name: 'Finish Data Services'
+        handler: 'https://pasc-dev.cessda.eu/osmh-repo'
 #      - url: https://dbk.gesis.org/dbkoai
 #        name: 'GESIS'
 #        handler: 'https://pasc-dev.cessda.eu/osmh-repo'
@@ -80,9 +83,6 @@ osmhConsumer:
 #        name: 'GESIS De'
 #        Process FSD Last, it is the slowest so far!
 #        handler: 'https://pasc-dev.cessda.eu/osmh-repo'
-      - url: http://services.fsd.uta.fi/v0/oai
-        name: 'Finish Data Services'
-        handler: 'https://pasc-dev.cessda.eu/osmh-repo'
   restTemplateProps:
     connTimeout: 5000
     connRequestTimeout: 5000
@@ -114,6 +114,9 @@ osmhConsumer:
       - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
         name: 'UK Data Service'
         handler: 'http://localhost:9091'
+      - url: http://services.fsd.uta.fi/v0/oai
+        name: 'Finish Data Services'
+        handler: 'http://localhost:9091'
 #      - url: https://dbk.gesis.org/dbkoai
 #        name: 'GESIS'
 #        handler: 'http://localhost:9091'
@@ -121,9 +124,6 @@ osmhConsumer:
 #        name: 'GESIS De'
 #        handler: 'http://localhost:9091'
 #        Process FSD Last, it is the slowest so far!
-      - url: http://services.fsd.uta.fi/v0/oai
-        name: 'Finish Data Services'
-        handler: 'http://localhost:9091'
 
 ---
 spring:

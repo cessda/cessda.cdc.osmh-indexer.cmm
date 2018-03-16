@@ -26,7 +26,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Service responsible for triggering Metadata Harvesting and ingestion insto the search engine
+ * Service responsible for triggering Metadata Harvesting and ingestion into the search engine
  *
  * @author moses@doraventures.com
  */
@@ -60,7 +60,7 @@ public class ConsumerScheduler {
    * Auto Starts after delay of 1min at startup
    */
   @ManagedOperation(description = "Manual trigger to do a full harvest and ingest run")
-  @Scheduled(initialDelay = 60_000L, fixedDelay = 315_360_000_000L) // Auto Starts. Delay of 1min at startup.
+  @Scheduled(initialDelay = 60_000L, fixedDelay = 315_360_000_000L)
   public void fullHarvestAndIngestionAllConfiguredSPsReposRecords() {
     Instant startTime = Instant.now();
     LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime.toEpochMilli()), ZoneId.systemDefault());
@@ -76,19 +76,11 @@ public class ConsumerScheduler {
     }
   }
 
-  // TODO: Revert to : Then run every sun at 11:30
-  @Scheduled(cron = "0 01 11 * * FRI")
-  public void cronFullHarvestAndIngestionAllConfiguredSPsReposRecords() {
-    log.info("Once a Week Full Run. Triggered by cron - STARTED");
-    fullHarvestAndIngestionAllConfiguredSPsReposRecords();
-    log.info("Once a Week Full Run. Triggered by cron - ENDED");
-  }
-
   /**
-   * Daily Harvest and Ingestion run.
+   * Daily Harvest and Ingestion run at 02:30am.
    */
   @ManagedOperation(description = "Manual trigger to do an incremental harvest and ingest")
-  @Scheduled(cron = "0 48 11 * * *") // TODO: revert to Everyday at 02:30am
+  @Scheduled(cron = "0 30 02 * * *")
   public void dailyIncrementalHarvestAndIngestionAllConfiguredSPsReposRecords() {
     Instant startTime = Instant.now();
     LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime.toEpochMilli()), ZoneId.systemDefault());
@@ -102,6 +94,16 @@ public class ConsumerScheduler {
     } else {
       log.info("A Harvest and Ingest is already in progress cannot run.  Skipping");
     }
+  }
+
+  /**
+   * Then run every Sunday at 11:30
+   */
+  @Scheduled(cron = "0 30 11 * * SUN")
+  public void weeklyFullHarvestAndIngestionAllConfiguredSPsReposRecords() {
+    log.info("Once a Week Full Run. Triggered by cron - STARTED");
+    fullHarvestAndIngestionAllConfiguredSPsReposRecords();
+    log.info("Once a Week Full Run. Triggered by cron - ENDED");
   }
 
   private void executeHarvestAndIngest(LocalDateTime lastModifiedDateTime) {
