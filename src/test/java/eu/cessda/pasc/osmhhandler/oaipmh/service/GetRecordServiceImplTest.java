@@ -179,6 +179,22 @@ public class GetRecordServiceImplTest {
     // Then an exception is thrown.
   }
 
+  @Test
+  public void shouldExtractAllRequiredCMMFieldsForAGivenAUKDSRecord() throws Exception {
+
+    // Given
+    given(getRecordDoa.getRecordXML("", "")).willReturn(
+        CMMStudyTestData.getContent("xml/ddi_record_ukds_example.xml")
+    );
+
+    // When
+    CMMStudy result = recordService.getRecord("", "");
+
+    then(result).isNotNull();
+    validateCMMStudyResultAgainstSchema(result);
+    assertFieldsAreExtractedAsExpectedForAllCMMRequired(result);
+  }
+
   private void validateCMMStudyResultAgainstSchema(CMMStudy record) throws IOException, ProcessingException, JSONException {
 
     then(record.isActive()).isTrue(); // No need to carry on validating other fields if marked as inActive
@@ -232,5 +248,21 @@ public class GetRecordServiceImplTest {
         .get("dataAccessFreeTexts").toString(), actualTree.get("dataAccessFreeTexts").toString(), true);
     assertEquals(expectedTree
         .get("studyUrl").toString(), actualTree.get("studyUrl").toString(), true);
+  }
+
+  private void assertFieldsAreExtractedAsExpectedForAllCMMRequired(CMMStudy record) throws IOException, JSONException {
+
+    final ObjectMapper mapper = new ObjectMapper();
+    String jsonString = CMMConverter.toJsonString(record);
+    String expectedJson = CMMStudyTestData.getContent("json/ddi_record_ukds_example_extracted.json");
+    final JsonNode actualTree = mapper.readTree(jsonString);
+    final JsonNode expectedTree = mapper.readTree(expectedJson);
+
+    // CMM Model Schema required fields
+    assertEquals(expectedTree.get("abstract").toString(), actualTree.get("abstract").toString(), true);
+    assertEquals(expectedTree.get("titleStudy").toString(), actualTree.get("titleStudy").toString(), true);
+    assertEquals(expectedTree.get("studyUrl").toString(), actualTree.get("studyUrl").toString(), true);
+    then(expectedTree.get("studyNumber").toString()).isEqualTo(actualTree.get("studyNumber").toString());
+    assertEquals(expectedTree.get("publisher").toString(), actualTree.get("publisher").toString(), true);
   }
 }

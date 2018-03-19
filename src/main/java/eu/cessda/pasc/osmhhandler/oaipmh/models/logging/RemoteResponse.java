@@ -29,6 +29,4 @@ public class RemoteResponse {
   int responseCode;
   String responseMessage;
   LocalDateTime occurredAt;
-
-  // TODO: implement toString to return json representation of this using ObjectMapper.
 }

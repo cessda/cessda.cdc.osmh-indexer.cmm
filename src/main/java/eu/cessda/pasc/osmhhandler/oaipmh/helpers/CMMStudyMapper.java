@@ -1,6 +1,7 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMStudy;
+import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.Publisher;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.configuration.OaiPmh;
 import lombok.extern.slf4j.Slf4j;
 import org.jdom2.Attribute;
@@ -232,9 +233,15 @@ public class CMMStudyMapper {
    * Xpath = {@value OaiPmhConstants#PUBLISHER_XPATH }
    */
   public static void parsePublisher(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory,
-                                    OaiPmh config, String defaultLangIsoCode) {
-    builder.publisher(extractMetadataObjectForEachLang(
-        config, defaultLangIsoCode, document, xFactory, PUBLISHER_XPATH, publisherStrategyFunction()));
+                                    OaiPmh config, String defaultLang) {
+    Map<String, Publisher> producerPathMap = extractMetadataObjectForEachLang(config, defaultLang, document, xFactory,
+        PUBLISHER_XPATH, publisherStrategyFunction());
+    Map<String, Publisher> distrPathMap = extractMetadataObjectForEachLang(config, defaultLang, document, xFactory,
+        DISTRIBUTOR_XPATH, publisherStrategyFunction());
+
+    Map<String, Publisher> mergedStudyUrls = new HashMap<>(producerPathMap);
+    distrPathMap.forEach((k, v) -> mergedStudyUrls.merge(k, v, (docDscrValue, stdyDscrValue) -> docDscrValue));
+    builder.publisher(mergedStudyUrls);
   }
 
   /**
