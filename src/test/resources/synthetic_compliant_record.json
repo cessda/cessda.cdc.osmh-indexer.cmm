@@ -244,6 +244,11 @@
     "en": "Jyväskylä Longitudinal Study of Personality and Social Development (JYLS): Interviews of 14-Year-Olds 1974: Text Data.",
     "de": "fake de title"
   },
+  "studyUrl": {
+    "fi": "http://dx.doi.org/10.5255/UKDA-SN-852661",
+    "en": "http://dx.doi.org/10.5255/UKDA-SN-852661",
+    "de": "http://dx.doi.org/10.5255/UKDA-SN-852661"
+  },
   "unitTypes": {
     "de": [
       {
@@ -281,6 +286,10 @@
       "abbr": "not available"
     },
     "fi": {
+      "publisher": "Yhteiskuntatieteellinen tietoarkisto",
+      "abbr": "FSD"
+    },
+    "de": {
       "publisher": "Yhteiskuntatieteellinen tietoarkisto",
       "abbr": "FSD"
     },

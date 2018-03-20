@@ -20,9 +20,9 @@ logging:
     .: WARN
     org: ERROR
     eu.cessda.pasc: INFO
-    eu.cessda.pasc.oci.service: INFO
-    eu.cessda.pasc.oci.repository: INFO
-    eu.cessda.pasc.oci.helpers: INFO
+    eu.cessda.pasc.oci.service: DEBUG
+    eu.cessda.pasc.oci.repository: DEBUG
+    eu.cessda.pasc.oci.helpers: DEBUG
     net: WARN
     com: ERROR
 spring:
@@ -75,6 +75,7 @@ osmhConsumer:
       - url: http://services.fsd.uta.fi/v0/oai
         name: 'Finish Data Services'
         handler: 'https://pasc-dev.cessda.eu/osmh-repo'
+        # TODO: Disabled as GESIS endpoint is currently not stable.  Can be enabled or added at runtime via admin app
 #      - url: https://dbk.gesis.org/dbkoai
 #        name: 'GESIS'
 #        handler: 'https://pasc-dev.cessda.eu/osmh-repo'
@@ -97,6 +98,11 @@ spring:
   boot:
     admin:
       url: http://localhost:8087
+logging:
+  level:
+    eu.cessda.pasc.oci.service: INFO
+    eu.cessda.pasc.oci.repository: INFO
+    eu.cessda.pasc.oci.helpers: INFO
 elasticsearch:
   host: http://35.195.82.45
 ---
@@ -107,6 +113,11 @@ spring:
   boot:
     admin:
       url: http://localhost:8087
+logging:
+  level:
+    eu.cessda.pasc.oci.service: INFO
+    eu.cessda.pasc.oci.repository: INFO
+    eu.cessda.pasc.oci.helpers: INFO
 osmhConsumer:
   languages: ['en', 'fi', 'de']
   endpoints:

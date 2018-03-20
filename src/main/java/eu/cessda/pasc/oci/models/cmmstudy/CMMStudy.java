@@ -81,6 +81,7 @@ public class CMMStudy {
   @JsonProperty("titleStudy")
   private Map<String, String> titleStudy;
 
+  @Setter
   @JsonProperty("studyUrl")
   private Map<String, String> studyUrl;
 
@@ -112,6 +113,7 @@ public class CMMStudy {
   @JsonProperty("lastModified")
   private String lastModified;
 
+  @Setter
   @JsonProperty("isActive")
   private boolean active;
 }

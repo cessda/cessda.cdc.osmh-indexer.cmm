@@ -64,10 +64,10 @@ public class ConsumerScheduler {
   public void fullHarvestAndIngestionAllConfiguredSPsReposRecords() {
     Instant startTime = Instant.now();
     LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime.toEpochMilli()), ZoneId.systemDefault());
-    logStartStatus(date, FULL_RUN);
 
     if (!runInProgress) {
       runInProgress = true;
+      logStartStatus(date, FULL_RUN);
       executeHarvestAndIngest(null);
       logEndStatus(date, startTime, FULL_RUN);
       runInProgress = false;
@@ -84,10 +84,10 @@ public class ConsumerScheduler {
   public void dailyIncrementalHarvestAndIngestionAllConfiguredSPsReposRecords() {
     Instant startTime = Instant.now();
     LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime.toEpochMilli()), ZoneId.systemDefault());
-    logStartStatus(date, DAILY_INCREMENTAL_RUN);
 
     if (!runInProgress) {
       runInProgress = true;
+      logStartStatus(date, DAILY_INCREMENTAL_RUN);
       executeHarvestAndIngest(esIndexerService.getMostRecentLastModified().orElse(null));
       logEndStatus(date, startTime, DAILY_INCREMENTAL_RUN);
       runInProgress = false;

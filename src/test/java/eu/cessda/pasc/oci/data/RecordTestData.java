@@ -126,7 +126,7 @@ public class RecordTestData {
   public static List<Optional<CMMStudy>> getASingleSyntheticCMMStudyAsList() {
     List<Optional<CMMStudy>> cmmStudies = new ArrayList<>();
     try {
-      cmmStudies.add(getCmmStudy());
+      cmmStudies.add(getSyntheticCmmStudy());
     } catch (IOException e) {
       fail("Unable to parse Study string to CMMStudy Object");
     }
@@ -137,7 +137,7 @@ public class RecordTestData {
   public static List<Optional<CMMStudy>> getSyntheticCMMStudyAndADeletedRecordAsList() {
     List<Optional<CMMStudy>> cmmStudies = new ArrayList<>();
     try {
-      cmmStudies.add(getCmmStudy());
+      cmmStudies.add(getSyntheticCmmStudy());
       cmmStudies.add(getDeletedCmmStudy());
     } catch (IOException e) {
       fail("Unable to parse Study string to CMMStudy Object");
@@ -171,7 +171,7 @@ public class RecordTestData {
     return studyOfLanguages;
   }
 
-  public static Optional<CMMStudy> getCmmStudy() throws IOException {
+  public static Optional<CMMStudy> getSyntheticCmmStudy() throws IOException {
     String cmmStudyString = new FileHandler().getFileWithUtil("synthetic_compliant_record.json");
     return Optional.ofNullable(CMMStudyConverter.fromJsonString(cmmStudyString));
   }
@@ -181,8 +181,8 @@ public class RecordTestData {
     return Optional.ofNullable(CMMStudyConverter.fromJsonString(cmmStudyString));
   }
 
-  public static Optional<CMMStudy> getCmmStudy(String identifier) throws IOException {
-    Optional<CMMStudy> optionalCmmStudy = getCmmStudy();
+  public static Optional<CMMStudy> getSyntheticCmmStudy(String identifier) throws IOException {
+    Optional<CMMStudy> optionalCmmStudy = getSyntheticCmmStudy();
     optionalCmmStudy.ifPresent(cmmStudy -> cmmStudy.setStudyNumber(identifier));
     return optionalCmmStudy;
   }

@@ -1,6 +1,7 @@
 package eu.cessda.pasc.oci.service.helpers;
 
 import eu.cessda.pasc.oci.AbstractSpringTestProfileContext;
+import eu.cessda.pasc.oci.data.RecordTestData;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
@@ -9,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -25,6 +27,132 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
 
   @Autowired
   LanguageDocumentExtractor languageDocumentExtractor;
+
+  @Test
+  public void shouldRejectRecordsWhenMissingTitle() throws IOException {
+
+    // Given
+    CMMStudy study = RecordTestData.getSyntheticCmmStudy().map(cmmStudyValue -> {
+      cmmStudyValue.getTitleStudy().remove("en");
+      return cmmStudyValue;
+    }).orElse(null);
+
+    // When
+    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", study);
+
+    then(validCMMStudyForLang).isFalse();
+  }
+
+  @Test
+  public void shouldRejectRecordsWhenMissingAbstract() throws IOException {
+    // Given
+    CMMStudy study = RecordTestData.getSyntheticCmmStudy().map(cmmStudyValue -> {
+      cmmStudyValue.getAbstractField().remove("en");
+      return cmmStudyValue;
+    }).orElse(null);
+
+    // When
+    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", study);
+    then(validCMMStudyForLang).isFalse();
+  }
+
+  @Test
+  public void shouldRejectRecordsWhenMissingStudyNumber() throws IOException {
+    // When Study Number is empty------------------------------------------------------------------------------/
+    CMMStudy study = RecordTestData.getSyntheticCmmStudy().map(cmmStudyValue -> {
+      cmmStudyValue.setStudyNumber("");
+      return cmmStudyValue;
+    }).orElse(null);
+
+    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", study);
+    then(validCMMStudyForLang).isFalse();
+
+    // When Study Number is null ------------------------------------------------------------------------------/
+    study = RecordTestData.getSyntheticCmmStudy().map(cmmStudyValue -> {
+      cmmStudyValue.setStudyNumber(null);
+      return cmmStudyValue;
+    }).orElse(null);
+
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", study);
+    then(validCMMStudyForLang).isFalse();
+  }
+
+  @Test
+  public void shouldRejectRecordsWhenMissingStudyUrl() throws IOException {
+
+    // When Study Url is Miss ------------------------------------------------------------------------------/
+    CMMStudy study = RecordTestData.getSyntheticCmmStudy().map(cmmStudyValue -> {
+      cmmStudyValue.getStudyUrl().remove("en");
+      return cmmStudyValue;
+    }).orElse(null);
+
+    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", study);
+    then(validCMMStudyForLang).isFalse();
+  }
+
+  @Test
+  public void shouldRejectRecordsWhenMissingPublisher() throws IOException {
+
+    // When Study Url is Miss ------------------------------------------------------------------------------/
+    CMMStudy study = RecordTestData.getSyntheticCmmStudy().map(cmmStudyValue -> {
+      cmmStudyValue.getPublisher().remove("en");
+      return cmmStudyValue;
+    }).orElse(null);
+
+    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", study);
+    then(validCMMStudyForLang).isFalse();
+  }
+
+  @Test
+  public void shouldValidateRecordsThatHaveTheMinimumCMMFields() throws IOException {
+
+    // Given
+    CMMStudy cmmStudy = RecordTestData.getSyntheticCmmStudy().orElse(null);
+
+    // When
+    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", cmmStudy);
+    then(validCMMStudyForLang).isTrue();
+
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("de", cmmStudy);
+    then(validCMMStudyForLang).isTrue();
+
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fi", cmmStudy);
+    then(validCMMStudyForLang).isTrue();
+
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("sv", cmmStudy);
+    then(validCMMStudyForLang).isFalse(); // we do not have the required abstract translation in "sv"
+
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fr", cmmStudy);
+    then(validCMMStudyForLang).isFalse(); // we have nothing for "fr"
+  }
+
+  @Test
+  public void shouldValidateRecordsThatAreMarkedAsInactiveByPassingTheMinimumCMMFieldsChecks() throws IOException {
+
+    // Given
+    Optional<CMMStudy> cmmStudy = RecordTestData.getSyntheticCmmStudy();
+    CMMStudy inActiveCmmStudy = cmmStudy.map(cmmStudy1 -> {
+          cmmStudy1.setActive(false);
+          return cmmStudy1;
+        }
+    ).orElse(null);
+
+    // When
+    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", inActiveCmmStudy);
+    then(validCMMStudyForLang).isTrue();
+
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("de", inActiveCmmStudy);
+    then(validCMMStudyForLang).isTrue();
+
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fi", inActiveCmmStudy);
+    then(validCMMStudyForLang).isTrue();
+
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("sv", inActiveCmmStudy);
+    then(validCMMStudyForLang).isTrue(); // Though, we do not have the required abstract translation in "sv".
+
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fr", inActiveCmmStudy);
+    then(validCMMStudyForLang).isTrue(); // We have nothing for "fr", when a record is deleted we lose this knowledge.
+  }
 
   @Test
   public void shouldReturnExtractedDocInThereRespectiveLangDocuments() {

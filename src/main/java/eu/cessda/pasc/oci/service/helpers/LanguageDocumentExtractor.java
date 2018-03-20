@@ -3,6 +3,7 @@ package eu.cessda.pasc.oci.service.helpers;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
+import eu.cessda.pasc.oci.models.cmmstudy.Publisher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -59,30 +60,48 @@ public class LanguageDocumentExtractor {
   private List<CMMStudyOfLanguage> getCmmStudiesOfLangCode(List<Optional<CMMStudy>> cmmStudies, String idPrefix,
                                                            String languageIsoCode) {
     return cmmStudies.stream()
-        .filter(cmmStudy -> isValidCMMStudyForLang(languageIsoCode, cmmStudy))
+        .filter(cmmStudy -> isValidCMMStudyForLang(languageIsoCode, cmmStudy.orElse(null)))
         .map(Optional::get)
         .map(cmmStudy -> getCmmStudyOfLanguage(idPrefix, languageIsoCode, cmmStudy))
         .collect(Collectors.toList());
   }
 
-  private boolean isValidCMMStudyForLang(String languageIsoCode, Optional<CMMStudy> cmmStudy) {
+  protected boolean isValidCMMStudyForLang(String languageIsoCode, CMMStudy cmmStudy) {
 
-    if (!cmmStudy.isPresent()) {
-      return false;
-    } else if (!cmmStudy.get().isActive()) {
-      return true; // Inactive = deleted record
-    } else {
+    return null != cmmStudy && (
+        !cmmStudy.isActive() || // Inactive = deleted record no need to validate against CMM below.
+            !missingTitle(languageIsoCode, cmmStudy)
+                && !missingAbstract(languageIsoCode, cmmStudy)
+                && !missingStudyNumber(cmmStudy)
+                && !missingStudyUrl(languageIsoCode, cmmStudy)
+                && !missingPublisher(languageIsoCode, cmmStudy)
+    );
 
-      // Active record Must have titleStudy
-      Optional<Map<String, String>> titleStudy = ofNullable(cmmStudy.get().getTitleStudy());
-      if (!titleStudy.isPresent() || !ofNullable(titleStudy.get().get(languageIsoCode)).isPresent()) {
-        return false;
-      }
+  }
 
-      // Active record Must have abstract
-      Optional<Map<String, String>> abstractField = ofNullable(cmmStudy.get().getAbstractField());
-      return abstractField.isPresent() && ofNullable(abstractField.get().get(languageIsoCode)).isPresent();
-    }
+  private boolean missingPublisher(String languageIsoCode, CMMStudy cmmStudy) {
+    Optional<Map<String, Publisher>> publisherOpt = ofNullable(cmmStudy.getPublisher());
+    return !publisherOpt.isPresent() || !ofNullable(publisherOpt.get().get(languageIsoCode)).isPresent();
+  }
+
+  private boolean missingStudyUrl(String languageIsoCode, CMMStudy cmmStudy) {
+    Optional<Map<String, String>> studyUrlOpt = ofNullable(cmmStudy.getStudyUrl());
+    return !studyUrlOpt.isPresent() || !ofNullable(studyUrlOpt.get().get(languageIsoCode)).isPresent();
+  }
+
+  private boolean missingStudyNumber(CMMStudy cmmStudy) {
+    Optional<String> studyNumberOpt = ofNullable(cmmStudy.getStudyNumber());
+    return !studyNumberOpt.isPresent() || studyNumberOpt.get().isEmpty();
+  }
+
+  private boolean missingAbstract(String languageIsoCode, CMMStudy cmmStudy) {
+    Optional<Map<String, String>> abstractFieldOpt = ofNullable(cmmStudy.getAbstractField());
+    return !abstractFieldOpt.isPresent() || !ofNullable(abstractFieldOpt.get().get(languageIsoCode)).isPresent();
+  }
+
+  private boolean missingTitle(String languageIsoCode, CMMStudy cmmStudy) {
+    Optional<Map<String, String>> titleStudyOpt = ofNullable(cmmStudy.getTitleStudy());
+    return !titleStudyOpt.isPresent() || !ofNullable(titleStudyOpt.get().get(languageIsoCode)).isPresent();
   }
 
   private CMMStudyOfLanguage getCmmStudyOfLanguage(String idPrefix, String lang, CMMStudy cmmStudy) {

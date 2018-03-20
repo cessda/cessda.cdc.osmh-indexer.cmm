@@ -15,6 +15,8 @@ import java.time.LocalDateTime;
 public class LogHelper {
 
   private static final String ERROR = "ERROR";
+  private static final String INFO = "INFO";
+  private static final String DEBUG= "DEBUG";
 
   private LogHelper() {
     throw new UnsupportedOperationException("Utility class, instantiation not allow");
@@ -31,6 +33,10 @@ public class LogHelper {
     String s = logLevel.toString();
     if (ERROR.equals(s)) {
       log.error(msg);
+    }else if (INFO.equals(s)) {
+      log.info(msg);
+    }else if (DEBUG.equals(s)) {
+      log.debug(msg);
     }
   }
 }
