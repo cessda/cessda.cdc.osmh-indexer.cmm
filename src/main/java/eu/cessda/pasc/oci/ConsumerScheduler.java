@@ -42,7 +42,6 @@ public class ConsumerScheduler {
   private HarvesterConsumerService harvesterConsumerService;
   private IngestService esIndexerService;
   private LanguageDocumentExtractor extractor;
-  private boolean runInProgress = false;
 
   @Autowired
   public ConsumerScheduler(DebuggingJMXBean debuggingJMXBean, AppConfigurationProperties configurationProperties,
@@ -64,16 +63,9 @@ public class ConsumerScheduler {
   public void fullHarvestAndIngestionAllConfiguredSPsReposRecords() {
     Instant startTime = Instant.now();
     LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime.toEpochMilli()), ZoneId.systemDefault());
-
-    if (!runInProgress) {
-      runInProgress = true;
-      logStartStatus(date, FULL_RUN);
-      executeHarvestAndIngest(null);
-      logEndStatus(date, startTime, FULL_RUN);
-      runInProgress = false;
-    } else {
-      log.info("A Harvest and Ingest is already in progress cannot run.  Skipping");
-    }
+    logStartStatus(date, FULL_RUN);
+    executeHarvestAndIngest(null);
+    logEndStatus(date, startTime, FULL_RUN);
   }
 
   /**
@@ -84,16 +76,9 @@ public class ConsumerScheduler {
   public void dailyIncrementalHarvestAndIngestionAllConfiguredSPsReposRecords() {
     Instant startTime = Instant.now();
     LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime.toEpochMilli()), ZoneId.systemDefault());
-
-    if (!runInProgress) {
-      runInProgress = true;
-      logStartStatus(date, DAILY_INCREMENTAL_RUN);
-      executeHarvestAndIngest(esIndexerService.getMostRecentLastModified().orElse(null));
-      logEndStatus(date, startTime, DAILY_INCREMENTAL_RUN);
-      runInProgress = false;
-    } else {
-      log.info("A Harvest and Ingest is already in progress cannot run.  Skipping");
-    }
+    logStartStatus(date, DAILY_INCREMENTAL_RUN);
+    executeHarvestAndIngest(esIndexerService.getMostRecentLastModified().orElse(null));
+    logEndStatus(date, startTime, DAILY_INCREMENTAL_RUN);
   }
 
   /**
