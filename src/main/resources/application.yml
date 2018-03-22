@@ -56,8 +56,8 @@ elasticsearch:
   clustername: elasticsearch
   host: 127.0.0.1
   port: 9300
-  numberOfShards: 5
-  numberOfReplicas: 0
+  numberOfShards: 2
+  numberOfReplicas: 2
 osmhConsumer:
   languages: ['en', 'fi', 'de']
   harvester:
