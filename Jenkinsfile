@@ -23,6 +23,7 @@ pipeline {
     }
     stage('Prepare Application for registration with Spring Boot Admin') {
       steps {
+        sh("ls -la")
         dir('./infrastructure/gcp/') {
           sh("pwd")
           sh("ls -la")
