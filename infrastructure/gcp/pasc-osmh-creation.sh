@@ -40,18 +40,3 @@ if kubectl get service $PRODUCT-$MODULE-$ENVIRONMENT -n $PRODUCT-$ENVIRONMENT > 
     kubectl create -f ../k8s/$PRODUCT-$MODULE-$ENVIRONMENT-service.yaml > /dev/null 2>&1
     echo "Service created"
 fi;
-
-### Clean Workspace
-rm -rf ../k8s/$PRODUCT-$MODULE-$ENVIRONMENT-deployment.yaml
-rm -rf ../k8s/$PRODUCT-$MODULE-$ENVIRONMENT-service.yaml
-
-
-# Wait 30s
-sleep 30s
-
-### DNS Records
-kubectl get pods -n $PRODUCT-$ENVIRONMENT -o wide
-kubectl get pods -n $PRODUCT-$ENVIRONMENT -o wide | grep "$PRODUCT-$ENVIRONMENT" | awk '{print $6,$1}' >> ./hosts
-kubectl exec $(kubectl get pods -n $PRODUCT-$ENVIRONMENT | grep "admin" | awk '{print $1}') -n $PRODUCT-$ENVIRONMENT -- /bin/sh -c "touch /tmp/hosts"
-kubectl cp ./hosts $(kubectl get pods -n $PRODUCT-$ENVIRONMENT | grep "admin" | awk '{print $1}'):/tmp/hosts -n $PRODUCT-$ENVIRONMENT
-kubectl exec $(kubectl get pods -n $PRODUCT-$ENVIRONMENT | grep "admin" | awk '{print $1}') -n $PRODUCT-$ENVIRONMENT -- /bin/sh -c "cat /tmp/hosts > /etc/hosts"
