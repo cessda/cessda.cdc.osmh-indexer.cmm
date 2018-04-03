@@ -108,6 +108,8 @@ spring:
         banner-mode: "off"
   boot:
     admin:
+      client:
+        prefer-ip: true
       url: http://localhost:8087
 osmhhandler:
   baseEndpoint: '/osmh-repo'
