@@ -145,3 +145,6 @@ osmhConsumer:
   languages: ['en', 'fi', 'sv', 'de']
 server:
   port: 9999
+elasticsearch:
+  numberOfShards: 1
+  numberOfReplicas: 0
