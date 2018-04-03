@@ -56,7 +56,7 @@ pipeline {
 	  stage('Build Docker image') {
    		steps {
 		  echo "Build Docker image"
-                  sh("gcloud docker -- pull eu.gcr.io/cessda-development/cessda-java:8")
+                  sh("gcloud docker -- pull eu.gcr.io/cessda-development/cessda-java:latest")
                   sh("docker build -t ${image_tag} .")
       }
     }
