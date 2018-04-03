@@ -106,7 +106,7 @@ logging:
     eu.cessda.pasc.oci.repository: INFO
     eu.cessda.pasc.oci.helpers: INFO
 elasticsearch:
-  host: http://35.195.82.45
+  host: http://cessda-pasc-es-dev-cluster:9300
 ---
 spring:
   profiles: local
