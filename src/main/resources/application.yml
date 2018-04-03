@@ -106,7 +106,9 @@ logging:
     eu.cessda.pasc.oci.repository: INFO
     eu.cessda.pasc.oci.helpers: INFO
 elasticsearch:
-  host: http://cessda-pasc-es-dev-cluster:9300
+  host: cessda-pasc-es-dev-cluster
+  numberOfShards: 2
+  numberOfReplicas: 2
 ---
 spring:
   profiles: local
