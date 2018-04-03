@@ -24,6 +24,7 @@ pipeline {
     stage('Prepare Application for registration with Spring Boot Admin') {
       steps {
         dir('./infrastructure/gcp/') {
+          sh("pwd")
           sh("ls -la")
           sh("bash pasc-osmh-registration.sh")
         }
