@@ -132,12 +132,12 @@ osmhConsumer:
       - url: http://services.fsd.uta.fi/v0/oai
         name: 'Finish Data Services'
         handler: 'http://localhost:9091'
-      - url: https://dbk.gesis.org/dbkoai
-        name: 'GESIS'
-        handler: 'http://localhost:9091'
-      - url: https://dbk.gesis.org/dbkoai/
-        name: 'GESIS De'
-        handler: 'http://localhost:9091'
+#      - url: https://dbk.gesis.org/dbkoai
+#        name: 'GESIS'
+#        handler: 'http://localhost:9091'
+#      - url: https://dbk.gesis.org/dbkoai/
+#        name: 'GESIS De'
+#        handler: 'http://localhost:9091'
 #        Process FSD Last, it is the slowest so far!
 
 ---
