@@ -59,7 +59,7 @@ elasticsearch:
   numberOfShards: 2
   numberOfReplicas: 2
 osmhConsumer:
-  languages: ['en', 'fi', 'de']
+  languages: ['en', 'fi', 'de', 'nl']
   harvester:
     url: 'http://localhost:9091'
     version: 'v0'
