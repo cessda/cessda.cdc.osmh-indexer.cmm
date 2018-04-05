@@ -20,7 +20,7 @@
           "standard",
           "lowercase",
           "asciifolding",
-          "english_stop",
+          "dutch_stop",
           "autocomplete_filter"
         ]
       }
