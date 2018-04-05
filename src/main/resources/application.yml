@@ -59,13 +59,14 @@ osmhhandler:
     repos:
       - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
         preferredMetadataParam: ddi
-      - url: http://services.fsd.uta.fi/v0/oai
-        preferredMetadataParam: ddi_c
       - url: https://dbk.gesis.org/dbkoai
         preferredMetadataParam: oai_ddi25
-      #** Note dirty extra "/" workaround for GESIS who separate records to different metadata prefix per language ***#
       - url: https://dbk.gesis.org/dbkoai/
         preferredMetadataParam: oai_ddi25-de
+      - url: https://easy.dans.knaw.nl/oai/
+        preferredMetadataParam: oai_dc
+      - url: http://services.fsd.uta.fi/v0/oai
+        preferredMetadataParam: ddi_c
     metadataParsingDefaultLang:
       active: true
       lang: 'en'
