@@ -78,9 +78,9 @@ osmhConsumer:
       - url: https://dbk.gesis.org/dbkoai/
         name: 'GESIS De'
         handler: 'https://pasc-dev.cessda.eu/osmh-repo'
-      - url: https://easy.dans.knaw.nl/oai/
-        name: 'DANS'
-        handler: 'https://pasc-dev.cessda.eu/osmh-repo'
+#      - url: https://easy.dans.knaw.nl/oai/
+#        name: 'DANS'
+#        handler: 'https://pasc-dev.cessda.eu/osmh-repo'
       - url: http://services.fsd.uta.fi/v0/oai
         name: 'Finish Data Services'
         handler: 'https://pasc-dev.cessda.eu/osmh-repo'
