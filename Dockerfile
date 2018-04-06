@@ -12,4 +12,4 @@ ADD ./target/pasc-oci*.jar pasc-oci.jar
 ENV JAVA_OPTS ""
 
 # Entrypoint - Start Admin
-ENTRYPOINT exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar -Dspring.profiles.active=dev /pasc-oci.jar
+ENTRYPOINT exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar -Dspring.profiles.active=staging /pasc-oci.jar
