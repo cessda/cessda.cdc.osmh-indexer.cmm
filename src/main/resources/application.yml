@@ -131,6 +131,25 @@ elasticsearch:
   numberOfShards: 2
   numberOfReplicas: 2
 ---
+  spring:
+    profiles: live
+    main:
+          banner-mode: "off"
+    boot:
+      admin:
+        client:
+          prefer-ip: true
+        url: http://localhost:8087
+  logging:
+    level:
+      eu.cessda.pasc.oci.service: INFO
+      eu.cessda.pasc.oci.repository: INFO
+      eu.cessda.pasc.oci.helpers: INFO
+  elasticsearch:
+    host: cessda-pasc-es-live-cluster
+    numberOfShards: 2
+    numberOfReplicas: 2
+  ---
 spring:
   profiles: local
   main:
