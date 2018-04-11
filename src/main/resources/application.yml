@@ -149,7 +149,7 @@ elasticsearch:
     host: cessda-pasc-es-live-cluster
     numberOfShards: 2
     numberOfReplicas: 2
-  ---
+---
 spring:
   profiles: local
   main:
@@ -179,7 +179,6 @@ osmhConsumer:
 #        name: 'GESIS De'
 #        handler: 'http://localhost:9091'
 #        Process FSD Last, it is the slowest so far!
-
 ---
 spring:
   profiles: test
