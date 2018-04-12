@@ -99,7 +99,9 @@
             "ignore_above": 256
           },
           "publisher": {
-            "type": "string"
+            "type": "string",
+            "index": "not_analyzed",
+            "ignore_above": 256
           }
         }
       },
