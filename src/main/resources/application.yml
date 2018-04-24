@@ -71,10 +71,10 @@ osmhConsumer:
     repos:
       - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
         name: 'UK Data Service'
-        handler: 'https://pasc-dev.cessda.eu/osmh-repo'
+        handler: 'https://pasc-staging.cessda.eu/osmh-repo'
       - url: https://dbk.gesis.org/dbkoai2/
         name: 'GESIS'
-        handler: 'https://pasc-dev.cessda.eu/osmh-repo'
+        handler: 'https://pasc-staging.cessda.eu/osmh-repo'
 #      - url: https://dbk.gesis.org/dbkoai/
 #        name: 'GESIS De'
 #        handler: 'https://pasc-dev.cessda.eu/osmh-repo'
