@@ -71,6 +71,7 @@ osmhConsumer:
     repos:
       - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
         name: 'UK Data Service'
+<<<<<<< HEAD
         handler: 'https://pasc-live.cessda.eu/osmh-repo'
       - url: https://dbk.gesis.org/dbkoai
         name: 'GESIS'
@@ -78,6 +79,15 @@ osmhConsumer:
       - url: https://dbk.gesis.org/dbkoai/
         name: 'GESIS De'
         handler: 'https://pasc-live.cessda.eu/osmh-repo'
+=======
+        handler: 'https://pasc-dev.cessda.eu/osmh-repo'
+      - url: https://dbk.gesis.org/dbkoai2/
+        name: 'GESIS'
+        handler: 'https://pasc-dev.cessda.eu/osmh-repo'
+#      - url: https://dbk.gesis.org/dbkoai/
+#        name: 'GESIS De'
+#        handler: 'https://pasc-dev.cessda.eu/osmh-repo'
+>>>>>>> develop
 #      - url: https://easy.dans.knaw.nl/oai/
 #        name: 'DANS'
 #        handler: 'https://pasc-dev.cessda.eu/osmh-repo'
@@ -179,7 +189,6 @@ osmhConsumer:
 #        name: 'GESIS De'
 #        handler: 'http://localhost:9091'
 #        Process FSD Last, it is the slowest so far!
-
 ---
 spring:
   profiles: test
