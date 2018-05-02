@@ -73,7 +73,7 @@ public class LanguageDocumentExtractor {
             !missingTitle(languageIsoCode, cmmStudy)
                 && !missingAbstract(languageIsoCode, cmmStudy)
                 && !missingStudyNumber(cmmStudy)
-                && !missingStudyUrl(languageIsoCode, cmmStudy)
+                //&& !missingStudyUrl(languageIsoCode, cmmStudy)
                 && !missingPublisher(languageIsoCode, cmmStudy)
     );
 
