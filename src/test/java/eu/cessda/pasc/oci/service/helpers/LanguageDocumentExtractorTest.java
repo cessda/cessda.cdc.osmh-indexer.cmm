@@ -78,19 +78,6 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
   }
 
   @Test
-  public void shouldRejectRecordsWhenMissingStudyUrl() throws IOException {
-
-    // When Study Url is Miss ------------------------------------------------------------------------------/
-    CMMStudy study = RecordTestData.getSyntheticCmmStudy().map(cmmStudyValue -> {
-      cmmStudyValue.getStudyUrl().remove("en");
-      return cmmStudyValue;
-    }).orElse(null);
-
-    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", study);
-    then(validCMMStudyForLang).isFalse();
-  }
-
-  @Test
   public void shouldRejectRecordsWhenMissingPublisher() throws IOException {
 
     // When Study Url is Miss ------------------------------------------------------------------------------/
