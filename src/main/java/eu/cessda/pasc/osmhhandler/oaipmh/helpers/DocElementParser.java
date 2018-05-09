@@ -17,6 +17,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -99,7 +100,7 @@ class DocElementParser {
     elements.forEach(element -> {
           Optional<T> parsedMetadataPojo = parserStrategy.apply(element);
           parsedMetadataPojo.ifPresent(parsedMetadataPojoValue -> {
-            Optional<String> langCode = getParseLanguageCode(config, defaultLangIsoCode, element);
+            Optional<String> langCode = parseLanguageCode(config, defaultLangIsoCode, element);
             langCode.ifPresent(code ->
                 mapMetadataToLanguageCode(mapOfMetadataToLanguageCode, parsedMetadataPojoValue, code));
           });
@@ -116,7 +117,7 @@ class DocElementParser {
     List<Element> elements = getElements(document, xFactory, xPath);
     elements.forEach(element -> {
           T parsedMetadataPojo = parserStrategy.apply(element);
-          Optional<String> langCode = getParseLanguageCode(config, defaultLangIsoCode, element);
+          Optional<String> langCode = parseLanguageCode(config, defaultLangIsoCode, element);
           langCode.ifPresent(languageIsoCode ->
               mapOfMetadataToLanguageCode.put(languageIsoCode, parsedMetadataPojo)); //Overrides duplicates, last wins.
         }
@@ -125,21 +126,29 @@ class DocElementParser {
     return mapOfMetadataToLanguageCode;
   }
 
-  private static Optional<String> getParseLanguageCode(OaiPmh config, String defaultLangIsoCode, Element element) {
-
-    Optional<Element> concept = Optional.ofNullable(element.getChild("concept", DDI_NS));
-
-    Attribute langAttr = concept.isPresent() ? concept.get().getAttribute(LANG_ATTR, XML_NS) :
-        element.getAttribute(LANG_ATTR, XML_NS);
-
+  private static Optional<String> parseLanguageCode(OaiPmh config, String defaultLangIsoCode, Element element) {
     Optional<String> langCode = Optional.empty();
-    if (null != langAttr && !langAttr.getValue().isEmpty()) {
-      langCode = Optional.ofNullable(langAttr.getValue());
+
+    Optional<Attribute> langAttr = parseLangAttribute(element);
+    if (langAttr.isPresent() && !langAttr.get().getValue().isEmpty()) {
+      langCode = ofNullable(langAttr.get().getValue());
     } else if (config.getMetadataParsingDefaultLang().isActive()) {
-      langCode = Optional.ofNullable(defaultLangIsoCode);
+      langCode = ofNullable(defaultLangIsoCode);
     }
 
     return langCode;
+  }
+
+  private static Optional<Attribute> parseLangAttribute(Element element) {
+    Optional<Attribute> parentLangAttr = ofNullable(element.getAttribute(LANG_ATTR, XML_NS));
+    Optional<Attribute> langAttr;
+    if (parentLangAttr.isPresent()) {
+      langAttr = parentLangAttr;
+    } else {
+      Optional<Element> concept = ofNullable(element.getChild("concept", DDI_NS));
+      langAttr = concept.isPresent() ? ofNullable(concept.get().getAttribute(LANG_ATTR, XML_NS)) : Optional.empty();
+    }
+    return langAttr;
   }
 
   private static <T> void mapMetadataToLanguageCode(Map<String, List<T>> mapOfMetadataToLanguageCode,
@@ -157,17 +166,17 @@ class DocElementParser {
   }
 
   static Optional<String> getAttributeValue(Element element, String idAttr) {
-    return Optional.ofNullable(element.getAttributeValue(idAttr));
+    return ofNullable(element.getAttributeValue(idAttr));
   }
 
   static Optional<Element> getFirstElement(Document document, XPathFactory xFactory, String xPathToElement) {
     XPathExpression<Element> expression = xFactory.compile(xPathToElement, Filters.element(), null, OAI_AND_DDI_NS);
-    return Optional.ofNullable(expression.evaluateFirst(document));
+    return ofNullable(expression.evaluateFirst(document));
   }
 
   static Optional<Attribute> getFirstAttribute(Document document, XPathFactory xFactory, String xPathToElement) {
     XPathExpression<Attribute> expression = xFactory.compile(xPathToElement, Filters.attribute(), null, OAI_AND_DDI_NS);
-    return Optional.ofNullable(expression.evaluateFirst(document));
+    return ofNullable(expression.evaluateFirst(document));
   }
 
   /**
@@ -193,8 +202,8 @@ class DocElementParser {
         // Currently there is no requirement to extract dates of event per language.
         .filter(distinctByKey(element -> element.getAttributeValue(EVENT_ATTR))) //
         .collect(Collectors.toMap(element ->
-        element.getAttributeValue(EVENT_ATTR), element ->
-        element.getAttributeValue(DATE_ATTR)));
+            element.getAttributeValue(EVENT_ATTR), element ->
+            element.getAttributeValue(DATE_ATTR)));
   }
 
   private static List<Attribute> getAttributes(Document document, XPathFactory xFactory, String xPathToElement) {
@@ -259,7 +268,7 @@ class DocElementParser {
   }
 
   private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
-    Map<Object,Boolean> seen = new ConcurrentHashMap<>();
+    Map<Object, Boolean> seen = new ConcurrentHashMap<>();
     return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
   }
 }

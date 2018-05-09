@@ -192,7 +192,7 @@ public class GetRecordServiceImplTest {
 
     then(result).isNotNull();
     validateCMMStudyResultAgainstSchema(result);
-    assertFieldsAreExtractedAsExpectedForAllCMMRequired(result);
+    assertThatCmmRequiredFieldsAreExtracted(result);
   }
 
   private void validateCMMStudyResultAgainstSchema(CMMStudy record) throws IOException, ProcessingException, JSONException {
@@ -250,7 +250,7 @@ public class GetRecordServiceImplTest {
         .get("studyUrl").toString(), actualTree.get("studyUrl").toString(), true);
   }
 
-  private void assertFieldsAreExtractedAsExpectedForAllCMMRequired(CMMStudy record) throws IOException, JSONException {
+  private void assertThatCmmRequiredFieldsAreExtracted(CMMStudy record) throws IOException, JSONException {
 
     final ObjectMapper mapper = new ObjectMapper();
     String jsonString = CMMConverter.toJsonString(record);

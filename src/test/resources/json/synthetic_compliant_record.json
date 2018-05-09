@@ -73,6 +73,20 @@
         "id": "Longitudinal.Panel 2"
       }
     ],
+    "fi": [
+      {
+        "vocabUri": "http:\/\/lod.data-archive.ac.uk",
+        "vocab": "DDI Time Method 1",
+        "term": "This is the term. xml:lang in parent el wins over concept",
+        "id": "This is the Id"
+      },
+      {
+        "vocabUri": "http:\/\/lod.data-archive.ac.uk",
+        "vocab": "DDI Time Method 1",
+        "term": "This is the term. xml:lang in parent el wins over concept regardless",
+        "id": "This is the Id"
+      }
+    ],
     "en": [
       {
         "vocabUri": "",
@@ -105,6 +119,8 @@
     "en": [
       "This is the term",
       "This is the term 2",
+      "This is the term. xml:lang in parent el wins over concept",
+      "This is the term. xml:lang in parent el wins over concept regardless",
       "Should ignore elements without a concept by TypeOfSamplingProcedures"
     ],
     "fr": [
@@ -235,6 +251,16 @@
         "vocabUri": "urn:ddi-cv:SamplingProcedure:1.1",
         "vocab": "DDI Sampling Procedure",
         "id": "Probability.Stratified 2"
+      },
+      {
+        "vocabUri": "urn:ddi-cv:SamplingProcedure:1.1",
+        "vocab": "DDI Sampling Procedure",
+        "id": "Probability.Stratified 2"
+      },
+      {
+        "vocabUri": "urn:ddi-cv:SamplingProcedure:1.1",
+        "vocab": "DDI Sampling Procedure",
+        "id": "Probability.Stratified 2"
       }
     ]
   },
@@ -253,7 +279,19 @@
       {
         "vocabUri": "",
         "vocab": "DDI Analysis Unit",
-        "term": "This is the term",
+        "term": "DE: This is the term",
+        "id": "This is the id"
+      },
+      {
+        "vocabUri": "",
+        "vocab": "DDI Analysis Unit",
+        "term": "DE: This is the term. XML-lang on parent element wins",
+        "id": "This is the id"
+      },
+      {
+        "vocabUri": "",
+        "vocab": "DDI Analysis Unit",
+        "term": "DE: This is the term. XML-lang on parent element wins regardless of missing XML-lang in concept  el",
         "id": "This is the id"
       }
     ],
