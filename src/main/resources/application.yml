@@ -57,9 +57,9 @@ elasticsearch:
   host: 127.0.0.1
   port: 9300
   numberOfShards: 2
-  numberOfReplicas: 2
+  numberOfReplicas: 0
 osmhConsumer:
-  languages: ['en', 'fi', 'de', 'nl']
+  languages: ['en', 'fi', 'de', 'nl', 'fr']
   harvester:
     url: 'http://localhost:9091'
     version: 'v0'
@@ -75,21 +75,12 @@ osmhConsumer:
       - url: https://dbk.gesis.org/dbkoai2/
         name: 'GESIS'
         handler: 'https://pasc-dev.cessda.eu/osmh-repo'
-#      - url: https://dbk.gesis.org/dbkoai/
-#        name: 'GESIS De'
-#        handler: 'https://pasc-dev.cessda.eu/osmh-repo'
-#      - url: https://easy.dans.knaw.nl/oai/
-#        name: 'DANS'
-#        handler: 'https://pasc-dev.cessda.eu/osmh-repo'
       - url: http://services.fsd.uta.fi/v0/oai
         name: 'Finish Data Services'
         handler: 'https://pasc-dev.cessda.eu/osmh-repo'
-        # TODO: Disabled as GESIS endpoint is currently not stable.  Can be enabled or added at runtime via admin app
-      #** Note dirty extra "/" workaround for GESIS who separate records to different metadata prefix per language ***#
-
     connTimeout: 5000
     connRequestTimeout: 5000
-    readTimeout: 65000 # 65secs (65_000ms) NOTE handler is less (60_000).
+    readTimeout: 120000 # 65secs (65_000ms) NOTE handler is less (60_000).
     verifySSL: false
 
 ---
@@ -159,11 +150,11 @@ spring:
       url: http://localhost:8087
 logging:
   level:
-    eu.cessda.pasc.oci.service: INFO
-    eu.cessda.pasc.oci.repository: INFO
-    eu.cessda.pasc.oci.helpers: INFO
+    eu.cessda.pasc.oci.service: DEBUG
+    eu.cessda.pasc.oci.repository: DEBUG
+    eu.cessda.pasc.oci.helpers: DEBUG
 osmhConsumer:
-  languages: ['en', 'fi', 'de']
+  languages: ['en', 'fi', 'de', 'fr']
   endpoints:
     repos:
       - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
@@ -172,13 +163,18 @@ osmhConsumer:
       - url: http://services.fsd.uta.fi/v0/oai
         name: 'Finish Data Services'
         handler: 'http://localhost:9091'
-#      - url: https://dbk.gesis.org/dbkoai
-#        name: 'GESIS'
-#        handler: 'http://localhost:9091'
-#      - url: https://dbk.gesis.org/dbkoai/
-#        name: 'GESIS De'
-#        handler: 'http://localhost:9091'
-#        Process FSD Last, it is the slowest so far!
+      - url: http://fors-nesstar.unil.ch/oai-pmh
+        name: 'FORS Data Service (Nesstar)'
+        handler: 'http://localhost:9842'
+      - url: http://nesstar.ukdataservice.ac.uk/oai-pmh
+        name: 'UK Data Service (Nesstar)'
+        handler: 'http://localhost:9842'
+      - url: http://nesstar.ucd.ie/oai-pmh
+        name: 'ISSDA (Nesstar)'
+        handler: 'http://localhost:9842'
+      - url:  http://nesstar.sciences-po.fr/oai-pmh
+        name: 'Progedo (Nesstar)'
+        handler: 'http://localhost:9842'
 ---
 spring:
   profiles: test

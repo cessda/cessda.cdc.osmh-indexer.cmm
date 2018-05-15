@@ -27,7 +27,7 @@ public class StudyIdentifierEncoderTest {
   public void printEncoding() {
 
     // Given
-    String identifier = "oai:fsd.uta.fi:FSD2496";
+    String identifier = "http://nesstar.sciences-po.fr:80/obj/fStudy/fr.cdsp.ddi.elipss.2013.09.dynamob";
 
     // When
     String encodedId = encodeStudyIdentifier().apply(identifier);
