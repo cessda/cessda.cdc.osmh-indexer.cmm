@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
@@ -20,6 +21,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Extra Util configuration
@@ -43,6 +46,9 @@ public class AppUtilityBeansConfiguration {
   @Autowired
   AppConfigurationProperties appConfigurationProperties;
 
+  @Autowired
+  PerfRequestSyncInterceptor perfRequestSyncInterceptor;
+
   @Bean
   public ObjectMapper objectMapper() {
     return new ObjectMapper();
@@ -57,7 +63,12 @@ public class AppUtilityBeansConfiguration {
 
   @Bean
   public RestTemplate restTemplate() {
-    return new RestTemplate(getClientHttpRequestFactory());
+    final RestTemplate restTemplate = new RestTemplate(getClientHttpRequestFactory());
+    final List<ClientHttpRequestInterceptor> requestInterceptors = new ArrayList<>();
+    requestInterceptors.add(perfRequestSyncInterceptor);
+    restTemplate.setInterceptors(requestInterceptors);
+
+    return restTemplate;
   }
 
   private ClientHttpRequestFactory getClientHttpRequestFactory() {
