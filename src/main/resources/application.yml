@@ -12,9 +12,9 @@ endpoints.shutdown.enabled: true
 logging:
   file: ${user.home}${file.separator}pasc-oci${file.separator}pasc-oci.log
   pattern:
-    console: '%d{yyyy-dd-MM HH:mm:ss.SSS} %highlight(%-5level) %30.30((%M\)) %40.40((%file:%line\))
+    console: '%d{yyyy-dd-MM HH:mm:ss.SSS} %highlight(%-5level) %40.40((%file:%line\))
       - %message%n'
-    file: '%d{yyyy-dd-MM HH:mm:ss.SSS}  %-5level  %30.30((%M\)) %40.40((%file:%line\))
+    file: '%d{yyyy-dd-MM HH:mm:ss.SSS}  %-5level  %40.40((%file:%line\))
       - %message%n'
   level:
     .: WARN
@@ -23,6 +23,7 @@ logging:
     eu.cessda.pasc.oci.service: DEBUG
     eu.cessda.pasc.oci.repository: DEBUG
     eu.cessda.pasc.oci.helpers: DEBUG
+    eu.cessda.pasc.oci.configurations.PerfRequestSyncInterceptor: DEBUG
     net: WARN
     com: ERROR
 spring:
@@ -78,9 +79,21 @@ osmhConsumer:
       - url: http://services.fsd.uta.fi/v0/oai
         name: 'Finish Data Services'
         handler: 'https://pasc-dev.cessda.eu/osmh-repo'
+      - url: http://fors-nesstar.unil.ch/oai-pmh
+        name: 'FORS Data Service (Nesstar)'
+        handler: 'https://pasc-dev.cessda.eu/osmh-repo-nesstar'
+      - url: http://nesstar.ukdataservice.ac.uk/oai-pmh
+        name: 'UK Data Service (Nesstar)'
+        handler: 'https://pasc-dev.cessda.eu/osmh-repo-nesstar'
+      - url: http://nesstar.ucd.ie/oai-pmh
+        name: 'ISSDA (Nesstar)'
+        handler: 'https://pasc-dev.cessda.eu/osmh-repo-nesstar'
+      - url:  http://nesstar.sciences-po.fr/oai-pmh
+        name: 'Progedo (Nesstar)'
+        handler: 'https://pasc-dev.cessda.eu/osmh-repo-nesstar'
     connTimeout: 5000
     connRequestTimeout: 5000
-    readTimeout: 120000 # 65secs (65_000ms) NOTE handler is less (60_000).
+    readTimeout: 120000 # increased from 60seconds to 120 seconds to deal with slower Nesstar repos
     verifySSL: false
 
 ---
@@ -98,6 +111,7 @@ logging:
     eu.cessda.pasc.oci.service: INFO
     eu.cessda.pasc.oci.repository: INFO
     eu.cessda.pasc.oci.helpers: INFO
+    eu.cessda.pasc.oci.configurations.PerfRequestSyncInterceptor: DEBUG
 elasticsearch:
   host: cessda-pasc-es-dev-cluster
   numberOfShards: 2
@@ -153,6 +167,7 @@ logging:
     eu.cessda.pasc.oci.service: DEBUG
     eu.cessda.pasc.oci.repository: DEBUG
     eu.cessda.pasc.oci.helpers: DEBUG
+    eu.cessda.pasc.oci.configurations.PerfRequestSyncInterceptor: DEBUG
 osmhConsumer:
   languages: ['en', 'fi', 'de', 'fr']
   endpoints:

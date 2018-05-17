@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 import org.springframework.boot.logging.LogLevel;
 
 import java.time.LocalDateTime;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
  *
  * @author moses@doraventures.com
  */
-@JsonInclude(JsonInclude.Include.ALWAYS)
+@JsonInclude()
 @JsonPropertyOrder({
     "logLevel",
     "responseCode",
@@ -22,11 +23,10 @@ import java.time.LocalDateTime;
 })
 @Builder
 @Getter
+@ToString
 public class RemoteResponse {
   LogLevel logLevel;
   int responseCode;
   String responseMessage;
   LocalDateTime occurredAt;
-
-  // TODO: implement toString to return json representation of this using ObjectMapper.
 }

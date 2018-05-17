@@ -46,7 +46,7 @@ public class LanguageDocumentExtractor {
     // with record embedded to each langCode, so that one can easily grab all records more efficiently for a langCode
     appConfigurationProperties.getLanguages().forEach(langCode -> {
           Instant start = Instant.now();
-          log.info("Extract CMMStudyOfLanguage for [{}] language code - STARTED", langCode);
+          log.trace("Extract CMMStudyOfLanguage for [{}] language code - STARTED", langCode);
           List<CMMStudyOfLanguage> collectLanguageCmmStudy = getCmmStudiesOfLangCode(cmmStudies, idPrefix, langCode);
           languageDocMap.put(langCode, collectLanguageCmmStudy);
           logTimeTook(langCode, start);
@@ -60,48 +60,73 @@ public class LanguageDocumentExtractor {
   private List<CMMStudyOfLanguage> getCmmStudiesOfLangCode(List<Optional<CMMStudy>> cmmStudies, String idPrefix,
                                                            String languageIsoCode) {
     return cmmStudies.stream()
-        .filter(cmmStudy -> isValidCMMStudyForLang(languageIsoCode, cmmStudy.orElse(null)))
+        .filter(cmmStudy -> isValidCMMStudyForLang(languageIsoCode, idPrefix, cmmStudy.orElse(null)))
         .map(Optional::get)
         .map(cmmStudy -> getCmmStudyOfLanguage(idPrefix, languageIsoCode, cmmStudy))
         .collect(Collectors.toList());
   }
 
-  protected boolean isValidCMMStudyForLang(String languageIsoCode, CMMStudy cmmStudy) {
+  boolean isValidCMMStudyForLang(String languageIsoCode, String idPrefix, CMMStudy cmmStudy) {
 
-    return null != cmmStudy && (
-        !cmmStudy.isActive() || // Inactive = deleted record no need to validate against CMM below.
-            !missingTitle(languageIsoCode, cmmStudy)
-                && !missingAbstract(languageIsoCode, cmmStudy)
-                && !missingStudyNumber(cmmStudy)
-                //&& !missingStudyUrl(languageIsoCode, cmmStudy)
-                && !missingPublisher(languageIsoCode, cmmStudy)
-    );
+    if (null != cmmStudy) {
+      if (!cmmStudy.isActive()) {
+        logInvalidCMMStudy("Study is not Active [{}]: [{}]", languageIsoCode, idPrefix, cmmStudy);
+        // Inactive = deleted record no need to validate against CMM below. Index as. Frontend has isActive filter.
+        return true;
+      }
 
+      if (!hasTitle(languageIsoCode, cmmStudy)) {
+        logInvalidCMMStudy("Study does not have a title [{}]: [{}]", languageIsoCode, idPrefix, cmmStudy);
+        return false;
+      }
+
+      if (!hasAbstract(languageIsoCode, cmmStudy)) {
+        logInvalidCMMStudy("Study does not have an abstract [{}]: [{}]", languageIsoCode, idPrefix, cmmStudy);
+        return false;
+      }
+
+      if (!hasStudyNumber(cmmStudy)) {
+        logInvalidCMMStudy("Study does not have a studyNumber [{}]: [{}]", languageIsoCode, idPrefix, cmmStudy);
+        return false;
+      }
+
+      if (!hasPublisher(languageIsoCode, cmmStudy)) {
+        logInvalidCMMStudy("Study does not have a publisher [{}]: [{}]", languageIsoCode, idPrefix, cmmStudy);
+        return false;
+      }
+    } else {
+      logInvalidCMMStudy("Study is null [{}]: [{}]", languageIsoCode, idPrefix, cmmStudy);
+      return false;
+    }
+
+    return true;
   }
 
-  private boolean missingPublisher(String languageIsoCode, CMMStudy cmmStudy) {
+  private void logInvalidCMMStudy(String msgTemplate, String languageIsoCode, String idPrefix, CMMStudy cmmStudy) {
+    if (log.isWarnEnabled()) {
+      final String studyNumber = idPrefix + "-" + (null != cmmStudy ? cmmStudy.getStudyNumber() : "Empty");
+      log.warn(msgTemplate, languageIsoCode, studyNumber);
+    }
+  }
+
+  private boolean hasPublisher(String languageIsoCode, CMMStudy cmmStudy) {
     Optional<Map<String, Publisher>> publisherOpt = ofNullable(cmmStudy.getPublisher());
-    return !publisherOpt.isPresent() || !ofNullable(publisherOpt.get().get(languageIsoCode)).isPresent();
+    return publisherOpt.isPresent() && ofNullable(publisherOpt.get().get(languageIsoCode)).isPresent();
   }
 
-  private boolean missingStudyUrl(String languageIsoCode, CMMStudy cmmStudy) {
-    Optional<Map<String, String>> studyUrlOpt = ofNullable(cmmStudy.getStudyUrl());
-    return !studyUrlOpt.isPresent() || !ofNullable(studyUrlOpt.get().get(languageIsoCode)).isPresent();
-  }
-
-  private boolean missingStudyNumber(CMMStudy cmmStudy) {
+  private boolean hasStudyNumber(CMMStudy cmmStudy) {
     Optional<String> studyNumberOpt = ofNullable(cmmStudy.getStudyNumber());
-    return !studyNumberOpt.isPresent() || studyNumberOpt.get().isEmpty();
+    return studyNumberOpt.isPresent() && !studyNumberOpt.get().isEmpty();
   }
 
-  private boolean missingAbstract(String languageIsoCode, CMMStudy cmmStudy) {
+  private boolean hasAbstract(String languageIsoCode, CMMStudy cmmStudy) {
     Optional<Map<String, String>> abstractFieldOpt = ofNullable(cmmStudy.getAbstractField());
-    return !abstractFieldOpt.isPresent() || !ofNullable(abstractFieldOpt.get().get(languageIsoCode)).isPresent();
+    return abstractFieldOpt.isPresent() && ofNullable(abstractFieldOpt.get().get(languageIsoCode)).isPresent();
   }
 
-  private boolean missingTitle(String languageIsoCode, CMMStudy cmmStudy) {
+  private boolean hasTitle(String languageIsoCode, CMMStudy cmmStudy) {
     Optional<Map<String, String>> titleStudyOpt = ofNullable(cmmStudy.getTitleStudy());
-    return !titleStudyOpt.isPresent() || !ofNullable(titleStudyOpt.get().get(languageIsoCode)).isPresent();
+    return titleStudyOpt.isPresent() && ofNullable(titleStudyOpt.get().get(languageIsoCode)).isPresent();
   }
 
   private CMMStudyOfLanguage getCmmStudyOfLanguage(String idPrefix, String lang, CMMStudy cmmStudy) {
@@ -144,7 +169,7 @@ public class LanguageDocumentExtractor {
   private static void logTimeTook(String langCode, Instant startTime) {
     String formatMsg = "Extract CMMStudyOfLanguage for [{}] language code - COMPLETED. Duration [{}]";
     Instant end = Instant.now();
-    log.info(formatMsg, langCode, Duration.between(startTime, end));
+    log.trace(formatMsg, langCode, Duration.between(startTime, end));
   }
 
   private static void logDetailedExtractionsReport(Map<String, List<CMMStudyOfLanguage>> languageDocMap) {
