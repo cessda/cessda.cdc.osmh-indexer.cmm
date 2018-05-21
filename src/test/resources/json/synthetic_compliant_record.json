@@ -57,7 +57,8 @@
       }
     ]
   },
-  "dataCollectionPeriodStartdate": "2018-09-20",
+  "dataCollectionPeriodStartdate": "2010-09-20",
+  "dataCollectionYear": "2010",
   "typeOfTimeMethods": {
     "de": [
       {

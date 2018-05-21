@@ -1,5 +1,7 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 
+import java.util.TimeZone;
+
 /**
  * Harvester (OSMH) Handler concept Constants
  *
@@ -23,6 +25,12 @@ public class HandlerConstants {
   static final String NOT_AVAIL = "not available";
   static final String EMPTY_EL = "empty";
   public static final String STUDY = "Study";
+
+  // Date / time
+  static final String[] EXPECTED_DATE_FORMATS = new String[]{"yyyy-MM-dd'T'HH:mm:ss'Z'", "yyyy-MM-dd", "yyyy-MM-dd'T'HH:mm:ssZ", "yyyy-MM", "yyyy"};
+
+  // System
+  static final String UTC_ID = TimeZone.getTimeZone("UTC").getID();
 
   private HandlerConstants() {
     throw new UnsupportedOperationException("Utility class, instantiation not allow");

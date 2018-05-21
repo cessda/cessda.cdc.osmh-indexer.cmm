@@ -26,7 +26,6 @@ public class OaiPmhConstants {
 
   // Codebook Paths
   static final String RECORD_DEFAULT_LANGUAGE= "//ddi:codeBook/@xml:lang";
-  static final String YEAR_OF_PUB_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:distDate[1]/@date";
   static final String ABSTRACT_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:abstract";
   static final String TITLE_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:titl";
   static final String STUDY_URL_DOC_DSCR_XPATH = "//ddi:codeBook/ddi:docDscr/ddi:citation/ddi:holdings";
@@ -35,6 +34,7 @@ public class OaiPmhConstants {
   static final String CREATORS_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty";
   static final String DATA_RESTRCTN_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:restrctn";
   static final String DATA_COLLECTION_PERIODS_PATH = "//ddi:codeBook//ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate";
+  static final String YEAR_OF_PUB_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:distDate[1]/@date";
   static final String CLASSIFICATIONS_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:subject/ddi:topcClas";
 
   static final String KEYWORDS_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:subject/ddi:keyword";

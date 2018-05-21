@@ -128,7 +128,7 @@
                 <universe xml:lang="fi" clusion="I">Otantahetkellä vuonna 1968 kansakoulun toisluokkalaiset keskisuomalaisen kaupungin oppilaat, jotka ovat edelleen mukana pitkittäistutkimuksessa ja kuuluivat 8- ja 14 -vuotiaana sosiaalisen käyttäytymisen ääriryhmiin.</universe>
                 <!-- Valid ISO Date-->
                 <collDate date="2018-10-21T00:00:00Z" event="end">End of October(has an @Date = not be extracted)</collDate>
-                <collDate date="2018-09-20" event="start" />
+                <collDate date="2010-09-20" event="start" />
                 <!-- Valid Data Collection FreeText description. Extract only when there is no @date -->
                 <collDate event="start">Spring 2018</collDate>
                 <collDate event="end">Christmas 2018</collDate>

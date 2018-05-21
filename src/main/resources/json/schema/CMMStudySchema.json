@@ -357,6 +357,10 @@
       "type": "string",
       "description": "A JSON date string in ISO 8601 format, e.g. 2012-04-23T18:25:43.511Z. In future restrict to [\"format\": \"date-time\" or \"date\"]"
     },
+    "dataCollectionYear": {
+      "type": "integer",
+      "description": "A JSON date year string, e.g. 2012."
+    },
     "dataCollectionFreeTexts": {
       "type": "object",
       "description": "A collection of data collection FreeTexts Dates in Potentially many languages",
