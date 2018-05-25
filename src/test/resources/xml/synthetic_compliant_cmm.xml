@@ -137,13 +137,13 @@
             <method>
               <dataColl>
                 <!-- 100% Compliance -->
-                <timeMeth>This is the term<concept xml:lang="de" vocab="DDI Time Method 1" vocabURI="http://lod.data-archive.ac.uk" ID="fake" >This is the Id</concept></timeMeth>
-                <timeMeth xml:lang="fi">This is the term. xml:lang in parent el wins over concept<concept xml:lang="should ignore this" vocab="DDI Time Method 1" vocabURI="http://lod.data-archive.ac.uk" ID="fake" >This is the Id</concept></timeMeth>
-                <timeMeth xml:lang="fi">This is the term. xml:lang in parent el wins over concept regardless<concept vocab="DDI Time Method 1" vocabURI="http://lod.data-archive.ac.uk" ID="fake" >This is the Id</concept></timeMeth>
+                <timeMeth>DE: This is the term<concept xml:lang="de" vocab="DE: DDI Time Method 1" vocabURI="http://de-lod.data-archive.ac.uk" ID="fake" >DE: This is the Id</concept></timeMeth>
+                <timeMeth xml:lang="fi">FI: This is the term. xml:lang in parent el wins over concept<concept xml:lang="FI: should ignore this" vocab="FI: DDI Time Method 1" vocabURI="http://fi-lod.data-archive.ac.uk" ID="fake" >FI: This is the Id</concept></timeMeth>
+                <timeMeth xml:lang="fi">FI: This is the term. xml:lang in parent el wins over concept regardless<concept vocab="FI: DDI Time Method 1" vocabURI="http://fi-lod.data-archive.ac.uk" ID="fi-fake" >FI: This is the Id</concept></timeMeth>
               <!-- Suggested by PUG: Element value/term in "timeMethod" wins over "concept" -->
-                <timeMeth>Längsschnitt: Panel 2<concept xml:lang="de" vocab="DDI Time Method 2">Longitudinal.Panel 2</concept></timeMeth>
+                <timeMeth>DE: Längsschnitt: Panel 2<concept xml:lang="de" vocab="DE: DDI Time Method 2">DE: Longitudinal.Panel 2</concept></timeMeth>
                 <!-- UKDS example -->
-                <timeMeth>Repeated cross-sectional study</timeMeth>
+                <timeMeth>Default-lang: Repeated cross-sectional study</timeMeth>
                 <dataCollector>National Centre for Social Research</dataCollector>
                 <!-- Compliant examples -->
                 <sampProc>This is the term<concept xml:lang="en" ID="madeUp" vocab="DDI Sampling Procedure" vocabURI="urn:ddi-cv:SamplingProcedure:1.1">This is the id</concept></sampProc>

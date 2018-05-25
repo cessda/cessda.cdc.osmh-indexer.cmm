@@ -62,37 +62,37 @@
   "typeOfTimeMethods": {
     "de": [
       {
-        "vocabUri": "http:\/\/lod.data-archive.ac.uk",
-        "vocab": "DDI Time Method 1",
-        "term": "This is the term",
-        "id": "This is the Id"
+        "vocabUri": "http:\/\/de-lod.data-archive.ac.uk",
+        "vocab": "DE: DDI Time Method 1",
+        "term": "DE: This is the term",
+        "id": "DE: This is the Id"
       },
       {
         "vocabUri": "",
-        "vocab": "DDI Time Method 2",
-        "term": "Längsschnitt: Panel 2",
-        "id": "Longitudinal.Panel 2"
+        "vocab": "DE: DDI Time Method 2",
+        "term": "DE: Längsschnitt: Panel 2",
+        "id": "DE: Longitudinal.Panel 2"
       }
     ],
     "fi": [
       {
-        "vocabUri": "http:\/\/lod.data-archive.ac.uk",
-        "vocab": "DDI Time Method 1",
-        "term": "This is the term. xml:lang in parent el wins over concept",
-        "id": "This is the Id"
+        "vocabUri": "http:\/\/fi-lod.data-archive.ac.uk",
+        "vocab": "FI: DDI Time Method 1",
+        "term": "FI: This is the term. xml:lang in parent el wins over concept",
+        "id": "FI: This is the Id"
       },
       {
-        "vocabUri": "http:\/\/lod.data-archive.ac.uk",
-        "vocab": "DDI Time Method 1",
-        "term": "This is the term. xml:lang in parent el wins over concept regardless",
-        "id": "This is the Id"
+        "vocabUri": "http:\/\/fi-lod.data-archive.ac.uk",
+        "vocab": "FI: DDI Time Method 1",
+        "term": "FI: This is the term. xml:lang in parent el wins over concept regardless",
+        "id": "FI: This is the Id"
       }
     ],
     "en": [
       {
         "vocabUri": "",
         "vocab": "",
-        "term": "Repeated cross-sectional study",
+        "term": "Default-lang: Repeated cross-sectional study",
         "id": ""
       }
     ]
