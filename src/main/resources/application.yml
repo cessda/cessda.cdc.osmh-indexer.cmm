@@ -82,9 +82,6 @@ osmhConsumer:
       - url: http://fors-nesstar.unil.ch/oai-pmh
         name: 'FORS Data Service (Nesstar)'
         handler: 'https://pasc-dev.cessda.eu/osmh-repo-nesstar'
-      - url: http://nesstar.ukdataservice.ac.uk/oai-pmh
-        name: 'UK Data Service (Nesstar)'
-        handler: 'https://pasc-dev.cessda.eu/osmh-repo-nesstar'
       - url: http://nesstar.ucd.ie/oai-pmh
         name: 'ISSDA (Nesstar)'
         handler: 'https://pasc-dev.cessda.eu/osmh-repo-nesstar'
@@ -172,17 +169,14 @@ osmhConsumer:
   languages: ['en', 'fi', 'de', 'fr']
   endpoints:
     repos:
-      - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
-        name: 'UK Data Service'
-        handler: 'http://localhost:9091'
-      - url: http://services.fsd.uta.fi/v0/oai
-        name: 'Finish Data Services'
-        handler: 'http://localhost:9091'
+#      - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
+#        name: 'UK Data Service'
+#        handler: 'http://localhost:9091'
+#      - url: http://services.fsd.uta.fi/v0/oai
+#        name: 'Finish Data Services'
+#        handler: 'http://localhost:9091'
       - url: http://fors-nesstar.unil.ch/oai-pmh
         name: 'FORS Data Service (Nesstar)'
-        handler: 'http://localhost:9842'
-      - url: http://nesstar.ukdataservice.ac.uk/oai-pmh
-        name: 'UK Data Service (Nesstar)'
         handler: 'http://localhost:9842'
       - url: http://nesstar.ucd.ie/oai-pmh
         name: 'ISSDA (Nesstar)'
