@@ -143,7 +143,8 @@ public class LanguageDocumentExtractor {
         .publicationYear(cmmStudy.getPublicationYear())
         .fileLanguages(cmmStudy.getFileLanguages())
         .dataCollectionPeriodStartdate(cmmStudy.getDataCollectionPeriodStartdate())
-        .dataCollectionPeriodEnddate(cmmStudy.getDataCollectionPeriodEnddate());
+        .dataCollectionPeriodEnddate(cmmStudy.getDataCollectionPeriodEnddate())
+        .dataCollectionYear(cmmStudy.getDataCollectionYear());
 
     ofNullable(cmmStudy.getTitleStudy()).ifPresent(map -> builder.titleStudy(map.get(lang)));
     ofNullable(cmmStudy.getAbstractField()).ifPresent(map -> builder.abstractField(map.get(lang)));

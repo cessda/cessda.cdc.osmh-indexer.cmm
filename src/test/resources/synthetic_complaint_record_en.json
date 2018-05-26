@@ -146,6 +146,7 @@
   ],
   "dataCollectionPeriodStartdate": "2018-09-20",
   "dataCollectionPeriodEnddate": "2018-10-21T00:00:00Z",
+  "dataCollectionYear": 2018,
   "dataCollectionFreeTexts": [
     {
       "dataCollectionFreeText": "Spring 2018",

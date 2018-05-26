@@ -53,6 +53,9 @@
         "format": "strict_date_optional_time||epoch_millis||year",
         "ignore_malformed": true
       },
+      "dataCollectionYear": {
+        "type": "integer"
+      },
       "fileLanguages": {
         "type": "string",
         "index": "not_analyzed",
