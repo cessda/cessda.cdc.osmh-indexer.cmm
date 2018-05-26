@@ -15,12 +15,14 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.net.InetAddress;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,10 +65,13 @@ public class AppUtilityBeansConfiguration {
 
   @Bean
   public RestTemplate restTemplate() {
-    final RestTemplate restTemplate = new RestTemplate(getClientHttpRequestFactory());
+
     final List<ClientHttpRequestInterceptor> requestInterceptors = new ArrayList<>();
     requestInterceptors.add(perfRequestSyncInterceptor);
+
+    final RestTemplate restTemplate = new RestTemplate(getClientHttpRequestFactory());
     restTemplate.setInterceptors(requestInterceptors);
+    restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
 
     return restTemplate;
   }
