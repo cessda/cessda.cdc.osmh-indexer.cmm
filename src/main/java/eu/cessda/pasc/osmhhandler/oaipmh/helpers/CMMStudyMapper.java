@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.DocElementParser.*;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HTMLFilter.CLEAN_MAP_VALUES;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.ParsingStrategies.*;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.TimeUtility.dataCollYearDateFunction;
@@ -256,6 +257,7 @@ public class CMMStudyMapper {
 
     List<Element> elements = getElements(document, xFactory, TITLE_XPATH);
     Map<String, String> studyTitles = getLanguageKeyValuePairs(config, elements, false, langCode, Element::getText);
+    CLEAN_MAP_VALUES.accept(studyTitles);
     builder.titleStudy(studyTitles);
   }
 
