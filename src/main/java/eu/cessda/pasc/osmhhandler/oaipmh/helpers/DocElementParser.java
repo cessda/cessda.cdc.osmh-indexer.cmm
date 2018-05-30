@@ -16,6 +16,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HTMLFilter.CLEAN_CHARACTER_RETURNS_STRATEGY;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -63,7 +64,7 @@ class DocElementParser {
 
   static TermVocabAttributes parseTermVocabAttrAndValues(Element parentElement, Element concept, boolean hasControlledValue) {
     TermVocabAttributes.TermVocabAttributesBuilder builder = TermVocabAttributes.builder();
-    builder.term(parentElement.getText());
+    builder.term(CLEAN_CHARACTER_RETURNS_STRATEGY.apply(parentElement.getText()));
 
     if (hasControlledValue) {
       builder.vocab(getAttributeValue(concept, VOCAB_ATTR).orElse(""))
