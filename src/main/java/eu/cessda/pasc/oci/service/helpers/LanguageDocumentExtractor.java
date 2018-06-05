@@ -33,10 +33,10 @@ public class LanguageDocumentExtractor {
   /**
    * Extracts a custom document for each language IsoCode found in the config.
    *
-   * @param cmmStudies raw list of studies which generally holds fields for all languages.
+   * @param cmmStudies filtered list of present studies which generally holds fields for all languages.
    * @return map extracted documents for each language iso code.
    */
-  public Map<String, List<CMMStudyOfLanguage>> mapLanguageDoc(List<Optional<CMMStudy>> cmmStudies, String spName) {
+  public Map<String, List<CMMStudyOfLanguage>> mapLanguageDoc(List<CMMStudy> cmmStudies, String spName) {
 
     log.info("Mapping CMMStudy to CMMStudyOfLanguage for SP[{}] with [{}] records", spName, cmmStudies.size());
     Map<String, List<CMMStudyOfLanguage>> languageDocMap = new HashMap<>();
@@ -57,11 +57,10 @@ public class LanguageDocumentExtractor {
     return languageDocMap;
   }
 
-  private List<CMMStudyOfLanguage> getCmmStudiesOfLangCode(List<Optional<CMMStudy>> cmmStudies, String idPrefix,
+  private List<CMMStudyOfLanguage> getCmmStudiesOfLangCode(List<CMMStudy> cmmStudies, String idPrefix,
                                                            String languageIsoCode) {
     return cmmStudies.stream()
-        .filter(cmmStudy -> isValidCMMStudyForLang(languageIsoCode, idPrefix, cmmStudy.orElse(null)))
-        .map(Optional::get)
+        .filter(cmmStudy -> isValidCMMStudyForLang(languageIsoCode, idPrefix, cmmStudy))
         .map(cmmStudy -> getCmmStudyOfLanguage(idPrefix, languageIsoCode, cmmStudy))
         .collect(Collectors.toList());
   }
