@@ -120,18 +120,22 @@ public class ConsumerScheduler {
     int recordHeadersSize = recordHeaders.size();
     log.info("Repo returned with [{}] record headers", recordHeadersSize);
 
-    List<Optional<CMMStudy>> cMMStudiesOptions = recordHeaders.stream()
+    List<Optional<CMMStudy>> totalCMMStudies = recordHeaders.stream()
         .map(recordHeader -> harvesterConsumerService.getRecord(repo, recordHeader.getIdentifier()))
         .collect(Collectors.toList());
 
-    List<Optional<CMMStudy>> presentCMMStudies = cMMStudiesOptions.stream()
+    List<CMMStudy> presentCMMStudies = totalCMMStudies.stream()
         .filter(Optional::isPresent)
+        .map(Optional::get)
         .collect(Collectors.toList());
 
-    String msgTemplate = "There are [{}] presentCMMStudies out of [{}] CMMStudiesOptions from [{}] RecordHeaders";
-    log.info(msgTemplate, presentCMMStudies.size(), cMMStudiesOptions.size(), recordHeadersSize);
+    String msgTemplate = "There are [{}] presentCMMStudies out of [{}] totalCMMStudies from [{}] Record Identifiers";
+    log.info(msgTemplate, presentCMMStudies.size(), totalCMMStudies.size(), recordHeadersSize);
 
-    return extractor.mapLanguageDoc(cMMStudiesOptions, repo.getName());
+    // TODO :
+    //    applyAvaiableLangs(totalCMMStudies);
+
+    return extractor.mapLanguageDoc(presentCMMStudies, repo.getName());
   }
 
   private void logStartStatus(LocalDateTime localDateTime, String runDescription) {

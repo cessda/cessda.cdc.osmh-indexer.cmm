@@ -120,7 +120,8 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     verify(harvesterConsumerService, times(2)).getRecord(any(Repo.class), anyString());
     verifyNoMoreInteractions(harvesterConsumerService);
 
-    // No bulk attempt should have been made for "sv" as we dont have any records for "sv". We do for 'en', 'fi', 'de'
+    // No bulk attempt should have been made for "sv" as it does not have the minimum valid cmm fields
+    // 'en', 'fi', 'de' has all minimum fields
     verify(esIndexer, times(3)).bulkIndex(anyListOf(CMMStudyOfLanguage.class), anyString());
     verifyNoMoreInteractions(esIndexer);
   }

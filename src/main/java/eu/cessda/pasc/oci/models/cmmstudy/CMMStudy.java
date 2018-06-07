@@ -1,6 +1,5 @@
 package eu.cessda.pasc.oci.models.cmmstudy;
 
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -36,6 +35,7 @@ import java.util.Set;
     "typeOfModeOfCollections",
     "dataCollectionPeriodStartdate",
     "dataCollectionPeriodEnddate",
+    "dataCollectionYear",
     "dataCollectionFreeTexts",
     "dataAccessFreeTexts",
     "lastModified",
@@ -53,6 +53,9 @@ public class CMMStudy {
 
   @JsonProperty("dataCollectionPeriodEnddate")
   private String dataCollectionPeriodEnddate;
+
+  @JsonProperty("dataCollectionYear")
+  private int dataCollectionYear;
 
   @JsonProperty("dataCollectionFreeTexts")
   private Map<String, List<DataCollectionFreeText>> dataCollectionFreeTexts;

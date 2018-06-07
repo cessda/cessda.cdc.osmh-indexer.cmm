@@ -27,18 +27,17 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
 
   @Autowired
   LanguageDocumentExtractor languageDocumentExtractor;
+  private String idPrefix = "test-stub";
 
   @Test
   public void shouldRejectRecordsWhenMissingTitle() throws IOException {
 
     // Given
-    CMMStudy study = RecordTestData.getSyntheticCmmStudy().map(cmmStudyValue -> {
-      cmmStudyValue.getTitleStudy().remove("en");
-      return cmmStudyValue;
-    }).orElse(null);
+    CMMStudy syntheticCmmStudy = RecordTestData.getSyntheticCmmStudy();
+    syntheticCmmStudy.getTitleStudy().remove("en");
 
     // When
-    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", study);
+    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", idPrefix, syntheticCmmStudy);
 
     then(validCMMStudyForLang).isFalse();
   }
@@ -46,47 +45,27 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
   @Test
   public void shouldRejectRecordsWhenMissingAbstract() throws IOException {
     // Given
-    CMMStudy study = RecordTestData.getSyntheticCmmStudy().map(cmmStudyValue -> {
-      cmmStudyValue.getAbstractField().remove("en");
-      return cmmStudyValue;
-    }).orElse(null);
+    CMMStudy syntheticCmmStudy = RecordTestData.getSyntheticCmmStudy();
+    syntheticCmmStudy.getAbstractField().remove("en");
 
     // When
-    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", study);
+    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", idPrefix, syntheticCmmStudy);
     then(validCMMStudyForLang).isFalse();
   }
 
   @Test
   public void shouldRejectRecordsWhenMissingStudyNumber() throws IOException {
     // When Study Number is empty------------------------------------------------------------------------------/
-    CMMStudy study = RecordTestData.getSyntheticCmmStudy().map(cmmStudyValue -> {
-      cmmStudyValue.setStudyNumber("");
-      return cmmStudyValue;
-    }).orElse(null);
+    CMMStudy syntheticCmmStudy = RecordTestData.getSyntheticCmmStudy();
+    syntheticCmmStudy.setStudyNumber("");
 
-    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", study);
+    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", idPrefix, syntheticCmmStudy);
     then(validCMMStudyForLang).isFalse();
 
     // When Study Number is null ------------------------------------------------------------------------------/
-    study = RecordTestData.getSyntheticCmmStudy().map(cmmStudyValue -> {
-      cmmStudyValue.setStudyNumber(null);
-      return cmmStudyValue;
-    }).orElse(null);
+    syntheticCmmStudy.setStudyNumber(null);
 
-    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", study);
-    then(validCMMStudyForLang).isFalse();
-  }
-
-  @Test
-  public void shouldRejectRecordsWhenMissingStudyUrl() throws IOException {
-
-    // When Study Url is Miss ------------------------------------------------------------------------------/
-    CMMStudy study = RecordTestData.getSyntheticCmmStudy().map(cmmStudyValue -> {
-      cmmStudyValue.getStudyUrl().remove("en");
-      return cmmStudyValue;
-    }).orElse(null);
-
-    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", study);
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", idPrefix, syntheticCmmStudy);
     then(validCMMStudyForLang).isFalse();
   }
 
@@ -94,12 +73,10 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
   public void shouldRejectRecordsWhenMissingPublisher() throws IOException {
 
     // When Study Url is Miss ------------------------------------------------------------------------------/
-    CMMStudy study = RecordTestData.getSyntheticCmmStudy().map(cmmStudyValue -> {
-      cmmStudyValue.getPublisher().remove("en");
-      return cmmStudyValue;
-    }).orElse(null);
+    CMMStudy syntheticCmmStudy = RecordTestData.getSyntheticCmmStudy();
+    syntheticCmmStudy.getPublisher().remove("en");
 
-    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", study);
+    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", idPrefix, syntheticCmmStudy);
     then(validCMMStudyForLang).isFalse();
   }
 
@@ -107,22 +84,22 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
   public void shouldValidateRecordsThatHaveTheMinimumCMMFields() throws IOException {
 
     // Given
-    CMMStudy cmmStudy = RecordTestData.getSyntheticCmmStudy().orElse(null);
+    CMMStudy cmmStudy = RecordTestData.getSyntheticCmmStudy();
 
     // When
-    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", cmmStudy);
+    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", idPrefix, cmmStudy);
     then(validCMMStudyForLang).isTrue();
 
-    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("de", cmmStudy);
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("de", idPrefix, cmmStudy);
     then(validCMMStudyForLang).isTrue();
 
-    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fi", cmmStudy);
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fi", idPrefix, cmmStudy);
     then(validCMMStudyForLang).isTrue();
 
-    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("sv", cmmStudy);
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("sv", idPrefix, cmmStudy);
     then(validCMMStudyForLang).isFalse(); // we do not have the required abstract translation in "sv"
 
-    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fr", cmmStudy);
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fr", idPrefix, cmmStudy);
     then(validCMMStudyForLang).isFalse(); // we have nothing for "fr"
   }
 
@@ -130,27 +107,23 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
   public void shouldValidateRecordsThatAreMarkedAsInactiveByPassingTheMinimumCMMFieldsChecks() throws IOException {
 
     // Given
-    Optional<CMMStudy> cmmStudy = RecordTestData.getSyntheticCmmStudy();
-    CMMStudy inActiveCmmStudy = cmmStudy.map(cmmStudy1 -> {
-          cmmStudy1.setActive(false);
-          return cmmStudy1;
-        }
-    ).orElse(null);
+    CMMStudy syntheticCmmStudy = RecordTestData.getSyntheticCmmStudy();
+    syntheticCmmStudy.setActive(false);
 
     // When
-    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", inActiveCmmStudy);
+    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", idPrefix, syntheticCmmStudy);
     then(validCMMStudyForLang).isTrue();
 
-    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("de", inActiveCmmStudy);
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("de", idPrefix, syntheticCmmStudy);
     then(validCMMStudyForLang).isTrue();
 
-    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fi", inActiveCmmStudy);
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fi", idPrefix, syntheticCmmStudy);
     then(validCMMStudyForLang).isTrue();
 
-    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("sv", inActiveCmmStudy);
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("sv", idPrefix, syntheticCmmStudy);
     then(validCMMStudyForLang).isTrue(); // Though, we do not have the required abstract translation in "sv".
 
-    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fr", inActiveCmmStudy);
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fr", idPrefix, syntheticCmmStudy);
     then(validCMMStudyForLang).isTrue(); // We have nothing for "fr", when a record is deleted we lose this knowledge.
   }
 
@@ -158,7 +131,7 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
   public void shouldReturnExtractedDocInThereRespectiveLangDocuments() {
 
     // Given
-    List<Optional<CMMStudy>> studies = getASingleSyntheticCMMStudyAsList();
+    List<CMMStudy> studies = getASingleSyntheticCMMStudyAsList();
 
     // When
     Map<String, List<CMMStudyOfLanguage>> languageDocMap =
@@ -181,7 +154,7 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
   public void shouldReturnExtractedDocInTheirRespectiveLangDocumentsIncludingDeletedRecordsMarkedAsInActive() {
 
     // Given
-    List<Optional<CMMStudy>> studies = getSyntheticCMMStudyAndADeletedRecordAsList();
+    List<CMMStudy> studies = getSyntheticCMMStudyAndADeletedRecordAsList();
 
     // When
     Map<String, List<CMMStudyOfLanguage>> languageDocMap =

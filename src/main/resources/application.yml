@@ -4,17 +4,17 @@ server:
 #  context-path: '/osmh-repo'
 security:
   user:
-    name: user
-    password: pass
+    name: springadmin
+    password: C3ssd@2018!
   basic.enabled: false            # Public API disable security on non-admin endpoints
 management.security.enabled: true # Enable security on admin endpoints
 endpoints.shutdown.enabled: true
 logging:
   file: ${user.home}${file.separator}pasc-oci${file.separator}pasc-oci.log
   pattern:
-    console: '%d{yyyy-dd-MM HH:mm:ss.SSS} %highlight(%-5level) %30.30((%M\)) %40.40((%file:%line\))
+    console: '%d{yyyy-dd-MM HH:mm:ss.SSS} %highlight(%-5level) %40.40((%file:%line\))
       - %message%n'
-    file: '%d{yyyy-dd-MM HH:mm:ss.SSS}  %-5level  %30.30((%M\)) %40.40((%file:%line\))
+    file: '%d{yyyy-dd-MM HH:mm:ss.SSS}  %-5level  %40.40((%file:%line\))
       - %message%n'
   level:
     .: WARN
@@ -23,6 +23,7 @@ logging:
     eu.cessda.pasc.oci.service: DEBUG
     eu.cessda.pasc.oci.repository: DEBUG
     eu.cessda.pasc.oci.helpers: DEBUG
+    eu.cessda.pasc.oci.configurations.PerfRequestSyncInterceptor: DEBUG
     net: WARN
     com: ERROR
 spring:
@@ -41,8 +42,8 @@ spring:
   boot:
     admin:
 #     url: http://localhost:8087 For dev, stg & prod set this at the specific active profile. Run app with profile set
-      username: user
-      password: pass
+      username: springadmin
+      password: C3ssd@2018!
       client.name: pasc-oci
       turbine:
         clusters: default
@@ -57,9 +58,9 @@ elasticsearch:
   host: 127.0.0.1
   port: 9300
   numberOfShards: 2
-  numberOfReplicas: 2
+  numberOfReplicas: 0
 osmhConsumer:
-  languages: ['en', 'fi', 'de', 'nl']
+  languages: ['en', 'fi', 'de', 'nl', 'fr']
   harvester:
     url: 'http://localhost:9091'
     version: 'v0'
@@ -74,22 +75,22 @@ osmhConsumer:
         handler: 'https://pasc-staging.cessda.eu/osmh-repo'
       - url: https://dbk.gesis.org/dbkoai2/
         name: 'GESIS'
-        handler: 'https://pasc-staging.cessda.eu/osmh-repo'
-#      - url: https://dbk.gesis.org/dbkoai/
-#        name: 'GESIS De'
-#        handler: 'https://pasc-dev.cessda.eu/osmh-repo'
-#      - url: https://easy.dans.knaw.nl/oai/
-#        name: 'DANS'
-#        handler: 'https://pasc-dev.cessda.eu/osmh-repo'
+        handler: 'https://pasc-dev.cessda.eu/osmh-repo'
       - url: http://services.fsd.uta.fi/v0/oai
         name: 'Finish Data Services'
-        handler: 'https://pasc-staging.cessda.eu/osmh-repo'
-        # TODO: Disabled as GESIS endpoint is currently not stable.  Can be enabled or added at runtime via admin app
-      #** Note dirty extra "/" workaround for GESIS who separate records to different metadata prefix per language ***#
-
+        handler: 'https://pasc-dev.cessda.eu/osmh-repo'
+      - url: http://fors-nesstar.unil.ch/oai-pmh
+        name: 'FORS Data Service (Nesstar)'
+        handler: 'https://pasc-dev.cessda.eu/osmh-repo-nesstar'
+      - url: http://nesstar.ucd.ie/oai-pmh
+        name: 'ISSDA (Nesstar)'
+        handler: 'https://pasc-dev.cessda.eu/osmh-repo-nesstar'
+      - url:  http://nesstar.sciences-po.fr/oai-pmh
+        name: 'Progedo (Nesstar)'
+        handler: 'https://pasc-dev.cessda.eu/osmh-repo-nesstar'
     connTimeout: 5000
     connRequestTimeout: 5000
-    readTimeout: 65000 # 65secs (65_000ms) NOTE handler is less (60_000).
+    readTimeout: 120000 # increased from 60seconds to 120 seconds to deal with slower Nesstar repos
     verifySSL: false
 
 ---
@@ -107,6 +108,7 @@ logging:
     eu.cessda.pasc.oci.service: INFO
     eu.cessda.pasc.oci.repository: INFO
     eu.cessda.pasc.oci.helpers: INFO
+    eu.cessda.pasc.oci.configurations.PerfRequestSyncInterceptor: DEBUG
 elasticsearch:
   host: cessda-pasc-es-dev-cluster
   numberOfShards: 2
@@ -159,26 +161,29 @@ spring:
       url: http://localhost:8087
 logging:
   level:
-    eu.cessda.pasc.oci.service: INFO
-    eu.cessda.pasc.oci.repository: INFO
-    eu.cessda.pasc.oci.helpers: INFO
+    eu.cessda.pasc.oci.service: DEBUG
+    eu.cessda.pasc.oci.repository: DEBUG
+    eu.cessda.pasc.oci.helpers: DEBUG
+    eu.cessda.pasc.oci.configurations.PerfRequestSyncInterceptor: DEBUG
 osmhConsumer:
-  languages: ['en', 'fi', 'de']
+  languages: ['en', 'fi', 'de', 'fr']
   endpoints:
     repos:
-      - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
-        name: 'UK Data Service'
-        handler: 'http://localhost:9091'
-      - url: http://services.fsd.uta.fi/v0/oai
-        name: 'Finish Data Services'
-        handler: 'http://localhost:9091'
-#      - url: https://dbk.gesis.org/dbkoai
-#        name: 'GESIS'
+#      - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
+#        name: 'UK Data Service'
 #        handler: 'http://localhost:9091'
-#      - url: https://dbk.gesis.org/dbkoai/
-#        name: 'GESIS De'
+#      - url: http://services.fsd.uta.fi/v0/oai
+#        name: 'Finish Data Services'
 #        handler: 'http://localhost:9091'
-#        Process FSD Last, it is the slowest so far!
+      - url: http://fors-nesstar.unil.ch/oai-pmh
+        name: 'FORS Data Service (Nesstar)'
+        handler: 'http://localhost:9842'
+      - url: http://nesstar.ucd.ie/oai-pmh
+        name: 'ISSDA (Nesstar)'
+        handler: 'http://localhost:9842'
+      - url:  http://nesstar.sciences-po.fr/oai-pmh
+        name: 'Progedo (Nesstar)'
+        handler: 'http://localhost:9842'
 ---
 spring:
   profiles: test
