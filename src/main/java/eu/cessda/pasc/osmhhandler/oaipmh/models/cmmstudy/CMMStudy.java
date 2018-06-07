@@ -36,6 +36,7 @@ import java.util.Set;
     "typeOfModeOfCollections",
     "dataCollectionPeriodStartdate",
     "dataCollectionPeriodEnddate",
+    "dataCollectionYear",
     "dataCollectionFreeTexts",
     "dataAccessFreeTexts",
     "lastModified",
@@ -56,8 +57,11 @@ public class CMMStudy {
   @JsonProperty("dataCollectionPeriodEnddate")
   private String dataCollectionPeriodEnddate;
 
+  @JsonProperty("dataCollectionYear")
+  private int dataCollectionYear;
+
   @JsonProperty("dataCollectionFreeTexts")
-  private Map<String, List<DataCollectionFreeText>>  dataCollectionFreeTexts;
+  private Map<String, List<DataCollectionFreeText>> dataCollectionFreeTexts;
 
   @JsonProperty("dataAccessFreeTexts")
   private Map<String, List<String>> dataAccessFreeTexts;

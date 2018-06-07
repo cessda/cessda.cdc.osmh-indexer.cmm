@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.DocElementParser.*;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HTMLFilter.CLEAN_CHARACTER_RETURNS_STRATEGY;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.EMPTY_EL;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.NOT_AVAIL;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
@@ -28,7 +29,7 @@ class ParsingStrategies {
     return element -> {
       Country country = Country.builder()
           .iso2LetterCode(getAttributeValue(element, ABBR_ATTR).orElse(NOT_AVAIL))
-          .countryName(element.getText())
+          .countryName(CLEAN_CHARACTER_RETURNS_STRATEGY.apply(element.getText()))
           .build();
       return Optional.of((T) country);
     };
@@ -67,7 +68,7 @@ class ParsingStrategies {
   static <T> Function<Element, T> publisherStrategyFunction() {
     return element -> (T) Publisher.builder()
         .iso2LetterCode(getAttributeValue(element, ABBR_ATTR).orElse(NOT_AVAIL))
-        .publisher(element.getText()).build();
+        .publisher(CLEAN_CHARACTER_RETURNS_STRATEGY.apply(element.getText())).build();
   }
 
   @SuppressWarnings("unchecked")
