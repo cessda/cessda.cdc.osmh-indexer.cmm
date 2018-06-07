@@ -3,7 +3,6 @@ package eu.cessda.pasc.oci.service.helpers;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
-import eu.cessda.pasc.oci.models.cmmstudy.Publisher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -13,7 +12,6 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
@@ -42,7 +40,7 @@ public class LanguageDocumentExtractor {
     Map<String, List<CMMStudyOfLanguage>> languageDocMap = new HashMap<>();
     String idPrefix = spName.trim().replace(" ", "-") + "__"; // UK Data Service = UK-Data-Service__
 
-    // TODO REFACTOR this for a single pass or - make handler return records with langCode as top node
+    // FIXME: REFACTOR this for a single pass or - make handler return records with langCode as top node
     // with record embedded to each langCode, so that one can easily grab all records more efficiently for a langCode
     appConfigurationProperties.getLanguages().forEach(langCode -> {
           Instant start = Instant.now();
@@ -67,38 +65,18 @@ public class LanguageDocumentExtractor {
 
   boolean isValidCMMStudyForLang(String languageIsoCode, String idPrefix, CMMStudy cmmStudy) {
 
-    if (null != cmmStudy) {
-      if (!cmmStudy.isActive()) {
-        logInvalidCMMStudy("Study is not Active [{}]: [{}]", languageIsoCode, idPrefix, cmmStudy);
-        // Inactive = deleted record no need to validate against CMM below. Index as. Frontend has isActive filter.
-        return true;
-      }
-
-      if (!hasTitle(languageIsoCode, cmmStudy)) {
-        logInvalidCMMStudy("Study does not have a title [{}]: [{}]", languageIsoCode, idPrefix, cmmStudy);
-        return false;
-      }
-
-      if (!hasAbstract(languageIsoCode, cmmStudy)) {
-        logInvalidCMMStudy("Study does not have an abstract [{}]: [{}]", languageIsoCode, idPrefix, cmmStudy);
-        return false;
-      }
-
-      if (!hasStudyNumber(cmmStudy)) {
-        logInvalidCMMStudy("Study does not have a studyNumber [{}]: [{}]", languageIsoCode, idPrefix, cmmStudy);
-        return false;
-      }
-
-      if (!hasPublisher(languageIsoCode, cmmStudy)) {
-        logInvalidCMMStudy("Study does not have a publisher [{}]: [{}]", languageIsoCode, idPrefix, cmmStudy);
-        return false;
-      }
-    } else {
-      logInvalidCMMStudy("Study is null [{}]: [{}]", languageIsoCode, idPrefix, cmmStudy);
+    if (null == cmmStudy) {
+      logInvalidCMMStudy("Study is null [{}]: [{}]", languageIsoCode, idPrefix, null);
       return false;
     }
 
-    return true;
+    // Inactive = deleted record no need to validate against CMM below. Index as. Filtered in Frontend.
+    if (!cmmStudy.isActive()) {
+      logInvalidCMMStudy("Study is not Active [{}]: [{}]", languageIsoCode, idPrefix, cmmStudy);
+      return true;
+    }
+
+    return cmmStudy.getLangAvailableIn().contains(languageIsoCode);
   }
 
   private void logInvalidCMMStudy(String msgTemplate, String languageIsoCode, String idPrefix, CMMStudy cmmStudy) {
@@ -106,26 +84,6 @@ public class LanguageDocumentExtractor {
       final String studyNumber = idPrefix + "-" + (null != cmmStudy ? cmmStudy.getStudyNumber() : "Empty");
       log.warn(msgTemplate, languageIsoCode, studyNumber);
     }
-  }
-
-  private boolean hasPublisher(String languageIsoCode, CMMStudy cmmStudy) {
-    Optional<Map<String, Publisher>> publisherOpt = ofNullable(cmmStudy.getPublisher());
-    return publisherOpt.isPresent() && ofNullable(publisherOpt.get().get(languageIsoCode)).isPresent();
-  }
-
-  private boolean hasStudyNumber(CMMStudy cmmStudy) {
-    Optional<String> studyNumberOpt = ofNullable(cmmStudy.getStudyNumber());
-    return studyNumberOpt.isPresent() && !studyNumberOpt.get().isEmpty();
-  }
-
-  private boolean hasAbstract(String languageIsoCode, CMMStudy cmmStudy) {
-    Optional<Map<String, String>> abstractFieldOpt = ofNullable(cmmStudy.getAbstractField());
-    return abstractFieldOpt.isPresent() && ofNullable(abstractFieldOpt.get().get(languageIsoCode)).isPresent();
-  }
-
-  private boolean hasTitle(String languageIsoCode, CMMStudy cmmStudy) {
-    Optional<Map<String, String>> titleStudyOpt = ofNullable(cmmStudy.getTitleStudy());
-    return titleStudyOpt.isPresent() && ofNullable(titleStudyOpt.get().get(languageIsoCode)).isPresent();
   }
 
   private CMMStudyOfLanguage getCmmStudyOfLanguage(String idPrefix, String lang, CMMStudy cmmStudy) {
@@ -143,7 +101,8 @@ public class LanguageDocumentExtractor {
         .fileLanguages(cmmStudy.getFileLanguages())
         .dataCollectionPeriodStartdate(cmmStudy.getDataCollectionPeriodStartdate())
         .dataCollectionPeriodEnddate(cmmStudy.getDataCollectionPeriodEnddate())
-        .dataCollectionYear(cmmStudy.getDataCollectionYear());
+        .dataCollectionYear(cmmStudy.getDataCollectionYear())
+        .langAvailableIn(cmmStudy.getLangAvailableIn());
 
     ofNullable(cmmStudy.getTitleStudy()).ifPresent(map -> builder.titleStudy(map.get(lang)));
     ofNullable(cmmStudy.getAbstractField()).ifPresent(map -> builder.abstractField(map.get(lang)));

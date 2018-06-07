@@ -6,9 +6,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Model representing a CMMStudy.
@@ -40,7 +38,8 @@ import java.util.Set;
     "dataAccessFreeTexts",
     "lastModified",
     "studyUrl",
-    "isActive"
+    "isActive",
+    "isAvailableIn"
 })
 @Getter
 public class CMMStudy {
@@ -119,4 +118,9 @@ public class CMMStudy {
   @Setter
   @JsonProperty("isActive")
   private boolean active;
+
+  @Setter
+  @Getter
+  @JsonProperty("langAvailableIn")
+  private Set<String> langAvailableIn = new HashSet<>();
 }

@@ -41,7 +41,8 @@ import java.util.Set;
     "dataCollectionFreeTexts",
     "dataAccessFreeTexts",
     "lastModified",
-    "isActive"
+    "isActive",
+    "langAvailableIn"
 })
 @Builder
 @Document(indexName = "test")
@@ -123,6 +124,9 @@ public class CMMStudyOfLanguage {
 
   @JsonProperty("isActive")
   private boolean active;
+
+  @JsonProperty("langAvailableIn")
+  private Set<String> langAvailableIn;
 
   public String getId() {
     return id;
