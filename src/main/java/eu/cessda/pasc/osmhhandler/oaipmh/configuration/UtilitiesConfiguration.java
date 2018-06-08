@@ -11,12 +11,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
 import javax.net.ssl.SSLContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.nio.charset.Charset;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -50,12 +52,16 @@ public class UtilitiesConfiguration {
 
   @Bean
   public RestTemplate restTemplate() {
-    return new RestTemplate(getClientHttpRequestFactory());
+    RestTemplate restTemplate = new RestTemplate(getClientHttpRequestFactory());
+    restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
+    return restTemplate;
   }
 
   @Bean
   public RestTemplate restTemplateWithNoSSLVerification() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
-    return new RestTemplate(getClientHttpRequestFactoryWithoutSSL());
+    RestTemplate restTemplate = new RestTemplate(getClientHttpRequestFactoryWithoutSSL());
+    restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
+    return restTemplate;
   }
 
   private ClientHttpRequestFactory getClientHttpRequestFactory() {

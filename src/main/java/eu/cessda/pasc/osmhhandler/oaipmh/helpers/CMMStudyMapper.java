@@ -16,8 +16,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.DocElementParser.*;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HTMLFilter.CLEAN_MAP_VALUES;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.ParsingStrategies.*;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.TimeUtility.dataCollYearDateFunction;
 
 /**
  * Responsible for Mapping oai-pmh fields to a CMMStudy
@@ -230,7 +232,8 @@ public class CMMStudyMapper {
   /**
    * Parse Publisher from:
    * <p>
-   * Xpath = {@value OaiPmhConstants#PUBLISHER_XPATH }
+   * Xpath = {@value OaiPmhConstants#PUBLISHER_XPATH } and
+   * Xpath = {@value OaiPmhConstants#DISTRIBUTOR_XPATH }
    */
   public static void parsePublisher(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory,
                                     OaiPmh config, String defaultLang) {
@@ -254,6 +257,7 @@ public class CMMStudyMapper {
 
     List<Element> elements = getElements(document, xFactory, TITLE_XPATH);
     Map<String, String> studyTitles = getLanguageKeyValuePairs(config, elements, false, langCode, Element::getText);
+    CLEAN_MAP_VALUES.accept(studyTitles);
     builder.titleStudy(studyTitles);
   }
 
@@ -306,16 +310,22 @@ public class CMMStudyMapper {
    * Parses Data Collection Period dates from:
    * <p>
    * Xpath = {@value OaiPmhConstants#DATA_COLLECTION_PERIODS_PATH}
+   *
+   * For Data Collection start and end date plus the four digit Year value as Data Collection Year
    */
   public static void parseDataCollectionDates(CMMStudy.CMMStudyBuilder builder, Document doc,
                                               XPathFactory xFactory) {
     Map<String, String> dateAttrs = getDateElementAttributesValueMap(doc, xFactory, DATA_COLLECTION_PERIODS_PATH);
 
     if (dateAttrs.containsKey(SINGLE_ATTR)) {
-      builder.dataCollectionPeriodStartdate(dateAttrs.get(SINGLE_ATTR));
+      final String singleDateValue = dateAttrs.get(SINGLE_ATTR);
+      builder.dataCollectionPeriodStartdate(singleDateValue);
+      builder.dataCollectionYear(dataCollYearDateFunction().apply(singleDateValue).orElse(0));
     } else {
       if (dateAttrs.containsKey(START_ATTR)) {
-        builder.dataCollectionPeriodStartdate(dateAttrs.get(START_ATTR));
+        final String startDateValue = dateAttrs.get(START_ATTR);
+        builder.dataCollectionPeriodStartdate(startDateValue);
+        builder.dataCollectionYear(dataCollYearDateFunction().apply(startDateValue).orElse(0));
       }
       if (dateAttrs.containsKey(END_ATTR)) {
         builder.dataCollectionPeriodEnddate(dateAttrs.get(END_ATTR));
