@@ -98,7 +98,12 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
       Optional<LocalDateTime> currentHeaderLastModified = TimeUtility.getLocalDateTime(lastModified);
       return currentHeaderLastModified
           .map(localDateTime -> localDateTime.isAfter(lastModifiedDate))
-          .orElse(false); // Could not parse lastDateModified therefore filtering out record header
+          .orElseGet(() -> {
+                final String msg = "Could not parse RecordIdentifier lastModifiedDate [{}]. Filtering out from list";
+                log.warn(msg, lastModified);
+                return false;
+              }
+          );
     };
   }
 }

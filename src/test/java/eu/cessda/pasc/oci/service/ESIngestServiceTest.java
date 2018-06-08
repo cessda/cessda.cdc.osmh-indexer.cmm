@@ -76,6 +76,7 @@ public class ESIngestServiceTest extends EmbeddedElasticsearchServer{
   public void shouldSuccessfullyBulkIndexAllCMMStudies() throws IOException, JSONException {
 
     // Given
+    final JsonNode expectedTree = mapper.readTree(getSyntheticCMMStudyOfLanguageEn());
     String language = "en";
     List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX1();
 
@@ -95,7 +96,6 @@ public class ESIngestServiceTest extends EmbeddedElasticsearchServer{
 
     // And Assert full json equality
     final JsonNode actualTree = mapper.readTree(response.getHits().getAt(0).getSourceAsString());
-    final JsonNode expectedTree = mapper.readTree(getSyntheticCMMStudyOfLanguageEn());
     assertEquals(expectedTree.toString(), actualTree.toString(), true);
   }
 

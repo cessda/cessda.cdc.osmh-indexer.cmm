@@ -57,27 +57,42 @@
       }
     ]
   },
-  "dataCollectionPeriodStartdate": "2018-09-20",
+  "dataCollectionPeriodStartdate": "2010-09-20",
+  "dataCollectionYear": "2010",
   "typeOfTimeMethods": {
     "de": [
       {
-        "vocabUri": "http:\/\/lod.data-archive.ac.uk",
-        "vocab": "DDI Time Method 1",
-        "term": "This is the term",
-        "id": "This is the Id"
+        "vocabUri": "http:\/\/de-lod.data-archive.ac.uk",
+        "vocab": "DE: DDI Time Method 1",
+        "term": "DE: This is the term",
+        "id": "DE: This is the Id"
       },
       {
         "vocabUri": "",
-        "vocab": "DDI Time Method 2",
-        "term": "Längsschnitt: Panel 2",
-        "id": "Longitudinal.Panel 2"
+        "vocab": "DE: DDI Time Method 2",
+        "term": "DE: Längsschnitt: Panel 2",
+        "id": "DE: Longitudinal.Panel 2"
+      }
+    ],
+    "fi": [
+      {
+        "vocabUri": "http:\/\/fi-lod.data-archive.ac.uk",
+        "vocab": "FI: DDI Time Method 1",
+        "term": "FI: This is the term. xml:lang in parent el wins over concept",
+        "id": "FI: This is the Id"
+      },
+      {
+        "vocabUri": "http:\/\/fi-lod.data-archive.ac.uk",
+        "vocab": "FI: DDI Time Method 1",
+        "term": "FI: This is the term. xml:lang in parent el wins over concept regardless",
+        "id": "FI: This is the Id"
       }
     ],
     "en": [
       {
         "vocabUri": "",
         "vocab": "",
-        "term": "Repeated cross-sectional study",
+        "term": "Default-lang: Repeated cross-sectional study",
         "id": ""
       }
     ]
@@ -105,6 +120,8 @@
     "en": [
       "This is the term",
       "This is the term 2",
+      "This is the term. xml:lang in parent el wins over concept",
+      "This is the term. xml:lang in parent el wins over concept regardless",
       "Should ignore elements without a concept by TypeOfSamplingProcedures"
     ],
     "fr": [
@@ -236,6 +253,16 @@
         "vocabUri": "urn:ddi-cv:SamplingProcedure:1.1",
         "vocab": "DDI Sampling Procedure",
         "id": "Probability.Stratified 2"
+      },
+      {
+        "vocabUri": "urn:ddi-cv:SamplingProcedure:1.1",
+        "vocab": "DDI Sampling Procedure",
+        "id": "Probability.Stratified 2"
+      },
+      {
+        "vocabUri": "urn:ddi-cv:SamplingProcedure:1.1",
+        "vocab": "DDI Sampling Procedure",
+        "id": "Probability.Stratified 2"
       }
     ]
   },
@@ -245,16 +272,29 @@
     "de": "fake de title"
   },
   "studyUrl": {
-    "fi": "http://dx.doi.org/10.5255/UKDA-SN-852661",
-    "en": "http://dx.doi.org/10.5255/UKDA-SN-852661",
-    "de": "http://dx.doi.org/10.5255/UKDA-SN-852661"
+    "de": "http://urn.fi/urn:nbn:fi:fsd:T-FSD3052_stdyDscr",
+    "en": "http://doi.org/10.5255/UKDA-SN-7615-2",
+    "se": "http://doi.org/10.5255/UKDA-SN-7615-2_stdyDscr",
+    "fi": "http://urn.fi/urn:nbn:fi:fsd:T-FSD3052"
   },
   "unitTypes": {
     "de": [
       {
         "vocabUri": "",
         "vocab": "DDI Analysis Unit",
-        "term": "This is the term",
+        "term": "DE: This is the term",
+        "id": "This is the id"
+      },
+      {
+        "vocabUri": "",
+        "vocab": "DDI Analysis Unit",
+        "term": "DE: This is the term. XML-lang on parent element wins",
+        "id": "This is the id"
+      },
+      {
+        "vocabUri": "",
+        "vocab": "DDI Analysis Unit",
+        "term": "DE: This is the term. XML-lang on parent element wins regardless of missing XML-lang in concept  el",
         "id": "This is the id"
       }
     ],
@@ -330,5 +370,10 @@
         "id": "Enquête téléphonique -concept"
       }
     ]
-  }
+  },
+  "langAvailableIn": [
+    "en",
+    "fi",
+    "de"
+  ]
 }

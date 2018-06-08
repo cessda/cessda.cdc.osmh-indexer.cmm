@@ -8,6 +8,7 @@ import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.service.HarvesterConsumerService;
 import eu.cessda.pasc.oci.service.IngestService;
 import eu.cessda.pasc.oci.service.helpers.DebuggingJMXBean;
+import eu.cessda.pasc.oci.service.helpers.LanguageAvailabilityMapper;
 import eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,17 +43,18 @@ public class ConsumerScheduler {
   private HarvesterConsumerService harvesterConsumerService;
   private IngestService esIndexerService;
   private LanguageDocumentExtractor extractor;
+  private LanguageAvailabilityMapper languageAvailabilityMapper;
 
   @Autowired
   public ConsumerScheduler(DebuggingJMXBean debuggingJMXBean, AppConfigurationProperties configurationProperties,
-                           HarvesterConsumerService harvesterConsumerService,
-                           IngestService esIndexerService,
-                           LanguageDocumentExtractor extractor) {
+                           HarvesterConsumerService harvesterConsumerService, IngestService esIndexerService,
+                           LanguageDocumentExtractor extractor, LanguageAvailabilityMapper languageAvailabilityMapper) {
     this.debuggingJMXBean = debuggingJMXBean;
     this.configurationProperties = configurationProperties;
     this.harvesterConsumerService = harvesterConsumerService;
     this.esIndexerService = esIndexerService;
     this.extractor = extractor;
+    this.languageAvailabilityMapper = languageAvailabilityMapper;
   }
 
   /**
@@ -120,18 +122,20 @@ public class ConsumerScheduler {
     int recordHeadersSize = recordHeaders.size();
     log.info("Repo returned with [{}] record headers", recordHeadersSize);
 
-    List<Optional<CMMStudy>> cMMStudiesOptions = recordHeaders.stream()
+    List<Optional<CMMStudy>> totalCMMStudies = recordHeaders.stream()
         .map(recordHeader -> harvesterConsumerService.getRecord(repo, recordHeader.getIdentifier()))
         .collect(Collectors.toList());
 
-    List<Optional<CMMStudy>> presentCMMStudies = cMMStudiesOptions.stream()
+    List<CMMStudy> presentCMMStudies = totalCMMStudies.stream()
         .filter(Optional::isPresent)
+        .map(Optional::get)
         .collect(Collectors.toList());
 
-    String msgTemplate = "There are [{}] presentCMMStudies out of [{}] CMMStudiesOptions from [{}] RecordHeaders";
-    log.info(msgTemplate, presentCMMStudies.size(), cMMStudiesOptions.size(), recordHeadersSize);
+    String msgTemplate = "There are [{}] presentCMMStudies out of [{}] totalCMMStudies from [{}] Record Identifiers";
+    log.info(msgTemplate, presentCMMStudies.size(), totalCMMStudies.size(), recordHeadersSize);
 
-    return extractor.mapLanguageDoc(cMMStudiesOptions, repo.getName());
+    presentCMMStudies.forEach(languageAvailabilityMapper::setAvailableLanguages);
+    return extractor.mapLanguageDoc(presentCMMStudies, repo.getName());
   }
 
   private void logStartStatus(LocalDateTime localDateTime, String runDescription) {

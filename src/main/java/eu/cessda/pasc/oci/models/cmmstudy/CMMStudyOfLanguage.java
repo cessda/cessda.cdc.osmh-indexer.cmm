@@ -37,10 +37,12 @@ import java.util.Set;
     "typeOfModeOfCollections",
     "dataCollectionPeriodStartdate",
     "dataCollectionPeriodEnddate",
+    "dataCollectionYear",
     "dataCollectionFreeTexts",
     "dataAccessFreeTexts",
     "lastModified",
-    "isActive"
+    "isActive",
+    "langAvailableIn"
 })
 @Builder
 @Document(indexName = "test")
@@ -58,6 +60,9 @@ public class CMMStudyOfLanguage {
 
   @JsonProperty("dataCollectionPeriodEnddate")
   private String dataCollectionPeriodEnddate;
+
+  @JsonProperty("dataCollectionYear")
+  private int dataCollectionYear;
 
   @JsonProperty("dataCollectionFreeTexts")
   private List<DataCollectionFreeText> dataCollectionFreeTexts;
@@ -119,6 +124,9 @@ public class CMMStudyOfLanguage {
 
   @JsonProperty("isActive")
   private boolean active;
+
+  @JsonProperty("langAvailableIn")
+  private Set<String> langAvailableIn;
 
   public String getId() {
     return id;

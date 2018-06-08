@@ -10,7 +10,13 @@
         "analyzer": "pasc_index_autocomplete_analyzer",
         "search_analyzer": "pasc_standard_analyzer",
         "term_vector": "with_positions_offsets",
-        "boost": 3.5
+        "boost": 3.5,
+        "fields": {
+          "raw": {
+            "type": "string",
+            "index": "not_analyzed"
+          }
+        }
       },
       "abstract": {
         "type": "string",
@@ -52,6 +58,9 @@
         "type": "date",
         "format": "strict_date_optional_time||epoch_millis||year",
         "ignore_malformed": true
+      },
+      "dataCollectionYear": {
+        "type": "integer"
       },
       "fileLanguages": {
         "type": "string",

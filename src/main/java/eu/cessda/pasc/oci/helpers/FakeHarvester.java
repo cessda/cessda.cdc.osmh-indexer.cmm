@@ -24,8 +24,12 @@ import java.util.Optional;
 @Component
 public class FakeHarvester {
 
-  @Autowired
   private AppConfigurationProperties appConfigurationProperties;
+
+  @Autowired
+  public FakeHarvester(AppConfigurationProperties appConfigurationProperties) {
+    this.appConfigurationProperties = appConfigurationProperties;
+  }
 
   public Optional<Repo> getRepoConfigurationProperties(String repositoryUrl) {
     return appConfigurationProperties.getEndpoints().getRepos()

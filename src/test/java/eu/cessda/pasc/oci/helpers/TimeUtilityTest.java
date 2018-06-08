@@ -28,6 +28,21 @@ public class TimeUtilityTest {
     }
   }
 
+  // String format yyyy-MM-dd'T'HH:mm:ssZ
+  @Test
+  public void shouldReturnExpectedDateValueForNesstarDateFormats() {
+
+    // Given
+    Optional<LocalDateTime> localDateTime = TimeUtility.getLocalDateTime("2015-05-04T22:55:30+0000");
+
+    // When
+    if (localDateTime.isPresent()) {
+      then(localDateTime.get().toString()).isEqualToIgnoringCase("2015-05-04T22:55:30");
+    } else {
+      fail("Failed to parse Date String");
+    }
+  }
+
   @Test
   public void shouldReturnMissingForInvalidDateValue() {
 
