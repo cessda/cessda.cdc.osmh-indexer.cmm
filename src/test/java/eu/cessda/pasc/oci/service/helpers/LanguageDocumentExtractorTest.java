@@ -30,11 +30,11 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
   private String idPrefix = "test-stub";
 
   @Test
-  public void shouldRejectRecordsWhenMissingTitle() throws IOException {
+  public void shouldRejectRecordWhenNotInListOfLanguagesAvailableIn() throws IOException {
 
     // Given
     CMMStudy syntheticCmmStudy = RecordTestData.getSyntheticCmmStudy();
-    syntheticCmmStudy.getTitleStudy().remove("en");
+    syntheticCmmStudy.getLangAvailableIn().remove("en");
 
     // When
     boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", idPrefix, syntheticCmmStudy);
@@ -43,45 +43,7 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
   }
 
   @Test
-  public void shouldRejectRecordsWhenMissingAbstract() throws IOException {
-    // Given
-    CMMStudy syntheticCmmStudy = RecordTestData.getSyntheticCmmStudy();
-    syntheticCmmStudy.getAbstractField().remove("en");
-
-    // When
-    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", idPrefix, syntheticCmmStudy);
-    then(validCMMStudyForLang).isFalse();
-  }
-
-  @Test
-  public void shouldRejectRecordsWhenMissingStudyNumber() throws IOException {
-    // When Study Number is empty------------------------------------------------------------------------------/
-    CMMStudy syntheticCmmStudy = RecordTestData.getSyntheticCmmStudy();
-    syntheticCmmStudy.setStudyNumber("");
-
-    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", idPrefix, syntheticCmmStudy);
-    then(validCMMStudyForLang).isFalse();
-
-    // When Study Number is null ------------------------------------------------------------------------------/
-    syntheticCmmStudy.setStudyNumber(null);
-
-    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", idPrefix, syntheticCmmStudy);
-    then(validCMMStudyForLang).isFalse();
-  }
-
-  @Test
-  public void shouldRejectRecordsWhenMissingPublisher() throws IOException {
-
-    // When Study Url is Miss ------------------------------------------------------------------------------/
-    CMMStudy syntheticCmmStudy = RecordTestData.getSyntheticCmmStudy();
-    syntheticCmmStudy.getPublisher().remove("en");
-
-    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", idPrefix, syntheticCmmStudy);
-    then(validCMMStudyForLang).isFalse();
-  }
-
-  @Test
-  public void shouldValidateRecordsThatHaveTheMinimumCMMFields() throws IOException {
+  public void shouldValidateRecordsWhenGivenLanguageCodeIsInListOfLanguagesAvailableIn() throws IOException {
 
     // Given
     CMMStudy cmmStudy = RecordTestData.getSyntheticCmmStudy();
@@ -97,10 +59,10 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
     then(validCMMStudyForLang).isTrue();
 
     validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("sv", idPrefix, cmmStudy);
-    then(validCMMStudyForLang).isFalse(); // we do not have the required abstract translation in "sv"
+    then(validCMMStudyForLang).isFalse(); // we do not have "sv" in list of available Languages
 
     validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fr", idPrefix, cmmStudy);
-    then(validCMMStudyForLang).isFalse(); // we have nothing for "fr"
+    then(validCMMStudyForLang).isFalse(); // we do not have "fr" in list of available Languages
   }
 
   @Test
@@ -121,10 +83,10 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
     then(validCMMStudyForLang).isTrue();
 
     validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("sv", idPrefix, syntheticCmmStudy);
-    then(validCMMStudyForLang).isTrue(); // Though, we do not have the required abstract translation in "sv".
+    then(validCMMStudyForLang).isTrue();
 
     validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fr", idPrefix, syntheticCmmStudy);
-    then(validCMMStudyForLang).isTrue(); // We have nothing for "fr", when a record is deleted we lose this knowledge.
+    then(validCMMStudyForLang).isTrue();
   }
 
   @Test

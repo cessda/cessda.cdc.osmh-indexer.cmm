@@ -8,6 +8,7 @@ import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.service.HarvesterConsumerService;
 import eu.cessda.pasc.oci.service.IngestService;
 import eu.cessda.pasc.oci.service.helpers.DebuggingJMXBean;
+import eu.cessda.pasc.oci.service.helpers.LanguageAvailabilityMapper;
 import eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,17 +43,18 @@ public class ConsumerScheduler {
   private HarvesterConsumerService harvesterConsumerService;
   private IngestService esIndexerService;
   private LanguageDocumentExtractor extractor;
+  private LanguageAvailabilityMapper languageAvailabilityMapper;
 
   @Autowired
   public ConsumerScheduler(DebuggingJMXBean debuggingJMXBean, AppConfigurationProperties configurationProperties,
-                           HarvesterConsumerService harvesterConsumerService,
-                           IngestService esIndexerService,
-                           LanguageDocumentExtractor extractor) {
+                           HarvesterConsumerService harvesterConsumerService, IngestService esIndexerService,
+                           LanguageDocumentExtractor extractor, LanguageAvailabilityMapper languageAvailabilityMapper) {
     this.debuggingJMXBean = debuggingJMXBean;
     this.configurationProperties = configurationProperties;
     this.harvesterConsumerService = harvesterConsumerService;
     this.esIndexerService = esIndexerService;
     this.extractor = extractor;
+    this.languageAvailabilityMapper = languageAvailabilityMapper;
   }
 
   /**
@@ -132,9 +134,7 @@ public class ConsumerScheduler {
     String msgTemplate = "There are [{}] presentCMMStudies out of [{}] totalCMMStudies from [{}] Record Identifiers";
     log.info(msgTemplate, presentCMMStudies.size(), totalCMMStudies.size(), recordHeadersSize);
 
-    // TODO :
-    //    applyAvaiableLangs(totalCMMStudies);
-
+    presentCMMStudies.forEach(languageAvailabilityMapper::setAvailableLanguages);
     return extractor.mapLanguageDoc(presentCMMStudies, repo.getName());
   }
 

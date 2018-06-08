@@ -9,6 +9,7 @@ import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.service.HarvesterConsumerService;
 import eu.cessda.pasc.oci.service.IngestService;
 import eu.cessda.pasc.oci.service.helpers.DebuggingJMXBean;
+import eu.cessda.pasc.oci.service.helpers.LanguageAvailabilityMapper;
 import eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,9 +42,12 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
   private HarvesterConsumerService harvesterConsumerService;
   private AppConfigurationProperties appConfigurationProperties;
   private IngestService esIndexer;
+
   @Autowired
   private LanguageDocumentExtractor extractor;
 
+  @Autowired
+  private LanguageAvailabilityMapper languageAvailabilityMapper;
 
   @Autowired
   ObjectMapper objectMapper;
@@ -76,7 +80,8 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     when(esIndexer.bulkIndex(anyListOf(CMMStudyOfLanguage.class), anyString())).thenReturn(true);
 
     // Given
-    scheduler = new ConsumerScheduler(debuggingJMXBean, appConfigurationProperties, harvesterConsumerService, esIndexer, extractor);
+    scheduler = new ConsumerScheduler(debuggingJMXBean, appConfigurationProperties, harvesterConsumerService,
+        esIndexer, extractor, languageAvailabilityMapper);
 
     // When
     scheduler.fullHarvestAndIngestionAllConfiguredSPsReposRecords();
@@ -100,7 +105,7 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     when(esIndexer.bulkIndex(anyListOf(CMMStudyOfLanguage.class), anyString())).thenReturn(true);
 
     // Given
-    scheduler = new ConsumerScheduler(debuggingJMXBean, appConfigurationProperties, harvesterConsumerService, esIndexer, extractor);
+    scheduler = new ConsumerScheduler(debuggingJMXBean, appConfigurationProperties, harvesterConsumerService, esIndexer, extractor, languageAvailabilityMapper);
 
     // When
     scheduler.weeklyFullHarvestAndIngestionAllConfiguredSPsReposRecords();
@@ -149,7 +154,7 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     when(esIndexer.getMostRecentLastModified()).thenReturn(Optional.of(LocalDateTime.parse("2018-02-20T07:48:38")));
 
     // Given
-    scheduler = new ConsumerScheduler(debuggingJMXBean, appConfigurationProperties, harvesterConsumerService, esIndexer, extractor);
+    scheduler = new ConsumerScheduler(debuggingJMXBean, appConfigurationProperties, harvesterConsumerService, esIndexer, extractor, languageAvailabilityMapper);
 
     // When
     scheduler.fullHarvestAndIngestionAllConfiguredSPsReposRecords();

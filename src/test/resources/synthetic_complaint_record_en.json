@@ -162,5 +162,10 @@
     "2 Restriction Text en"
   ],
   "lastModified": "2017-11-17T08:08:11Z",
+  "langAvailableIn": [
+    "de",
+    "fi",
+    "en"
+  ],
   "isActive": true
 }

@@ -8,6 +8,7 @@ import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -174,6 +175,12 @@ public class RecordTestData {
   public static CMMStudy getSyntheticCmmStudy() throws IOException {
     String cmmStudyString = new FileHandler().getFileWithUtil("synthetic_compliant_record.json");
     return CMMStudyConverter.fromJsonString(cmmStudyString);
+  }
+
+  public static CMMStudy getSyntheticCmmStudyWithNoAvailableLangsSet() throws IOException {
+    final CMMStudy syntheticCmmStudy = getSyntheticCmmStudy();
+    syntheticCmmStudy.setLangAvailableIn(new HashSet<>());
+    return syntheticCmmStudy;
   }
 
   private static CMMStudy getDeletedCmmStudy() throws IOException {
