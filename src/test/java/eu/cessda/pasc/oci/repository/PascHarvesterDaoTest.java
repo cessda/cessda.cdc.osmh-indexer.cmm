@@ -47,11 +47,7 @@ public class PascHarvesterDaoTest extends AbstractSpringTestProfileContext {
   public void shouldReturnSuccessfulHttpResponseListRecord() throws ExternalSystemException {
 
     // Given
-<<<<<<< HEAD
     String expected_url = "https://pasc-live.cessda.eu/osmh-repo/v0/ListRecordHeaders?" +
-=======
-    String expected_url = "https://pasc-staging.cessda.eu/osmh-repo/v0/ListRecordHeaders?" +
->>>>>>> staging
         "Repository=https://oai.ukdataservice.ac.uk:8443/oai/provider";
 
     serverMock.expect(once(), requestTo(expected_url))
@@ -72,11 +68,7 @@ public class PascHarvesterDaoTest extends AbstractSpringTestProfileContext {
     FileHandler fileHandler = new FileHandler();
     String studyNumber = "998";
     String recordUkds998 = fileHandler.getFileWithUtil("record_ukds_998.json");
-<<<<<<< HEAD
     String expected_url = "https://pasc-live.cessda.eu/osmh-repo/v0/GetRecord/CMMStudy/998?" +
-=======
-    String expected_url = "https://pasc-staging.cessda.eu/osmh-repo/v0/GetRecord/CMMStudy/998?" +
->>>>>>> staging
         "Repository=https://oai.ukdataservice.ac.uk:8443/oai/provider";
 
     serverMock.expect(once(), requestTo(expected_url))
