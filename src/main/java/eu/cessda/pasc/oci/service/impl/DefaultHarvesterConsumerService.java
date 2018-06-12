@@ -83,8 +83,8 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
 
     if (filteredRecordHeaders.isPresent()) {
       List<RecordHeader> filteredHeaders = filteredRecordHeaders.get();
-      String formatMsg = "Returning [{}] filtered recordHeaders  out of [{}] unfiltered by date greater than [{}]";
-      log.info(formatMsg, filteredHeaders.size(), unfilteredRecordHeaders.size(), ingestedLastModifiedDate);
+      String formatMsg = "Returning [{}] filtered recordHeaders by date greater than [{}] | out of [{}] unfiltered ";
+      log.info(formatMsg, filteredHeaders.size(), ingestedLastModifiedDate, unfilteredRecordHeaders.size());
       return filteredHeaders;
     }
 

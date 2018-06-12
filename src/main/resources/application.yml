@@ -20,10 +20,10 @@ logging:
     .: WARN
     org: ERROR
     eu.cessda.pasc: INFO
-    eu.cessda.pasc.oci.service: DEBUG
-    eu.cessda.pasc.oci.repository: DEBUG
-    eu.cessda.pasc.oci.helpers: DEBUG
-    eu.cessda.pasc.oci.configurations.PerfRequestSyncInterceptor: DEBUG
+    eu.cessda.pasc.oci.service: INFO
+    eu.cessda.pasc.oci.repository: INFO
+    eu.cessda.pasc.oci.helpers: INFO
+    eu.cessda.pasc.oci.configurations.PerfRequestSyncInterceptor: INFO
     net: WARN
     com: ERROR
 spring:
@@ -70,6 +70,9 @@ osmhConsumer:
     supportedRecordTypes:
       - CMMStudy
     repos:
+      - url: https://snd.gu.se/en/oai-pmh
+        name: 'SND'
+        handler: 'https://pasc-dev.cessda.eu/osmh-repo'
       - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
         name: 'UK Data Service'
         handler: 'https://pasc-dev.cessda.eu/osmh-repo'
@@ -169,21 +172,24 @@ osmhConsumer:
   languages: ['en', 'fi', 'de', 'fr']
   endpoints:
     repos:
+      - url: https://snd.gu.se/en/oai-pmh
+        name: 'SND'
+        handler: 'http://localhost:9091'
 #      - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
 #        name: 'UK Data Service'
 #        handler: 'http://localhost:9091'
 #      - url: http://services.fsd.uta.fi/v0/oai
 #        name: 'Finish Data Services'
 #        handler: 'http://localhost:9091'
-      - url: http://fors-nesstar.unil.ch/oai-pmh
-        name: 'FORS Data Service (Nesstar)'
-        handler: 'http://localhost:9842'
-      - url: http://nesstar.ucd.ie/oai-pmh
-        name: 'ISSDA (Nesstar)'
-        handler: 'http://localhost:9842'
-      - url:  http://nesstar.sciences-po.fr/oai-pmh
-        name: 'Progedo (Nesstar)'
-        handler: 'http://localhost:9842'
+#      - url: http://fors-nesstar.unil.ch/oai-pmh
+#        name: 'FORS Data Service (Nesstar)'
+#        handler: 'http://localhost:9842'
+#      - url: http://nesstar.ucd.ie/oai-pmh
+#        name: 'ISSDA (Nesstar)'
+#        handler: 'http://localhost:9842'
+#      - url:  http://nesstar.sciences-po.fr/oai-pmh
+#        name: 'Progedo (Nesstar)'
+#        handler: 'http://localhost:9842'
 ---
 spring:
   profiles: test
