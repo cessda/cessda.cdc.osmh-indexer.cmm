@@ -63,6 +63,8 @@ osmhhandler:
         preferredMetadataParam: ddi_c
       - url: https://dbk.gesis.org/dbkoai2/
         preferredMetadataParam: oai_ddi25
+      - url: https://snd.gu.se/en/oai-pmh
+        preferredMetadataParam: oai_ddi25
 #      - url: https://dbk.gesis.org/dbkoai/
 #        preferredMetadataParam: oai_ddi25-de
 #      - url: https://easy.dans.knaw.nl/oai/
@@ -101,6 +103,17 @@ osmhhandler:
 spring:
   profiles: local
   boot.admin.url: http://localhost:8087
+#osmhhandler:
+#  oaiPmh:
+#    repos:
+#      - url: https://snd.gu.se/en/oai-pmh
+#        preferredMetadataParam: oai_ddi25
+#      - url: https://data.aussda.at/oai
+#        preferredMetadataParam: oai_ddi
+#      - url: https://dbk.gesis.org/dbkoai/
+#        preferredMetadataParam: oai_ddi25-de
+#      - url: https://easy.dans.knaw.nl/oai/
+#        preferredMetadataParam: oai_dc
 
 ---
 spring:
