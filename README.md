@@ -12,6 +12,7 @@ Runs all the Junit Test
 
     mvn clean test
 
+
 ### Sonar it
 
 Static code quality with verification with SonarQube
