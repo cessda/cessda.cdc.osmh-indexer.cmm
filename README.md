@@ -66,19 +66,8 @@ On mac this can be done with `brew`
 
 ### Break down into end to end tests
 
-TODO: Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-TODO: Explain what these tests test and why
-
-```
-Give an example
-```
+- Makes use of TDD
+- For integrations test, loads up an embedded elasticsearch server with tests against it
 
 ## Deployment
 
@@ -96,6 +85,19 @@ all environment properties can be changed at runtime.
 * **EFFECTIVE AFTER A CONTEXT RELOAD**
 * **LOST AFTER AN APPLICATION RESTART UNLESS PERSISTED IN APPLICATION.yml**
  
+##  Timers Properties: 
+
+Harvesting Schedule timers.
+
+```
+osmhConsumer:
+  delay:
+    initial: '60000'                  # Auto Starts after delay of 1min at startup
+    fixed: '315360000000'               # Yearly clean up run
+  daily:
+    run: '0 30 02 * * *'                # Daily Harvest and Ingestion run at 02:30am.
+    sunday.run: '0 30 11 * * SUN'       # Then run every Sunday at 11:30
+```    
 
 ## Built With
 

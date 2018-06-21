@@ -58,10 +58,10 @@ public class ConsumerScheduler {
   }
 
   /**
-   * Auto Starts after delay of 1min at startup
+   * Auto Starts after delay of given time at startup.
    */
   @ManagedOperation(description = "Manual trigger to do a full harvest and ingest run")
-  @Scheduled(initialDelay = 60_000L, fixedDelay = 315_360_000_000L)
+  @Scheduled(initialDelayString = "${osmhConsumer.delay.initial}", fixedDelayString = "${osmhConsumer.delay.fixed}")
   public void fullHarvestAndIngestionAllConfiguredSPsReposRecords() {
     Instant startTime = Instant.now();
     LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime.toEpochMilli()), ZoneId.systemDefault());
@@ -71,10 +71,10 @@ public class ConsumerScheduler {
   }
 
   /**
-   * Daily Harvest and Ingestion run at 02:30am.
+   * Daily Harvest and Ingestion run.
    */
   @ManagedOperation(description = "Manual trigger to do an incremental harvest and ingest")
-  @Scheduled(cron = "0 30 02 * * *")
+  @Scheduled(cron = "${osmhConsumer.daily.run}")
   public void dailyIncrementalHarvestAndIngestionAllConfiguredSPsReposRecords() {
     Instant startTime = Instant.now();
     LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime.toEpochMilli()), ZoneId.systemDefault());
@@ -84,9 +84,9 @@ public class ConsumerScheduler {
   }
 
   /**
-   * Then run every Sunday at 11:30
+   * Weekly run.
    */
-  @Scheduled(cron = "0 30 11 * * SUN")
+  @Scheduled(cron = "${osmhConsumer.daily.sunday.run}")
   public void weeklyFullHarvestAndIngestionAllConfiguredSPsReposRecords() {
     log.info("Once a Week Full Run. Triggered by cron - STARTED");
     fullHarvestAndIngestionAllConfiguredSPsReposRecords();

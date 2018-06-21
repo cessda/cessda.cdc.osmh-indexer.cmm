@@ -61,6 +61,15 @@ elasticsearch:
   numberOfReplicas: 0
 osmhConsumer:
   languages: ['en', 'fi', 'de', 'nl', 'fr']
+  delay:
+    # Auto Starts after delay of 1min at startup
+    initial: '60000'
+    fixed: '315360000000'
+  daily:
+    # Daily Harvest and Ingestion run at 02:30am.
+    run: '0 30 02 * * *'
+    # Then run every Sunday at 11:30
+    sunday.run: '0 30 11 * * SUN'
   harvester:
     url: 'http://localhost:9091'
     version: 'v0'
