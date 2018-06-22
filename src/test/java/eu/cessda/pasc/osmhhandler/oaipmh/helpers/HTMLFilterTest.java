@@ -15,7 +15,7 @@ public class HTMLFilterTest {
   public void shouldCleanOutHtmlReturnCharacters() {
 
     // Given
-    String raw = "\n\"Arma sunt necessaria\" (Arms are necessary) Guns, " +
+    String raw = "\n \"Arma sunt necessaria\" (Arms are necessary) Guns, " +
         "Gun Culture and Cultural Origins of the Second \nAmendment to the U.S. Constitution\n";
 
     // When
@@ -25,16 +25,14 @@ public class HTMLFilterTest {
         "Gun Culture and Cultural Origins of the Second Amendment to the U.S. Constitution");
   }
 
-
   @Test
   public void shouldCleanOutHtmlReturnCharactersFromMap() {
 
     // Given
     Map<String, String> titleMap = new HashMap<>();
-    titleMap.put("en", "\n\"Arma sunt necessaria\" (Arms are necessary) Guns Constitution\n");
+    titleMap.put("en", " \n\"Arma sunt necessaria\" (Arms are necessary) Guns Constitution\n");
     titleMap.put("sv", "\n\"Arma sunt necessaria\" (Arms are necessary) Guns Constitution\n");
-    titleMap.put("fi", "\nDocumentation pour \"European Social Survey in Switzerland - 2004\"");
-
+    titleMap.put("fi", "\n Documentation pour \"European Social Survey in Switzerland - 2004\"");
 
     // When
     CLEAN_MAP_VALUES.accept(titleMap);

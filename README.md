@@ -10,6 +10,7 @@ purposes. See deployment for notes on how to deploy the project on a live system
 ### Test it
 Runs all the Junit Test
 
+
     mvn clean test
 
 ### Sonar it
