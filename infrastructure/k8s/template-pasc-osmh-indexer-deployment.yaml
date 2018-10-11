@@ -17,5 +17,3 @@ spec:
         ports:
         - containerPort: 9092
           name: osmh-ind-cport
-      nodeSelector:
-        app: global
