@@ -60,18 +60,17 @@ osmhhandler:
       - url: https://data2.aussda.at/oai
         preferredMetadataParam: oai_ddi
 #      - url: https://easy.dans.knaw.nl/oai/
-#        preferredMetadataParam: oai_dc
+#        preferredMetadataParam: oai_ddi
       - url: http://services.fsd.uta.fi/v0/oai
         preferredMetadataParam: oai_ddi25
-     - url: https://dbk.gesis.org/dbkoai3/
+      - url: https://dbk.gesis.org/dbkoai3/
         preferredMetadataParam: oai_ddi25
-     - url: http://147.213.4.44:6003/v0/oai
+      - url: http://147.213.4.44:6003/v0/oai
         preferredMetadataParam: oai_ddi25
-     - url: https://snd.gu.se/en/oai-pmh
-        preferredMetadataParam: oai_ddi25       
+      - url: https://snd.gu.se/en/oai-pmh
+        preferredMetadataParam: oai_ddi25
       - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
-        preferredMetadataParam: ddi
-
+        preferredMetadataParam: oai_ddi
     metadataParsingDefaultLang:
       active: true
       lang: 'en'
