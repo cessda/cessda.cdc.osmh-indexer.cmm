@@ -70,7 +70,7 @@ osmhhandler:
       - url: https://snd.gu.se/en/oai-pmh
         preferredMetadataParam: oai_ddi25
       - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
-        preferredMetadataParam: oai_ddi
+        preferredMetadataParam: ddi
     metadataParsingDefaultLang:
       active: true
       lang: 'en'
