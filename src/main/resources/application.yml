@@ -60,7 +60,7 @@ elasticsearch:
   numberOfShards: 2
   numberOfReplicas: 0
 osmhConsumer:
-  languages: ['de', 'en', 'fi', 'se', 'nl', 'fr']
+  languages: ['de', 'en', 'fi', 'fr', 'nl', 'sk', 'se']
   delay:
     # Auto Starts after delay of 1min at startup
     initial: '60000'
@@ -184,7 +184,7 @@ logging:
     eu.cessda.pasc.oci.helpers: DEBUG
     eu.cessda.pasc.oci.configurations.PerfRequestSyncInterceptor: DEBUG
 osmhConsumer:
-  languages: ['de', 'en', 'fi', 'se', 'sk']
+  languages: ['de', 'en', 'fi', 'fr', 'nl', 'sk', 'se']
   endpoints:
     repos:
       - url: https://snd.gu.se/en/oai-pmh
@@ -211,7 +211,7 @@ spring:
   main:
         banner-mode: "off"
 osmhConsumer:
-  languages: ['en', 'fi', 'sv', 'de']
+  languages: ['de', 'en', 'fi', 'fr', 'nl', 'sk', 'se']
 server:
   port: 9999
 elasticsearch:
