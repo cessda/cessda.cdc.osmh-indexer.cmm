@@ -59,8 +59,8 @@ osmhhandler:
     repos:
       - url: https://data2.aussda.at/oai/
         preferredMetadataParam: oai_ddi
-      - url: http://fors-getdata.unil.ch/oai-pmh/
-        preferredMetadataParam: oai_ddi
+#      - url: http://fors-getdata.unil.ch/oai-pmh/ Using Nesstar endpoint
+#       preferredMetadataParam: oai_ddi
       - url: http://services.fsd.uta.fi/v0/oai
         preferredMetadataParam: oai_ddi25
       - url: https://dbk.gesis.org/dbkoai3/
