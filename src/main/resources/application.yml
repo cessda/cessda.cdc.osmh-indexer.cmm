@@ -103,6 +103,9 @@ osmhConsumer:
     - url: http://fors-nesstar.unil.ch/oai-pmh
       name: 'FORS Data Service (Nesstar)'
       handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo-nesstar'
+    - url: https://oai-pmh.nsd.no/oai-pmh
+      name: 'NSD (Nesstar)'
+      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo-nesstar'
     - url:  http://nesstar.sciences-po.fr/oai-pmh
       name: 'Progedo (Nesstar)'
       handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo-nesstar'
