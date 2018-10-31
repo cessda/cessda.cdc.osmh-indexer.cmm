@@ -49,20 +49,26 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
     CMMStudy cmmStudy = RecordTestData.getSyntheticCmmStudy();
 
     // When
-    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", idPrefix, cmmStudy);
+    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("de", idPrefix, cmmStudy);
     then(validCMMStudyForLang).isTrue();
 
-    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("de", idPrefix, cmmStudy);
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", idPrefix, cmmStudy);
     then(validCMMStudyForLang).isTrue();
 
     validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fi", idPrefix, cmmStudy);
     then(validCMMStudyForLang).isTrue();
-
-    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("sv", idPrefix, cmmStudy);
-    then(validCMMStudyForLang).isFalse(); // we do not have "sv" in list of available Languages
-
+    
     validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fr", idPrefix, cmmStudy);
-    then(validCMMStudyForLang).isFalse(); // we do not have "fr" in list of available Languages
+    then(validCMMStudyForLang).isTrue();
+    
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("nl", idPrefix, cmmStudy);
+     then(validCMMStudyForLang).isTrue();
+
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("se", idPrefix, cmmStudy);
+    then(validCMMStudyForLang).isFalse(); 
+
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("sk", idPrefix, cmmStudy);
+    then(validCMMStudyForLang).isFalse(); 
   }
 
   @Test
@@ -73,19 +79,25 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
     syntheticCmmStudy.setActive(false);
 
     // When
-    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", idPrefix, syntheticCmmStudy);
+    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("de", idPrefix, syntheticCmmStudy);
     then(validCMMStudyForLang).isTrue();
 
-    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("de", idPrefix, syntheticCmmStudy);
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", idPrefix, syntheticCmmStudy);
     then(validCMMStudyForLang).isTrue();
 
     validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fi", idPrefix, syntheticCmmStudy);
     then(validCMMStudyForLang).isTrue();
 
-    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("sv", idPrefix, syntheticCmmStudy);
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fr", idPrefix, syntheticCmmStudy);
     then(validCMMStudyForLang).isTrue();
 
-    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fr", idPrefix, syntheticCmmStudy);
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("nl", idPrefix, syntheticCmmStudy);
+    then(validCMMStudyForLang).isTrue();
+
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("se", idPrefix, syntheticCmmStudy);
+    then(validCMMStudyForLang).isTrue();
+
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("sk", idPrefix, syntheticCmmStudy);
     then(validCMMStudyForLang).isTrue();
   }
 
@@ -101,11 +113,15 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
 
     then(languageDocMap).isNotNull();
     then(languageDocMap).hasSize(4);
-    then(languageDocMap).containsOnlyKeys("en", "fi", "sv", "de");
+    then(languageDocMap).containsOnlyKeys("de", "en", "fi", "fr", "nl", "se", "sk");
+    then(languageDocMap.get("de")).hasSize(1);
     then(languageDocMap.get("en")).hasSize(1);
     then(languageDocMap.get("fi")).hasSize(1);
-    then(languageDocMap.get("sv")).hasSize(0); //Synthetic doc does not have a studyTitle or abstract, so sv is skipped
-    then(languageDocMap.get("de")).hasSize(1);
+    //Synthetic doc does not exist, or does have a studyTitle or abstract, so language is skipped
+    //then(languageDocMap.get("fr")).hasSize(0); 
+    //then(languageDocMap.get("nl")).hasSize(0); 
+    //then(languageDocMap.get("se")).hasSize(0); 
+    //then(languageDocMap.get("sk")).hasSize(0); 
 
     List<CMMStudyOfLanguage> enStudy = languageDocMap.get("en");
     Optional<String> enCMMStudyJsonStringOpt = CMMStudyOfLanguageConverter.toJsonString(enStudy.get(0));
@@ -123,12 +139,12 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
         languageDocumentExtractor.mapLanguageDoc(studies, "UK Data Service");
 
     then(languageDocMap).isNotNull();
-    then(languageDocMap).hasSize(4);
-    then(languageDocMap).containsOnlyKeys("en", "fi", "sv", "de");
+    then(languageDocMap).hasSize(7);
+    then(languageDocMap).containsOnlyKeys("de", "en", "fi", "fr", "nl", "se", "sk");
+    then(languageDocMap.get("de")).hasSize(2); // a deleted record and an active record that is valid
     then(languageDocMap.get("en")).hasSize(2); // a deleted record and an active record that is valid
     then(languageDocMap.get("fi")).hasSize(2); // a deleted record and an active record that is valid
-    then(languageDocMap.get("sv")).hasSize(1); // a deleted record and an active record that is not valid for lang sv
-    then(languageDocMap.get("de")).hasSize(2); // a deleted record and an active record that is valid
+    //then(languageDocMap.get("sv")).hasSize(1); // a deleted record and an active record that is not valid for lang
 
     List<CMMStudyOfLanguage> enStudy = languageDocMap.get("en");
     System.out.println("Printing Records");
