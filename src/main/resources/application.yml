@@ -99,7 +99,7 @@ osmhConsumer:
       handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo'
     - url: https://nesstar2.adp.fdv.uni-lj.si/oai-pmh
       name: 'ADP (Nesstar)'
-      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo'
+      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo-nesstar'
     - url: http://fors-nesstar.unil.ch/oai-pmh
       name: 'FORS Data Service (Nesstar)'
       handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo-nesstar'
