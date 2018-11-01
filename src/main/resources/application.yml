@@ -1,6 +1,6 @@
 ---
 server:
-  port: 9091
+  port: 9902
 #  context-path: '/osmh-repo'
 security:
   user:
@@ -9,7 +9,26 @@ security:
   basic.enabled: false            # Public API disable security on non-admin endpoints
 management.security.enabled: true # Enable security on admin endpoints
 endpoints.shutdown.enabled: true
+logging:
+  file: ${user.home}${file.separator}pasc-oci${file.separator}pasc-oci.log
+  pattern:
+    console: '%d{yyyy-dd-MM HH:mm:ss.SSS} %highlight(%-5level) %40.40((%file:%line\))
+      - %message%n'
+    file: '%d{yyyy-dd-MM HH:mm:ss.SSS}  %-5level  %40.40((%file:%line\))
+      - %message%n'
+  level:
+    .: WARN
+    org: ERROR
+    eu.cessda.pasc: INFO
+    eu.cessda.pasc.oci.service: INFO
+    eu.cessda.pasc.oci.repository: INFO
+    eu.cessda.pasc.oci.helpers: INFO
+    eu.cessda.pasc.oci.configurations.PerfRequestSyncInterceptor: INFO
+    net: WARN
+    com: ERROR
 spring:
+  mail:
+    host: svboexc02.gesis.intra
   output:
     ansi:
       enabled: DETECT
@@ -17,15 +36,15 @@ spring:
     restart:
       enabled: false
   application:
-    name: pasc-osmh-handler-oai-pmh
+    name: pasc-oci
   jmx:
-    default-domain: pasc-osmh-handler-oai-pmh
+    default-domain: pasc-oci
   boot:
     admin:
 #     url: http://localhost:8087 For dev, stg & prod set this at the specific active profile. Run app with profile set
       username: springadmin
       password: C3ssd@2018!
-      client.name: pasc-osmh-handler-oai-pmh
+      client.name: pasc-oci
       turbine:
         clusters: default
         url: http://localhost:8989/turbine.stream
@@ -33,74 +52,73 @@ spring:
         endpoints: env,metrics,log,trace,dump,jolokia,info,configprops,trace,logfile,refresh,flyway,liquibase,heapdump
       auto-deregistration: true
       auto-registration: true
-logging:
-  file: ${user.home}${file.separator}pasc-osmh-handler${file.separator}pasc-osmh-handler-oai-pmh.log
-  pattern:
-    console: '%d{yyyy-dd-MM HH:mm:ss.SSS} %highlight(%-5level) %30.30((%M\)) %40.40((%file:%line\))
-      - %message%n'
-    file: '%d{yyyy-dd-MM HH:mm:ss.SSS}  %-5level  %30.30((%M\)) %40.40((%file:%line\))
-      - %message%n'
-  level:
-    .: WARN
-    org: ERROR
-    eu.cessda.pasc: INFO
-    eu.cessda.pasc.osmhhandler.oaipmh.controller: INFO
-    eu.cessda.pasc.osmhhandler.oaipmh.service: INFO
-    eu.cessda.pasc.osmhhandler.oaipmh.helpers: INFO
-    net: WARN
-    com: ERROR
-osmhhandler:
-  baseEndpoint: '/'
-  oaiPmh:
+      period: 30000
+elasticsearch:
+  clustername: elasticsearch
+  host: 127.0.0.1
+  port: 9300
+  numberOfShards: 2
+  numberOfReplicas: 0
+osmhConsumer:
+  languages: ['de', 'en', 'fi', 'fr', 'nl', 'sk', 'se']
+  delay:
+    # Auto Starts after delay of 1min at startup
+    initial: '60000'
+    fixed: '315360000000'
+  daily:
+    # Daily Harvest and Ingestion run at 02:30am.
+    run: '0 30 02 * * *'
+    # Then run every Sunday at 11:30
+    sunday.run: '0 30 11 * * SUN'
+  harvester:
+    url: 'http://localhost:9091'
+    version: 'v0'
+  endpoints:
     supportedApiVersions:
       - v0
     supportedRecordTypes:
       - CMMStudy
     repos:
-      - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
-        preferredMetadataParam: ddi
-      - url: http://services.fsd.uta.fi/v0/oai
-        preferredMetadataParam: ddi_c
-      - url: https://dbk.gesis.org/dbkoai2/
-        preferredMetadataParam: oai_ddi25
-#      - url: https://dbk.gesis.org/dbkoai/
-#        preferredMetadataParam: oai_ddi25-de
-#      - url: https://easy.dans.knaw.nl/oai/
-#        preferredMetadataParam: oai_dc
-    metadataParsingDefaultLang:
-      active: true
-      lang: 'en'
-    concatRepeatedElements: true
-    concatSeparator: "+<br>"
-    publicationYearDefault: 1970
-  restTemplateProps:
+    - url: https://data2.aussda.at/oai
+      name: 'AUSSDA'
+      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo'
+    - url: http://services.fsd.uta.fi/v0/oai
+      name: 'Finish Data Services'
+      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo'
+    - url: https://dbk.gesis.org/dbkoai3/
+      name: 'GESIS'
+      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo'
+    - url: http://147.213.4.44:6003/v0/oai
+      name: 'SASD'
+      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo'
+    - url: https://snd.gu.se/en/oai-pmh
+      name: 'SND'
+      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo'
+    - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
+      name: 'UK Data Service'
+      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo'
+    - url: https://nesstar2.adp.fdv.uni-lj.si/oai-pmh
+      name: 'ADP (Nesstar)'
+      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo-nesstar'
+    - url: http://fors-nesstar.unil.ch/oai-pmh
+      name: 'FORS Data Service (Nesstar)'
+      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo-nesstar'
+    - url: https://oai-pmh.nsd.no/oai-pmh
+      name: 'NSD (Nesstar)'
+      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo-nesstar'
+    - url:  http://nesstar.sciences-po.fr/oai-pmh
+      name: 'Progedo (Nesstar)'
+      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo-nesstar'  
+    - url: http://nesstar.soc.cas.cz/oai-pmh
+      name: 'CSDA (Nesstar)'
+      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo-nesstar'
+    - url:  http://149.132.157.156/oai-pmh
+      name: 'Unidata (Nesstar)'
+      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo-nesstar'
     connTimeout: 5000
     connRequestTimeout: 5000
-    readTimeout: 60000 #every 1 minute (60_000ms)
+    readTimeout: 120000 # increased from 60seconds to 120 seconds to deal with slower Nesstar repos
     verifySSL: false
-
----
-spring:
-  profiles: test
-  main:
-        banner-mode: "off"
-osmhhandler:
-  oaiPmh:
-    supportedRecordTypes:
-      - Study
-      - StudyGroup
-      - Variable
-      - Question
-      - CMM
-    metadataParsingDefaultLang:
-      active: true
-      lang: 'en'
-    publicationYearDefault: 1970
-
----
-spring:
-  profiles: local
-  boot.admin.url: http://localhost:8087
 
 ---
 spring:
@@ -112,5 +130,99 @@ spring:
       client:
         prefer-ip: true
       url: http://localhost:8087
-osmhhandler:
-  baseEndpoint: '/osmh-repo'
+logging:
+  level:
+    eu.cessda.pasc.oci.service: INFO
+    eu.cessda.pasc.oci.repository: INFO
+    eu.cessda.pasc.oci.helpers: INFO
+    eu.cessda.pasc.oci.configurations.PerfRequestSyncInterceptor: DEBUG
+elasticsearch:
+  host: cessda-pasc-es-dev-cluster
+  numberOfShards: 2
+  numberOfReplicas: 2
+---
+spring:
+  profiles: staging
+  main:
+        banner-mode: "off"
+  boot:
+    admin:
+      client:
+        prefer-ip: true
+      url: http://localhost:8087
+logging:
+  level:
+    eu.cessda.pasc.oci.service: INFO
+    eu.cessda.pasc.oci.repository: INFO
+    eu.cessda.pasc.oci.helpers: INFO
+elasticsearch:
+  host: cessda-pasc-es-staging-cluster
+  numberOfShards: 2
+  numberOfReplicas: 2
+---
+  spring:
+    profiles: live
+    main:
+          banner-mode: "off"
+    boot:
+      admin:
+        client:
+          prefer-ip: true
+        url: http://localhost:8087
+  logging:
+    level:
+      eu.cessda.pasc.oci.service: INFO
+      eu.cessda.pasc.oci.repository: INFO
+      eu.cessda.pasc.oci.helpers: INFO
+  elasticsearch:
+    host: cessda-pasc-es-live-cluster
+    numberOfShards: 2
+    numberOfReplicas: 2
+---
+spring:
+  profiles: local
+  main:
+        banner-mode: "off"
+  boot:
+    admin:
+      url: http://localhost:8087
+logging:
+  level:
+    eu.cessda.pasc.oci.service: DEBUG
+    eu.cessda.pasc.oci.repository: DEBUG
+    eu.cessda.pasc.oci.helpers: DEBUG
+    eu.cessda.pasc.oci.configurations.PerfRequestSyncInterceptor: DEBUG
+osmhConsumer:
+  languages: ['de', 'en', 'fi', 'fr', 'nl', 'sk', 'se']
+  endpoints:
+    repos:
+      - url: https://snd.gu.se/en/oai-pmh
+        name: 'SND'
+        handler: 'http://localhost:9091'
+#      - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
+#        name: 'UK Data Service'
+#        handler: 'http://localhost:9091'
+#      - url: http://services.fsd.uta.fi/v0/oai
+#        name: 'Finish Data Services'
+#        handler: 'http://localhost:9091'
+#      - url: http://fors-nesstar.unil.ch/oai-pmh
+#        name: 'FORS Data Service (Nesstar)'
+#        handler: 'http://localhost:9842'
+#      - url: http://nesstar.ucd.ie/oai-pmh
+#        name: 'ISSDA (Nesstar)'
+#        handler: 'http://localhost:9842'
+#      - url:  http://nesstar.sciences-po.fr/oai-pmh
+#        name: 'Progedo (Nesstar)'
+#        handler: 'http://localhost:9842'
+---
+spring:
+  profiles: test
+  main:
+        banner-mode: "off"
+osmhConsumer:
+  languages: ['de', 'en', 'fi', 'fr', 'nl', 'sk', 'se']
+server:
+  port: 9999
+elasticsearch:
+  numberOfShards: 1
+  numberOfReplicas: 0
