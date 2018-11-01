@@ -18,7 +18,7 @@ class HTMLFilter {
   }
 
   static final Function<String, String> CLEAN_CHARACTER_RETURNS_STRATEGY = candidate ->
-      candidate.replace("\n", "");
+      candidate.replace("\n", "").trim();
 
   static final Consumer<Map<String, String>> CLEAN_MAP_VALUES = candidateMap ->
       candidateMap.replaceAll((key, value) -> CLEAN_CHARACTER_RETURNS_STRATEGY.apply(value));
