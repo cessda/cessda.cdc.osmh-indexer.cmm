@@ -43,7 +43,7 @@ public class SwaggerConfig {
 
   private ApiInfo metaData() {
 
-    Contact contact = new Contact("Cessda PaSC", "https://www.cessda.eu/", "moses@doraventures.com");
+    Contact contact = new Contact("Cessda PaSC", "https://www.cessda.eu/", "support@cessda.eu");
 
     return new ApiInfo(
         "PaSC OSMH Handler OAI-PMH",
