@@ -17,5 +17,3 @@ spec:
         ports:
         - containerPort: 9091
           name: osmh-rep-cport
-      nodeSelector:
-        app: global
