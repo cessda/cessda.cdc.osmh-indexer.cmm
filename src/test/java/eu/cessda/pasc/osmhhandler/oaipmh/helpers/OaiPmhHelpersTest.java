@@ -31,7 +31,7 @@ public class OaiPmhHelpersTest {
 
     // Given
     String fsdEndpoint = "http://services.fsd.uta.fi/v0/oai";
-    String expectedReqUrl = "http://services.fsd.uta.fi/v0/oai?verb=GetRecord&identifier=15454&metadataPrefix=ddi_c";
+    String expectedReqUrl = "http://services.fsd.uta.fi/v0/oai?verb=GetRecord&identifier=15454&metadataPrefix=oai_ddi25";
 
     // When
     String builtUrl = appendGetRecordParams(fsdEndpoint, "15454", handlerConfigurationProperties.getOaiPmh());
