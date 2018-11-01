@@ -40,8 +40,6 @@ public class LanguageDocumentExtractor {
     Map<String, List<CMMStudyOfLanguage>> languageDocMap = new HashMap<>();
     String idPrefix = spName.trim().replace(" ", "-") + "__"; // UK Data Service = UK-Data-Service__
 
-    // FIXME: REFACTOR this for a single pass or - make handler return records with langCode as top node
-    // with record embedded to each langCode, so that one can easily grab all records more efficiently for a langCode
     appConfigurationProperties.getLanguages().forEach(langCode -> {
           Instant start = Instant.now();
           log.trace("Extract CMMStudyOfLanguage for [{}] language code - STARTED", langCode);
@@ -134,7 +132,7 @@ public class LanguageDocumentExtractor {
   private static void logDetailedExtractionsReport(Map<String, List<CMMStudyOfLanguage>> languageDocMap) {
     if (log.isDebugEnabled()) {
       languageDocMap.forEach((langIsoCode, cmmStudyOfLanguages) -> {
-        String formatTemplate = "langIsoCode [{}] has [{}] records passed";
+        String formatTemplate = "langIsoCode [{}] has [{}] records passed CMM minimum fields validation";
         log.debug(formatTemplate, langIsoCode, cmmStudyOfLanguages.size());
       });
     }
