@@ -119,7 +119,7 @@ spring:
 
 ---
 spring:
-  profiles: dev
+  profiles: live
   main:
         banner-mode: "off"
   boot:
