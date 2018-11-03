@@ -65,11 +65,11 @@ osmhConsumer:
     # Auto Starts after delay of 1min at startup
     initial: '60000'
     fixed: '315360000000'
-  daily:
-    # Daily Harvest and Ingestion run at 02:30am.
-    run: '0 30 02 * * *'
-    # Then run every Sunday at 11:30
-    sunday.run: '0 30 11 * * SUN'
+daily:
+    # Daily Harvest and Ingestion run at 03:00am.
+    run: '0 00 03 * * *'
+    # Then run every Sunday at 11:59
+    sunday.run: '0 59 11 * * SUN'
   harvester:
     url: 'http://localhost:9091'
     version: 'v0'
