@@ -119,46 +119,6 @@ osmhConsumer:
     connRequestTimeout: 5000
     readTimeout: 180000 # increased from 120 seconds to 180 seconds to deal with slower Nesstar repos
     verifySSL: false
-
----
-spring:
-  profiles: dev
-  main:
-        banner-mode: "off"
-  boot:
-    admin:
-      client:
-        prefer-ip: true
-      url: http://localhost:8087
-logging:
-  level:
-    eu.cessda.pasc.oci.service: INFO
-    eu.cessda.pasc.oci.repository: INFO
-    eu.cessda.pasc.oci.helpers: INFO
-    eu.cessda.pasc.oci.configurations.PerfRequestSyncInterceptor: DEBUG
-elasticsearch:
-  host: cessda-pasc-es-dev-cluster
-  numberOfShards: 2
-  numberOfReplicas: 2
----
-spring:
-  profiles: staging
-  main:
-        banner-mode: "off"
-  boot:
-    admin:
-      client:
-        prefer-ip: true
-      url: http://localhost:8087
-logging:
-  level:
-    eu.cessda.pasc.oci.service: INFO
-    eu.cessda.pasc.oci.repository: INFO
-    eu.cessda.pasc.oci.helpers: INFO
-elasticsearch:
-  host: cessda-pasc-es-staging-cluster
-  numberOfShards: 2
-  numberOfReplicas: 2
 ---
   spring:
     profiles: live
@@ -175,54 +135,6 @@ elasticsearch:
       eu.cessda.pasc.oci.repository: INFO
       eu.cessda.pasc.oci.helpers: INFO
   elasticsearch:
-    host: cessda-pasc-es-live-cluster
+    host: cessda-pasc-es-live-cluster # must match profile name
     numberOfShards: 2
     numberOfReplicas: 2
----
-spring:
-  profiles: local
-  main:
-        banner-mode: "off"
-  boot:
-    admin:
-      url: http://localhost:8087
-logging:
-  level:
-    eu.cessda.pasc.oci.service: DEBUG
-    eu.cessda.pasc.oci.repository: DEBUG
-    eu.cessda.pasc.oci.helpers: DEBUG
-    eu.cessda.pasc.oci.configurations.PerfRequestSyncInterceptor: DEBUG
-osmhConsumer:
-  languages: ['de', 'en', 'fi', 'fr', 'nl', 'sk', 'se']
-  endpoints:
-    repos:
-      - url: https://snd.gu.se/en/oai-pmh
-        name: 'SND'
-        handler: 'http://localhost:9091'
-#      - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
-#        name: 'UK Data Service'
-#        handler: 'http://localhost:9091'
-#      - url: http://services.fsd.uta.fi/v0/oai
-#        name: 'Finish Data Services'
-#        handler: 'http://localhost:9091'
-#      - url: http://fors-nesstar.unil.ch/oai-pmh
-#        name: 'FORS Data Service (Nesstar)'
-#        handler: 'http://localhost:9842'
-#      - url: http://nesstar.ucd.ie/oai-pmh
-#        name: 'ISSDA (Nesstar)'
-#        handler: 'http://localhost:9842'
-#      - url:  http://nesstar.sciences-po.fr/oai-pmh
-#        name: 'Progedo (Nesstar)'
-#        handler: 'http://localhost:9842'
----
-spring:
-  profiles: test
-  main:
-        banner-mode: "off"
-osmhConsumer:
-  languages: ['de', 'en', 'fi', 'fr', 'nl', 'sk', 'se']
-server:
-  port: 9999
-elasticsearch:
-  numberOfShards: 1
-  numberOfReplicas: 0
