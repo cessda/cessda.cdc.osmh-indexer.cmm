@@ -187,7 +187,7 @@
           </execution>
         </executions>
         <configuration>
-          <destFile>${sonar.jacoco.reportPath}</destFile>
+          <destFile>${sonar.jacoco.reportPaths}</destFile>
         </configuration>
       </plugin>
     </plugins>
