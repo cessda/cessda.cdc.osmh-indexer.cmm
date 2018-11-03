@@ -65,7 +65,7 @@ osmhConsumer:
     # Auto Starts after delay of 1min at startup
     initial: '60000'
     fixed: '315360000000'
-daily:
+  daily:
     # Daily Harvest and Ingestion run at 03:00am.
     run: '0 00 03 * * *'
     # Then run every Sunday at 11:59
