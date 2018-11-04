@@ -21,14 +21,14 @@ logging:
     org: ERROR
     eu.cessda.pasc: INFO
     eu.cessda.pasc.oci.service: INFO
-    eu.cessda.pasc.oci.repository: INFO
+    eu.cessda.pasc.oci.repository: DEBUG
     eu.cessda.pasc.oci.helpers: INFO
     eu.cessda.pasc.oci.configurations.PerfRequestSyncInterceptor: INFO
     net: WARN
     com: ERROR
 spring:
   mail:
-    host: svboexc02.gesis.intra
+    host: cessda-pasc-mailrelay-dev
   output:
     ansi:
       enabled: DETECT
@@ -60,7 +60,7 @@ elasticsearch:
   numberOfShards: 2
   numberOfReplicas: 0
 osmhConsumer:
-  languages: ['de', 'en', 'fi', 'fr', 'nl', 'sk', 'se']
+  languages: ['de', 'en', 'fi', 'fr', 'nl', 'se', 'sk', 'sl']
   delay:
     # Auto Starts after delay of 1min at startup
     initial: '60000'
