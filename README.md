@@ -88,16 +88,20 @@ all environment properties can be changed at runtime.
  
 ##  Timers Properties: 
 
-Harvesting Schedule timers.
+Harvesting Schedule timers (different for each instance):
 
 ```
 osmhConsumer:
-  delay:
-    initial: '60000'                  # Auto Starts after delay of 1min at startup
-    fixed: '315360000000'               # Yearly clean up run
+ delay:
+    # Auto Starts after delay of 1min at startup
+    initial: '60000'
+    # Yearly clean up run
+    fixed: '315360000000'
   daily:
-    run: '0 30 02 * * *'                # Daily Harvest and Ingestion run at 02:30am.
-    sunday.run: '0 30 11 * * SUN'       # Then run every Sunday at 11:30
+    # Daily Harvest and Ingestion run at 03:00am.
+    run: '0 00 03 * * *'
+    # Then run every Sunday at 11:59
+    sunday.run: '0 59 11 * * SUN'
 ```    
 
 ## Built With
