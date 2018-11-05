@@ -79,7 +79,7 @@ osmhConsumer:
     supportedRecordTypes:
       - CMMStudy
     repos:
-    - url: https://data2.aussda.at/oai
+    - url: http://data2.aussda.at/oai
       name: 'AUSSDA'
       handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo'
     - url: http://services.fsd.uta.fi/v0/oai
