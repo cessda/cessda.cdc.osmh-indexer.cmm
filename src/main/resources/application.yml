@@ -61,6 +61,8 @@ osmhhandler:
         preferredMetadataParam: oai_ddi
 #      - url: http://fors-getdata.unil.ch/oai-pmh/ Using Nesstar endpoint
 #       preferredMetadataParam: oai_ddi
+      - url: https://act.easy.dans.knaw.nl/oai/
+        preferredMetadataParam: oai_ddi25_en
       - url: http://services.fsd.uta.fi/v0/oai
         preferredMetadataParam: oai_ddi25
       - url: https://dbk.gesis.org/dbkoai3/
