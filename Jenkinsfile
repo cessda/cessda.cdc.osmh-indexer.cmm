@@ -12,7 +12,7 @@ pipeline {
   stages {
     stage('Check environment') {
       steps {
-	      echo "Check environment"
+        echo "Check environment"
         echo "project_name = ${project_name}"
         echo "app_name = ${app_name}"
         echo "feSvc_name = ${feSvc_name}"
@@ -29,7 +29,9 @@ pipeline {
       }
     }
     stage('Build Project and start Sonar scan') {
-		  steps {
+      when { branch 'develop' }
+        steps {
+        echo "Only run sonar if executing dev branch"
         withSonarQubeEnv('cessda-sonar') {
           sh 'mvn clean install sonar:sonar -Dsonar.projectName=$JOB_NAME -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_AUTH_TOKEN}'
           sleep 5
@@ -37,7 +39,9 @@ pipeline {
       }
     }
     stage('Get Quality Gate Status') {
+      when { branch 'develop' }
       steps {
+      echo "Only check quality gate if executing dev branch"
         withSonarQubeEnv('cessda-sonar') {
           sh 'curl -su ${SONAR_AUTH_TOKEN}: ${SONAR_HOST_URL}api/qualitygates/project_status?analysisId="$(curl -su ${SONAR_AUTH_TOKEN}: ${SONAR_HOST_URL}api/ce/task?id="$(cat target/sonar/report-task.txt | awk -F "=" \'/ceTaskId=/{print $2}\')" | jq -r \'.task.analysisId\')" | jq -r \'.projectStatus.status\' > status'
         }
@@ -54,15 +58,17 @@ pipeline {
       }
     }
 	  stage('Build Docker image') {
+        when { branch 'devlop' }
    		steps {
-		  echo "Build Docker image"
+        echo "Only run build Docker image if executing dev branch"
                   sh("gcloud docker -- pull eu.gcr.io/cessda-development/cessda-java:latest")
                   sh("docker build -t ${image_tag} .")
       }
     }
     stage('Push Docker image') {
+      when { branch 'develop' }
       steps {
-		    echo "Push Docker image"
+        echo "Only push Docker image if executing dev branch"
         sh("gcloud docker -- push ${image_tag}")
         sh("gcloud container images add-tag ${image_tag} eu.gcr.io/${project_name}/${app_name}:latest")
       }
