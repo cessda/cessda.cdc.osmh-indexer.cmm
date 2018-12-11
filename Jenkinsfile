@@ -46,7 +46,6 @@ pipeline {
           sleep 5
         }
       }
-    }
     stage('Get Quality Gate Status') {
       when { branch 'develop' }
       steps {
