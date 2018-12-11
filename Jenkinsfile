@@ -38,6 +38,15 @@ pipeline {
         }
       }
     }
+    stage('Build Project without Sonar') {
+      when {not { branch 'develop' } }
+        steps {
+        echo "Don't run sonar"
+          sh 'mvn clean install'
+          sleep 5
+        }
+      }
+    }
     stage('Get Quality Gate Status') {
       when { branch 'develop' }
       steps {
@@ -58,17 +67,15 @@ pipeline {
       }
     }
 	  stage('Build Docker image') {
-        when { branch 'devlop' }
    		steps {
-        echo "Only run build Docker image if executing dev branch"
+        echo "Build Docker image"
                   sh("gcloud docker -- pull eu.gcr.io/cessda-development/cessda-java:latest")
                   sh("docker build -t ${image_tag} .")
       }
     }
     stage('Push Docker image') {
-      when { branch 'develop' }
       steps {
-        echo "Only push Docker image if executing dev branch"
+        echo "Push Docker image"
         sh("gcloud docker -- push ${image_tag}")
         sh("gcloud container images add-tag ${image_tag} eu.gcr.io/${project_name}/${app_name}:latest")
       }
