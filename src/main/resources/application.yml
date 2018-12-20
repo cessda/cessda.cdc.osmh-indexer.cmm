@@ -111,12 +111,15 @@ osmhConsumer:
       handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo-nesstar'
     - url:  http://nesstar.sciences-po.fr/oai-pmh
       name: 'Progedo (Nesstar)'
-      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo-nesstar'  
+      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo-nesstar'
     - url: http://nesstar.soc.cas.cz/oai-pmh
       name: 'CSDA (Nesstar)'
       handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo-nesstar'
     - url:  http://149.132.157.156/oai-pmh
       name: 'Unidata (Nesstar)'
+      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo-nesstar'
+    - url:  http://nesstar-server.sodanet.gr/oai-pmh
+      name: 'SoDaNet (Nesstar)'
       handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo-nesstar'
     connTimeout: 5000
     connRequestTimeout: 5000
@@ -143,4 +146,3 @@ elasticsearch:
   host: cessda-pasc-es-dev-cluster  # must match profile name
   numberOfShards: 2
   numberOfReplicas: 2
-
