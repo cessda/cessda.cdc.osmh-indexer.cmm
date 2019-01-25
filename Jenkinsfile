@@ -58,7 +58,7 @@ pipeline {
       }
     }
 	  stage('Build Docker image') {
-      when { branch 'devlop' }
+      when { branch 'develop' }
    		steps {
 		    echo "Only build Docker image if executing dev branch"
         sh("gcloud docker -- pull eu.gcr.io/cessda-development/cessda-java:latest")
@@ -66,7 +66,7 @@ pipeline {
       }
     }
     stage('Push Docker image') {
-      when { branch 'devlop' }
+      when { branch 'develop' }
       steps {
 		    echo "Only push Docker image if executing dev branch"
         sh("gcloud docker -- push ${image_tag}")
