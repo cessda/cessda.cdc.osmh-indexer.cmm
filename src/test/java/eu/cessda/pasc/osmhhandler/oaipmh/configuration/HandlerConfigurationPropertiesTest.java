@@ -38,7 +38,7 @@ public class HandlerConfigurationPropertiesTest {
     then(oaiPmh.getRepos()).isNotEmpty();
     then(oaiPmh.getRepos().get(0).getUrl()).isEqualTo("https://data2.aussda.at/oai/");
     then(oaiPmh.getRepos().get(0).getPreferredMetadataParam()).isEqualTo("oai_ddi");
-    then(oaiPmh.getRepos().get(1).getUrl()).isEqualTo("https://act.easy.dans.knaw.nl/oai/");
+    then(oaiPmh.getRepos().get(1).getUrl()).isEqualTo("https://easy.dans.knaw.nl/oai/");
     then(oaiPmh.getRepos().get(1).getPreferredMetadataParam()).isEqualTo("oai_ddi25_en");
     then(oaiPmh.getRepos().get(2).getUrl()).isEqualTo("http://services.fsd.uta.fi/v0/oai");
     then(oaiPmh.getRepos().get(2).getPreferredMetadataParam()).isEqualTo("oai_ddi25");
