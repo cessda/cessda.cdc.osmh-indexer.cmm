@@ -10,8 +10,8 @@
           "standard",
           "lowercase",
           "asciifolding",
-          "german_stop",
-          "german_normalization"
+          "greek_stop",
+          "greek_normalization"
         ]
       },
       "pasc_index_autocomplete_analyzer": {
@@ -21,8 +21,8 @@
           "standard",
           "lowercase",
           "asciifolding",
-          "german_stop",
-          "german_normalization",
+          "greek_stop",
+          "greek_normalization",
           "autocomplete_filter"
         ]
       }
@@ -33,7 +33,7 @@
         "min_gram": 1,
         "max_gram": 30
       },
-      "german_stop": {
+      "greek_stop": {
         "type": "stop",
         "stopwords": "_greek_"
       }

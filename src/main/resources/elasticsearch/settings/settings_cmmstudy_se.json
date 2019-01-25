@@ -10,8 +10,8 @@
           "standard",
           "lowercase",
           "asciifolding",
-          "german_stop",
-          "german_normalization"
+          "swedish_stop",
+          "swedish_normalization"
         ]
       },
       "pasc_index_autocomplete_analyzer": {
@@ -21,8 +21,8 @@
           "standard",
           "lowercase",
           "asciifolding",
-          "german_stop",
-          "german_normalization",
+          "swedish_stop",
+          "swedish_normalization",
           "autocomplete_filter"
         ]
       }
@@ -33,7 +33,7 @@
         "min_gram": 1,
         "max_gram": 30
       },
-      "german_stop": {
+      "swedish_stop": {
         "type": "stop",
         "stopwords": "_swedish_"
       }
