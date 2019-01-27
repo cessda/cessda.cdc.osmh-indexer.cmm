@@ -10,7 +10,8 @@
           "standard",
           "lowercase",
           "asciifolding",
-          "dutch_stop"
+          "dutch_stop",
+          "dutch_normalization"
         ]
       },
       "pasc_index_autocomplete_analyzer": {
@@ -21,6 +22,7 @@
           "lowercase",
           "asciifolding",
           "dutch_stop",
+          "dutch_normalization",
           "autocomplete_filter"
         ]
       }
@@ -29,7 +31,7 @@
       "autocomplete_filter": {
         "type": "edge_ngram",
         "min_gram": 1,
-        "max_gram": 20
+        "max_gram": 30
       },
       "dutch_stop": {
         "type": "stop",
