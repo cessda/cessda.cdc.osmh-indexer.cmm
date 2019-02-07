@@ -63,6 +63,8 @@ osmhhandler:
 #       preferredMetadataParam: oai_ddi
       - url: https://easy.dans.knaw.nl/oai/
         preferredMetadataParam: oai_ddi25_en
+      - url: https://easy.dans.knaw.nl/oai/
+        preferredMetadataParam: oai_ddi25_nl
       - url: http://services.fsd.uta.fi/v0/oai
         preferredMetadataParam: oai_ddi25
       - url: https://dbk.gesis.org/dbkoai3/
