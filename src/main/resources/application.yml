@@ -83,10 +83,10 @@ osmhConsumer:
       name: 'AUSSDA'
       handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo'
     - url: https://easy.dans.knaw.nl/oai/
-      name: 'DANS (en)'
+      name: 'DANS (nl)'
       handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo'
     - url: https://easy.dans.knaw.nl/oai/
-      name: 'DANS (nl)'
+      name: 'DANS (en)'
       handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo'
     - url: http://services.fsd.uta.fi/v0/oai
       name: 'Finish Data Services'
