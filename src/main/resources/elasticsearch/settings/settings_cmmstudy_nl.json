@@ -10,8 +10,7 @@
           "standard",
           "lowercase",
           "asciifolding",
-          "dutch_stop",
-          "dutch_normalization"
+          "dutch_stop"
         ]
       },
       "pasc_index_autocomplete_analyzer": {
@@ -22,7 +21,6 @@
           "lowercase",
           "asciifolding",
           "dutch_stop",
-          "dutch_normalization",
           "autocomplete_filter"
         ]
       }

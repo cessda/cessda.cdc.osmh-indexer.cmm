@@ -11,7 +11,7 @@
           "lowercase",
           "asciifolding",
           "swedish_stop",
-          "swedish_normalization"
+          "scandinavian_normalization"
         ]
       },
       "pasc_index_autocomplete_analyzer": {
@@ -22,7 +22,7 @@
           "lowercase",
           "asciifolding",
           "swedish_stop",
-          "swedish_normalization",
+          "scandinavian_normalization",
           "autocomplete_filter"
         ]
       }

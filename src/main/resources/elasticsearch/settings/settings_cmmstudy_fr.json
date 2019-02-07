@@ -10,8 +10,7 @@
           "standard",
           "lowercase",
           "asciifolding",
-          "french_stop",
-          "french_normalization"
+          "french_stop"
         ]
       },
       "pasc_index_autocomplete_analyzer": {
@@ -22,7 +21,6 @@
           "lowercase",
           "asciifolding",
           "french_stop",
-          "french_normalization",
           "autocomplete_filter"
         ]
       }

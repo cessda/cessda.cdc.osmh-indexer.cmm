@@ -10,8 +10,7 @@
           "standard",
           "lowercase",
           "asciifolding",
-          "english_stop",
-          "english_normalization"
+          "slovenian_stop"
         ]
       },
       "pasc_index_autocomplete_analyzer": {
@@ -21,8 +20,7 @@
           "standard",
           "lowercase",
           "asciifolding",
-          "english_stop",
-          "english_normalization",
+          "slovenian_stop",
           "autocomplete_filter"
         ]
       }
@@ -33,7 +31,7 @@
         "min_gram": 1,
         "max_gram": 30
       },
-      "english_stop": {
+      "slovenian_stop": {
         "type": "stop",
         "stopwords": "_none_"
       }
