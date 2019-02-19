@@ -13,8 +13,11 @@
 ### Load Env Variable and set gcloud Region/Zone/Project
 source ./gcp.config > /dev/null 2>&1
 
+echo "PRODUCT = $PRODUCT"
+echo "ENVIRONMENT = $ENVIRONMENT"
+
 # Kubctl credentials setup
-gcloud container clusters get-credentials $PRODUCT-$ENVIRONMENT-cc --zone=$ZONE > /dev/null 2>&1
+gcloud container clusters get-credentials $PRODUCT-$ENVIRONMENT-cc --zone=$ZONE  > /dev/null 2>&1
 
 ### Kubernetes Deployment ###
 if kubectl get deployment $PRODUCT-admin-$ENVIRONMENT -n $PRODUCT-$ENVIRONMENT > /dev/null 2>&1;
