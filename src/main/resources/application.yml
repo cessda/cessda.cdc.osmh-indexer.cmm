@@ -60,7 +60,7 @@ elasticsearch:
   numberOfShards: 2
   numberOfReplicas: 0
 osmhConsumer:
-  languages: ['de', 'el', 'en', 'fi', 'fr', 'nl', 'se', 'sk', 'sl']
+  languages: ['de', 'el', 'en', 'fi', 'fr', 'nl', 'no', 'sk', 'sl', 'sv']
   delay:
     # Auto Starts after delay of 1min at startup
     initial: '60000'
