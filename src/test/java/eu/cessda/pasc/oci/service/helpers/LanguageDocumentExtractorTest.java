@@ -142,7 +142,7 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
 
     then(languageDocMap).isNotNull();
     then(languageDocMap).hasSize(9);
-    then(languageDocMap).containsOnlyKeys("de", "el", "en", "fi", "fr", "nl", "se", "sk", "sl");
+    then(languageDocMap).containsOnlyKeys("de", "el", "en", "fi", "fr", "nl", "no", "sk", "sl", "sv");
     then(languageDocMap.get("de")).hasSize(2); // a deleted record and an active record that is valid
     then(languageDocMap.get("en")).hasSize(2); // a deleted record and an active record that is valid
     then(languageDocMap.get("fi")).hasSize(2); // a deleted record and an active record that is valid
