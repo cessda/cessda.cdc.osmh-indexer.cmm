@@ -114,8 +114,8 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
         languageDocumentExtractor.mapLanguageDoc(studies, "UK Data Service");
 
     then(languageDocMap).isNotNull();
-    then(languageDocMap).hasSize(9);
-    then(languageDocMap).containsOnlyKeys("de", "el", "en", "fi", "fr", "nl", "se", "sk", "sl");
+    then(languageDocMap).hasSize(10);
+    then(languageDocMap).containsOnlyKeys("de", "el", "en", "fi", "fr", "nl", "no", "sk", "sl", "sv");
     then(languageDocMap.get("de")).hasSize(1);
     then(languageDocMap.get("en")).hasSize(1);
     then(languageDocMap.get("fi")).hasSize(1);
@@ -141,7 +141,7 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
         languageDocumentExtractor.mapLanguageDoc(studies, "UK Data Service");
 
     then(languageDocMap).isNotNull();
-    then(languageDocMap).hasSize(9);
+    then(languageDocMap).hasSize(10);
     then(languageDocMap).containsOnlyKeys("de", "el", "en", "fi", "fr", "nl", "no", "sk", "sl", "sv");
     then(languageDocMap.get("de")).hasSize(2); // a deleted record and an active record that is valid
     then(languageDocMap.get("en")).hasSize(2); // a deleted record and an active record that is valid
