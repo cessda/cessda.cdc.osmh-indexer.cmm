@@ -96,7 +96,7 @@ public class ConsumerScheduler {
   }
   */
 
-/** NOT NEEDED, UNLESS WEEKLY OR SUNDAY RUN IS USED
+
   private void executeHarvestAndIngest(LocalDateTime lastModifiedDateTime) {
     List<Repo> repos = configurationProperties.getEndpoints().getRepos();
     repos.forEach(repo -> {
@@ -104,7 +104,7 @@ public class ConsumerScheduler {
       langStudies.forEach((langIsoCode, cmmStudies) -> executeBulk(repo, langIsoCode, cmmStudies));
     });
   }
-  */
+
 
   private void executeBulk(Repo repo, String langIsoCode, List<CMMStudyOfLanguage> cmmStudies) {
     if (cmmStudies.isEmpty()) {
