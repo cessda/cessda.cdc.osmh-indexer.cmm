@@ -70,9 +70,10 @@ public class ConsumerScheduler {
     logEndStatus(date, startTime, FULL_RUN);
   }
 
-  /**
+  /** Use Jenkins job instead
+
    * Daily Harvest and Ingestion run.
-   */
+
   @ManagedOperation(description = "Manual trigger to do an incremental harvest and ingest")
   @Scheduled(cron = "${osmhConsumer.daily.run}")
   public void dailyIncrementalHarvestAndIngestionAllConfiguredSPsReposRecords() {
@@ -82,17 +83,20 @@ public class ConsumerScheduler {
     executeHarvestAndIngest(esIndexerService.getMostRecentLastModified().orElse(null));
     logEndStatus(date, startTime, DAILY_INCREMENTAL_RUN);
   }
+  */
 
-  /**
+  /** Use Jenkins job instead
+
    * Weekly run.
-   */
   @Scheduled(cron = "${osmhConsumer.daily.sunday.run}")
   public void weeklyFullHarvestAndIngestionAllConfiguredSPsReposRecords() {
     log.info("Once a Week Full Run. Triggered by cron - STARTED");
     fullHarvestAndIngestionAllConfiguredSPsReposRecords();
     log.info("Once a Week Full Run. Triggered by cron - ENDED");
   }
+  */
 
+/** NOT NEEDED, UNLESS WEEKLY OR SUNDAY RUN IS USED
   private void executeHarvestAndIngest(LocalDateTime lastModifiedDateTime) {
     List<Repo> repos = configurationProperties.getEndpoints().getRepos();
     repos.forEach(repo -> {
@@ -100,6 +104,7 @@ public class ConsumerScheduler {
       langStudies.forEach((langIsoCode, cmmStudies) -> executeBulk(repo, langIsoCode, cmmStudies));
     });
   }
+  */
 
   private void executeBulk(Repo repo, String langIsoCode, List<CMMStudyOfLanguage> cmmStudies) {
     if (cmmStudies.isEmpty()) {
