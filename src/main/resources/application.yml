@@ -65,11 +65,12 @@ osmhConsumer:
     # Auto Starts after delay of 1min at startup
     initial: '60000'
     fixed: '315360000000'
-  daily:
+# Don't reindex this way, use Jenkins job
+  # daily:
    # Daily Harvest and Ingestion run at 00:01am.
-    run: '0 01 00 * * *'
+    # run: '0 01 00 * * *'
     # Then run every Sunday at 09:00
-    sunday.run: '0 00 09 * * SUN'
+    # sunday.run: '0 00 09 * * SUN'
   harvester:
     url: 'http://localhost:9091'
     version: 'v0'
