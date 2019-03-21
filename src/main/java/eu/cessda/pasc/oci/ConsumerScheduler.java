@@ -103,7 +103,6 @@ public class ConsumerScheduler {
       langStudies.forEach((langIsoCode, cmmStudies) -> executeBulk(repo, langIsoCode, cmmStudies));
     });
   }
-  */
 
   private void executeBulk(Repo repo, String langIsoCode, List<CMMStudyOfLanguage> cmmStudies) {
     if (cmmStudies.isEmpty()) {
