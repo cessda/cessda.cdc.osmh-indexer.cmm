@@ -1,9 +1,7 @@
 # PaSC - OSMH Consumer Indexer (PaSC-OCI)
 
 Cessda PaSC Consumer Indexer (an OSMH Consumer) for Metadata harvesting  and ingestion into Elasticsearch.
-See the 
-[OSMH System Architecture Document](https://docs.google.com/document/d/1RrXjpbyUGdd5FKSjrnQmRdbzaCQzE2W-92lYKs1KeCA/edit)
-for more information about The Open Source Metadata Harvester (OSMH).
+See the [OSMH System Architecture Document](https://docs.google.com/document/d/1RrXjpbyUGdd5FKSjrnQmRdbzaCQzE2W-92lYKs1KeCA/edit) for more information about The Open Source Metadata Harvester (OSMH).
 
 ## Getting Started
 
@@ -23,26 +21,27 @@ Static code quality with verification with SonarQube
 
 ### Build it
 
-    mvn clean package 
+    mvn clean package
 
-### Run it 
+### Run it
 
-    java -Xms2G -Xmx4G -jar target/pasc-oci*.jar 
+    java -Xms2G -Xmx4G -jar target/pasc-oci*.jar
 
 ### Run it - with profile
+
     java -jar -Dspring.profiles.active=dev target/pasc-oci*.jar
     java -jar -Dspring.profiles.active=uat target/pasc-oci*.jar
     java -jar -Dspring.profiles.active=prod target/pasc-oci*.jar
 
 Note if no profile flag is set the default profile will be used. Which is non.
 
-    
 ### Prerequisites
 
 The following is expected to be install before building running.  To install see your preferred package manager like.
 On mac this can be done with `brew`
-- Java JDK 8
-- Maven
+
+* Java JDK 8
+* Maven
 
 `brew tap caskroom/versions`
 
@@ -54,42 +53,43 @@ On mac this can be done with `brew`
 
 `mvn -version` // To verify which version it will install.
 
-
 ## Running the tests
 
 ### How to run the automated tests and sonar report in CI 
 
 `mvn clean install sonar:sonar -Dsonar.host.url=http://localhost:9000`
 
-
-# Further detailed notes
+## Further detailed notes
 
 ### Break down into end to end tests
 
-- Makes use of TDD
-- For integrations test, loads up an embedded elasticsearch server with tests against it
+* Makes use of TDD
+* For integrations test, loads up an embedded elasticsearch server with tests against it
 
 ## Deployment
 
 ### At startup
+
 Configuration is loaded and overwritten in this order
+
 * application-[dev,local,prod].yml
 * application.yml
 * CLI parameters e.g. `--logging.level.=DEBUG` sets logging level for all classes
 
 ### At Runtime
+
 If the app is registered at a [spring boot admin server](https://github.com/codecentric/spring-boot-admin)
 all environment properties can be changed at runtime.
 
 **CHANGES MADE AT RUNTIME WILL BE**
-* **EFFECTIVE AFTER A CONTEXT RELOAD**
-* **LOST AFTER AN APPLICATION RESTART UNLESS PERSISTED IN APPLICATION.yml**
- 
-##  Timers Properties: 
+**EFFECTIVE AFTER A CONTEXT RELOAD**
+**LOST AFTER AN APPLICATION RESTART UNLESS PERSISTED IN APPLICATION.yml**
+
+## Timers Properties
 
 Harvesting Schedule timers (different for each instance):
 
-```
+```yaml
 osmhConsumer:
  delay:
     # Auto Starts after delay of 1min at startup
@@ -101,7 +101,7 @@ daily:
     run: '0 01 00 * * *'
     # Then run every Sunday at 09:00
     sunday.run: '0 00 09 * * SUN'
-```    
+```
 
 ## Built With
 
@@ -126,13 +126,6 @@ This project is licensed under the Apache 2 License - see the [LICENSE](LICENSE)
 
 ## Acknowledgments
 
+## Edge Case and Assumptions
 
-## Edge Case and Assumptions:
-
-- Note the dirty extra "/" workaround in the [application.yml](src/main/resources/application.yml) repository
- configuration for GESIS (and GESIS DE) who separate records to different metadata prefix per language hosted
- with the same repository url.  This url in a way act as a key, so the extra "/" distinguishes the two for the specific 
- metadataPrefix to be retrieved.  There must be a better way to handle this edge case that is specific to GESIS.  
- Not seen other SPs with this implementation that separate records in different languages by using a different 
- metadataPrefix, so leaving this as is for now.  This workaround affects this project and the pasc-osmh-handler-oai-pmh
-
+* Note the dirty extra "/" workaround in the [application.yml](src/main/resources/application.yml) repository configuration for GESIS (and GESIS DE) who separate records to different metadata prefix per language hosted with the same repository url.  This url in a way act as a key, so the extra "/" distinguishes the two for the specific metadataPrefix to be retrieved.  There must be a better way to handle this edge case that is specific to GESIS. Not seen other SPs with this implementation that separate records in different languages by using a different metadataPrefix, so leaving this as is for now.  This workaround affects this project and the pasc-osmh-handler-oai-pmh

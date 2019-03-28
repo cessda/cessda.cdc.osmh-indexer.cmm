@@ -33,8 +33,6 @@
 .Trashes
 ehthumbs.db
 Thumbs.db
-<<<<<<< HEAD
-=======
 
 target/
 !.mvn/wrapper/maven-wrapper.jar
@@ -60,4 +58,3 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
->>>>>>> master

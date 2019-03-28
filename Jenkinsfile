@@ -1,10 +1,9 @@
 pipeline {
   environment {
-    project_name = "cessda-development"
+    project_name = "cessda-dev"
     app_name = "pasc-oci"
-    feSvc_name = "${app_name}-service"
     namespace = "cessda-pasc"
-    image_tag = "eu.gcr.io/${project_name}/${app_name}:v${env.BUILD_NUMBER}"
+    image_tag = "eu.gcr.io/${project_name}/${module_name}:${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
   }
 
   agent any
@@ -15,9 +14,7 @@ pipeline {
 	      echo "Check environment"
         echo "project_name = ${project_name}"
         echo "app_name = ${app_name}"
-        echo "feSvc_name = ${feSvc_name}"
         echo "namespace = ${namespace}"
-        echo "JOB_NAME = ${JOB_NAME}"
         echo "image_tag = ${image_tag}"
       }
     }
@@ -28,55 +25,38 @@ pipeline {
         }
       }
     }
-    stage('Build Project and start Sonar scan') {
-      when { branch 'develop' }
+    stage('Build Project and Run Sonar Scan') {
 		  steps {
-        echo "Only run sonar if executing dev branch"
         withSonarQubeEnv('cessda-sonar') {
-          sh 'mvn clean install sonar:sonar -Dsonar.projectName=$JOB_NAME -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_AUTH_TOKEN}'
-          sleep 5
-        }
-      }
-    }
-    stage('Get Quality Gate Status') {
-      when { branch 'develop' }
-      steps {
-        echo "Only check quality gate if executing dev branch"
-        withSonarQubeEnv('cessda-sonar') {
-          sh 'curl -su ${SONAR_AUTH_TOKEN}: ${SONAR_HOST_URL}api/qualitygates/project_status?analysisId="$(curl -su ${SONAR_AUTH_TOKEN}: ${SONAR_HOST_URL}api/ce/task?id="$(cat target/sonar/report-task.txt | awk -F "=" \'/ceTaskId=/{print $2}\')" | jq -r \'.task.analysisId\')" | jq -r \'.projectStatus.status\' > status'
-        }
-        script {
-          STATUS = readFile('status')
-          if ( STATUS.trim() == "ERROR") {
-            error("Quality Gate not reached, please review the Sonar Report")
-          } else if ( STATUS.trim() == "WARN") {
-            error("Quality Gate not reached, please review the Sonar Report")
-          } else {
-            echo "Quality Gate reached, deployment will be processed, please wait"
+          withMaven(options: [junitPublisher(healthScaleFactor: 1.0)], tempBinDir: '') {
+            sh 'mvn clean install sonar:sonar'
           }
         }
       }
     }
+    stage('Get Quality Gate Status') {
+      steps {
+        timeout(time: 1, unit: 'HOURS') {
+          waitForQualityGate abortPipeline: true
+        }
+      }
+    }
 	  stage('Build Docker image') {
-      when { branch 'develop' }
    		steps {
-		    echo "Only build Docker image if executing dev branch"
-        sh("gcloud docker -- pull eu.gcr.io/cessda-development/cessda-java:latest")
         sh("docker build -t ${image_tag} .")
       }
     }
     stage('Push Docker image') {
-      when { branch 'develop' }
       steps {
-		    echo "Only push Docker image if executing dev branch"
-        sh("gcloud docker -- push ${image_tag}")
-        sh("gcloud container images add-tag ${image_tag} eu.gcr.io/${project_name}/${app_name}:latest")
+        sh("gcloud auth configure-docker")
+        sh("docker push ${image_tag}")
+        sh("gcloud container images add-tag ${image_tag} eu.gcr.io/${project_name}/${env.BRANCH_NAME}-${app_name}:latest")
       }
     }
     stage('Check Requirements and Deployments') {
       steps {
         dir('./infrastructure/gcp/') {
-          sh("bash pasc-osmh-creation.sh")
+          echo "Occurs in seperate repo now..."
         }
       }
     }

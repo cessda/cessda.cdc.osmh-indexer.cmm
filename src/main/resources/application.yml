@@ -28,7 +28,7 @@ logging:
     com: ERROR
 spring:
   mail:
-    host: cessda-pasc-mailrelay-dev
+    host: pasc-mailrelay
   output:
     ansi:
       enabled: DETECT
@@ -146,6 +146,6 @@ logging:
     eu.cessda.pasc.oci.helpers: INFO
     eu.cessda.pasc.oci.configurations.PerfRequestSyncInterceptor: DEBUG
 elasticsearch:
-  host: cessda-pasc-es-dev-cluster  # must match profile name
+  host: pasc-es  # must match profile name
   numberOfShards: 2
   numberOfReplicas: 2
