@@ -12,7 +12,7 @@ pipeline {
       steps {
 	      echo "Check environment"
         echo "project_name = ${project_name}"
-        echo "module_name = ${app_name}"
+        echo "module_name = ${module_name}"
         echo "image_tag = ${image_tag}"
       }
     }
