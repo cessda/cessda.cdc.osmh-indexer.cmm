@@ -1,7 +1,7 @@
 pipeline {
   environment {
     project_name = "cessda-dev"
-    app_name = "pasc-oci"
+    module_name = "pasc-oci"
     namespace = "cessda-pasc"
     image_tag = "eu.gcr.io/${project_name}/${module_name}:${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
   }
