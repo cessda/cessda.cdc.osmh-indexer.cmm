@@ -21,7 +21,7 @@ pipeline {
     stage('Prepare Application for registration with Spring Boot Admin') {
       steps {
         dir('./infrastructure/gcp/') {
-          sh("bash pasc-osmh-registration.sh")
+          sh("./pasc-osmh-registration.sh")
         }
       }
     }
@@ -56,7 +56,7 @@ pipeline {
     stage('Check Requirements and Deployments') {
       steps {
         dir('./infrastructure/gcp/') {
-          echo "Occurs in seperate repo now..."
+          sh("./pasc-osmh-creation.sh")
         }
       }
     }
