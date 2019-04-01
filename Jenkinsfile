@@ -2,7 +2,6 @@ pipeline {
   environment {
     project_name = "cessda-dev"
     module_name = "pasc-oci"
-    namespace = "cessda-pasc"
     image_tag = "eu.gcr.io/${project_name}/${module_name}:${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
   }
 
@@ -13,8 +12,7 @@ pipeline {
       steps {
 	      echo "Check environment"
         echo "project_name = ${project_name}"
-        echo "app_name = ${app_name}"
-        echo "namespace = ${namespace}"
+        echo "module_name = ${app_name}"
         echo "image_tag = ${image_tag}"
       }
     }
