@@ -1,7 +1,7 @@
 pipeline {
   environment {
     project_name = "cessda-dev"
-    module_name = "pasc-oci"
+    module_name = "cdc-oci"
     image_tag = "eu.gcr.io/${project_name}/${module_name}:${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
   }
 
@@ -48,7 +48,7 @@ pipeline {
       steps {
         sh("gcloud auth configure-docker")
         sh("docker push ${image_tag}")
-        sh("gcloud container images add-tag ${image_tag} eu.gcr.io/${project_name}/${env.BRANCH_NAME}-${module_name}:latest")
+        sh("gcloud container images add-tag ${image_tag} eu.gcr.io/${project_name}/${module_name}:${env.BRANCH_NAME}-latest")
       }
     }
     stage('Check Requirements and Deployments') {
