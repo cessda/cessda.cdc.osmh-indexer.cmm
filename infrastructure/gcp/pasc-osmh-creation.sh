@@ -14,29 +14,14 @@
 source ./gcp.config > /dev/null 2>&1
 
 ### Kubernetes configuration generation ###
-sed "s/DEPLOYMENTNAME/$PRODUCT-$MODULE-$ENVIRONMENT/g; s/NAMESPACE/$PRODUCT-$ENVIRONMENT/g; s/PVCNAME/$PRODUCT-$ENVIRONMENT-pvc/g" ../k8s/template-pasc-$MODULE-deployment.yaml > ../k8s/$PRODUCT-$MODULE-$ENVIRONMENT-deployment.yaml
-sed "s/SERVICENAME/$PRODUCT-$MODULE-$ENVIRONMENT/g; s/NAMESPACE/$PRODUCT-$ENVIRONMENT/g" ../k8s/template-pasc-$MODULE-service.yaml > ../k8s/$PRODUCT-$MODULE-$ENVIRONMENT-service.yaml
+sed "s#DEPLOYMENTNAME#$PRODUCT-$MODULE#g; s#NAMESPACE#$PRODUCT#g; s#PVCNAME#$PRODUCT-pvc#g; s#IMAGENAME#$image_tag#g" ../k8s/template-pasc-$MODULE-deployment.yaml > ../k8s/$PRODUCT-$MODULE-deployment.yaml
+sed "s/SERVICENAME/$PRODUCT-$MODULE/g; s/NAMESPACE/$PRODUCT/g" ../k8s/template-pasc-$MODULE-service.yaml > ../k8s/$PRODUCT-$MODULE-service.yaml
 
 # Kubctl credentials setup
-gcloud container clusters get-credentials $PRODUCT-$ENVIRONMENT-cc --zone=$ZONE > /dev/null 2>&1
+gcloud container clusters get-credentials development-cluster --zone=$ZONE
 
 # Deployment
-if kubectl get deployment $PRODUCT-$MODULE-$ENVIRONMENT -n $PRODUCT-$ENVIRONMENT > /dev/null 2>&1;
-  then
-    echo "Deployment already exists, it will be destroyed to perform the new deployment"
-    kubectl delete deployment $PRODUCT-$MODULE-$ENVIRONMENT -n $PRODUCT-$ENVIRONMENT > /dev/null 2>&1
-    kubectl create -f ../k8s/$PRODUCT-$MODULE-$ENVIRONMENT-deployment.yaml
-    echo "Deployment created"
-  else
-    kubectl create -f ../k8s/$PRODUCT-$MODULE-$ENVIRONMENT-deployment.yaml
-    echo "Deployment created"
-fi;
+kubectl apply -f ../k8s/$PRODUCT-$MODULE-deployment.yaml
 
 # Service
-if kubectl get service $PRODUCT-$MODULE-$ENVIRONMENT -n $PRODUCT-$ENVIRONMENT > /dev/null 2>&1;
-  then
-    echo "Service already exists"
-  else
-    kubectl create -f ../k8s/$PRODUCT-$MODULE-$ENVIRONMENT-service.yaml > /dev/null 2>&1
-    echo "Service created"
-fi;
+kubectl apply -f ../k8s/$PRODUCT-$MODULE-service.yaml

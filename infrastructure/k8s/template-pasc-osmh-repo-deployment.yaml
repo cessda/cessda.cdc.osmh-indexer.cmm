@@ -13,7 +13,14 @@ spec:
     spec:
       containers:
       - name: DEPLOYMENTNAME
-        image: eu.gcr.io/cessda-development/pasc-osmh:latest
+        image: IMAGENAME
         ports:
         - containerPort: 9091
           name: osmh-rep-cport
+        resources:
+          requests:
+            memory: 1.5Gi
+          limits:
+            memory: 3Gi
+      nodeSelector:
+        cloud.google.com/gke-nodepool: himem-pool
