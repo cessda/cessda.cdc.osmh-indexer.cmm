@@ -1,8 +1,8 @@
 # OpenJDK Base Container
-FROM eu.gcr.io/cessda-development/cessda-java:latest
+FROM openjdk:8-jre
 
 # Container Information
-MAINTAINER CESSDA-ERIC "support@cessda.eu"
+LABEL maintainer="CESSDA-ERIC <support@cessda.eu>" 
 
 # Create Volume tmp and add JAR artifacts
 VOLUME /tmp
