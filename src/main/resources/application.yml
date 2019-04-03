@@ -81,49 +81,49 @@ osmhConsumer:
     repos:
     - url: https://data2.aussda.at/oai
       name: 'AUSSDA'
-      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo'
+      handler: 'http://cdc-osmh-repo'
 #      - url: https://easy.dans.knaw.nl/oai/
 #        name: 'DANS (nl)'
-#        handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo'
+#        handler: 'http://cdc-osmh-repo'
     - url: https://easy.dans.knaw.nl/oai/
       name: 'DANS (en)'
-      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo'
+      handler: 'http://cdc-osmh-repo'
     - url: http://services.fsd.uta.fi/v0/oai
       name: 'Finish Data Services'
-      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo'
+      handler: 'http://cdc-osmh-repo'
     - url: https://dbk.gesis.org/dbkoai3/
       name: 'GESIS'
-      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo'
+      handler: 'http://cdc-osmh-repo'
     - url: http://147.213.4.44:6003/v0/oai
       name: 'SASD'
-      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo'
+      handler: 'http://cdc-osmh-repo'
     - url: https://snd.gu.se/en/oai-pmh
       name: 'SND'
-      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo'
+      handler: 'http://cdc-osmh-repo'
     - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
       name: 'UK Data Service'
-      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo'
+      handler: 'http://cdc-osmh-repo'
     - url: https://nesstar2.adp.fdv.uni-lj.si/oai-pmh
       name: 'ADP (Nesstar)'
-      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo-nesstar'
+      handler: 'http://cdc-osmh-repo-nesstar'
     - url: http://fors-nesstar.unil.ch/oai-pmh
       name: 'FORS Data Service (Nesstar)'
-      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo-nesstar'
+      handler: 'http://cdc-osmh-repo-nesstar'
     - url: https://oai-pmh.nsd.no/oai-pmh
       name: 'NSD (Nesstar)'
-      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo-nesstar'
+      handler: 'http://cdc-osmh-repo-nesstar'
     - url:  http://nesstar.sciences-po.fr/oai-pmh
       name: 'Progedo (Nesstar)'
-      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo-nesstar'
+      handler: 'http://cdc-osmh-repo-nesstar'
     - url: http://nesstar.soc.cas.cz/oai-pmh
       name: 'CSDA (Nesstar)'
-      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo-nesstar'
+      handler: 'http://cdc-osmh-repo-nesstar'
     - url:  http://149.132.157.156/oai-pmh
       name: 'Unidata (Nesstar)'
-      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo-nesstar'
+      handler: 'http://cdc-osmh-repo-nesstar'
     - url:  http://nesstar-server.sodanet.gr/oai-pmh
       name: 'SoDaNet (Nesstar)'
-      handler: 'https://datacatalogue-dev.cessda.eu/osmh-repo-nesstar'
+      handler: 'http://cdc-osmh-repo-nesstar'
     connTimeout: 5000
     connRequestTimeout: 5000
     readTimeout: 180000 # increased from 120 seconds to 180 seconds to deal with slower Nesstar repos
