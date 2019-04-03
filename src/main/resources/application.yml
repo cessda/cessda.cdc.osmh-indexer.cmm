@@ -21,7 +21,7 @@ logging:
     org: ERROR
     eu.cessda.pasc: INFO
     eu.cessda.pasc.oci.service: INFO
-    eu.cessda.pasc.oci.repository: DEBUG
+    eu.cessda.pasc.oci.repository: INFO
     eu.cessda.pasc.oci.helpers: INFO
     eu.cessda.pasc.oci.configurations.PerfRequestSyncInterceptor: INFO
     net: WARN
