@@ -117,7 +117,7 @@ osmhConsumer:
       handler: 'http://cdc-osmh-repo-nesstar:9842'
     - url: http://nesstar.soc.cas.cz/oai-pmh
       name: 'CSDA (Nesstar)'
-      handler: 'http://cdc-osmh-repo:9091-nesstar:9842'
+      handler: 'http://cdc-osmh-repo-nesstar:9842'
     - url:  http://149.132.157.156/oai-pmh
       name: 'Unidata (Nesstar)'
       handler: 'http://cdc-osmh-repo-nesstar'
