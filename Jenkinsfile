@@ -1,8 +1,8 @@
 pipeline {
   environment {
-    project_name = "cessda-dev"
-    module_name = "cdc-osmh"
-    image_tag = "eu.gcr.io/${project_name}/${module_name}:${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
+    product_name = "cdc"
+    module_name = "osmh-repo"
+    image_tag = "${docker_repo}/${product_name}-${module_name}:${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
   }
 
   agent any
@@ -11,16 +11,14 @@ pipeline {
     stage('Check environment') {
       steps {
 	      echo "Check environment"
-        echo "project_name = ${project_name}"
+        echo "product_name = ${product_name}"
         echo "module_name = ${module_name}"
         echo "image_tag = ${image_tag}"
       }
     }
     stage('Prepare Application for registration with Spring Boot Admin') {
       steps {
-        dir('./infrastructure/gcp/') {
-          sh("./pasc-osmh-registration.sh")
-        }
+        sh("./cdc-osmh-registration.sh")
       }
     }
     stage('Build Project and Run Sonar Scan') {
@@ -48,13 +46,13 @@ pipeline {
       steps {
         sh("gcloud auth configure-docker")
         sh("docker push ${image_tag}")
-        sh("gcloud container images add-tag ${image_tag} eu.gcr.io/${project_name}/${module_name}:${env.BRANCH_NAME}-latest")
+        sh("gcloud container images add-tag ${image_tag} ${docker_repo}/${product_name}-${module_name}:${env.BRANCH_NAME}-latest")
       }
     }
     stage('Check Requirements and Deployments') {
       steps {
         dir('./infrastructure/gcp/') {
-          sh("./pasc-osmh-creation.sh")
+          build job: 'cessda.cdc.deploy/master', parameters: [string(name: 'osmh_repo_image_tag', value: "${image_tag}"), string(name: 'module', value: 'osmh-repo')], wait: false
         }
       }
     }
