@@ -144,7 +144,7 @@ logging:
     eu.cessda.pasc.oci.service: INFO
     eu.cessda.pasc.oci.repository: INFO
     eu.cessda.pasc.oci.helpers: INFO
-    eu.cessda.pasc.oci.configurations.PerfRequestSyncInterceptor: DEBUG
+    eu.cessda.pasc.oci.configurations.PerfRequestSyncInterceptor: INFO
 elasticsearch:
   host: cdc-es  # must match profile name
   numberOfShards: 2
