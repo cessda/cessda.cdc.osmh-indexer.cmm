@@ -18,7 +18,7 @@ pipeline {
     }
     stage('Prepare Application for registration with Spring Boot Admin') {
       steps {
-          sh("./osmh-gcp-registration.sh")
+          sh("./osmh-gcp-configuration.sh")
       }
     }
     stage('Build Project and Run Sonar Scan') {
