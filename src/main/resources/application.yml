@@ -120,7 +120,7 @@ osmhConsumer:
       handler: 'http://cdc-osmh-repo-nesstar:9842'
     - url:  http://149.132.157.156/oai-pmh
       name: 'Unidata (Nesstar)'
-      handler: 'http://cdc-osmh-repo-nesstar'
+      handler: 'http://cdc-osmh-repo-nesstar:9842'
     - url:  http://nesstar-server.sodanet.gr/oai-pmh
       name: 'SoDaNet (Nesstar)'
       handler: 'http://cdc-osmh-repo-nesstar:9842'
