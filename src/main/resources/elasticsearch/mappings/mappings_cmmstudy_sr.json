@@ -172,7 +172,7 @@
       "typeOfModeOfCollections": {
         "type": "nested",
         "properties": {
-         "id": {
+          "id": {
             "type": "string",
             "index": "not_analyzed",
             "ignore_above": 256
@@ -197,7 +197,7 @@
       "typeOfTimeMethods": {
         "type": "nested",
         "properties": {
-         "id": {
+          "id": {
             "type": "string",
             "index": "not_analyzed",
             "ignore_above": 256
@@ -222,7 +222,7 @@
       "unitTypes": {
         "type": "nested",
         "properties": {
-         "id": {
+          "id": {
             "type": "string",
             "index": "not_analyzed",
             "ignore_above": 256
@@ -247,7 +247,7 @@
       "classifications": {
         "type": "nested",
         "properties": {
-         "id": {
+          "id": {
             "type": "string",
             "index": "not_analyzed",
             "ignore_above": 256
