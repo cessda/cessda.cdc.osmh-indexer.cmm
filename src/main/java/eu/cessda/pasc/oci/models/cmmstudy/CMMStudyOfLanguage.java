@@ -4,7 +4,9 @@ package eu.cessda.pasc.oci.models.cmmstudy;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
@@ -45,6 +47,8 @@ import java.util.Set;
     "langAvailableIn"
 })
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Document(indexName = "test")
 public class CMMStudyOfLanguage {
 

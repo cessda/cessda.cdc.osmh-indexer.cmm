@@ -1,7 +1,9 @@
 package eu.cessda.pasc.oci.models.cmmstudy;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * TermVocabAttributes pojo this represents the attributes and terms from such a element:
@@ -16,6 +18,8 @@ import lombok.Getter;
  */
 @Builder
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class TermVocabAttributes {
   private String vocab;
   private String vocabUri;
