@@ -1,7 +1,9 @@
 package eu.cessda.pasc.oci.models.cmmstudy;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 /**
  * Publisher pojo to hold
@@ -13,6 +15,8 @@ import lombok.Builder;
  * @author moses@doraventures.com
  */
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Publisher {
   @JsonProperty("abbr")
   private String iso2LetterCode;

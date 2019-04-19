@@ -3,8 +3,10 @@ package eu.cessda.pasc.oci.models;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  *
@@ -18,6 +20,8 @@ import lombok.Getter;
     "identifier"
 })
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 public class RecordHeader {
 
