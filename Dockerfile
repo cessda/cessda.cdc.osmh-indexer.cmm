@@ -1,5 +1,5 @@
 # OpenJDK Base Container
-FROM openjdk:8-jre
+FROM openjdk:11-jre
 
 # Container Information
 LABEL maintainer='CESSDA-ERIC "support@cessda.eu"'
