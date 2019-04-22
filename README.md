@@ -78,7 +78,7 @@ On mac this can be done with `brew`
 
 `brew tap caskroom/versions`
 
-`brew cask install java8`
+`brew cask install java11`
 
 `brew cask info java`  // To verify which version it will install.
 
