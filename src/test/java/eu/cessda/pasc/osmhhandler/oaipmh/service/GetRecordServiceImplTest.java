@@ -68,6 +68,30 @@ public class GetRecordServiceImplTest {
   }
 
   @Test
+  public void shouldHarvestedContentForLanguageSpecificDimensionFromElementWithCorrectXmlLangAttribute() throws Exception {
+
+    // Given
+    given(getRecordDoa.getRecordXML("", "")).willReturn(
+        CMMStudyTestData.getContent("xml/oai-fsd_uta_fi-FSD3187.xml")
+    );
+
+    // When
+    CMMStudy result = recordService.getRecord("", "");
+
+    then(result).isNotNull();
+
+    // Verifies timeMeth extraction
+    then(result.getTypeOfTimeMethods().size()).isEqualTo(2);
+    then(result.getTypeOfTimeMethods().get("fi").get(0).getTerm()).isEqualTo("Pitkittäisaineisto: trendi/toistuva poikkileikkausaineisto");
+    then(result.getTypeOfTimeMethods().get("en").get(0).getTerm()).isEqualTo("Longitudinal: Trend/Repeated cross-section");
+
+    // Verifies unitTypes extraction
+    then(result.getUnitTypes().size()).isEqualTo(2);
+    then(result.getUnitTypes().get("fi").get(0).getTerm()).isEqualTo("Henkilö");
+    then(result.getUnitTypes().get("en").get(0).getTerm()).isEqualTo("Individual");
+  }
+
+  @Test
   public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord() throws Exception {
 
     // Given
