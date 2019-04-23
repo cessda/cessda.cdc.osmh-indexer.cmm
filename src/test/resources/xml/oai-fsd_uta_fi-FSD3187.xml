@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+    <responseDate>2019-04-23T11:56:54Z</responseDate>
+    <request identifier="oai:fsd.uta.fi:FSD3187" verb="GetRecord">http://services.fsd.uta.fi/v0/oai</request>
+    <GetRecord>
+        <record>
+            <header>
+                <identifier>oai:fsd.uta.fi:FSD3187</identifier>
+                <datestamp>2018-09-06T10:13:53Z</datestamp>
+                <setSpec>study_groups:kehy</setSpec><setSpec>language:en</setSpec><setSpec>language:fi</setSpec>
+            </header>
+            <metadata>
+                <codeBook xmlns="ddi:codebook:2_5" version="2.5" xsi:schemaLocation="ddi:codebook:2_5 http://www.ddialliance.org/Specification/DDI-Codebook/2.5/XMLSchema/codebook.xsd">
+                    <docDscr>
+                        <citation>
+                            <titlStmt><titl/></titlStmt>
+                            <prodStmt>
+                                <producer xml:lang="fi" abbr="FSD">Yhteiskuntatieteellinen tietoarkisto</producer><producer xml:lang="en" abbr="FSD">Finnish Social Science Data Archive</producer>
+                                <copyright xml:lang="fi">Yhteiskuntatieteellinen tietoarkisto</copyright><copyright xml:lang="en">Finnish Social Science Data Archive</copyright>
+                            </prodStmt>
+                            <holdings xml:lang="fi" URI="http://urn.fi/urn:nbn:fi:fsd:T-FSD3187" location="Yhteiskuntatieteellinen tietoarkisto FSD"/><holdings xml:lang="en" URI="http://urn.fi/urn:nbn:fi:fsd:T-FSD3187" location="Finnish Social Science Data Archive FSD"/>
+                        </citation>
+                    </docDscr>
+                    <stdyDscr>
+                        <citation xml:lang="en">
+                            <titlStmt>
+                                <titl xml:lang="en">Development Cooperation Survey 2017</titl>
+                                <parTitl xml:lang="en">Development Cooperation Survey 2017</parTitl>
+                                <IDNo xml:lang="en" agency="FSD">FSD3187</IDNo><IDNo xml:lang="en" agency="The National Library of Finland">urn:nbn:fi:fsd:T-FSD3187</IDNo>
+                            </titlStmt>
+                            <rspStmt>
+                                <AuthEnty xml:lang="en">Taloustutkimus</AuthEnty><AuthEnty xml:lang="en">Ministry for Foreign Affairs of Finland</AuthEnty>
+                            </rspStmt>
+                            <prodStmt>
+                                <prodDate xml:lang="en">2017-12-12</prodDate>
+                            </prodStmt>
+                            <distStmt>
+                                <distDate xml:lang="en" date="2017-12-12"/>
+                                <distrbtr abbr="FSD" URI="http://www.fsd.uta.fi/" xml:lang="en">Finnish Social Science Data Archive</distrbtr>
+                            </distStmt>
+                            <serStmt>
+                                <serName ID="kehy" xml:lang="en">Development Cooperation Surveys</serName>
+                            </serStmt>
+                            <verStmt>
+                                <version date="2017-09-21" xml:lang="en"/>
+                            </verStmt>
+                        </citation><citation xml:lang="fi">
+                        <titlStmt>
+                            <titl xml:lang="fi">Kehitysyhteistyötutkimus 2017</titl>
+                            <parTitl xml:lang="fi">Kehitysyhteistyötutkimus 2017</parTitl>
+                            <IDNo xml:lang="fi" agency="FSD">FSD3187</IDNo><IDNo xml:lang="fi" agency="Kansalliskirjasto">urn:nbn:fi:fsd:T-FSD3187</IDNo>
+                        </titlStmt>
+                        <rspStmt>
+                            <AuthEnty xml:lang="fi">Taloustutkimus</AuthEnty><AuthEnty xml:lang="fi">Ulkoasiainministeriö</AuthEnty>
+                        </rspStmt>
+                        <prodStmt>
+                            <prodDate xml:lang="fi">2017-10-26</prodDate>
+                        </prodStmt>
+                        <distStmt>
+                            <distDate xml:lang="fi" date="2017-10-26"/>
+                            <distrbtr abbr="FSD" URI="http://www.fsd.uta.fi/" xml:lang="fi">Yhteiskuntatieteellinen tietoarkisto</distrbtr>
+                        </distStmt>
+                        <serStmt>
+                            <serName ID="kehy" xml:lang="fi">Kehitysyhteistyötutkimukset</serName>
+                        </serStmt>
+                        <verStmt>
+                            <version date="2017-09-21" xml:lang="fi"/>
+                        </verStmt>
+                    </citation>
+                        <stdyInfo>
+                            <subject>
+                                <keyword xml:lang="fi" vocab="YSA" vocabURI="http://vesa.lib.helsinki.fi/" ID="kehitysyhteistyoe">kehitysyhteistyö</keyword><keyword xml:lang="fi" vocab="YSA" vocabURI="http://vesa.lib.helsinki.fi/" ID="kehityspolitiikka">kehityspolitiikka</keyword><keyword xml:lang="fi" vocab="YSA" vocabURI="http://vesa.lib.helsinki.fi/" ID="maeaeraerahat">määrärahat</keyword><keyword xml:lang="fi" vocab="YSA" vocabURI="http://vesa.lib.helsinki.fi/" ID="hyvinvointi">hyvinvointi</keyword><keyword xml:lang="fi" vocab="YSA" vocabURI="http://vesa.lib.helsinki.fi/" ID="kestaevae_kehitys">kestävä kehitys</keyword><keyword xml:lang="fi" vocab="YSA" vocabURI="http://vesa.lib.helsinki.fi/" ID="avustustoiminta">avustustoiminta</keyword><keyword xml:lang="fi" vocab="YSA" vocabURI="http://vesa.lib.helsinki.fi/" ID="kansainvaelinen_yhteistyoe">kansainvälinen yhteistyö</keyword><keyword xml:lang="fi" vocab="YSA" vocabURI="http://vesa.lib.helsinki.fi/" ID="kehitysmaat">kehitysmaat</keyword><keyword xml:lang="fi" vocab="YSA" vocabURI="http://vesa.lib.helsinki.fi/" ID="koeyhyys">köyhyys</keyword><keyword xml:lang="fi" vocab="YSA" vocabURI="http://vesa.lib.helsinki.fi/" ID="pakolaiset">pakolaiset</keyword><keyword xml:lang="fi" vocab="YSA" vocabURI="http://vesa.lib.helsinki.fi/" ID="katastrofiapu">katastrofiapu</keyword><keyword xml:lang="en" vocab="ELSST" ID="aid">aid</keyword><keyword xml:lang="en" vocab="ELSST" ID="developing_countries">developing countries</keyword><keyword xml:lang="en" vocab="ELSST" ID="development_aid_international">development aid (international)</keyword><keyword xml:lang="en" vocab="ELSST" ID="development_policy">development policy</keyword><keyword xml:lang="en" vocab="ELSST" ID="international_cooperation">international cooperation</keyword><keyword xml:lang="en" vocab="ELSST" ID="poverty">poverty</keyword><keyword xml:lang="en" vocab="ELSST" ID="public_expenditure">public expenditure</keyword><keyword xml:lang="en" vocab="ELSST" ID="refugees">refugees</keyword><keyword xml:lang="en" vocab="ELSST" ID="sustainable_development">sustainable development</keyword>
+                                <topcClas xml:lang="fi" vocab="OKM" vocabURI="http://www.yso.fi/onto/okm-tieteenala/conceptscheme" ID="yhteiskuntatieteet">yhteiskuntatieteet</topcClas><topcClas xml:lang="fi" vocab="CESSDA Topic Classification" ID="kansainvaelinen_politiikka_ja_jaerjestoet">kansainvälinen politiikka ja järjestöt</topcClas><topcClas xml:lang="en" vocab="OKM" vocabURI="http://www.yso.fi/onto/okm-tieteenala/conceptscheme" ID="social_sciences">social sciences</topcClas><topcClas xml:lang="en" vocab="CESSDA Topic Classification" ID="international_politics_and_organisations">international politics and organisations</topcClas>
+                            </subject>
+                            <abstract xml:lang="fi">Tutkimuksessa selvitettiin suomalaisten mielipiteitä kehitysyhteistyöstä. Tutkimuksen on toteuttanut Taloustutkimus Oy Ulkoasiainministeriön toimeksiannosta. Kysely on jatkoa vuodesta 2002 toteutetuille tutkimuksille. Kysymykset käsittelivät laajasti kehitysyhteistyötä ja kehityspolitiikkaa. Niillä kartoitettiin mm. kehitysyhteistyön kohdentumista ja tuloksia, kehitysyhteistyön määrärahoja sekä kehitysyhteistyöstä saatavaa tietoa ja omaa osallistumista kehitysyhteistyöhön. Osa kysymyksistä on ollut mukana vuosien ajan samanmuotoisina, jolloin mielipiteiden muutosta voidaan seurata. Taustamuuttujina ovat sukupuoli, ikä, talouden tyyppi, internetin käyttö, työelämään osallistuminen, ammatti, koulutus, siviilisääty, perheen eniten ansaitsevan henkilön ammatti/asema ja koulutus, perheen tuloluokka, asunnon tyyppi sekä aluemuuttujia.</abstract><abstract xml:lang="en">The survey charted Finnish opinions on and knowledge of the country's development cooperation, its importance, content, objectives, and allocation. Some questions focused on the UN's Sustainable Development Goals (Agenda 2030). The data were collected as part of Taloustutkimus's national CAPI Omnibus study. The respondents were asked what they thought development cooperation was, how important they regarded development cooperation to be, and to what extent they agreed with a number of statements relating to development cooperation (e.g. "Development cooperation increases Finland's international influence"). Familiarity with the UN's Sustainable Development Goals (Agenda 2030) was surveyed as well as views on the most important Sustainable Development Goals. Opinions on funding the private sector of developing countries were studied. Furthermore, thoughts on the significance of development cooperation in alleviating poverty and improving the lives of people in developing countries were investigated. The respondents were asked to choose two of the most important areas for advancing the rights and circumstances of girls and women. Regarding inequality, the respondents were asked how Finland could decrease global inequality. Views were studied on whether development cooperation could prevent refugee crisis from happening by helping people in their own country, and if Finland's development cooperation could help with preventing climate change. With regard to development cooperation by Finland, opinions were studied on the importance of Finnish humanitarian aid, the most important forms of development cooperation for Finland (e.g. bilateral, multilateral, cooperation through the EU), and to what causes should humanitarian aid primarily be directed to. The respondents' factual knowledge was charted by asking how much the respondents thought Finland was going to spend on development cooperation in 2017 (as percentage of the GNI and in euros). The respondents were asked whether Finland should increase or decrease the amount of funding allocated to development cooperation in light of the current economic situation. Some questions pertained to whether there was enough information available on development cooperation and developing countries, from which information sources the respondents had received information on these topics, and how reliable public authorities, voluntary/civic organisations and the media were as sources of such information. The respondents were also asked how they thought they could help the developing countries as individuals and how they had participated in helping the developing countries or people in those countries in the past year. Background variables included, among others, the respondent's age, gender, economic activity and occupational status, education, and marital status as well as economic activity/occupational status and education of the household head, household composition, ages of children living at home, gross annual income of the household, municipality size and type, major region (NUTS2) and region (NUTS3) of residence, type of accommodation, type of mobile phone, and Internet and social media use.</abstract>
+                            <sumDscr>
+                                <collDate xml:lang="fi" date="2017-05-12" event="start"/><collDate xml:lang="fi" date="2017-05-31" event="end"/><collDate xml:lang="en" date="2017-05-12" event="start"/><collDate xml:lang="en" date="2017-05-31" event="end"/>
+                                <nation xml:lang="fi" abbr="FI">Suomi</nation><nation xml:lang="en" abbr="FI">Finland</nation>
+                                <anlyUnit xml:lang="fi">Henkilö<concept>Individual</concept></anlyUnit><anlyUnit xml:lang="en">Individual<concept>Individual</concept></anlyUnit>
+                                <universe xml:lang="fi" clusion="I">Suomen 15 - 74-vuotias väestö</universe><universe xml:lang="fi" clusion="E">Ahvenanmaa</universe><universe xml:lang="en" clusion="I">Finnish people aged 15 - 74</universe><universe xml:lang="en" clusion="E">the Åland Islands</universe>
+                            </sumDscr>
+                        </stdyInfo>
+                        <method>
+                            <dataColl>
+                                <timeMeth xml:lang="fi">Pitkittäisaineisto: trendi/toistuva poikkileikkausaineisto<concept>Longitudinal.TrendRepeatedCrossSection</concept></timeMeth><timeMeth xml:lang="en">Longitudinal: Trend/Repeated cross-section<concept>Longitudinal.TrendRepeatedCrossSection</concept></timeMeth>
+                                <collMode xml:lang="fi">Kasvokkainen haastattelu: tietokoneavusteinen (CAPI tai CAMI)<concept/></collMode><collMode xml:lang="en">Face-to-face interview: Computer-assisted (CAPI/CAMI)<concept/></collMode>
+                            </dataColl>
+                        </method>
+                        <dataAccs>
+                            <useStmt>
+                                <restrctn xml:lang="fi">Aineisto on käytettävissä (B) tutkimukseen, opetukseen ja opiskeluun.</restrctn><restrctn xml:lang="en">The dataset is (B) available for research, teaching and study.</restrctn>
+                            </useStmt>
+                        </dataAccs>
+                        <othrStdyMat>
+                        </othrStdyMat>
+                    </stdyDscr>
+                    <fileDscr>
+                        <fileTxt>
+                            <fileName xml:lang="fi">daF3187.por</fileName>
+                        </fileTxt><fileTxt>
+                        <fileName xml:lang="en">daF3187e.por</fileName>
+                    </fileTxt>
+                    </fileDscr>
+                </codeBook>
+            </metadata>
+        </record>
+    </GetRecord>
+</OAI-PMH>
