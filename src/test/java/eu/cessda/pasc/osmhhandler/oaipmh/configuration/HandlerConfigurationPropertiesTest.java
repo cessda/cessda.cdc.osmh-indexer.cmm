@@ -53,6 +53,6 @@ public class HandlerConfigurationPropertiesTest {
     then(oaiPmh.getRepos().get(7).getUrl()).isEqualTo("https://snd.gu.se/en/oai-pmh");
     then(oaiPmh.getRepos().get(7).getPreferredMetadataParam()).isEqualTo("oai_ddi25");
     then(oaiPmh.getRepos().get(8).getUrl()).isEqualTo("https://oai.ukdataservice.ac.uk:8443/oai/provider");
-    then(oaiPmh.getRepos().get(7).getPreferredMetadataParam()).isEqualTo("ddi");
+    then(oaiPmh.getRepos().get(8).getPreferredMetadataParam()).isEqualTo("ddi");
   }
 }
