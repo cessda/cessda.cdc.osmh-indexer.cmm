@@ -88,6 +88,9 @@ osmhConsumer:
     - url: https://easy.dans.knaw.nl/oai/
       name: 'DANS (en)'
       handler: 'http://cdc-osmh-repo:9091'
+    - url: https://kuha.sa.dk/v0/oai
+      name: 'DNA'
+      handler: 'http://cdc-osmh-repo:9091'
     - url: http://services.fsd.uta.fi/v0/oai
       name: 'Finish Data Services'
       handler: 'http://cdc-osmh-repo:9091'
