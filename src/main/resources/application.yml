@@ -66,7 +66,7 @@ osmhConsumer:
     initial: '60000'
     fixed: '315360000000'
   daily:
-   # Daily Harvest and Ingestion run at 00:01am.
+    # Daily Harvest and Ingestion run at 00:01am.
     run: '0 01 00 * * *'
     # Then run every Sunday at 09:00
     sunday.run: '0 00 09 * * SUN'
@@ -152,3 +152,40 @@ elasticsearch:
   host: cdc-es  # must match profile name
   numberOfShards: 2
   numberOfReplicas: 2
+
+---
+spring:
+  profiles: local
+  boot:
+    admin:
+      client:
+        prefer-ip: true
+      url: http://localhost:8087
+logging:
+  level:
+    eu.cessda.pasc.oci.repository: DEBUG
+
+osmhConsumer:
+  endpoints:
+    repos:
+    - url: https://nesstar2.adp.fdv.uni-lj.si/oai-pmh
+      name: 'ADP (Nesstar)'
+      handler: 'http://localhost:9842'
+    - url: http://fors-nesstar.unil.ch/oai-pmh
+      name: 'FORS Data Service (Nesstar)'
+      handler: 'http://localhost:9842'
+    - url: https://oai-pmh.nsd.no/oai-pmh
+      name: 'NSD (Nesstar)'
+      handler: 'http://localhost:9842'
+    - url:  http://nesstar.sciences-po.fr/oai-pmh
+      name: 'Progedo (Nesstar)'
+      handler: 'http://localhost:9842'
+    - url:  http://nesstar-server.sodanet.gr/oai-pmh
+      name: 'SoDaNet (Nesstar)'
+      handler: 'http://localhost:9842'
+    - url: http://nesstar.soc.cas.cz/oai-pmh
+      name: 'CSDA (Nesstar)'
+      handler: 'http://localhost:9842'
+    - url:  http://149.132.157.156/oai-pmh
+      name: 'Unidata (Nesstar)'
+      handler: 'http://localhost:9842'
