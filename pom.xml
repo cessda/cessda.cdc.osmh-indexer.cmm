@@ -30,7 +30,7 @@
     <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
     <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
     <sonar.jacoco.reportPaths>${project.basedir}/target/jacoco.exec</sonar.jacoco.reportPaths>
-    <jacoco-maven-plugin.version>0.7.8</jacoco-maven-plugin.version>
+    <jacoco-maven-plugin.version>0.8.3</jacoco-maven-plugin.version>
     <!--Sonar Pros: ends-->
     <lombok.version>1.18.6</lombok.version>
     <httpclient.version>4.5.4</httpclient.version>
