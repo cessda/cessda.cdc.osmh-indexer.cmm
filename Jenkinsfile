@@ -22,10 +22,16 @@ pipeline {
       }
     }
     stage('Build Project and Run Sonar Scan') {
+      agent {
+        docker {
+          image 'maven:3-jdk-11'
+          reuseNode true
+        }
+      }
 		  steps {
         withSonarQubeEnv('cessda-sonar') {
           withMaven(options: [junitPublisher(healthScaleFactor: 1.0)], tempBinDir: '') {
-            sh 'mvn clean install sonar:sonar'
+            sh 'export PATH=$MVN_CMD_DIR:$PATH && mvn clean install sonar:sonar'
           }
         }
       }
