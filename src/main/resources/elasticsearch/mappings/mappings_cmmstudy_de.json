@@ -254,8 +254,8 @@
           },
           "term": {
             "type": "string",
-            "analyzer": "pasc_standard_analyzer",
-            "term_vector": "with_positions_offsets"
+            "index": "not_analyzed",
+            "ignore_above": 256
           },
           "vocab": {
             "type": "string",
