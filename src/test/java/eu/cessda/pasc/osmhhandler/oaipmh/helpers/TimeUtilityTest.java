@@ -16,8 +16,9 @@ import static org.assertj.core.api.BDDAssertions.then;
 public class TimeUtilityTest {
 
 
+  // yyyy-MM-dd
   @Test
-  public void shouldReturnExpectedDateValue() {
+  public void shouldReturnExpectedDateValueForFormat() {
 
     // Given
     Optional<LocalDateTime> localDateTime = TimeUtility.getLocalDateTime("2018-03-20");
@@ -40,6 +41,21 @@ public class TimeUtilityTest {
     // When
     if (localDateTime.isPresent()) {
       then(localDateTime.get().toString()).isEqualToIgnoringCase("2015-05-04T22:55:30");
+    } else {
+      fail("Failed to parse Date String");
+    }
+  }
+
+  // String format "yyyy-dd-MM HH:mm:ss.SSS"
+  @Test
+  public void shouldReturnExpectedDateValueForCustomDateFormat() {
+
+    // Given
+    Optional<LocalDateTime> localDateTime = TimeUtility.getLocalDateTime("2019-24-04 14:32:30.448");
+
+    // When
+    if (localDateTime.isPresent()) {
+      then(localDateTime.get().toString()).isEqualToIgnoringCase("2019-04-24T13:32:30.448");
     } else {
       fail("Failed to parse Date String");
     }

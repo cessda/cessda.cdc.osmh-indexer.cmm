@@ -27,7 +27,13 @@ public class HandlerConstants {
   public static final String STUDY = "Study";
 
   // Date / time
-  static final String[] EXPECTED_DATE_FORMATS = new String[]{"yyyy-MM-dd'T'HH:mm:ss'Z'", "yyyy-MM-dd", "yyyy-MM-dd'T'HH:mm:ssZ", "yyyy-MM", "yyyy"};
+  static final String[] EXPECTED_DATE_FORMATS = new String[]{
+      "yyyy-MM-dd'T'HH:mm:ss'Z'",
+      "yyyy-dd-MM HH:mm:ss.SSS",
+      "yyyy-MM-dd",
+      "yyyy-MM-dd'T'HH:mm:ssZ",
+      "yyyy-MM", "yyyy"
+  };
 
   // System
   static final String UTC_ID = TimeZone.getTimeZone("UTC").getID();
