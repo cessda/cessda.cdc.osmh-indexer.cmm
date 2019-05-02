@@ -6,7 +6,6 @@ import org.junit.Test;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.UTC_ZONE_ID;
 import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.api.BDDAssertions.then;
 
@@ -56,7 +55,7 @@ public class TimeUtilityTest {
 
     // When
     if (localDateTime.isPresent()) {
-      then(localDateTime.get().atZone(UTC_ZONE_ID).toLocalDateTime().toString()).isEqualToIgnoringCase("2019-04-24T13:32:30.448");
+      then(localDateTime.get().toLocalDate().toString()).isEqualToIgnoringCase("2019-04-24");
     } else {
       fail("Failed to parse Date String");
     }
