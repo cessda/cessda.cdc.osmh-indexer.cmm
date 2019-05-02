@@ -1,5 +1,6 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 
+import java.time.ZoneId;
 import java.util.TimeZone;
 
 /**
@@ -36,7 +37,8 @@ public class HandlerConstants {
   };
 
   // System
-  static final String UTC_ID = TimeZone.getTimeZone("UTC").getID();
+  private static final String UTC_ID = TimeZone.getTimeZone("UTC").getID();
+  static final ZoneId UTC_ZONE_ID = ZoneId.of(UTC_ID);
 
   private HandlerConstants() {
     throw new UnsupportedOperationException("Utility class, instantiation not allow");

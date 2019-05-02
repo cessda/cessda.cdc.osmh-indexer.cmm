@@ -5,13 +5,12 @@ import org.apache.commons.lang3.time.DateUtils;
 
 import java.text.ParseException;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.Optional;
 import java.util.function.Function;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.EXPECTED_DATE_FORMATS;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.UTC_ID;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.UTC_ZONE_ID;
 
 @Slf4j
 class TimeUtility {
@@ -33,7 +32,7 @@ class TimeUtility {
     try {
       Date date = DateUtils.parseDate(dateString, EXPECTED_DATE_FORMATS);
       recordLastModifiedZoneDateTime = Optional.of(date.toInstant()
-          .atZone(ZoneId.of(UTC_ID))
+          .atZone(UTC_ZONE_ID)
           .toLocalDateTime());
       return recordLastModifiedZoneDateTime;
     } catch (ParseException | IllegalArgumentException e) {
