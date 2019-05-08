@@ -5,7 +5,7 @@
 
   <groupId>eu.cessda.pasc</groupId>
   <artifactId>pasc-osmh-handler-oai-pmh</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>${revision}</version>
   <packaging>jar</packaging>
 
   <name>pasc-osmh-handler-oai-pmh</name>
@@ -19,6 +19,8 @@
   </parent>
 
   <properties>
+    <baseRevision>0.1</baseRevision>
+    <revision>${baseRevision}-SNAPSHOT</revision>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.version>11</java.version>
@@ -245,6 +247,18 @@
       <!-- Sonar End -->
     </plugins>
   </build>
-
-
+  
+  <profiles>
+    <profile>
+      <id>jenkins</id>
+      <activation>
+        <property>
+          <name>env.BUILD_NUMBER</name>
+        </property>
+      </activation>
+      <properties>
+        <revision>${baseRevision}.${env.BUILD_NUMBER}</revision>
+      </properties>
+    </profile>
+  </profiles>
 </project>
