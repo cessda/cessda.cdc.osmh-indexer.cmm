@@ -5,7 +5,7 @@
 
   <groupId>eu.cessda.pasc</groupId>
   <artifactId>pasc-oci</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+	<version>${revision}</version>
   <packaging>jar</packaging>
 
   <name>pasc-oci</name>
@@ -19,6 +19,8 @@
   </parent>
 
   <properties>
+    <baseRevision>0.1</baseRevision>
+    <revision>${baseRevision}-SNAPSHOT</revision>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.version>11</java.version>
@@ -31,7 +33,6 @@
     <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
     <sonar.jacoco.reportPaths>${project.basedir}/target/jacoco.exec</sonar.jacoco.reportPaths>
     <jacoco-maven-plugin.version>0.8.3</jacoco-maven-plugin.version>
-
     <sonar.exclusions>**/models/**</sonar.exclusions>
     <sonar.links.scm>https://bitbucket.org/cessda/cessda.pasc.osmh-indexer.cmm</sonar.links.scm>
     <sonar.links.issue>https://bitbucket.org/cessda/cessda.pasc.version2/issues</sonar.links.issue>
@@ -220,4 +221,17 @@
       </plugin>
     </plugins>
   </build>
+  <profiles>
+    <profile>
+      <id>jenkins</id>
+      <activation>
+        <property>
+          <name>env.BUILD_NUMBER</name>
+        </property>
+      </activation>
+      <properties>
+        <revision>${baseRevision}.${env.BUILD_NUMBER}</revision>
+      </properties>
+    </profile>
+  </profiles>
 </project>
