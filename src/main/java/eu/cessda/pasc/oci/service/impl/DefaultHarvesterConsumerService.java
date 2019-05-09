@@ -44,6 +44,14 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
   public List<RecordHeader> listRecordHeaders(Repo repo, LocalDateTime lastModifiedDate) {
     List<RecordHeader> recordHeadersUnfiltered = new ArrayList<>();
 
+
+    // FIXME:  Review all changes in this code base this might actually be it.
+    // This is inside a loop for repos so, this will repeat repos with the same url but diff metadataPreference.
+    //
+    //  Might not need the following comments or prior changes in the PascharvesterDao
+    //  build logic in harvesterDao.listRecordHeaders() to return List<RecordHeader> recordHeadersUnfiltered
+    // Modify RecordHeader to hold metadataPreference, which is then used to GetRecord.
+
     try {
       String recordHeadersJsonString = harvesterDao.listRecordHeaders(repo.getUrl());
       CollectionType collectionType = mapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class);

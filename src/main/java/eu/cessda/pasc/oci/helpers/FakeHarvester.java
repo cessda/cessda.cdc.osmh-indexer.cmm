@@ -5,7 +5,8 @@ import eu.cessda.pasc.oci.models.configurations.Repo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This is a temp Solution whilst changes are being made to the Harvester (Node JS app)
@@ -31,10 +32,10 @@ public class FakeHarvester {
     this.appConfigurationProperties = appConfigurationProperties;
   }
 
-  public Optional<Repo> getRepoConfigurationProperties(String repositoryUrl) {
+  public List<Repo> getRepoConfigurationProperties(String repositoryUrl) {
     return appConfigurationProperties.getEndpoints().getRepos()
         .stream()
         .filter(repo -> repo.getUrl().equalsIgnoreCase(repositoryUrl))
-        .findFirst();
+        .collect(Collectors.toList());
   }
 }

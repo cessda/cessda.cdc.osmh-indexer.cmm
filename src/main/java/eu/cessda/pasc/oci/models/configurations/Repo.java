@@ -15,6 +15,7 @@ import lombok.ToString;
 public class Repo {
 
   private String url;
+  private String preferredMetadataParam;
   private String name;
   private String handler;
 }

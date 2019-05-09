@@ -8,7 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static eu.cessda.pasc.oci.repository.StudyIdentifierEncoder.encodeStudyIdentifier;
 
@@ -43,25 +46,31 @@ public class PascHarvesterDao extends DaoBase implements HarvesterDao {
     return postForStringResponse(finalUrl);
   }
 
-  private String constructListRecordUrl(String repositoryUrl) {
-    //pascOciConfig.getHarvesterUrl(),  Fixme: reeanable and remove the fake following urls
+  private List<String> constructListRecordUrl(String repositoryUrl) {
+    //pascOciConfig.getHarvesterUrl(),  Fixme: re-enable and remove the fake following urls
 
-    String finalUrl = "replace_me";
-    Optional<Repo> repoOptional = fakeHarvester.getRepoConfigurationProperties(repositoryUrl);
-
-    if (repoOptional.isPresent()) {
-      finalUrl = String.format(LIST_RECORD_TEMPLATE,
-          repoOptional.get().getHandler(),
-          appConfigurationProperties.getHarvester().getVersion(),
-          repositoryUrl);
+    List<Repo> repos = fakeHarvester.getRepoConfigurationProperties(repositoryUrl);
+    List<String> formattedListRecordUrls = new ArrayList<>(); // FIXME: Make this a Map<String, List<String>>.
+    for (Repo repo : repos) {
+      formattedListRecordUrls.add(
+          String.format(LIST_RECORD_TEMPLATE, repo.getHandler(),
+              appConfigurationProperties.getHarvester().getVersion(), repositoryUrl));
     }
 
-    log.info("[{}] Final ListHeaders Handler url [{}]", repositoryUrl, finalUrl);
-    return finalUrl;
+    if (log.isInfoEnabled()) {
+      String msgTemplate = "[{}] result to [{}] ListHeaders Handler url(s) [{}]";
+      log.info(msgTemplate, repositoryUrl, formattedListRecordUrls.size(),
+          formattedListRecordUrls
+              .stream()
+              .map(String::valueOf)
+              .collect(Collectors.joining(", ")));
+    }
+
+    return formattedListRecordUrls;
   }
 
   private String constructGetRecordUrl(String repositoryUrl, String studyNumber) {
-    //pascOciConfig.getHarvesterUrl(),  Fixme: reeanable and remove the fake following urls
+    //pascOciConfig.getHarvesterUrl(),  Fixme: re-enable and remove the fake following urls
 
     String finalUrl = "replace_me";
     Optional<Repo> repoOptional = fakeHarvester.getRepoConfigurationProperties(repositoryUrl);
