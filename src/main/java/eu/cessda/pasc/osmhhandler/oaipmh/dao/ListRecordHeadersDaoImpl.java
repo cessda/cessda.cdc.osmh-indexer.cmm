@@ -1,6 +1,7 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.dao;
 
 import eu.cessda.pasc.osmhhandler.oaipmh.configuration.HandlerConfigurationProperties;
+import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -23,7 +24,7 @@ public class ListRecordHeadersDaoImpl extends DaoBase implements ListRecordHeade
   }
 
   @Override
-  public String listRecordHeaders(String baseRepoUrl) throws ExternalSystemException {
+  public String listRecordHeaders(String baseRepoUrl) throws CustomHandlerException {
     String finalListRecordUrl = appendListRecordParams(baseRepoUrl, config.getOaiPmh());
     return postForStringResponse(finalListRecordUrl);
   }

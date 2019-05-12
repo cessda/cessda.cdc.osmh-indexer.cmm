@@ -166,6 +166,5 @@ This project is licensed under the Apache 2 License - see the [LICENSE](LICENSE)
 
 ## TODO 
 
-- Should map out PID Study alongside their Agency name.
+- Check for exception type in Constructors for more specific error message with the EntityResponse
 - Remove Principal Investigator
-- Add Hook support for Dev branch

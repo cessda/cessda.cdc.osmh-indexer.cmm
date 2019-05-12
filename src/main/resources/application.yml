@@ -22,7 +22,7 @@ spring:
     default-domain: pasc-osmh-handler-oai-pmh
   boot:
     admin:
-#     url: http://localhost:8087 For dev, stg & prod set this at the specific active profile. Run app with profile set
+      #     url: http://localhost:8087 For dev, stg & prod set this at the specific active profile. Run app with profile set
       username: springadmin
       password: C3ssd@2018!
       client.name: pasc-osmh-handler-oai-pmh
@@ -59,8 +59,8 @@ osmhhandler:
     repos:
       - url: https://data2.aussda.at/oai/
         preferredMetadataParam: oai_ddi
-#      - url: http://fors-getdata.unil.ch/oai-pmh/ Using Nesstar endpoint
-#       preferredMetadataParam: oai_ddi
+      #      - url: http://fors-getdata.unil.ch/oai-pmh/ Using Nesstar endpoint
+      #       preferredMetadataParam: oai_ddi
       - url: https://easy.dans.knaw.nl/oai/
         preferredMetadataParam: oai_ddi25_nl
       - url: https://easy.dans.knaw.nl/oai/
@@ -93,7 +93,7 @@ osmhhandler:
 spring:
   profiles: test
   main:
-        banner-mode: "off"
+    banner-mode: "off"
 osmhhandler:
   oaiPmh:
     supportedRecordTypes:
@@ -106,14 +106,24 @@ osmhhandler:
       active: true
       lang: 'en'
     publicationYearDefault: 1970
-
+    repos:
+      - url: https://data2.aussda.at/oai/
+        preferredMetadataParam: oai_ddi
+      - url: http://services.fsd.uta.fi/v0/oai
+        preferredMetadataParam: oai_ddi25
+        setSpec: study_groups:energia
+      - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
+        preferredMetadataParam: ddi
 ---
 spring:
   profiles: local
   boot.admin.url: http://localhost:8087
-#osmhhandler:
-#  oaiPmh:
-#    repos:
+osmhhandler:
+  oaiPmh:
+    repos:
+      - url: http://services.fsd.uta.fi/v0/oai
+        preferredMetadataParam: oai_ddi25
+        setSpec: study_groups:energia
 #      - url: https://snd.gu.se/en/oai-pmh
 #        preferredMetadataParam: oai_ddi25
 #      - url: https://data.aussda.at/oai
@@ -127,7 +137,7 @@ spring:
 spring:
   profiles: live
   main:
-        banner-mode: "off"
+    banner-mode: "off"
   boot:
     admin:
       client:

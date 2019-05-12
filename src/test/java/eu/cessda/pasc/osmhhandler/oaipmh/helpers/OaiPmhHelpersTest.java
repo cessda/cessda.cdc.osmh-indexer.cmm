@@ -1,6 +1,7 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 
 import eu.cessda.pasc.osmhhandler.oaipmh.configuration.HandlerConfigurationProperties;
+import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ public class OaiPmhHelpersTest {
   private HandlerConfigurationProperties handlerConfigurationProperties;
 
   @Test
-  public void ShouldAppendMetaDataPrefixForGivenFSD() {
+  public void ShouldAppendMetaDataPrefixForGivenFSD() throws CustomHandlerException {
 
     // Given
     String fsdEndpoint = "http://services.fsd.uta.fi/v0/oai";
@@ -40,7 +41,7 @@ public class OaiPmhHelpersTest {
   }
 
   @Test
-  public void ShouldAppendMetaDataPrefixForGivenUKDS() {
+  public void ShouldAppendMetaDataPrefixForGivenUKDS() throws CustomHandlerException {
 
     // Given
     String fsdEndpoint = "https://oai.ukdataservice.ac.uk:8443/oai/provider";
@@ -52,17 +53,10 @@ public class OaiPmhHelpersTest {
     then(builtUrl).isEqualTo(expectedReqUrl);
   }
 
-  @Test
-  public void ShouldAppendMetaDataPrefixForGivenNonConfiguredRepo() {
-
-    // Given
-    String fsdEndpoint = "http://services.inthe.future/v0/oai";
-    String expectedReqUrl = "http://services.inthe.future/v0/oai?verb=GetRecord&identifier=15454&metadataPrefix=ddi";
-
+  @Test(expected = CustomHandlerException.class)
+  public void ShouldThrowExceptionForANonConfiguredRepo() throws CustomHandlerException {
     // When
-    String builtUrl = appendGetRecordParams(fsdEndpoint, "15454", handlerConfigurationProperties.getOaiPmh());
-
-    then(builtUrl).isEqualTo(expectedReqUrl);
+    appendGetRecordParams("http://services.inthe.future/v0/oai", "15454", handlerConfigurationProperties.getOaiPmh());
   }
 
   @Test

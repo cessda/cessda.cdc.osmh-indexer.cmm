@@ -1,7 +1,7 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.dao;
 
 import eu.cessda.pasc.osmhhandler.oaipmh.configuration.HandlerConfigurationProperties;
-import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
+import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -16,11 +16,15 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhHelpers.decodeStud
 @Repository
 public class GetRecordDoaImpl extends DaoBase implements GetRecordDoa {
 
+  private final HandlerConfigurationProperties oaiPmhConfig;
+
   @Autowired
-  private HandlerConfigurationProperties oaiPmhConfig;
+  public GetRecordDoaImpl(HandlerConfigurationProperties oaiPmhConfig) {
+    this.oaiPmhConfig = oaiPmhConfig;
+  }
 
   @Override
-  public String getRecordXML(String repoUrl, String studyIdentifier) throws ExternalSystemException {
+  public String getRecordXML(String repoUrl, String studyIdentifier) throws CustomHandlerException {
 
     String decodedStudyId = decodeStudyNumber(studyIdentifier);
     final String fullUrl = appendGetRecordParams(repoUrl, decodedStudyId, oaiPmhConfig.getOaiPmh());
