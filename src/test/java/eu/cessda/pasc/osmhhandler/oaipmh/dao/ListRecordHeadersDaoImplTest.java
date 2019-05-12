@@ -61,4 +61,24 @@ public class ListRecordHeadersDaoImplTest {
     then(recordHeadersXML).isNotEmpty();
     then(recordHeadersXML).contains(getListIdentifiersXML());
   }
+
+  @Test
+  public void shouldReturnXmlPayloadOfGivenSpecSetRecordHeadersFromRemoteRepository() throws CustomHandlerException {
+
+    // Given
+    String expected_url= "http://services.fsd.uta.fi/v0/oai?verb=ListIdentifiers&metadataPrefix=oai_ddi25&set=study_groups:energia";
+
+    server.expect(once(), requestTo(expected_url))
+        .andExpect(method(GET))
+        .andRespond(withSuccess(getListIdentifiersXML(), MediaType.TEXT_XML));
+
+    // When
+    String recordHeadersXML = listRecordHeadersDao.listRecordHeaders("http://services.fsd.uta.fi/v0/oai");
+
+    System.out.println("Actual: " + recordHeadersXML);
+
+    then(recordHeadersXML).isNotNull();
+    then(recordHeadersXML).isNotEmpty();
+    then(recordHeadersXML).contains(getListIdentifiersXML());
+  }
 }

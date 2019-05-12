@@ -1,5 +1,6 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.dao;
 
+import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
 import eu.cessda.pasc.osmhhandler.oaipmh.mock.data.CMMStudyTestData;
 import org.junit.Before;
@@ -45,7 +46,7 @@ public class GetRecordDoaImplTest {
   }
 
   @Test
-  public void shouldReturnXMLPayloadOfGivenRecordIdentifierFromGivenRepoURL() throws ExternalSystemException {
+  public void shouldReturnXMLPayloadOfGivenRecordIdentifierFromGivenRepoURL() throws CustomHandlerException {
 
     // Given
     String expected_url = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=GetRecord&identifier=1683&metadataPrefix=ddi";
@@ -63,7 +64,7 @@ public class GetRecordDoaImplTest {
   }
 
   @Test(expected = ExternalSystemException.class)
-  public void shouldThrowExceptionWhenRemoteServerResponseIsNotSuccessful() throws ExternalSystemException {
+  public void shouldThrowExceptionWhenRemoteServerResponseIsNotSuccessful() throws CustomHandlerException {
 
     // Given
     String expected_url = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=GetRecord&identifier=1683&metadataPrefix=ddi";

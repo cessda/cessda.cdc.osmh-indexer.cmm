@@ -9,7 +9,7 @@ public class CustomHandlerException extends Exception{
 
   private static final long serialVersionUID = 5715687019114712665L;
 
-  CustomHandlerException(String message) {
+  public CustomHandlerException(String message) {
     super(message);
   }
 

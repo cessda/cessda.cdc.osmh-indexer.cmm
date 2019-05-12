@@ -74,8 +74,8 @@ public class OaiPmhConstants {
   static final String CONCEPT_EL = "concept";
   static final String URI_ATTR = "URI";
   public static final String COMPLETE_LIST_SIZE_ATTR = "completeListSize";
-  public static final String OAI_PMH = "OAI-PMH";
-  public static final String ERROR = "error";
+  static final String OAI_PMH = "OAI-PMH";
+  static final String ERROR = "error";
 
   // Encoding
   public static final String UTF_8 = "UTF-8";
@@ -83,13 +83,14 @@ public class OaiPmhConstants {
   // URL Paths tokens
   static final String VERB_PARAM_KEY = "verb";
   static final String METADATA_PREFIX_PARAM_KEY = "metadataPrefix";
+  static final String SET_SPEC_PARAM_KEY = "set";
   static final String IDENTIFIER_PARAM_KEY = IDENTIFIER_ELEMENT;
   static final String RESUMPTION_TOKEN_KEY = RESUMPTION_TOKEN_ELEMENT;
   static final String LIST_IDENTIFIERS_VALUE = "ListIdentifiers";
   static final String GET_RECORD_VALUE = "GetRecord";
-  static final String METADATA_DDI_2_5_VALUE = "ddi";
 
   static final String LIST_RECORD_HEADERS_URL_TEMPLATE = "%s?%s=%s&%s=%s";
+  static final String LIST_RECORD_HEADERS_PER_SET_URL_TEMPLATE = "%s?%s=%s&%s=%s&%s=%s";
   static final String GET_RECORD_URL_TEMPLATE = "%s?%s=%s&%s=%s&%s=%s";
 
   private OaiPmhConstants() {
