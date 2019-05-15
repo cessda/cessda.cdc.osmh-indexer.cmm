@@ -92,7 +92,7 @@ osmhConsumer:
       name: 'DNA'
       handler: 'http://cdc-osmh-repo:9091'
     - url: http://services.fsd.uta.fi/v0/oai
-      name: 'Finish Data Services'
+      name: 'Finnish Data Services'
       handler: 'http://cdc-osmh-repo:9091'
     - url: https://dbk.gesis.org/dbkoai3/
       name: 'GESIS'
