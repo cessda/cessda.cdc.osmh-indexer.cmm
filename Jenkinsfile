@@ -1,4 +1,8 @@
 pipeline {
+  options {
+    buildDiscarder logRotator(artifactNumToKeepStr: '5', numToKeepStr: '10')
+  }
+
   environment {
     product_name = "cdc"
     module_name = "osmh-repo"
