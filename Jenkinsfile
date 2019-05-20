@@ -35,7 +35,7 @@ pipeline {
 		  steps {
         withSonarQubeEnv('cessda-sonar') {
           withMaven(options: [junitPublisher(healthScaleFactor: 1.0)], tempBinDir: '') {
-            sh 'export PATH=$MVN_CMD_DIR:$PATH && mvn clean install sonar:sonar'
+            sh 'export PATH=$MVN_CMD_DIR:$PATH && mvn clean deploy sonar:sonar'
           }
         }
       }
