@@ -31,7 +31,7 @@
     <sonar-maven-plugin.version>3.6.0.1398</sonar-maven-plugin.version>
     <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
     <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
-    <sonar.jacoco.reportPaths>${project.basedir}/target/jacoco.exec</sonar.jacoco.reportPaths>
+    <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     <jacoco-maven-plugin.version>0.8.3</jacoco-maven-plugin.version>
     <sonar.exclusions>**/models/**</sonar.exclusions>
     <sonar.links.scm>https://bitbucket.org/cessda/cessda.pasc.osmh-indexer.cmm</sonar.links.scm>
@@ -169,6 +169,21 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+
+  <distributionManagement>
+    <repository>
+      <id>cessda-nexus</id>
+      <name>CESSDA Nexus Repository</name>
+      <url>https://nexus.cessda.eu/repository/maven-releases</url>
+    </repository>
+    <snapshotRepository>
+      <id>cessda-nexus-snapshot</id>
+      <name>CESSDA Nexus Snapshot Repository</name>
+      <url>https://nexus.cessda.eu/repository/maven-snapshots/</url>
+      <uniqueVersion>true</uniqueVersion>
+    </snapshotRepository>
+  </distributionManagement>
+
   <build>
     <plugins>
       <plugin>
@@ -214,10 +229,13 @@
               <goal>prepare-agent</goal>
             </goals>
           </execution>
+          <execution>
+						<id>report</id>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
         </executions>
-        <configuration>
-          <destFile>${sonar.jacoco.reportPaths}</destFile>
-        </configuration>
       </plugin>
     </plugins>
   </build>
