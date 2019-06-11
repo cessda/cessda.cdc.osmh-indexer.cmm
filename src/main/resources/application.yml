@@ -121,7 +121,7 @@ osmhConsumer:
     - url: http://nesstar.soc.cas.cz/oai-pmh
       name: 'CSDA (Nesstar)'
       handler: 'http://cdc-osmh-repo-nesstar:9842'
-    - url:  http://149.132.157.156/oai-pmh
+    - url:  http://nesstar.unidata.unimib.it/oai-pmh
       name: 'Unidata (Nesstar)'
       handler: 'http://cdc-osmh-repo-nesstar:9842'
     - url:  http://nesstar-server.sodanet.gr/oai-pmh
@@ -186,6 +186,6 @@ osmhConsumer:
     - url: http://nesstar.soc.cas.cz/oai-pmh
       name: 'CSDA (Nesstar)'
       handler: 'http://localhost:9842'
-    - url:  http://149.132.157.156/oai-pmh
+    - url:  http://nesstar.unidata.unimib.it/oai-pmh
       name: 'Unidata (Nesstar)'
       handler: 'http://localhost:9842'
