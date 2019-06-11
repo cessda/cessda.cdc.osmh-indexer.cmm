@@ -75,7 +75,7 @@ public class ConsumerScheduler {
    */
 
   @ManagedOperation(description = "Manual trigger to do an incremental harvest and ingest")
-  //@Scheduled(cron = "${osmhConsumer.daily.run}") Use Jenkins job instead
+  @Scheduled(cron = "${osmhConsumer.daily.run}") //Use Jenkins job instead
   public void dailyIncrementalHarvestAndIngestionAllConfiguredSPsReposRecords() {
     Instant startTime = Instant.now();
     LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime.toEpochMilli()), ZoneId.systemDefault());
@@ -87,7 +87,7 @@ public class ConsumerScheduler {
   /**
    * Weekly run.
    */
-  //@Scheduled(cron = "${osmhConsumer.daily.sunday.run}") Use Jenkins job instead
+  @Scheduled(cron = "${osmhConsumer.daily.sunday.run}") //Use Jenkins job instead
   public void weeklyFullHarvestAndIngestionAllConfiguredSPsReposRecords() {
     log.info("Once a Week Full Run. Triggered by cron - STARTED");
     fullHarvestAndIngestionAllConfiguredSPsReposRecords();
