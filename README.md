@@ -1,4 +1,4 @@
-# PaSC OSMH Handler OAI-PMH
+# OSMH Handler OAI-PMH
 
 Cessda PaSC OSMH repository handler for harvesting OAI-PMH metadata format
 
