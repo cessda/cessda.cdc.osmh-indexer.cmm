@@ -1,4 +1,4 @@
-# PaSC - OSMH Consumer Indexer (PaSC-OCI)
+# OSMH Consumer Indexer (PaSC-OCI)
 
 Cessda PaSC Consumer Indexer (an OSMH Consumer) for Metadata harvesting  and ingestion into Elasticsearch.
 See the [OSMH System Architecture Document](https://docs.google.com/document/d/1RrXjpbyUGdd5FKSjrnQmRdbzaCQzE2W-92lYKs1KeCA/edit) for more information about The Open Source Metadata Harvester (OSMH).
