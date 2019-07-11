@@ -61,6 +61,7 @@ pipeline {
 					waitForQualityGate abortPipeline: true
 				}
 			}
+            when { branch 'master' }
 		}
 		stage('Build Docker image') {
 			 steps {
@@ -82,7 +83,7 @@ pipeline {
 					build job: 'cessda.cdc.deploy/master', parameters: [string(name: 'osmh_indexer_image_tag', value: "${image_tag}"), string(name: 'module', value: 'osmh-indexer')], wait: false
 				}
 			}
+            when { branch 'master' }
 		}
-		when { branch 'master' }
 	}
 }
