@@ -29,7 +29,7 @@ pipeline {
 		stage('Build Project') {
 			steps {
 				withMaven {
-				    sh 'mvn clean deploy -Pdocker-compose -Dmaven.test.failure.ignore=true'					
+				    sh 'mvn clean deploy'					
 				}
 			}
 			when { branch 'master' }
@@ -38,7 +38,7 @@ pipeline {
 		stage('Test Project') {
 			steps {
 				withMaven {
-					sh 'mvn clean test -Pdocker-compose'					
+					sh 'mvn clean test'					
 				}
 			}
 			when { not { branch 'master' } }
