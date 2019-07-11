@@ -27,30 +27,46 @@ pipeline {
 		}
 		// Building on master
 		stage('Build Project') {
+            agent {
+                docker {
+                    image 'maven:3-jdk-11'
+                    reuseNode true
+                }
+            }
 			steps {
 				withMaven {
-				    sh 'mvn clean deploy -Pdocker-compose -Dmaven.test.failure.ignore=true'					
+                    sh 'export PATH=$MVN_CMD_DIR:$PATH && mvn clean deploy'				
 				}
 			}
 			when { branch 'master' }
 		}
         // Not running on master - test only (for PRs and integration branches)
 		stage('Test Project') {
+            agent {
+                docker {
+                    image 'maven:3-jdk-11'
+                    reuseNode true
+                }
+            }
 			steps {
 				withMaven {
-					sh 'mvn clean test -Pdocker-compose'					
+					sh 'export PATH=$MVN_CMD_DIR:$PATH && mvn clean test'					
 				}
 			}
 			when { not { branch 'master' } }
 		}
 		stage('Run Sonar Scan') {
+            agent {
+                docker {
+                    image 'maven:3-jdk-11'
+                    reuseNode true
+                }
+            }
 			steps {
 				withSonarQubeEnv('cessda-sonar') {
-					nodejs('node') {
-						withMaven {
-							sh 'mvn sonar:sonar -Pdocker-compose'
-						}
-					}
+                    withMaven {
+                        sh 'export PATH=$MVN_CMD_DIR:$PATH && mvn sonar:sonar'
+                    }
 				}
 			}
 			when { branch 'master' }
