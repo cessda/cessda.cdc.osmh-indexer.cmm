@@ -60,7 +60,7 @@ elasticsearch:
   numberOfShards: 2
   numberOfReplicas: 0
 osmhConsumer:
-  languages: ['cs', 'da', 'de', 'el', 'en', 'et', 'fi', 'fr', 'hu', 'it', 'nl', 'no', 'po', 'sk', 'sl', 'sr', 'sv']
+  languages: ['cs', 'da', 'de', 'el', 'en', 'et', 'fi', 'fr', 'hu', 'it', 'nl', 'no', 'pt', 'sk', 'sl', 'sr', 'sv']
   delay:
     # Auto Starts after delay of 1min at startup
     initial: '60000'
@@ -135,6 +135,9 @@ osmhConsumer:
       preferredMetadataParam: oai_ddi
       name: 'CSDA (Nesstar)'
       handler: 'http://cdc-osmh-repo-nesstar:9842'
+    - url:  http://nesstar.unidata.unimib.it/oai-pmh
+      name: 'Unidata (Nesstar)'
+      handler: 'http://cdc-osmh-repo-nesstar:9842'
     - url:  http://nesstar-server.sodanet.gr/oai-pmh
       preferredMetadataParam: oai_ddi
       name: 'SoDaNet (Nesstar)'
@@ -202,6 +205,6 @@ osmhConsumer:
     - url: http://nesstar.soc.cas.cz/oai-pmh
       name: 'CSDA (Nesstar)'
       handler: 'http://localhost:9842'
-    - url:  http://149.132.157.156/oai-pmh
+    - url:  http://nesstar.unidata.unimib.it/oai-pmh
       name: 'Unidata (Nesstar)'
       handler: 'http://localhost:9842'

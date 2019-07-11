@@ -115,7 +115,7 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
 
     then(languageDocMap).isNotNull();
     then(languageDocMap).hasSize(17);
-    then(languageDocMap).containsOnlyKeys("cs", "da", "de", "el", "en", "et", "fi", "fr", "hu", "it", "nl", "no", "po", "sk", "sl", "sr", "sv");
+    then(languageDocMap).containsOnlyKeys("cs", "da", "de", "el", "en", "et", "fi", "fr", "hu", "it", "nl", "no", "pt", "sk", "sl", "sr", "sv");
     then(languageDocMap.get("de")).hasSize(1);
     then(languageDocMap.get("en")).hasSize(1);
     then(languageDocMap.get("fi")).hasSize(1);
@@ -142,7 +142,7 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
 
     then(languageDocMap).isNotNull();
     then(languageDocMap).hasSize(17);
-    then(languageDocMap).containsOnlyKeys("cs", "da", "de", "el", "en", "et", "fi", "fr", "hu", "it", "nl", "no", "po", "sk", "sl", "sr", "sv");
+    then(languageDocMap).containsOnlyKeys("cs", "da", "de", "el", "en", "et", "fi", "fr", "hu", "it", "nl", "no", "pt", "sk", "sl", "sr", "sv");
     then(languageDocMap.get("de")).hasSize(2); // a deleted record and an active record that is valid
     then(languageDocMap.get("en")).hasSize(2); // a deleted record and an active record that is valid
     then(languageDocMap.get("fi")).hasSize(2); // a deleted record and an active record that is valid

@@ -58,3 +58,4 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
+.vscode/
