@@ -46,11 +46,9 @@ pipeline {
 		stage('Run Sonar Scan') {
 			steps {
 				withSonarQubeEnv('cessda-sonar') {
-					nodejs('node') {
-						withMaven {
-							sh 'mvn sonar:sonar -Pdocker-compose'
-						}
-					}
+                    withMaven {
+                        sh 'mvn sonar:sonar'
+                    }
 				}
 			}
 			when { branch 'master' }
