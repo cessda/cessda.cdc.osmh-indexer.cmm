@@ -35,7 +35,7 @@ pipeline {
             }
 			steps {
 				withMaven {
-				    sh 'mvn clean deploy'					
+                    sh 'export PATH=$MVN_CMD_DIR:$PATH && mvn clean deploy'				
 				}
 			}
 			when { branch 'master' }
@@ -50,7 +50,7 @@ pipeline {
             }
 			steps {
 				withMaven {
-					sh 'mvn clean test'					
+					sh 'export PATH=$MVN_CMD_DIR:$PATH && mvn clean test'					
 				}
 			}
 			when { not { branch 'master' } }
@@ -65,7 +65,7 @@ pipeline {
 			steps {
 				withSonarQubeEnv('cessda-sonar') {
                     withMaven {
-                        sh 'mvn sonar:sonar'
+                        sh 'export PATH=$MVN_CMD_DIR:$PATH && mvn sonar:sonar'
                     }
 				}
 			}
