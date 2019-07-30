@@ -142,7 +142,7 @@ for details on our code of conduct, and the process for submitting pull requests
 
 ## Authors
 
-* **Moses Mansaray <moses@doraventures.com>** - *Initial work, first version release*
+* **Moses Mansaray <moses AT doraventures DOT com>** - *Initial work, first version release*
 
 You can find the list of all contributors [here](CONTRIBUTORS.md)
 
