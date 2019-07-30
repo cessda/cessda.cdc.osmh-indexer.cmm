@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 /**
  * Service responsible for triggering Metadata Harvesting and ingestion into the search engine
  *
- * @author moses@doraventures.com
+ * @author moses AT doravenetures DOT com
  */
 @Component
 @ManagedResource

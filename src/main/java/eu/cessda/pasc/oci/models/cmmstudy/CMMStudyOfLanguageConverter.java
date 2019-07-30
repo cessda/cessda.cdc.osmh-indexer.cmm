@@ -34,7 +34,7 @@ import java.util.Optional;
  *  }
  * </pre>
  *
- * @author moses@doraventures.com
+ * @author moses AT doravenetures DOT com
  */
 @Slf4j
 public class CMMStudyOfLanguageConverter {

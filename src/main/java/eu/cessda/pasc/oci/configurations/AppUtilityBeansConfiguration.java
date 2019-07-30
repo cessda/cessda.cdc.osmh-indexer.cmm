@@ -44,7 +44,7 @@ import java.util.List;
 /**
  * Extra Util configuration
  *
- * @author moses@doraventures.com
+ * @author moses AT doravenetures DOT com
  */
 @Configuration
 @EnableElasticsearchRepositories(basePackages = "eu.cessda.pasc.oci.repository")

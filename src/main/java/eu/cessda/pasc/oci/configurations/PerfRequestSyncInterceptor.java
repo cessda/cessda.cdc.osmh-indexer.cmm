@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * HTTP request interceptor for logging response times
  *
- * @author moses@doraventures.com
+ * @author moses AT doravenetures DOT com
  */
 @Component
 @Slf4j

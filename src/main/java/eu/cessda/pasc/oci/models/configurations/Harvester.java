@@ -20,7 +20,7 @@ import lombok.Setter;
 /**
  * Harvester Configurations
  *
- * @author moses@doraventures.com
+ * @author moses AT doravenetures DOT com
  */
 @Getter
 @Setter

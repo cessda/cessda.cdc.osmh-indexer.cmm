@@ -41,7 +41,7 @@ import static eu.cessda.pasc.oci.helpers.AppConstants.LAST_MODIFIED_FIELD;
 /**
  * Service responsible for triggering harvesting and Metadata ingestion to the search engine
  *
- * @author moses@doraventures.com
+ * @author moses AT doravenetures DOT com
  */
 @Service
 @Slf4j

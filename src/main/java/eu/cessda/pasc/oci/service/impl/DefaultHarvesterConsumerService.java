@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
 /**
  * Default OSMH Consumer Service implementation
  *
- * @author moses@doraventures.com
+ * @author moses AT doravenetures DOT com
  */
 @Service
 @Slf4j

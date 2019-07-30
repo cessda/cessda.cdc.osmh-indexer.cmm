@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
  * "dataCollectionFreeText": "Free text 1 in a given Language",
  * "event": "event start, single or end"
  *
- * @author moses@doraventures.com
+ * @author moses AT doravenetures DOT com
  */
 @Builder
 @NoArgsConstructor

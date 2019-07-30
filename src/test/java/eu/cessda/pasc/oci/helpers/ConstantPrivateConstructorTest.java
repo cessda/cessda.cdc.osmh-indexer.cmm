@@ -26,7 +26,7 @@ import static org.junit.Assert.assertTrue;
 
 
 /**
- * @author moses@doraventures.com
+ * @author moses AT doravenetures DOT com
  */
 public class ConstantPrivateConstructorTest {
 

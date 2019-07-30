@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * Endpoints configuration model
  *
- * @author moses@doraventures.com
+ * @author moses AT doravenetures DOT com
  */
 @Getter
 @Setter

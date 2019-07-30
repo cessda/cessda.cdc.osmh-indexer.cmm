@@ -30,7 +30,7 @@ import java.io.IOException;
  *  }
  * </pre>
  *
- * @author moses@doraventures.com
+ * @author moses AT doravenetures DOT com
  */
 public class CMMStudyConverter {
 

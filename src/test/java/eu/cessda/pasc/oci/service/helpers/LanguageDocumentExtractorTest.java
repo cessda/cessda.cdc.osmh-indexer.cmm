@@ -34,7 +34,7 @@ import static eu.cessda.pasc.oci.data.RecordTestData.getSyntheticCMMStudyAndADel
 import static org.assertj.core.api.Java6BDDAssertions.then;
 
 /**
- * @author moses@doraventures.com
+ * @author moses AT doravenetures DOT com
  */
 @RunWith(SpringRunner.class)
 public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileContext {

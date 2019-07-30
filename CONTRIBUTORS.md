@@ -1,15 +1,14 @@
-<<<<<<< HEAD
 # Project Name
 
 ## First Name - Last Name ##
 
-Descritption of the person role
+Description of the person role
 =======
-# PaSC OSMH Handler OAI-PMH
+# CDC OSMH Handler OAI-PMH
 
 ## Contributors
 
 Name            | Email                     | Role
 :---            | :---                      | :---
-Moses Mansaray  | <moses@doravnetures.com>  | Metadata backend development consultant
->>>>>>> master
+Moses Mansaray  | <moses AT doraventures DOT com>  | Metadata backend development consultant
+John Shepherdson  | <john DOT shepherdson AT cessda DOT eu>  |Platform Delivery Director

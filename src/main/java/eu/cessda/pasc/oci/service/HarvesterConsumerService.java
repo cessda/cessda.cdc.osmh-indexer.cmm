@@ -25,7 +25,7 @@ import java.util.Optional;
 /**
  * Service responsible for consuming harvested and Metadata via OSMH Harvester
  *
- * @author moses@doraventures.com
+ * @author moses AT doravenetures DOT com
  */
 public interface HarvesterConsumerService {
 

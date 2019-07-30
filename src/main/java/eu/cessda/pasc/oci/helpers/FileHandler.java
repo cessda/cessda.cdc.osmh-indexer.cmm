@@ -23,7 +23,7 @@ import java.io.IOException;
 /**
  * File handling helper methods
  *
- * @author moses@doraventures.com
+ * @author moses AT doravenetures DOT com
  */
 @Component
 @Slf4j

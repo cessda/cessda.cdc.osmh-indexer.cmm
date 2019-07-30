@@ -20,7 +20,7 @@ import static eu.cessda.pasc.oci.repository.StudyIdentifierEncoder.encodeStudyId
 import static org.assertj.core.api.BDDAssertions.then;
 
 /**
- * @author moses@doraventures.com
+ * @author moses AT doravenetures DOT com
  */
 public class StudyIdentifierEncoderTest {
 

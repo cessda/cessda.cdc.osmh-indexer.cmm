@@ -33,7 +33,7 @@ import java.util.Optional;
  * <p>
  * FIXME: Remove this fake and call the Harvester directly with the repo url
  *
- * @author moses@doraventures.com
+ * @author moses AT doravenetures DOT com
  */
 @Component
 public class FakeHarvester {

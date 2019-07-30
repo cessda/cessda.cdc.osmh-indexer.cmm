@@ -31,7 +31,7 @@ import static eu.cessda.pasc.oci.helpers.LogHelper.logResponse;
 /**
  * Shareable Dao functions
  *
- * @author moses@doraventures.com
+ * @author moses AT doravenetures DOT com
  */
 @Component
 @Slf4j

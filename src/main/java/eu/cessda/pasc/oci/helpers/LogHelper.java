@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
 /**
  * Log Helper
  *
- * @author moses@doraventures.com
+ * @author moses AT doravenetures DOT com
  */
 public class LogHelper {
 

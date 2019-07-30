@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 /**
  * Bean for JMX debugging
  *
- * @author moses@doraventures.com
+ * @author moses AT doravenetures DOT com
  */
 @Component
 @ManagedResource

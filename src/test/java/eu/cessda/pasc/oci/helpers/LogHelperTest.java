@@ -23,7 +23,7 @@ import org.springframework.http.HttpStatus;
 import static org.mockito.Mockito.*;
 
 /**
- * @author moses@doraventures.com
+ * @author moses AT doravenetures DOT com
  */
 @Slf4j
 public class LogHelperTest {

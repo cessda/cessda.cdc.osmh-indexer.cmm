@@ -31,7 +31,7 @@ import static java.util.Optional.ofNullable;
  * <p>
  * Note the CMM record must meet the minimum CMM Fields requirements.
  *
- * @author moses@doraventures.com
+ * @author moses AT doravenetures DOT com
  */
 @Component
 public class LanguageAvailabilityMapper {

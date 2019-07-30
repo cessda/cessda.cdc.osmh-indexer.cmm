@@ -29,7 +29,7 @@ import static eu.cessda.pasc.oci.repository.StudyIdentifierEncoder.encodeStudyId
 /**
  * A Pasc Harvester Service implementation
  *
- * @author moses@doraventures.com
+ * @author moses AT doravenetures DOT com
  */
 @Service
 @Slf4j

@@ -1,11 +1,11 @@
 # OSMH Consumer Indexer (PaSC-OCI)
 
-Cessda PaSC Consumer Indexer (an OSMH Consumer) for Metadata harvesting  and ingestion into Elasticsearch.
+CESSDA CDC Consumer Indexer (an OSMH Consumer) for Metadata harvesting  and ingestion into Elasticsearch.
 See the [OSMH System Architecture Document](https://docs.google.com/document/d/1RrXjpbyUGdd5FKSjrnQmRdbzaCQzE2W-92lYKs1KeCA/edit) for more information about The Open Source Metadata Harvester (OSMH).
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing 
+These instructions will get you a copy of the project up and running on your local machine for development and testing
 purposes. See deployment for notes on how to deploy the project on a live system.
 
 ### Test it
@@ -55,7 +55,7 @@ On mac this can be done with `brew`
 
 ## Running the tests
 
-### How to run the automated tests and sonar report in CI 
+### How to run the automated tests and sonar report in CI
 
 `mvn clean install sonar:sonar -Dsonar.host.url=http://localhost:9000`
 
@@ -109,14 +109,14 @@ daily:
 
 ## Contributing
 
-Please read [CESSDA Guideline for developpers](https://bitbucket.org/cessda/cessda.guidelines.cit/wiki/Developers) 
+Please read [CESSDA Guideline for developpers](https://bitbucket.org/cessda/cessda.guidelines.cit/wiki/Developers)
 for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Versioning
 
 ## Authors
 
-* **Moses Mansaray <moses@doraventures.com>** - *Initial work, first version release*
+* **Moses Mansaray <moses AT doravenetures DOT com>** - *Initial work, first version release*
 
 You can find the list of all contributors [here](CONTRIBUTORS.md)
 

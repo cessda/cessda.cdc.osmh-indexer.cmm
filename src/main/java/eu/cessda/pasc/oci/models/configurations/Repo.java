@@ -21,7 +21,7 @@ import lombok.ToString;
 /**
  * Repo configuration model
  *
- * @author moses@doraventures.com
+ * @author moses AT doravenetures DOT com
  */
 @Getter
 @Setter

@@ -46,7 +46,7 @@ import static org.mockito.Mockito.*;
 
 
 /**
- * @author moses@doraventures.com
+ * @author moses AT doravenetures DOT com
  */
 @RunWith(SpringRunner.class)
 public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
