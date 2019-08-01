@@ -4,8 +4,8 @@ server:
 #  context-path: '/osmh-repo'
 security:
   user:
-    name: springadmin
-    password: C3ssd@2018!
+    name: ${SECURITY_USER_NAME}
+    password: ${SECURITY_USER_PASSWORD}
   basic.enabled: false            # Public API disable security on non-admin endpoints
 management.security.enabled: true # Enable security on admin endpoints
 endpoints.shutdown.enabled: true
@@ -22,9 +22,9 @@ spring:
     default-domain: pasc-osmh-handler-oai-pmh
   boot:
     admin:
-      #     url: http://localhost:8087 For dev, stg & prod set this at the specific active profile. Run app with profile set
-      username: springadmin
-      password: C3ssd@2018!
+#     url: http://localhost:8087 For dev, stg & prod set this at the specific active profile. Run app with profile set
+      username: ${SPRING_BOOT_ADMIN_USERNAME}
+      password: ${SPRING_BOOT_ADMIN_PASSWORD}
       client.name: pasc-osmh-handler-oai-pmh
       turbine:
         clusters: default
