@@ -27,18 +27,45 @@
 *.sql
 *.sqlite
 
-# OS generated files #
+### OS generated files #
 ######################
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
 
-target/
-!.mvn/wrapper/maven-wrapper.jar
+### Windows ###
+Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+Desktop.ini
+$RECYCLE.BIN/
+.vs/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+
+### MacOS ###
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+Icon
+
+
+### IDE generated files #
+######################
 
 ### STS ###
 .apt_generated
@@ -48,7 +75,7 @@ target/
 .settings
 .springBeans
 
-### IntelliJ IDEA ###
+### IntelliJ IDEA/Jetbrains ###
 .idea
 *.iws
 *.iml
@@ -61,3 +88,29 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
+
+### Sass ###
+.sass-cache/
+*.css.map
+
+
+### Maven files #
+######################
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+
+### Node files #
+######################
+/node_modules/
+
+### Build files #
+######################
+/dist/
+/bin
+/obj/Debug
+
+### Test Coverage files #
+######################
+/coverage/
+junit.xml

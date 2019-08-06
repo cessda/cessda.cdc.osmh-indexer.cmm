@@ -1,10 +1,10 @@
-# OSMH Handler OAI-PMH
+# OSMH Handler OAI-PMH v2.1.0
 
-Cessda PaSC OSMH repository handler for harvesting OAI-PMH metadata format
+CDC OSMH repository handler for harvesting OAI-PMH metadata format
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing 
+These instructions will get you a copy of the project up and running on your local machine for development and testing
 purposes. See deployment for notes on how to deploy the project on a live system.
 
 ### Test it
@@ -23,13 +23,13 @@ Static code quality with verification with SonarQube
 ### Build it
 Prepares a clean jar package
 
-    mvn clean package 
+    mvn clean package
 
-### Run it 
+### Run it
 Runs the built jar
 
-    java -Xms2G -Xmx4G -jar target/pasc-osmh-handler-oai-pmh*.jar 
-    
+    java -Xms2G -Xmx4G -jar target/pasc-osmh-handler-oai-pmh*.jar
+
 ### Run it one-liner
 
     mvn clean package && java -Xms2G -Xmx4G -jar target/pasc-osmh-handler-oai-pmh*.jar
@@ -52,16 +52,16 @@ Note if no profile flag is set the default profile will be used. Which is non.
 ### Run it local docker as in CI
 
 Log into GCR to be able to download the default java image (note the personal user token after `-p` flag)
-    
+
     docker login -u _json_key -p "$(cat dev_files/Technical-Infrastructure-f626925a1edb.json)" https://eu.gcr.io
-    
+
 Then test you can manually download the image
-    
+
     docker pull eu.gcr.io/cessda-development/cessda-java:latest
-  
+
 If successful then build image with docker file in the root `dir`
 
-    docker build . 
+    docker build .
 
 Run the docker image
 
@@ -89,7 +89,7 @@ On mac this can be done with `brew`
 
 ## Running the tests
 
-### How to run the automated tests and sonar report in CI 
+### How to run the automated tests and sonar report in CI
 
 `mvn clean install sonar:sonar -Dsonar.host.url=http://localhost:9000`
 
@@ -127,7 +127,7 @@ all environment properties can be changed at runtime.
 **CHANGES MADE AT RUNTIME WILL BE**
 * **EFFECTIVE AFTER A CONTEXT RELOAD**
 * **LOST AFTER AN APPLICATION RESTART UNLESS PERSISTED IN APPLICATION.yml**
- 
+
 
 ## Built With
 
@@ -135,14 +135,14 @@ all environment properties can be changed at runtime.
 
 ## Contributing
 
-Please read [CESSDA Guideline for developpers](https://bitbucket.org/cessda/cessda.guidelines.cit/wiki/Developers) 
+Please read [CESSDA Guideline for developpers](https://bitbucket.org/cessda/cessda.guidelines.cit/wiki/Developers)
 for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Versioning
 
 ## Authors
 
-* **Moses Mansaray <moses AT doraventures DOT com>** - *Initial work, first version release*
+* **Moses Mansaray <moses AT doraventures DOT com>** - *Version 2.0.0 and 2.1.0 releases*
 
 You can find the list of all contributors [here](CONTRIBUTORS.md)
 
@@ -151,20 +151,10 @@ You can find the list of all contributors [here](CONTRIBUTORS.md)
 This project is licensed under the Apache 2 License - see the [LICENSE](LICENSE) file for details
 
 ## Acknowledgments
-
+N/A
 
 
 ## Edge Case and Assumptions:
 
-- If publicationYear cannot be parsed to an Int we default to epoch year 1970
-- Note the dirty extra "/" workaround in the [application.yml](src/main/resources/application.yml) repository
- configuration for GESIS (and GESIS DE) who separate records to different metadata prefix per language hosted
- with the same repository url.  This url in a way act as a key, so the extra "/" distinguishes the two for the specific 
- metadataPrefix to be retrieved.  There must be a better way to handle this edge case that is specific to GESIS.  
- Not seen other SPs with this implementation that separate records in different languages by using a different 
- metadataPrefix, so leaving this as is for now. This workaround affects this project and the pasc-oci
-
-## TODO 
-
-- Check for exception type in Constructors for more specific error message with the EntityResponse
-- Remove Principal Investigator
+* If publicationYear cannot be parsed to an Int we default to epoch year 1970
+* Note the extra "/" workaround in the application.yml repository configuration for repositories that separate records with a different metadata prefix per language accessed with the same basic url. This url in a way act as a key, so the extra "/" distinguishes the two for the specific metadataPrefix to be retrieved. There must be a better way to handle this edge case. This workaround affects this project and the pasc-oci as well.
