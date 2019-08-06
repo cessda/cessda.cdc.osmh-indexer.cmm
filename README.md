@@ -1,6 +1,6 @@
 # OSMH Consumer Indexer (PaSC-OCI)
 
-CESSDA CDC Consumer Indexer (an OSMH Consumer) for Metadata harvesting  and ingestion into Elasticsearch.
+CESSDA CDC Consumer Indexer (an OSMH Consumer) for Metadata harvesting and ingestion into Elasticsearch.
 See the [OSMH System Architecture Document](https://docs.google.com/document/d/1RrXjpbyUGdd5FKSjrnQmRdbzaCQzE2W-92lYKs1KeCA/edit) for more information about The Open Source Metadata Harvester (OSMH).
 
 ## Getting Started
@@ -40,7 +40,7 @@ Note if no profile flag is set the default profile will be used. Which is non.
 The following is expected to be install before building running.  To install see your preferred package manager like.
 On mac this can be done with `brew`
 
-* Java JDK 8
+* Java JDK 11
 * Maven
 
 `brew tap caskroom/versions`
@@ -64,7 +64,7 @@ On mac this can be done with `brew`
 ### Break down into end to end tests
 
 * Makes use of TDD
-* For integrations test, loads up an embedded elasticsearch server with tests against it
+* For integrations test, loads up an embedded Elasticsearch server with tests against it
 
 ## Deployment
 
@@ -76,32 +76,41 @@ Configuration is loaded and overwritten in this order
 * application.yml
 * CLI parameters e.g. `--logging.level.=DEBUG` sets logging level for all classes
 
+Note that usernames
+
+*${SECURITY_USER_NAME}*
+
+*${SPRING_BOOT_ADMIN_USERNAME}*
+
+and passwords
+
+*${SECURITY_USER_PASSWORD}*
+
+*${SPRING_BOOT_ADMIN_PASSWORD}*
+
+are defined externally, and consumed by *application.yml* at runtime.
+
 ### At Runtime
 
 If the app is registered at a [spring boot admin server](https://github.com/codecentric/spring-boot-admin)
 all environment properties can be changed at runtime.
 
-**CHANGES MADE AT RUNTIME WILL BE**
-**EFFECTIVE AFTER A CONTEXT RELOAD**
-**LOST AFTER AN APPLICATION RESTART UNLESS PERSISTED IN APPLICATION.yml**
+**Changes made at runtime will be effective after a context reload but are lost
+after an application restart unless persisted in** *application.yml*
+
 
 ## Timers Properties
 
-Harvesting Schedule timers (different for each instance):
+Harvesting Schedule timers:
 
 ```yaml
 osmhConsumer:
  delay:
-    # Auto Starts after delay of 1min at startup
+    # Auto Starts after delay of 60 seconds at startup
     initial: '60000'
-    # Yearly clean up run
-    fixed: '315360000000'
-daily:
-   # Daily Harvest and Ingestion run at 00:01am.
-    run: '0 01 00 * * *'
-    # Then run every Sunday at 09:00
-    sunday.run: '0 00 09 * * SUN'
 ```
+
+Don't set a daily/Sunday timer, otherwise all running instances will attempt to reharvest the same endpoints at the same time.
 
 ## Built With
 
@@ -128,4 +137,4 @@ This project is licensed under the Apache 2 License - see the [LICENSE](LICENSE)
 
 ## Edge Case and Assumptions
 
-* Note the dirty extra "/" workaround in the [application.yml](src/main/resources/application.yml) repository configuration for GESIS (and GESIS DE) who separate records to different metadata prefix per language hosted with the same repository url.  This url in a way act as a key, so the extra "/" distinguishes the two for the specific metadataPrefix to be retrieved.  There must be a better way to handle this edge case that is specific to GESIS. Not seen other SPs with this implementation that separate records in different languages by using a different metadataPrefix, so leaving this as is for now.  This workaround affects this project and the pasc-osmh-handler-oai-pmh
+* Note the extra "/" workaround in the [application.yml](src/main/resources/application.yml) repository configuration for repositories that separate records with a different metadata prefix per language accessed with the same basic url.  This url in a way act as a key, so the extra "/" distinguishes the two for the specific metadataPrefix to be retrieved.  There must be a better way to handle this edge case.  This workaround affects this project and the pasc-osmh-handler-oai-pmh as well.
