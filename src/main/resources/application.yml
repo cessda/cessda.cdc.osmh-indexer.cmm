@@ -146,25 +146,30 @@ osmhConsumer:
 
 ---
 spring:
-  profiles: dev
+  profiles: gcp
   main:
-        banner-mode: "off"
+    banner-mode: "off"
   boot:
     admin:
       client:
         prefer-ip: true
-      url: http://localhost:8087
+      url: ${SPRING_BOOT_ADMIN_URL}
+  output.ansi.enabled: NEVER
 logging:
   level:
-    eu.cessda.pasc.oci.service: INFO
-    eu.cessda.pasc.oci.repository: INFO
-    eu.cessda.pasc.oci.helpers: INFO
-    eu.cessda.pasc.oci.configurations.PerfRequestSyncInterceptor: INFO
+    eu.cessda.pasc.oci.service: ${SPRING_LOGGING_LEVEL}
+    eu.cessda.pasc.oci.repository: ${SPRING_LOGGING_LEVEL}
+    eu.cessda.pasc.oci.helpers: ${SPRING_LOGGING_LEVEL}
+    eu.cessda.pasc.oci.configurations.PerfRequestSyncInterceptor: ${SPRING_LOGGING_LEVEL}
 elasticsearch:
   host: cdc-es  # must match profile name
   numberOfShards: 2
   numberOfReplicas: 2
-
+osmhConsumer:
+  daily:
+    # The following variables are defined using cron notation
+    run: ${OSMHCONSUMER_DAILY_RUN}
+    sunday.run: ${OSMHCONSUMER_DAILY_SUNDAY_RUN}
 ---
 spring:
   profiles: local
@@ -176,7 +181,6 @@ spring:
 logging:
   level:
     eu.cessda.pasc.oci.repository: DEBUG
-
 osmhConsumer:
   endpoints:
     repos:
