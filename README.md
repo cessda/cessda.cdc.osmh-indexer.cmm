@@ -135,8 +135,8 @@ all environment properties can be changed at runtime.
 
 ## Contributing
 
-Please read [CESSDA Guideline for developpers](https://bitbucket.org/cessda/cessda.guidelines.cit/wiki/Developers)
-for details on our code of conduct, and the process for submitting pull requests to us.
+Please read [Contributing to CESSDA Open Source Software](https://bitbucket.org/cessda/cessda.guidelines.public/src/master/CONTRIBUTING.md)
+for information on contribution to CESSDA software.
 
 ## Versioning
 
