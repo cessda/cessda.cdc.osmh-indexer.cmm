@@ -118,8 +118,8 @@ Don't set a daily/Sunday timer, otherwise all running instances will attempt to 
 
 ## Contributing
 
-Please read [CESSDA Guideline for developpers](https://bitbucket.org/cessda/cessda.guidelines.cit/wiki/Developers)
-for details on our code of conduct, and the process for submitting pull requests to us.
+Please read [Contributing to CESSDA Open Source Software](https://bitbucket.org/cessda/cessda.guidelines.public/src/master/CONTRIBUTING.md)
+for information on contribution to CESSDA software.
 
 ## Versioning
 
