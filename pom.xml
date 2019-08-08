@@ -17,8 +17,8 @@
 	<version>${revision}</version>
   <packaging>jar</packaging>
 
-  <name>pasc-oci</name>
-  <description>Cessda PaSC OSMH Consumer Indexer (pasc-oci) for harvested Metadata</description>
+  <name>CESSDA Data Catalogue OSMH Indexer</name>
+  <description>Cessda CDC OSMH harvester</description>
 
   <parent>
     <groupId>org.springframework.boot</groupId>
@@ -43,9 +43,9 @@
     <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     <jacoco-maven-plugin.version>0.8.3</jacoco-maven-plugin.version>
     <sonar.exclusions>**/models/**</sonar.exclusions>
-    <sonar.links.scm>https://bitbucket.org/cessda/cessda.pasc.osmh-indexer.cmm</sonar.links.scm>
-    <sonar.links.issue>https://bitbucket.org/cessda/cessda.pasc.version2/issues</sonar.links.issue>
-    <sonar.links.homepage>https://bitbucket.org/cessda/cessda.pasc.version2/wiki/Home</sonar.links.homepage>
+    <sonar.links.scm>https://bitbucket.org/cessda/cessda.cdc.osmh-indexer.cmm</sonar.links.scm>
+    <sonar.links.issue>https://bitbucket.org/cessda/cessda.cdc.version2/issues</sonar.links.issue>
+    <sonar.links.homepage>https://bitbucket.org/cessda/cessda.cdc.version2/wiki/Home</sonar.links.homepage>
     <sonar.links.ci>https://jenkins.cessda.eu/</sonar.links.ci>
     <!--Sonar Pros: ends-->
     <lombok.version>1.18.6</lombok.version>
