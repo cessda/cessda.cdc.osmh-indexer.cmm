@@ -16,7 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 -->
-  <groupId>cdc-osmh-oaipmh-handler</groupId>
+  <groupId>eu.cessda.pasc</groupId>
   <artifactId>pasc-osmh-handler-oai-pmh</artifactId>
   <version>${revision}</version>
   <packaging>jar</packaging>
