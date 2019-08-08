@@ -16,13 +16,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 -->
-  <groupId>eu.cessda.pasc</groupId>
+  <groupId>cdc-osmh-oaipmh-handler</groupId>
   <artifactId>pasc-osmh-handler-oai-pmh</artifactId>
   <version>${revision}</version>
   <packaging>jar</packaging>
 
-  <name>pasc-osmh-handler-oai-pmh</name>
-  <description>Cessda PaSC OSMH repository handler for harvesting OAI-PMH metadata format</description>
+  <name>CESSDA Data Catalogue OSMH OAI-PMH Handler</name>
+  <description>Cessda CDC OSMH repository handler for harvesting OAI-PMH metadata format from OAI-PMH endpoints</description>
 
   <parent>
     <groupId>org.springframework.boot</groupId>
@@ -46,9 +46,9 @@
     <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
     <jacoco-maven-plugin.version>0.8.3</jacoco-maven-plugin.version>
     <sonar.exclusions>**/models/**</sonar.exclusions>
-    <sonar.links.scm>https://bitbucket.org/cessda/cessda.pasc.osmh-repository-handler.oai-pmh</sonar.links.scm>
-    <sonar.links.issue>https://bitbucket.org/cessda/cessda.pasc.version2/issues</sonar.links.issue>
-    <sonar.links.homepage>https://bitbucket.org/cessda/cessda.pasc.version2/wiki/Home</sonar.links.homepage>
+    <sonar.links.scm>https://bitbucket.org/cessda/cessda.cdc.osmh-repository-handler.oai-pmh</sonar.links.scm>
+    <sonar.links.issue>https://bitbucket.org/cessda/cessda.cdc.version2/issues</sonar.links.issue>
+    <sonar.links.homepage>https://bitbucket.org/cessda/cessda.cdc.version2/wiki/Home</sonar.links.homepage>
     <sonar.links.ci>https://jenkins.cessda.eu/</sonar.links.ci>
     <!--Sonar Pros: ends-->
     <jdom2.version>2.0.6</jdom2.version>
