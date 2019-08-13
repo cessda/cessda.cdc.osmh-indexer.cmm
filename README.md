@@ -1,3 +1,4 @@
+[![Build Status](https://jenkins.cessda.eu/buildStatus/icon?job=cessda.cdc.osmh-repository-handler.oai-pmh%2Fmaster)](https://jenkins.cessda.eu/job/cessda.cdc.osmh-repository-handler.oai-pmh/job/master/)
 [![Bugs](https://sonarqube.cessda.eu/api/project_badges/measure?project=eu.cessda.pasc%3Apasc-osmh-handler-oai-pmh&metric=bugs)](https://sonarqube.cessda.eu/dashboard?id=eu.cessda.pasc%3Apasc-osmh-handler-oai-pmh)
 [![Code Smells](https://sonarqube.cessda.eu/api/project_badges/measure?project=eu.cessda.pasc%3Apasc-osmh-handler-oai-pmh&metric=code_smells)](https://sonarqube.cessda.eu/dashboard?id=eu.cessda.pasc%3Apasc-osmh-handler-oai-pmh)
 [![Coverage](https://sonarqube.cessda.eu/api/project_badges/measure?project=eu.cessda.pasc%3Apasc-osmh-handler-oai-pmh&metric=coverage)](https://sonarqube.cessda.eu/dashboard?id=eu.cessda.pasc%3Apasc-osmh-handler-oai-pmh)
