@@ -16,6 +16,10 @@
 
 CDC OSMH repository handler for harvesting OAI-PMH metadata format
 
+## Quality - Software Maturity Level
+
+The overall Software Maturity Level for this product and the individual scores for each attribute can be found in the  [SML](SML.md) file.
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing
