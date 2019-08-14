@@ -16,6 +16,11 @@
 CESSDA CDC Consumer Indexer (an OSMH Consumer) for Metadata harvesting and ingestion into Elasticsearch.
 See the [OSMH System Architecture Document](https://docs.google.com/document/d/1RrXjpbyUGdd5FKSjrnQmRdbzaCQzE2W-92lYKs1KeCA/edit) for more information about The Open Source Metadata Harvester (OSMH).
 
+## Quality - Software Maturity Level
+
+The overall Software Maturity Level for this product and the individual scores for each attribute can be found in the  [SML](SML.md) file.
+
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing
