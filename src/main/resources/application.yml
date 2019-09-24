@@ -57,7 +57,7 @@ osmhhandler:
     supportedRecordTypes:
       - CMMStudy
     repos:
-      - url: https://data2.aussda.at/oai/
+      - url: https://data2.aussda.at/oai
         preferredMetadataParam: oai_ddi
       - url: http://194.117.18.18:6003/v0/oai
         preferredMetadataParam: oai_ddi25
