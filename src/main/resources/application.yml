@@ -94,17 +94,17 @@ osmhConsumer:
     - url: https://data2.aussda.at/oai
       name: 'AUSSDA'
       handler: 'http://cdc-osmh-repo:9091'
-#      - url: https://easy.dans.knaw.nl/oai/
-#        name: 'DANS (nl)'
-#        handler: 'http://cdc-osmh-repo:9091'
+    - url: http://194.117.18.18:6003/v0/oai
+      name: 'APIS'
+      handler: 'http://cdc-osmh-repo:9091'
     - url: https://easy.dans.knaw.nl/oai/
-      name: 'DANS (en)'
+      name: 'DANS'
       handler: 'http://cdc-osmh-repo:9091'
     - url: https://kuha.sa.dk/v0/oai
       name: 'DNA'
       handler: 'http://cdc-osmh-repo:9091'
     - url: http://services.fsd.uta.fi/v0/oai
-      name: 'Finnish Data Services'
+      name: 'FSD'
       handler: 'http://cdc-osmh-repo:9091'
     - url: https://dbk.gesis.org/dbkoai3/
       name: 'GESIS'
@@ -116,13 +116,13 @@ osmhConsumer:
       name: 'SND'
       handler: 'http://cdc-osmh-repo:9091'
     - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
-      name: 'UK Data Service'
+      name: 'UKDS'
       handler: 'http://cdc-osmh-repo:9091'
     - url: https://nesstar2.adp.fdv.uni-lj.si/oai-pmh
       name: 'ADP (Nesstar)'
       handler: 'http://cdc-osmh-repo-nesstar:9842'
     - url: http://fors-nesstar.unil.ch/oai-pmh
-      name: 'FORS Data Service (Nesstar)'
+      name: 'FORS (Nesstar)'
       handler: 'http://cdc-osmh-repo-nesstar:9842'
     - url: https://oai-pmh.nsd.no/oai-pmh
       name: 'NSD (Nesstar)'
