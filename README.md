@@ -90,6 +90,9 @@ On mac this can be done with `brew`
 
 Configuration is loaded and overwritten in this order
 
+* Environment Variables e.g. `SECURITY_USER_NAME`
+    * Spring can use weak binding to convert environment variables into Java properties
+    * e.g. `SPRING_BOOT_ADMIN_USERNAME` converts to `spring.boot.admin.username`
 * application-[dev,local,prod].yml
 * application.yml
 * CLI parameters e.g. `--logging.level.=DEBUG` sets logging level for all classes
@@ -116,7 +119,6 @@ all environment properties can be changed at runtime.
 **Changes made at runtime will be effective after a context reload but are lost
 after an application restart unless persisted in** *application.yml*
 
-
 ## Timers Properties
 
 Harvesting Schedule timers:
@@ -128,7 +130,7 @@ osmhConsumer:
     initial: '60000'
 ```
 
- The timer schedule for GCP use is defined in [CDC deployment repository's template-deployment.yaml](https://bitbucket.org/cessda/cessda.cdc.deploy/src/master/osmh-indexer/infrastructure/k8s/template-deployment.yaml), but if you are deploying the software elsewhere, then the timer settings in [application.yaml](/src/main/resources/application.yaml) are relevant. The profiles are defined in [application.yaml](/src/main/resources/application.yaml) and selected in [Dockerfile](Dockerfile/).
+The timer schedule for GCP use is defined in [CDC deployment repository's template-deployment.yaml](https://bitbucket.org/cessda/cessda.cdc.deploy/src/master/osmh-indexer/infrastructure/k8s/template-deployment.yaml), but if you are deploying the software elsewhere, then the timer settings in [application.yaml](/src/main/resources/application.yaml) are relevant. The profiles are defined in [application.yaml](/src/main/resources/application.yaml) and selected in [Dockerfile](Dockerfile/).
 
 Take care with the daily/Sunday timer settings, otherwise all running instances may attempt to reharvest the same endpoints at the same time.
 
@@ -140,7 +142,6 @@ Take care with the daily/Sunday timer settings, otherwise all running instances 
 
 Please read [Contributing to CESSDA Open Source Software](https://bitbucket.org/cessda/cessda.guidelines.public/src/master/CONTRIBUTING.md)
 for information on contribution to CESSDA software.
-
 
 ## Versioning
 
