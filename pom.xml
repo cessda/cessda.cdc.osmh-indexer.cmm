@@ -236,6 +236,13 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>build-info</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
 
       <!-- Exclude certain dependencies causing related transitive issues.-->
@@ -266,11 +273,11 @@
             </goals>
           </execution>
           <execution>
-						<id>report</id>
-						<goals>
-							<goal>report</goal>
-						</goals>
-					</execution>
+            <id>report</id>
+            <goals>
+                <goal>report</goal>
+            </goals>
+          </execution>
         </executions>
       </plugin>
       <!-- Sonar End -->
