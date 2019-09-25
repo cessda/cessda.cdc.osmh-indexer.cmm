@@ -1,4 +1,4 @@
-/**
+/*
 # Copyright CESSDA ERIC 2017-2019
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -91,7 +91,7 @@ public class GetRecordServiceImpl implements GetRecordService {
     // Short-Circuit. We carry on to parse beyond the headers only if record is active
     boolean isActiveRecord = parseHeaderElement(builder, document, X_FACTORY);
     if (isActiveRecord) {
-      String defaultLangIsoCode = parseDefaultLanguage(builder, document, X_FACTORY, oaiPmh);
+      String defaultLangIsoCode = parseDefaultLanguage(document, X_FACTORY, oaiPmh);
       parseStudyTitle(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
       parseStudyUrl(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
       parseAbstract(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);

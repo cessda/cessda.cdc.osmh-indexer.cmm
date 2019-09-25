@@ -1,4 +1,4 @@
-/**
+/*
 # Copyright CESSDA ERIC 2017-2019
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -20,16 +20,7 @@ import eu.cessda.pasc.osmhhandler.oaipmh.models.configuration.Repo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.GET_RECORD_URL_TEMPLATE;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.GET_RECORD_VALUE;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.IDENTIFIER_PARAM_KEY;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.LIST_IDENTIFIERS_VALUE;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.LIST_RECORD_HEADERS_PER_SET_URL_TEMPLATE;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.LIST_RECORD_HEADERS_URL_TEMPLATE;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.METADATA_PREFIX_PARAM_KEY;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.RESUMPTION_TOKEN_KEY;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.SET_SPEC_PARAM_KEY;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.VERB_PARAM_KEY;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
 
 /**
  * Helper methods to deal with Oai-pmh protocol
@@ -75,9 +66,9 @@ public class OaiPmhHelpers {
   }
 
   public static String decodeStudyNumber(String encodedStudyNumber) {
-    return encodedStudyNumber.replaceAll("_dt_", ".")
-        .replaceAll("_sl_", "/")
-        .replaceAll("_cl_", ":");
+    return encodedStudyNumber.replace("_dt_", ".")
+        .replace("_sl_", "/")
+        .replace("_cl_", ":");
   }
 
   private static Repo getMetadataPrefix(String repoUrl, OaiPmh oaiPmh) throws CustomHandlerException {

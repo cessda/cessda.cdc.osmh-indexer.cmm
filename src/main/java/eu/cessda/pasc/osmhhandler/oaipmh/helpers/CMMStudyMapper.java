@@ -1,4 +1,4 @@
-/**
+/*
 # Copyright CESSDA ERIC 2017-2019
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -71,8 +71,7 @@ public class CMMStudyMapper {
     return parseRecordStatus(builder, document, xFactory);
   }
 
-  public static String parseDefaultLanguage(CMMStudy.CMMStudyBuilder builder, Document document,
-                                            XPathFactory xFactory, OaiPmh oaiPmh) {
+  public static String parseDefaultLanguage(Document document, XPathFactory xFactory, OaiPmh oaiPmh) {
     XPathExpression<Attribute> attributeExpression = xFactory
         .compile(RECORD_DEFAULT_LANGUAGE, Filters.attribute(), null, OAI_AND_DDI_NS);
     Optional<Attribute> codeBookLang = Optional.ofNullable(attributeExpression.evaluateFirst(document));
