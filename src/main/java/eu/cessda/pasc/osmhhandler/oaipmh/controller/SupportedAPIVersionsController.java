@@ -25,8 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -47,7 +47,7 @@ public class SupportedAPIVersionsController extends ControllerBase{
   @Autowired
   APISupportedService apiSupportedService;
 
-  @RequestMapping(method = RequestMethod.GET)
+  @GetMapping()
   @ApiOperation(value = "Gets a list of supported api version numbers.",
       response = String.class, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponses(value = {
@@ -60,14 +60,13 @@ public class SupportedAPIVersionsController extends ControllerBase{
     return new ResponseEntity<>(apiSupportedService.getSupportedVersion(), HttpStatus.OK);
   }
 
-  @RequestMapping(path = "*", method = RequestMethod.GET)
+  @GetMapping(path = "*")
   @ApiOperation(value = RETURN_404_FOR_OTHER_PATHS,
       response = String.class, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponses(value = {
       @ApiResponse(code = 404, message = NOT_FOUND, response = ErrorMessage.class)
   })
   public ResponseEntity<String> getSupportedVersionForOtherPaths() {
-
     return getResponseEntityMessage(THE_GIVEN_URL_IS_NOT_FOUND, HttpStatus.NOT_FOUND);
   }
 }

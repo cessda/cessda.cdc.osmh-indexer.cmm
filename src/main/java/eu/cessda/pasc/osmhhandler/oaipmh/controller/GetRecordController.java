@@ -56,7 +56,7 @@ public class GetRecordController extends ControllerBase {
   @Autowired
   GetRecordService getRecordService;
 
-  @RequestMapping(value = "/CMMStudy/{studyId}", method = RequestMethod.GET)
+  @GetMapping(value = "/CMMStudy/{studyId}")
   @ApiOperation(value = GETS_A_RECORD,
       response = String.class, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponses(value = {
@@ -84,7 +84,7 @@ public class GetRecordController extends ControllerBase {
     }
   }
 
-  @RequestMapping(path = "/**", method = RequestMethod.GET)
+  @GetMapping(path = "/**")
   @ApiOperation(value = RETURN_404_FOR_OTHER_PATHS,
       response = String.class, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponses(value = {

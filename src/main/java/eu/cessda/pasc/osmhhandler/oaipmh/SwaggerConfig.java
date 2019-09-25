@@ -33,14 +33,11 @@ import java.util.ArrayList;
 @EnableSwagger2
 public class SwaggerConfig {
 
-  @Autowired
-  private ServletContext servletContext;
-
   @Value("${osmhhandler.baseEndpoint}")
   private String baseEndpoint;
 
   @Bean
-  public Docket api() {
+  public Docket api(ServletContext servletContext) {
     return new Docket(DocumentationType.SWAGGER_2)
         .select()
         .apis(RequestHandlerSelectors.basePackage("eu.cessda.pasc.osmhhandler.oaipmh.controller"))

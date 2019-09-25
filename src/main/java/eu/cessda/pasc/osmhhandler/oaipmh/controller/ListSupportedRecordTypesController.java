@@ -27,9 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.*;
@@ -52,7 +52,7 @@ public class ListSupportedRecordTypesController extends ControllerBase{
   @Autowired
   APISupportedService apiSupportedService;
 
-  @RequestMapping(method = RequestMethod.GET)
+  @GetMapping()
   @ApiOperation(value = GETS_A_LIST_OF_SUPPORTED_RECORD_TYPES,
       response = String.class, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponses(value = {
@@ -74,7 +74,7 @@ public class ListSupportedRecordTypesController extends ControllerBase{
     }
   }
 
-  @RequestMapping(path = "*", method = RequestMethod.GET)
+  @GetMapping(path = "*")
   @ApiOperation(value = RETURN_404_FOR_OTHER_PATHS,
       response = String.class, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponses(value = {
