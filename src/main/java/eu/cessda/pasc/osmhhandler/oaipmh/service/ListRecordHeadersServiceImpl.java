@@ -34,6 +34,7 @@ import javax.xml.parsers.DocumentBuilder;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -167,7 +168,7 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
 
   private Document getDocument(String docXMLString) throws InternalSystemException {
     try {
-      InputStream is = new ByteArrayInputStream(docXMLString.getBytes(UTF_8));
+      InputStream is = new ByteArrayInputStream(docXMLString.getBytes(StandardCharsets.UTF_8));
       return builder.parse(is);
     } catch (SAXException | IOException e) {
       String msg = "Unable to parse repo response.";
