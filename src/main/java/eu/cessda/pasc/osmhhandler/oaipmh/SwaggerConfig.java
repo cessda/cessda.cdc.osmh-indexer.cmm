@@ -58,11 +58,12 @@ public class SwaggerConfig {
   private ApiInfo metaData() {
 
     Contact contact = new Contact("Cessda PaSC", "https://www.cessda.eu/", "support@cessda.eu");
+    String version = getClass().getPackage().getImplementationVersion();
 
     return new ApiInfo(
         "PaSC OSMH Handler OAI-PMH",
         "Cessda PaSC OSMH repository handler for harvesting OAI-PMH metadata format",
-        "1.0.0",
+        version,
         "https://www.ukdataservice.ac.uk/conditions",
         contact,
         "Apache License Version 2.0",
