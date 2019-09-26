@@ -1,4 +1,4 @@
-/**
+/*
 # Copyright CESSDA ERIC 2017-2019
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -38,6 +38,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.net.InetAddress;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,7 +88,7 @@ public class AppUtilityBeansConfiguration {
 
     final RestTemplate restTemplate = new RestTemplate(getClientHttpRequestFactory());
     restTemplate.setInterceptors(requestInterceptors);
-    restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
+    restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
 
     return restTemplate;
   }

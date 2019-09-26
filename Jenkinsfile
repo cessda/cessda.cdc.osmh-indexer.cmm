@@ -34,11 +34,6 @@ pipeline {
 				echo "image_tag = ${image_tag}"
 			}
 		}
-		stage('Prepare Application for registration with Spring Boot Admin') {
-			steps {
-                sh("./osmh-gcp-configuration.sh")
-			}
-		}
 		// Building on master
 		stage('Build Project') {
             agent {

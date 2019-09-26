@@ -1,4 +1,4 @@
-/**
+/*
 # Copyright CESSDA ERIC 2017-2019
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -69,7 +69,7 @@ public class HarvesterConsumerServiceRunnerTest {
     System.out.println("Printing Report for all repos");
     System.out.println("############################################################################################");
     countReport.forEach((repo, headerCount) -> System.out.println("#### " + headerCount + " Header count for " + repo));
-    long sum = countReport.entrySet().stream().mapToLong(Map.Entry::getValue).sum();
+    long sum = countReport.values().stream().mapToLong(l -> l).sum();
     System.out.println("#### Total Count : " + sum);
     System.out.println("############################################################################################");
   }

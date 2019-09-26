@@ -130,7 +130,7 @@ osmhConsumer:
     initial: '60000'
 ```
 
-The timer schedule for GCP use is defined in [CDC deployment repository's template-deployment.yaml](https://bitbucket.org/cessda/cessda.cdc.deploy/src/master/osmh-indexer/infrastructure/k8s/template-deployment.yaml), but if you are deploying the software elsewhere, then the timer settings in [application.yaml](/src/main/resources/application.yaml) are relevant. The profiles are defined in [application.yaml](/src/main/resources/application.yaml) and selected in [Dockerfile](Dockerfile/).
+The timer schedule for GCP use is defined in [CDC deployment repository's template-deployment.yaml](https://bitbucket.org/cessda/cessda.cdc.deploy/src/master/osmh-indexer/infrastructure/k8s/template-deployment.yaml), but if you are deploying the software elsewhere, then the timer settings in [application.yml](/src/main/resources/application.yml) are relevant. The profiles are defined in [application.yml](/src/main/resources/application.yml) and selected in [Dockerfile](Dockerfile).
 
 Take care with the daily/Sunday timer settings, otherwise all running instances may attempt to reharvest the same endpoints at the same time.
 
@@ -153,7 +153,7 @@ You can find the list of all contributors [here](CONTRIBUTORS.md)
 
 ## License
 
-This project is licensed under the Apache 2 License - see the [LICENSE](LICENSE) file for details
+This project is licensed under the Apache 2 License - see the [LICENSE](LICENSE.txt) file for details
 
 ## Acknowledgments
 
