@@ -161,7 +161,7 @@ class DocElementParser {
       langAttr = parentLangAttr;
     } else {
       Optional<Element> concept = ofNullable(element.getChild("concept", DDI_NS));
-      langAttr = concept.isPresent() ? ofNullable(concept.get().getAttribute(LANG_ATTR, XML_NS)) : Optional.empty();
+      langAttr = concept.map(value -> value.getAttribute(LANG_ATTR, XML_NS));
     }
     return langAttr;
   }

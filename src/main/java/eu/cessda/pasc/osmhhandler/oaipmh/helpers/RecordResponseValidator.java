@@ -21,6 +21,10 @@ import org.jdom2.xpath.XPathFactory;
 
 public class RecordResponseValidator {
 
+  private RecordResponseValidator() {
+    throw new IllegalStateException("This utility class is not to be instanced.");
+  }
+
   /**
    * Checks if the record has an <error> element.
    *

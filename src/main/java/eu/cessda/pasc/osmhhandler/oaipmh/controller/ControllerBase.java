@@ -50,6 +50,7 @@ public class ControllerBase {
 
   private static String getSimpleResponseMessage(String messageString) {
     JSONObject obj = new JSONObject();
+    //noinspection unchecked
     obj.put(MESSAGE, messageString);
     return obj.toJSONString();
   }

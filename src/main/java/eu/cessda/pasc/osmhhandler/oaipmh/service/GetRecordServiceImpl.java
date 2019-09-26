@@ -78,7 +78,7 @@ public class GetRecordServiceImpl implements GetRecordService {
     Document document = saxBuilder.build(recordXMLStream);
 
     if (log.isTraceEnabled()) {
-      log.trace("Record XML String [{}]", document.toString());
+      log.trace("Record XML String [{}]", document);
     }
 
     // We exit if the record has an <error> element

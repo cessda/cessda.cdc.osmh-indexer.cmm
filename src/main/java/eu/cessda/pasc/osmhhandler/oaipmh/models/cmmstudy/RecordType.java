@@ -27,9 +27,9 @@ public enum  RecordType {
 
   @JsonValue
   public String toValue() {
-    switch (this) {
-      case CMM_STUDY: return "CMMStudy";
-    }
+      if (this == RecordType.CMM_STUDY) {
+          return "CMMStudy";
+      }
     return null;
   }
 
