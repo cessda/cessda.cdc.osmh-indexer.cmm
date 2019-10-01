@@ -75,8 +75,13 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
     log.info("ParseRecordHeaders Start:  For [{}].", baseRepoUrl);
     List<RecordHeader> recordHeaders = retrieveRecordHeaders(new ArrayList<>(), doc, baseRepoUrl);
     log.info("ParseRecordHeaders End:  No more resumption token to process for [{}].", baseRepoUrl);
-    String msg = "ParseRecordHeaders retrieved [{}] of [{}] expected record headers for [{}].";
-    log.info(msg, recordHeaders.size(), getRecordHeadersCount(doc), baseRepoUrl);
+    int expectedRecordHeadersCount = getRecordHeadersCount(doc);
+    if(expectedRecordHeadersCount != -1) {
+      log.info("ParseRecordHeaders retrieved [{}] of [{}] expected record headers for [{}].", recordHeaders.size(), expectedRecordHeadersCount, baseRepoUrl);
+    }
+    else {
+      log.info("ParseRecordHeaders retrieved [{}] record headers for [{}].", recordHeaders.size(), baseRepoUrl);
+    }
     return recordHeaders;
   }
 
@@ -93,7 +98,7 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
       }
     }
     // Should not reach here for valid oai-pmh xml responses
-    log.info("Unable to parse RecordHeadersCount from oai-pmh xml response.");
+    log.warn("Unable to parse RecordHeadersCount from oai-pmh xml response.");
     return -1;
   }
 
