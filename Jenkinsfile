@@ -26,73 +26,47 @@ pipeline {
 	agent any
 
 	stages {
-		stage('Check environment') {
-			steps {
-				echo "Check environment"
-				echo "product_name = ${product_name}"
-				echo "module_name = ${module_name}"
-				echo "image_tag = ${image_tag}"
-			}
-		}
-		stage('Prepare Application for registration with Spring Boot Admin') {
-			steps {
-				sh("./cdc-osmh-registration.sh")
-			}
-		}
-		// Building on master
-		stage('Build Project') {
-            agent {
-                docker {
+		stage('Pull SDK Docker Image') {
+		    agent {
+		        docker {
                     image 'maven:3-jdk-11'
                     reuseNode true
                 }
             }
-			steps {
-				withMaven {
-                    sh 'export PATH=$MVN_CMD_DIR:$PATH && mvn clean deploy'
-				}
-			}
-			when { branch 'master' }
-		}
-        // Not running on master - test only (for PRs and integration branches)
-		stage('Test Project') {
-            agent {
-                docker {
-                    image 'maven:3-jdk-11'
-                    reuseNode true
-                }
-            }
-			steps {
-				withMaven {
-					sh 'export PATH=$MVN_CMD_DIR:$PATH && mvn clean test'
-				}
-			}
-			when { not { branch 'master' } }
-		}
-		stage('Run Sonar Scan') {
-            agent {
-                docker {
-                    image 'maven:3-jdk-11'
-                    reuseNode true
-                }
-            }
-			steps {
-				withSonarQubeEnv('cessda-sonar') {
-                    withMaven {
-                        sh 'export PATH=$MVN_CMD_DIR:$PATH && mvn sonar:sonar'
+		    stages {
+		        // Building on master
+                stage('Build Project') {
+                    steps {
+                        withMaven {
+                            sh 'export PATH=$MVN_CMD_DIR:$PATH && mvn clean deploy'
+                        }
                     }
-				}
-			}
-			when { branch 'master' }
-		}
-		stage('Get Sonar Quality Gate') {
-			steps {
-				timeout(time: 1, unit: 'HOURS') {
-					waitForQualityGate abortPipeline: true
-				}
-			}
-            when { branch 'master' }
-		}
+                    when { branch 'master' }
+                }
+                // Not running on master - test only (for PRs and integration branches)
+                stage('Test Project') {
+                    steps {
+                        withMaven {
+                            sh 'export PATH=$MVN_CMD_DIR:$PATH && mvn clean test'
+                        }
+                    }
+                    when { not { branch 'master' } }
+                }
+                stage('Run Sonar Scan') {
+                    steps {
+                        withSonarQubeEnv('cessda-sonar') {
+                            withMaven {
+                                sh 'export PATH=$MVN_CMD_DIR:$PATH && mvn sonar:sonar'
+                            }
+                        }
+                        timeout(time: 1, unit: 'HOURS') {
+                            waitForQualityGate abortPipeline: true
+                        }
+                    }
+                    when { branch 'master' }
+                }
+            }
+        }
 		stage('Build Docker image') {
 			 steps {
 				sh("docker build -t ${image_tag} .")
