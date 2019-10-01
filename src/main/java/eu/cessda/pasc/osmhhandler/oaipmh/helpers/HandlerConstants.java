@@ -43,6 +43,7 @@ public class HandlerConstants {
 
   // Date / time
   static final String[] EXPECTED_DATE_FORMATS = new String[]{
+      "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
       "yyyy-MM-dd'T'HH:mm:ss'Z'",
       "yyyy-dd-MM HH:mm:ss.SSS",
       "yyyy-MM-dd",
