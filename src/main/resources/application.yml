@@ -75,7 +75,7 @@ osmhhandler:
         preferredMetadataParam: oai_ddi25
       - url: https://snd.gu.se/en/oai-pmh
         preferredMetadataParam: oai_ddi25
-        setSpec: subject:social-sciences
+        setSpec: discipline:social-science
       - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
         preferredMetadataParam: ddi
     metadataParsingDefaultLang:
