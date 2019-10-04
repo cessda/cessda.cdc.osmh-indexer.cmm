@@ -26,6 +26,7 @@ pipeline {
 	agent any
 
 	stages {
+		// Building on master
 		stage('Pull SDK Docker Image') {
 		    agent {
 		        docker {
@@ -34,7 +35,6 @@ pipeline {
                 }
             }
 		    stages {
-		        // Building on master
                 stage('Build Project') {
                     steps {
                         withMaven {
@@ -59,9 +59,9 @@ pipeline {
                                 sh 'export PATH=$MVN_CMD_DIR:$PATH && mvn sonar:sonar'
                             }
                         }
-                        timeout(time: 1, unit: 'HOURS') {
-                            waitForQualityGate abortPipeline: true
-                        }
+						timeout(time: 1, unit: 'HOURS') {
+							waitForQualityGate abortPipeline: true
+						}
                     }
                     when { branch 'master' }
                 }

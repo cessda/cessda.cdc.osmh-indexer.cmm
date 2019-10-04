@@ -36,9 +36,9 @@ spring:
 logging:
   file: ${user.home}${file.separator}pasc-osmh-handler${file.separator}pasc-osmh-handler-oai-pmh.log
   pattern:
-    console: '%d{yyyy-dd-MM HH:mm:ss.SSS} %highlight(%-5level) %30.30((%M\)) %40.40((%file:%line\))
+    console: '%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) %30.30((%M\)) %40.40((%file:%line\))
       - %message%n'
-    file: '%d{yyyy-dd-MM HH:mm:ss.SSS}  %-5level  %30.30((%M\)) %40.40((%file:%line\))
+    file: '%d{yyyy-MM-dd HH:mm:ss.SSS}  %-5level  %30.30((%M\)) %40.40((%file:%line\))
       - %message%n'
   level:
     .: WARN
