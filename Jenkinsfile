@@ -84,14 +84,6 @@ pipeline {
 		stage('Check Requirements and Deployments') {
 			steps {
 				dir('./infrastructure/gcp/') {
-					build job: 'cessda.cdc.deploy/master', parameters: [string(name: 'osmh_nesstar_image_tag', value: "${image_tag}"), string(name: 'module', value: 'osmh-repo-nesstar')], wait: false
-				}
-			}
-            when { branch 'master' }
-		}
-		stage('Check Requirements and Deployments') {
-			steps {
-				dir('./infrastructure/gcp/') {
 					build job: 'cessda.cdc.deploy/master', parameters: [string(name: 'osmh_indexer_image_tag', value: "${image_tag}"), string(name: 'module', value: 'osmh-indexer')], wait: false
 				}
 			}
