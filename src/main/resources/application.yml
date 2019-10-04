@@ -24,9 +24,9 @@ endpoints.shutdown.enabled: true
 logging:
   file: ${user.home}${file.separator}pasc-oci${file.separator}pasc-oci.log
   pattern:
-    console: '%d{yyyy-dd-MM HH:mm:ss.SSS} %highlight(%-5level) %40.40((%file:%line\))
+    console: '%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) %40.40((%file:%line\))
       - %message%n'
-    file: '%d{yyyy-dd-MM HH:mm:ss.SSS}  %-5level  %40.40((%file:%line\))
+    file: '%d{yyyy-MM-dd HH:mm:ss.SSS}  %-5level  %40.40((%file:%line\))
       - %message%n'
   level:
     .: WARN
