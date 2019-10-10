@@ -205,6 +205,9 @@
         <configuration>
           <source>${maven.compiler.source}</source>
           <target>${maven.compiler.target}</target>
+          <compilerArgs>
+            <arg>-Xlint:all</arg>
+          </compilerArgs>
         </configuration>
       </plugin>
       <plugin>
@@ -249,11 +252,11 @@
             </goals>
           </execution>
           <execution>
-						<id>report</id>
-						<goals>
-							<goal>report</goal>
-						</goals>
-					</execution>
+            <id>report</id>
+            <goals>
+              <goal>report</goal>
+            </goals>
+        </execution>
         </executions>
       </plugin>
     </plugins>
