@@ -52,6 +52,11 @@ pipeline {
                     }
                     when { not { branch 'master' } }
                 }
+                stage('Record Issues') {
+                    steps {
+                        recordIssues(tools: [java()])
+                    }
+                }
                 stage('Run Sonar Scan') {
                     steps {
                         withSonarQubeEnv('cessda-sonar') {
