@@ -136,7 +136,7 @@ osmhConsumer:
     - url:  http://nesstar.unidata.unimib.it/oai-pmh
       name: 'Unidata (Nesstar)'
       handler: 'http://cdc-osmh-repo-nesstar:9842'
-    - url:  http://nesstar-server.sodanet.gr/oai-pmh
+    - url:  http://harvester.sodanet.gr:8080/oai/request
       name: 'SoDaNet (Nesstar)'
       handler: 'http://cdc-osmh-repo-nesstar:9842'
     connTimeout: 5000
@@ -196,7 +196,7 @@ osmhConsumer:
     - url:  http://nesstar.sciences-po.fr/oai-pmh
       name: 'Progedo (Nesstar)'
       handler: 'http://localhost:9842'
-    - url:  http://nesstar-server.sodanet.gr/oai-pmh
+    - url:  http://harvester.sodanet.gr:8080/oai/request
       name: 'SoDaNet (Nesstar)'
       handler: 'http://localhost:9842'
     - url: http://nesstar.soc.cas.cz/oai-pmh
