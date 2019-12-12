@@ -40,7 +40,12 @@ import java.util.List;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.RECORD_HEADER;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.STUDY;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.COMPLETE_LIST_SIZE_ATTR;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.DATESTAMP_ELEMENT;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.HEADER_ELEMENT;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.IDENTIFIER_ELEMENT;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.RESUMPTION_TOKEN_ELEMENT;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.SET_SPEC_ELEMENT;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhHelpers.appendListRecordResumptionToken;
 import static eu.cessda.pasc.osmhhandler.oaipmh.models.response.RecordHeader.*;
 
@@ -53,11 +58,15 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.models.response.RecordHeader.*;
 @Slf4j
 public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
 
-  @Autowired
-  ListRecordHeadersDao listRecordHeadersDao;
+  private final ListRecordHeadersDao listRecordHeadersDao;
+
+  private final DocumentBuilder builder;
 
   @Autowired
-  private DocumentBuilder builder;
+  public ListRecordHeadersServiceImpl(ListRecordHeadersDao listRecordHeadersDao, DocumentBuilder builder) {
+    this.listRecordHeadersDao = listRecordHeadersDao;
+    this.builder = builder;
+  }
 
   @Override
   public List<RecordHeader> getRecordHeaders(String baseRepoUrl) throws CustomHandlerException {
@@ -76,10 +85,9 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
     List<RecordHeader> recordHeaders = retrieveRecordHeaders(new ArrayList<>(), doc, baseRepoUrl);
     log.info("ParseRecordHeaders End:  No more resumption token to process for [{}].", baseRepoUrl);
     int expectedRecordHeadersCount = getRecordHeadersCount(doc);
-    if(expectedRecordHeadersCount != -1) {
+    if (expectedRecordHeadersCount != -1) {
       log.info("ParseRecordHeaders retrieved [{}] of [{}] expected record headers for [{}].", recordHeaders.size(), expectedRecordHeadersCount, baseRepoUrl);
-    }
-    else {
+    } else {
       log.info("ParseRecordHeaders retrieved [{}] record headers for [{}].", recordHeaders.size(), baseRepoUrl);
     }
     return recordHeaders;

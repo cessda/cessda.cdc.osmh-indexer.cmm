@@ -24,15 +24,24 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.*;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.BAD_REQUEST;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.NOT_FOUND;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.RETURN_404_FOR_OTHER_PATHS;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.SUCCESSFUL_OPERATION;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.SYSTEM_ERROR;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.THE_GIVEN_URL_IS_NOT_FOUND;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.UNSUPPORTED_API_VERSION;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 /**
@@ -44,17 +53,19 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 @RequestMapping("{version}/GetRecord")
 @Api(value = "GetRecord", description = "REST API for getting a remote Record",
     tags = {"GetRecord"})
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 @Slf4j
 public class GetRecordController extends ControllerBase {
 
   private static final String GETS_A_RECORD = "Gets a Record with the given identifier";
 
-  @Autowired
-  APISupportedService apiSupportedService;
+  private final APISupportedService apiSupportedService;
+  private final  GetRecordService getRecordService;
 
   @Autowired
-  GetRecordService getRecordService;
+  public GetRecordController(APISupportedService apiSupportedService, GetRecordService getRecordService) {
+    this.apiSupportedService = apiSupportedService;
+    this.getRecordService = getRecordService;
+  }
 
   @GetMapping(value = "/CMMStudy/{studyId}")
   @ApiOperation(value = GETS_A_RECORD,
@@ -65,7 +76,7 @@ public class GetRecordController extends ControllerBase {
       @ApiResponse(code = 404, message = NOT_FOUND, response = ErrorMessage.class),
       @ApiResponse(code = 500, message = SYSTEM_ERROR, response = ErrorMessage.class)
   })
-  public ResponseEntity<String> getRecordHeaders(
+  public ResponseEntity<String> getCMMStudyRecord(
       @PathVariable String version, @PathVariable String studyId, @RequestParam("Repository") String repository) {
 
     try {
@@ -90,7 +101,7 @@ public class GetRecordController extends ControllerBase {
   @ApiResponses(value = {
       @ApiResponse(code = 404, message = NOT_FOUND, response = ErrorMessage.class)
   })
-  public ResponseEntity<String> getRecordHeadersForOtherPaths() {
+  public ResponseEntity<String> getCMMStudyRecordForOtherPaths() {
     return getResponseEntityMessage(THE_GIVEN_URL_IS_NOT_FOUND, HttpStatus.NOT_FOUND);
   }
 }

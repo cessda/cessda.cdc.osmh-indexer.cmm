@@ -50,8 +50,12 @@ import static org.apache.http.ssl.SSLContexts.custom;
 @Slf4j
 public class UtilitiesConfiguration {
 
+  private final HandlerConfigurationProperties handlerConfigurationProperties;
+
   @Autowired
-  HandlerConfigurationProperties handlerConfigurationProperties;
+  public UtilitiesConfiguration(HandlerConfigurationProperties handlerConfigurationProperties) {
+    this.handlerConfigurationProperties = handlerConfigurationProperties;
+  }
 
   @Bean
   public ObjectMapper objectMapper() {
@@ -90,6 +94,7 @@ public class UtilitiesConfiguration {
   }
 
   // FIXME:  A "temp" to work around untrusted certificate for UKDA oai-pmh endpoint
+
   /**
    * Builds a {@link ClientHttpRequestFactory} with ssl off.
    */

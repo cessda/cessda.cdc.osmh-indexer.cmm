@@ -1,7 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "CMMStudy",
-  "version": "v0",
   "description": "This schema defines the format of the CMMStudy record type.",
   "type": "object",
   "required": [

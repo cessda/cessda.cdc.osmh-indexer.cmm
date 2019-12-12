@@ -22,17 +22,26 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.*;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.BAD_REQUEST;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.NOT_FOUND;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.RETURN_404_FOR_OTHER_PATHS;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.SUCCESSFUL_OPERATION;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.SYSTEM_ERROR;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.THE_GIVEN_URL_IS_NOT_FOUND;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.UNSUPPORTED_API_VERSION;
 
 /**
  * Controller to handle request for Record Headers.
@@ -43,17 +52,20 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.*;
 @RequestMapping("{version}/ListRecordHeaders")
 @Api(value = "ListRecordHeaders", description = "REST API for Listing Record Headers",
     tags = {"ListRecordHeaders"})
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 @Slf4j
 public class ListRecordHeadersController extends ControllerBase {
 
   private static final String GETS_A_LIST_OF_ALL_SUPPORTED_RECORD_TYPES = "Gets a list of all supported record types";
 
-  @Autowired
-  APISupportedService apiSupportedService;
+  private final APISupportedService apiSupportedService;
+
+  private final ListRecordHeadersServiceImpl listRecordHeadersService;
 
   @Autowired
-  ListRecordHeadersServiceImpl listRecordHeadersService;
+  public ListRecordHeadersController(APISupportedService apiSupportedService, ListRecordHeadersServiceImpl listRecordHeadersService) {
+    this.apiSupportedService = apiSupportedService;
+    this.listRecordHeadersService = listRecordHeadersService;
+  }
 
   @GetMapping()
   @ApiOperation(value = GETS_A_LIST_OF_ALL_SUPPORTED_RECORD_TYPES,

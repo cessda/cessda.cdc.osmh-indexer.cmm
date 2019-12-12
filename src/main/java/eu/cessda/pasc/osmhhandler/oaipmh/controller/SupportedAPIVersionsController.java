@@ -20,7 +20,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,7 +30,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.*;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.BAD_REQUEST;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.NOT_FOUND;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.RETURN_404_FOR_OTHER_PATHS;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.SUCCESSFUL_OPERATION;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.SYSTEM_ERROR;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.THE_GIVEN_URL_IS_NOT_FOUND;
 
 /**
  * Controller to handle request for services, versions and metadata formats supported by this api
@@ -41,11 +45,14 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.*;
 @RestController
 @RequestMapping("/SupportedVersions")
 @Api(value = "SupportedVersions", description = "REST API for supported api versions", tags = {"SupportedVersions"})
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class SupportedAPIVersionsController extends ControllerBase{
+public class SupportedAPIVersionsController extends ControllerBase {
+
+  private final APISupportedService apiSupportedService;
 
   @Autowired
-  APISupportedService apiSupportedService;
+  public SupportedAPIVersionsController(APISupportedService apiSupportedService) {
+    this.apiSupportedService = apiSupportedService;
+  }
 
   @GetMapping()
   @ApiOperation(value = "Gets a list of supported api version numbers.",
