@@ -1,9 +1,3 @@
-# Project Name
-
-## First Name - Last Name ##
-
-Description of the person role
-=======
 # CDC OSMH Handler OAI-PMH
 
 ## Contributors

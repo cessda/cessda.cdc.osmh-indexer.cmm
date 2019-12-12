@@ -23,7 +23,7 @@ import lombok.Setter;
 import java.util.*;
 
 /**
- * Model representing a CMMStudy.
+ * Model representing a CMMStudy. Used to deserialize documents from json.
  *
  * @author moses AT doravenetures DOT com
  */
@@ -133,6 +133,11 @@ public class CMMStudy {
   @JsonProperty("isActive")
   private boolean active;
 
+  /**
+   * This is added information by this application after checking the the CMM record meets
+   * the minimum CMM Fields requirements for given Lang Iso Code.
+   * @see eu.cessda.pasc.oci.service.helpers.LanguageAvailabilityMapper#setAvailableLanguages(CMMStudy)
+   */
   @Setter
   @Getter
   @JsonProperty("langAvailableIn")

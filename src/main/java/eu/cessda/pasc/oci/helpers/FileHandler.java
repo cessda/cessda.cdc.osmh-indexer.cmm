@@ -19,6 +19,7 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * File handling helper methods
@@ -34,7 +35,7 @@ public class FileHandler {
     String result = "";
     ClassLoader classLoader = getClass().getClassLoader();
     try {
-      result = IOUtils.toString(classLoader.getResourceAsStream(fileName));
+      result = IOUtils.toString(Objects.requireNonNull(classLoader.getResourceAsStream(fileName)));
     } catch (IOException | NullPointerException e) {
       log.error("Could not read file [{}]. Exception Message [{}]", fileName, e.getMessage());
     }

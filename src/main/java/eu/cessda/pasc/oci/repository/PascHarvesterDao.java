@@ -21,6 +21,7 @@ import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
 
@@ -38,11 +39,17 @@ public class PascHarvesterDao extends DaoBase implements HarvesterDao {
   private static final String LIST_RECORD_TEMPLATE = "%s/%s/ListRecordHeaders?Repository=%s";
   private static final String GET_RECORD_TEMPLATE = "%s/%s/GetRecord/CMMStudy/%s?Repository=%s";
 
-  @Autowired
-  private FakeHarvester fakeHarvester;
+  private final FakeHarvester fakeHarvester;
+  private final AppConfigurationProperties appConfigurationProperties;
 
   @Autowired
-  private AppConfigurationProperties appConfigurationProperties;
+  public PascHarvesterDao(FakeHarvester fakeHarvester,
+                          AppConfigurationProperties appConfigurationProperties,
+                          RestTemplate restTemplate) {
+    super(restTemplate);
+    this.fakeHarvester = fakeHarvester;
+    this.appConfigurationProperties = appConfigurationProperties;
+  }
 
   @Override
   public String listRecordHeaders(String spRepository) throws ExternalSystemException {
