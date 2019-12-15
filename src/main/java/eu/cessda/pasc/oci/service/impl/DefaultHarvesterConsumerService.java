@@ -75,8 +75,8 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
   public Optional<CMMStudy> getRecord(Repo repo, String studyNumber) {
 
     try {
-      String recordHeadersJsonString = harvesterDao.getRecord(repo.getUrl(), studyNumber);
-      return Optional.ofNullable(CMMStudyConverter.fromJsonString(recordHeadersJsonString));
+      String recordJsonString = harvesterDao.getRecord(repo.getUrl(), studyNumber);
+      return Optional.ofNullable(CMMStudyConverter.fromJsonString(recordJsonString));
     } catch (ExternalSystemException e) {
       log.warn("Exception msg[{}]. External system response body[{}]", e.getMessage(), e.getExternalResponseBody());
     } catch (IOException e) {
