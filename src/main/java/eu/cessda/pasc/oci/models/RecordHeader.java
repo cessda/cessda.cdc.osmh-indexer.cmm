@@ -17,13 +17,13 @@ package eu.cessda.pasc.oci.models;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.google.common.base.CharMatcher;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
- *
  * @author moses AT doravenetures DOT com
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -47,4 +47,8 @@ public class RecordHeader {
   private String recordType;
   @JsonProperty("identifier")
   private String identifier;
+
+  public void setIdentifier(String identifier) {
+    this.identifier = CharMatcher.BREAKING_WHITESPACE.removeFrom(identifier);
+  }
 }
