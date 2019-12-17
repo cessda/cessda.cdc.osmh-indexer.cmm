@@ -32,8 +32,8 @@
   </parent>
 
   <properties>
-    <baseRevision>2.1</baseRevision>
-    <revision>${baseRevision}-SNAPSHOT</revision>
+    <buildNumber>SNAPSHOT</buildNumber>
+    <revision>2.2.0-${buildNumber}</revision>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.version>11</java.version>
@@ -286,18 +286,4 @@
       <!-- Sonar End -->
     </plugins>
   </build>
-
-  <profiles>
-    <profile>
-      <id>jenkins</id>
-      <activation>
-        <property>
-          <name>env.BUILD_NUMBER</name>
-        </property>
-      </activation>
-      <properties>
-        <revision>${baseRevision}.${env.BUILD_NUMBER}</revision>
-      </properties>
-    </profile>
-  </profiles>
 </project>
