@@ -28,8 +28,8 @@
   </parent>
 
   <properties>
-    <baseRevision>2.1</baseRevision>
-    <buildRevision>-SNAPSHOT</buildRevision>
+    <baseRevision>2.2.0-</baseRevision>
+    <buildRevision>SNAPSHOT</buildRevision>
     <revision>${baseRevision}${buildRevision}</revision>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
