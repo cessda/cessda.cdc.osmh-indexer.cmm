@@ -15,6 +15,7 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.dao;
 
 import eu.cessda.pasc.osmhhandler.oaipmh.configuration.HandlerConfigurationProperties;
+import eu.cessda.pasc.osmhhandler.oaipmh.configuration.UtilitiesConfiguration;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -33,7 +34,8 @@ public class GetRecordDoaImpl extends DaoBase implements GetRecordDoa {
   private final HandlerConfigurationProperties oaiPmhConfig;
 
   @Autowired
-  public GetRecordDoaImpl(HandlerConfigurationProperties oaiPmhConfig) {
+  public GetRecordDoaImpl(HandlerConfigurationProperties oaiPmhConfig, UtilitiesConfiguration configuration) {
+    super(configuration);
     this.oaiPmhConfig = oaiPmhConfig;
   }
 

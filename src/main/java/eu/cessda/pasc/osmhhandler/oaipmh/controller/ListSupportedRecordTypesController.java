@@ -21,7 +21,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,7 +31,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.*;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.BAD_REQUEST;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.NOT_FOUND;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.RETURN_404_FOR_OTHER_PATHS;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.SUCCESSFUL_OPERATION;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.SYSTEM_ERROR;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.THE_GIVEN_URL_IS_NOT_FOUND;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.UNSUPPORTED_API_VERSION;
 
 /**
  * Controller to handle request for supported Record Types per supported API version.
@@ -43,14 +48,17 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.*;
 @RequestMapping("{version}/ListSupportedRecordTypes")
 @Api(value = "ListSupportedRecordTypes", description = "REST API for supported record types",
     tags = {"ListSupportedRecordTypes"})
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 @Slf4j
-public class ListSupportedRecordTypesController extends ControllerBase{
+public class ListSupportedRecordTypesController extends ControllerBase {
 
   private static final String GETS_A_LIST_OF_SUPPORTED_RECORD_TYPES = "Gets a list of Supported Record Types.";
 
+  private final APISupportedService apiSupportedService;
+
   @Autowired
-  APISupportedService apiSupportedService;
+  public ListSupportedRecordTypesController(APISupportedService apiSupportedService) {
+    this.apiSupportedService = apiSupportedService;
+  }
 
   @GetMapping()
   @ApiOperation(value = GETS_A_LIST_OF_SUPPORTED_RECORD_TYPES,

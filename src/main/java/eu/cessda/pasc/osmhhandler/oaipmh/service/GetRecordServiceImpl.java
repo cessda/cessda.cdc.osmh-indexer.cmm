@@ -47,13 +47,17 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.RecordResponseValidator.
 @Slf4j
 public class GetRecordServiceImpl implements GetRecordService {
 
-  @Autowired
-  GetRecordDoa getRecordDoa;
+  private final GetRecordDoa getRecordDoa;
 
-  @Autowired
-  HandlerConfigurationProperties handlerConfig;
+  private final HandlerConfigurationProperties handlerConfig;
 
   private static final XPathFactory X_FACTORY = XPathFactory.instance();
+
+  @Autowired
+  public GetRecordServiceImpl(GetRecordDoa getRecordDoa, HandlerConfigurationProperties handlerConfig) {
+    this.getRecordDoa = getRecordDoa;
+    this.handlerConfig = handlerConfig;
+  }
 
   @Override
   public CMMStudy getRecord(String repository, String studyId) throws CustomHandlerException {

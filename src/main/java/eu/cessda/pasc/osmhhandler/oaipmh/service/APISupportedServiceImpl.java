@@ -27,9 +27,12 @@ import java.util.List;
 @Service
 public class APISupportedServiceImpl implements APISupportedService {
 
+  private final HandlerConfigurationProperties pmhConfig;
+
   @Autowired
-  @Qualifier("HandlerConfigurationProperties")
-  HandlerConfigurationProperties pmhConfig;
+  public APISupportedServiceImpl(@Qualifier("HandlerConfigurationProperties") HandlerConfigurationProperties pmhConfig) {
+    this.pmhConfig = pmhConfig;
+  }
 
   public List<String> getSupportedVersion() {
     return pmhConfig.getOaiPmh().getSupportedApiVersions();

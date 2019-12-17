@@ -37,8 +37,12 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerLogHelper.logResp
 @Slf4j
 public class DaoBase {
 
+  private final UtilitiesConfiguration configuration;
+
   @Autowired
-  UtilitiesConfiguration configuration;
+  public DaoBase(UtilitiesConfiguration configuration) {
+    this.configuration = configuration;
+  }
 
   String postForStringResponse(String fullUrl) throws ExternalSystemException {
     ResponseEntity<String> responseEntity;

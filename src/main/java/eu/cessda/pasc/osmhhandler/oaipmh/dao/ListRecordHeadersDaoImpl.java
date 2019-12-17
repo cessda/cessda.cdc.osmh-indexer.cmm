@@ -15,6 +15,7 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.dao;
 
 import eu.cessda.pasc.osmhhandler.oaipmh.configuration.HandlerConfigurationProperties;
+import eu.cessda.pasc.osmhhandler.oaipmh.configuration.UtilitiesConfiguration;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,8 @@ public class ListRecordHeadersDaoImpl extends DaoBase implements ListRecordHeade
   private HandlerConfigurationProperties config;
 
   @Autowired
-  public ListRecordHeadersDaoImpl(HandlerConfigurationProperties config) {
+  public ListRecordHeadersDaoImpl(HandlerConfigurationProperties config, UtilitiesConfiguration configuration) {
+    super(configuration);
     this.config = config;
   }
 
