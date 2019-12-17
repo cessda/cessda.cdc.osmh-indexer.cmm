@@ -19,7 +19,7 @@ package eu.cessda.pasc.oci.helpers.exception;
  *
  * @author moses AT doravenetures DOT com
  */
-public class CustomExceptionBase extends Exception{
+class CustomExceptionBase extends Exception{
 
   private static final long serialVersionUID = 5715687019114712665L;
 

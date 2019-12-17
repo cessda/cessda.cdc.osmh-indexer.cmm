@@ -39,8 +39,12 @@ import static java.util.Optional.ofNullable;
 @Slf4j
 public class LanguageDocumentExtractor {
 
+  private final AppConfigurationProperties appConfigurationProperties;
+
   @Autowired
-  private AppConfigurationProperties appConfigurationProperties;
+  public LanguageDocumentExtractor(AppConfigurationProperties appConfigurationProperties) {
+    this.appConfigurationProperties = appConfigurationProperties;
+  }
 
   /**
    * Extracts a custom document for each language IsoCode found in the config.
@@ -75,6 +79,15 @@ public class LanguageDocumentExtractor {
         .collect(Collectors.toList());
   }
 
+  /**
+   * CMM Model minimum field check.  Restriction here has been reduced from these previous mandatory fields:
+   * title, abstract, studyNumber and publisher
+   *
+   * @param languageIsoCode the languageIsoCode
+   * @param idPrefix        the idPrefix
+   * @param cmmStudy        the CmmStudy Object
+   * @return true if Study is available in other languages
+   */
   boolean isValidCMMStudyForLang(String languageIsoCode, String idPrefix, CMMStudy cmmStudy) {
 
     if (null == cmmStudy) {
@@ -82,7 +95,7 @@ public class LanguageDocumentExtractor {
       return false;
     }
 
-    // Inactive = deleted record no need to validate against CMM below. Index as. Filtered in Frontend.
+    // Inactive = deleted record no need to validate against CMM below. Index as is. Filtered in Frontend.
     if (!cmmStudy.isActive()) {
       logInvalidCMMStudy("Study is not Active [{}]: [{}]", languageIsoCode, idPrefix, cmmStudy);
       return true;
@@ -105,6 +118,7 @@ public class LanguageDocumentExtractor {
 
     CMMStudyOfLanguage.CMMStudyOfLanguageBuilder builder = CMMStudyOfLanguage.builder();
 
+    // Language neutral specific field extraction
     builder.id(idPrefix + cmmStudy.getStudyNumber())
         .studyNumber(cmmStudy.getStudyNumber())
         .active(cmmStudy.isActive())
@@ -116,6 +130,7 @@ public class LanguageDocumentExtractor {
         .dataCollectionYear(cmmStudy.getDataCollectionYear())
         .langAvailableIn(cmmStudy.getLangAvailableIn());
 
+    // Language specific field extraction
     ofNullable(cmmStudy.getTitleStudy()).ifPresent(map -> builder.titleStudy(map.get(lang)));
     ofNullable(cmmStudy.getAbstractField()).ifPresent(map -> builder.abstractField(map.get(lang)));
     ofNullable(cmmStudy.getKeywords()).ifPresent(map -> builder.keywords(map.get(lang)));

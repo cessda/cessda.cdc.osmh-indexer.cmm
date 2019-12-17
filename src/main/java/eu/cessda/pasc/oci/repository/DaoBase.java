@@ -37,8 +37,12 @@ import static eu.cessda.pasc.oci.helpers.LogHelper.logResponse;
 @Slf4j
 public class DaoBase {
 
+  private final RestTemplate restTemplate;
+
   @Autowired
-  RestTemplate restTemplate;
+  public DaoBase(RestTemplate restTemplate) {
+    this.restTemplate = restTemplate;
+  }
 
   String postForStringResponse(String fullUrl) throws ExternalSystemException {
     ResponseEntity<String> responseEntity;

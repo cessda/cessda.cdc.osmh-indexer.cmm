@@ -37,7 +37,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.net.InetAddress;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,11 +60,15 @@ public class AppUtilityBeansConfiguration {
   @Value("${elasticsearch.clustername}")
   private String esClusterName;
 
-  @Autowired
-  AppConfigurationProperties appConfigurationProperties;
+  private final AppConfigurationProperties appConfigurationProperties;
+
+  private final PerfRequestSyncInterceptor perfRequestSyncInterceptor;
 
   @Autowired
-  PerfRequestSyncInterceptor perfRequestSyncInterceptor;
+  public AppUtilityBeansConfiguration(AppConfigurationProperties appConfigurationProperties, PerfRequestSyncInterceptor perfRequestSyncInterceptor) {
+    this.appConfigurationProperties = appConfigurationProperties;
+    this.perfRequestSyncInterceptor = perfRequestSyncInterceptor;
+  }
 
   @Bean
   public ObjectMapper objectMapper() {
