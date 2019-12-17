@@ -38,7 +38,7 @@ pipeline {
                 stage('Build Project') {
                     steps {
                         withMaven {
-                            sh 'export PATH=$MVN_CMD_DIR:$PATH && mvn clean deploy'
+                            sh "export PATH=$MVN_CMD_DIR:$PATH && mvn clean install -DbuildNumber=${env.BUILD_NUMBER}"
                         }
                     }
                     when { branch 'master' }
@@ -61,7 +61,7 @@ pipeline {
                     steps {
                         withSonarQubeEnv('cessda-sonar') {
                             withMaven {
-                                sh 'export PATH=$MVN_CMD_DIR:$PATH && mvn sonar:sonar'
+                                sh "export PATH=$MVN_CMD_DIR:$PATH && mvn sonar:sonar -DbuildNumber=${env.BUILD_NUMBER}"
                             }
                         }
 						timeout(time: 1, unit: 'HOURS') {

@@ -14,7 +14,7 @@
 <!-- limitations under the License.  -->
   <groupId>eu.cessda.pasc</groupId>
   <artifactId>pasc-oci</artifactId>
-	<version>${revision}</version>
+  <version>${revision}</version>
   <packaging>jar</packaging>
 
   <name>CESSDA Data Catalogue OSMH Indexer</name>
@@ -28,9 +28,8 @@
   </parent>
 
   <properties>
-    <baseRevision>2.2.0-</baseRevision>
-    <buildRevision>SNAPSHOT</buildRevision>
-    <revision>${baseRevision}${buildRevision}</revision>
+    <buildNumber>SNAPSHOT</buildNumber>
+    <revision>2.2.0-${buildNumber}</revision>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.version>11</java.version>
@@ -261,17 +260,4 @@
       </plugin>
     </plugins>
   </build>
-  <profiles>
-    <profile>
-      <id>jenkins</id>
-      <activation>
-        <property>
-          <name>env.BUILD_NUMBER</name>
-        </property>
-      </activation>
-      <properties>
-        <buildRevision>.${env.BUILD_NUMBER}</buildRevision>
-      </properties>
-    </profile>
-  </profiles>
 </project>
