@@ -16,7 +16,7 @@ package eu.cessda.pasc.oci.repository;
 
 import org.junit.Test;
 
-import static eu.cessda.pasc.oci.repository.StudyIdentifierEncoder.encodeStudyIdentifier;
+import static eu.cessda.pasc.oci.service.helpers.StudyIdentifierEncoder.encodeStudyIdentifier;
 import static org.assertj.core.api.BDDAssertions.then;
 
 /**

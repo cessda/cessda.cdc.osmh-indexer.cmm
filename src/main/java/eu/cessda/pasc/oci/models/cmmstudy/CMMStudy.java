@@ -53,7 +53,7 @@ import java.util.*;
     "lastModified",
     "studyUrl",
     "isActive",
-    "isAvailableIn"
+    "langAvailableIn"
 })
 @Getter
 public class CMMStudy {
