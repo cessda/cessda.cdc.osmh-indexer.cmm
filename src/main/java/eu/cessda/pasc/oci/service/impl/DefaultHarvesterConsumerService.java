@@ -24,6 +24,7 @@ import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.repository.HarvesterDao;
 import eu.cessda.pasc.oci.service.HarvesterConsumerService;
+import eu.cessda.pasc.oci.service.RepositoryUrlService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,11 +47,14 @@ import java.util.stream.Collectors;
 public class DefaultHarvesterConsumerService implements HarvesterConsumerService {
 
   private HarvesterDao harvesterDao;
+  private final RepositoryUrlService repositoryUrlService;
   private ObjectMapper mapper;
 
   @Autowired
-  public DefaultHarvesterConsumerService(HarvesterDao harvesterDao, ObjectMapper mapper) {
+  public DefaultHarvesterConsumerService(HarvesterDao harvesterDao, RepositoryUrlService repositoryUrlService,
+                                         ObjectMapper mapper) {
     this.harvesterDao = harvesterDao;
+    this.repositoryUrlService = repositoryUrlService;
     this.mapper = mapper;
   }
 
@@ -59,7 +63,8 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
     List<RecordHeader> recordHeadersUnfiltered = new ArrayList<>();
 
     try {
-      String recordHeadersJsonString = harvesterDao.listRecordHeaders(repo.getUrl());
+      String finalUrl = repositoryUrlService.constructListRecordUrl(repo.getUrl());
+      String recordHeadersJsonString = harvesterDao.listRecordHeaders(finalUrl);
       CollectionType collectionType = mapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class);
       recordHeadersUnfiltered = mapper.readValue(recordHeadersJsonString, collectionType);
     } catch (ExternalSystemException e) {
@@ -75,7 +80,8 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
   public Optional<CMMStudy> getRecord(Repo repo, String studyNumber) {
 
     try {
-      String recordJsonString = harvesterDao.getRecord(repo.getUrl(), studyNumber);
+      String finalUrl = repositoryUrlService.constructGetRecordUrl(repo.getUrl(), studyNumber);
+      String recordJsonString = harvesterDao.getRecord(finalUrl);
       return Optional.ofNullable(CMMStudyConverter.fromJsonString(recordJsonString));
     } catch (ExternalSystemException e) {
       log.warn("Exception msg[{}]. External system response body[{}]", e.getMessage(), e.getExternalResponseBody());

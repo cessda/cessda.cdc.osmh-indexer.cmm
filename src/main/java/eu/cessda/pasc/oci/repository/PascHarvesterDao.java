@@ -15,7 +15,6 @@
 package eu.cessda.pasc.oci.repository;
 
 import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
-import eu.cessda.pasc.oci.service.RepositoryUrlService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -30,24 +29,19 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 public class PascHarvesterDao extends DaoBase implements HarvesterDao {
 
-  private final RepositoryUrlService repositoryUrlService;
 
   @Autowired
-  public PascHarvesterDao(RestTemplate restTemplate, RepositoryUrlService repositoryUrlService) {
+  public PascHarvesterDao(RestTemplate restTemplate) {
     super(restTemplate);
-    this.repositoryUrlService = repositoryUrlService;
   }
 
   @Override
-  public String listRecordHeaders(String spRepository) throws ExternalSystemException {
-
-    String finalUrl = repositoryUrlService.constructListRecordUrl(spRepository);
+  public String listRecordHeaders(String finalUrl) throws ExternalSystemException {
     return postForStringResponse(finalUrl);
   }
 
   @Override
-  public String getRecord(String spRepository, String studyNumber) throws ExternalSystemException {
-    String finalUrl = repositoryUrlService.constructGetRecordUrl(spRepository, studyNumber);
+  public String getRecord(String finalUrl) throws ExternalSystemException {
     return postForStringResponse(finalUrl);
   }
 }

@@ -34,12 +34,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static eu.cessda.pasc.oci.data.RecordTestData.*;
+import static eu.cessda.pasc.oci.data.RecordTestData.LIST_RECORDER_HEADERS_BODY_EXAMPLE;
+import static eu.cessda.pasc.oci.data.RecordTestData.LIST_RECORDER_HEADERS_WITH_INVALID_DATETIME;
+import static eu.cessda.pasc.oci.data.RecordTestData.LIST_RECORDER_HEADERS_X6;
 import static eu.cessda.pasc.oci.data.ReposTestData.getUKDSRepo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Java6BDDAssertions.then;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.matches;
 import static org.mockito.Mockito.when;
 
 /**
@@ -111,8 +112,9 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
     FileHandler fileHandler = new FileHandler();
     String recordUkds998 = fileHandler.getFileWithUtil("record_ukds_998.json");
     String recordID = "998";
+    String expectedUrl = "http://cdc-osmh-repo:9091/v0/GetRecord/CMMStudy/998?Repository=https://oai.ukdataservice.ac.uk:8443/oai/provider";
 
-    when(harvesterDao.getRecord(anyString(), anyString())).thenReturn(recordUkds998);
+    when(harvesterDao.getRecord(expectedUrl)).thenReturn(recordUkds998);
     Repo repo = getUKDSRepo();
 
     Optional<CMMStudy> cmmStudy = defaultHarvesterConsumerService.getRecord(repo, recordID);
@@ -129,8 +131,9 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
     FileHandler fileHandler = new FileHandler();
     String recordUkds1031 = fileHandler.getFileWithUtil("record_ukds_1031_deleted.json");
     String recordID = "1031";
+    String expectedUrl = "http://cdc-osmh-repo:9091/v0/GetRecord/CMMStudy/1031?Repository=https://oai.ukdataservice.ac.uk:8443/oai/provider";
 
-    when(harvesterDao.getRecord(anyString(), matches(recordID))).thenReturn(recordUkds1031);
+    when(harvesterDao.getRecord(expectedUrl)).thenReturn(recordUkds1031);
     Repo repo = getUKDSRepo();
 
     Optional<CMMStudy> cmmStudy = defaultHarvesterConsumerService.getRecord(repo, recordID);
