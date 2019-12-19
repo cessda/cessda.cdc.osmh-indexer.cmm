@@ -115,8 +115,8 @@ public class CMMStudyMapper {
   public static void parseAbstract(
       CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory, OaiPmh config, String langCode) {
 
-    List<Element> elements = getElements(document, xFactory, ABSTRACT_XPATH);
-    Map<String, String> abstracts = getLanguageKeyValuePairs(config, elements, true, langCode, Element::getText);
+    Map<String, String> abstracts =
+        parseLanguageContentOfElement(document, xFactory, config, langCode, ABSTRACT_XPATH, true);
     builder.abstractField(abstracts);
   }
 
@@ -263,15 +263,29 @@ public class CMMStudyMapper {
   /**
    * Parses Study Title.
    * <p>
-   * Xpath = {@value OaiPmhConstants#TITLE_XPATH }
+   * Xpath = {@value OaiPmhConstants#TITLE_XPATH } and {@value OaiPmhConstants#PAR_TITLE_XPATH }
    */
   public static void parseStudyTitle(CMMStudy.CMMStudyBuilder builder, Document document, XPathFactory xFactory,
                                      OaiPmh config, String langCode) {
 
-    List<Element> elements = getElements(document, xFactory, TITLE_XPATH);
-    Map<String, String> studyTitles = getLanguageKeyValuePairs(config, elements, false, langCode, Element::getText);
-    CLEAN_MAP_VALUES.accept(studyTitles);
-    builder.titleStudy(studyTitles);
+    Map<String, String> titles = parseLanguageContentOfElement(document, xFactory, config, langCode, TITLE_XPATH, false);
+
+    // https://bitbucket.org/cessda/cessda.cdc.version2/issues/135
+    if (!titles.isEmpty()) {
+      Map<String, String> parTitles =
+          parseLanguageContentOfElement(document, xFactory, config, langCode, PAR_TITLE_XPATH, false);
+      parTitles.forEach(titles::putIfAbsent);  // parTitl lang must not be same as or override titl lang
+    }
+
+    CLEAN_MAP_VALUES.accept(titles);
+    builder.titleStudy(titles);
+  }
+
+  private static Map<String, String> parseLanguageContentOfElement(Document document, XPathFactory xFactory,
+                                                                   OaiPmh config, String langCode, String titleXpath,
+                                                                   boolean isConcatenating) {
+    List<Element> elements = getElements(document, xFactory, titleXpath);
+    return getLanguageKeyValuePairs(config, elements, isConcatenating, langCode, Element::getText);
   }
 
   /**
@@ -323,7 +337,7 @@ public class CMMStudyMapper {
    * Parses Data Collection Period dates from:
    * <p>
    * Xpath = {@value OaiPmhConstants#DATA_COLLECTION_PERIODS_PATH}
-   *
+   * <p>
    * For Data Collection start and end date plus the four digit Year value as Data Collection Year
    */
   public static void parseDataCollectionDates(CMMStudy.CMMStudyBuilder builder, Document doc,

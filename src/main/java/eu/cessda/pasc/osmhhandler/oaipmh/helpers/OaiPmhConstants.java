@@ -42,6 +42,7 @@ public class OaiPmhConstants {
   static final String RECORD_DEFAULT_LANGUAGE= "//ddi:codeBook/@xml:lang";
   static final String ABSTRACT_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:abstract";
   static final String TITLE_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:titl";
+  static final String PAR_TITLE_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:parTitl";
   static final String STUDY_URL_DOC_DSCR_XPATH = "//ddi:codeBook/ddi:docDscr/ddi:citation/ddi:holdings";
   static final String STUDY_URL_STDY_DSCR_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:holdings";
   static final String PID_STUDY_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo"; // TODO use @agency instead
