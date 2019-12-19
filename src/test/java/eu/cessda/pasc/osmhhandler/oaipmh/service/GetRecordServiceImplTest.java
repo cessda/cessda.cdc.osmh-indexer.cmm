@@ -182,6 +182,27 @@ public class GetRecordServiceImplTest {
     validateCMMStudyResultAgainstSchema(record);
   }
 
+  @Test // https://bitbucket.org/cessda/cessda.cdc.version2/issues/135
+  public void shouldReturnCMMStudyRecordWithOutParTitleWhenThereIsALangDifferentFromDefault() throws Exception {
+
+    Map<String, String> expectedTitle = new HashMap<>();
+    expectedTitle.put("en", "Machinery of Government, 1976-1977");
+    expectedTitle.put("no", "2 - Et Machinery of Government, 1976-1977");
+    expectedTitle.put("yy", "Enquête sociale européenne");
+
+    given(getRecordDoa.getRecordXML("", "")).willReturn(
+        CMMStudyTestData.getContent("xml/ddi_record_1683.xml")
+    );
+
+    // When
+    CMMStudy record = recordService.getRecord("", "");
+
+    then(record).isNotNull();
+    then(record.getTitleStudy().size()).isEqualTo(3);
+    then(record.getTitleStudy()).isEqualTo(expectedTitle);
+    validateCMMStudyResultAgainstSchema(record);
+  }
+
   @Test()
   public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord_MarkedAsNotActive()
       throws CustomHandlerException {

@@ -36,7 +36,13 @@
               <titlStmt>
                 <titl>Machinery of Government, 1976-1977</titl>
                 <titl xml:lang="no">Et Machinery of Government, 1976-1977</titl>
-                <titl xml:lang="no">Et Machinery of Government2, 1976-1977</titl>
+                <titl xml:lang="no">2 - Et Machinery of Government, 1976-1977</titl>
+                <parTitl xml:lang="yy">
+                  Enquête sociale européenne
+                </parTitl>
+                <parTitl xml:lang="en">
+                  should not show up as it has lang element same as default xml:lang in codebook
+                </parTitl>
                 <IDNo agency="UKDA">1683</IDNo>
                 <IDNo agency="datacite">10.5255/UKDA-SN-1683-1</IDNo>
               </titlStmt>
