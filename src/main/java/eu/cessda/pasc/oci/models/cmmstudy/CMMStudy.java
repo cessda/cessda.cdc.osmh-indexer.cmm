@@ -53,7 +53,8 @@ import java.util.*;
     "lastModified",
     "studyUrl",
     "isActive",
-    "langAvailableIn"
+    "langAvailableIn",
+    "studyXmlSourceUrl"
 })
 @Getter
 public class CMMStudy {
@@ -142,4 +143,7 @@ public class CMMStudy {
   @Getter
   @JsonProperty("langAvailableIn")
   private Set<String> langAvailableIn = new HashSet<>();
+
+  @JsonProperty("studyXmlSourceUrl")
+  private String studyXmlSourceUrl;
 }

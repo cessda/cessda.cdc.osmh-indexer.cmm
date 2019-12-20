@@ -124,6 +124,9 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
     then(cmmStudy.get().getLastModified()).isEqualTo("2018-02-22T07:48:38Z");
     then(cmmStudy.get().getKeywords()).hasSize(1);
     then(cmmStudy.get().getKeywords().get("en")).hasSize(62);
+    then(cmmStudy.get().getStudyXmlSourceUrl())
+        .isEqualTo("http://services.fsd.uta.fi/v0/oai?verb=GetRecord&identifier=http://my-example_url:80/obj/fStudy" +
+            "/ch.sidos.ddi.468.7773&metadataPrefix=oai_ddi25");
   }
 
   @Test

@@ -484,5 +484,6 @@
     ]
   },
   "lastModified": "2018-02-22T07:48:38Z",
-  "isActive": true
+  "isActive": true,
+  "studyXmlSourceUrl": "http://services.fsd.uta.fi/v0/oai?verb=GetRecord&identifier=http://my-example_url:80/obj/fStudy/ch.sidos.ddi.468.7773&metadataPrefix=oai_ddi25"
 }

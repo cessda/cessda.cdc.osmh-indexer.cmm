@@ -58,7 +58,8 @@ import java.util.Set;
     "dataAccessFreeTexts",
     "lastModified",
     "isActive",
-    "langAvailableIn"
+    "langAvailableIn",
+    "studyXmlSourceUrl"
 })
 @Builder
 @NoArgsConstructor
@@ -145,6 +146,9 @@ public class CMMStudyOfLanguage {
 
   @JsonProperty("langAvailableIn")
   private Set<String> langAvailableIn;
+
+  @JsonProperty("studyXmlSourceUrl")
+  private String studyXmlSourceUrl;
 
   public String getId() {
     return id;
