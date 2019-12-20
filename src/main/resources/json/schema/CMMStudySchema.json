@@ -452,6 +452,10 @@
       "type": "boolean",
       "description": "Is the record marked as deleted. If record is deleted this = false.",
       "default": true
+    },
+    "studyXmlSourceUrl": {
+      "type": "string",
+      "description": "The Study's Full xml URL of the Service Provider's endpoint"
     }
   }
 }

@@ -14,13 +14,23 @@
 */
 package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 
+import eu.cessda.pasc.osmhhandler.oaipmh.configuration.HandlerConfigurationProperties;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.configuration.OaiPmh;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.configuration.Repo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.GET_RECORD_URL_TEMPLATE;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.GET_RECORD_VALUE;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.IDENTIFIER_PARAM_KEY;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.LIST_IDENTIFIERS_VALUE;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.LIST_RECORD_HEADERS_PER_SET_URL_TEMPLATE;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.LIST_RECORD_HEADERS_URL_TEMPLATE;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.METADATA_PREFIX_PARAM_KEY;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.RESUMPTION_TOKEN_KEY;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.SET_SPEC_PARAM_KEY;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.VERB_PARAM_KEY;
 
 /**
  * Helper methods to deal with Oai-pmh protocol
@@ -32,6 +42,13 @@ public class OaiPmhHelpers {
 
   private OaiPmhHelpers() {
     throw new UnsupportedOperationException("Utility class, instantiation not allow");
+  }
+
+  public static String buildGetStudyFullUrl(String repositoryUrl, String studyIdentifier,
+                                            HandlerConfigurationProperties oaiPmhConfig)
+      throws CustomHandlerException {
+    String decodedStudyId = decodeStudyNumber(studyIdentifier);
+    return appendGetRecordParams(repositoryUrl, decodedStudyId, oaiPmhConfig.getOaiPmh());
   }
 
   public static String appendListRecordParams(String repoUrl, OaiPmh oaiPmh) throws CustomHandlerException {
@@ -56,30 +73,31 @@ public class OaiPmhHelpers {
     );
   }
 
-  public static String appendGetRecordParams(String repoUrl, String identifier, OaiPmh oaiPmh) throws CustomHandlerException {
+  private static String appendGetRecordParams(String repositoryUrl, String identifier, OaiPmh oaiPmh)
+      throws CustomHandlerException {
     return String.format(
-        GET_RECORD_URL_TEMPLATE, repoUrl,
+        GET_RECORD_URL_TEMPLATE, repositoryUrl,
         VERB_PARAM_KEY, GET_RECORD_VALUE, // verb=GetRecord
         IDENTIFIER_PARAM_KEY, identifier, //&identifier=1683
-        METADATA_PREFIX_PARAM_KEY, getMetadataPrefix(repoUrl, oaiPmh).getPreferredMetadataParam() //&metadataPrefix=ddi
+        METADATA_PREFIX_PARAM_KEY, getMetadataPrefix(repositoryUrl, oaiPmh).getPreferredMetadataParam() //&metadataPrefix=ddi
     );
   }
 
-  public static String decodeStudyNumber(String encodedStudyNumber) {
+  private static String decodeStudyNumber(String encodedStudyNumber) {
     return encodedStudyNumber.replace("_dt_", ".")
         .replace("_sl_", "/")
         .replace("_cl_", ":");
   }
 
-  private static Repo getMetadataPrefix(String repoUrl, OaiPmh oaiPmh) throws CustomHandlerException {
+  private static Repo getMetadataPrefix(String repositoryUrl, OaiPmh oaiPmh) throws CustomHandlerException {
 
     Repo repo = oaiPmh.getRepos()
         .stream()
-        .filter(currentStreamRepo -> currentStreamRepo.getUrl().equalsIgnoreCase(repoUrl))
+        .filter(currentStreamRepo -> currentStreamRepo.getUrl().equalsIgnoreCase(repositoryUrl))
         .findFirst()
-        .orElseThrow(() -> new CustomHandlerException(String.format("Configuration not found for Repo [%s]", repoUrl)));
+        .orElseThrow(() -> new CustomHandlerException(String.format("Configuration not found for Repo [%s]", repositoryUrl)));
 
-    log.debug("Retrieved Params for repo [{}] as [{}]", repoUrl, repo);
+    log.debug("Retrieved Params for repo [{}] as [{}]", repositoryUrl, repo);
     return repo;
   }
 }

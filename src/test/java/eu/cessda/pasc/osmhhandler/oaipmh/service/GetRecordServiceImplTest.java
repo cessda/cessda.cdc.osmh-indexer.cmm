@@ -56,6 +56,11 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 @ActiveProfiles("test")
 public class GetRecordServiceImplTest {
 
+  private final static String REPO_URL = "http://services.fsd.uta.fi/v0/oai";
+  private final static String RECORD_IDENTIFIER = "http://my-example_url:80/obj/fStudy/ch.sidos.ddi.468.7773";
+  private final static String FULL_RECORD_URL = REPO_URL + "?verb=GetRecord&identifier=" + RECORD_IDENTIFIER + "&metadataPrefix=oai_ddi25";
+
+
   @MockBean
   GetRecordDoa getRecordDoa;
 
@@ -69,12 +74,12 @@ public class GetRecordServiceImplTest {
   public void shouldReturnValidCMMStudyRecordFromAFullyComplaintCmmDdiRecord() throws Exception {
 
     // Given
-    given(getRecordDoa.getRecordXML("", "")).willReturn(
+    given(getRecordDoa.getRecordXML(FULL_RECORD_URL)).willReturn(
         CMMStudyTestData.getContent("xml/synthetic_compliant_cmm.xml")
     );
 
     // When
-    CMMStudy result = recordService.getRecord("", "");
+    CMMStudy result = recordService.getRecord(REPO_URL, RECORD_IDENTIFIER);
 
     then(result).isNotNull();
     validateCMMStudyResultAgainstSchema(result);
@@ -85,12 +90,12 @@ public class GetRecordServiceImplTest {
   public void shouldHarvestedContentForLanguageSpecificDimensionFromElementWithCorrectXmlLangAttribute() throws Exception {
 
     // Given
-    given(getRecordDoa.getRecordXML("", "")).willReturn(
+    given(getRecordDoa.getRecordXML(FULL_RECORD_URL)).willReturn(
         CMMStudyTestData.getContent("xml/oai-fsd_uta_fi-FSD3187.xml")
     );
 
     // When
-    CMMStudy result = recordService.getRecord("", "");
+    CMMStudy result = recordService.getRecord(REPO_URL, RECORD_IDENTIFIER);
 
     then(result).isNotNull();
 
@@ -109,16 +114,14 @@ public class GetRecordServiceImplTest {
   public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord() throws Exception {
 
     // Given
-    String repoUrl = "";
-    String studyIdentifier = "";
-
-    given(getRecordDoa.getRecordXML(repoUrl, studyIdentifier)).willReturn(
+    given(getRecordDoa.getRecordXML(FULL_RECORD_URL)).willReturn(
         CMMStudyTestData.getContent("xml/ddi_record_1683.xml")
     );
 
     // When
-    CMMStudy record = recordService.getRecord(repoUrl, studyIdentifier);
+    CMMStudy record = recordService.getRecord(REPO_URL, RECORD_IDENTIFIER);
 
+    // Then
     then(record).isNotNull();
     validateCMMStudyResultAgainstSchema(record);
   }
@@ -127,12 +130,12 @@ public class GetRecordServiceImplTest {
   public void shouldOnlyExtractSingleDateAsStartDateForRecordsWithASingleDateAttr() throws Exception {
 
     // Given
-    given(getRecordDoa.getRecordXML("", "")).willReturn(
+    given(getRecordDoa.getRecordXML(FULL_RECORD_URL)).willReturn(
         CMMStudyTestData.getContent("xml/ddi_record_1683.xml")
     );
 
     // When
-    CMMStudy record = recordService.getRecord("", "");
+    CMMStudy record = recordService.getRecord(REPO_URL, RECORD_IDENTIFIER);
     then(record).isNotNull();
     validateCMMStudyResultAgainstSchema(record);
     final ObjectMapper mapper = new ObjectMapper();
@@ -149,12 +152,12 @@ public class GetRecordServiceImplTest {
 
     // Given
     String expectedCmmStudyJsonString = CMMStudyTestData.getContent("json/ddi_record_1683_with_codebookXmlLag.json");
-    given(getRecordDoa.getRecordXML("", "")).willReturn(
+    given(getRecordDoa.getRecordXML(FULL_RECORD_URL)).willReturn(
         CMMStudyTestData.getContent("xml/ddi_record_1683_with_codebookXmlLag.xml")
     );
 
     // When
-    CMMStudy record = recordService.getRecord("", "");
+    CMMStudy record = recordService.getRecord(REPO_URL, RECORD_IDENTIFIER);
     String actualCmmStudyJsonString = CMMConverter.toJsonString(record);
 
     // then
@@ -169,12 +172,12 @@ public class GetRecordServiceImplTest {
     expectedAbstract.put("fi", "Haastattelu+<br>Jyväskylä");
     expectedAbstract.put("en", "1. The data+<br>2. The datafiles");
 
-    given(getRecordDoa.getRecordXML("", "")).willReturn(
+    given(getRecordDoa.getRecordXML(FULL_RECORD_URL)).willReturn(
         CMMStudyTestData.getContent("xml/ddi_record_2305_fsd_repeat_abstract.xml")
     );
 
     // When
-    CMMStudy record = recordService.getRecord("", "");
+    CMMStudy record = recordService.getRecord(REPO_URL, RECORD_IDENTIFIER);
 
     then(record).isNotNull();
     then(record.getAbstractField().size()).isEqualTo(3);
@@ -190,12 +193,12 @@ public class GetRecordServiceImplTest {
     expectedTitle.put("no", "2 - Et Machinery of Government, 1976-1977");
     expectedTitle.put("yy", "Enquête sociale européenne");
 
-    given(getRecordDoa.getRecordXML("", "")).willReturn(
+    given(getRecordDoa.getRecordXML(FULL_RECORD_URL)).willReturn(
         CMMStudyTestData.getContent("xml/ddi_record_1683.xml")
     );
 
     // When
-    CMMStudy record = recordService.getRecord("", "");
+    CMMStudy record = recordService.getRecord(REPO_URL, RECORD_IDENTIFIER);
 
     then(record).isNotNull();
     then(record.getTitleStudy().size()).isEqualTo(3);
@@ -208,16 +211,14 @@ public class GetRecordServiceImplTest {
       throws CustomHandlerException {
 
     // Given
-    String repoUrl = "";
-    String studyIdentifier = "";
-
-    given(getRecordDoa.getRecordXML(repoUrl, studyIdentifier)).willReturn(
+    given(getRecordDoa.getRecordXML(FULL_RECORD_URL)).willReturn(
         CMMStudyTestData.getContent("xml/ddi_record_1031_deleted.xml")
     );
 
     // When
-    CMMStudy record = recordService.getRecord(repoUrl, studyIdentifier);
+    CMMStudy record = recordService.getRecord(REPO_URL, RECORD_IDENTIFIER);
 
+    // Then
     then(record).isNotNull();
     then(record.isActive()).isFalse();
   }
@@ -226,15 +227,12 @@ public class GetRecordServiceImplTest {
   public void shouldThrowExceptionForRecordWithErrorElement() throws CustomHandlerException {
 
     // Given
-    String repoUrl = "www.myurl.com";
-    String studyIdentifier = "Id12214";
-
-    given(getRecordDoa.getRecordXML(repoUrl, studyIdentifier)).willReturn(
+    given(getRecordDoa.getRecordXML(FULL_RECORD_URL)).willReturn(
         CMMStudyTestData.getContent("xml/ddi_record_WithError.xml")
     );
 
     // When
-    recordService.getRecord(repoUrl, studyIdentifier);
+    recordService.getRecord(REPO_URL, RECORD_IDENTIFIER);
 
     // Then an exception is thrown.
   }
@@ -243,12 +241,12 @@ public class GetRecordServiceImplTest {
   public void shouldExtractAllRequiredCMMFieldsForAGivenAUKDSRecord() throws Exception {
 
     // Given
-    given(getRecordDoa.getRecordXML("", "")).willReturn(
+    given(getRecordDoa.getRecordXML(FULL_RECORD_URL)).willReturn(
         CMMStudyTestData.getContent("xml/ddi_record_ukds_example.xml")
     );
 
     // When
-    CMMStudy result = recordService.getRecord("", "");
+    CMMStudy result = recordService.getRecord(REPO_URL, RECORD_IDENTIFIER);
 
     then(result).isNotNull();
     validateCMMStudyResultAgainstSchema(result);
@@ -307,8 +305,8 @@ public class GetRecordServiceImplTest {
         .get("dataCollectionFreeTexts").toString(), actualTree.get("dataCollectionFreeTexts").toString(), true);
     assertEquals(expectedTree
         .get("dataAccessFreeTexts").toString(), actualTree.get("dataAccessFreeTexts").toString(), true);
-    assertEquals(expectedTree
-        .get("studyUrl").toString(), actualTree.get("studyUrl").toString(), true);
+    assertEquals(expectedTree.get("studyUrl").toString(), actualTree.get("studyUrl").toString(), true);
+    assertEquals(expectedTree.get("studyXmlSourceUrl").toString(), actualTree.get("studyXmlSourceUrl").toString(), true);
   }
 
   private void assertThatCmmRequiredFieldsAreExtracted(CMMStudy record) throws IOException, JSONException {

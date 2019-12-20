@@ -55,7 +55,8 @@ import java.util.Set;
     "dataAccessFreeTexts",
     "lastModified",
     "studyUrl",
-    "isActive"
+    "isActive",
+    "studyXmlSourceUrl"
 })
 @Builder
 @Getter
@@ -133,4 +134,7 @@ public class CMMStudy {
 
   @JsonProperty("isActive")
   private boolean active;
+
+  @JsonProperty("studyXmlSourceUrl")
+  private String studyXmlSourceUrl;
 }

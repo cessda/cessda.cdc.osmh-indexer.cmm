@@ -70,7 +70,7 @@ public class GetRecordDoaImplTest {
         .andRespond(withSuccess(ddiRecord1683, MediaType.TEXT_XML));
 
     // When
-    String responseXMLRecord = recordDoa.getRecordXML("https://oai.ukdataservice.ac.uk:8443/oai/provider", "1683");
+    String responseXMLRecord = recordDoa.getRecordXML(expected_url);
 
     then(responseXMLRecord).isNotEmpty();
     then(responseXMLRecord).isNotBlank();
@@ -87,6 +87,6 @@ public class GetRecordDoaImplTest {
         .andRespond(withBadRequest());
 
     // When
-    recordDoa.getRecordXML("https://oai.ukdataservice.ac.uk:8443/oai/provider", "1683");
+    recordDoa.getRecordXML(expected_url);
   }
 }

@@ -22,5 +22,5 @@ import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMStudy;
  * @author moses AT doraventures DOT com
  */
 public interface GetRecordService {
-  CMMStudy getRecord(String repository, String studyId) throws CustomHandlerException;
+  CMMStudy getRecord(String repositoryUrl, String studyIdentifier) throws CustomHandlerException;
 }
