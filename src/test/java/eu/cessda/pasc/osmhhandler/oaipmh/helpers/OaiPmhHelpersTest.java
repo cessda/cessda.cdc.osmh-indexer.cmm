@@ -23,8 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhHelpers.appendGetRecordParams;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhHelpers.decodeStudyNumber;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhHelpers.buildGetStudyFullUrl;
 import static org.assertj.core.api.BDDAssertions.then;
 
 /**
@@ -49,7 +48,7 @@ public class OaiPmhHelpersTest {
     String expectedReqUrl = "http://services.fsd.uta.fi/v0/oai?verb=GetRecord&identifier=15454&metadataPrefix=oai_ddi25";
 
     // When
-    String builtUrl = appendGetRecordParams(fsdEndpoint, "15454", handlerConfigurationProperties.getOaiPmh());
+    String builtUrl = buildGetStudyFullUrl(fsdEndpoint, "15454", handlerConfigurationProperties);
 
     then(builtUrl).isEqualTo(expectedReqUrl);
   }
@@ -62,7 +61,7 @@ public class OaiPmhHelpersTest {
     String expectedReqUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=GetRecord&identifier=15454&metadataPrefix=ddi";
 
     // When
-    String builtUrl = appendGetRecordParams(fsdEndpoint, "15454", handlerConfigurationProperties.getOaiPmh());
+    String builtUrl = buildGetStudyFullUrl(fsdEndpoint, "15454", handlerConfigurationProperties);
 
     then(builtUrl).isEqualTo(expectedReqUrl);
   }
@@ -70,18 +69,20 @@ public class OaiPmhHelpersTest {
   @Test(expected = CustomHandlerException.class)
   public void ShouldThrowExceptionForANonConfiguredRepo() throws CustomHandlerException {
     // When
-    appendGetRecordParams("http://services.inthe.future/v0/oai", "15454", handlerConfigurationProperties.getOaiPmh());
+    buildGetStudyFullUrl("http://services.inthe.future/v0/oai", "15454", handlerConfigurationProperties);
   }
 
   @Test
-  public void shouldDecodeStudyNumberSpecialCharactersBackToOriginalForm() {
+  public void shouldDecodeStudyNumberSpecialCharactersBackToOriginalForm() throws CustomHandlerException {
 
     // Given
     String studyNumberWithRestCharactersEncoded = "oai_cl_dbk_dt_gesis_dt_org_cl_DBK_sl_ZA0001";
+    String fsdEndpoint = "http://services.fsd.uta.fi/v0/oai";
+    String expectedReqUrl = "http://services.fsd.uta.fi/v0/oai?verb=GetRecord&identifier=oai:dbk.gesis.org:DBK/ZA0001&metadataPrefix=oai_ddi25";
 
     // When
-    String result = decodeStudyNumber(studyNumberWithRestCharactersEncoded);
+    String builtUrl = buildGetStudyFullUrl(fsdEndpoint, studyNumberWithRestCharactersEncoded, handlerConfigurationProperties);
 
-    then(result).isEqualTo("oai:dbk.gesis.org:DBK/ZA0001");
+    then(builtUrl).isEqualTo(expectedReqUrl);
   }
 }

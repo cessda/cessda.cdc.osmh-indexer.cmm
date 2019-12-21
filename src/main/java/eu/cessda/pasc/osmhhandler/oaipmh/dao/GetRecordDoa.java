@@ -23,5 +23,5 @@ import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
  */
 public interface GetRecordDoa {
 
-  String getRecordXML(String repoUrl, String studyIdentifier) throws CustomHandlerException;
+  String getRecordXML(String studyFullUrl) throws CustomHandlerException;
 }

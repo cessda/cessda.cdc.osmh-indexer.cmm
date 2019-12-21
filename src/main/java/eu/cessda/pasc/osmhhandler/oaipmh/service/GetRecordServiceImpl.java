@@ -19,6 +19,7 @@ import eu.cessda.pasc.osmhhandler.oaipmh.dao.GetRecordDoa;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.InternalSystemException;
+import eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhHelpers;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.configuration.OaiPmh;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.errors.ErrorStatus;
@@ -35,7 +36,27 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.*;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseAbstract;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseClassifications;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseCreator;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseDataAccessFreeText;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseDataCollectionDates;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseDataCollectionFreeTexts;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseDefaultLanguage;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseFileLanguages;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseHeaderElement;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseKeywords;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parsePidStudies;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parsePublisher;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseSamplingProcedureFreeTexts;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseStudyAreaCountries;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseStudyTitle;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseStudyUrl;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseTypeOfModeOfCollection;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseTypeOfSamplingProcedure;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseTypeOfTimeMethod;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseUnitTypes;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseYrOfPublication;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.RecordResponseValidator.validateResponse;
 
 /**
@@ -49,34 +70,36 @@ public class GetRecordServiceImpl implements GetRecordService {
 
   private final GetRecordDoa getRecordDoa;
 
-  private final HandlerConfigurationProperties handlerConfig;
+  private final HandlerConfigurationProperties oaiPmhHandlerConfig;
 
   private static final XPathFactory X_FACTORY = XPathFactory.instance();
 
   @Autowired
-  public GetRecordServiceImpl(GetRecordDoa getRecordDoa, HandlerConfigurationProperties handlerConfig) {
+  public GetRecordServiceImpl(GetRecordDoa getRecordDoa, HandlerConfigurationProperties oaiPmhHandlerConfig) {
     this.getRecordDoa = getRecordDoa;
-    this.handlerConfig = handlerConfig;
+    this.oaiPmhHandlerConfig = oaiPmhHandlerConfig;
   }
 
   @Override
-  public CMMStudy getRecord(String repository, String studyId) throws CustomHandlerException {
-    CMMStudy.CMMStudyBuilder builder = CMMStudy.builder();
-    log.debug("Querying Repo [{}] for StudyID [{}]", repository, studyId);
-    String recordXML = getRecordDoa.getRecordXML(repository, studyId);
+  public CMMStudy getRecord(String repositoryUrl, String studyIdentifier) throws CustomHandlerException {
+    log.trace("Querying Repo [{}] for StudyID [{}]", repositoryUrl, studyIdentifier);
+    String fullUrl = OaiPmhHelpers.buildGetStudyFullUrl(repositoryUrl, studyIdentifier, oaiPmhHandlerConfig);
+    String recordXML = getRecordDoa.getRecordXML(fullUrl);
 
+    CMMStudy.CMMStudyBuilder builder = CMMStudy.builder();
     try {
       mapDDIRecordToCMMStudy(recordXML, builder);
     } catch (JDOMException | IOException e) {
       throw new InternalSystemException("Unable to parse xml :" + e.getMessage());
     }
-    return builder.build();
+
+    return builder.studyXmlSourceUrl(fullUrl).build();
   }
 
   private void mapDDIRecordToCMMStudy(String recordXML, CMMStudy.CMMStudyBuilder builder)
       throws JDOMException, IOException, ExternalSystemException {
 
-    OaiPmh oaiPmh = handlerConfig.getOaiPmh();
+    OaiPmh oaiPmh = oaiPmhHandlerConfig.getOaiPmh();
     InputStream recordXMLStream = IOUtils.toInputStream(recordXML, Charsets.UTF_8);
     SAXBuilder saxBuilder = new SAXBuilder();
     Document document = saxBuilder.build(recordXMLStream);
