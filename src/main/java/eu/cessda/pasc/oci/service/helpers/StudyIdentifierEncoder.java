@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 */
-package eu.cessda.pasc.oci.repository;
+package eu.cessda.pasc.oci.service.helpers;
 
 import java.util.function.Function;
 
@@ -26,7 +26,7 @@ import java.util.function.Function;
  */
 public class StudyIdentifierEncoder {
 
-  static Function<String, String> encodeStudyIdentifier(){
+  public static Function<String, String> encodeStudyIdentifier(){
     return studyIdentifier -> studyIdentifier.replace(".", "_dt_")
         .replace("/", "_sl_")
         .replace(":", "_cl_");
