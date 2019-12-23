@@ -128,7 +128,8 @@ public class LanguageDocumentExtractor {
         .dataCollectionPeriodStartdate(cmmStudy.getDataCollectionPeriodStartdate())
         .dataCollectionPeriodEnddate(cmmStudy.getDataCollectionPeriodEnddate())
         .dataCollectionYear(cmmStudy.getDataCollectionYear())
-        .langAvailableIn(cmmStudy.getLangAvailableIn());
+        .langAvailableIn(cmmStudy.getLangAvailableIn())
+        .studyXmlSourceUrl(cmmStudy.getStudyXmlSourceUrl());
 
     // Language specific field extraction
     ofNullable(cmmStudy.getTitleStudy()).ifPresent(map -> builder.titleStudy(map.get(lang)));
