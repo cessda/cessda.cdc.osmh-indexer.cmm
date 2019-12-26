@@ -18,15 +18,10 @@ import eu.cessda.pasc.osmhhandler.oaipmh.configuration.UtilitiesConfiguration;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.logging.LogLevel;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
-
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.UNSUCCESSFUL_RESPONSE;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerLogHelper.logResponse;
 
 /**
  * Shareable Dao functions
@@ -48,19 +43,21 @@ public class DaoBase {
     ResponseEntity<String> responseEntity;
 
     try {
-      log.debug("Sending request to remote SP  for [{}]", fullUrl);
+      log.debug("Sending request to remote SP with url [{}].", fullUrl);
       responseEntity = configuration.getRestTemplate().getForEntity(fullUrl, String.class);
-      log.debug("Got response for [{}] responseCode [{}]", fullUrl, responseEntity.getStatusCodeValue());
+      log.debug("Got response code of [{}] for [{}]", responseEntity.getStatusCodeValue(), fullUrl);
       return responseEntity.getBody();
     } catch (RestClientException e) {
-      ExternalSystemException exception = new ExternalSystemException(UNSUCCESSFUL_RESPONSE, e.getCause());
+      String message = String.format("RestClientException! Unsuccessful response from remote SP's Endpoint [%s]", fullUrl);
+      ExternalSystemException exception = new ExternalSystemException(message, e.getCause());
+
       try {
         exception.setExternalResponseBody((((HttpServerErrorException) e).getResponseBodyAsString()));
       } catch (Exception e1) {
         exception.setExternalResponseBody(e.getMessage());
       }
 
-      logResponse(HttpStatus.NOT_ACCEPTABLE, exception, log, LogLevel.ERROR);
+      log.trace(message, e);
       throw exception;
     }
   }

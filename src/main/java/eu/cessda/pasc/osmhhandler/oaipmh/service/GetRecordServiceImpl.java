@@ -90,7 +90,8 @@ public class GetRecordServiceImpl implements GetRecordService {
     try {
       mapDDIRecordToCMMStudy(recordXML, builder);
     } catch (JDOMException | IOException e) {
-      throw new InternalSystemException("Unable to parse xml :" + e.getMessage());
+      log.trace("Error passing XML to a CMMStudy. Content [{}]", recordXML, e);
+      throw new InternalSystemException(String.format("Unable to parse xml error message [%s], FullUrl [%s]", e.getMessage(), fullUrl));
     }
 
     return builder.studyXmlSourceUrl(fullUrl).build();
@@ -104,14 +105,12 @@ public class GetRecordServiceImpl implements GetRecordService {
     SAXBuilder saxBuilder = new SAXBuilder();
     Document document = saxBuilder.build(recordXMLStream);
 
-    if (log.isTraceEnabled()) {
-      log.trace("Record XML String [{}]", document);
-    }
+    log.trace("Record XML String [{}]", document);
 
     // We exit if the record has an <error> element
     ErrorStatus errorStatus = validateResponse(document, X_FACTORY);
     if (errorStatus.isHasError()) {
-      log.debug("Returned Record has error message [{}] ", errorStatus.getMessage());
+      log.debug("Returned Record has an <error> element with ErrorStatus message [{}]", errorStatus.getMessage());
       throw new ExternalSystemException(errorStatus.getMessage());
     }
 
@@ -138,7 +137,6 @@ public class GetRecordServiceImpl implements GetRecordService {
       parseTypeOfModeOfCollection(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
       parseDataCollectionDates(builder, document, X_FACTORY);
       parseDataCollectionFreeTexts(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
-      log.debug("Successfully parsed record with no known errors");
     }
   }
 }

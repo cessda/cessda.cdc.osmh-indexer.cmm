@@ -35,9 +35,9 @@ public class ControllerBase {
   @Autowired
   ObjectMapper objectMapper;
 
-  static ResponseEntity<String> logAndGetResponseEntityMessage(String message, HttpStatus httpStatus, Logger logger) {
+  static ResponseEntity<String> logAndGetResponseEntityMessage(String message, Logger logger) {
     logger.error(message);
-    return getResponseEntityMessage(message, httpStatus);
+    return getResponseEntityMessage(message, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   static ResponseEntity<String> getResponseEntityMessage(String message, HttpStatus httpStatus) {

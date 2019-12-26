@@ -81,14 +81,20 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
       throw new ExternalSystemException(errorStatus.getMessage());
     }
 
-    log.info("ParseRecordHeaders Start:  For [{}].", baseRepoUrl);
+    log.info("ParseRecordHeaders Started:  For [{}].", baseRepoUrl);
     List<RecordHeader> recordHeaders = retrieveRecordHeaders(new ArrayList<>(), doc, baseRepoUrl);
-    log.info("ParseRecordHeaders End:  No more resumption token to process for [{}].", baseRepoUrl);
+    log.info("ParseRecordHeaders Ended:  No more resumption token to process for repo with url [{}].", baseRepoUrl);
     int expectedRecordHeadersCount = getRecordHeadersCount(doc);
     if (expectedRecordHeadersCount != -1) {
-      log.info("ParseRecordHeaders retrieved [{}] of [{}] expected record headers for [{}].", recordHeaders.size(), expectedRecordHeadersCount, baseRepoUrl);
+      log.info("ParseRecordHeaders retrieved [{}] of [{}] expected record headers count for repo [{}].",
+          recordHeaders.size(),
+          expectedRecordHeadersCount,
+          baseRepoUrl);
+    } else if (expectedRecordHeadersCount == -1) {
+      log.error("Unable to parse Record header's count from response. Retrieved record content [{}] for SP baseUrl [{}]",
+          doc, baseRepoUrl);
     } else {
-      log.info("ParseRecordHeaders retrieved [{}] record headers for [{}].", recordHeaders.size(), baseRepoUrl);
+      log.info("ParseRecordHeaders retrieved [{}] record headers for repo [{}].", recordHeaders.size(), baseRepoUrl);
     }
     return recordHeaders;
   }
@@ -106,7 +112,6 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
       }
     }
     // Should not reach here for valid oai-pmh xml responses
-    log.warn("Unable to parse RecordHeadersCount from oai-pmh xml response.");
     return -1;
   }
 
