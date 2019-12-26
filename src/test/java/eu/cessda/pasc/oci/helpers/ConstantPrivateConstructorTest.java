@@ -34,15 +34,6 @@ public class ConstantPrivateConstructorTest {
   public final ExpectedException exception = ExpectedException.none();
 
   @Test
-  public void logHelper_shouldHaveAPrivateConstructor() throws Exception {
-    Constructor constructor = LogHelper.class.getDeclaredConstructor();
-    assertTrue("Constructor is not private", Modifier.isPrivate(constructor.getModifiers()));
-    constructor.setAccessible(true);
-    exception.expect(InvocationTargetException.class);
-    constructor.newInstance();
-  }
-
-  @Test
   public void appConstantsShouldHaveAPrivateConstructor() throws Exception {
     Constructor constructor = AppConstants.class.getDeclaredConstructor();
     assertTrue("Constructor is not private", Modifier.isPrivate(constructor.getModifiers()));

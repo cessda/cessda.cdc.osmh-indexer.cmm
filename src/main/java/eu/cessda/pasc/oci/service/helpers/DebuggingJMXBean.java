@@ -53,15 +53,17 @@ public class DebuggingJMXBean {
 
     Client client = elasticsearchTemplate.getClient();
     Map<String, String> asMap = client.settings().getAsMap();
-    log.info("ElasticSearch Client Settings Details [ \n ]",
+    log.info("ElasticSearch Client Settings Details [\n{}].",
         asMap.entrySet().stream()
             .map(entry -> "\n" + "*" + entry.getKey() + "=" + entry.getValue())
             .collect(Collectors.joining()));
 
     ClusterHealthResponse healths = client.admin().cluster().prepareHealth().get();
     client.admin().cluster().prepareHealth().get();
-    log.info("ElasticSearch Cluster Details [ \n Cluster Name [{}] \n NumberOfDataNodes [{}] \n NumberOfNodes [{}] ] \n",
-        healths.getClusterName(), healths.getNumberOfDataNodes(), healths.getNumberOfNodes());
+    log.info("ElasticSearch Cluster Details: Cluster Name [{}] \n NumberOfDataNodes [{}] \n NumberOfNodes [{}] ] \n",
+        healths.getClusterName(),
+        healths.getNumberOfDataNodes(),
+        healths.getNumberOfNodes());
 
     if (log.isDebugEnabled()) {
       log.debug("ElasticSearch Cluster Nodes Report: Start--");
@@ -69,7 +71,11 @@ public class DebuggingJMXBean {
       log.debug("NumberOfNodes [{}], Index Details Details:", healths.getNumberOfNodes());
       for (ClusterIndexHealth health : healths.getIndices().values()) {
         log.debug("Index [{}] [Current Index [{}] \t NumberOfShards [{}] \t NumberOfReplicas [{}] \t Status [{}] ]",
-            counter++, health.getIndex(), health.getNumberOfShards(), health.getNumberOfReplicas(), health.getStatus());
+            counter++,
+            health.getIndex(),
+            health.getNumberOfShards(),
+            health.getNumberOfReplicas(),
+            health.getStatus());
       }
     }
     return "Printed Health";

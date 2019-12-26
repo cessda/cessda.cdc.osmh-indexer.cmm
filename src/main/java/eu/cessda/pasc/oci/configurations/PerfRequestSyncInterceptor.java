@@ -41,9 +41,12 @@ public class PerfRequestSyncInterceptor implements ClientHttpRequestInterceptor 
     stopwatch.stop();
 
     if (log.isDebugEnabled()) {
-      final String msg = "X[{}], uri=[{}], Took=[{}]ms, Code=[{}]";
-      log.debug(
-          msg, hr.getMethod(), hr.getURI(), stopwatch.elapsed(TimeUnit.MILLISECONDS), response.getStatusCode().value());
+      final String msg = "X[{}] request for uri [{}] took [{}]ms.  Response code [{}]";
+      log.debug(msg,
+          hr.getMethod(),
+          hr.getURI(),
+          stopwatch.elapsed(TimeUnit.MILLISECONDS),
+          response.getStatusCode().value());
     }
     return response;
   }

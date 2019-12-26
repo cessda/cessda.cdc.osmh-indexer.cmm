@@ -31,4 +31,10 @@ public class StudyIdentifierEncoder {
         .replace("/", "_sl_")
         .replace(":", "_cl_");
   }
+
+  public static String decodeStudyNumber(String encodedStudyNumber) {
+    return encodedStudyNumber.replace("_dt_", ".")
+        .replace("_sl_", "/")
+        .replace("_cl_", ":");
+  }
 }

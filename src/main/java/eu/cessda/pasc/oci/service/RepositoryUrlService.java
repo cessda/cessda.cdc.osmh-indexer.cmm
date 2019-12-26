@@ -40,7 +40,7 @@ public class RepositoryUrlService {
           repositoryUrl);
     }
 
-    log.info("[{}] Final ListHeaders Handler url [{}]", repositoryUrl, finalUrl);
+    log.info("[{}] Final ListHeaders Handler url [{}] constructed.", repositoryUrl, finalUrl);
     return finalUrl;
   }
 
@@ -58,7 +58,7 @@ public class RepositoryUrlService {
           encodedStudyID,
           repositoryUrl);
     }
-    log.trace("[{}] Final GetRecord Handler url [{}]", repositoryUrl, finalUrl);
+    log.trace("[{}] Final GetRecord Handler url [{}] constructed.", repositoryUrl, finalUrl);
     return finalUrl;
   }
 }

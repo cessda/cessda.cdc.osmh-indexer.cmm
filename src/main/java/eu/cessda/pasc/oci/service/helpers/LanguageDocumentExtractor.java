@@ -67,7 +67,12 @@ public class LanguageDocumentExtractor {
         }
     );
 
-    logDetailedExtractionsReport(languageDocMap);
+    if (log.isDebugEnabled()) {
+      languageDocMap.forEach((langIsoCode, cmmStudyOfLanguages) -> {
+        String formatTemplate = "langIsoCode [{}] has [{}] records that has passed CMM minimum fields validation";
+        log.debug(formatTemplate, langIsoCode, cmmStudyOfLanguages.size());
+      });
+    }
     return languageDocMap;
   }
 
@@ -91,13 +96,13 @@ public class LanguageDocumentExtractor {
   boolean isValidCMMStudyForLang(String languageIsoCode, String idPrefix, CMMStudy cmmStudy) {
 
     if (null == cmmStudy) {
-      logInvalidCMMStudy("Study is null [{}]: [{}]", languageIsoCode, idPrefix, null);
+      logInvalidCMMStudy("Study is null for language[{}] with studyNumber [{}]", languageIsoCode, idPrefix, null);
       return false;
     }
 
     // Inactive = deleted record no need to validate against CMM below. Index as is. Filtered in Frontend.
     if (!cmmStudy.isActive()) {
-      logInvalidCMMStudy("Study is not Active [{}]: [{}]", languageIsoCode, idPrefix, cmmStudy);
+      logInvalidCMMStudy("Study is not Active for language [{}] with studyNumber [{}]", languageIsoCode, idPrefix, cmmStudy);
       return true;
     }
 
@@ -114,7 +119,7 @@ public class LanguageDocumentExtractor {
   private CMMStudyOfLanguage getCmmStudyOfLanguage(String idPrefix, String lang, CMMStudy cmmStudy) {
 
     String formatMsg = "Extracting CMMStudyOfLang from CMMStudyNumber [{}] for lang [{}]";
-    if (log.isTraceEnabled()) log.trace(formatMsg, cmmStudy.getStudyNumber(), lang);
+    log.trace(formatMsg, cmmStudy.getStudyNumber(), lang);
 
     CMMStudyOfLanguage.CMMStudyOfLanguageBuilder builder = CMMStudyOfLanguage.builder();
 
@@ -157,14 +162,5 @@ public class LanguageDocumentExtractor {
     String formatMsg = "Extract CMMStudyOfLanguage for [{}] language code - COMPLETED. Duration [{}]";
     Instant end = Instant.now();
     log.trace(formatMsg, langCode, Duration.between(startTime, end));
-  }
-
-  private static void logDetailedExtractionsReport(Map<String, List<CMMStudyOfLanguage>> languageDocMap) {
-    if (log.isDebugEnabled()) {
-      languageDocMap.forEach((langIsoCode, cmmStudyOfLanguages) -> {
-        String formatTemplate = "langIsoCode [{}] has [{}] records passed CMM minimum fields validation";
-        log.debug(formatTemplate, langIsoCode, cmmStudyOfLanguages.size());
-      });
-    }
   }
 }

@@ -49,7 +49,7 @@ public class CMMStudyOfLanguageConverter {
     try {
       return Optional.ofNullable(getObjectWriter().writeValueAsString(obj));
     } catch (JsonProcessingException e) {
-      log.error("Failed to write Object as string [{}].  Returning empty Option.", e.getMessage());
+      log.error("Failed to write CMMStudy as string [{}].", e.getMessage());
       return Optional.empty();
     }
   }

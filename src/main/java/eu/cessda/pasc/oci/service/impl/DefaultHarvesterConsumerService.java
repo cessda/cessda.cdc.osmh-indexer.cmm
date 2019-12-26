@@ -37,6 +37,8 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static eu.cessda.pasc.oci.service.helpers.StudyIdentifierEncoder.decodeStudyNumber;
+
 /**
  * Default OSMH Consumer Service implementation
  *
@@ -68,9 +70,9 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
       CollectionType collectionType = mapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class);
       recordHeadersUnfiltered = mapper.readValue(recordHeadersJsonString, collectionType);
     } catch (ExternalSystemException e) {
-      log.error("ExternalSystemException! ListRecordHeaders failed for repo [{}]. Error[{}]", repo, e.getMessage(), e);
+      log.error("ListRecordHeaders failed for repo [{}]. CDC Handler Error object Msg [{}].", repo, e.getMessage(), e);
     } catch (IOException e) {
-      log.error("Error, Unable to pass ListRecordHeaders response error[{}]", e.getMessage(), e);
+      log.error("Error, Unable to pass ListRecordHeaders response error message [{}].", e.getMessage(), e);
     }
 
     return filterRecords(recordHeadersUnfiltered, lastModifiedDate);
@@ -79,14 +81,20 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
   @Override
   public Optional<CMMStudy> getRecord(Repo repo, String studyNumber) {
 
+    String finalUrl = "";
     try {
-      String finalUrl = repositoryUrlService.constructGetRecordUrl(repo.getUrl(), studyNumber);
+      finalUrl = repositoryUrlService.constructGetRecordUrl(repo.getUrl(), studyNumber);
       String recordJsonString = harvesterDao.getRecord(finalUrl);
       return Optional.ofNullable(CMMStudyConverter.fromJsonString(recordJsonString));
     } catch (ExternalSystemException e) {
-      log.warn("Exception msg[{}]. External system response body[{}]", e.getMessage(), e.getExternalResponseBody());
+      log.warn("Short Exception msg [{}], " +
+              "HttpServerErrorException response detail from handler's [{}], " +
+              "URL to handler for harvesting [{}].",
+          e.getMessage(),
+          e.getExternalResponseBody(),
+          decodeStudyNumber(finalUrl));
     } catch (IOException e) {
-      log.error("Error, Unable to pass GetRecord response error[{}]", e.getMessage(), e);
+      log.error("Error, Unable to pass GetRecord response error message [{}].", e.getMessage(), e);
     }
 
     return Optional.empty();
@@ -103,12 +111,15 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
 
     if (filteredRecordHeaders.isPresent()) {
       List<RecordHeader> filteredHeaders = filteredRecordHeaders.get();
-      String formatMsg = "Returning [{}] filtered recordHeaders by date greater than [{}] | out of [{}] unfiltered ";
-      log.info(formatMsg, filteredHeaders.size(), ingestedLastModifiedDate, unfilteredRecordHeaders.size());
+      log.info("Returning [{}] filtered recordHeaders by date greater than [{}] | out of [{}] unfiltered.",
+          filteredHeaders.size(),
+          ingestedLastModifiedDate,
+          unfilteredRecordHeaders.size());
+
       return filteredHeaders;
     }
 
-    log.info("Nothing filterable by date [{}]", ingestedLastModifiedDate);
+    log.info("Nothing filterable by date [{}].", ingestedLastModifiedDate);
     return unfilteredRecordHeaders;
   }
 
@@ -119,8 +130,9 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
       return currentHeaderLastModified
           .map(localDateTime -> localDateTime.isAfter(lastModifiedDate))
           .orElseGet(() -> {
-                final String msg = "Could not parse RecordIdentifier lastModifiedDate [{}]. Filtering out from list";
-                log.warn(msg, lastModified);
+                log.warn("Could not parse RecordIdentifier lastModifiedDate [{}]. Filtering out from list.",
+                    lastModified);
+
                 return false;
               }
           );
