@@ -61,6 +61,6 @@ public class StatusServiceTest {
 
     //then
     verifier.verify(prettyWriter, calls(2)).writeValueAsString(anyObject());
-    then(outPut).isEqualTo("See logs.");
+    then(outPut).isEqualTo("See logs for configuration print.");
   }
 }
