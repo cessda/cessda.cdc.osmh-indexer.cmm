@@ -23,7 +23,7 @@ import org.springframework.web.client.RestTemplate;
 /**
  * A Pasc Harvester Service implementation
  *
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 @Component
 @Slf4j

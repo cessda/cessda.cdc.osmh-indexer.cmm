@@ -22,7 +22,7 @@ import java.util.function.Function;
  * This is reversed by the respective handler using the same string replace token here
  * before calling the remote Service providers repo
  *
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 public class StudyIdentifierEncoder {
 

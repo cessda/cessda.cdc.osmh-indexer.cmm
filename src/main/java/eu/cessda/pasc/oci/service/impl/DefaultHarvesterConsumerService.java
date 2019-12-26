@@ -42,7 +42,7 @@ import static eu.cessda.pasc.oci.service.helpers.StudyIdentifierEncoder.decodeSt
 /**
  * Default OSMH Consumer Service implementation
  *
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 @Service
 @Slf4j

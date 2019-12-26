@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Loads Configurations from application*.yml specifically for elasticsearch
  *
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 @Configuration
 @EnableConfigurationProperties

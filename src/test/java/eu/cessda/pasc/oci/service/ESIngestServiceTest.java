@@ -50,7 +50,7 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 /**
  * Indexer Service test with embedded Elasticsearch
  *
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest

@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 @RunWith(SpringRunner.class)
 public class LanguageAvailabilityMapperTest extends AbstractSpringTestProfileContext {

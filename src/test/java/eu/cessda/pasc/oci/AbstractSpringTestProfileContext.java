@@ -21,7 +21,7 @@ import org.springframework.test.context.ActiveProfiles;
  *  "The Old InstanceAlreadyExistsException JUnit Trick"
  *  Base Context for tests to share to avoid UnableToRegisterMBeanException, InstanceAlreadyExistsException
  *
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 @SpringBootTest()
 @ActiveProfiles("test")

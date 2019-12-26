@@ -26,7 +26,7 @@ import org.springframework.web.client.RestTemplate;
 /**
  * Shareable Dao functions
  *
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 @Component
 @Slf4j

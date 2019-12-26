@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
  * - "abbr": "ISO 3166 2-letter code for country 1",
  * - "country": "The name of the country in a given Language"
  *
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 @Builder
 @NoArgsConstructor

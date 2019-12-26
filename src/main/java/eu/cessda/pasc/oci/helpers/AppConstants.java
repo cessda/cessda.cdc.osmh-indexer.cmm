@@ -19,7 +19,7 @@ import java.util.TimeZone;
 /**
  * Harvester (OSMH) Handler concept Constants
  *
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 public class AppConstants {
 

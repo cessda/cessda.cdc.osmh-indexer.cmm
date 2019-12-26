@@ -20,7 +20,7 @@ import lombok.Setter;
 /**
  * Exception for external encountered Exceptions
  *
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 public class ExternalSystemException extends CustomExceptionBase {
 

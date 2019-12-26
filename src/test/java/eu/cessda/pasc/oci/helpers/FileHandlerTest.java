@@ -20,7 +20,7 @@ import static org.assertj.core.api.Java6BDDAssertions.then;
 
 
 /**
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 public class FileHandlerTest {
 

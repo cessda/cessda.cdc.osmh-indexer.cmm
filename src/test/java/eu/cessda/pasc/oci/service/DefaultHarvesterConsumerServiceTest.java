@@ -44,7 +44,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 /**
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 @RunWith(SpringRunner.class)
 public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfileContext {

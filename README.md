@@ -147,7 +147,7 @@ for information on contribution to CESSDA software.
 
 ## Authors
 
-* **Moses Mansaray <moses AT doravenetures DOT com>** - *Initial work, first version release*
+* **Moses Mansaray <moses AT doraventures DOT com>** - *Initial work, first version release*
 
 You can find the list of all contributors [here](CONTRIBUTORS.md)
 

@@ -17,7 +17,7 @@ package eu.cessda.pasc.oci.helpers.exception;
 /**
  * Custom Exception
  *
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 class CustomExceptionBase extends Exception{
 

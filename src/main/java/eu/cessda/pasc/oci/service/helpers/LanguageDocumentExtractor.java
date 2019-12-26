@@ -33,7 +33,7 @@ import static java.util.Optional.ofNullable;
 /**
  * Language Document Extractor.  Helper to Extracts a custom document for each language IsoCode found in the config.
  *
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 @Component
 @Slf4j

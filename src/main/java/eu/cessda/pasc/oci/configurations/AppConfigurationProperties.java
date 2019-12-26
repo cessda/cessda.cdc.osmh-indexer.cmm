@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * Loads Default Configurations from application*.yml
  *
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 @Configuration
 @EnableConfigurationProperties

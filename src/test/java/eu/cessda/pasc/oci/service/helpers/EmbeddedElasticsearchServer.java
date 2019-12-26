@@ -31,7 +31,7 @@ import static org.junit.Assert.fail;
 /**
  * Default Embedded server for Integration Test
  *
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 @Slf4j
 public class EmbeddedElasticsearchServer {
