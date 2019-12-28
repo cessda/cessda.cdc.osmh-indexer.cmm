@@ -199,9 +199,10 @@ osmhConsumer:
     - url:  http://harvester.sodanet.gr:8080/oai/request
       name: 'SoDaNet (Nesstar)'
       handler: 'http://localhost:9842'
-    - url: http://nesstar.soc.cas.cz/oai-pmh
-      name: 'CSDA (Nesstar)'
-      handler: 'http://localhost:9842'
-    - url:  http://nesstar.unidata.unimib.it/oai-pmh
-      name: 'Unidata (Nesstar)'
-      handler: 'http://localhost:9842'
+---
+spring:
+  profiles: test
+logging:
+  level:
+    eu.cessda.pasc.oci.service.helpers.DebuggingJMXBean: DEBUG
+    eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor: DEBUG

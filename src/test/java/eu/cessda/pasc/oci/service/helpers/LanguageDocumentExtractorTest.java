@@ -170,4 +170,13 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
         }
     );
   }
+
+  @Test
+  public void shouldReturnFalseForInValidCMMStudyForLang() {
+
+    // When
+    boolean actual = languageDocumentExtractor.isValidCMMStudyForLang("en", "UK Data Service", null);
+
+    then(actual).isFalse();
+  }
 }
