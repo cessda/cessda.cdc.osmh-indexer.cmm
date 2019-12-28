@@ -20,7 +20,7 @@ import lombok.Setter;
 /**
  * RestTemplate Properties configuration model
  *
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 @Getter
 @Setter

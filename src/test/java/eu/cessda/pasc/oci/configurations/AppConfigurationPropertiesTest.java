@@ -28,7 +28,7 @@ import static org.assertj.core.api.BDDAssertions.then;
 /**
  * Configurations loader tests
  *
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 @RunWith(SpringRunner.class)
 public class AppConfigurationPropertiesTest extends AbstractSpringTestProfileContext{

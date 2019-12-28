@@ -26,7 +26,7 @@ import lombok.NoArgsConstructor;
  *
  * Publisher value can be in multiple language translations.
  *
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 @Builder
 @NoArgsConstructor

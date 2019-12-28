@@ -23,7 +23,7 @@ import java.util.Optional;
 /**
  * Service interface contract for data ingestion
  *
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 public interface IngestService {
 

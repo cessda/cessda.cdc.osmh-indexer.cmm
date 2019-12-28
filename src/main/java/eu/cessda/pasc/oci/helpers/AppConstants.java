@@ -19,11 +19,10 @@ import java.util.TimeZone;
 /**
  * Harvester (OSMH) Handler concept Constants
  *
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 public class AppConstants {
 
-  public static final String UNSUCCESSFUL_RESPONSE = "Unsuccessful response from remote repository.";
   static final String[] EXPECTED_DATE_FORMATS = new String[]{"yyyy-MM-dd'T'HH:mm:ss'Z'", "yyyy-MM-dd", "yyyy-MM-dd'T'HH:mm:ssZ"};
   static final String UTC_ID = TimeZone.getTimeZone("UTC").getID();
   public static final String LAST_MODIFIED_FIELD = "lastModified";

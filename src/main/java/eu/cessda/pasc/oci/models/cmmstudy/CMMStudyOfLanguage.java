@@ -31,7 +31,7 @@ import java.util.Set;
 /**
  * Model representing a CMMStudy.
  *
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({

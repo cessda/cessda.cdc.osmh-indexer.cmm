@@ -26,7 +26,7 @@ import java.time.LocalDateTime;
 /**
  * Pojo to hold details of remote detail. To be used for logging JSON
  *
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 @JsonInclude()
 @JsonPropertyOrder({

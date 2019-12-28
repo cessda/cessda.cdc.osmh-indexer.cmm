@@ -38,7 +38,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 /**
  * Test for the Harvester
  *
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 @RunWith(SpringRunner.class)
 public class PascHarvesterDaoTest extends AbstractSpringTestProfileContext {

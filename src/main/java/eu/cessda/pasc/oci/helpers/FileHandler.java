@@ -24,7 +24,7 @@ import java.util.Objects;
 /**
  * File handling helper methods
  *
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 @Component
 @Slf4j

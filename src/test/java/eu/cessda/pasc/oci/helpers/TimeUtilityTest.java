@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.api.BDDAssertions.then;
 
 /**
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 public class TimeUtilityTest {
 

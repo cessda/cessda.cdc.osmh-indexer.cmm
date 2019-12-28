@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 /**
  * Service responsible for triggering Metadata Harvesting and ingestion into the search engine
  *
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 @Component
 @ManagedResource
@@ -120,7 +120,7 @@ public class ConsumerScheduler {
 
   private void executeBulk(Repo repo, String langIsoCode, List<CMMStudyOfLanguage> cmmStudies) {
     if (cmmStudies.isEmpty()) {
-      log.warn("Empty study list! Nothing to BulkIndex. For repo[{}].  LangIsoCode [{}].", repo, langIsoCode);
+      log.warn("CmmStudies list is empty and henceforth there is nothing to BulkIndex for repo[{}] with LangIsoCode [{}].", repo, langIsoCode);
     } else {
       log.info("BulkIndexing [{}] index with [{}] CmmStudies", langIsoCode, cmmStudies.size());
       boolean isSuccessful = esIndexerService.bulkIndex(cmmStudies, langIsoCode);
@@ -137,7 +137,7 @@ public class ConsumerScheduler {
     List<RecordHeader> recordHeaders = harvesterConsumerService.listRecordHeaders(repo, lastModifiedDateTime);
 
     int recordHeadersSize = recordHeaders.size();
-    log.info("Repo returned with [{}] record headers", recordHeadersSize);
+    log.info("Repo [{}].  Returned with [{}] record headers", repo.toString(), recordHeadersSize);
 
     List<Optional<CMMStudy>> totalCMMStudies = recordHeaders.stream()
         .map(recordHeader -> harvesterConsumerService.getRecord(repo, recordHeader.getIdentifier()))

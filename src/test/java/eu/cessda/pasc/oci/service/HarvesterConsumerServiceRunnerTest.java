@@ -45,7 +45,7 @@ import static org.assertj.core.api.Java6BDDAssertions.then;
  * <p>
  * Known repo= repo that has been tested and currently being consumed and index.
  *
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest

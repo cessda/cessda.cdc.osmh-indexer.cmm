@@ -31,7 +31,7 @@ import lombok.NoArgsConstructor;
  *}
  * </pre>
  *
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 @Builder
 @NoArgsConstructor

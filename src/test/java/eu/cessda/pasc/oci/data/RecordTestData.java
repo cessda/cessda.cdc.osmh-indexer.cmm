@@ -29,7 +29,7 @@ import java.util.Optional;
 import static org.junit.Assert.fail;
 
 /**
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 public class RecordTestData {
 

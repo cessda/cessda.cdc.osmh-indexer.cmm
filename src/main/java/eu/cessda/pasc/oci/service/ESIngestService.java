@@ -41,7 +41,7 @@ import static eu.cessda.pasc.oci.helpers.AppConstants.LAST_MODIFIED_FIELD;
 /**
  * Service responsible for triggering harvesting and Metadata ingestion to the search engine
  *
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 @Service
 @Slf4j
@@ -89,7 +89,7 @@ public class ESIngestService implements IngestService {
         esTemplate.refresh(indexName);
         log.info("[{}] BulkIndex completed.", languageIsoCode);
       } catch (Exception e) {
-        log.error("[{}] Encountered an exception [{}].", indexName, e.getMessage());
+        log.error("[{}] Indexing Encountered an exception with message [{}].", indexName, e.getMessage(), e);
         isSuccessful = false;
       }
     } else {
@@ -134,11 +134,11 @@ public class ESIngestService implements IngestService {
   private boolean prepareIndex(String indexName, ElasticsearchTemplate elasticsearchTemplate, FileHandler fileHandler) {
 
     if (elasticsearchTemplate.indexExists(indexName)) {
-      log.info("Index [{}] Already Exist, Skipping creation.", indexName);
+      log.info("[{}] index name already Exist, Skipping creation.", indexName);
       return true;
     }
 
-    log.info("[{}] index does not exist.", indexName);
+    log.info("[{}] index name does not exist and would be created", indexName);
     return createIndex(indexName, elasticsearchTemplate, fileHandler);
   }
 
@@ -150,29 +150,29 @@ public class ESIngestService implements IngestService {
     String mappings = fileHandler.getFileWithUtil(mappingsPath);
 
     if (settings.isEmpty() || mappings.isEmpty()) {
-      log.warn("Settings & Mappings must be define for a custom [{}] index creation.", indexName);
-      log.warn("Creating [{}] index with no custom settings or mappings.", indexName);
+      log.warn("[{}] index creation Settings & Mappings must be define for a custom index.", indexName);
+      log.warn("[{}] index creation with no custom settings or mappings.", indexName);
       return (elasticsearchTemplate.createIndex(indexName));
     }
 
-    log.debug("Creating custom [{}] index with settings from [{}]. Content [\n{}\n]", indexName, settingsPath, settings);
+    log.debug("[{}] custom index creation with settings from [{}]. Content [\n{}\n]", indexName, settingsPath, settings);
     try {
       if (!elasticsearchTemplate.createIndex(indexName, settings)) {
-        log.error("Failed custom [{}] index creation!", indexName);
+        log.error("[{}] custom index failed creation!", indexName);
         return false;
       } else {
-        log.info("Create custom [{}] index successfully!", indexName);
-        log.debug("Putting [{}] index mapping from [{}] with content [\n{}\n]", indexName, mappingsPath, mappings);
+        log.info("[{}] custom index created successfully!", indexName);
+        log.debug("[{}] index mapping XPUT request from [{}] with content [\n{}\n]", indexName, mappingsPath, mappings);
         if (elasticsearchTemplate.putMapping(indexName, INDEX_TYPE, mappings)) {
-          log.info("Put [{}] index mapping for type [{}] was successful.", indexName, INDEX_TYPE);
+          log.info("[{}] index mapping XPUT request for type [{}] was successful.", indexName, INDEX_TYPE);
           return true;
         } else {
-          log.error("Put [{}] index mapping for type [{}] was unsuccessful.", indexName, INDEX_TYPE);
+          log.error("[{}] index mapping XPUT request for type [{}] was unsuccessful.", indexName, INDEX_TYPE);
           return false;
         }
       }
     } catch (Exception e) {
-      log.error("Custom [{}] Index creation failed. Message [{}]", indexName, e.getMessage(), e);
+      log.error("[{}] Custom Index creation failed. Message [{}]", indexName, e.getMessage(), e);
       return false;
     }
   }
@@ -181,8 +181,7 @@ public class ESIngestService implements IngestService {
     try {
       esTemplate.bulkIndex(queries);
     } catch (ElasticsearchException e) {
-      log.error("BulkIndexing ElasticsearchException with message [{}]", e.getMessage());
-      log.error("BulkIndexing ElasticsearchException: Printing failed documents' Id and Message");
+      log.error("BulkIndexing ElasticsearchException with message [{}]", e.getMessage(), e);
       Map<String, String> failedDocs = e.getFailedDocuments();
 
       if (!failedDocs.isEmpty()) {

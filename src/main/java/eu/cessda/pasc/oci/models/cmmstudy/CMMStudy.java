@@ -25,7 +25,7 @@ import java.util.*;
 /**
  * Model representing a CMMStudy. Used to deserialize documents from json.
  *
- * @author moses AT doravenetures DOT com
+ * @author moses AT doraventures DOT com
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
