@@ -79,6 +79,24 @@ public class ListRecordHeadersControllerTest {
   }
 
   @Test
+  public void shouldReturnSystemErrorWhenAndExceptionIsThrownInternally() throws Exception {
+
+    // Given
+    given(this.listRecordHeadersService.getRecordHeaders("http://kirkedata.nsd.uib.no"))
+        .willThrow(Exception.class);
+
+    String expectedRecordsJsonString = "{\"message\":\"Internal OAI-PMH Handler System error!: null\"}";
+
+    // When
+    this.mockMvc.perform(get("/v0/ListRecordHeaders?Repository=http://kirkedata.nsd.uib.no").accept(MediaType.APPLICATION_JSON_VALUE))
+
+        // Then
+        .andExpect(status().isInternalServerError())
+        .andExpect(status().reason(new IsNull<>()))
+        .andExpect(content().json(expectedRecordsJsonString));
+  }
+
+  @Test
   public void shouldReturnErrorMessageForNonSupportedAPIVersion() throws Exception {
 
     // Given

@@ -14,14 +14,16 @@
 */
 package eu.cessda.pasc.osmhhandler.oaipmh.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.cessda.pasc.osmhhandler.oaipmh.configuration.HandlerConfigurationProperties;
-import eu.cessda.pasc.osmhhandler.oaipmh.service.APISupportedServiceImpl;
+import eu.cessda.pasc.osmhhandler.oaipmh.service.APISupportedService;
 import org.hamcrest.core.IsNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -29,10 +31,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.THE_GIVEN_URL_IS_NOT_FOUND;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.UNSUPPORTED_API_VERSION;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -44,9 +49,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @RunWith(SpringRunner.class)
 @WebMvcTest(ListSupportedRecordTypesController.class)
-@Import({APISupportedServiceImpl.class, HandlerConfigurationProperties.class})
+@Import({HandlerConfigurationProperties.class})
 @ActiveProfiles("test")
 public class ListSupportedRecordTypesControllerTest {
+
+  @MockBean
+  APISupportedService apiSupportedService;
 
   @Autowired
   private MockMvc mockMvc;
@@ -58,11 +66,38 @@ public class ListSupportedRecordTypesControllerTest {
     // Given
     String expectedRecords = "[\"StudyGroup\", \"Study\", \"Variable\", \"CMM\", \"Question\"]";
 
+    given(this.apiSupportedService.isSupportedVersion(any()))
+        .willReturn(true);
+
+    given(this.apiSupportedService.getSupportedRecordTypes())
+        .willReturn(List.of("Study", "StudyGroup", "Variable", "Question", "CMM"));
+
     // When
     this.mockMvc.perform(get("/v0/ListSupportedRecordTypes").accept(MediaType.APPLICATION_JSON_VALUE))
 
         // Then
         .andExpect(status().isOk())
+        .andExpect(status().reason(new IsNull<>()))
+        .andExpect(content().json(expectedRecords));
+  }
+
+  @Test
+  public void shouldReturnSystemErrorIfAJsonProcessingExceptionOccursDueToBadConfiguration() throws Exception {
+
+    // Given
+    String expectedRecords = "{\"message\":\"Internal OAI-PMH Handler System error!: N\\/A\"}";
+
+    given(this.apiSupportedService.isSupportedVersion(any()))
+        .willReturn(true);
+
+    given(this.apiSupportedService.getSupportedRecordTypes())
+        .willThrow(JsonProcessingException.class);
+
+    // When
+    this.mockMvc.perform(get("/v0/ListSupportedRecordTypes").accept(MediaType.APPLICATION_JSON_VALUE))
+
+        // Then
+        .andExpect(status().isInternalServerError())
         .andExpect(status().reason(new IsNull<>()))
         .andExpect(content().json(expectedRecords));
   }

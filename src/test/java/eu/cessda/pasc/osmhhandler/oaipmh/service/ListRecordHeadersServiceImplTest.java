@@ -17,6 +17,7 @@ package eu.cessda.pasc.osmhhandler.oaipmh.service;
 import eu.cessda.pasc.osmhhandler.oaipmh.dao.ListRecordHeadersDao;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
+import eu.cessda.pasc.osmhhandler.oaipmh.exception.InternalSystemException;
 import eu.cessda.pasc.osmhhandler.oaipmh.mock.data.RecordHeadersMock;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.response.RecordHeader;
 import org.junit.Test;
@@ -63,6 +64,18 @@ public class ListRecordHeadersServiceImplTest {
     then(recordHeaders).extracting("identifier").containsOnly("850229", "850232", "850235");
     then(recordHeaders).extracting("lastModified").containsOnly("2017-11-20T10:37:18Z");
     then(recordHeaders).extracting("type").containsOnly("Study");
+  }
+
+  @Test(expected = InternalSystemException.class)
+  public void shouldThrowWhenRequestForHeaderFails() throws CustomHandlerException {
+
+    // Given
+    String repoUrl = "www.my-fake-url.com";
+    String mockRecordHeadersXml = RecordHeadersMock.getListIdentifiersXMLResumptionTokenNotMockedForInvalid();
+    given(listRecordHeadersDao.listRecordHeaders(repoUrl)).willReturn(mockRecordHeadersXml);
+
+    // When
+    listRecordHeadersService.getRecordHeaders(repoUrl);
   }
 
   @Test

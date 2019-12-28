@@ -106,6 +106,28 @@ public class RecordHeadersMock {
             "</OAI-PMH>";
   }
 
+  public static String getListIdentifiersXMLResumptionTokenNotMockedForInvalid() {
+    return
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
+            "<?xml-stylesheet type='text/xsl' href='oai2.xsl' ?>\n" +
+            "<OAI-PMH xmlns=\"http://www.openarchives.org/OAI/2.0/\"\n" +
+            " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+            " xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/\n" +
+            " http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd\">\n" +
+            "    <responseDate>2018-01-10T16:31:14Z</responseDate>\n" +
+            "    <request verb=\"ListIdentifiers\" metadataPrefix=\"ddi\" from=\"2016-06-01\">" +
+            "https://oai.ukdataservice.ac.uk:8443/oai/provider</request>\n" +
+            "    <ListIdentifiers>\n" +
+            "        <header>\n" +
+            "            <identifier>850235</identifier>\n" +
+            "            <datestamp>2017-11-20T10:37:18Z</datestamp>\n" +
+            "            <setSpec>DataCollections</setSpec>\n" +
+            "        </header>\n" +
+            "        <resumptionToken completeListSize=\"3\" cursor=\"0\">3/6/7/ddi/null/2017-01-01/null</resumptionToken>\n" +
+            "    </ListIdentifiers>\n" +
+            "</OAI-PMH>";
+  }
+
   public static String getListIdentifiersXML() {
     return
         "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +

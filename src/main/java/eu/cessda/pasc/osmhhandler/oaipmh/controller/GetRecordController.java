@@ -42,6 +42,7 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.SUCCESS
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.SYSTEM_ERROR;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.THE_GIVEN_URL_IS_NOT_FOUND;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.UNSUPPORTED_API_VERSION;
+import static java.lang.String.format;
 
 /**
  * Controller to handle request for getting a remote Record.
@@ -58,7 +59,7 @@ public class GetRecordController extends ControllerBase {
   private static final String GETS_A_RECORD = "Gets a Record with the given identifier";
 
   private final APISupportedService apiSupportedService;
-  private final  GetRecordService getRecordService;
+  private final GetRecordService getRecordService;
 
   @Autowired
   public GetRecordController(APISupportedService apiSupportedService, GetRecordService getRecordService) {
@@ -86,11 +87,15 @@ public class GetRecordController extends ControllerBase {
       String valueAsString = CMMConverter.toJsonString(cmmStudy);
       return getResponseEntity(valueAsString, HttpStatus.OK);
     } catch (CustomHandlerException e) {
-      log.debug("[{}] [{}]", e.getClass().getSimpleName(), e.getMessage());
-      return logAndGetResponseEntityMessage(e.getClass().getSimpleName() + ": " + e.getMessage(), log);
+      String message = format("CustomHandlerException occurred whilst getting record message [%s], for studyID [%s]",
+          e.getMessage(), studyId);
+      log.debug(message, e);
+      return buildResponseEntityMessage(message);
     } catch (Exception e) {
-      log.debug("[{}] [{}]", e.getClass().getSimpleName(), e.getMessage(), e);
-      return logAndGetResponseEntityMessage(SYSTEM_ERROR + ": " + e.getMessage(), log);
+      String message = format("Exception occurred whilst getting record message [%s], for studyID [%s].",
+          e.getMessage(), studyId);
+      log.debug(message, e);
+      return buildResponseEntityMessage(message);
     }
   }
 
