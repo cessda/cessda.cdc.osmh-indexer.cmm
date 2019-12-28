@@ -188,9 +188,10 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
     try {
       InputStream is = new ByteArrayInputStream(docXMLString.getBytes(StandardCharsets.UTF_8));
       return builder.parse(is);
-    } catch (SAXException | IOException e) {
-      String msg = "Unable to parse repo response.";
+    } catch (NullPointerException | SAXException | IOException e) {
+      String msg = "Unable to parse repo RecordHeader response bytes.";
       log.error(msg);
+      log.debug(msg + ". Document content [{}].", docXMLString);
       throw new InternalSystemException(msg);
     }
   }

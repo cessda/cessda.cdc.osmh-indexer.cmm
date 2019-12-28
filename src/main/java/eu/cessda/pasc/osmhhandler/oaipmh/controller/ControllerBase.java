@@ -17,7 +17,6 @@ package eu.cessda.pasc.osmhhandler.oaipmh.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,8 +34,7 @@ public class ControllerBase {
   @Autowired
   ObjectMapper objectMapper;
 
-  static ResponseEntity<String> logAndGetResponseEntityMessage(String message, Logger logger) {
-    logger.error(message);
+  static ResponseEntity<String> buildResponseEntityMessage(String message) {
     return getResponseEntityMessage(message, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 

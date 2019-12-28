@@ -16,6 +16,7 @@ package eu.cessda.pasc.osmhhandler.oaipmh.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.cessda.pasc.osmhhandler.oaipmh.configuration.HandlerConfigurationProperties;
+import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
 import eu.cessda.pasc.osmhhandler.oaipmh.service.APISupportedServiceImpl;
 import eu.cessda.pasc.osmhhandler.oaipmh.service.GetRecordService;
 import org.hamcrest.core.IsNull;
@@ -77,6 +78,38 @@ public class GetRecordControllerTest {
         .andExpect(content().json(expectedCMMStudyJsonString));
   }
 
+
+  @Test
+  public void shouldCatchAndBuildRelevantEntityMessageWhenACustomHandlerExceptionIsThrownReturn() throws Exception {
+
+    // Given
+    given(this.getRecordService.getRecord("http://kirkedata.nsd.uib.no", "StudyID222")).willThrow(CustomHandlerException.class);
+
+    // When
+    this.mockMvc.perform(get("/v0/GetRecord/CMMStudy/StudyID222?Repository=http://kirkedata.nsd.uib.no")
+        .accept(MediaType.APPLICATION_JSON_VALUE))
+
+        // Then
+        .andExpect(status().isInternalServerError())
+        .andExpect(status().reason(new IsNull<>()))
+        .andExpect(content().json("{\"message\":\"CustomHandlerException occurred whilst getting record message [null], for studyID [StudyID222]\"}"));
+  }
+
+  @Test
+  public void shouldCatchAndBuildRelevantEntityMessageWhenAnExceptionIsThrownReturn() throws Exception {
+
+    // Given
+    given(this.getRecordService.getRecord("http://kirkedata.nsd.uib.no", "StudyID222")).willThrow(Exception.class);
+
+    // When
+    this.mockMvc.perform(get("/v0/GetRecord/CMMStudy/StudyID222?Repository=http://kirkedata.nsd.uib.no")
+        .accept(MediaType.APPLICATION_JSON_VALUE))
+
+        // Then
+        .andExpect(status().isInternalServerError())
+        .andExpect(status().reason(new IsNull<>()))
+        .andExpect(content().json("{\"message\":\"Exception occurred whilst getting record message [null], for studyID [StudyID222].\"}"));
+  }
   @Test
   public void shouldReturnErrorMessageForNonSupportedAPIVersion() throws Exception {
 
