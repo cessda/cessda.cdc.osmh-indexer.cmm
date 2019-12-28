@@ -42,7 +42,6 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.SUCCESS
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.SYSTEM_ERROR;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.THE_GIVEN_URL_IS_NOT_FOUND;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.UNSUPPORTED_API_VERSION;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 /**
  * Controller to handle request for getting a remote Record.
@@ -88,10 +87,10 @@ public class GetRecordController extends ControllerBase {
       return getResponseEntity(valueAsString, HttpStatus.OK);
     } catch (CustomHandlerException e) {
       log.debug("[{}] [{}]", e.getClass().getSimpleName(), e.getMessage());
-      return logAndGetResponseEntityMessage(e.getClass().getSimpleName() + ": " + e.getMessage(), INTERNAL_SERVER_ERROR, log);
+      return logAndGetResponseEntityMessage(e.getClass().getSimpleName() + ": " + e.getMessage(), log);
     } catch (Exception e) {
       log.debug("[{}] [{}]", e.getClass().getSimpleName(), e.getMessage(), e);
-      return logAndGetResponseEntityMessage(SYSTEM_ERROR + ": " + e.getMessage(), INTERNAL_SERVER_ERROR, log);
+      return logAndGetResponseEntityMessage(SYSTEM_ERROR + ": " + e.getMessage(), log);
     }
   }
 

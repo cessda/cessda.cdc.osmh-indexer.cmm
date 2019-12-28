@@ -89,7 +89,7 @@ public class ListRecordHeadersController extends ControllerBase {
       String valueAsString = objectMapper.writeValueAsString(recordHeaders);
       return getResponseEntity(valueAsString, HttpStatus.OK);
     } catch (Exception e) {
-      return logAndGetResponseEntityMessage(SYSTEM_ERROR + ": " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, log);
+      return logAndGetResponseEntityMessage(SYSTEM_ERROR + ": " + e.getMessage(), log);
     }
   }
 

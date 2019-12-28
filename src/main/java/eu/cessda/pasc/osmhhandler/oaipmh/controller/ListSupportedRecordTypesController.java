@@ -78,7 +78,7 @@ public class ListSupportedRecordTypesController extends ControllerBase {
       }
       return getResponseEntityMessage(UNSUPPORTED_API_VERSION, HttpStatus.BAD_REQUEST);
     } catch (JsonProcessingException e) {
-      return logAndGetResponseEntityMessage(SYSTEM_ERROR + ": " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, log);
+      return logAndGetResponseEntityMessage(SYSTEM_ERROR + ": " + e.getMessage(), log);
     }
   }
 

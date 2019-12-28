@@ -25,9 +25,8 @@ import java.util.TimeZone;
 public class HandlerConstants {
 
   // Messaging and Exceptions
-  public static final String UNSUCCESSFUL_RESPONSE = "Unsuccessful response from remote repository.";
   public static final String UNSUPPORTED_API_VERSION = "Unsupported API-version [%s]";
-  public static final String SYSTEM_ERROR = "System error!";
+  public static final String SYSTEM_ERROR = "Internal OAI-PMH Handler System error!";
   public static final String SUCCESSFUL_OPERATION = "Successful operation!";
   public static final String BAD_REQUEST = "Bad request!";
   public static final String NOT_FOUND = "Not found!";
