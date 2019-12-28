@@ -30,6 +30,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +42,7 @@ import static eu.cessda.pasc.oci.data.ReposTestData.getUKDSRepo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Java6BDDAssertions.then;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -105,6 +107,47 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
 
     List<RecordHeader> recordHeaders = defaultHarvesterConsumerService.listRecordHeaders(repo, null);
     assertThat(recordHeaders).hasSize(6);
+  }
+
+  @Test
+  public void shouldReturnEmptyHeaderListWhenExternalSystemExceptionIsThrown() throws ExternalSystemException {
+
+    when(harvesterDao.listRecordHeaders(anyString())).thenThrow(ExternalSystemException.class);
+    Repo repo = getUKDSRepo();
+
+    List<RecordHeader> recordHeaders = defaultHarvesterConsumerService.listRecordHeaders(repo, null);
+    assertThat(recordHeaders).isEmpty();
+  }
+
+  @Test
+  public void shouldReturnEmptyListWhenIOExceptionIsThrown() throws ExternalSystemException {
+
+    when(harvesterDao.listRecordHeaders(anyString())).thenThrow(IOException.class);
+    Repo repo = getUKDSRepo();
+
+    List<RecordHeader> recordHeaders = defaultHarvesterConsumerService.listRecordHeaders(repo, null);
+    assertThat(recordHeaders).isEmpty();
+  }
+  
+  @Test
+  public void shouldReturnEmptyListWhenNullPointerExceptionIsThrown() {
+
+    Optional<CMMStudy> actualRecord = defaultHarvesterConsumerService.getRecord(null, null);
+    then(actualRecord.isPresent()).isFalse();
+  }
+
+  @Test
+  public void shouldReturnEmptyCMMStudyListWhenExternalSystemExceptionIsThrown() throws ExternalSystemException {
+    // Given
+    Repo repoMock = mock(Repo.class);
+    when(repoMock.getUrl()).thenReturn("https://oai.ukdataservice.ac.uk:8443/oai/provider");
+
+    when(harvesterDao.getRecord(anyString())).thenThrow(ExternalSystemException.class);
+
+    Optional<CMMStudy> actualRecord = defaultHarvesterConsumerService.getRecord(repoMock, "4124325");
+
+    // Then exception is thrown caught and an empty list returned
+    then(actualRecord.isPresent()).isFalse();
   }
 
   @Test

@@ -92,8 +92,8 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
               "URL to handler for harvesting [{}].",
           e.getMessage(),
           e.getExternalResponseBody(),
-          decodeStudyNumber(finalUrl));
-    } catch (IOException e) {
+          decodeStudyNumber().apply(finalUrl));
+    } catch (NullPointerException | IOException e) {
       log.error("Error, Unable to pass GetRecord response error message [{}].", e.getMessage(), e);
     }
 
@@ -130,9 +130,7 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
       return currentHeaderLastModified
           .map(localDateTime -> localDateTime.isAfter(lastModifiedDate))
           .orElseGet(() -> {
-                log.warn("Could not parse RecordIdentifier lastModifiedDate [{}]. Filtering out from list.",
-                    lastModified);
-
+                log.warn("Could not parse RecordIdentifier lastModifiedDate [{}]. Filtering out from list.", lastModified);
                 return false;
               }
           );

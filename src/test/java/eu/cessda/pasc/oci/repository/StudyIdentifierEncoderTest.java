@@ -16,6 +16,7 @@ package eu.cessda.pasc.oci.repository;
 
 import org.junit.Test;
 
+import static eu.cessda.pasc.oci.service.helpers.StudyIdentifierEncoder.decodeStudyNumber;
 import static eu.cessda.pasc.oci.service.helpers.StudyIdentifierEncoder.encodeStudyIdentifier;
 import static org.assertj.core.api.BDDAssertions.then;
 
@@ -38,13 +39,28 @@ public class StudyIdentifierEncoderTest {
   }
 
   @Test
-  public void printEncoding() {
+  public void shouldDoEncoding() {
 
     // Given
     String identifier = "http://nesstar.ucd.ie:80/obj/fStudy/PVTYV1-Anon";
+    String expectedEncoded = "http_cl__sl__sl_nesstar_dt_ucd_dt_ie_cl_80_sl_obj_sl_fStudy_sl_PVTYV1-Anon";
 
     // When
-    String encodedId = encodeStudyIdentifier().apply(identifier);
-    System.out.println(encodedId);
+    String actual = encodeStudyIdentifier().apply(identifier);
+
+    then(actual).isEqualTo(expectedEncoded);
+  }
+
+  @Test
+  public void shouldDoDecoding() {
+
+    // Given
+    String encoded = "http_cl__sl__sl_nesstar_dt_ucd_dt_ie_cl_80_sl_obj_sl_fStudy_sl_PVTYV1-Anon";
+    String expectedDecodedIdentifier = "http://nesstar.ucd.ie:80/obj/fStudy/PVTYV1-Anon";
+
+    // When
+    String actual = decodeStudyNumber().apply(encoded);
+
+    then(actual).isEqualTo(expectedDecodedIdentifier);
   }
 }

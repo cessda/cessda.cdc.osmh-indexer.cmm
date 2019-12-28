@@ -18,7 +18,7 @@ import java.util.function.Function;
 
 /**
  * Utility to encode(String replace) known Special Characters in HTTP rest context.
- *
+ * <p>
  * This is reversed by the respective handler using the same string replace token here
  * before calling the remote Service providers repo
  *
@@ -26,14 +26,14 @@ import java.util.function.Function;
  */
 public class StudyIdentifierEncoder {
 
-  public static Function<String, String> encodeStudyIdentifier(){
+  public static Function<String, String> encodeStudyIdentifier() {
     return studyIdentifier -> studyIdentifier.replace(".", "_dt_")
         .replace("/", "_sl_")
         .replace(":", "_cl_");
   }
 
-  public static String decodeStudyNumber(String encodedStudyNumber) {
-    return encodedStudyNumber.replace("_dt_", ".")
+  public static Function<String, String> decodeStudyNumber() {
+    return encodedStudyNumber -> encodedStudyNumber.replace("_dt_", ".")
         .replace("_sl_", "/")
         .replace("_cl_", ":");
   }

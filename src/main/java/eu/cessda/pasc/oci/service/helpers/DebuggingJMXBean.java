@@ -19,7 +19,6 @@ import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.cluster.health.ClusterIndexHealth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.jmx.export.annotation.ManagedOperation;
@@ -27,6 +26,7 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -60,24 +60,20 @@ public class DebuggingJMXBean {
 
     ClusterHealthResponse healths = client.admin().cluster().prepareHealth().get();
     client.admin().cluster().prepareHealth().get();
+
     log.info("ElasticSearch Cluster Details: Cluster Name [{}] \n NumberOfDataNodes [{}] \n NumberOfNodes [{}] ] \n",
         healths.getClusterName(),
         healths.getNumberOfDataNodes(),
         healths.getNumberOfNodes());
 
-    if (log.isDebugEnabled()) {
-      log.debug("ElasticSearch Cluster Nodes Report: Start--");
-      int counter = 1;
-      log.debug("NumberOfNodes [{}], Index Details Details:", healths.getNumberOfNodes());
-      for (ClusterIndexHealth health : healths.getIndices().values()) {
-        log.debug("Index [{}] [Current Index [{}] \t NumberOfShards [{}] \t NumberOfReplicas [{}] \t Status [{}] ]",
-            counter++,
-            health.getIndex(),
-            health.getNumberOfShards(),
-            health.getNumberOfReplicas(),
-            health.getStatus());
-      }
-    }
+    log.debug("ElasticSearch Cluster Nodes Report: Start--");
+    AtomicInteger counter = new AtomicInteger(1);
+    log.debug("NumberOfNodes [{}], Index Details Details:", healths.getNumberOfNodes());
+
+    String msg = "Index [{}] [Current Index [{}] \t Status [{}] ]";
+    healths.getIndices().values()
+        .forEach(health -> log.debug(msg, counter.getAndIncrement(), health.getIndex(), health.getStatus()));
+
     return "Printed Health";
   }
 

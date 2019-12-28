@@ -34,8 +34,7 @@ purposes. See deployment for notes on how to deploy the project on a live system
 
 Static code quality with verification with SonarQube
 
-    mvn sonar:sonar \
-      -Dsonar.host.url=http://localhost:9000 \
+    mvn sonar:sonar -Dsonar.host.url=http://localhost:9000
 
 ### Build it
 
