@@ -15,6 +15,7 @@
 package eu.cessda.pasc.oci.configurations;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.cessda.pasc.oci.helpers.exception.InternalSystemException;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
@@ -37,6 +38,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -106,19 +108,27 @@ public class AppUtilityBeansConfiguration {
   }
 
   @Bean
-  public Client client() throws Exception {
+  public Client client() throws InternalSystemException {
 
     Settings esSettings = Settings.settingsBuilder().put("cluster.name", esClusterName).build();
 
     //https://www.elastic.co/guide/en/elasticsearch/guide/current/_transport_client_versus_node_client.html
-    return TransportClient.builder()
-        .settings(esSettings)
-        .build().addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(esHost), esPort)
-        );
+    try {
+      return TransportClient.builder()
+          .settings(esSettings)
+          .build().addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(esHost), esPort)
+          );
+    } catch (UnknownHostException e) {
+      throw new InternalSystemException(e.getMessage(), e);
+    }
   }
 
   @Bean()
-  public ElasticsearchTemplate elasticsearchTemplate() throws Exception {
-    return new ElasticsearchTemplate(client());
+  public ElasticsearchTemplate elasticsearchTemplate() throws InternalSystemException {
+    try {
+      return new ElasticsearchTemplate(client());
+    } catch (InternalSystemException e) {
+      throw new InternalSystemException(e.getMessage(), e);
+    }
   }
 }

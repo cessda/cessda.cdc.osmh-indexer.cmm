@@ -49,11 +49,11 @@ public class DaoBase {
     } catch (RestClientException e) {
       String message = String.format(UNSUCCESSFUL_RESPONSE, fullUrl);
       log.error(message, e);
-      ExternalSystemException exception = new ExternalSystemException(message, e.getCause());
+      ExternalSystemException exception;
       try {
-        exception.setExternalResponseBody((((HttpServerErrorException) e).getResponseBodyAsString()));
+        exception = new ExternalSystemException(message, e.getCause(), ((HttpServerErrorException) e).getResponseBodyAsString());
       } catch (Exception e1) {
-        exception.setExternalResponseBody(e.getMessage());
+        exception = new ExternalSystemException(message, e.getCause(), e.getMessage());
       }
       throw exception;
     }

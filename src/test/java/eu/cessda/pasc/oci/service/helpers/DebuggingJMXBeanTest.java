@@ -26,7 +26,7 @@ import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.assertj.core.api.Java6BDDAssertions.then;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author moses AT doraventures DOT com
@@ -56,13 +56,13 @@ public class DebuggingJMXBeanTest extends EmbeddedElasticsearchServer {
 
   @Test
   public void shouldPrintElasticsearchDetails() {
-    then(debuggingJMXBean.printElasticSearchInfo()).isEqualTo("Printed Health");
+    assertThat(debuggingJMXBean.printElasticSearchInfo()).isEqualTo("Printed Health");
   }
 
   @Test
   public void shouldPrintCurrentlyConfiguredRepoEndpoints() {
     // When
     String actualRepos = debuggingJMXBean.printCurrentlyConfiguredRepoEndpoints();
-    then(actualRepos).isNotEmpty();
+    assertThat(actualRepos).isNotEmpty();
   }
 }

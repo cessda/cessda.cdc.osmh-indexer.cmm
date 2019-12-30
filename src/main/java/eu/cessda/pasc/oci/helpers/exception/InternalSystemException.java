@@ -12,31 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 */
-package eu.cessda.pasc.oci.helpers;
-
-import org.junit.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
+package eu.cessda.pasc.oci.helpers.exception;
 
 /**
+ * Exception for external encountered Exceptions
+ *
  * @author moses AT doraventures DOT com
  */
-public class FileHandlerTest {
+public class InternalSystemException extends CustomExceptionBase {
 
-  @Test
-  public void shouldReturnContentToAValidFilePath() {
+  private static final long serialVersionUID = -4761094323324014290L;
 
-    FileHandler fileHandler = new FileHandler();
-    String recordUkds998 = fileHandler.getFileWithUtil("record_ukds_998.json");
-    assertThat(recordUkds998).isNotEmpty();
-  }
-
-  @Test
-  public void shouldReturnEmptyContentToAInvalidValidFilePath() {
-
-    FileHandler fileHandler = new FileHandler();
-    String recordUkds998 = fileHandler.getFileWithUtil("does_not_exist.json");
-    assertThat(recordUkds998).isEmpty();
+  public InternalSystemException(String message, Throwable cause) {
+    super(message, cause);
   }
 }

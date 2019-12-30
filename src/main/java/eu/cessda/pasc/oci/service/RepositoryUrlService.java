@@ -28,8 +28,6 @@ public class RepositoryUrlService {
   }
 
   public String constructListRecordUrl(String repositoryUrl) {
-    //pascOciConfig.getHarvesterUrl(),  Fixme: reeanable and remove the fake following urls
-
     String finalUrl = "replace_me";
     Optional<Repo> repoOptional = fakeHarvester.getRepoConfigurationProperties(repositoryUrl);
 
@@ -45,9 +43,7 @@ public class RepositoryUrlService {
   }
 
   public String constructGetRecordUrl(String repositoryUrl, String studyNumber) {
-    //pascOciConfig.getHarvesterUrl(),  Fixme: reeanable and remove the fake following urls
-
-    String finalUrl = "replace_me";
+    String finalUrl = "I_SHOULD-HAVE-BEEN-REPLACED";
     Optional<Repo> repoOptional = fakeHarvester.getRepoConfigurationProperties(repositoryUrl);
     String encodedStudyID = StudyIdentifierEncoder.encodeStudyIdentifier().apply(studyNumber);
 
