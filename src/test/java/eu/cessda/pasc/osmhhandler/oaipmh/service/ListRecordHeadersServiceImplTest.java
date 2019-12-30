@@ -16,7 +16,6 @@ package eu.cessda.pasc.osmhhandler.oaipmh.service;
 
 import eu.cessda.pasc.osmhhandler.oaipmh.dao.ListRecordHeadersDao;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
-import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.InternalSystemException;
 import eu.cessda.pasc.osmhhandler.oaipmh.mock.data.RecordHeadersMock;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.response.RecordHeader;
@@ -113,7 +112,7 @@ public class ListRecordHeadersServiceImplTest {
     then(recordHeaders).extracting("type").containsOnly("Study");
   }
 
-  @Test(expected = ExternalSystemException.class)
+  @Test(expected = InternalSystemException.class)
   public void shouldThrowExceptionForRecordHeadersInvalidMetadataToken() throws CustomHandlerException {
 
     // Given

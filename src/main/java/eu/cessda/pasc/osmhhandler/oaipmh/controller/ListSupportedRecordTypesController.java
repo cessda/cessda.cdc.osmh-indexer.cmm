@@ -46,8 +46,7 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.UNSUPPO
  */
 @RestController
 @RequestMapping("{version}/ListSupportedRecordTypes")
-@Api(value = "ListSupportedRecordTypes", description = "REST API for supported record types",
-    tags = {"ListSupportedRecordTypes"})
+@Api(value = "ListSupportedRecordTypes", tags = {"ListSupportedRecordTypes"})
 @Slf4j
 public class ListSupportedRecordTypesController extends ControllerBase {
 

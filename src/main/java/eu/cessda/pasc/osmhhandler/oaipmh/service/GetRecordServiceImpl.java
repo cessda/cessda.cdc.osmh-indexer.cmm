@@ -17,7 +17,6 @@ package eu.cessda.pasc.osmhhandler.oaipmh.service;
 import eu.cessda.pasc.osmhhandler.oaipmh.configuration.HandlerConfigurationProperties;
 import eu.cessda.pasc.osmhhandler.oaipmh.dao.GetRecordDoa;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
-import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.InternalSystemException;
 import eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhHelpers;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMStudy;
@@ -98,7 +97,7 @@ public class GetRecordServiceImpl implements GetRecordService {
   }
 
   private void mapDDIRecordToCMMStudy(String recordXML, CMMStudy.CMMStudyBuilder builder)
-      throws JDOMException, IOException, ExternalSystemException {
+      throws JDOMException, IOException, InternalSystemException {
 
     OaiPmh oaiPmh = oaiPmhHandlerConfig.getOaiPmh();
     InputStream recordXMLStream = IOUtils.toInputStream(recordXML, Charsets.UTF_8);
@@ -111,7 +110,7 @@ public class GetRecordServiceImpl implements GetRecordService {
     ErrorStatus errorStatus = validateResponse(document, X_FACTORY);
     if (errorStatus.isHasError()) {
       log.debug("Returned Record has an <error> element with ErrorStatus message [{}]", errorStatus.getMessage());
-      throw new ExternalSystemException(errorStatus.getMessage());
+      throw new InternalSystemException(errorStatus.getMessage());
     }
 
     // Short-Circuit. We carry on to parse beyond the headers only if record is active

@@ -49,12 +49,11 @@ public class DaoBase {
       return responseEntity.getBody();
     } catch (RestClientException e) {
       String message = String.format("RestClientException! Unsuccessful response from remote SP's Endpoint [%s]", fullUrl);
-      ExternalSystemException exception = new ExternalSystemException(message, e.getCause());
-
+      ExternalSystemException exception;
       try {
-        exception.setExternalResponseBody((((HttpServerErrorException) e).getResponseBodyAsString()));
+        exception = new ExternalSystemException(message, e.getCause(), ((HttpServerErrorException) e).getResponseBodyAsString());
       } catch (Exception e1) {
-        exception.setExternalResponseBody(e.getMessage());
+        exception = new ExternalSystemException(message, e.getCause(), e.getMessage());
       }
 
       log.trace(message, e);

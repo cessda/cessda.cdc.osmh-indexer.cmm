@@ -47,12 +47,11 @@ import static java.lang.String.format;
 /**
  * Controller to handle request for getting a remote Record.
  *
- * @author moses AT doraventures DOT com
+ * @author moses AT doraventures DOT com.
  */
 @RestController
 @RequestMapping("{version}/GetRecord")
-@Api(value = "GetRecord", description = "REST API for getting a remote Record",
-    tags = {"GetRecord"})
+@Api(value = "GetRecord", tags = {"GetRecord"})
 @Slf4j
 public class GetRecordController extends ControllerBase {
 

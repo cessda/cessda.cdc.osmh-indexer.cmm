@@ -45,13 +45,14 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.UNSUPPO
 
 /**
  * Controller to handle request for Record Headers.
+ * <p>
+ * e.g. for Listing Record Headers.
  *
  * @author moses AT doraventures DOT com
  */
 @RestController
 @RequestMapping("{version}/ListRecordHeaders")
-@Api(value = "ListRecordHeaders", description = "REST API for Listing Record Headers",
-    tags = {"ListRecordHeaders"})
+@Api(value = "ListRecordHeaders", tags = {"ListRecordHeaders"})
 @Slf4j
 public class ListRecordHeadersController extends ControllerBase {
 

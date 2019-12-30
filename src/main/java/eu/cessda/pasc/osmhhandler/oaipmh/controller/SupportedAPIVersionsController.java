@@ -44,7 +44,7 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.THE_GIV
  */
 @RestController
 @RequestMapping("/SupportedVersions")
-@Api(value = "SupportedVersions", description = "REST API for supported api versions", tags = {"SupportedVersions"})
+@Api(value = "SupportedVersions", tags = {"SupportedVersions"})
 public class SupportedAPIVersionsController extends ControllerBase {
 
   private final APISupportedService apiSupportedService;

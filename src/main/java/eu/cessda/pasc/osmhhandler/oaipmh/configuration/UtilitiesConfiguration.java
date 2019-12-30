@@ -93,10 +93,10 @@ public class UtilitiesConfiguration {
     return clientHttpRequestFactory;
   }
 
-  // FIXME:  A "temp" to work around untrusted certificate for UKDA oai-pmh endpoint
-
   /**
    * Builds a {@link ClientHttpRequestFactory} with ssl off.
+   *
+   * <b>Note this is a "temp" to work around untrusted certificate for UKDA oai-pmh endpoint</b>
    */
   private ClientHttpRequestFactory getClientHttpRequestFactoryWithoutSSL()
       throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {

@@ -277,7 +277,7 @@ public class CMMStudyMapper {
       parTitles.forEach(titles::putIfAbsent);  // parTitl lang must not be same as or override titl lang
     }
 
-    CLEAN_MAP_VALUES.accept(titles);
+    CLEAN_MAP_VALUES.apply(titles);
     builder.titleStudy(titles);
   }
 
