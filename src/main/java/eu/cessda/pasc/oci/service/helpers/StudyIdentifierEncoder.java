@@ -14,6 +14,9 @@
 */
 package eu.cessda.pasc.oci.service.helpers;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.util.function.Function;
 
 /**
@@ -24,6 +27,7 @@ import java.util.function.Function;
  *
  * @author moses AT doraventures DOT com
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class StudyIdentifierEncoder {
 
   public static Function<String, String> encodeStudyIdentifier() {

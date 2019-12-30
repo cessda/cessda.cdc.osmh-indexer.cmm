@@ -15,7 +15,6 @@
 package eu.cessda.pasc.oci.helpers.exception;
 
 import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Exception for external encountered Exceptions
@@ -27,10 +26,10 @@ public class ExternalSystemException extends CustomExceptionBase {
   private static final long serialVersionUID = 928798312826959273L;
 
   @Getter
-  @Setter
-  private String externalResponseBody;
+  private final String externalResponseBody;
 
-  public ExternalSystemException(String message, Throwable cause) {
+  public ExternalSystemException(String message, Throwable cause, String externalResponseBody) {
     super(message, cause);
+    this.externalResponseBody = externalResponseBody;
   }
 }
