@@ -17,7 +17,7 @@ package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 import eu.cessda.pasc.osmhhandler.oaipmh.FileHandler;
 import org.junit.Test;
 
-import static org.assertj.core.api.BDDAssertions.then;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author moses AT doraventures DOT com
@@ -33,7 +33,7 @@ public class FileHandlerTest {
     // When
     String fileContent = fileHandler.getFileWithUtil("xml/ddi_record_1683_does_not_exist.xml");
 
-    then(fileContent).isEqualTo("");
+    assertThat(fileContent).isEqualTo("");
   }
 
   @Test
@@ -45,6 +45,6 @@ public class FileHandlerTest {
     // When
     String fileContent = fileHandler.getFileWithUtil("xml/ddi_record_1683.xml");
 
-    then(fileContent).contains("<request verb=\"GetRecord\" identifier=\"1683\"");
+    assertThat(fileContent).contains("<request verb=\"GetRecord\" identifier=\"1683\"");
   }
 }

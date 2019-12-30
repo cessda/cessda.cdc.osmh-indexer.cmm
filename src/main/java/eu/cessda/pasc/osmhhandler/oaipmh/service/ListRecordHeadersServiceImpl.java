@@ -16,7 +16,6 @@ package eu.cessda.pasc.osmhhandler.oaipmh.service;
 
 import eu.cessda.pasc.osmhhandler.oaipmh.dao.ListRecordHeadersDao;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
-import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.InternalSystemException;
 import eu.cessda.pasc.osmhhandler.oaipmh.helpers.ListIdentifiersResponseValidator;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.errors.ErrorStatus;
@@ -47,7 +46,6 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.IDENTIFI
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.RESUMPTION_TOKEN_ELEMENT;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.SET_SPEC_ELEMENT;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhHelpers.appendListRecordResumptionToken;
-import static eu.cessda.pasc.osmhhandler.oaipmh.models.response.RecordHeader.*;
 
 /**
  * Service implementation to handle Listing Record Headers
@@ -78,7 +76,7 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
     ErrorStatus errorStatus = ListIdentifiersResponseValidator.validateResponse(doc);
     if (errorStatus.isHasError()) {
       log.debug("Returned response has error message [{}].", errorStatus.getMessage());
-      throw new ExternalSystemException(errorStatus.getMessage());
+      throw new InternalSystemException(errorStatus.getMessage());
     }
 
     log.info("ParseRecordHeaders Started:  For [{}].", baseRepoUrl);
@@ -153,7 +151,7 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
 
   private RecordHeader parseRecordHeader(NodeList headerElements) {
 
-    RecordHeaderBuilder recordHeaderBuilder = builder();
+    RecordHeader.RecordHeaderBuilder recordHeaderBuilder = RecordHeader.builder();
     recordHeaderBuilder.recordType(RECORD_HEADER);
 
     for (int headerElementIndex = 0; headerElementIndex < headerElements.getLength(); headerElementIndex++) {
@@ -170,7 +168,8 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
           recordHeaderBuilder.lastModified(currentHeaderElementValue);
           break;
         case SET_SPEC_ELEMENT:
-          // FixMe: 1 There might be multiple SetSpec: https://www.oaforum.org/tutorial/english/page3.htm#section7
+          // Note:
+          // 1 There might be multiple SetSpec: https://www.oaforum.org/tutorial/english/page3.htm#section7
           // 2 Depending on feedback from John Shepherdson set record type based on the SetSpec
           // For instance for UKDA - DataCollections = Study
           // For now we assume all setSpec are a Study as UKDA endpoint repo only holds Studies, SAME for others?

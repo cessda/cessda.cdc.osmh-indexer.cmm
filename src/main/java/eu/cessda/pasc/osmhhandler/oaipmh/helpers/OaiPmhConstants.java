@@ -16,6 +16,8 @@ package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 
 import org.jdom2.Namespace;
 
+import java.net.URI;
+
 /**
  * OaiPmh related attributes and element Constants
  *
@@ -23,7 +25,7 @@ import org.jdom2.Namespace;
  */
 public class OaiPmhConstants {
 
-  private static final String OAI_NS_PATH = "http://www.openarchives.org/OAI/2.0/";
+  private static final String OAI_NS_PATH =  URI.create("http://www.openarchives.org/OAI/2.0/").toString();
   private static final String DDI_NS_PATH = "ddi:codebook:2_5";
 
   // Name Spaces
@@ -45,7 +47,7 @@ public class OaiPmhConstants {
   static final String PAR_TITLE_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:parTitl";
   static final String STUDY_URL_DOC_DSCR_XPATH = "//ddi:codeBook/ddi:docDscr/ddi:citation/ddi:holdings";
   static final String STUDY_URL_STDY_DSCR_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:holdings";
-  static final String PID_STUDY_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo"; // TODO use @agency instead
+  static final String PID_STUDY_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo"; //use @agency instead?
   static final String CREATORS_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty";
   static final String DATA_RESTRCTN_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:restrctn";
   static final String DATA_COLLECTION_PERIODS_PATH = "//ddi:codeBook//ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate";

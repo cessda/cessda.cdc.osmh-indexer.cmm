@@ -15,10 +15,13 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 
 import eu.cessda.pasc.osmhhandler.oaipmh.models.errors.ErrorStatus;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.xpath.XPathFactory;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RecordResponseValidator {
 
   /**

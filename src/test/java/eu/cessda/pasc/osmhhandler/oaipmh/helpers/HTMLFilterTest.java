@@ -49,7 +49,7 @@ public class HTMLFilterTest {
     titleMap.put("fi", "\n Documentation pour \"European Social Survey in Switzerland - 2004\"");
 
     // When
-    CLEAN_MAP_VALUES.accept(titleMap);
+    CLEAN_MAP_VALUES.apply(titleMap);
 
     then(titleMap.get("en")).isEqualTo("\"Arma sunt necessaria\" (Arms are necessary) Guns Constitution");
     then(titleMap.get("sv")).isEqualTo("\"Arma sunt necessaria\" (Arms are necessary) Guns Constitution");
