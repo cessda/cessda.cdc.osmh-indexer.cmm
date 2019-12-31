@@ -14,6 +14,7 @@
 */
 package eu.cessda.pasc.osmhhandler.oaipmh.service;
 
+import eu.cessda.pasc.osmhhandler.oaipmh.configuration.HandlerConfigurationProperties;
 import eu.cessda.pasc.osmhhandler.oaipmh.dao.ListRecordHeadersDao;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.InternalSystemException;
@@ -45,6 +46,7 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.HEADER_E
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.IDENTIFIER_ELEMENT;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.RESUMPTION_TOKEN_ELEMENT;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.SET_SPEC_ELEMENT;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhHelpers.appendListRecordParams;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhHelpers.appendListRecordResumptionToken;
 
 /**
@@ -57,20 +59,23 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhHelpers.appendList
 public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
 
   private final ListRecordHeadersDao listRecordHeadersDao;
-
+  private final HandlerConfigurationProperties config;
   private final DocumentBuilder builder;
 
   @Autowired
-  public ListRecordHeadersServiceImpl(ListRecordHeadersDao listRecordHeadersDao, DocumentBuilder builder) {
+  public ListRecordHeadersServiceImpl(ListRecordHeadersDao listRecordHeadersDao, HandlerConfigurationProperties config,
+                                      DocumentBuilder builder) {
     this.listRecordHeadersDao = listRecordHeadersDao;
+    this.config = config;
     this.builder = builder;
   }
 
   @Override
   public List<RecordHeader> getRecordHeaders(String baseRepoUrl) throws CustomHandlerException {
 
-    String recordHeadersXMLString = listRecordHeadersDao.listRecordHeaders(baseRepoUrl);
-    Document doc = getDocument(recordHeadersXMLString);
+    String fullListRecordUrlPath = appendListRecordParams(baseRepoUrl, config.getOaiPmh());
+    String recordHeadersXMLString = listRecordHeadersDao.listRecordHeaders(fullListRecordUrlPath);
+    Document doc = getDocument(recordHeadersXMLString, fullListRecordUrlPath);
 
     // We exit if the response has an <error> element
     ErrorStatus errorStatus = ListIdentifiersResponseValidator.validateResponse(doc);
@@ -81,7 +86,6 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
 
     log.info("ParseRecordHeaders Started:  For [{}].", baseRepoUrl);
     List<RecordHeader> recordHeaders = retrieveRecordHeaders(new ArrayList<>(), doc, baseRepoUrl);
-    log.info("ParseRecordHeaders Ended:  No more resumption token to process for repo with url [{}].", baseRepoUrl);
     int expectedRecordHeadersCount = getRecordHeadersCount(doc);
     if (expectedRecordHeadersCount != -1) {
       log.info("ParseRecordHeaders retrieved [{}] of [{}] expected record headers count for repo [{}].",
@@ -116,18 +120,21 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
   private List<RecordHeader> retrieveRecordHeaders(List<RecordHeader> recordHeaders, Document doc, String baseRepoUrl)
       throws CustomHandlerException {
 
-    parseRecordHeaders(recordHeaders, doc);
+    parseRecordHeadersFromDoc(recordHeaders, doc);
+
+    // Now lets check and loop when there is a resumptionToken
     String resumptionToken = parseResumptionToken(doc);
     if (!resumptionToken.isEmpty()) {
       String repoUrlWithResumptionToken = appendListRecordResumptionToken(baseRepoUrl, resumptionToken);
       String resumedXMLDoc = listRecordHeadersDao.listRecordHeadersResumption(repoUrlWithResumptionToken);
       log.info("Looping for [{}].", repoUrlWithResumptionToken);
-      retrieveRecordHeaders(recordHeaders, getDocument(resumedXMLDoc), baseRepoUrl);
+      retrieveRecordHeaders(recordHeaders, getDocument(resumedXMLDoc, repoUrlWithResumptionToken), baseRepoUrl);
     }
+    log.info("ParseRecordHeaders Ended:  No more resumption token to process for repo with url [{}].", baseRepoUrl);
     return recordHeaders;
   }
 
-  private void parseRecordHeaders(List<RecordHeader> recordHeaders, Document doc) {
+  private void parseRecordHeadersFromDoc(List<RecordHeader> recordHeaders, Document doc) {
     NodeList headers = doc.getElementsByTagName(HEADER_ELEMENT);
 
     for (int headerRowIndex = 0; headerRowIndex < headers.getLength(); headerRowIndex++) {
@@ -183,14 +190,14 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
     return recordHeaderBuilder.build();
   }
 
-  private Document getDocument(String docXMLString) throws InternalSystemException {
+  private Document getDocument(String docXMLString, String fullListRecordUrlPath) throws InternalSystemException {
     try {
       InputStream is = new ByteArrayInputStream(docXMLString.getBytes(StandardCharsets.UTF_8));
       return builder.parse(is);
     } catch (NullPointerException | SAXException | IOException e) {
-      String msg = "Unable to parse repo RecordHeader response bytes.";
-      log.error(msg);
-      log.debug(msg + ". Document content [{}].", docXMLString);
+      String msg = "Unable to parse repo RecordHeader response bytes for path [{}].";
+      log.error(msg, fullListRecordUrlPath, e);
+      log.debug(String.join(" ", msg + " Document content [{}]."), fullListRecordUrlPath, docXMLString, e);
       throw new InternalSystemException(msg);
     }
   }

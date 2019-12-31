@@ -23,7 +23,7 @@ import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
  */
 public interface ListRecordHeadersDao {
 
-  String listRecordHeaders(String baseRepoUrl) throws CustomHandlerException;
+  String listRecordHeaders(String fullListRecordUrlPath) throws CustomHandlerException;
 
-  String listRecordHeadersResumption(String baseRepoUrl) throws CustomHandlerException;
+  String listRecordHeadersResumption(String repoUrlWithResumptionToken) throws CustomHandlerException;
 }

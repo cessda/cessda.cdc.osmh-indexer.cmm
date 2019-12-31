@@ -89,15 +89,15 @@ public class OaiPmhHelpers {
         .replace("_cl_", ":");
   }
 
-  private static Repo getMetadataPrefix(String repositoryUrl, OaiPmh oaiPmh) throws CustomHandlerException {
+  private static Repo getMetadataPrefix(String repoBaseUrl, OaiPmh oaiPmh) throws CustomHandlerException {
 
     Repo repo = oaiPmh.getRepos()
         .stream()
-        .filter(currentStreamRepo -> currentStreamRepo.getUrl().equalsIgnoreCase(repositoryUrl))
+        .filter(currentStreamRepo -> currentStreamRepo.getUrl().equalsIgnoreCase(repoBaseUrl))
         .findFirst()
-        .orElseThrow(() -> new CustomHandlerException(String.format("Configuration not found for Repo [%s]", repositoryUrl)));
+        .orElseThrow(() -> new CustomHandlerException(String.format("Configuration not found for Repo [%s]", repoBaseUrl)));
 
-    log.debug("Retrieved Params for repo [{}] as [{}]", repositoryUrl, repo);
+    log.debug("Retrieved Params for repoBaseUrl [{}] as [{}]", repoBaseUrl, repo);
     return repo;
   }
 }

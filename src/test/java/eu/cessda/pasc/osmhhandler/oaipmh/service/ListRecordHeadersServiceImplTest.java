@@ -52,9 +52,10 @@ public class ListRecordHeadersServiceImplTest {
   public void shouldReturnRecordHeadersForGivenRepo() throws CustomHandlerException {
 
     // Given
-    String repoUrl = "www.my-fake-url.com";
+    String repoUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider";
+    String fullListRecordRepoUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=ListIdentifiers&metadataPrefix=ddi";
     String mockRecordHeadersXml = RecordHeadersMock.getListIdentifiersXMLResumptionEmpty();
-    given(listRecordHeadersDao.listRecordHeaders(repoUrl)).willReturn(mockRecordHeadersXml);
+    given(listRecordHeadersDao.listRecordHeaders(fullListRecordRepoUrl)).willReturn(mockRecordHeadersXml);
 
     // When
     List<RecordHeader> recordHeaders = listRecordHeadersService.getRecordHeaders(repoUrl);
@@ -69,9 +70,10 @@ public class ListRecordHeadersServiceImplTest {
   public void shouldThrowWhenRequestForHeaderFails() throws CustomHandlerException {
 
     // Given
-    String repoUrl = "www.my-fake-url.com";
+    String repoUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider";
+    String fullListRecordRepoUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=ListIdentifiers&metadataPrefix=ddi";
     String mockRecordHeadersXml = RecordHeadersMock.getListIdentifiersXMLResumptionTokenNotMockedForInvalid();
-    given(listRecordHeadersDao.listRecordHeaders(repoUrl)).willReturn(mockRecordHeadersXml);
+    given(listRecordHeadersDao.listRecordHeaders(fullListRecordRepoUrl)).willReturn(mockRecordHeadersXml);
 
     // When
     listRecordHeadersService.getRecordHeaders(repoUrl);
@@ -82,18 +84,19 @@ public class ListRecordHeadersServiceImplTest {
       throws CustomHandlerException {
 
     // Given
-    String repoBaseUrl = "www.my-fake-url.com";
+    String baseRepoUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider";
+    String fullListRecordRepoUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=ListIdentifiers&metadataPrefix=ddi";
     String identifiersXML = RecordHeadersMock.getListIdentifiersXML();
 
     String resumptionToken01 = "0/3/7/ddi/null/2016-06-01/null";
-    String repoUrlWithResumptionToken01 = appendListRecordResumptionToken(repoBaseUrl, resumptionToken01);
+    String repoUrlWithResumptionToken01 = appendListRecordResumptionToken(baseRepoUrl, resumptionToken01);
     String identifiersXMLWithResumption = RecordHeadersMock.getListIdentifiersXMLWithResumption();
 
     String resumptionToken02 = "3/6/7/ddi/null/2017-01-01/null";
-    String repoUrlWithResumptionToken02 = appendListRecordResumptionToken(repoBaseUrl, resumptionToken02);
+    String repoUrlWithResumptionToken02 = appendListRecordResumptionToken(baseRepoUrl, resumptionToken02);
     String identifiersXMLWithResumptionLastList = RecordHeadersMock.getListIdentifiersXMLWithResumptionLastList();
 
-    given(listRecordHeadersDao.listRecordHeaders(repoBaseUrl)).willReturn(identifiersXML);
+    given(listRecordHeadersDao.listRecordHeaders(fullListRecordRepoUrl)).willReturn(identifiersXML);
 
     given(listRecordHeadersDao.listRecordHeadersResumption(repoUrlWithResumptionToken01))
         .willReturn(identifiersXMLWithResumption);
@@ -102,7 +105,7 @@ public class ListRecordHeadersServiceImplTest {
         .willReturn(identifiersXMLWithResumptionLastList);
 
     // When
-    List<RecordHeader> recordHeaders = listRecordHeadersService.getRecordHeaders(repoBaseUrl);
+    List<RecordHeader> recordHeaders = listRecordHeadersService.getRecordHeaders(baseRepoUrl);
 
     then(recordHeaders).hasSize(7);
     then(recordHeaders).extracting("identifier")
@@ -116,9 +119,11 @@ public class ListRecordHeadersServiceImplTest {
   public void shouldThrowExceptionForRecordHeadersInvalidMetadataToken() throws CustomHandlerException {
 
     // Given
-    String repoUrl = "www.my-fake-url.com/WithInvalidToken";
+    String repoUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider";
+    String fullListRecordRepoUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=ListIdentifiers&metadataPrefix=ddi";
+
     String mockRecordHeadersXml = RecordHeadersMock.getListIdentifiersXMLWithInvalidMetadataTokenError();
-    given(listRecordHeadersDao.listRecordHeaders(repoUrl)).willReturn(mockRecordHeadersXml);
+    given(listRecordHeadersDao.listRecordHeaders(fullListRecordRepoUrl)).willReturn(mockRecordHeadersXml);
 
     // When
     listRecordHeadersService.getRecordHeaders(repoUrl);

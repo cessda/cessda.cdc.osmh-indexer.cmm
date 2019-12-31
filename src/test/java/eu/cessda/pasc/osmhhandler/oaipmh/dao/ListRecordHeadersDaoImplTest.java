@@ -60,14 +60,14 @@ public class ListRecordHeadersDaoImplTest {
   public void shouldReturnXmlPayloadOfRecordHeadersFromRemoteRepository() throws CustomHandlerException {
 
     // Given
-    String expected_url= "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=ListIdentifiers&metadataPrefix=ddi";
+    String fullListRecordHeadersUrl= "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=ListIdentifiers&metadataPrefix=ddi";
 
-    server.expect(once(), requestTo(expected_url))
+    server.expect(once(), requestTo(fullListRecordHeadersUrl))
         .andExpect(method(GET))
         .andRespond(withSuccess(getListIdentifiersXML(), MediaType.TEXT_XML));
 
     // When
-    String recordHeadersXML = listRecordHeadersDao.listRecordHeaders("https://oai.ukdataservice.ac.uk:8443/oai/provider");
+    String recordHeadersXML = listRecordHeadersDao.listRecordHeaders(fullListRecordHeadersUrl);
 
     System.out.println("Actual: " + recordHeadersXML);
 
@@ -80,14 +80,14 @@ public class ListRecordHeadersDaoImplTest {
   public void shouldReturnXmlPayloadOfGivenSpecSetRecordHeadersFromRemoteRepository() throws CustomHandlerException {
 
     // Given
-    String expected_url= "http://services.fsd.uta.fi/v0/oai?verb=ListIdentifiers&metadataPrefix=oai_ddi25&set=study_groups:energia";
+    String fullListRecordHeadersUrl= "http://services.fsd.uta.fi/v0/oai?verb=ListIdentifiers&metadataPrefix=oai_ddi25&set=study_groups:energia";
 
-    server.expect(once(), requestTo(expected_url))
+    server.expect(once(), requestTo(fullListRecordHeadersUrl))
         .andExpect(method(GET))
         .andRespond(withSuccess(getListIdentifiersXML(), MediaType.TEXT_XML));
 
     // When
-    String recordHeadersXML = listRecordHeadersDao.listRecordHeaders("http://services.fsd.uta.fi/v0/oai");
+    String recordHeadersXML = listRecordHeadersDao.listRecordHeaders(fullListRecordHeadersUrl);
 
     System.out.println("Actual: " + recordHeadersXML);
 
