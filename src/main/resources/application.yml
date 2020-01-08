@@ -153,14 +153,14 @@ spring:
     admin:
       client:
         prefer-ip: true
-      url: ${SPRING_BOOT_ADMIN_URL}
+      url: http://localhost:8087
   output.ansi.enabled: NEVER
 logging:
   level:
-    eu.cessda.pasc.oci.service: ${SPRING_LOGGING_LEVEL}
-    eu.cessda.pasc.oci.repository: ${SPRING_LOGGING_LEVEL}
-    eu.cessda.pasc.oci.helpers: ${SPRING_LOGGING_LEVEL}
-    eu.cessda.pasc.oci.configurations.PerfRequestSyncInterceptor: ${SPRING_LOGGING_LEVEL}
+    eu.cessda.pasc.oci.service: INFO
+    eu.cessda.pasc.oci.repository: INFO
+    eu.cessda.pasc.oci.helpers: INFO
+    eu.cessda.pasc.oci.configurations.PerfRequestSyncInterceptor: INFO
 elasticsearch:
   host: cdc-es  # must match profile name
   numberOfShards: 2
