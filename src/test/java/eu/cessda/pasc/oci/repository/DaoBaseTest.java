@@ -1,3 +1,18 @@
+/*
+ * Copyright © 2017-2019 CESSDA ERIC (support@cessda.eu)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.cessda.pasc.oci.repository;
 
 import eu.cessda.pasc.oci.AbstractSpringTestProfileContext;
@@ -26,55 +41,59 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
  *
  * @author moses AT doraventures DOT com
  */
-@RunWith(SpringRunner.class)
-public class DaoBaseTest extends AbstractSpringTestProfileContext {
+@RunWith( SpringRunner.class )
+public class DaoBaseTest extends AbstractSpringTestProfileContext
+{
 
-  private MockRestServiceServer serverMock;
+    private MockRestServiceServer serverMock;
 
-  @Autowired
-  private RestTemplate restTemplate;
+    @Autowired
+    private RestTemplate restTemplate;
 
-  @Autowired
-  @Qualifier("daoBase")
-  private DaoBase underTest;
+    @Autowired
+    @Qualifier( "daoBase" )
+    private DaoBase underTest;
 
-  @Before
-  public void setUp() {
-    serverMock = MockRestServiceServer.bindTo(restTemplate).build();
-  }
+    @Before
+    public void setUp()
+    {
+        serverMock = MockRestServiceServer.bindTo( restTemplate ).build();
+    }
 
-  @Test
-  public void shouldPostForStringResponse() throws ExternalSystemException {
+    @Test
+    public void shouldPostForStringResponse() throws ExternalSystemException
+    {
 
-    // Given
-    String expectedUrl = "http://cdc-osmh-repo:9091/v0/ListRecordHeaders?" +
-        "Repository=https://oai.ukdataservice.ac.uk:8443/oai/provider";
+        // Given
+        String expectedUrl = "http://cdc-osmh-repo:9091/v0/ListRecordHeaders?" +
+                "Repository=https://oai.ukdataservice.ac.uk:8443/oai/provider";
 
-    serverMock.expect(once(), requestTo(expectedUrl))
-        .andExpect(method(GET))
-        .andRespond(MockRestResponseCreators.withSuccess(LIST_RECORDER_HEADERS_BODY_EXAMPLE, MediaType.APPLICATION_JSON)
-        );
+        serverMock.expect( once(), requestTo( expectedUrl ) )
+                .andExpect( method( GET ) )
+                .andRespond( MockRestResponseCreators.withSuccess( LIST_RECORDER_HEADERS_BODY_EXAMPLE, MediaType.APPLICATION_JSON )
+                );
 
-    // When
-    String recordHeaders = underTest.postForStringResponse(expectedUrl);
+        // When
+        String recordHeaders = underTest.postForStringResponse( expectedUrl );
 
-    then(recordHeaders).isEqualTo(LIST_RECORDER_HEADERS_BODY_EXAMPLE);
-  }
+        then( recordHeaders ).isEqualTo( LIST_RECORDER_HEADERS_BODY_EXAMPLE );
+    }
 
-  @Test(expected = ExternalSystemException.class)
-  public void shouldThrowExternalSystemException() throws ExternalSystemException {
+    @Test( expected = ExternalSystemException.class )
+    public void shouldThrowExternalSystemException() throws ExternalSystemException
+    {
 
-    // Given
-    String expectedUrl = "http://cdc-osmh-repo:9091/v0/ListRecordHeaders?" +
-        "Repository=https://oai.ukdataservice.ac.uk:8443/oai/provider";
+        // Given
+        String expectedUrl = "http://cdc-osmh-repo:9091/v0/ListRecordHeaders?" +
+                "Repository=https://oai.ukdataservice.ac.uk:8443/oai/provider";
 
-    serverMock.expect(once(), requestTo(expectedUrl))
-        .andExpect(method(GET))
-        .andRespond(MockRestResponseCreators.withBadRequest());
+        serverMock.expect( once(), requestTo( expectedUrl ) )
+                .andExpect( method( GET ) )
+                .andRespond( MockRestResponseCreators.withBadRequest() );
 
-    // When
-    underTest.postForStringResponse(expectedUrl);
+        // When
+        underTest.postForStringResponse( expectedUrl );
 
-    // then exception should be thrown.
-  }
+        // then exception should be thrown.
+    }
 }
