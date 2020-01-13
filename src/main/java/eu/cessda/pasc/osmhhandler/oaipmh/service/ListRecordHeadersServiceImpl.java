@@ -1,17 +1,19 @@
 /*
-# Copyright CESSDA ERIC 2017-2019
-#
-# Licensed under the Apache License, Version 2.0 (the "License"); you may not
-# use this file except in compliance with the License.
-# You may obtain a copy of the License at
-# http://www.apache.org/licenses/LICENSE-2.0
+ * Copyright © 2017-2019 CESSDA ERIC (support@cessda.eu)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-*/
 package eu.cessda.pasc.osmhhandler.oaipmh.service;
 
 import eu.cessda.pasc.osmhhandler.oaipmh.configuration.HandlerConfigurationProperties;
@@ -40,12 +42,7 @@ import java.util.List;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.RECORD_HEADER;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HandlerConstants.STUDY;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.COMPLETE_LIST_SIZE_ATTR;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.DATESTAMP_ELEMENT;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.HEADER_ELEMENT;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.IDENTIFIER_ELEMENT;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.RESUMPTION_TOKEN_ELEMENT;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.SET_SPEC_ELEMENT;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhHelpers.appendListRecordParams;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhHelpers.appendListRecordResumptionToken;
 
@@ -92,11 +89,9 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
           recordHeaders.size(),
           expectedRecordHeadersCount,
           baseRepoUrl);
-    } else if (expectedRecordHeadersCount == -1) {
-      log.error("Unable to parse Record header's count from response. Retrieved record content [{}] for SP baseUrl [{}]",
-          doc, baseRepoUrl);
     } else {
-      log.info("ParseRecordHeaders retrieved [{}] record headers for repo [{}].", recordHeaders.size(), baseRepoUrl);
+      log.warn("Unable to parse Record header's count from response. Retrieved record content [{}] for SP baseUrl [{}]",
+              doc, baseRepoUrl);
     }
     return recordHeaders;
   }

@@ -1,17 +1,19 @@
 /*
-# Copyright CESSDA ERIC 2017-2019
-#
-# Licensed under the Apache License, Version 2.0 (the "License"); you may not
-# use this file except in compliance with the License.
-# You may obtain a copy of the License at
-# http://www.apache.org/licenses/LICENSE-2.0
+ * Copyright © 2017-2019 CESSDA ERIC (support@cessda.eu)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-*/
 package eu.cessda.pasc.osmhhandler.oaipmh.service;
 
 import eu.cessda.pasc.osmhhandler.oaipmh.configuration.HandlerConfigurationProperties;
@@ -35,27 +37,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseAbstract;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseClassifications;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseCreator;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseDataAccessFreeText;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseDataCollectionDates;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseDataCollectionFreeTexts;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseDefaultLanguage;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseFileLanguages;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseHeaderElement;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseKeywords;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parsePidStudies;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parsePublisher;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseSamplingProcedureFreeTexts;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseStudyAreaCountries;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseStudyTitle;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseStudyUrl;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseTypeOfModeOfCollection;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseTypeOfSamplingProcedure;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseTypeOfTimeMethod;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseUnitTypes;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.parseYrOfPublication;
+import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.*;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.RecordResponseValidator.validateResponse;
 
 /**
