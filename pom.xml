@@ -302,6 +302,7 @@
             <excludes>Jenkinsfile</excludes>
             <excludes>LICENSE.txt</excludes>
             <exclude>**/README</exclude>
+            <exclude>**/.m2/**</exclude>
             <exclude>src/test/resources/**</exclude>
             <exclude>src/main/resources/**</exclude>
           </excludes>
