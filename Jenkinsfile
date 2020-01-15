@@ -89,7 +89,7 @@ pipeline {
 		stage('Check Requirements and Deployments') {
 			steps {
 				dir('./infrastructure/gcp/') {
-					build job: 'cessda.cdc.deploy/master', parameters: [string(name: 'osmh_repo_image_tag', value: "${image_tag}"), string(name: 'module', value: 'osmh-repo')], wait: false
+					build job: 'cessda.cdc.deploy/master', parameters: [string(name: 'osmh_repo_image_tag', value: "${env.BRANCH_NAME}-${env.BUILD_NUMBER}")], wait: false
 				}
 			}
             when { branch 'master' }
