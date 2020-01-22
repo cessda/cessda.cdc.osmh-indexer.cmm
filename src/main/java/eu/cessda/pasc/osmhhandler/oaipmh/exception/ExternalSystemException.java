@@ -17,20 +17,39 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.exception;
 
 import lombok.Getter;
+import lombok.NonNull;
 
 /**
  * Exception for internally encountered Exceptions
  *
  * @author moses AT doraventures DOT com
  */
-public class ExternalSystemException extends CustomHandlerException{
+public class ExternalSystemException extends CustomHandlerException {
 
   private static final long serialVersionUID = 928798312826959273L;
 
   @Getter
   private final String externalResponseBody;
 
-  public ExternalSystemException(String message, Throwable cause, String externalResponseBody) {
+  /**
+   * Constructs an ExternalSystemException with the specified message and cause.
+   *
+   * @param message the detail message
+   * @param cause   the cause
+   */
+  public ExternalSystemException(String message, Throwable cause) {
+    super(message, cause);
+    externalResponseBody = null;
+  }
+
+  /**
+   * Constructs an ExternalSystemException with the specified message, cause and external response body.
+   *
+   * @param message              the detail message
+   * @param cause                the cause
+   * @param externalResponseBody the external response that caused this exception
+   */
+  public ExternalSystemException(String message, Throwable cause, @NonNull String externalResponseBody) {
     super(message, cause);
     this.externalResponseBody = externalResponseBody;
   }

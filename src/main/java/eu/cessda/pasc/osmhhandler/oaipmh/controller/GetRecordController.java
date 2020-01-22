@@ -16,6 +16,7 @@
 
 package eu.cessda.pasc.osmhhandler.oaipmh.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMConverter;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMStudy;
@@ -79,13 +80,13 @@ public class GetRecordController extends ControllerBase {
       return getResponseEntity(valueAsString, HttpStatus.OK);
     } catch (CustomHandlerException e) {
       String message = format("CustomHandlerException occurred whilst getting record message [%s], for studyID [%s]",
-          e.getMessage(), studyId);
-      log.debug(message, e);
+              e, studyId);
+      log.error(message, e.getCause());
       return buildResponseEntityMessage(message);
-    } catch (Exception e) {
-      String message = format("Exception occurred whilst getting record message [%s], for studyID [%s].",
-          e.getMessage(), studyId);
-      log.debug(message, e);
+    } catch (JsonProcessingException e) {
+      String message = format("JsonProcessingException occurred whilst getting record message [%s], for studyID [%s].",
+              e.getMessage(), studyId);
+      log.error(message, e);
       return buildResponseEntityMessage(message);
     }
   }

@@ -16,6 +16,8 @@
 
 package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 
+import lombok.experimental.UtilityClass;
+
 import java.time.ZoneId;
 import java.util.TimeZone;
 
@@ -24,6 +26,7 @@ import java.util.TimeZone;
  *
  * @author moses AT doraventures DOT com
  */
+@UtilityClass
 public class HandlerConstants {
 
   // Messaging and Exceptions
@@ -55,8 +58,4 @@ public class HandlerConstants {
   // System
   private static final String UTC_ID = TimeZone.getTimeZone("UTC").getID();
   static final ZoneId UTC_ZONE_ID = ZoneId.of(UTC_ID);
-
-  private HandlerConstants() {
-    throw new UnsupportedOperationException("Utility class, instantiation not allow");
-  }
 }

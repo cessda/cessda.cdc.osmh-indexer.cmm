@@ -19,6 +19,7 @@ package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.Publisher;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.configuration.OaiPmh;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
@@ -43,11 +44,8 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.TimeUtility.dataCollYear
  * @author moses AT doraventures DOT com
  */
 @Slf4j
+@UtilityClass
 public class CMMStudyMapper {
-
-  private CMMStudyMapper() {
-    throw new UnsupportedOperationException("Utility class, instantiation not allow");
-  }
 
   /**
    * NOTE: Extracts the Study Number from the header element

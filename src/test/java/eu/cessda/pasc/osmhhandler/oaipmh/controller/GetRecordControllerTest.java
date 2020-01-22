@@ -89,28 +89,28 @@ public class GetRecordControllerTest {
 
     // When
     this.mockMvc.perform(get("/v0/GetRecord/CMMStudy/StudyID222?Repository=http://kirkedata.nsd.uib.no")
-        .accept(MediaType.APPLICATION_JSON_VALUE))
+            .accept(MediaType.APPLICATION_JSON_VALUE))
 
-        // Then
-        .andExpect(status().isInternalServerError())
-        .andExpect(status().reason(new IsNull<>()))
-        .andExpect(content().json("{\"message\":\"CustomHandlerException occurred whilst getting record message [null], for studyID [StudyID222]\"}"));
+            // Then
+            .andExpect(status().isInternalServerError())
+            .andExpect(status().reason(new IsNull<>()))
+            .andExpect(content().json("{\"message\":\"CustomHandlerException occurred whilst getting record message [" + CustomHandlerException.class.getCanonicalName() + "], for studyID [StudyID222]\"}"));
   }
 
   @Test
   public void shouldCatchAndBuildRelevantEntityMessageWhenAnExceptionIsThrownReturn() throws Exception {
 
     // Given
-    given(this.getRecordService.getRecord("http://kirkedata.nsd.uib.no", "StudyID222")).willThrow(Exception.class);
+      given(this.getRecordService.getRecord("http://kirkedata.nsd.uib.no", "StudyID222")).willThrow(CustomHandlerException.class);
 
     // When
-    this.mockMvc.perform(get("/v0/GetRecord/CMMStudy/StudyID222?Repository=http://kirkedata.nsd.uib.no")
-        .accept(MediaType.APPLICATION_JSON_VALUE))
+      this.mockMvc.perform(get("/v0/GetRecord/CMMStudy/StudyID222?Repository=http://kirkedata.nsd.uib.no")
+              .accept(MediaType.APPLICATION_JSON_VALUE))
 
-        // Then
-        .andExpect(status().isInternalServerError())
-        .andExpect(status().reason(new IsNull<>()))
-        .andExpect(content().json("{\"message\":\"Exception occurred whilst getting record message [null], for studyID [StudyID222].\"}"));
+              // Then
+              .andExpect(status().isInternalServerError())
+              .andExpect(status().reason(new IsNull<>()))
+              .andExpect(content().json("{\"message\":\"CustomHandlerException occurred whilst getting record message [" + CustomHandlerException.class.getCanonicalName() + "], for studyID [StudyID222]\"}"));
   }
   @Test
   public void shouldReturnErrorMessageForNonSupportedAPIVersion() throws Exception {

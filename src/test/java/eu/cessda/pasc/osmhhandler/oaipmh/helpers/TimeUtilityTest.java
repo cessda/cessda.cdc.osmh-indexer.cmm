@@ -98,6 +98,6 @@ public class TimeUtilityTest {
     Optional<Integer> actualYearDate = TimeUtility.dataCollYearDateFunction().apply(rawDate);
 
     Java6BDDAssertions.then(actualYearDate.isPresent()).isTrue();
-    Java6BDDAssertions.then(actualYearDate.get()).isEqualTo(expected);
+      actualYearDate.ifPresent(integer -> Java6BDDAssertions.then(integer).isEqualTo(expected));
   }
 }

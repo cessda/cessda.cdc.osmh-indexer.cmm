@@ -4,8 +4,8 @@ server:
 #  context-path: '/osmh-repo'
 security:
   user:
-    name: ${SECURITY_USER_NAME}
-    password: ${SECURITY_USER_PASSWORD}
+    name: username
+    password: password
   basic.enabled: false            # Public API disable security on non-admin endpoints
 management.security.enabled: true # Enable security on admin endpoints
 endpoints.shutdown.enabled: true
@@ -79,7 +79,7 @@ osmhhandler:
       - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
         preferredMetadataParam: ddi
     metadataParsingDefaultLang:
-      active: false
+      active: true
       lang: 'en'
     concatRepeatedElements: true
     concatSeparator: "+<br>"

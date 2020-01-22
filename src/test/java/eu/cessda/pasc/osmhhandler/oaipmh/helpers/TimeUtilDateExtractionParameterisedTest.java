@@ -64,6 +64,6 @@ public class TimeUtilDateExtractionParameterisedTest {
 
     // Then
     Java6BDDAssertions.then(actualYearDate.isPresent()).isTrue();
-    Java6BDDAssertions.then(actualYearDate.get()).isEqualTo(fExpected);
+      actualYearDate.ifPresent(integer -> Java6BDDAssertions.then(integer).isEqualTo(fExpected));
   }
 }

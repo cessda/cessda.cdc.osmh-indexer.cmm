@@ -34,32 +34,41 @@ import org.springframework.web.client.RestClientException;
 @Slf4j
 public class DaoBase {
 
-  private final UtilitiesConfiguration configuration;
+    private final UtilitiesConfiguration configuration;
 
-  @Autowired
-  public DaoBase(UtilitiesConfiguration configuration) {
-    this.configuration = configuration;
-  }
-
-  String postForStringResponse(String fullUrl) throws ExternalSystemException {
-    ResponseEntity<String> responseEntity;
-
-    try {
-      log.debug("Sending request to remote SP with url [{}].", fullUrl);
-      responseEntity = configuration.getRestTemplate().getForEntity(fullUrl, String.class);
-      log.debug("Got response code of [{}] for [{}]", responseEntity.getStatusCodeValue(), fullUrl);
-      return responseEntity.getBody();
-    } catch (RestClientException e) {
-      String message = String.format("RestClientException! Unsuccessful response from remote SP's Endpoint [%s]", fullUrl);
-      ExternalSystemException exception;
-      try {
-        exception = new ExternalSystemException(message, e.getCause(), ((HttpServerErrorException) e).getResponseBodyAsString());
-      } catch (Exception e1) {
-        exception = new ExternalSystemException(message, e.getCause(), e.getMessage());
-      }
-
-      log.trace(message, e);
-      throw exception;
+    @Autowired
+    public DaoBase(UtilitiesConfiguration configuration) {
+        this.configuration = configuration;
     }
-  }
+
+    /**
+     * Gets the requested url as a string.
+     *
+     * @param fullUrl The URL to retrieve.
+     * @return A string containing the response
+     * @throws ExternalSystemException if an error occurs getting the url. The cause can be retrieved using getCause().
+     */
+    String postForStringResponse(String fullUrl) throws ExternalSystemException {
+        ResponseEntity<String> responseEntity;
+
+        try {
+            log.debug("Sending request to remote SP with url [{}].", fullUrl);
+            responseEntity = configuration.getRestTemplate().getForEntity(fullUrl, String.class);
+            log.debug("Got response code of [{}] for [{}]", responseEntity.getStatusCodeValue(), fullUrl);
+            return responseEntity.getBody();
+        } catch (RestClientException e) {
+            String message = String.format("RestClientException! Unsuccessful response from remote SP's Endpoint [%s]", fullUrl);
+            ExternalSystemException exception;
+            //noinspection OverlyBroadCatchBlock
+            try {
+                exception = new ExternalSystemException(message, e, ((HttpServerErrorException) e).getResponseBodyAsString());
+            } catch (Exception e1) {
+                exception = new ExternalSystemException(message, e);
+            }
+
+            log.trace(message, e);
+            //noinspection ThrowInsideCatchBlockWhichIgnoresCaughtException
+            throw exception;
+        }
+    }
 }

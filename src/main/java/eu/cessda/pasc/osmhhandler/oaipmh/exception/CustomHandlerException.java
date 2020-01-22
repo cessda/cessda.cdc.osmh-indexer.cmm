@@ -29,7 +29,7 @@ public class CustomHandlerException extends Exception {
         super(message);
     }
 
-    CustomHandlerException(String message, Throwable cause) {
+    public CustomHandlerException(String message, Throwable cause) {
         super(message, cause);
     }
 }

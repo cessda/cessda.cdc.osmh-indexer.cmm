@@ -18,6 +18,7 @@ package eu.cessda.pasc.osmhhandler.oaipmh.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.cessda.pasc.osmhhandler.oaipmh.configuration.HandlerConfigurationProperties;
+import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
 import eu.cessda.pasc.osmhhandler.oaipmh.mock.data.RecordHeadersMock;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.response.RecordHeader;
 import eu.cessda.pasc.osmhhandler.oaipmh.service.APISupportedServiceImpl;
@@ -85,7 +86,7 @@ public class ListRecordHeadersControllerTest {
 
     // Given
     given(this.listRecordHeadersService.getRecordHeaders("http://kirkedata.nsd.uib.no"))
-        .willThrow(Exception.class);
+            .willThrow(CustomHandlerException.class);
 
     String expectedRecordsJsonString = "{\"message\":\"Internal OAI-PMH Handler System error!: null\"}";
 

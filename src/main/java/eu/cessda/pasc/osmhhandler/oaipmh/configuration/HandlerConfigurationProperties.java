@@ -36,6 +36,6 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 public class HandlerConfigurationProperties {
 
-  private OaiPmh oaiPmh = new OaiPmh();
-  private RestTemplateProps restTemplateProps = new RestTemplateProps();
+  private final OaiPmh oaiPmh = new OaiPmh();
+  private final RestTemplateProps restTemplateProps = new RestTemplateProps();
 }

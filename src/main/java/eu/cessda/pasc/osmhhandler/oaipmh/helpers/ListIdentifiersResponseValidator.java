@@ -17,6 +17,7 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 
 import eu.cessda.pasc.osmhhandler.oaipmh.models.errors.ErrorStatus;
+import lombok.experimental.UtilityClass;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -25,41 +26,38 @@ import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 
+@UtilityClass
 public class ListIdentifiersResponseValidator {
 
-  private static final String MISSING_ELEMENT_MISSING_OAI_ELEMENT = "MissingElement: Missing Oai element";
+    private static final String MISSING_ELEMENT_MISSING_OAI_ELEMENT = "MissingElement: Missing Oai element";
 
-  private ListIdentifiersResponseValidator() {
-    throw new UnsupportedOperationException("Utility class, instantiation not allow");
-  }
+    /**
+     * Checks if the response has an <error> element.
+     *
+     * @param document the document to map to.
+     * @return ErrorStatus of the record.
+     */
+    public static ErrorStatus validateResponse(Document document) {
+        ErrorStatus.ErrorStatusBuilder statusBuilder = ErrorStatus.builder();
+        Optional<NodeList> oAINode = ofNullable(document.getElementsByTagName(OaiPmhConstants.OAI_PMH));
 
-  /**
-   * Checks if the response has an <error> element.
-   *
-   * @param document the document to map to.
-   * @return ErrorStatus of the record.
-   */
-  public static ErrorStatus validateResponse(Document document) {
-    ErrorStatus.ErrorStatusBuilder statusBuilder = ErrorStatus.builder();
-    Optional<NodeList> oAINode = ofNullable(document.getElementsByTagName(OaiPmhConstants.OAI_PMH));
-
-    if (oAINode.isEmpty()) {
-      return statusBuilder.hasError(true).message(MISSING_ELEMENT_MISSING_OAI_ELEMENT).build();
-    }
-
-    NodeList nodeList = oAINode.get();
-    for (int i = 0; i < nodeList.getLength(); i++) {
-      NodeList childNodes = nodeList.item(i).getChildNodes();
-      for (int childNodeIndex = 0; childNodeIndex < childNodes.getLength(); childNodeIndex++) {
-        Node item = childNodes.item(childNodeIndex);
-        if (OaiPmhConstants.ERROR.equals(item.getLocalName())) {
-          return statusBuilder.hasError(true)
-              .message(item.getAttributes().getNamedItem("code").getTextContent() + ": " + item.getTextContent())
-              .build();
+        if (oAINode.isEmpty()) {
+            return statusBuilder.hasError(true).message(MISSING_ELEMENT_MISSING_OAI_ELEMENT).build();
         }
-      }
-    }
 
-    return statusBuilder.build();
-  }
+        NodeList nodeList = oAINode.get();
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            NodeList childNodes = nodeList.item(i).getChildNodes();
+            for (int childNodeIndex = 0; childNodeIndex < childNodes.getLength(); childNodeIndex++) {
+                Node item = childNodes.item(childNodeIndex);
+                if (OaiPmhConstants.ERROR.equals(item.getLocalName())) {
+                    return statusBuilder.hasError(true)
+                            .message(item.getAttributes().getNamedItem("code").getTextContent() + ": " + item.getTextContent())
+                            .build();
+                }
+            }
+        }
+
+        return statusBuilder.build();
+    }
 }

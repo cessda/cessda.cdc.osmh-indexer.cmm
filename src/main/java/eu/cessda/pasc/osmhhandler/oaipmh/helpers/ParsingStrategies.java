@@ -17,6 +17,7 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.*;
+import lombok.experimental.UtilityClass;
 import org.jdom2.Element;
 
 import java.util.Optional;
@@ -34,11 +35,8 @@ import static java.util.Optional.ofNullable;
  *
  * @author moses AT doraventures DOT com
  */
+@UtilityClass
 class ParsingStrategies {
-
-  private ParsingStrategies() {
-    throw new UnsupportedOperationException("Utility class, instantiation not allow");
-  }
 
   @SuppressWarnings("unchecked")
   static <T> Function<Element, Optional<T>> countryStrategyFunction() {

@@ -68,7 +68,7 @@ public class ListRecordHeadersServiceImplTest {
     then(recordHeaders).extracting("type").containsOnly("Study");
   }
 
-  @Test(expected = InternalSystemException.class)
+  @Test(expected = NullPointerException.class)
   public void shouldThrowWhenRequestForHeaderFails() throws CustomHandlerException {
 
     // Given

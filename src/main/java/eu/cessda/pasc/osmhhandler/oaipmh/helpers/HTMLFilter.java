@@ -16,7 +16,7 @@
 
 package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 
-import eu.cessda.pasc.osmhhandler.oaipmh.exception.InternalSystemException;
+import lombok.experimental.UtilityClass;
 
 import java.util.Map;
 import java.util.function.UnaryOperator;
@@ -26,11 +26,8 @@ import java.util.function.UnaryOperator;
  *
  * @author moses AT doraventures DOT com
  */
+@UtilityClass
 class HTMLFilter {
-
-  private HTMLFilter() throws InternalSystemException {
-    throw new InternalSystemException("Unsupported operation");
-  }
 
   static final UnaryOperator<String> CLEAN_CHARACTER_RETURNS_STRATEGY = candidate -> candidate.replace("\n", "").trim();
 

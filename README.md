@@ -166,7 +166,7 @@ You can find the list of all contributors [here](CONTRIBUTORS.md)
 
 ## License
 
-This project is licensed under the Apache 2 License - see the [LICENSE](LICENSE) file for details
+This project is licensed under the Apache 2 License - see the [LICENSE](LICENSE.txt) file for details
 
 ## Acknowledgments
 N/A

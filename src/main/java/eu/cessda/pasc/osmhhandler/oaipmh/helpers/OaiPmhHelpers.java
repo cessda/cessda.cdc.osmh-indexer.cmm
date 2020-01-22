@@ -20,6 +20,7 @@ import eu.cessda.pasc.osmhhandler.oaipmh.configuration.HandlerConfigurationPrope
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.configuration.OaiPmh;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.configuration.Repo;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -31,11 +32,8 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
  * @author moses AT doraventures DOT com
  */
 @Slf4j
+@UtilityClass
 public class OaiPmhHelpers {
-
-  private OaiPmhHelpers() {
-    throw new UnsupportedOperationException("Utility class, instantiation not allow");
-  }
 
   public static String buildGetStudyFullUrl(String repositoryUrl, String studyIdentifier,
                                             HandlerConfigurationProperties oaiPmhConfig)

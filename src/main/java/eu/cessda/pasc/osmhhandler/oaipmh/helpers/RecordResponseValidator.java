@@ -24,16 +24,16 @@ import org.jdom2.Element;
 import org.jdom2.xpath.XPathFactory;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class RecordResponseValidator {
+public final class RecordResponseValidator {
 
-  /**
-   * Checks if the record has an <error> element.
-   *
-   * @param document the document to map to.
-   * @param xFactory the Path Factory.
-   * @return ErrorStatus of the record.
-   */
-  public static ErrorStatus validateResponse(Document document, XPathFactory xFactory) {
+    /**
+     * Checks if the record has an <error> element.
+     *
+     * @param document the document to map to.
+     * @param xFactory the Path Factory.
+     * @return ErrorStatus of the record.
+     */
+    public static ErrorStatus validateResponse(Document document, XPathFactory xFactory) {
 
     ErrorStatus.ErrorStatusBuilder statusBuilder = ErrorStatus.builder();
     DocElementParser.getFirstElement(document, xFactory, OaiPmhConstants.ERROR_PATH)

@@ -19,6 +19,7 @@ package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.TermVocabAttributes;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.VocabAttributes;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.configuration.OaiPmh;
+import lombok.experimental.UtilityClass;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -42,11 +43,8 @@ import static java.util.stream.Collectors.toList;
  *
  * @author moses AT doraventures DOT com
  */
+@UtilityClass
 class DocElementParser {
-
-  private DocElementParser() {
-    throw new UnsupportedOperationException("Utility class, instantiation not allow");
-  }
 
   /**
    * Extracts elements from doc
@@ -213,11 +211,12 @@ class DocElementParser {
                                                               String elementXpath) {
     List<Element> elements = getElementsWithDateAttr(document, xFactory, elementXpath);
     return elements.stream()
-        // If the same "event" type is defined for multiple languages the following filter will only allow the first.
-        // eg: <collDate xml:lang="en" date="2009-03-19" event="start"/>
-        //     <collDate xml:lang="fi" date="2009-03-19" event="start"/>
-        // Currently there is no requirement to extract dates of event per language.
-        .filter(distinctByKey(element -> element.getAttributeValue(EVENT_ATTR))) //
+            // If the same "event" type is defined for multiple languages the following filter will only allow the first.
+            // eg: <collDate xml:lang="en" date="2009-03-19" event="start"/>
+            //     <collDate xml:lang="fi" date="2009-03-19" event="start"/>
+            // Currently there is no requirement to extract dates of event per language.
+            .filter(element -> Objects.nonNull(element.getAttributeValue(EVENT_ATTR)))
+            .filter(distinctByKey(element -> element.getAttributeValue(EVENT_ATTR)))
         .collect(Collectors.toMap(element ->
             element.getAttributeValue(EVENT_ATTR), element ->
             element.getAttributeValue(DATE_ATTR)));

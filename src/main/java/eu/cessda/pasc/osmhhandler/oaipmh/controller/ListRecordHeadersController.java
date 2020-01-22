@@ -16,6 +16,8 @@
 
 package eu.cessda.pasc.osmhhandler.oaipmh.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.errors.ErrorMessage;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.response.RecordHeader;
 import eu.cessda.pasc.osmhhandler.oaipmh.service.APISupportedService;
@@ -72,18 +74,22 @@ public class ListRecordHeadersController extends ControllerBase {
   public ResponseEntity<String> getRecordHeaders(
       @PathVariable String version, @RequestParam("Repository") String repository) {
 
-    try {
+      try {
 
-      if (!apiSupportedService.isSupportedVersion(version)) {
-        return getResponseEntityMessage(UNSUPPORTED_API_VERSION, HttpStatus.BAD_REQUEST);
+          if (!apiSupportedService.isSupportedVersion(version)) {
+              return getResponseEntityMessage(UNSUPPORTED_API_VERSION, HttpStatus.BAD_REQUEST);
+          }
+
+          List<RecordHeader> recordHeaders = listRecordHeadersService.getRecordHeaders(repository);
+          String valueAsString = objectMapper.writeValueAsString(recordHeaders);
+          return getResponseEntity(valueAsString, HttpStatus.OK);
+      } catch (CustomHandlerException e) {
+          log.error(String.valueOf(e), e.getCause());
+          return buildResponseEntityMessage(SYSTEM_ERROR + ": " + e.getMessage());
+      } catch (JsonProcessingException e) {
+          log.error("JSON Error:", e);
+          return buildResponseEntityMessage(SYSTEM_ERROR + ": " + e.getMessage());
       }
-
-      List<RecordHeader> recordHeaders = listRecordHeadersService.getRecordHeaders(repository);
-      String valueAsString = objectMapper.writeValueAsString(recordHeaders);
-      return getResponseEntity(valueAsString, HttpStatus.OK);
-    } catch (Exception e) {
-      return buildResponseEntityMessage(SYSTEM_ERROR + ": " + e.getMessage());
-    }
   }
 
 

@@ -16,6 +16,7 @@
 
 package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 
+import lombok.experimental.UtilityClass;
 import org.jdom2.Namespace;
 
 import java.net.URI;
@@ -25,6 +26,7 @@ import java.net.URI;
  *
  * @author moses AT doraventures DOT com
  */
+@UtilityClass
 public class OaiPmhConstants {
 
   private static final String OAI_NS_PATH =  URI.create("http://www.openarchives.org/OAI/2.0/").toString();
@@ -111,8 +113,4 @@ public class OaiPmhConstants {
   static final String LIST_RECORD_HEADERS_URL_TEMPLATE = "%s?%s=%s&%s=%s";
   static final String LIST_RECORD_HEADERS_PER_SET_URL_TEMPLATE = "%s?%s=%s&%s=%s&%s=%s";
   static final String GET_RECORD_URL_TEMPLATE = "%s?%s=%s&%s=%s&%s=%s";
-
-  private OaiPmhConstants() {
-    throw new UnsupportedOperationException("Utility class, instantiation not allow");
-  }
 }
