@@ -31,6 +31,7 @@ import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import static net.logstash.logback.argument.StructuredArguments.keyValue;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -149,8 +150,8 @@ public class ConsumerScheduler {
         .map(Optional::get)
         .collect(Collectors.toList());
 
-    String msgTemplate = "There are [{}] presentCMMStudies out of [{}] totalCMMStudies from [{}] Record Identifiers";
-    log.info(msgTemplate, presentCMMStudies.size(), totalCMMStudies.size(), recordHeadersSize);
+    String msgTemplate = "Repo Name [{}] of [{}] Endpoint. There are [{}] presentCMMStudies out of [{}] totalCMMStudies from [{}] Record Identifiers";
+    log.info(msgTemplate, keyValue("RepoName", repo.getName()), keyValue("RepoEndpointUrl", repo.getUrl()), keyValue("PresentCMMRecord", presentCMMStudies.size()), totalCMMStudies.size(), recordHeadersSize);
 
     presentCMMStudies.forEach(languageAvailabilityMapper::setAvailableLanguages);
     return extractor.mapLanguageDoc(presentCMMStudies, repo.getName());
