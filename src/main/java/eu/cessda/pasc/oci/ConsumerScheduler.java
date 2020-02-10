@@ -137,7 +137,8 @@ public class ConsumerScheduler {
   private Map<String, List<CMMStudyOfLanguage>> getCmmStudiesOfEachLangIsoCodeMap(Repo repo, LocalDateTime lastModifiedDateTime) {
     log.info("Processing Repo [{}]", repo.toString());
     List<RecordHeader> recordHeaders = harvesterConsumerService.listRecordHeaders(repo, lastModifiedDateTime);
-
+    
+    int CMMStudiesRejectedSize = 0;
     int recordHeadersSize = recordHeaders.size();
     log.info("Repo [{}].  Returned with [{}] record headers", repo.toString(), recordHeadersSize);
 
@@ -149,9 +150,10 @@ public class ConsumerScheduler {
         .filter(Optional::isPresent)
         .map(Optional::get)
         .collect(Collectors.toList());
+    CMMStudiesRejectedSize = totalCMMStudies.size() - presentCMMStudies.size(); 
 
-    String msgTemplate = "Repo Name [{}] of [{}] Endpoint. There are [{}] presentCMMStudies out of [{}] totalCMMStudies from [{}] Record Identifiers";
-    log.info(msgTemplate, keyValue("repo_name", repo.getName()), keyValue("repo_endpoint_url", repo.getUrl()), keyValue("present_cmm_record", presentCMMStudies.size()), totalCMMStudies.size(), recordHeadersSize);
+    String msgTemplate = "Repo Name [{}] of [{}] Endpoint. There are [{}] presentCMMStudies out of [{}] totalCMMStudies from [{}] Record Identifiers. Therefore CMMStudiesRejected is [{}]";
+    log.info(msgTemplate, keyValue("repo_name", repo.getName()), keyValue("repo_endpoint_url", repo.getUrl()), keyValue("present_cmm_record", presentCMMStudies.size()), totalCMMStudies.size(), keyValue("cmm_records_rejected", CMMStudiesRejectedSize) );
 
     presentCMMStudies.forEach(languageAvailabilityMapper::setAvailableLanguages);
     return extractor.mapLanguageDoc(presentCMMStudies, repo.getName());
@@ -166,6 +168,6 @@ public class ConsumerScheduler {
 
   private void logEndStatus(LocalDateTime localDateTime, Instant startTime, String runDescription) {
     String formatMsg = "[{}] Consume and Ingest All SPs Repos Ended at [{}], Duration [{}]";
-    log.info(formatMsg, runDescription, localDateTime, Duration.between(startTime, Instant.now()));
+    log.info(formatMsg, runDescription, keyValue("job_end_time",localDateTime), keyValue("job_duration",Duration.between(startTime, Instant.now())));
   }
 }
