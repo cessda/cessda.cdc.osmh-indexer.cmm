@@ -122,9 +122,9 @@ public class ConsumerScheduler {
 
   private void executeBulk(Repo repo, String langIsoCode, List<CMMStudyOfLanguage> cmmStudies) {
     if (cmmStudies.isEmpty()) {
-      log.warn("CmmStudies list is empty and henceforth there is nothing to BulkIndex for repo[{}] with LangIsoCode [{}].", repo, langIsoCode);
+      log.warn("CmmStudies list is empty and henceforth there is nothing to BulkIndex for repo[{}] with LangIsoCode [{}].", keyValue("repo_name",repo.getName()), langIsoCode);
     } else {
-      log.info("BulkIndexing [{}] index with [{}] CmmStudies", langIsoCode, cmmStudies.size());
+      log.info("BulkIndexing [{}] index with [{}] CmmStudies", keyValue("lang_code",langIsoCode), keyValue("cmm_studies_added",cmmStudies.size()));
       boolean isSuccessful = esIndexerService.bulkIndex(cmmStudies, langIsoCode);
       if (isSuccessful) {
         log.info("BulkIndexing was Successful. For repo[{}].  LangIsoCode [{}].", repo, langIsoCode);
@@ -151,7 +151,7 @@ public class ConsumerScheduler {
         .collect(Collectors.toList());
 
     String msgTemplate = "Repo Name [{}] of [{}] Endpoint. There are [{}] presentCMMStudies out of [{}] totalCMMStudies from [{}] Record Identifiers";
-    log.info(msgTemplate, keyValue("RepoName", repo.getName()), keyValue("RepoEndpointUrl", repo.getUrl()), keyValue("PresentCMMRecord", presentCMMStudies.size()), totalCMMStudies.size(), recordHeadersSize);
+    log.info(msgTemplate, keyValue("repo_name", repo.getName()), keyValue("repo_endpoint_url", repo.getUrl()), keyValue("present_cmm_record", presentCMMStudies.size()), totalCMMStudies.size(), recordHeadersSize);
 
     presentCMMStudies.forEach(languageAvailabilityMapper::setAvailableLanguages);
     return extractor.mapLanguageDoc(presentCMMStudies, repo.getName());
