@@ -31,6 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
@@ -65,6 +66,9 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
 
   @Autowired
   ObjectMapper objectMapper;
+  
+  @Autowired
+  ElasticsearchTemplate esTemplate;
 
   @Before
   public void setUp() {
@@ -95,7 +99,7 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
 
     // Given
     scheduler = new ConsumerScheduler(debuggingJMXBean, appConfigurationProperties, harvesterConsumerService,
-        esIndexer, extractor, languageAvailabilityMapper);
+        esIndexer, extractor, languageAvailabilityMapper, esTemplate);
 
     // When
     scheduler.fullHarvestAndIngestionAllConfiguredSPsReposRecords();
@@ -119,7 +123,7 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     when(esIndexer.bulkIndex(anyListOf(CMMStudyOfLanguage.class), anyString())).thenReturn(true);
 
     // Given
-    scheduler = new ConsumerScheduler(debuggingJMXBean, appConfigurationProperties, harvesterConsumerService, esIndexer, extractor, languageAvailabilityMapper);
+    scheduler = new ConsumerScheduler(debuggingJMXBean, appConfigurationProperties, harvesterConsumerService, esIndexer, extractor, languageAvailabilityMapper, esTemplate);
 
     // When
     scheduler.weeklyFullHarvestAndIngestionAllConfiguredSPsReposRecords();
@@ -168,7 +172,7 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     when(esIndexer.getMostRecentLastModified()).thenReturn(Optional.of(LocalDateTime.parse("2018-02-20T07:48:38")));
 
     // Given
-    scheduler = new ConsumerScheduler(debuggingJMXBean, appConfigurationProperties, harvesterConsumerService, esIndexer, extractor, languageAvailabilityMapper);
+    scheduler = new ConsumerScheduler(debuggingJMXBean, appConfigurationProperties, harvesterConsumerService, esIndexer, extractor, languageAvailabilityMapper, esTemplate);
 
     // When
     scheduler.fullHarvestAndIngestionAllConfiguredSPsReposRecords();

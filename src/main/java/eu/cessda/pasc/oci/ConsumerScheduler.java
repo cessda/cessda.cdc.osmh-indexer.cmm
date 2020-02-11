@@ -26,11 +26,21 @@ import eu.cessda.pasc.oci.service.helpers.DebuggingJMXBean;
 import eu.cessda.pasc.oci.service.helpers.LanguageAvailabilityMapper;
 import eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.elasticsearch.action.count.CountRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.QueryBuilders.*;
+import org.elasticsearch.search.SearchHits;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import org.elasticsearch.search.SearchHit;
 import static net.logstash.logback.argument.StructuredArguments.keyValue;
 
 import java.time.Duration;
@@ -60,17 +70,22 @@ public class ConsumerScheduler {
   private IngestService esIndexerService;
   private LanguageDocumentExtractor extractor;
   private LanguageAvailabilityMapper languageAvailabilityMapper;
+  private ElasticsearchTemplate esTemplate;
+  private static final String INDEX_NAME_PATTERN = "cmmstudy_*";
+  private static final String INDEX_TYPE = "cmmstudy";
 
   @Autowired
   public ConsumerScheduler(DebuggingJMXBean debuggingJMXBean, AppConfigurationProperties configurationProperties,
                            HarvesterConsumerService harvesterConsumerService, IngestService esIndexerService,
-                           LanguageDocumentExtractor extractor, LanguageAvailabilityMapper languageAvailabilityMapper) {
+                           LanguageDocumentExtractor extractor, LanguageAvailabilityMapper languageAvailabilityMapper,
+                           ElasticsearchTemplate esTemplate) {
     this.debuggingJMXBean = debuggingJMXBean;
     this.configurationProperties = configurationProperties;
     this.harvesterConsumerService = harvesterConsumerService;
     this.esIndexerService = esIndexerService;
     this.extractor = extractor;
     this.languageAvailabilityMapper = languageAvailabilityMapper;
+    this.esTemplate = esTemplate;
   }
 
   /**
@@ -83,6 +98,7 @@ public class ConsumerScheduler {
     LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime.toEpochMilli()), ZoneId.systemDefault());
     logStartStatus(date, FULL_RUN);
     executeHarvestAndIngest(null);
+    currentTotalCmmStudiesInElasticSearch();
     logEndStatus(date, startTime, FULL_RUN);
   }
 
@@ -97,7 +113,9 @@ public class ConsumerScheduler {
     LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime.toEpochMilli()), ZoneId.systemDefault());
     logStartStatus(date, DAILY_INCREMENTAL_RUN);
     executeHarvestAndIngest(esIndexerService.getMostRecentLastModified().orElse(null));
+    currentTotalCmmStudiesInElasticSearch();
     logEndStatus(date, startTime, DAILY_INCREMENTAL_RUN);
+    
   }
 
   /**
@@ -132,6 +150,7 @@ public class ConsumerScheduler {
         log.error("BulkIndexing was UnSuccessful. For repo[{}].  LangIsoCode [{}].", repo, langIsoCode);
       }
     }
+       
   }
 
   private Map<String, List<CMMStudyOfLanguage>> getCmmStudiesOfEachLangIsoCodeMap(Repo repo, LocalDateTime lastModifiedDateTime) {
@@ -152,8 +171,9 @@ public class ConsumerScheduler {
         .collect(Collectors.toList());
     CMMStudiesRejectedSize = totalCMMStudies.size() - presentCMMStudies.size(); 
 
-    String msgTemplate = "Repo Name [{}] of [{}] Endpoint. There are [{}] presentCMMStudies out of [{}] totalCMMStudies from [{}] Record Identifiers. Therefore CMMStudiesRejected is [{}]";
-    log.info(msgTemplate, keyValue("repo_name", repo.getName()), keyValue("repo_endpoint_url", repo.getUrl()), keyValue("present_cmm_record", presentCMMStudies.size()), totalCMMStudies.size(), keyValue("cmm_records_rejected", CMMStudiesRejectedSize) );
+    String msgTemplate = "Repo Name [{}] of [{}] Endpoint. There are [{}] presentCMMStudies out of [{}] totalCMMStudies from [{}] Record Identifiers. Therefore CMMStudiesRejected is"
+    		+ "";
+    log.info(msgTemplate  + "" + CMMStudiesRejectedSize, keyValue("repo_name", repo.getName()), keyValue("repo_endpoint_url", repo.getUrl()), keyValue("present_cmm_record", presentCMMStudies.size()), totalCMMStudies.size(), keyValue("cmm_records_rejected", CMMStudiesRejectedSize) );
 
     presentCMMStudies.forEach(languageAvailabilityMapper::setAvailableLanguages);
     return extractor.mapLanguageDoc(presentCMMStudies, repo.getName());
@@ -168,6 +188,18 @@ public class ConsumerScheduler {
 
   private void logEndStatus(LocalDateTime localDateTime, Instant startTime, String runDescription) {
     String formatMsg = "[{}] Consume and Ingest All SPs Repos Ended at [{}], Duration [{}]";
-    log.info(formatMsg, runDescription, keyValue("job_end_time",localDateTime), keyValue("job_duration",Duration.between(startTime, Instant.now())));
+    log.info(formatMsg, runDescription, localDateTime, keyValue("job_duration",Duration.between(startTime, Instant.now()).getSeconds()));
+  }
+  
+
+  private void currentTotalCmmStudiesInElasticSearch() { 
+	    SearchResponse response = esTemplate.getClient().prepareSearch(INDEX_NAME_PATTERN)
+	            .setTypes(INDEX_TYPE)
+	            .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+	            .setQuery(QueryBuilders.matchAllQuery())
+	            .get();
+	    SearchHits hits = response.getHits();
+	    long totalHitCount = hits.getTotalHits();
+	    log.info("Total number of records stands" + totalHitCount, keyValue("Total_cmm_studies", totalHitCount));  
   }
 }
