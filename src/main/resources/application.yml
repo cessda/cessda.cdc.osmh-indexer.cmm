@@ -16,8 +16,8 @@ server:
 #  context-path: '/osmh-repo'
 security:
   user:
-    name: ${SECURITY_USER_NAME}
-    password: ${SECURITY_USER_PASSWORD}
+    name: user
+    password: password
   basic.enabled: false            # Public API disable security on non-admin endpoints
 management.security.enabled: true # Enable security on admin endpoints
 endpoints.shutdown.enabled: true
@@ -35,7 +35,7 @@ logging:
     eu.cessda.pasc.oci.service: INFO
     eu.cessda.pasc.oci.repository: INFO
     eu.cessda.pasc.oci.helpers: INFO
-    eu.cessda.pasc.oci.configurations.PerfRequestSyncInterceptor: INFO
+    eu.cessda.pasc.oci.configurations.PerfRequestSyncInterceptor: DEBUG
     net: WARN
     com: ERROR
 spring:
@@ -53,9 +53,6 @@ spring:
     default-domain: pasc-oci
   boot:
     admin:
-#     url: http://localhost:8087 For dev, stg & prod set this at the specific active profile. Run app with profile set
-      username: ${SPRING_BOOT_ADMIN_USERNAME}
-      password: ${SPRING_BOOT_ADMIN_PASSWORD}
       client.name: pasc-oci
       turbine:
         clusters: default
@@ -75,7 +72,7 @@ osmhConsumer:
   languages: ['cs', 'da', 'de', 'el', 'en', 'et', 'fi', 'fr', 'hu', 'it', 'nl', 'no', 'pt', 'sk', 'sl', 'sr', 'sv']
   delay:
     # Auto Starts after delay of 1min at startup
-    initial: '60000'
+    initial: '0'
     fixed: '315360000000'
   daily:
     # Daily Harvest and Ingestion run at 00:01am.
@@ -93,52 +90,52 @@ osmhConsumer:
     repos:
     - url: https://data2.aussda.at/oai
       name: 'AUSSDA'
-      handler: 'http://cdc-osmh-repo:9091'
+      handler: 'http://localhost:9091'
     - url: http://194.117.18.18:6003/v0/oai
       name: 'APIS'
-      handler: 'http://cdc-osmh-repo:9091'
+      handler: 'http://localhost:9091'
     - url: https://easy.dans.knaw.nl/oai/
       name: 'DANS'
-      handler: 'http://cdc-osmh-repo:9091'
+      handler: 'http://localhost:9091'
     - url: https://kuha.sa.dk/v0/oai
       name: 'DNA'
-      handler: 'http://cdc-osmh-repo:9091'
+      handler: 'http://localhost:9091'
     - url: http://services.fsd.uta.fi/v0/oai
       name: 'FSD'
-      handler: 'http://cdc-osmh-repo:9091'
+      handler: 'http://localhost:9091'
     - url: https://dbk.gesis.org/dbkoai3/
       name: 'GESIS'
-      handler: 'http://cdc-osmh-repo:9091'
+      handler: 'http://localhost:9091'
     - url: http://147.213.4.44:6003/v0/oai
       name: 'SASD'
-      handler: 'http://cdc-osmh-repo:9091'
+      handler: 'http://localhost:9091'
     - url: https://snd.gu.se/en/oai-pmh
       name: 'SND'
-      handler: 'http://cdc-osmh-repo:9091'
+      handler: 'http://localhost:9091'
     - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
       name: 'UKDS'
-      handler: 'http://cdc-osmh-repo:9091'
+      handler: 'http://localhost:9091'
     - url: https://nesstar2.adp.fdv.uni-lj.si/oai-pmh
       name: 'ADP (Nesstar)'
-      handler: 'http://cdc-osmh-repo-nesstar:9842'
+      handler: 'http://localhost:9842'
     - url: http://fors-nesstar.unil.ch/oai-pmh
       name: 'FORS (Nesstar)'
-      handler: 'http://cdc-osmh-repo-nesstar:9842'
+      handler: 'http://localhost:9842'
     - url: https://oai-pmh.nsd.no/oai-pmh
       name: 'NSD (Nesstar)'
-      handler: 'http://cdc-osmh-repo-nesstar:9842'
+      handler: 'http://localhost:9842'
     - url:  http://nesstar.sciences-po.fr/oai-pmh
       name: 'Progedo (Nesstar)'
-      handler: 'http://cdc-osmh-repo-nesstar:9842'
+      handler: 'http://localhost:9842'
     - url: http://nesstar.soc.cas.cz/oai-pmh
       name: 'CSDA (Nesstar)'
-      handler: 'http://cdc-osmh-repo-nesstar:9842'
+      handler: 'http://localhost:9842'
     - url:  http://nesstar.unidata.unimib.it/oai-pmh
       name: 'Unidata (Nesstar)'
-      handler: 'http://cdc-osmh-repo-nesstar:9842'
+      handler: 'http://localhost:9842'
     - url:  http://harvester.sodanet.gr:8080/oai/request
       name: 'SoDaNet (Nesstar)'
-      handler: 'http://cdc-osmh-repo-nesstar:9842'
+      handler: 'http://localhost:9842'
     connTimeout: 5000
     connRequestTimeout: 5000
     readTimeout: 180000 # increased from 120 seconds to 180 seconds to deal with slower Nesstar repos
