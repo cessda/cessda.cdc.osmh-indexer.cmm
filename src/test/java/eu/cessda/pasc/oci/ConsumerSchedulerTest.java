@@ -27,6 +27,12 @@ import eu.cessda.pasc.oci.service.IngestService;
 import eu.cessda.pasc.oci.service.helpers.DebuggingJMXBean;
 import eu.cessda.pasc.oci.service.helpers.LanguageAvailabilityMapper;
 import eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor;
+import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.client.Client;
+import org.elasticsearch.index.query.MatchAllQueryBuilder;
+import org.elasticsearch.search.SearchHits;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -66,8 +72,7 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
 
   @Autowired
   ObjectMapper objectMapper;
-  
-  @Autowired
+
   ElasticsearchTemplate esTemplate;
 
   @Before
@@ -81,6 +86,21 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     // mock for configuration of our repos
     appConfigurationProperties = mock(AppConfigurationProperties.class);
     when(appConfigurationProperties.getEndpoints()).thenReturn(getEndpoints());
+
+    // mock the elasticsearch
+    esTemplate = mock(ElasticsearchTemplate.class);
+    Client esClient = mock(Client.class);
+    when(esTemplate.getClient()).thenReturn(esClient);
+    SearchRequestBuilder builder = mock(SearchRequestBuilder.class);
+    when(esClient.prepareSearch(anyString())).thenReturn(builder);
+    SearchHits mockSearchHits = mock(SearchHits.class);
+    when(mockSearchHits.getTotalHits()).thenReturn(20L);
+    SearchResponse response = mock(SearchResponse.class);
+    when(response.getHits()).thenReturn(mockSearchHits);
+    when(builder.setTypes(anyString())).thenReturn(builder);
+    when(builder.setSearchType(any(SearchType.class))).thenReturn(builder);
+    when(builder.setQuery(any(MatchAllQueryBuilder.class))).thenReturn(builder);
+    when(builder.get()).thenReturn(response);
   }
 
   @Test
