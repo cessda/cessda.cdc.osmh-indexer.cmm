@@ -27,11 +27,9 @@ import eu.cessda.pasc.oci.service.helpers.LanguageAvailabilityMapper;
 import eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.elasticsearch.action.count.CountRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.QueryBuilders.*;
 import org.elasticsearch.search.SearchHits;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
@@ -40,7 +38,6 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import org.elasticsearch.search.SearchHit;
 import static net.logstash.logback.argument.StructuredArguments.keyValue;
 
 import java.time.Duration;
@@ -140,14 +137,14 @@ public class ConsumerScheduler {
 
   private void executeBulk(Repo repo, String langIsoCode, List<CMMStudyOfLanguage> cmmStudies) {
     if (cmmStudies.isEmpty()) {
-      log.warn("CmmStudies list is empty and henceforth there is nothing to BulkIndex for repo[{}] with LangIsoCode [{}].", keyValue("repo_name",repo.getName()), langIsoCode);
+      log.warn("CmmStudies list is empty and henceforth there is nothing to BulkIndex for repo[{}] with LangIsoCode [{}].", keyValue("repo_name",repo.getName()), keyValue("lang_code",langIsoCode));
     } else {
       log.info("BulkIndexing [{}] index with [{}] CmmStudies", keyValue("lang_code",langIsoCode), keyValue("cmm_studies_added",cmmStudies.size()));
       boolean isSuccessful = esIndexerService.bulkIndex(cmmStudies, langIsoCode);
       if (isSuccessful) {
-        log.info("BulkIndexing was Successful. For repo[{}].  LangIsoCode [{}].", repo, langIsoCode);
+        log.info("BulkIndexing was Successful. For repo name [{}] and its corresponding [{}].  LangIsoCode [{}].", keyValue("repo_name", repo.getName()), keyValue("repo_endpoint_url", repo.getUrl()),keyValue("lang_code",langIsoCode));
       } else {
-        log.error("BulkIndexing was UnSuccessful. For repo[{}].  LangIsoCode [{}].", repo, langIsoCode);
+        log.error("BulkIndexing was UnSuccessful. For repo name [{}] and its corresponding [{}].  LangIsoCode [{}].", keyValue("repo_name", repo.getName()), keyValue("repo_endpoint_url", repo.getUrl()), keyValue("lang_code",langIsoCode));
       }
     }
        
@@ -171,7 +168,7 @@ public class ConsumerScheduler {
         .collect(Collectors.toList());
     CMMStudiesRejectedSize = totalCMMStudies.size() - presentCMMStudies.size(); 
 
-    String msgTemplate = "Repo Name [{}] of [{}] Endpoint. There are [{}] presentCMMStudies out of [{}] totalCMMStudies from [{}] Record Identifiers. Therefore CMMStudiesRejected is"
+    String msgTemplate = "Repo Name [{}] of [{}] Endpoint. There are [{}] presentCMMStudies out of [{}] totalCMMStudies from [{}] Record Identifiers. Therefore CMMStudiesRejected is  "
     		+ "";
     log.info(msgTemplate  + "" + CMMStudiesRejectedSize, keyValue("repo_name", repo.getName()), keyValue("repo_endpoint_url", repo.getUrl()), keyValue("present_cmm_record", presentCMMStudies.size()), totalCMMStudies.size(), keyValue("cmm_records_rejected", CMMStudiesRejectedSize) );
 
@@ -200,6 +197,6 @@ public class ConsumerScheduler {
 	            .get();
 	    SearchHits hits = response.getHits();
 	    long totalHitCount = hits.getTotalHits();
-	    log.info("Total number of records stands" + totalHitCount, keyValue("Total_cmm_studies", totalHitCount));  
+	    log.info("Total number of records stands  " + totalHitCount, keyValue("total_cmm_studies", totalHitCount));  
   }
 }
