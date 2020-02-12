@@ -79,7 +79,7 @@ public class GetRecordServiceImpl implements GetRecordService {
     try {
       return mapDDIRecordToCMMStudy(recordXML, repositoryUrl).studyXmlSourceUrl(fullUrl).build();
     } catch (JDOMException | IOException e) {
-      throw new InternalSystemException(String.format("Unable to parse xml error message [%s], FullUrl [%s]", e.getMessage(), fullUrl), e);
+      throw new InternalSystemException(String.format("Unable to parse xml! FullUrl [%s]", fullUrl), e);
     }
   }
 
@@ -95,8 +95,7 @@ public class GetRecordServiceImpl implements GetRecordService {
     // We exit if the record has an <error> element
     ErrorStatus errorStatus = validateResponse(document, X_FACTORY);
     if (errorStatus.isHasError()) {
-      log.debug("Returned Record has an <error> element with ErrorStatus message [{}]", errorStatus.getMessage());
-      throw new InternalSystemException(errorStatus.getMessage());
+      throw new InternalSystemException("Remote repository " + repositoryUrl + " returned error: " + errorStatus.getMessage());
     }
 
     // Short-Circuit. We carry on to parse beyond the headers only if record is active
