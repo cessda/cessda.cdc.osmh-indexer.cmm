@@ -40,8 +40,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DebuggingJMXBean {
 
-  private ElasticsearchTemplate elasticsearchTemplate;
-  private AppConfigurationProperties appConfigProps;
+  private final ElasticsearchTemplate elasticsearchTemplate;
+  private final AppConfigurationProperties appConfigProps;
 
   @Autowired
   public DebuggingJMXBean(ElasticsearchTemplate elasticsearchTemplate, AppConfigurationProperties appConfigProps) {
@@ -49,23 +49,24 @@ public class DebuggingJMXBean {
     this.appConfigProps = appConfigProps;
   }
 
+  @SuppressWarnings("SameReturnValue")
   @ManagedOperation(description = "Prints to log the Elasticsearch server state.")
   public String printElasticSearchInfo() {
 
     Client client = elasticsearchTemplate.getClient();
     Map<String, String> asMap = client.settings().getAsMap();
     log.info("ElasticSearch Client Settings Details [\n{}].",
-        asMap.entrySet().stream()
-            .map(entry -> "\n" + "*" + entry.getKey() + "=" + entry.getValue())
-            .collect(Collectors.joining()));
+            asMap.entrySet().stream()
+                    .map(entry -> "\n" + "*" + entry.getKey() + "=" + entry.getValue())
+                    .collect(Collectors.joining()));
 
     ClusterHealthResponse healths = client.admin().cluster().prepareHealth().get();
     client.admin().cluster().prepareHealth().get();
 
     log.info("ElasticSearch Cluster Details: Cluster Name [{}] \n NumberOfDataNodes [{}] \n NumberOfNodes [{}] ] \n",
-        healths.getClusterName(),
-        healths.getNumberOfDataNodes(),
-        healths.getNumberOfNodes());
+            healths.getClusterName(),
+            healths.getNumberOfDataNodes(),
+            healths.getNumberOfNodes());
 
     log.debug("ElasticSearch Cluster Nodes Report: Start--");
     AtomicInteger counter = new AtomicInteger(1);
@@ -73,7 +74,7 @@ public class DebuggingJMXBean {
 
     String msg = "Index [{}] [Current Index [{}] \t Status [{}] ]";
     healths.getIndices().values()
-        .forEach(health -> log.debug(msg, counter.getAndIncrement(), health.getIndex(), health.getStatus()));
+            .forEach(health -> log.debug(msg, counter.getAndIncrement(), health.getIndex(), health.getStatus()));
 
     return "Printed Health";
   }

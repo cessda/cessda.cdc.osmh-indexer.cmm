@@ -49,9 +49,9 @@ import static eu.cessda.pasc.oci.service.helpers.StudyIdentifierEncoder.decodeSt
 @Slf4j
 public class DefaultHarvesterConsumerService implements HarvesterConsumerService {
 
-  private HarvesterDao harvesterDao;
+  private final HarvesterDao harvesterDao;
   private final RepositoryUrlService repositoryUrlService;
-  private ObjectMapper mapper;
+  private final ObjectMapper mapper;
 
   @Autowired
   public DefaultHarvesterConsumerService(HarvesterDao harvesterDao, RepositoryUrlService repositoryUrlService,
@@ -89,12 +89,12 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
       return Optional.ofNullable(CMMStudyConverter.fromJsonString(recordJsonString));
     } catch (ExternalSystemException e) {
       log.warn("Short Exception msg [{}], " +
-              "HttpServerErrorException response detail from handler's [{}], " +
-              "URL to handler for harvesting [{}].",
-          e.getMessage(),
-          e.getExternalResponseBody(),
-          decodeStudyNumber().apply(finalUrl));
-    } catch (NullPointerException | IOException e) {
+                      "HttpServerErrorException response detail from handler's [{}], " +
+                      "URL to handler for harvesting [{}].",
+              e.getMessage(),
+              e.getExternalResponseBody(),
+              decodeStudyNumber().apply(finalUrl));
+    } catch (IOException e) {
       log.error("Error, Unable to pass GetRecord response error message [{}].", e.getMessage(), e);
     }
 

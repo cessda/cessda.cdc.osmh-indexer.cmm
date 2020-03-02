@@ -16,7 +16,6 @@
 
 package eu.cessda.pasc.oci.configurations;
 
-import com.google.common.base.Stopwatch;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
@@ -25,7 +24,8 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
+import java.time.Instant;
 
 /**
  * HTTP request interceptor for logging response times
@@ -38,17 +38,16 @@ public class PerfRequestSyncInterceptor implements ClientHttpRequestInterceptor 
 
   @Override
   public ClientHttpResponse intercept(HttpRequest hr, byte[] bytes, ClientHttpRequestExecution chre) throws IOException {
-    Stopwatch stopwatch = Stopwatch.createStarted();
+    Instant start = Instant.now();
     ClientHttpResponse response = chre.execute(hr, bytes);
-    stopwatch.stop();
+    Instant stop = Instant.now();
 
     if (log.isDebugEnabled()) {
-      final String msg = "X[{}] request for uri [{}] took [{}]ms.  Response code [{}]";
-      log.debug(msg,
-          hr.getMethod(),
-          hr.getURI(),
-          stopwatch.elapsed(TimeUnit.MILLISECONDS),
-          response.getStatusCode().value());
+      log.debug("X[{}] request for uri [{}] took [{}]ms.  Response code [{}]",
+              hr.getMethod(),
+              hr.getURI(),
+              Duration.between(start, stop).toMillis(),
+              response.getStatusCode().value());
     }
     return response;
   }

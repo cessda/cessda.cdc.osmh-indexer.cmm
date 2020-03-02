@@ -37,7 +37,7 @@ import static java.util.Optional.ofNullable;
 @Component
 public class LanguageAvailabilityMapper {
 
-  private AppConfigurationProperties appConfigurationProperties;
+  private final AppConfigurationProperties appConfigurationProperties;
 
   @Autowired
   public LanguageAvailabilityMapper(AppConfigurationProperties appConfigurationProperties) {

@@ -16,6 +16,7 @@
 package eu.cessda.pasc.oci.helpers.exception;
 
 import lombok.Getter;
+import lombok.NonNull;
 
 /**
  * Exception for external encountered Exceptions
@@ -29,7 +30,25 @@ public class ExternalSystemException extends CustomExceptionBase {
   @Getter
   private final String externalResponseBody;
 
-  public ExternalSystemException(String message, Throwable cause, String externalResponseBody) {
+  /**
+   * Constructs an ExternalSystemException with the specified message and cause.
+   *
+   * @param message the detail message
+   * @param cause   the cause
+   */
+  public ExternalSystemException(String message, Throwable cause) {
+    super(message, cause);
+    externalResponseBody = null;
+  }
+
+  /**
+   * Constructs an ExternalSystemException with the specified message, cause and external response body.
+   *
+   * @param message              the detail message
+   * @param cause                the cause
+   * @param externalResponseBody the external response that caused this exception
+   */
+  public ExternalSystemException(String message, Throwable cause, @NonNull String externalResponseBody) {
     super(message, cause);
     this.externalResponseBody = externalResponseBody;
   }

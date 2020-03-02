@@ -52,13 +52,13 @@ public class ESIngestService implements IngestService {
   private static final String INDEX_NAME_PATTERN = "cmmstudy_*";
   private static final String INDEX_TYPE = "cmmstudy";
   private static final int INDEX_COMMIT_SIZE = 500;
-  private ElasticsearchTemplate esTemplate;
-  private FileHandler fileHandler;
-  private ESConfigurationProperties esConfig;
+  private final ElasticsearchTemplate esTemplate;
+  private final FileHandler fileHandler;
+  private final ESConfigurationProperties esConfig;
 
   @Autowired
   public ESIngestService(
-      ElasticsearchTemplate esTemplate, FileHandler fileHandler, ESConfigurationProperties esConfig) {
+          ElasticsearchTemplate esTemplate, FileHandler fileHandler, ESConfigurationProperties esConfig) {
 
     this.esTemplate = esTemplate;
     this.fileHandler = fileHandler;
@@ -89,7 +89,7 @@ public class ESIngestService implements IngestService {
         }
         esTemplate.refresh(indexName);
         log.info("[{}] BulkIndex completed.", languageIsoCode);
-      } catch (Exception e) {
+      } catch (RuntimeException e) {
         log.error("[{}] Indexing Encountered an exception with message [{}].", indexName, e.getMessage(), e);
         isSuccessful = false;
       }
@@ -135,11 +135,11 @@ public class ESIngestService implements IngestService {
   private boolean prepareIndex(String indexName, ElasticsearchTemplate elasticsearchTemplate, FileHandler fileHandler) {
 
     if (elasticsearchTemplate.indexExists(indexName)) {
-      log.info("[{}] index name already Exist, Skipping creation.", indexName);
+      log.info("[{}] index name already exists, Skipping creation.", indexName);
       return true;
     }
 
-    log.info("[{}] index name does not exist and would be created", indexName);
+    log.info("[{}] index name does not exist and will be created", indexName);
     return createIndex(indexName, elasticsearchTemplate, fileHandler);
   }
 
@@ -162,7 +162,7 @@ public class ESIngestService implements IngestService {
         log.error("[{}] custom index failed creation!", indexName);
         return false;
       } else {
-        log.info("[{}] custom index created successfully!", indexName);
+        log.info("[{}] custom index created successfully.", indexName);
         log.debug("[{}] index mapping XPUT request from [{}] with content [\n{}\n]", indexName, mappingsPath, mappings);
         if (elasticsearchTemplate.putMapping(indexName, INDEX_TYPE, mappings)) {
           log.info("[{}] index mapping XPUT request for type [{}] was successful.", indexName, INDEX_TYPE);
@@ -172,7 +172,7 @@ public class ESIngestService implements IngestService {
           return false;
         }
       }
-    } catch (Exception e) {
+    } catch (RuntimeException e) {
       log.error("[{}] Custom Index creation failed. Message [{}]", indexName, e.getMessage(), e);
       return false;
     }

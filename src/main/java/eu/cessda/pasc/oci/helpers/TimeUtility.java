@@ -15,6 +15,7 @@
  */
 package eu.cessda.pasc.oci.helpers;
 
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.time.DateUtils;
 
@@ -28,11 +29,8 @@ import static eu.cessda.pasc.oci.helpers.AppConstants.EXPECTED_DATE_FORMATS;
 import static eu.cessda.pasc.oci.helpers.AppConstants.UTC_ID;
 
 @Slf4j
+@UtilityClass
 public class TimeUtility {
-
-  private TimeUtility() {
-    throw new UnsupportedOperationException("Utility class, instantiation not allow");
-  }
 
   /**
    * Attempts to pass date string using multiple expected date formats into a LocalDateTime.

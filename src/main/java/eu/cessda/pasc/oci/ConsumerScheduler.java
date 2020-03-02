@@ -26,12 +26,9 @@ import eu.cessda.pasc.oci.service.helpers.DebuggingJMXBean;
 import eu.cessda.pasc.oci.service.helpers.LanguageAvailabilityMapper;
 import eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor;
 import lombok.extern.slf4j.Slf4j;
-
-import org.elasticsearch.action.count.CountRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.QueryBuilders.*;
 import org.elasticsearch.search.SearchHits;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
@@ -39,9 +36,6 @@ import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import org.elasticsearch.search.SearchHit;
-import static net.logstash.logback.argument.StructuredArguments.keyValue;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -51,6 +45,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static net.logstash.logback.argument.StructuredArguments.keyValue;
 
 /**
  * Service responsible for triggering Metadata Harvesting and ingestion into the search engine
@@ -64,12 +60,12 @@ public class ConsumerScheduler {
 
   private static final String FULL_RUN = "Full Run";
   private static final String DAILY_INCREMENTAL_RUN = "Daily Incremental Run";
-  private DebuggingJMXBean debuggingJMXBean;
-  private AppConfigurationProperties configurationProperties;
-  private HarvesterConsumerService harvesterConsumerService;
-  private IngestService esIndexerService;
-  private LanguageDocumentExtractor extractor;
-  private LanguageAvailabilityMapper languageAvailabilityMapper;
+  private final DebuggingJMXBean debuggingJMXBean;
+  private final AppConfigurationProperties configurationProperties;
+  private final HarvesterConsumerService harvesterConsumerService;
+  private final IngestService esIndexerService;
+  private final LanguageDocumentExtractor extractor;
+  private final LanguageAvailabilityMapper languageAvailabilityMapper;
   private ElasticsearchTemplate esTemplate;
   private static final String INDEX_NAME_PATTERN = "cmmstudy_*";
   private static final String INDEX_TYPE = "cmmstudy";
@@ -115,7 +111,6 @@ public class ConsumerScheduler {
     executeHarvestAndIngest(esIndexerService.getMostRecentLastModified().orElse(null));
     currentTotalCmmStudiesInElasticSearch();
     logEndStatus(date, startTime, DAILY_INCREMENTAL_RUN);
-    
   }
 
   /**
@@ -150,16 +145,15 @@ public class ConsumerScheduler {
         log.error("BulkIndexing was UnSuccessful. For repo[{}].  LangIsoCode [{}].", repo, langIsoCode);
       }
     }
-       
+
   }
 
   private Map<String, List<CMMStudyOfLanguage>> getCmmStudiesOfEachLangIsoCodeMap(Repo repo, LocalDateTime lastModifiedDateTime) {
-    log.info("Processing Repo [{}]", repo.toString());
+    log.info("Processing Repo [{}]", repo);
     List<RecordHeader> recordHeaders = harvesterConsumerService.listRecordHeaders(repo, lastModifiedDateTime);
-    
-    int CMMStudiesRejectedSize = 0;
+
     int recordHeadersSize = recordHeaders.size();
-    log.info("Repo [{}].  Returned with [{}] record headers", repo.toString(), recordHeadersSize);
+    log.info("Repo [{}].  Returned with [{}] record headers", repo, recordHeadersSize);
 
     List<Optional<CMMStudy>> totalCMMStudies = recordHeaders.stream()
         .map(recordHeader -> harvesterConsumerService.getRecord(repo, recordHeader.getIdentifier()))
@@ -169,11 +163,10 @@ public class ConsumerScheduler {
         .filter(Optional::isPresent)
         .map(Optional::get)
         .collect(Collectors.toList());
-    CMMStudiesRejectedSize = totalCMMStudies.size() - presentCMMStudies.size(); 
 
     String msgTemplate = "Repo Name [{}] of [{}] Endpoint. There are [{}] presentCMMStudies out of [{}] totalCMMStudies from [{}] Record Identifiers. Therefore CMMStudiesRejected is"
     		+ "";
-    log.info(msgTemplate  + "" + CMMStudiesRejectedSize, keyValue("repo_name", repo.getName()), keyValue("repo_endpoint_url", repo.getUrl()), keyValue("present_cmm_record", presentCMMStudies.size()), totalCMMStudies.size(), keyValue("cmm_records_rejected", CMMStudiesRejectedSize) );
+    log.info(msgTemplate + "" + (totalCMMStudies.size() - presentCMMStudies.size()), keyValue("repo_name", repo.getName()), keyValue("repo_endpoint_url", repo.getUrl()), keyValue("present_cmm_record", presentCMMStudies.size()), totalCMMStudies.size(), keyValue("cmm_records_rejected", totalCMMStudies.size() - presentCMMStudies.size()));
 
     presentCMMStudies.forEach(languageAvailabilityMapper::setAvailableLanguages);
     return extractor.mapLanguageDoc(presentCMMStudies, repo.getName());
@@ -190,16 +183,16 @@ public class ConsumerScheduler {
     String formatMsg = "[{}] Consume and Ingest All SPs Repos Ended at [{}], Duration [{}]";
     log.info(formatMsg, runDescription, localDateTime, keyValue("job_duration",Duration.between(startTime, Instant.now()).getSeconds()));
   }
-  
 
-  private void currentTotalCmmStudiesInElasticSearch() { 
-	    SearchResponse response = esTemplate.getClient().prepareSearch(INDEX_NAME_PATTERN)
-	            .setTypes(INDEX_TYPE)
-	            .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-	            .setQuery(QueryBuilders.matchAllQuery())
-	            .get();
-	    SearchHits hits = response.getHits();
-	    long totalHitCount = hits.getTotalHits();
-	    log.info("Total number of records stands" + totalHitCount, keyValue("Total_cmm_studies", totalHitCount));  
+
+  private void currentTotalCmmStudiesInElasticSearch() {
+    SearchResponse response = esTemplate.getClient().prepareSearch(INDEX_NAME_PATTERN)
+            .setTypes(INDEX_TYPE)
+            .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+            .setQuery(QueryBuilders.matchAllQuery())
+            .get();
+    SearchHits hits = response.getHits();
+    long totalHitCount = hits.getTotalHits();
+    log.info("Total number of records stands {}", keyValue("total_cmm_studies", totalHitCount));
   }
 }

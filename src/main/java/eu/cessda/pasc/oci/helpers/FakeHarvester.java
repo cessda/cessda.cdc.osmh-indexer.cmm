@@ -39,7 +39,7 @@ import java.util.Optional;
 @Component
 public class FakeHarvester {
 
-  private AppConfigurationProperties appConfigurationProperties;
+  private final AppConfigurationProperties appConfigurationProperties;
 
   @Autowired
   public FakeHarvester(AppConfigurationProperties appConfigurationProperties) {
