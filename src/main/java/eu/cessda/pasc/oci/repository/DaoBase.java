@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import static net.logstash.logback.argument.StructuredArguments.keyValue;
 
 /**
  * Shareable Dao functions
@@ -48,7 +49,7 @@ public class DaoBase {
       responseEntity = restTemplate.getForEntity(fullUrl, String.class);
       return responseEntity.getBody();
     } catch (RestClientException e) {
-      String message = String.format(UNSUCCESSFUL_RESPONSE, fullUrl);
+      String message = String.format(UNSUCCESSFUL_RESPONSE, keyValue("error_repo_handler_source",fullUrl));
       log.error(message, e);
       ExternalSystemException exception;
       try {
