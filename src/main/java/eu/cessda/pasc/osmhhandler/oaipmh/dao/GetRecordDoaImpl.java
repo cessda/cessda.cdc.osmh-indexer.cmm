@@ -16,7 +16,6 @@
 
 package eu.cessda.pasc.osmhhandler.oaipmh.dao;
 
-import eu.cessda.pasc.osmhhandler.oaipmh.configuration.UtilitiesConfiguration;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -31,8 +30,8 @@ import org.springframework.web.client.RestTemplate;
 public class GetRecordDoaImpl extends DaoBase implements GetRecordDoa {
 
   @Autowired
-  public GetRecordDoaImpl(UtilitiesConfiguration configuration, RestTemplate restTemplate) {
-    super(configuration, restTemplate);
+  public GetRecordDoaImpl(RestTemplate restTemplate) {
+    super(restTemplate);
   }
 
   @Override

@@ -16,7 +16,6 @@
 
 package eu.cessda.pasc.osmhhandler.oaipmh.dao;
 
-import eu.cessda.pasc.osmhhandler.oaipmh.configuration.UtilitiesConfiguration;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,12 +34,10 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 public class DaoBase {
 
-    private final UtilitiesConfiguration configuration;
     private final RestTemplate restTemplate;
 
     @Autowired
-    public DaoBase(UtilitiesConfiguration configuration, RestTemplate restTemplate) {
-        this.configuration = configuration;
+    public DaoBase(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 

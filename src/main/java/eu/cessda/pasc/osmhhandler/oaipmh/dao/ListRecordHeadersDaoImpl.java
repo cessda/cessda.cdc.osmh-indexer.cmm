@@ -16,7 +16,6 @@
 
 package eu.cessda.pasc.osmhhandler.oaipmh.dao;
 
-import eu.cessda.pasc.osmhhandler.oaipmh.configuration.UtilitiesConfiguration;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -31,8 +30,8 @@ import org.springframework.web.client.RestTemplate;
 public class ListRecordHeadersDaoImpl extends DaoBase implements ListRecordHeadersDao {
 
   @Autowired
-  public ListRecordHeadersDaoImpl(UtilitiesConfiguration configuration, RestTemplate restTemplate) {
-    super(configuration, restTemplate);
+  public ListRecordHeadersDaoImpl(RestTemplate restTemplate) {
+    super(restTemplate);
   }
 
   @Override
