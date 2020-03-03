@@ -30,12 +30,15 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.json.JSONException;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -60,7 +63,7 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 @Slf4j
 public class ESIngestServiceTest extends EmbeddedElasticsearchServer{
 
-  private IngestService eSIndexerService; // Class under test
+  private final ElasticsearchTemplate mockedElasticsearchTemplate = Mockito.mock(ElasticsearchTemplate.class);
   private static final String INDEX_NAME = "cmmstudy_en";
   private static final String INDEX_TYPE = "cmmstudy";
 
@@ -72,13 +75,14 @@ public class ESIngestServiceTest extends EmbeddedElasticsearchServer{
 
   @Autowired
   private FileHandler fileHandler;
+  private IngestService ingestService; // Class under test
 
   @Before
   public void init() {
     startup(ELASTICSEARCH_HOME);
     log.info("Embedded Server initiated");
     ElasticsearchTemplate elasticsearchTemplate = new ElasticsearchTemplate(getClient());
-    eSIndexerService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp);
+    ingestService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp);
   }
 
   @After
@@ -97,7 +101,7 @@ public class ESIngestServiceTest extends EmbeddedElasticsearchServer{
     List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX1();
 
     // When
-    boolean isSuccessful = this.eSIndexerService.bulkIndex(studyOfLanguages, language);
+    boolean isSuccessful = this.ingestService.bulkIndex(studyOfLanguages, language);
 
     // Then
     then(isSuccessful).isTrue();
@@ -121,7 +125,7 @@ public class ESIngestServiceTest extends EmbeddedElasticsearchServer{
     // Given
     String language = "en";
     List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
-    boolean isSuccessful = this.eSIndexerService.bulkIndex(studyOfLanguages, language);
+    boolean isSuccessful = this.ingestService.bulkIndex(studyOfLanguages, language);
     then(isSuccessful).isTrue();
     SearchResponse response = getClient().prepareSearch(INDEX_NAME)
         .setTypes(INDEX_TYPE)
@@ -138,9 +142,27 @@ public class ESIngestServiceTest extends EmbeddedElasticsearchServer{
     then(response.getHits().getAt(2).getId()).isEqualTo("UK-Data-Service__1000");
 
     // When
-    Optional<LocalDateTime> mostRecentLastModified = this.eSIndexerService.getMostRecentLastModified();
+    Optional<LocalDateTime> mostRecentLastModified = this.ingestService.getMostRecentLastModified();
 
     // Then
     then(mostRecentLastModified.orElse(null)).isEqualByComparingTo(LocalDateTime.parse("2017-11-17T00:00:00"));
+  }
+
+  @Test
+  public void shouldReturnFalseOnRuntimeException() throws IOException {
+    Mockito.doThrow(new RuntimeException("Mocked exception!"))
+            .when(mockedElasticsearchTemplate).bulkIndex(Mockito.anyListOf(IndexQuery.class));
+    Mockito.doReturn(true).when(mockedElasticsearchTemplate).indexExists(Mockito.anyString());
+    IngestService ingestService = new ESIngestService(mockedElasticsearchTemplate, fileHandler, esConfigProp);
+
+    // Given
+    String language = "en";
+    List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
+
+    // When
+    boolean isSuccessful = ingestService.bulkIndex(studyOfLanguages, language);
+
+    // Then
+    Assert.assertFalse(isSuccessful);
   }
 }

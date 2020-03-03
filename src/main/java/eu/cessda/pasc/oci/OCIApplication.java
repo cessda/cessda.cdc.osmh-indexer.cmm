@@ -15,25 +15,14 @@
  */
 package eu.cessda.pasc.oci;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.EnableMBeanExport;
 
 @SpringBootApplication
 @EnableMBeanExport
-@Slf4j
 public class OCIApplication {
-
-	private static ApplicationContext applicationContext;
-
 	public static void main(String[] args) {
-		applicationContext = SpringApplication.run(OCIApplication.class, args);
-	}
-
-	static void shutdown(int exitCode) {
-		log.info("Shutting down.");
-		SpringApplication.exit(applicationContext, () -> exitCode);
+		SpringApplication.run(OCIApplication.class, args);
 	}
 }
