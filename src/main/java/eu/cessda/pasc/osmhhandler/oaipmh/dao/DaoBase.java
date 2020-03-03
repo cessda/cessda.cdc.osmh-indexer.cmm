@@ -24,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * Shareable Dao functions
@@ -35,10 +36,12 @@ import org.springframework.web.client.RestClientException;
 public class DaoBase {
 
     private final UtilitiesConfiguration configuration;
+    private final RestTemplate restTemplate;
 
     @Autowired
-    public DaoBase(UtilitiesConfiguration configuration) {
+    public DaoBase(UtilitiesConfiguration configuration, RestTemplate restTemplate) {
         this.configuration = configuration;
+        this.restTemplate = restTemplate;
     }
 
     /**
@@ -53,7 +56,7 @@ public class DaoBase {
 
         try {
             log.debug("Sending request to remote SP with url [{}].", fullUrl);
-            responseEntity = configuration.getRestTemplate().getForEntity(fullUrl, String.class);
+            responseEntity = restTemplate.getForEntity(fullUrl, String.class);
             log.debug("Got response code of [{}] for [{}]", responseEntity.getStatusCodeValue(), fullUrl);
             return responseEntity.getBody();
         } catch (RestClientException e) {

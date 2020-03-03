@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HTMLFilter.CLEAN_CHARACTER_RETURNS_STRATEGY;
-import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.HTMLFilter.CLEAN_MAP_VALUES;
 import static org.assertj.core.api.BDDAssertions.then;
 
 public class HTMLFilterTest {
@@ -51,7 +50,7 @@ public class HTMLFilterTest {
     titleMap.put("fi", "\n Documentation pour \"European Social Survey in Switzerland - 2004\"");
 
     // When
-    CLEAN_MAP_VALUES.apply(titleMap);
+    HTMLFilter.cleanMapValues(titleMap);
 
     then(titleMap.get("en")).isEqualTo("\"Arma sunt necessaria\" (Arms are necessary) Guns Constitution");
     then(titleMap.get("sv")).isEqualTo("\"Arma sunt necessaria\" (Arms are necessary) Guns Constitution");

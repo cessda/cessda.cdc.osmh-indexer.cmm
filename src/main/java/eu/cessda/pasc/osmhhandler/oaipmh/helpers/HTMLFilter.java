@@ -31,9 +31,7 @@ class HTMLFilter {
 
   static final UnaryOperator<String> CLEAN_CHARACTER_RETURNS_STRATEGY = candidate -> candidate.replace("\n", "").trim();
 
-  static final UnaryOperator<Map<String, String>> CLEAN_MAP_VALUES = candidateMap ->
-  {
+  static void cleanMapValues(Map<String, String> candidateMap) {
     candidateMap.replaceAll((key, value) -> CLEAN_CHARACTER_RETURNS_STRATEGY.apply(value));
-    return candidateMap;
-  };
+  }
 }

@@ -49,7 +49,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 public class GetRecordDoaImplTest {
 
   @Autowired
-  private RestTemplate restTemplateWithNoSSLVerification;
+  private RestTemplate restTemplate;
 
   private MockRestServiceServer mockRestServiceServer;
 
@@ -58,7 +58,7 @@ public class GetRecordDoaImplTest {
 
   @Before
   public void setUp() {
-    mockRestServiceServer = MockRestServiceServer.bindTo(restTemplateWithNoSSLVerification).build();
+    mockRestServiceServer = MockRestServiceServer.bindTo(restTemplate).build();
   }
 
   @Test

@@ -24,6 +24,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.TimeZone;
+
 /**
  * Loads Configurations from application*.yml
  *
@@ -38,4 +40,8 @@ public class HandlerConfigurationProperties {
 
   private final OaiPmh oaiPmh = new OaiPmh();
   private final RestTemplateProps restTemplateProps = new RestTemplateProps();
+
+  public HandlerConfigurationProperties() {
+    TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+  }
 }

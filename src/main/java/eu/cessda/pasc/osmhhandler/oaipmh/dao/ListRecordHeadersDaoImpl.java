@@ -17,10 +17,10 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.dao;
 
 import eu.cessda.pasc.osmhhandler.oaipmh.configuration.UtilitiesConfiguration;
-import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * Data access object contract implementation for querying remote repository for RecordHeaders.
@@ -31,12 +31,12 @@ import org.springframework.stereotype.Repository;
 public class ListRecordHeadersDaoImpl extends DaoBase implements ListRecordHeadersDao {
 
   @Autowired
-  public ListRecordHeadersDaoImpl(UtilitiesConfiguration configuration) {
-    super(configuration);
+  public ListRecordHeadersDaoImpl(UtilitiesConfiguration configuration, RestTemplate restTemplate) {
+    super(configuration, restTemplate);
   }
 
   @Override
-  public String listRecordHeaders(String fullListRecordUrlPath) throws CustomHandlerException {
+  public String listRecordHeaders(String fullListRecordUrlPath) throws ExternalSystemException {
     return postForStringResponse(fullListRecordUrlPath);
   }
 

@@ -73,15 +73,13 @@ public class UtilitiesConfiguration {
   }
 
   @Bean
-  public RestTemplate restTemplate() {
-    RestTemplate restTemplate = new RestTemplate(getClientHttpRequestFactory());
-    restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
-    return restTemplate;
-  }
-
-  @Bean
-  public RestTemplate restTemplateWithNoSSLVerification() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
-    RestTemplate restTemplate = new RestTemplate(getClientHttpRequestFactoryWithoutSSL());
+  public RestTemplate restTemplate() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+    RestTemplate restTemplate;
+    if (handlerConfigurationProperties.getRestTemplateProps().isVerifySSL()) {
+      restTemplate = new RestTemplate(getClientHttpRequestFactory());
+    } else {
+      restTemplate = new RestTemplate(getClientHttpRequestFactoryWithoutSSL());
+    }
     restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
     return restTemplate;
   }
@@ -114,18 +112,5 @@ public class UtilitiesConfiguration {
     requestFactory.setConnectionRequestTimeout(handlerConfigurationProperties.getRestTemplateProps().getConnRequestTimeout());
     requestFactory.setHttpClient(httpClient);
     return requestFactory;
-  }
-
-  public RestTemplate getRestTemplate() {
-    if (handlerConfigurationProperties.getRestTemplateProps().isVerifySSL()) {
-      return restTemplate();
-    }
-
-    try {
-      return restTemplateWithNoSSLVerification();
-    } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
-      log.error("Failed to build restTemplate with SSL off, building and return default Template with SSL on");
-      return restTemplate();
-    }
   }
 }
