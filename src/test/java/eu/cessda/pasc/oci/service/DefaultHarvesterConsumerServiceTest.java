@@ -16,6 +16,7 @@
 
 package eu.cessda.pasc.oci.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.cessda.pasc.oci.AbstractSpringTestProfileContext;
 import eu.cessda.pasc.oci.helpers.FileHandler;
 import eu.cessda.pasc.oci.helpers.TimeUtility;
@@ -25,9 +26,9 @@ import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.repository.HarvesterDao;
 import eu.cessda.pasc.oci.service.impl.DefaultHarvesterConsumerService;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -54,9 +55,18 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
   @Mock
   private HarvesterDao harvesterDao;
 
-  @InjectMocks
   @Autowired
+  RepositoryUrlService repositoryUrlService;
+
+  @Autowired
+  ObjectMapper objectMapper;
+
   DefaultHarvesterConsumerService defaultHarvesterConsumerService;
+
+  @Before
+  public void setUp() {
+    defaultHarvesterConsumerService = new DefaultHarvesterConsumerService(harvesterDao, repositoryUrlService, objectMapper);
+  }
 
   @Test
   public void shouldReturnASuccessfulResponseForListingRecordHeaders() throws ExternalSystemException {
@@ -127,13 +137,6 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
 
     List<RecordHeader> recordHeaders = defaultHarvesterConsumerService.listRecordHeaders(repo, null);
     assertThat(recordHeaders).isEmpty();
-  }
-  
-  @Test
-  public void shouldReturnEmptyListWhenNullPointerExceptionIsThrown() {
-
-    Optional<CMMStudy> actualRecord = defaultHarvesterConsumerService.getRecord(null, null);
-    then(actualRecord.isPresent()).isFalse();
   }
 
   @Test
