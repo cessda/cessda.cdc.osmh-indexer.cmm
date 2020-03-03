@@ -65,6 +65,7 @@ public class ESIngestService implements IngestService {
     this.esConfig = esConfig;
   }
 
+  @Override
   public boolean bulkIndex(List<CMMStudyOfLanguage> languageCMMStudiesMap, String languageIsoCode) {
     String indexName = String.format(INDEX_NAME_TEMPLATE, languageIsoCode);
     boolean isSuccessful = true;

@@ -28,8 +28,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.fail;
-
 /**
  * @author moses AT doraventures DOT com
  */
@@ -145,7 +143,7 @@ public class RecordTestData {
     try {
       cmmStudies.add(getSyntheticCmmStudy());
     } catch (IOException e) {
-      fail("Unable to parse Study string to CMMStudy Object");
+      throw new AssertionError("Unable to parse Study string to CMMStudy Object", e);
     }
     return cmmStudies;
   }
@@ -157,7 +155,7 @@ public class RecordTestData {
       cmmStudies.add(getSyntheticCmmStudy());
       cmmStudies.add(getDeletedCmmStudy());
     } catch (IOException e) {
-      fail("Unable to parse Study string to CMMStudy Object");
+      throw new AssertionError("Unable to parse Study string to CMMStudy Object", e);
     }
     return cmmStudies;
   }
