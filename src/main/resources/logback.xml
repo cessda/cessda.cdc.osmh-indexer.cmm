@@ -17,6 +17,14 @@
   <appender name="jsonConsoleAppender" class="ch.qos.logback.core.ConsoleAppender">
     <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
   </appender>
+  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <!-- Here we can refer to the variable
+     defined at the resource1.properties -->
+    <file>${user.home}${file.separator}pasc-oci${file.separator}pasc-oci.log</file>
+    <encoder>
+      <pattern>%msg%n</pattern>
+    </encoder>
+  </appender>
   <root level="INFO">
     <appender-ref ref="jsonConsoleAppender"/>
   </root>
