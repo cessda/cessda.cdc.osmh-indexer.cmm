@@ -27,7 +27,7 @@
        defined at the resource1.properties -->
       <file>${user.home}${file.separator}pasc-oci${file.separator}pasc-oci.log</file>
       <encoder>
-        <pattern>%msg%n</pattern>
+        <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %40.40((%file:%line\)) - %message%n</pattern>
       </encoder>
     </appender>
     <root level="INFO">
