@@ -15,7 +15,6 @@
  */
 package eu.cessda.pasc.oci.repository;
 
-import eu.cessda.pasc.oci.ConsumerScheduler;
 import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +23,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+
 import static net.logstash.logback.argument.StructuredArguments.keyValue;
 
 /**
@@ -43,21 +43,19 @@ public class DaoBase {
     this.restTemplate = restTemplate;
   }
 
+  @SuppressWarnings("ThrowInsideCatchBlockWhichIgnoresCaughtException")
   String postForStringResponse(String fullUrl) throws ExternalSystemException {
     ResponseEntity<String> responseEntity;
-    var  cdcJobKey = ConsumerScheduler.DEFAULT_CDC_JOB_KEY;
-    var cdcRunjobId =  ConsumerScheduler.cdcRunjobId;
 
     try {
       responseEntity = restTemplate.getForEntity(fullUrl, String.class);
       return responseEntity.getBody();
     } catch (RestClientException e) {
       String message = String.format(UNSUCCESSFUL_RESPONSE, keyValue("error_repo_handler_source",fullUrl));
-      log.error(message, keyValue(cdcJobKey, cdcRunjobId), e);
       ExternalSystemException exception;
       try {
         exception = new ExternalSystemException(message, e.getCause(), ((HttpServerErrorException) e).getResponseBodyAsString());
-      } catch (Exception e1) {
+      } catch (RuntimeException e1) {
         exception = new ExternalSystemException(message, e.getCause(), e.getMessage());
       }
       throw exception;
