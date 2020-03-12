@@ -30,6 +30,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHits;
+import org.jboss.logging.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.jmx.export.annotation.ManagedOperation;
@@ -37,13 +38,16 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static net.logstash.logback.argument.StructuredArguments.keyValue;
@@ -72,7 +76,13 @@ public class ConsumerScheduler {
   private ElasticsearchTemplate esTemplate;
   private static final String INDEX_NAME_PATTERN = "cmmstudy_*";
   private static final String INDEX_TYPE = "cmmstudy";
-
+  public static final String DEFAULT_CDC_JOB_KEY = "indexer_job_id";
+  private static final String DEFAULT_RESPONSE_TOKEN_HEADER = "cdc-";
+  
+  static SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd:HH:mm");
+  static Date date = new Date();
+  public static String cdcRunjobId = DEFAULT_RESPONSE_TOKEN_HEADER + formatter.format(date); 
+  
   @Autowired
   public ConsumerScheduler(DebuggingJMXBean debuggingJMXBean, AppConfigurationProperties configurationProperties,
                            HarvesterConsumerService harvesterConsumerService, IngestService esIndexerService,
@@ -85,6 +95,9 @@ public class ConsumerScheduler {
     this.extractor = extractor;
     this.languageAvailabilityMapper = languageAvailabilityMapper;
     this.esTemplate = esTemplate;
+    
+
+ 
   }
 
   /**
@@ -114,6 +127,7 @@ public class ConsumerScheduler {
     executeHarvestAndIngest(esIndexerService.getMostRecentLastModified().orElse(null));
     currentTotalCmmStudiesInElasticSearch();
     logEndStatus(date, startTime, DAILY_INCREMENTAL_RUN);
+   
   }
 
   /**
@@ -138,25 +152,25 @@ public class ConsumerScheduler {
 
   private void executeBulk(Repo repo, String langIsoCode, List<CMMStudyOfLanguage> cmmStudies) {
     if (cmmStudies.isEmpty()) {
-      log.warn("CmmStudies list is empty and henceforth there is nothing to BulkIndex for repo[{}] with LangIsoCode [{}].", keyValue(REPO_NAME, repo.getName()), keyValue(LANG_CODE, langIsoCode));
+      log.warn("CmmStudies list is empty and henceforth there is nothing to BulkIndex for repo[{}] with LangIsoCode [{}].", keyValue(REPO_NAME, repo.getName()), keyValue(LANG_CODE, langIsoCode), keyValue(DEFAULT_CDC_JOB_KEY, cdcRunjobId));
     } else {
-      log.info("BulkIndexing [{}] index with [{}] CmmStudies", keyValue(LANG_CODE, langIsoCode), keyValue("cmm_studies_added", cmmStudies.size()));
+      log.info("BulkIndexing [{}] index with [{}] CmmStudies", keyValue(LANG_CODE, langIsoCode), keyValue("cmm_studies_added", cmmStudies.size()), keyValue(DEFAULT_CDC_JOB_KEY, cdcRunjobId));
       boolean isSuccessful = esIndexerService.bulkIndex(cmmStudies, langIsoCode);
       if (isSuccessful) {
-        log.info("BulkIndexing was Successful. For repo name [{}] and its corresponding [{}].  LangIsoCode [{}].", keyValue(REPO_NAME, repo.getName()), keyValue(REPO_ENDPOINT_URL, repo.getUrl()), keyValue(LANG_CODE, langIsoCode));
+        log.info("BulkIndexing was Successful. For repo name [{}] and its corresponding [{}].  LangIsoCode [{}].", keyValue(REPO_NAME, repo.getName()), keyValue(REPO_ENDPOINT_URL, repo.getUrl()), keyValue(LANG_CODE, langIsoCode),keyValue(DEFAULT_CDC_JOB_KEY, cdcRunjobId));
       } else {
-        log.error("BulkIndexing was UnSuccessful. For repo name [{}] and its corresponding [{}].  LangIsoCode [{}].", keyValue(REPO_NAME, repo.getName()), keyValue(REPO_ENDPOINT_URL, repo.getUrl()), keyValue(LANG_CODE, langIsoCode));
+        log.error("BulkIndexing was UnSuccessful. For repo name [{}] and its corresponding [{}].  LangIsoCode [{}].", keyValue(REPO_NAME, repo.getName()), keyValue(REPO_ENDPOINT_URL, repo.getUrl()), keyValue(LANG_CODE, langIsoCode), keyValue(DEFAULT_CDC_JOB_KEY, cdcRunjobId));
       }
     }
 
   }
 
   private Map<String, List<CMMStudyOfLanguage>> getCmmStudiesOfEachLangIsoCodeMap(Repo repo, LocalDateTime lastModifiedDateTime) {
-    log.info("Processing Repo [{}]", repo);
+    log.info("Processing Repo [{}]", repo, keyValue(DEFAULT_CDC_JOB_KEY, cdcRunjobId));
     List<RecordHeader> recordHeaders = harvesterConsumerService.listRecordHeaders(repo, lastModifiedDateTime);
 
     int recordHeadersSize = recordHeaders.size();
-    log.info("Repo [{}].  Returned with [{}] record headers", repo, recordHeadersSize);
+    log.info("Repo [{}].  Returned with [{}] record headers", repo, recordHeadersSize, keyValue(DEFAULT_CDC_JOB_KEY, cdcRunjobId));
 
     List<Optional<CMMStudy>> totalCMMStudies = recordHeaders.stream()
         .map(recordHeader -> harvesterConsumerService.getRecord(repo, recordHeader.getIdentifier()))
@@ -169,22 +183,23 @@ public class ConsumerScheduler {
 
     String msgTemplate = "Repo Name [{}] of [{}] Endpoint. There are [{}] presentCMMStudies out of [{}] totalCMMStudies from [{}] Record Identifiers. Therefore CMMStudiesRejected is  "
     		+ "";
-    log.info(msgTemplate + "" + (totalCMMStudies.size() - presentCMMStudies.size()), keyValue(REPO_NAME, repo.getName()), keyValue(REPO_ENDPOINT_URL, repo.getUrl()), keyValue("present_cmm_record", presentCMMStudies.size()), totalCMMStudies.size(), keyValue("cmm_records_rejected", totalCMMStudies.size() - presentCMMStudies.size()));
+    log.info(msgTemplate + "" + (totalCMMStudies.size() - presentCMMStudies.size()), keyValue(REPO_NAME, repo.getName()), keyValue(REPO_ENDPOINT_URL, repo.getUrl()), keyValue("present_cmm_record", presentCMMStudies.size()), totalCMMStudies.size(), keyValue("cmm_records_rejected", totalCMMStudies.size() - presentCMMStudies.size()), keyValue(DEFAULT_CDC_JOB_KEY, cdcRunjobId));
 
     presentCMMStudies.forEach(languageAvailabilityMapper::setAvailableLanguages);
     return extractor.mapLanguageDoc(presentCMMStudies, repo.getName());
   }
 
   private void logStartStatus(LocalDateTime localDateTime, String runDescription) {
-    log.info("[{}] Consume and Ingest All SPs Repos : Started at [{}]", runDescription, localDateTime);
-    log.info("Currents state before run:");
+    log.info("[{}] Consume and Ingest All SPs Repos : Started at [{}]", runDescription, localDateTime, keyValue(DEFAULT_CDC_JOB_KEY, cdcRunjobId));
+    log.info("Currents state before run:",  keyValue(DEFAULT_CDC_JOB_KEY, cdcRunjobId));
     debuggingJMXBean.printCurrentlyConfiguredRepoEndpoints();
     debuggingJMXBean.printElasticSearchInfo();
   }
 
   private void logEndStatus(LocalDateTime localDateTime, Instant startTime, String runDescription) {
     String formatMsg = "[{}] Consume and Ingest All SPs Repos Ended at [{}], Duration [{}]";
-    log.info(formatMsg, runDescription, localDateTime, keyValue("job_duration",Duration.between(startTime, Instant.now()).getSeconds()));
+    log.info(formatMsg, runDescription, localDateTime, keyValue("job_duration",Duration.between(startTime, Instant.now()).getSeconds()),  keyValue(DEFAULT_CDC_JOB_KEY, cdcRunjobId));
+
   }
 
 
@@ -196,6 +211,6 @@ public class ConsumerScheduler {
             .get();
     SearchHits hits = response.getHits();
     long totalHitCount = hits.getTotalHits();
-    log.info("Total number of records stands {}", keyValue("total_cmm_studies", totalHitCount));
+    log.info("Total number of records stands {}", keyValue("total_cmm_studies", totalHitCount), keyValue(DEFAULT_CDC_JOB_KEY, cdcRunjobId));
   }
 }

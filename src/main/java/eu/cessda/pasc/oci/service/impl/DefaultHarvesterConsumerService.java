@@ -17,6 +17,8 @@ package eu.cessda.pasc.oci.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
+
+import eu.cessda.pasc.oci.ConsumerScheduler;
 import eu.cessda.pasc.oci.helpers.TimeUtility;
 import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
 import eu.cessda.pasc.oci.models.RecordHeader;
@@ -39,6 +41,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static eu.cessda.pasc.oci.service.helpers.StudyIdentifierEncoder.decodeStudyNumber;
+import static net.logstash.logback.argument.StructuredArguments.keyValue;
 
 /**
  * Default OSMH Consumer Service implementation
@@ -52,6 +55,8 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
   private final HarvesterDao harvesterDao;
   private final RepositoryUrlService repositoryUrlService;
   private final ObjectMapper mapper;
+  
+
 
   @Autowired
   public DefaultHarvesterConsumerService(HarvesterDao harvesterDao, RepositoryUrlService repositoryUrlService,
@@ -64,6 +69,8 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
   @Override
   public List<RecordHeader> listRecordHeaders(Repo repo, LocalDateTime lastModifiedDate) {
     List<RecordHeader> recordHeadersUnfiltered = new ArrayList<>();
+    var  cdcJobKey = ConsumerScheduler.DEFAULT_CDC_JOB_KEY;
+    var cdcRunjobId =  ConsumerScheduler.cdcRunjobId;
 
     try {
       String finalUrl = repositoryUrlService.constructListRecordUrl(repo.getUrl());
@@ -71,9 +78,9 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
       CollectionType collectionType = mapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class);
       recordHeadersUnfiltered = mapper.readValue(recordHeadersJsonString, collectionType);
     } catch (ExternalSystemException e) {
-      log.error("ListRecordHeaders failed for repo [{}]. CDC Handler Error object Msg [{}].", repo, e.getMessage(), e);
+      log.error("ListRecordHeaders failed for repo [{}]. CDC Handler Error object Msg [{}].", repo, e.getMessage(), e, keyValue(cdcJobKey, cdcRunjobId));
     } catch (IOException e) {
-      log.error("Error, Unable to pass ListRecordHeaders response error message [{}].", e.getMessage(), e);
+      log.error("Error, Unable to pass ListRecordHeaders response error message [{}].", keyValue(cdcJobKey, cdcRunjobId), e.getMessage(), e);
     }
 
     return filterRecords(recordHeadersUnfiltered, lastModifiedDate);
@@ -81,7 +88,9 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
 
   @Override
   public Optional<CMMStudy> getRecord(Repo repo, String studyNumber) {
-
+	  
+	    var  cdcJobKey = ConsumerScheduler.DEFAULT_CDC_JOB_KEY;
+	    var cdcRunjobId =  ConsumerScheduler.cdcRunjobId;
     String finalUrl = "";
     try {
       finalUrl = repositoryUrlService.constructGetRecordUrl(repo.getUrl(), studyNumber);
@@ -91,18 +100,20 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
       log.warn("Short Exception msg [{}], " +
                       "HttpServerErrorException response detail from handler's [{}], " +
                       "URL to handler for harvesting [{}].",
+              keyValue(cdcJobKey, cdcRunjobId),        
               e.getMessage(),
               e.getExternalResponseBody(),
               decodeStudyNumber().apply(finalUrl));
     } catch (IOException e) {
-      log.error("Error, Unable to pass GetRecord response error message [{}].", e.getMessage(), e);
+      log.error("Error, Unable to pass GetRecord response error message [{}].", e.getMessage(), e, keyValue(cdcJobKey, cdcRunjobId));
     }
 
     return Optional.empty();
   }
 
   private List<RecordHeader> filterRecords(List<RecordHeader> unfilteredRecordHeaders, LocalDateTime ingestedLastModifiedDate) {
-
+	    var  cdcJobKey = ConsumerScheduler.DEFAULT_CDC_JOB_KEY;
+	    var cdcRunjobId =  ConsumerScheduler.cdcRunjobId;
     Optional<LocalDateTime> ingestedLastModifiedDateOption = Optional.ofNullable(ingestedLastModifiedDate);
     Optional<List<RecordHeader>> filteredRecordHeaders = ingestedLastModifiedDateOption.map(
         lastModifiedDate -> unfilteredRecordHeaders
@@ -112,26 +123,30 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
 
     if (filteredRecordHeaders.isPresent()) {
       List<RecordHeader> filteredHeaders = filteredRecordHeaders.get();
-      log.info("Returning [{}] filtered recordHeaders by date greater than [{}] | out of [{}] unfiltered.",
+      log.info("Returning [{}] filtered recordHeaders by date greater than [{}] | out of [{}] unfiltered.", 
+            
           filteredHeaders.size(),
           ingestedLastModifiedDate,
-          unfilteredRecordHeaders.size());
+          unfilteredRecordHeaders.size(),
+          keyValue(cdcJobKey, cdcRunjobId));
 
       return filteredHeaders;
     }
 
-    log.info("Nothing filterable by date [{}].", ingestedLastModifiedDate);
+    log.info("Nothing filterable by date [{}].", ingestedLastModifiedDate, keyValue(cdcJobKey, cdcRunjobId));
     return unfilteredRecordHeaders;
   }
 
   private Predicate<RecordHeader> isHeaderTimeGreater(LocalDateTime lastModifiedDate) {
+	    var  cdcJobKey = ConsumerScheduler.DEFAULT_CDC_JOB_KEY;
+	    var cdcRunjobId =  ConsumerScheduler.cdcRunjobId;
     return recordHeader -> {
       String lastModified = recordHeader.getLastModified();
       Optional<LocalDateTime> currentHeaderLastModified = TimeUtility.getLocalDateTime(lastModified);
       return currentHeaderLastModified
           .map(localDateTime -> localDateTime.isAfter(lastModifiedDate))
           .orElseGet(() -> {
-                log.warn("Could not parse RecordIdentifier lastModifiedDate [{}]. Filtering out from list.", lastModified);
+                log.warn("Could not parse RecordIdentifier lastModifiedDate [{}]. Filtering out from list.", lastModified, keyValue(cdcJobKey, cdcRunjobId));
                 return false;
               }
           );
