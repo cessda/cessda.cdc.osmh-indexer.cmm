@@ -29,17 +29,17 @@ import java.util.function.Function;
  * @author moses AT doraventures DOT com
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class StudyIdentifierEncoder {
+public final class StudyIdentifierEncoder {
 
   public static Function<String, String> encodeStudyIdentifier() {
     return studyIdentifier -> studyIdentifier.replace(".", "_dt_")
-        .replace("/", "_sl_")
-        .replace(":", "_cl_");
+            .replace("/", "_sl_")
+            .replace(":", "_cl_");
   }
 
   public static Function<String, String> decodeStudyNumber() {
     return encodedStudyNumber -> encodedStudyNumber.replace("_dt_", ".")
-        .replace("_sl_", "/")
+            .replace("_sl_", "/")
         .replace("_cl_", ":");
   }
 }

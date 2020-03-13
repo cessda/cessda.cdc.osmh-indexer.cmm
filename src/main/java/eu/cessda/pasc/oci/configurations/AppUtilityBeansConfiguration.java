@@ -16,6 +16,7 @@
 package eu.cessda.pasc.oci.configurations;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.cessda.pasc.oci.models.configurations.RestTemplateProps;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
@@ -27,16 +28,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
-import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.annotation.PreDestroy;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
@@ -66,6 +63,8 @@ public class AppUtilityBeansConfiguration {
 
   private final PerfRequestSyncInterceptor perfRequestSyncInterceptor;
 
+  private Client client;
+
   @Autowired
   public AppUtilityBeansConfiguration(AppConfigurationProperties appConfigurationProperties, PerfRequestSyncInterceptor perfRequestSyncInterceptor) {
     this.appConfigurationProperties = appConfigurationProperties;
@@ -78,48 +77,44 @@ public class AppUtilityBeansConfiguration {
   }
 
   @Bean
-  public DocumentBuilder documentBuilder() throws ParserConfigurationException {
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-    factory.setNamespaceAware(true);
-    return factory.newDocumentBuilder();
-  }
-
-  @Bean
   public RestTemplate restTemplate() {
 
     final List<ClientHttpRequestInterceptor> requestInterceptors = new ArrayList<>();
     requestInterceptors.add(perfRequestSyncInterceptor);
 
-    final RestTemplate restTemplate = new RestTemplate(getClientHttpRequestFactory());
+    HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
+    RestTemplateProps restTemplateProps = appConfigurationProperties.getRestTemplateProps();
+    clientHttpRequestFactory.setConnectTimeout(restTemplateProps.getConnTimeout());
+    clientHttpRequestFactory.setReadTimeout(restTemplateProps.getReadTimeout());
+    clientHttpRequestFactory.setConnectionRequestTimeout(restTemplateProps.getConnRequestTimeout());
+
+    final RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory);
     restTemplate.setInterceptors(requestInterceptors);
     restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
 
     return restTemplate;
   }
 
-  private ClientHttpRequestFactory getClientHttpRequestFactory() {
-    HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
-    clientHttpRequestFactory.setConnectTimeout(appConfigurationProperties.getRestTemplateProps().getConnTimeout());
-    clientHttpRequestFactory.setReadTimeout(appConfigurationProperties.getRestTemplateProps().getReadTimeout());
-    clientHttpRequestFactory.setConnectionRequestTimeout(appConfigurationProperties.getRestTemplateProps()
-        .getConnRequestTimeout());
-    return clientHttpRequestFactory;
-  }
-
   @Bean
   public Client client() throws UnknownHostException {
-
+    log.debug("Creating Elasticsearch Client\nCluster name={}\nHostname={}", esClusterName, esHost);
     Settings esSettings = Settings.settingsBuilder().put("cluster.name", esClusterName).build();
 
     // https://www.elastic.co/guide/en/elasticsearch/guide/current/_transport_client_versus_node_client.html
-    return TransportClient.builder()
+    client = TransportClient.builder()
             .settings(esSettings)
             .build().addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(esHost), esPort));
+    return client;
   }
 
-  @Bean()
+  @Bean
   public ElasticsearchTemplate elasticsearchTemplate() throws UnknownHostException {
     return new ElasticsearchTemplate(client());
+  }
+
+  @PreDestroy
+  public void closeElasticsearch() {
+    log.debug("Closing Elasticsearch Client");
+    client.close();
   }
 }

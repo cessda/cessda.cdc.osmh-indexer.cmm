@@ -21,6 +21,7 @@ import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
+import lombok.experimental.UtilityClass;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,21 +32,18 @@ import java.util.Optional;
 /**
  * @author moses AT doraventures DOT com
  */
-public class RecordTestData {
-
-  private RecordTestData() {
-    throw new UnsupportedOperationException("Utility class, instantiation not allow");
-  }
+@UtilityClass
+public final class RecordTestData {
 
   public static final String LIST_RECORDER_HEADERS_BODY_EXAMPLE = "" +
-      "[\n" +
-      "  {\n" +
-      "    \"lastModified\": \"2018-02-21T07:48:38Z\",\n" +
-      "    \"type\": \"Study\",\n" +
-      "    \"recordType\": \"RecordHeader\",\n" +
-      "    \"identifier\": \"997\"\n" +
-      "  },\n" +
-      "  {\n" +
+          "[\n" +
+          "  {\n" +
+          "    \"lastModified\": \"2018-02-21T07:48:38Z\",\n" +
+          "    \"type\": \"Study\",\n" +
+          "    \"recordType\": \"RecordHeader\",\n" +
+          "    \"identifier\": \"997\"\n" +
+          "  },\n" +
+          "  {\n" +
       "    \"lastModified\": \"2018-02-19\",\n" +
       "    \"type\": \"Study\",\n" +
       "    \"recordType\": \"RecordHeader\",\n" +
