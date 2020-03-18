@@ -16,6 +16,7 @@
 
 package eu.cessda.pasc.osmhhandler.oaipmh.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.cessda.pasc.osmhhandler.oaipmh.configuration.HandlerConfigurationProperties;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
@@ -48,6 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * @author moses AT doraventures DOT com
  */
+@SuppressWarnings("ProhibitedExceptionDeclared")
 @RunWith(SpringRunner.class)
 @WebMvcTest(GetRecordController.class)
 @Import({APISupportedServiceImpl.class, HandlerConfigurationProperties.class})
@@ -57,6 +59,7 @@ public class GetRecordControllerTest {
   @Autowired
   private MockMvc mockMvc;
   private static final ObjectMapper MAPPER = new ObjectMapper();
+  private static final CustomHandlerException mockedCustomHandlerException = new CustomHandlerException("Mocked!");
 
   @MockBean
   GetRecordService getRecordService;
@@ -85,7 +88,7 @@ public class GetRecordControllerTest {
   public void shouldCatchAndBuildRelevantEntityMessageWhenACustomHandlerExceptionIsThrownReturn() throws Exception {
 
     // Given
-    given(this.getRecordService.getRecord("http://kirkedata.nsd.uib.no", "StudyID222")).willThrow(CustomHandlerException.class);
+    given(this.getRecordService.getRecord("http://kirkedata.nsd.uib.no", "StudyID222")).willThrow(mockedCustomHandlerException);
 
     // When
     this.mockMvc.perform(get("/v0/GetRecord/CMMStudy/StudyID222?Repository=http://kirkedata.nsd.uib.no")
@@ -94,23 +97,23 @@ public class GetRecordControllerTest {
             // Then
             .andExpect(status().isInternalServerError())
             .andExpect(status().reason(new IsNull<>()))
-            .andExpect(content().json("{\"message\":\"CustomHandlerException occurred whilst getting record message [" + CustomHandlerException.class.getCanonicalName() + "], for studyID [StudyID222]\"}"));
+            .andExpect(content().json("{\"message\":\"CustomHandlerException occurred whilst getting record message [" + mockedCustomHandlerException.toString() + "], for studyID [StudyID222]\"}"));
   }
 
   @Test
   public void shouldCatchAndBuildRelevantEntityMessageWhenAnExceptionIsThrownReturn() throws Exception {
 
     // Given
-      given(this.getRecordService.getRecord("http://kirkedata.nsd.uib.no", "StudyID222")).willThrow(CustomHandlerException.class);
+    given(this.getRecordService.getRecord("http://kirkedata.nsd.uib.no", "StudyID222")).willThrow(mockedCustomHandlerException);
 
     // When
-      this.mockMvc.perform(get("/v0/GetRecord/CMMStudy/StudyID222?Repository=http://kirkedata.nsd.uib.no")
-              .accept(MediaType.APPLICATION_JSON_VALUE))
+    this.mockMvc.perform(get("/v0/GetRecord/CMMStudy/StudyID222?Repository=http://kirkedata.nsd.uib.no")
+            .accept(MediaType.APPLICATION_JSON_VALUE))
 
-              // Then
-              .andExpect(status().isInternalServerError())
-              .andExpect(status().reason(new IsNull<>()))
-              .andExpect(content().json("{\"message\":\"CustomHandlerException occurred whilst getting record message [" + CustomHandlerException.class.getCanonicalName() + "], for studyID [StudyID222]\"}"));
+            // Then
+            .andExpect(status().isInternalServerError())
+            .andExpect(status().reason(new IsNull<>()))
+            .andExpect(content().json("{\"message\":\"CustomHandlerException occurred whilst getting record message [" + mockedCustomHandlerException.toString() + "], for studyID [StudyID222]\"}"));
   }
   @Test
   public void shouldReturnErrorMessageForNonSupportedAPIVersion() throws Exception {
@@ -143,12 +146,27 @@ public class GetRecordControllerTest {
 
     // When
     this.mockMvc.perform(
-        get("/" + invalidVersion + "/GetRecord/CMMInvalid/StudyID222/?Repository=http://kirkedata.nsd.uib.no")
+            get("/" + invalidVersion + "/GetRecord/CMMInvalid/StudyID222/?Repository=http://kirkedata.nsd.uib.no")
+                    .accept(MediaType.APPLICATION_JSON_VALUE))
+
+            // Then
+            .andExpect(status().isNotFound())
+            .andExpect(status().reason(new IsNull<>()))
+            .andExpect(content().json(expectedMessage));
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  public void shouldReturnErrorMessageWhenJsonProcessingExceptionIsThrown() throws Exception {
+    given(this.getRecordService.getRecord("http://kirkedata.nsd.uib.no", "StudyID222")).willThrow(JsonProcessingException.class);
+
+    // When
+    this.mockMvc.perform(get("/v0/GetRecord/CMMStudy/StudyID222?Repository=http://kirkedata.nsd.uib.no")
             .accept(MediaType.APPLICATION_JSON_VALUE))
 
-        // Then
-        .andExpect(status().isNotFound())
-        .andExpect(status().reason(new IsNull<>()))
-        .andExpect(content().json(expectedMessage));
+            // Then
+            .andExpect(status().isInternalServerError())
+            .andExpect(status().reason(new IsNull<>()))
+            .andExpect(content().json("{\"message\":\"JsonProcessingException occurred whilst getting record message [N/A], for studyID [StudyID222].\"}"));
   }
 }
