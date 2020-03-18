@@ -36,11 +36,14 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class StatusService {
 
-  @Autowired
-  HandlerConfigurationProperties handlerConfigurationProperties;
+  private HandlerConfigurationProperties handlerConfigurationProperties;
+  private ObjectMapper objectMapper;
 
   @Autowired
-  ObjectMapper objectMapper;
+  public StatusService(HandlerConfigurationProperties handlerConfigurationProperties, ObjectMapper objectMapper) {
+    this.handlerConfigurationProperties = handlerConfigurationProperties;
+    this.objectMapper = objectMapper;
+  }
 
   @ManagedOperation(description = "prints out the PaSC Handler OaiPmh ddi 2.5 Configurations.")
   public String printPaSCHandlerOaiPmhConfig() throws JsonProcessingException {

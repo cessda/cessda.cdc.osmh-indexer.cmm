@@ -24,8 +24,6 @@ import eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhHelpers;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.configuration.OaiPmh;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.errors.ErrorStatus;
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
@@ -37,8 +35,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.*;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.RecordResponseValidator.validateResponse;
@@ -55,19 +51,11 @@ public class GetRecordServiceImpl implements GetRecordService {
   private static final XPathFactory X_FACTORY = XPathFactory.instance();
   private final GetRecordDoa getRecordDoa;
   private final HandlerConfigurationProperties oaiPmhHandlerConfig;
-  private final Map<String, Counter> activeRecordCounters = new HashMap<>();
-  private final Map<String, Counter> inactiveRecordCounters = new HashMap<>();
 
   @Autowired
-  public GetRecordServiceImpl(GetRecordDoa getRecordDoa, HandlerConfigurationProperties oaiPmhHandlerConfig, MeterRegistry meterRegistry) {
+  public GetRecordServiceImpl(GetRecordDoa getRecordDoa, HandlerConfigurationProperties oaiPmhHandlerConfig) {
     this.getRecordDoa = getRecordDoa;
     this.oaiPmhHandlerConfig = oaiPmhHandlerConfig;
-    for (var repo : oaiPmhHandlerConfig.getOaiPmh().getRepos()) {
-      activeRecordCounters.put(repo.getUrl(), Counter.builder("cdc.oai-pmh.records.active.retrieved").tag("url", repo.getUrl())
-              .description("Active records retrieved from endpoints").register(meterRegistry));
-      inactiveRecordCounters.put(repo.getUrl(), Counter.builder("cdc.oai-pmh.records.inactive.retrieved").tag("url", repo.getUrl())
-              .description("Inactive records retrieved from endpoints").register(meterRegistry));
-    }
   }
 
   @Override
@@ -121,9 +109,6 @@ public class GetRecordServiceImpl implements GetRecordService {
       parseTypeOfModeOfCollection(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
       parseDataCollectionDates(builder, document, X_FACTORY);
       parseDataCollectionFreeTexts(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
-      activeRecordCounters.get(repositoryUrl).increment();
-    } else {
-      inactiveRecordCounters.get(repositoryUrl).increment();
     }
     return builder;
   }

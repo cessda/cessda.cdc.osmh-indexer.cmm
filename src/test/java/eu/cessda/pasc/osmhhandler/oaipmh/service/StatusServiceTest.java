@@ -19,11 +19,10 @@ package eu.cessda.pasc.osmhhandler.oaipmh.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import eu.cessda.pasc.osmhhandler.oaipmh.configuration.HandlerConfigurationProperties;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -42,20 +41,18 @@ import static org.mockito.Mockito.*;
 @ActiveProfiles("test")
 public class StatusServiceTest {
 
-  @Mock
-  private ObjectMapper objectMapperMock = mock(ObjectMapper.class);
-
-  @InjectMocks
   @Autowired
-  StatusService statusService;
+  private HandlerConfigurationProperties handlerConfigurationProperties;
 
   @Test
   public void shouldPrintOutConfiguration() throws JsonProcessingException {
 
     //given
     ObjectWriter prettyWriter = mock(ObjectWriter.class);
-    given(objectMapperMock.writerWithDefaultPrettyPrinter()).willReturn(prettyWriter);
+    ObjectMapper objectMapper = mock(ObjectMapper.class);
+    given(objectMapper.writerWithDefaultPrettyPrinter()).willReturn(prettyWriter);
     given(prettyWriter.writeValueAsString(anyObject())).willReturn("{\"test\":\"value\"}");
+    StatusService statusService = new StatusService(handlerConfigurationProperties, objectMapper);
 
     // when
     String outPut = statusService.printPaSCHandlerOaiPmhConfig();

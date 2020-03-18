@@ -78,6 +78,7 @@ public class UtilitiesConfiguration {
     if (handlerConfigurationProperties.getRestTemplateProps().isVerifySSL()) {
       restTemplate = new RestTemplate(getClientHttpRequestFactory());
     } else {
+      log.warn("Creating RestTemplate without SSL verification enabled");
       restTemplate = new RestTemplate(getClientHttpRequestFactoryWithoutSSL());
     }
     restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));

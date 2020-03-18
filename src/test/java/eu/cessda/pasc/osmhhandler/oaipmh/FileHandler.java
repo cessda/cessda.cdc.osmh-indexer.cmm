@@ -21,6 +21,7 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 /**
@@ -37,7 +38,7 @@ public class FileHandler {
     String result = "";
     ClassLoader classLoader = getClass().getClassLoader();
     try {
-      result = IOUtils.toString(Objects.requireNonNull(classLoader.getResourceAsStream(fileName)));
+      result = IOUtils.toString(Objects.requireNonNull(classLoader.getResourceAsStream(fileName)), StandardCharsets.UTF_8);
     } catch (IOException | NullPointerException e) {
       log.error("Could not read file successfully [{}]", e.getMessage());
     }
