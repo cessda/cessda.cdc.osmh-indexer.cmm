@@ -36,6 +36,7 @@ public class APISupportedServiceImpl implements APISupportedService {
     this.pmhConfig = pmhConfig;
   }
 
+  @Override
   public List<String> getSupportedVersion() {
     return pmhConfig.getOaiPmh().getSupportedApiVersions();
   }

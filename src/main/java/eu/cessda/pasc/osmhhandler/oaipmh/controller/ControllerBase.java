@@ -48,9 +48,9 @@ public class ControllerBase {
     return new ResponseEntity<>(message, httpStatus);
   }
 
+  @SuppressWarnings("unchecked")
   private static String getSimpleResponseMessage(String messageString) {
     JSONObject obj = new JSONObject();
-    //noinspection unchecked
     obj.put(MESSAGE, messageString);
     return obj.toJSONString();
   }

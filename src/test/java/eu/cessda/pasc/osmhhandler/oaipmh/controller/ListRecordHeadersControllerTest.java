@@ -81,6 +81,7 @@ public class ListRecordHeadersControllerTest {
         .andExpect(content().json(expectedRecordsJsonString));
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void shouldReturnSystemErrorWhenAndExceptionIsThrownInternally() throws Exception {
 
@@ -93,10 +94,10 @@ public class ListRecordHeadersControllerTest {
     // When
     this.mockMvc.perform(get("/v0/ListRecordHeaders?Repository=http://kirkedata.nsd.uib.no").accept(MediaType.APPLICATION_JSON_VALUE))
 
-        // Then
-        .andExpect(status().isInternalServerError())
-        .andExpect(status().reason(new IsNull<>()))
-        .andExpect(content().json(expectedRecordsJsonString));
+            // Then
+            .andExpect(status().isInternalServerError())
+            .andExpect(status().reason(new IsNull<>()))
+            .andExpect(content().json(expectedRecordsJsonString));
   }
 
   @Test

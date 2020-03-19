@@ -38,59 +38,52 @@ import static java.util.Optional.ofNullable;
 @UtilityClass
 class ParsingStrategies {
 
-  @SuppressWarnings("unchecked")
-  static <T> Function<Element, Optional<T>> countryStrategyFunction() {
+  static Function<Element, Optional<Country>> countryStrategyFunction() {
     return element -> {
       Country country = Country.builder()
-          .iso2LetterCode(getAttributeValue(element, ABBR_ATTR).orElse(NOT_AVAIL))
-          .countryName(CLEAN_CHARACTER_RETURNS_STRATEGY.apply(element.getText()))
-          .build();
-      return Optional.of((T) country);
+              .iso2LetterCode(getAttributeValue(element, ABBR_ATTR).orElse(NOT_AVAIL))
+              .countryName(CLEAN_CHARACTER_RETURNS_STRATEGY.apply(element.getText()))
+              .build();
+      return Optional.of(country);
     };
   }
 
-  @SuppressWarnings("unchecked")
-  static <T> Function<Element, Optional<T>> pidStrategyFunction() {
+  static Function<Element, Optional<Pid>> pidStrategyFunction() {
     return element -> {
       Pid agency = Pid.builder()
-          .agency(getAttributeValue(element, AGENCY_ATTR).orElse(NOT_AVAIL))
-          .pid(element.getText())
-          .build();
-      return Optional.of((T) agency);
+              .agency(getAttributeValue(element, AGENCY_ATTR).orElse(NOT_AVAIL))
+              .pid(element.getText())
+              .build();
+      return Optional.of(agency);
     };
   }
 
-  @SuppressWarnings("unchecked")
-  static <T> Function<Element, Optional<T>> nullableElementValueStrategyFunction() {
+  static Function<Element, Optional<String>> nullableElementValueStrategyFunction() {
     return element -> {
       String value = element.getText();
-      return (value.isEmpty())
-          ? Optional.empty() :
-          Optional.of((T) value);
+      return value.isEmpty() ? Optional.empty() : Optional.of(value);
     };
   }
 
   static Function<Element, Optional<String>> creatorStrategyFunction() {
     return element -> Optional.of(
-        getAttributeValue(element, CREATOR_AFFILIATION_ATTR).map(
-            valueString -> (element.getText() + " (" + valueString + ")")).orElseGet(element::getText)
+            getAttributeValue(element, CREATOR_AFFILIATION_ATTR).map(
+                    valueString -> (element.getText() + " (" + valueString + ")")).orElseGet(element::getText)
     );
   }
 
-  @SuppressWarnings("unchecked")
-  static <T> Function<Element, T> publisherStrategyFunction() {
-    return element -> (T) Publisher.builder()
-        .iso2LetterCode(getAttributeValue(element, ABBR_ATTR).orElse(NOT_AVAIL))
-        .publisher(CLEAN_CHARACTER_RETURNS_STRATEGY.apply(element.getText())).build();
+  static Function<Element, Publisher> publisherStrategyFunction() {
+    return element -> Publisher.builder()
+            .iso2LetterCode(getAttributeValue(element, ABBR_ATTR).orElse(NOT_AVAIL))
+            .publisher(CLEAN_CHARACTER_RETURNS_STRATEGY.apply(element.getText())).build();
   }
 
-  @SuppressWarnings("unchecked")
-  static <T> Function<Element, Optional<T>> termVocabAttributeStrategyFunction(boolean hasControlledValue) {
+  static Function<Element, Optional<TermVocabAttributes>> termVocabAttributeStrategyFunction(boolean hasControlledValue) {
     return element -> {
       Optional<Element> concept = ofNullable(element.getChild(CONCEPT_EL, DDI_NS));
       Element conceptVal = concept.orElse(new Element(EMPTY_EL));
       TermVocabAttributes vocabValueAttrs = parseTermVocabAttrAndValues(element, conceptVal, hasControlledValue);
-      return Optional.of((T) vocabValueAttrs);
+      return Optional.of(vocabValueAttrs);
     };
   }
 
@@ -98,38 +91,34 @@ class ParsingStrategies {
     return element -> ofNullable(element.getAttributeValue(URI_ATTR)).orElse("");
   }
 
-  @SuppressWarnings("unchecked")
-  static <T> Function<Element, Optional<T>> samplingTermVocabAttributeStrategyFunction(boolean hasControlledValue) {
+  static Function<Element, Optional<VocabAttributes>> samplingTermVocabAttributeStrategyFunction(boolean hasControlledValue) {
 
     return element -> {
-      Optional<T> vocabValueAttrsOpt = Optional.empty();
       Optional<Element> concept = ofNullable(element.getChild(CONCEPT_EL, DDI_NS));
       if (concept.isPresent()) {  //PUG req. only process if element has a <concept>
         Element conceptVal = concept.orElse(new Element(EMPTY_EL));
         VocabAttributes vocabValueAttrs = parseVocabAttrAndValues(element, conceptVal, hasControlledValue);
-        vocabValueAttrsOpt = Optional.of((T) vocabValueAttrs);
+        return Optional.of(vocabValueAttrs);
       }
-      return vocabValueAttrsOpt;
+      return Optional.empty();
     };
   }
 
-  @SuppressWarnings("unchecked")
-  static <T> Function<Element, Optional<T>> dataCollFreeTextStrategyFunction() {
+  static Function<Element, Optional<DataCollectionFreeText>> dataCollFreeTextStrategyFunction() {
 
     return element -> {
 
-      Optional<T> dataCollFTxt = Optional.empty();
       Optional<String> dateAttrValue = getAttributeValue(element, DATE_ATTR);
 
       // PUG requirement:  Only extract if there is no @date in <collDate>
       if (dateAttrValue.isEmpty()) {
-        dataCollFTxt = Optional.of((T) DataCollectionFreeText.builder()
+        return Optional.of(DataCollectionFreeText.builder()
                 .event(getAttributeValue(element, EVENT_ATTR).orElse(NOT_AVAIL))
                 .dataCollectionFreeText(element.getText())
                 .build());
       }
 
-      return dataCollFTxt;
+      return Optional.empty();
     };
   }
 }
