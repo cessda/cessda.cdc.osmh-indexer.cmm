@@ -52,7 +52,7 @@ public class DaoBase {
       return responseEntity.getBody();
     } catch (RestClientException e) {
       String message = String.format(UNSUCCESSFUL_RESPONSE, keyValue("error_repo_handler_source",fullUrl));
-      log.error(UNSUCCESSFUL_RESPONSE + "",  keyValue("error_endpoint",fullUrl.substring(66)), keyValue("error_repo_handler_source",fullUrl));
+      log.error(message + "",  keyValue("error_endpoint",fullUrl.substring(66)), keyValue("error_repo_handler_source",fullUrl));
       ExternalSystemException exception;
       try {
         exception = new ExternalSystemException(message, e.getCause(), ((HttpServerErrorException) e).getResponseBodyAsString());
