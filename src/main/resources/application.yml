@@ -111,6 +111,9 @@ osmhConsumer:
 #   - url: ''
 #     name: 'GESIS'
 #     handler: 'http://cdc-osmh-repo:9091'
+    - url: https://dataspire-test.sciencespo.fr/oai
+      name: 'Progedo'
+      handler: 'http://cdc-osmh-repo:9091'
     - url: http://147.213.4.44:6003/v0/oai
       name: 'SASD'
       handler: 'http://cdc-osmh-repo:9091'
@@ -129,9 +132,9 @@ osmhConsumer:
     - url: https://oai-pmh.nsd.no/oai-pmh
       name: 'NSD (Nesstar)'
       handler: 'http://cdc-osmh-repo-nesstar:9842'
-    - url:  http://nesstar.sciences-po.fr/oai-pmh
-      name: 'Progedo (Nesstar)'
-      handler: 'http://cdc-osmh-repo-nesstar:9842'
+#    - url:  http://nesstar.sciences-po.fr/oai-pmh
+#      name: 'Progedo (Nesstar)'
+#      handler: 'http://cdc-osmh-repo-nesstar:9842'
     - url:  http://harvester.sodanet.gr:8080/oai/request
       name: 'SoDaNet (Nesstar)'
       handler: 'http://cdc-osmh-repo-nesstar:9842'
@@ -192,9 +195,9 @@ osmhConsumer:
     - url: https://oai-pmh.nsd.no/oai-pmh
       name: 'NSD (Nesstar)'
       handler: 'http://localhost:9842'
-    - url:  http://nesstar.sciences-po.fr/oai-pmh
-      name: 'Progedo (Nesstar)'
-      handler: 'http://localhost:9842'
+  #  - url:  http://nesstar.sciences-po.fr/oai-pmh
+  #    name: 'Progedo (Nesstar)'
+  #    handler: 'http://localhost:9842'
     - url:  http://harvester.sodanet.gr:8080/oai/request
       name: 'SoDaNet (Nesstar)'
       handler: 'http://localhost:9842'
