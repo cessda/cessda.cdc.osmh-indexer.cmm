@@ -83,6 +83,7 @@ public class ListSupportedRecordTypesControllerTest {
         .andExpect(content().json(expectedRecords));
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void shouldReturnSystemErrorIfAJsonProcessingExceptionOccursDueToBadConfiguration() throws Exception {
 
@@ -90,18 +91,17 @@ public class ListSupportedRecordTypesControllerTest {
     String expectedRecords = "{\"message\":\"Internal OAI-PMH Handler System error!: N\\/A\"}";
 
     given(this.apiSupportedService.isSupportedVersion(any()))
-        .willReturn(true);
+            .willReturn(true);
 
-    given(this.apiSupportedService.getSupportedRecordTypes())
-        .willThrow(JsonProcessingException.class);
+    given(this.apiSupportedService.getSupportedRecordTypes()).willThrow(JsonProcessingException.class);
 
     // When
     this.mockMvc.perform(get("/v0/ListSupportedRecordTypes").accept(MediaType.APPLICATION_JSON_VALUE))
 
-        // Then
-        .andExpect(status().isInternalServerError())
-        .andExpect(status().reason(new IsNull<>()))
-        .andExpect(content().json(expectedRecords));
+            // Then
+            .andExpect(status().isInternalServerError())
+            .andExpect(status().reason(new IsNull<>()))
+            .andExpect(content().json(expectedRecords));
   }
 
   @Test

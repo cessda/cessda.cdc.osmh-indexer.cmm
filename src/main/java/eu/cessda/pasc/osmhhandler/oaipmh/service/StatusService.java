@@ -36,8 +36,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class StatusService {
 
-  private HandlerConfigurationProperties handlerConfigurationProperties;
-  private ObjectMapper objectMapper;
+  private final HandlerConfigurationProperties handlerConfigurationProperties;
+  private final ObjectMapper objectMapper;
 
   @Autowired
   public StatusService(HandlerConfigurationProperties handlerConfigurationProperties, ObjectMapper objectMapper) {
@@ -45,11 +45,10 @@ public class StatusService {
     this.objectMapper = objectMapper;
   }
 
-  @ManagedOperation(description = "prints out the PaSC Handler OaiPmh ddi 2.5 Configurations.")
+  @ManagedOperation(description = "Prints out the PaSC Handler Oai-Pmh DDI 2.5 Configurations.")
   public String printPaSCHandlerOaiPmhConfig() throws JsonProcessingException {
     ObjectWriter prettyPrinter = objectMapper.writerWithDefaultPrettyPrinter();
-    log.info("Config for Rest: [{}]", prettyPrinter.writeValueAsString(handlerConfigurationProperties.getRestTemplateProps()));
-    log.info("Config for DDI 2.5: [{}]", prettyPrinter.writeValueAsString(handlerConfigurationProperties.getOaiPmh()));
-    return "See logs for configuration print.";
+    return "Config for Rest: [" + prettyPrinter.writeValueAsString(handlerConfigurationProperties.getRestTemplateProps()) + "]\n" +
+            "Config for DDI 2.5: [" + prettyPrinter.writeValueAsString(handlerConfigurationProperties.getOaiPmh()) + "]";
   }
 }

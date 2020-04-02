@@ -16,6 +16,7 @@
 
 package eu.cessda.pasc.osmhhandler.oaipmh;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,28 +35,32 @@ import java.util.ArrayList;
 @EnableSwagger2
 public class SwaggerConfig {
 
-  @Value("${osmhhandler.baseEndpoint}")
-  private String baseEndpoint;
+    private final String baseEndpoint;
 
-  @Bean
-  public Docket api(ServletContext servletContext) {
-    return new Docket(DocumentationType.SWAGGER_2)
-        .select()
-        .apis(RequestHandlerSelectors.basePackage("eu.cessda.pasc.osmhhandler.oaipmh.controller"))
-        .build()
-        .useDefaultResponseMessages(false)
-        .pathProvider(new RelativePathProvider(servletContext) {
-          @Override
-          public String getApplicationBasePath() {
-            return baseEndpoint;
-          }
-        })
-        .apiInfo(metaData());
-  }
+    @Autowired
+    public SwaggerConfig(@Value("${osmhhandler.baseEndpoint}") String baseEndpoint) {
+        this.baseEndpoint = baseEndpoint;
+    }
 
-  private ApiInfo metaData() {
+    @Bean
+    public Docket api(ServletContext servletContext) {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .select()
+                .apis(RequestHandlerSelectors.basePackage("eu.cessda.pasc.osmhhandler.oaipmh.controller"))
+                .build()
+                .useDefaultResponseMessages(false)
+                .pathProvider(new RelativePathProvider(servletContext) {
+                    @Override
+                    public String getApplicationBasePath() {
+                        return baseEndpoint;
+                    }
+                })
+                .apiInfo(metaData());
+    }
 
-    Contact contact = new Contact("Cessda PaSC", "https://www.cessda.eu/", "support@cessda.eu");
+    private ApiInfo metaData() {
+
+        Contact contact = new Contact("Cessda PaSC", "https://www.cessda.eu/", "support@cessda.eu");
     String version = getClass().getPackage().getImplementationVersion();
 
     return new ApiInfo(

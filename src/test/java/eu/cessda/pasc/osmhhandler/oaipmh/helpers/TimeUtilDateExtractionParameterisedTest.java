@@ -33,8 +33,8 @@ import java.util.Optional;
 @RunWith(Parameterized.class)
 public class TimeUtilDateExtractionParameterisedTest {
 
-  private String fInput;
-  private int fExpected;
+  private final String fInput;
+  private final int fExpected;
 
   public TimeUtilDateExtractionParameterisedTest(String fInput, int fExpected) {
     this.fInput = fInput;

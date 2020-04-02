@@ -30,7 +30,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.*;
 
 /**
@@ -60,6 +59,6 @@ public class StatusServiceTest {
 
     //then
     verifier.verify(prettyWriter, calls(2)).writeValueAsString(anyObject());
-    then(outPut).isEqualTo("See logs for configuration print.");
+    then(outPut).startsWith("Config for Rest: [{\"test\":\"value\"}]");
   }
 }

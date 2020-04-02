@@ -20,9 +20,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Component;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 
 /**
  * File handling helper methods
@@ -36,10 +37,14 @@ public class FileHandler {
   public String getFileWithUtil(String fileName) {
 
     String result = "";
-    ClassLoader classLoader = getClass().getClassLoader();
     try {
-      result = IOUtils.toString(Objects.requireNonNull(classLoader.getResourceAsStream(fileName)), StandardCharsets.UTF_8);
-    } catch (IOException | NullPointerException e) {
+      InputStream resource = getClass().getClassLoader().getResourceAsStream(fileName);
+      if (resource != null) {
+        result = IOUtils.toString(resource, StandardCharsets.UTF_8);
+      } else {
+        throw new FileNotFoundException(fileName + " could not be found");
+      }
+    } catch (IOException e) {
       log.error("Could not read file successfully [{}]", e.getMessage());
     }
     return result;

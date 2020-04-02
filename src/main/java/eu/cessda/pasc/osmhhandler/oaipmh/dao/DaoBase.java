@@ -50,25 +50,16 @@ public class DaoBase {
      */
     String postForStringResponse(String fullUrl) throws ExternalSystemException {
         ResponseEntity<String> responseEntity;
-
+        String message = String.format("RestClientException! Unsuccessful response from remote SP's Endpoint [%s]", fullUrl);
         try {
             log.debug("Sending request to remote SP with url [{}].", fullUrl);
             responseEntity = restTemplate.getForEntity(fullUrl, String.class);
             log.debug("Got response code of [{}] for [{}]", responseEntity.getStatusCodeValue(), fullUrl);
             return responseEntity.getBody();
+        } catch (HttpServerErrorException e) {
+            throw new ExternalSystemException(message, e, e.getResponseBodyAsString());
         } catch (RestClientException e) {
-            String message = String.format("RestClientException! Unsuccessful response from remote SP's Endpoint [%s]", fullUrl);
-            ExternalSystemException exception;
-            //noinspection OverlyBroadCatchBlock
-            try {
-                exception = new ExternalSystemException(message, e, ((HttpServerErrorException) e).getResponseBodyAsString());
-            } catch (Exception e1) {
-                exception = new ExternalSystemException(message, e);
-            }
-
-            log.trace(message, e);
-            //noinspection ThrowInsideCatchBlockWhichIgnoresCaughtException
-            throw exception;
+            throw new ExternalSystemException(message, e);
         }
     }
 }
