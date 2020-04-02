@@ -72,19 +72,15 @@ pipeline {
                 }
             }
         }
-		stage('Build Docker image') {
-			 steps {
-				sh("docker build -t ${image_tag} .")
-			}
-			when { branch 'master' }
-		}
-		stage('Push Docker image') {
-			steps {
-				sh("gcloud auth configure-docker")
-				sh("docker push ${image_tag}")
-				sh("gcloud container images add-tag ${image_tag} ${docker_repo}/${product_name}-${module_name}:${env.BRANCH_NAME}-latest")
-			}
-			when { branch 'master' }
+		stage('Build and Push Docker image') {
+            steps {
+                sh 'gcloud auth configure-docker'
+                withMaven {
+                    sh "mvn jib:build -Dimage=${image_tag}"
+                }
+                sh("gcloud container images add-tag ${image_tag} ${docker_repo}/${product_name}-${module_name}:${env.BRANCH_NAME}-latest")
+            }
+            when { branch 'master' }
 		}
 		stage('Check Requirements and Deployments') {
 			steps {
