@@ -73,6 +73,8 @@ osmhhandler:
 #        preferredMetadataParam: oai_ddi25
       - url: http://147.213.4.44:6003/v0/oai
         preferredMetadataParam: oai_ddi25
+      - url: https://dataspire-test.sciencespo.fr/oai
+        preferredMetadataParam: oai_ddi
       - url: https://snd.gu.se/en/oai-pmh
         preferredMetadataParam: oai_ddi25
         setSpec: discipline:social-science
@@ -85,9 +87,9 @@ osmhhandler:
     concatSeparator: "+<br>"
     publicationYearDefault: 1970
   restTemplateProps:
-    connTimeout: 5000
-    connRequestTimeout: 5000
-    readTimeout: 60000 #every 1 minute (60_000ms)
+    connTimeout: 10000 # increased from 5 seconds to 10 seconds to deal with slower Nesstar repos
+    connRequestTimeout: 5000 # 5 seconds
+    readTimeout: 180000 # increased from 120 seconds to 180 seconds to deal with slower Nesstar repos
     verifySSL: true
 
 ---
