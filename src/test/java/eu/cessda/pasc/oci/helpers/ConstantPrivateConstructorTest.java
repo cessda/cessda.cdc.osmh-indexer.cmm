@@ -36,8 +36,8 @@ public class ConstantPrivateConstructorTest {
   public final ExpectedException exception = ExpectedException.none();
 
   @Test
-  public void appConstantsShouldHaveAPrivateConstructor() throws Exception {
-    Constructor constructor = AppConstants.class.getDeclaredConstructor();
+  public void appConstantsShouldHaveAPrivateConstructor() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+    Constructor<AppConstants> constructor = AppConstants.class.getDeclaredConstructor();
     assertTrue("Constructor is not private", Modifier.isPrivate(constructor.getModifiers()));
     constructor.setAccessible(true);
     exception.expect(InvocationTargetException.class);
@@ -45,8 +45,8 @@ public class ConstantPrivateConstructorTest {
   }
 
   @Test
-  public void timeUtilityShouldHaveAPrivateConstructor() throws Exception {
-    Constructor constructor = TimeUtility.class.getDeclaredConstructor();
+  public void timeUtilityShouldHaveAPrivateConstructor() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+    Constructor<TimeUtility> constructor = TimeUtility.class.getDeclaredConstructor();
     assertTrue("Constructor is not private", Modifier.isPrivate(constructor.getModifiers()));
     constructor.setAccessible(true);
     exception.expect(InvocationTargetException.class);

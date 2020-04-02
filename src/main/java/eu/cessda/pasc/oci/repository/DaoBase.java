@@ -24,7 +24,7 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import static net.logstash.logback.argument.StructuredArguments.keyValue;
+import static net.logstash.logback.argument.StructuredArguments.value;
 
 /**
  * Shareable Dao functions
@@ -35,7 +35,6 @@ import static net.logstash.logback.argument.StructuredArguments.keyValue;
 @Slf4j
 public class DaoBase {
 
-  private static final String UNSUCCESSFUL_RESPONSE = "Unsuccessful response from CDC Handler [%s].";
   private final RestTemplate restTemplate;
 
   @Autowired
@@ -43,22 +42,18 @@ public class DaoBase {
     this.restTemplate = restTemplate;
   }
 
-  @SuppressWarnings("ThrowInsideCatchBlockWhichIgnoresCaughtException")
   String postForStringResponse(String fullUrl) throws ExternalSystemException {
     ResponseEntity<String> responseEntity;
 
+    // This is common to both error handling paths
+    String message = String.format("Unsuccessful response from CDC Handler [%s].", value("error_repo_handler_source", fullUrl));
     try {
       responseEntity = restTemplate.getForEntity(fullUrl, String.class);
       return responseEntity.getBody();
+    } catch (HttpServerErrorException e) {
+      throw new ExternalSystemException(message, e, e.getResponseBodyAsString());
     } catch (RestClientException e) {
-      String message = String.format(UNSUCCESSFUL_RESPONSE, keyValue("error_repo_handler_source",fullUrl));
-      ExternalSystemException exception;
-      try {
-        exception = new ExternalSystemException(message, e.getCause(), ((HttpServerErrorException) e).getResponseBodyAsString());
-      } catch (RuntimeException e1) {
-        exception = new ExternalSystemException(message, e.getCause(), e.getMessage());
-      }
-      throw exception;
+      throw new ExternalSystemException(message, e);
     }
   }
 }

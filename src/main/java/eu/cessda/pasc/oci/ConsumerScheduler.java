@@ -38,10 +38,7 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -100,7 +97,7 @@ public class ConsumerScheduler {
   public void fullHarvestAndIngestionAllConfiguredSPsReposRecords() {
     String cdcRunjobId = getCdcRunjobId();
     try (var ignored = MDC.putCloseable(ConsumerScheduler.DEFAULT_CDC_JOB_KEY, cdcRunjobId)) {
-      OffsetDateTime date = OffsetDateTime.now();
+      OffsetDateTime date = OffsetDateTime.now(ZoneId.systemDefault());
       logStartStatus(date, FULL_RUN);
       executeHarvestAndIngest(null);
       currentTotalCmmStudiesInElasticSearch();
@@ -112,11 +109,11 @@ public class ConsumerScheduler {
    * Daily Harvest and Ingestion run.
    */
   @ManagedOperation(description = "Manual trigger to do an incremental harvest and ingest")
-  @Scheduled(cron = "${osmhConsumer.daily.run}") //Use Jenkins job instead
+  @Scheduled(cron = "${osmhConsumer.daily.run}")
   public void dailyIncrementalHarvestAndIngestionAllConfiguredSPsReposRecords() {
     String cdcRunjobId = getCdcRunjobId();
     try (var ignored = MDC.putCloseable(ConsumerScheduler.DEFAULT_CDC_JOB_KEY, cdcRunjobId)) {
-      OffsetDateTime date = OffsetDateTime.now();
+      OffsetDateTime date = OffsetDateTime.now(ZoneId.systemDefault());
       logStartStatus(date, DAILY_INCREMENTAL_RUN);
       executeHarvestAndIngest(esIndexerService.getMostRecentLastModified().orElse(null));
       currentTotalCmmStudiesInElasticSearch();
@@ -127,7 +124,7 @@ public class ConsumerScheduler {
   /**
    * Weekly run.
    */
-  @Scheduled(cron = "${osmhConsumer.daily.sunday.run}") //Use Jenkins job instead
+  @Scheduled(cron = "${osmhConsumer.daily.sunday.run}")
   public void weeklyFullHarvestAndIngestionAllConfiguredSPsReposRecords() {
     String cdcRunjobId = getCdcRunjobId();
     try (var ignored = MDC.putCloseable(ConsumerScheduler.DEFAULT_CDC_JOB_KEY, cdcRunjobId)) {
@@ -143,7 +140,7 @@ public class ConsumerScheduler {
    * @return the correlation id
    */
   private String getCdcRunjobId() {
-    return DEFAULT_RESPONSE_TOKEN_HEADER + formatter.format(OffsetDateTime.now());
+    return DEFAULT_RESPONSE_TOKEN_HEADER + formatter.format(OffsetDateTime.now(ZoneId.systemDefault()));
   }
 
   private void executeHarvestAndIngest(LocalDateTime lastModifiedDateTime) {

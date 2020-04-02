@@ -28,9 +28,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.sort.SortOrder;
-import org.json.JSONException;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,7 +36,6 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
-import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -93,7 +90,7 @@ public class ESIngestServiceTest extends EmbeddedElasticsearchServer{
   }
 
   @Test
-  public void shouldSuccessfullyBulkIndexAllCMMStudies() throws IOException, JSONException {
+  public void shouldSuccessfullyBulkIndexAllCMMStudies() throws IOException {
 
     // Given
     final JsonNode expectedTree = mapper.readTree(getSyntheticCMMStudyOfLanguageEn());
@@ -146,23 +143,5 @@ public class ESIngestServiceTest extends EmbeddedElasticsearchServer{
 
     // Then
     then(mostRecentLastModified.orElse(null)).isEqualByComparingTo(LocalDateTime.parse("2017-11-17T00:00:00"));
-  }
-
-  @Test
-  public void shouldReturnFalseOnRuntimeException() throws IOException {
-    Mockito.doThrow(new RuntimeException("Mocked exception!"))
-            .when(mockedElasticsearchTemplate).bulkIndex(Mockito.anyListOf(IndexQuery.class));
-    Mockito.doReturn(true).when(mockedElasticsearchTemplate).indexExists(Mockito.anyString());
-    IngestService ingestService = new ESIngestService(mockedElasticsearchTemplate, fileHandler, esConfigProp);
-
-    // Given
-    String language = "en";
-    List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
-
-    // When
-    boolean isSuccessful = ingestService.bulkIndex(studyOfLanguages, language);
-
-    // Then
-    Assert.assertFalse(isSuccessful);
   }
 }

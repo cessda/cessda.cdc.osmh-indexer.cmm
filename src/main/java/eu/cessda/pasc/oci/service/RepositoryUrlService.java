@@ -46,36 +46,32 @@ public class RepositoryUrlService
 
     public String constructListRecordUrl( String repositoryUrl )
     {
-        String finalUrl = "replace_me";
-        Optional<Repo> repoOptional = fakeHarvester.getRepoConfigurationProperties( repositoryUrl );
-
-        if ( repoOptional.isPresent() )
-        {
-            finalUrl = String.format( LIST_RECORD_TEMPLATE,
+        Optional<Repo> repoOptional = fakeHarvester.getRepoConfigurationProperties(repositoryUrl);
+        if (repoOptional.isPresent()) {
+            String finalUrl = String.format(LIST_RECORD_TEMPLATE,
                     repoOptional.get().getHandler(),
                     appConfigurationProperties.getHarvester().getVersion(),
-                    repositoryUrl );
+                    repositoryUrl);
+            log.info("[{}] Final ListHeaders Handler url [{}] constructed.", repositoryUrl, finalUrl);
+            return finalUrl;
+        } else {
+            throw new IllegalStateException("Couldn't construct Final ListHeaders Handler url for repository" + repositoryUrl);
         }
-
-        log.info( "[{}] Final ListHeaders Handler url [{}] constructed.", repositoryUrl, finalUrl );
-        return finalUrl;
     }
 
-    public String constructGetRecordUrl( String repositoryUrl, String studyNumber )
-    {
-        String finalUrl = "I_SHOULD-HAVE-BEEN-REPLACED";
-        Optional<Repo> repoOptional = fakeHarvester.getRepoConfigurationProperties( repositoryUrl );
-        String encodedStudyID = StudyIdentifierEncoder.encodeStudyIdentifier().apply( studyNumber );
-
-        if ( repoOptional.isPresent() )
-        {
-            finalUrl = String.format( GET_RECORD_TEMPLATE,
+    public String constructGetRecordUrl( String repositoryUrl, String studyNumber ) {
+        Optional<Repo> repoOptional = fakeHarvester.getRepoConfigurationProperties(repositoryUrl);
+        if (repoOptional.isPresent()) {
+            String encodedStudyID = StudyIdentifierEncoder.encodeStudyIdentifier().apply(studyNumber);
+            String finalUrl = String.format(GET_RECORD_TEMPLATE,
                     repoOptional.get().getHandler(),
                     appConfigurationProperties.getHarvester().getVersion(),
                     encodedStudyID,
-                    repositoryUrl );
+                    repositoryUrl);
+            log.trace("[{}] Final GetRecord Handler url [{}] constructed.", repositoryUrl, finalUrl);
+            return finalUrl;
+        } else {
+            throw new IllegalStateException("Couldn't construct Final GetRecord Handler url for repository " + repositoryUrl + " and studyNumber " + studyNumber);
         }
-        log.trace( "[{}] Final GetRecord Handler url [{}] constructed.", repositoryUrl, finalUrl );
-        return finalUrl;
     }
 }
