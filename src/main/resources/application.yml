@@ -138,7 +138,7 @@ osmhhandler:
 
 ---
 spring:
-  profiles: live
+  profiles: gcp
   main:
     banner-mode: "off"
   boot:
