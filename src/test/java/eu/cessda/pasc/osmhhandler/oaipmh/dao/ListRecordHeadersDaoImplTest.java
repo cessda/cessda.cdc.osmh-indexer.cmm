@@ -16,25 +16,21 @@
 
 package eu.cessda.pasc.osmhhandler.oaipmh.dao;
 
+import com.pgssoft.httpclient.HttpClientMock;
+import eu.cessda.pasc.osmhhandler.oaipmh.configuration.HandlerConfigurationProperties;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.web.client.RestTemplate;
 
-import static eu.cessda.pasc.osmhhandler.oaipmh.mock.data.RecordHeadersMock.getListIdentifiersXML;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+
 import static org.assertj.core.api.BDDAssertions.then;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.test.web.client.ExpectedCount.once;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 /**
  * @author moses AT doraventures DOT com
@@ -44,57 +40,49 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 @ActiveProfiles("test")
 public class ListRecordHeadersDaoImplTest {
 
-  @Autowired
-  RestTemplate restTemplateWithNoSSLVerification;
+    @Autowired
+    private HandlerConfigurationProperties handlerConfigurationProperties;
 
-  @Autowired
-  ListRecordHeadersDao listRecordHeadersDao;
+    private HttpClientMock httpClient = new HttpClientMock();
 
-  private MockRestServiceServer server;
+    @Test
+    public void shouldReturnXmlPayloadOfRecordHeadersFromRemoteRepository() throws CustomHandlerException, IOException {
 
-  @Before
-  public void setUp() {
-    server = MockRestServiceServer.bindTo(restTemplateWithNoSSLVerification).build();
-  }
+        // Given
+        String fullListRecordHeadersUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=ListIdentifiers&metadataPrefix=ddi";
 
+        httpClient.onGet(fullListRecordHeadersUrl).doReturn(fullListRecordHeadersUrl, StandardCharsets.UTF_8);
 
-  @Test
-  public void shouldReturnXmlPayloadOfRecordHeadersFromRemoteRepository() throws CustomHandlerException {
+        // When
+        ListRecordHeadersDao listRecordHeadersDao = new ListRecordHeadersDaoImpl(httpClient, handlerConfigurationProperties);
+        try (InputStream inputStream = listRecordHeadersDao.listRecordHeaders(fullListRecordHeadersUrl)) {
+            String recordHeadersXML = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            System.out.println("Actual: " + recordHeadersXML);
 
-    // Given
-    String fullListRecordHeadersUrl= "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=ListIdentifiers&metadataPrefix=ddi";
+            then(recordHeadersXML).isNotNull();
+            then(recordHeadersXML).isNotEmpty();
+            then(recordHeadersXML).contains(fullListRecordHeadersUrl);
+        }
+    }
 
-    server.expect(once(), requestTo(fullListRecordHeadersUrl))
-        .andExpect(method(GET))
-        .andRespond(withSuccess(getListIdentifiersXML(), MediaType.TEXT_XML));
+    @Test
+    public void shouldReturnXmlPayloadOfGivenSpecSetRecordHeadersFromRemoteRepository() throws CustomHandlerException, IOException {
 
-    // When
-    String recordHeadersXML = listRecordHeadersDao.listRecordHeaders(fullListRecordHeadersUrl);
+        // Given
+        String fullListRecordHeadersUrl = "http://services.fsd.uta.fi/v0/oai?verb=ListIdentifiers&metadataPrefix=oai_ddi25&set=study_groups:energia";
 
-    System.out.println("Actual: " + recordHeadersXML);
+        httpClient.onGet(fullListRecordHeadersUrl).doReturn(fullListRecordHeadersUrl, StandardCharsets.UTF_8);
 
-    then(recordHeadersXML).isNotNull();
-    then(recordHeadersXML).isNotEmpty();
-    then(recordHeadersXML).contains(getListIdentifiersXML());
-  }
+        // When
+        ListRecordHeadersDao listRecordHeadersDao = new ListRecordHeadersDaoImpl(httpClient, handlerConfigurationProperties);
+        try (InputStream inputStream = listRecordHeadersDao.listRecordHeaders(fullListRecordHeadersUrl)) {
+            String recordHeadersXML = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 
-  @Test
-  public void shouldReturnXmlPayloadOfGivenSpecSetRecordHeadersFromRemoteRepository() throws CustomHandlerException {
+            System.out.println("Actual: " + recordHeadersXML);
 
-    // Given
-    String fullListRecordHeadersUrl= "http://services.fsd.uta.fi/v0/oai?verb=ListIdentifiers&metadataPrefix=oai_ddi25&set=study_groups:energia";
-
-    server.expect(once(), requestTo(fullListRecordHeadersUrl))
-        .andExpect(method(GET))
-        .andRespond(withSuccess(getListIdentifiersXML(), MediaType.TEXT_XML));
-
-    // When
-    String recordHeadersXML = listRecordHeadersDao.listRecordHeaders(fullListRecordHeadersUrl);
-
-    System.out.println("Actual: " + recordHeadersXML);
-
-    then(recordHeadersXML).isNotNull();
-    then(recordHeadersXML).isNotEmpty();
-    then(recordHeadersXML).contains(getListIdentifiersXML());
-  }
+            then(recordHeadersXML).isNotNull();
+            then(recordHeadersXML).isNotEmpty();
+            then(recordHeadersXML).contains(fullListRecordHeadersUrl);
+        }
+    }
 }

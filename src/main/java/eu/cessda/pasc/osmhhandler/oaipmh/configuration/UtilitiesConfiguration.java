@@ -18,30 +18,15 @@ package eu.cessda.pasc.osmhhandler.oaipmh.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.TrustStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.web.client.RestTemplate;
 
-import javax.net.ssl.SSLContext;
 import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.nio.charset.StandardCharsets;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
-
-import static org.apache.http.ssl.SSLContexts.custom;
+import java.net.http.HttpClient;
+import java.time.Duration;
 
 /**
  * Extra Util configuration
@@ -65,53 +50,18 @@ public class UtilitiesConfiguration {
   }
 
   @Bean
-  public DocumentBuilder documentBuilder() throws ParserConfigurationException {
+  public DocumentBuilderFactory documentBuilderFactory() throws ParserConfigurationException {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
     factory.setNamespaceAware(true);
-    return factory.newDocumentBuilder();
+    return factory;
   }
 
   @Bean
-  public RestTemplate restTemplate() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
-    RestTemplate restTemplate;
-    if (handlerConfigurationProperties.getRestTemplateProps().isVerifySSL()) {
-      restTemplate = new RestTemplate(getClientHttpRequestFactory());
-    } else {
-      log.warn("Creating RestTemplate without SSL verification enabled");
-      restTemplate = new RestTemplate(getClientHttpRequestFactoryWithoutSSL());
-    }
-    restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
-    return restTemplate;
-  }
-
-  private ClientHttpRequestFactory getClientHttpRequestFactory() {
-    HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
-    clientHttpRequestFactory.setConnectTimeout(handlerConfigurationProperties.getRestTemplateProps().getConnTimeout());
-    clientHttpRequestFactory.setReadTimeout(handlerConfigurationProperties.getRestTemplateProps().getReadTimeout());
-    clientHttpRequestFactory.setConnectionRequestTimeout(handlerConfigurationProperties.getRestTemplateProps()
-        .getConnRequestTimeout());
-    return clientHttpRequestFactory;
-  }
-
-  /**
-   * Builds a {@link ClientHttpRequestFactory} with ssl off.
-   *
-   * <b>Note this is a "temp" to work around untrusted certificate for UKDA oai-pmh endpoint</b>
-   */
-  private ClientHttpRequestFactory getClientHttpRequestFactoryWithoutSSL()
-      throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
-
-    TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
-    SSLContext sslContext = custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
-    SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
-    CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(csf).build();
-
-    HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-    requestFactory.setConnectTimeout(handlerConfigurationProperties.getRestTemplateProps().getConnTimeout());
-    requestFactory.setReadTimeout(handlerConfigurationProperties.getRestTemplateProps().getReadTimeout());
-    requestFactory.setConnectionRequestTimeout(handlerConfigurationProperties.getRestTemplateProps().getConnRequestTimeout());
-    requestFactory.setHttpClient(httpClient);
-    return requestFactory;
+  public HttpClient httpClient() {
+    return HttpClient.newBuilder()
+            .connectTimeout(Duration.ofMillis(handlerConfigurationProperties.getRestTemplateProps().getConnTimeout()))
+            .followRedirects(HttpClient.Redirect.NORMAL)
+            .build();
   }
 }

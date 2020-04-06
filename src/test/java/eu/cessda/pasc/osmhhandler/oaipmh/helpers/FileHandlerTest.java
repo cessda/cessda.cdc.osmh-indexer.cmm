@@ -19,6 +19,9 @@ package eu.cessda.pasc.osmhhandler.oaipmh.helpers;
 import eu.cessda.pasc.osmhhandler.oaipmh.FileHandler;
 import org.junit.Test;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -26,27 +29,25 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class FileHandlerTest {
 
-  @Test
-  public void shouldReturnEmptyStringForBadPath() {
+    @Test(expected = FileNotFoundException.class)
+    public void shouldReturnEmptyStringForBadPath() throws IOException {
 
-    // Given
-    FileHandler fileHandler = new FileHandler();
+        // Given
+        FileHandler fileHandler = new FileHandler();
 
-    // When
-    String fileContent = fileHandler.getFileWithUtil("xml/ddi_record_1683_does_not_exist.xml");
+        // When
+        fileHandler.getFileWithUtil("xml/ddi_record_1683_does_not_exist.xml");
+    }
 
-    assertThat(fileContent).isEqualTo("");
-  }
+    @Test
+    public void shouldReturnContentOfValidFilePath() throws IOException {
 
-  @Test
-  public void shouldReturnContentOfValidFilePath() {
+        // Given
+        FileHandler fileHandler = new FileHandler();
 
-    // Given
-    FileHandler fileHandler = new FileHandler();
+        // When
+        String fileContent = fileHandler.getFileWithUtil("xml/ddi_record_1683.xml");
 
-    // When
-    String fileContent = fileHandler.getFileWithUtil("xml/ddi_record_1683.xml");
-
-    assertThat(fileContent).contains("<request verb=\"GetRecord\" identifier=\"1683\"");
-  }
+        assertThat(fileContent).contains("<request verb=\"GetRecord\" identifier=\"1683\"");
+    }
 }

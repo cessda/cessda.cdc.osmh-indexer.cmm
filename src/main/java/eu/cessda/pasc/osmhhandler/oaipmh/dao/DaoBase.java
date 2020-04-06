@@ -16,50 +16,65 @@
 
 package eu.cessda.pasc.osmhhandler.oaipmh.dao;
 
+import eu.cessda.pasc.osmhhandler.oaipmh.configuration.HandlerConfigurationProperties;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 
 /**
  * Shareable Dao functions
  *
  * @author moses AT doraventures DOT com
  */
-@Component
 @Slf4j
 public class DaoBase {
 
-    private final RestTemplate restTemplate;
+    public static final String EXCEPTION_MESSAGE = "RestClientException! Unsuccessful response from remote SP's Endpoint [%s]";
+    private final HttpClient httpClient;
+    private final HandlerConfigurationProperties handlerConfigurationProperties;
 
-    @Autowired
-    public DaoBase(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
+    public DaoBase(HttpClient httpClient, HandlerConfigurationProperties handlerConfigurationProperties) {
+        this.httpClient = httpClient;
+        this.handlerConfigurationProperties = handlerConfigurationProperties;
     }
 
-    /**
-     * Gets the requested url as a string.
-     *
-     * @param fullUrl The URL to retrieve.
-     * @return A string containing the response
-     * @throws ExternalSystemException if an error occurs getting the url. The cause can be retrieved using getCause().
-     */
-    String postForStringResponse(String fullUrl) throws ExternalSystemException {
-        ResponseEntity<String> responseEntity;
-        String message = String.format("RestClientException! Unsuccessful response from remote SP's Endpoint [%s]", fullUrl);
+    protected InputStream postForStringResponse(String fullUrl) throws ExternalSystemException {
+        return postForStringResponse(URI.create(fullUrl));
+    }
+
+    protected InputStream postForStringResponse(URI fullUrl) throws ExternalSystemException {
+        HttpRequest httpRequest = HttpRequest
+                .newBuilder(fullUrl)
+                .timeout(Duration.ofMillis(handlerConfigurationProperties.getRestTemplateProps().getReadTimeout()))
+                .build();
         try {
             log.debug("Sending request to remote SP with url [{}].", fullUrl);
-            responseEntity = restTemplate.getForEntity(fullUrl, String.class);
-            log.debug("Got response code of [{}] for [{}]", responseEntity.getStatusCodeValue(), fullUrl);
-            return responseEntity.getBody();
-        } catch (HttpServerErrorException e) {
-            throw new ExternalSystemException(message, e, e.getResponseBodyAsString());
-        } catch (RestClientException e) {
-            throw new ExternalSystemException(message, e);
+            HttpResponse<InputStream> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofInputStream());
+            log.debug("Got response code of [{}] for [{}]", httpResponse.statusCode(), fullUrl);
+            if (httpResponse.statusCode() >= 400) {
+                try (InputStream body = httpResponse.body()) {
+                    throw new ExternalSystemException(
+                            String.format(EXCEPTION_MESSAGE, fullUrl),
+                            new IOException("Server returned " + httpResponse.statusCode()),
+                            new String(body.readAllBytes(), StandardCharsets.UTF_8)
+                    );
+                }
+            }
+            return httpResponse.body();
+        } catch (IOException e) {
+            throw new ExternalSystemException(String.format(EXCEPTION_MESSAGE, fullUrl), e);
+        } catch (InterruptedException e) {
+            log.warn("Interrupted. Request cancelled.");
+            Thread.currentThread().interrupt();
+            return InputStream.nullInputStream();
         }
     }
 }

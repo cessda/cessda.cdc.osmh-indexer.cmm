@@ -19,8 +19,12 @@ package eu.cessda.pasc.osmhhandler.oaipmh.mock.data;
 
 import eu.cessda.pasc.osmhhandler.oaipmh.FileHandler;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMStudy;
+import lombok.experimental.UtilityClass;
 import org.assertj.core.util.Maps;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 /**
@@ -28,6 +32,7 @@ import java.util.Map;
  *
  * @author moses AT doraventures DOT com
  */
+@UtilityClass
 public class CMMStudyTestData {
 
   public static CMMStudy getCMMStudy() {
@@ -42,8 +47,13 @@ public class CMMStudyTestData {
     return builder.build();
   }
 
-  public static String getContent(String filePath) {
+  public static String getContent(String filePath) throws IOException {
     FileHandler fileHandler = new FileHandler();
     return fileHandler.getFileWithUtil(filePath);
+  }
+
+  public static InputStream getContentAsStream(String filePath) throws FileNotFoundException {
+    FileHandler fileHandler = new FileHandler();
+    return fileHandler.getFileAsStream(filePath);
   }
 }
