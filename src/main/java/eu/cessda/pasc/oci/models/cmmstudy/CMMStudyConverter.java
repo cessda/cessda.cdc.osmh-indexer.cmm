@@ -18,7 +18,8 @@ package eu.cessda.pasc.oci.models.cmmstudy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
-import lombok.experimental.UtilityClass;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,24 +36,23 @@ import java.io.InputStream;
  *
  * @author moses AT doraventures DOT com
  */
-@UtilityClass
+@Service
 public class CMMStudyConverter {
 
-  // Serialize/deserialize helpers
+  private final ObjectReader reader;
 
-  public static CMMStudy fromJsonString(InputStream json) throws IOException {
-    return getObjectReader().readValue(json);
-  }
-
-  private static ObjectReader reader;
-
-  private static void instantiateMapper() {
-    ObjectMapper mapper = new ObjectMapper();
+  @Autowired
+  public CMMStudyConverter(ObjectMapper mapper) {
     reader = mapper.readerFor(CMMStudy.class);
   }
 
-  private static ObjectReader getObjectReader() {
-    if (reader == null) instantiateMapper();
-    return reader;
+  /**
+   * Convert a JSON stream to a {@link CMMStudy} POJO.
+   *
+   * @param json the input stream to parse.
+   * @throws IOException if an IO error occurs when parsing the stream.
+   */
+  public CMMStudy fromJsonString(InputStream json) throws IOException {
+    return reader.readValue(json);
   }
 }

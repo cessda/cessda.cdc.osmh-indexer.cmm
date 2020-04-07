@@ -23,6 +23,7 @@ import eu.cessda.pasc.oci.helpers.TimeUtility;
 import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
+import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.repository.HarvesterDao;
 import eu.cessda.pasc.oci.service.impl.DefaultHarvesterConsumerService;
@@ -63,11 +64,14 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
   @Autowired
   ObjectMapper objectMapper;
 
+  @Autowired
+  CMMStudyConverter cmmStudyConverter;
+
   DefaultHarvesterConsumerService defaultHarvesterConsumerService;
 
   @Before
   public void setUp() {
-    defaultHarvesterConsumerService = new DefaultHarvesterConsumerService(harvesterDao, repositoryUrlService, objectMapper);
+    defaultHarvesterConsumerService = new DefaultHarvesterConsumerService(harvesterDao, repositoryUrlService, objectMapper, cmmStudyConverter);
   }
 
   @Test
