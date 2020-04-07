@@ -24,6 +24,7 @@ import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
 import lombok.experimental.UtilityClass;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -185,7 +186,7 @@ public final class RecordTestData {
   }
 
   public static CMMStudy getSyntheticCmmStudy() throws IOException {
-    String cmmStudyString = new FileHandler().getFileWithUtil("synthetic_compliant_record.json");
+    InputStream cmmStudyString = new FileHandler().getFileAsStream("synthetic_compliant_record.json");
     return CMMStudyConverter.fromJsonString(cmmStudyString);
   }
 
@@ -196,7 +197,7 @@ public final class RecordTestData {
   }
 
   private static CMMStudy getDeletedCmmStudy() throws IOException {
-    String cmmStudyString = new FileHandler().getFileWithUtil("record_ukds_1031_deleted.json");
+    InputStream cmmStudyString = new FileHandler().getFileAsStream("record_ukds_1031_deleted.json");
     return CMMStudyConverter.fromJsonString(cmmStudyString);
   }
 
@@ -206,7 +207,7 @@ public final class RecordTestData {
     return optionalCmmStudy;
   }
 
-  public static String getSyntheticCMMStudyOfLanguageEn() {
+  public static String getSyntheticCMMStudyOfLanguageEn() throws IOException {
     FileHandler fileHandler = new FileHandler();
     return fileHandler.getFileWithUtil("synthetic_complaint_record_en.json");
   }

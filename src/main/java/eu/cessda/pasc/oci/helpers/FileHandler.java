@@ -16,11 +16,12 @@
 package eu.cessda.pasc.oci.helpers;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Component;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Objects;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 /**
  * File handling helper methods
@@ -31,15 +32,16 @@ import java.util.Objects;
 @Slf4j
 public class FileHandler {
 
-  public String getFileWithUtil(String fileName) {
-
-    String result = "";
-    ClassLoader classLoader = getClass().getClassLoader();
-    try {
-      result = IOUtils.toString(Objects.requireNonNull(classLoader.getResourceAsStream(fileName)));
-    } catch (IOException | NullPointerException e) {
-      log.error("Could not read file [{}]. Exception Message [{}]", fileName, e.getMessage());
+    public InputStream getFileAsStream(String fileName) throws FileNotFoundException {
+        InputStream resource = getClass().getClassLoader().getResourceAsStream(fileName);
+        if (resource == null) {
+            throw new FileNotFoundException(fileName + " could not be found");
+        }
+        return resource;
     }
-    return result;
-  }
+
+    public String getFileWithUtil(String fileName) throws IOException {
+        InputStream resource = getFileAsStream(fileName);
+        return new String(resource.readAllBytes(), StandardCharsets.UTF_8);
+    }
 }

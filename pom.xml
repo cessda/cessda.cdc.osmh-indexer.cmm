@@ -194,6 +194,11 @@
       <version>3.0.0</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.pgs-soft</groupId>
+      <artifactId>HttpClientMock</artifactId>
+      <version>1.0.0</version>
+    </dependency>
   </dependencies>
 
   <dependencyManagement>

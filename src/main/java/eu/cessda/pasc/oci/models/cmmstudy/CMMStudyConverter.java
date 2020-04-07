@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import lombok.experimental.UtilityClass;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * CMMStudy Serialize/deserialize helpers.
@@ -39,7 +40,7 @@ public class CMMStudyConverter {
 
   // Serialize/deserialize helpers
 
-  public static CMMStudy fromJsonString(String json) throws IOException {
+  public static CMMStudy fromJsonString(InputStream json) throws IOException {
     return getObjectReader().readValue(json);
   }
 

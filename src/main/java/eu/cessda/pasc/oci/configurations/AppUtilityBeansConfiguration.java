@@ -36,7 +36,9 @@ import org.springframework.web.client.RestTemplate;
 import javax.annotation.PreDestroy;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -110,6 +112,14 @@ public class AppUtilityBeansConfiguration {
   @Bean
   public ElasticsearchTemplate elasticsearchTemplate() throws UnknownHostException {
     return new ElasticsearchTemplate(client());
+  }
+
+  @Bean
+  public HttpClient httpClient() {
+    return HttpClient.newBuilder()
+            .connectTimeout(Duration.ofMillis(appConfigurationProperties.getRestTemplateProps().getConnTimeout()))
+            .followRedirects(HttpClient.Redirect.NORMAL)
+            .build();
   }
 
   @PreDestroy

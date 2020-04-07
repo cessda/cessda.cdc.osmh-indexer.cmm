@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,9 +69,10 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
     List<RecordHeader> recordHeadersUnfiltered = new ArrayList<>();
     try {
       String finalUrl = repositoryUrlService.constructListRecordUrl(repo.getUrl());
-      String recordHeadersJsonString = harvesterDao.listRecordHeaders(finalUrl);
-      CollectionType collectionType = mapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class);
-      recordHeadersUnfiltered = mapper.readValue(recordHeadersJsonString, collectionType);
+      try (InputStream recordHeadersJsonString = harvesterDao.listRecordHeaders(finalUrl)) {
+        CollectionType collectionType = mapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class);
+        recordHeadersUnfiltered = mapper.readValue(recordHeadersJsonString, collectionType);
+      }
     } catch (ExternalSystemException e) {
       log.error("ListRecordHeaders failed for repo [{}]. CDC Handler Error object Msg [{}].", repo, e.getMessage(), e);
     } catch (IOException e) {
@@ -85,8 +87,9 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
     String finalUrl = "";
     try {
       finalUrl = repositoryUrlService.constructGetRecordUrl(repo.getUrl(), studyNumber);
-      String recordJsonString = harvesterDao.getRecord(finalUrl);
-      return Optional.ofNullable(CMMStudyConverter.fromJsonString(recordJsonString));
+      try (InputStream recordJsonString = harvesterDao.getRecord(finalUrl)) {
+        return Optional.ofNullable(CMMStudyConverter.fromJsonString(recordJsonString));
+      }
     } catch (ExternalSystemException e) {
       log.warn("Short Exception msg [{}], " +
                       "HttpServerErrorException response detail from handler's [{}], " +

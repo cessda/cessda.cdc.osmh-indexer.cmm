@@ -15,45 +15,65 @@
  */
 package eu.cessda.pasc.oci.repository;
 
+import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 
-import static net.logstash.logback.argument.StructuredArguments.value;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 
 /**
  * Shareable Dao functions
  *
  * @author moses AT doraventures DOT com
  */
-@Component
 @Slf4j
 public class DaoBase {
 
-  private final RestTemplate restTemplate;
+    public static final String EXCEPTION_MESSAGE = "RestClientException! Unsuccessful response from remote SP's Endpoint [%s]";
+    private final HttpClient httpClient;
+    private final AppConfigurationProperties appConfigurationProperties;
 
-  @Autowired
-  public DaoBase(RestTemplate restTemplate) {
-    this.restTemplate = restTemplate;
-  }
-
-  String postForStringResponse(String fullUrl) throws ExternalSystemException {
-    ResponseEntity<String> responseEntity;
-
-    // This is common to both error handling paths
-    String message = String.format("Unsuccessful response from CDC Handler [%s].", value("error_repo_handler_source", fullUrl));
-    try {
-      responseEntity = restTemplate.getForEntity(fullUrl, String.class);
-      return responseEntity.getBody();
-    } catch (HttpServerErrorException e) {
-      throw new ExternalSystemException(message, e, e.getResponseBodyAsString());
-    } catch (RestClientException e) {
-      throw new ExternalSystemException(message, e);
+    public DaoBase(HttpClient httpClient, AppConfigurationProperties appConfigurationProperties) {
+        this.httpClient = httpClient;
+        this.appConfigurationProperties = appConfigurationProperties;
     }
-  }
+
+    protected InputStream postForStringResponse(String fullUrl) throws ExternalSystemException {
+        return postForStringResponse(URI.create(fullUrl));
+    }
+
+    protected InputStream postForStringResponse(URI fullUrl) throws ExternalSystemException {
+        HttpRequest httpRequest = HttpRequest
+                .newBuilder(fullUrl)
+                .timeout(Duration.ofMillis(appConfigurationProperties.getRestTemplateProps().getReadTimeout()))
+                .build();
+        try {
+            log.debug("Sending request to remote SP with url [{}].", fullUrl);
+            HttpResponse<InputStream> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofInputStream());
+            log.debug("Got response code of [{}] for [{}]", httpResponse.statusCode(), fullUrl);
+            if (httpResponse.statusCode() >= 400) {
+                try (InputStream body = httpResponse.body()) {
+                    throw new ExternalSystemException(
+                            String.format(EXCEPTION_MESSAGE, fullUrl),
+                            new IOException("Server returned " + httpResponse.statusCode()),
+                            new String(body.readAllBytes(), StandardCharsets.UTF_8)
+                    );
+                }
+            }
+            return httpResponse.body();
+        } catch (IOException e) {
+            throw new ExternalSystemException(String.format(EXCEPTION_MESSAGE, fullUrl), e);
+        } catch (InterruptedException e) {
+            log.warn("Interrupted. Request cancelled.");
+            Thread.currentThread().interrupt();
+            return InputStream.nullInputStream();
+        }
+    }
 }
