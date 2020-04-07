@@ -209,8 +209,8 @@ osmhConsumer:
         name: 'NSD (Nesstar)'
         handler: 'http://localhost:9842'
       - url:  http://harvester.sodanet.gr:8080/oai/request
-      name: 'SoDaNet (Nesstar)'
-      handler: 'http://localhost:9842'
+        name: 'SoDaNet (Nesstar)'
+        handler: 'http://localhost:9842'
 ---
 spring:
   profiles: test
