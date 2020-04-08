@@ -24,13 +24,13 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 
-import java.io.File;
+import java.io.Closeable;
 import java.io.IOException;
+import java.nio.file.Path;
 
 import static org.assertj.core.api.Java6BDDAssertions.then;
 import static org.awaitility.Awaitility.await;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
-import static org.junit.Assert.fail;
 
 /**
  * Default Embedded server for Integration Test
@@ -38,51 +38,48 @@ import static org.junit.Assert.fail;
  * @author moses AT doraventures DOT com
  */
 @Slf4j
-public class EmbeddedElasticsearchServer {
+public class EmbeddedElasticsearchServer implements Closeable {
 
   private static final int TCP_PORT = 9390;
   private static final int HTTP_PORT = 9290;
-  protected static final String ELASTICSEARCH_HOME = "target/elasticsearch-data";
-  protected Node node;
-  private String dataDirectory;
+  private static final Path DATA_DIRECTORY = Path.of("target", "elasticsearch-data");
 
-  protected void startup(String dataDirectory) {
+  private final Node node;
 
-    this.dataDirectory = dataDirectory;
+  public EmbeddedElasticsearchServer() {
+
     NodeBuilder nodeBuilder = nodeBuilder();
     nodeBuilder.settings()
-        .put("path.home", dataDirectory)
-        .put("http.port", HTTP_PORT)
-        .put("transport.tcp.port", TCP_PORT)
-        .put("discovery.zen.ping.multicast.enabled", "false");
+            .put("path.home", DATA_DIRECTORY.toString())
+            .put("http.port", HTTP_PORT)
+            .put("transport.tcp.port", TCP_PORT)
+            .put("discovery.zen.ping.multicast.enabled", "false");
 
     node = nodeBuilder.clusterName("elasticsearch").node();
 
-    ClusterHealthResponse clusterHealthResponse = node.client().admin().cluster()
-        .prepareHealth()
-        .setWaitForGreenStatus().get();
+    try (Client client = node.client()) {
+      ClusterHealthResponse clusterHealthResponse = client.admin().cluster()
+              .prepareHealth()
+              .setWaitForGreenStatus().get();
 
-    then(node).isNotNull();
-    then(node.isClosed()).isFalse();
-    log.info("Started Node and health is [{}]", clusterHealthResponse);
+      then(node).isNotNull();
+      then(node.isClosed()).isFalse();
+      log.info("Started Node and health is [{}]", clusterHealthResponse);
 
-    Duration waitDuration = Duration.TWO_SECONDS;
-    log.info("Waiting [{}ms] for node to fully initiate (For low spec environment)", waitDuration.getValueInMS());
-    await().atMost(waitDuration);
+      Duration waitDuration = Duration.TWO_SECONDS;
+      log.info("Waiting [{}ms] for the node to start", waitDuration.getValueInMS());
+      await().atMost(waitDuration);
+    }
   }
 
-  protected Client getClient() {
+  public Client getClient() {
     return node.client();
   }
 
-  protected void closeNodeResources() {
-    try {
-      node.close();
-      FileUtils.deleteDirectory(new File(dataDirectory));
-      log.info("Deleted data Directory");
-    } catch (IOException e) {
-      log.error("Unable to delete data Directory [{}]", e.getMessage(), e);
-      fail("Unable to delete Directory and wait successfully");
-    }
+  @Override
+  public void close() throws IOException {
+    log.info("Closing Embedded Elasticsearch");
+    node.close();
+    FileUtils.deleteDirectory(DATA_DIRECTORY.toFile());
   }
 }

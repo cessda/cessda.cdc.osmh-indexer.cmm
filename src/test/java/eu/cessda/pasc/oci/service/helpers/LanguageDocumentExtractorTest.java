@@ -47,7 +47,7 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
   @Autowired
   private CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter;
 
-  private String idPrefix = "test-stub";
+  private static final String ID_PREFIX = "test-stub";
 
   @Test
   public void shouldRejectRecordWhenNotInListOfLanguagesAvailableIn() throws IOException {
@@ -57,7 +57,7 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
     syntheticCmmStudy.getLangAvailableIn().remove("en");
 
     // When
-    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", idPrefix, syntheticCmmStudy);
+    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", ID_PREFIX, syntheticCmmStudy);
 
     then(validCMMStudyForLang).isFalse();
   }
@@ -69,13 +69,13 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
     CMMStudy cmmStudy = RecordTestData.getSyntheticCmmStudy();
 
     // When
-    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("de", idPrefix, cmmStudy);
+    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("de", ID_PREFIX, cmmStudy);
     then(validCMMStudyForLang).isTrue();
 
-    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", idPrefix, cmmStudy);
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", ID_PREFIX, cmmStudy);
     then(validCMMStudyForLang).isTrue();
 
-    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fi", idPrefix, cmmStudy);
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fi", ID_PREFIX, cmmStudy);
     then(validCMMStudyForLang).isTrue();
 
      //Synthetic doc does not exist, so language is skipped
@@ -100,13 +100,13 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
     syntheticCmmStudy.setActive(false);
 
     // When
-    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("de", idPrefix, syntheticCmmStudy);
+    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("de", ID_PREFIX, syntheticCmmStudy);
     then(validCMMStudyForLang).isTrue();
 
-    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", idPrefix, syntheticCmmStudy);
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", ID_PREFIX, syntheticCmmStudy);
     then(validCMMStudyForLang).isTrue();
 
-    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fi", idPrefix, syntheticCmmStudy);
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fi", ID_PREFIX, syntheticCmmStudy);
     then(validCMMStudyForLang).isTrue();
 
     //Synthetic doc does not exist, so language is skipped

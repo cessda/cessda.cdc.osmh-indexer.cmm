@@ -16,7 +16,6 @@
 package eu.cessda.pasc.oci.configurations;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.cessda.pasc.oci.models.configurations.RestTemplateProps;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
@@ -28,19 +27,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PreDestroy;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.net.http.HttpClient;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Extra Util configuration
@@ -63,14 +55,11 @@ public class AppUtilityBeansConfiguration {
 
   private final AppConfigurationProperties appConfigurationProperties;
 
-  private final PerfRequestSyncInterceptor perfRequestSyncInterceptor;
-
   private Client client;
 
   @Autowired
-  public AppUtilityBeansConfiguration(AppConfigurationProperties appConfigurationProperties, PerfRequestSyncInterceptor perfRequestSyncInterceptor) {
+  public AppUtilityBeansConfiguration(AppConfigurationProperties appConfigurationProperties) {
     this.appConfigurationProperties = appConfigurationProperties;
-    this.perfRequestSyncInterceptor = perfRequestSyncInterceptor;
   }
 
   @Bean
@@ -78,24 +67,6 @@ public class AppUtilityBeansConfiguration {
     return new ObjectMapper();
   }
 
-  @Bean
-  public RestTemplate restTemplate() {
-
-    final List<ClientHttpRequestInterceptor> requestInterceptors = new ArrayList<>();
-    requestInterceptors.add(perfRequestSyncInterceptor);
-
-    HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
-    RestTemplateProps restTemplateProps = appConfigurationProperties.getRestTemplateProps();
-    clientHttpRequestFactory.setConnectTimeout(restTemplateProps.getConnTimeout());
-    clientHttpRequestFactory.setReadTimeout(restTemplateProps.getReadTimeout());
-    clientHttpRequestFactory.setConnectionRequestTimeout(restTemplateProps.getConnRequestTimeout());
-
-    final RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory);
-    restTemplate.setInterceptors(requestInterceptors);
-    restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
-
-    return restTemplate;
-  }
 
   @Bean
   public Client client() throws UnknownHostException {

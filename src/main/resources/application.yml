@@ -72,7 +72,7 @@ osmhConsumer:
   languages: ['cs', 'da', 'de', 'el', 'en', 'et', 'fi', 'fr', 'hu', 'it', 'nl', 'no', 'pt', 'sk', 'sl', 'sr', 'sv']
   delay:
     # Auto Starts after delay of 1min at startup
-    initial: '2'
+    initial: '2000'
     fixed: '315360000000'
   daily:
     # Daily Harvest and Ingestion run at 00:01am.
@@ -216,8 +216,8 @@ spring:
   profiles: test
 logging:
   level:
-    eu.cessda.pasc.oci.service.helpers.DebuggingJMXBean: DEBUG
     eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor: DEBUG
+    eu.cessda.pasc.oci.repository.DaoBase: DEBUG
 osmhConsumer:
   delay:
     # For tests, the delay should be effectively disabled

@@ -27,6 +27,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.time.Instant;
 
 /**
  * Shareable Dao functions
@@ -36,7 +37,7 @@ import java.time.Duration;
 @Slf4j
 public class DaoBase {
 
-    public static final String EXCEPTION_MESSAGE = "RestClientException! Unsuccessful response from remote SP's Endpoint [%s]";
+    public static final String EXCEPTION_MESSAGE = "Unsuccessful response from remote SP's Endpoint [%s]";
     private final HttpClient httpClient;
     private final AppConfigurationProperties appConfigurationProperties;
 
@@ -56,18 +57,33 @@ public class DaoBase {
                 .build();
         try {
             log.debug("Sending request to remote SP with url [{}].", fullUrl);
-            HttpResponse<InputStream> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofInputStream());
-            log.debug("Got response code of [{}] for [{}]", httpResponse.statusCode(), fullUrl);
-            if (httpResponse.statusCode() >= 400) {
-                try (InputStream body = httpResponse.body()) {
-                    throw new ExternalSystemException(
-                            String.format(EXCEPTION_MESSAGE, fullUrl),
-                            new IOException("Server returned " + httpResponse.statusCode()),
-                            new String(body.readAllBytes(), StandardCharsets.UTF_8)
-                    );
-                }
+
+            Instant start = null;
+            if (log.isDebugEnabled()) {
+                start = Instant.now();
             }
-            return httpResponse.body();
+
+            HttpResponse<InputStream> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofInputStream());
+
+            if (log.isDebugEnabled()) {
+                Instant end = Instant.now();
+                assert start != null;
+                log.debug("Got response code of [{}], getting headers took [{}] ms",
+                        httpResponse.statusCode(), Duration.between(start, end).toMillis());
+            }
+
+            // Check the returned HTTP status code, throw an exception if not a success code
+            // This includes redirects
+            if (httpResponse.statusCode() < 300) {
+                return httpResponse.body();
+            }
+            try (InputStream body = httpResponse.body()) {
+                throw new ExternalSystemException(
+                        String.format(EXCEPTION_MESSAGE, fullUrl),
+                        new IOException("Server returned " + httpResponse.statusCode()),
+                        new String(body.readAllBytes(), StandardCharsets.UTF_8)
+                );
+            }
         } catch (IOException e) {
             throw new ExternalSystemException(String.format(EXCEPTION_MESSAGE, fullUrl), e);
         } catch (InterruptedException e) {

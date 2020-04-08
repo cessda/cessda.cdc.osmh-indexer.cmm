@@ -45,7 +45,7 @@ public class DaoBaseTest extends AbstractSpringTestProfileContext
     @Autowired
     private AppConfigurationProperties appConfigurationProperties;
 
-    private HttpClientMock httpClient = new HttpClientMock();
+    private final HttpClientMock httpClient = new HttpClientMock();
 
     @Test
     public void shouldPostForStringResponse() throws ExternalSystemException, IOException {
