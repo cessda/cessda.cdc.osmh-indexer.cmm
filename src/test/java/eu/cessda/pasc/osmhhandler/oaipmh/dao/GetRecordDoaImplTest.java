@@ -16,27 +16,24 @@
 
 package eu.cessda.pasc.osmhhandler.oaipmh.dao;
 
+import com.pgssoft.httpclient.HttpClientMock;
+import com.pgssoft.httpclient.MockedServerResponse;
+import eu.cessda.pasc.osmhhandler.oaipmh.configuration.HandlerConfigurationProperties;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
-import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
-import eu.cessda.pasc.osmhhandler.oaipmh.mock.data.CMMStudyTestData;
-import org.junit.Before;
+import lombok.SneakyThrows;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.web.client.RestTemplate;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.BDDAssertions.then;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.test.web.client.ExpectedCount.once;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 /**
  * Dao Spring Test class for retrieving record's xml
@@ -48,47 +45,55 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 @ActiveProfiles("test")
 public class GetRecordDoaImplTest {
 
-  @Autowired
-  private RestTemplate restTemplate;
+    @Autowired
+    private HandlerConfigurationProperties handlerConfigurationProperties;
 
-  private MockRestServiceServer mockRestServiceServer;
+    private HttpClientMock httpClient = new HttpClientMock();
 
-  @Autowired
-  private GetRecordDoa recordDoa;
+    @SneakyThrows
+    private static void throwInterruptedException(MockedServerResponse.Builder responseBuilder) {
+        throw new InterruptedException("Mocked");
+    }
 
-  @Before
-  public void setUp() {
-    mockRestServiceServer = MockRestServiceServer.bindTo(restTemplate).build();
-  }
+    @Test
+    public void shouldReturnXMLPayloadOfGivenRecordIdentifierFromGivenRepoURL() throws CustomHandlerException, IOException {
 
-  @Test
-  public void shouldReturnXMLPayloadOfGivenRecordIdentifierFromGivenRepoURL() throws CustomHandlerException {
+        // Given
+        String expectedUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=GetRecord&identifier=1683&metadataPrefix=ddi";
 
-    // Given
-    String expected_url = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=GetRecord&identifier=1683&metadataPrefix=ddi";
-    String ddiRecord1683 = CMMStudyTestData.getContent("xml/ddi_record_1683.xml");
-    mockRestServiceServer.expect(once(), requestTo(expected_url))
-        .andExpect(method(GET))
-        .andRespond(withSuccess(ddiRecord1683, MediaType.TEXT_XML));
+        httpClient.onGet(expectedUrl).doReturnXML(expectedUrl, StandardCharsets.UTF_8);
 
-    // When
-    String responseXMLRecord = recordDoa.getRecordXML(expected_url);
+        // When
+        GetRecordDoa recordDoa = new GetRecordDoaImpl(httpClient, handlerConfigurationProperties);
+        try (InputStream responseXMLRecord = recordDoa.getRecordXML(expectedUrl)) {
+            then(new String(responseXMLRecord.readAllBytes(), StandardCharsets.UTF_8)).isEqualTo(expectedUrl);
+        }
+    }
 
-    then(responseXMLRecord).isNotEmpty();
-    then(responseXMLRecord).isNotBlank();
-    then(responseXMLRecord).isEqualToIgnoringCase(ddiRecord1683);
-  }
+    @SuppressWarnings("resource")
+    @Test(expected = CustomHandlerException.class)
+    public void shouldThrowExceptionWhenRemoteServerResponseIsNotSuccessful() throws CustomHandlerException {
 
-  @Test(expected = ExternalSystemException.class)
-  public void shouldThrowExceptionWhenRemoteServerResponseIsNotSuccessful() throws CustomHandlerException {
+        // Given
+        String expectedFullGetRecordUrl = "https://the.remote.endpoint/?verb=GetRecord&identifier=1683&metadataPrefix=ddi";
 
-    // Given
-    String expected_url = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=GetRecord&identifier=1683&metadataPrefix=ddi";
-    mockRestServiceServer.expect(once(), requestTo(expected_url))
-        .andExpect(method(GET))
-        .andRespond(withBadRequest());
+        httpClient.onGet(expectedFullGetRecordUrl).doReturn(500, expectedFullGetRecordUrl);
 
-    // When
-    recordDoa.getRecordXML(expected_url);
-  }
+        // When
+        GetRecordDoa recordDoa = new GetRecordDoaImpl(httpClient, handlerConfigurationProperties);
+        recordDoa.getRecordXML(expectedFullGetRecordUrl);
+    }
+
+    @Test
+    public void shouldReturnEmptyStreamWhenInterrupted() throws IOException, CustomHandlerException {
+
+        // Given
+        httpClient.onGet().doAction(GetRecordDoaImplTest::throwInterruptedException);
+
+        // When
+        GetRecordDoa recordDoa = new GetRecordDoaImpl(httpClient, handlerConfigurationProperties);
+        try (InputStream empty = recordDoa.getRecordXML("http://error.endpoint/")) {
+            Assert.assertEquals(-1, empty.read());
+        }
+    }
 }

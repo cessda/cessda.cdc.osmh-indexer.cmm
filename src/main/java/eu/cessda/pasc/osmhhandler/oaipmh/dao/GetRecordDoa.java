@@ -18,6 +18,8 @@ package eu.cessda.pasc.osmhhandler.oaipmh.dao;
 
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
 
+import java.io.InputStream;
+
 /**
  * Data access for fetching Record from remote repositories
  *
@@ -25,5 +27,5 @@ import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
  */
 public interface GetRecordDoa {
 
-  String getRecordXML(String studyFullUrl) throws CustomHandlerException;
+    InputStream getRecordXML(String studyFullUrl) throws CustomHandlerException;
 }

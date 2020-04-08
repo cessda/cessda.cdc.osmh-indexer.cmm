@@ -18,6 +18,8 @@ package eu.cessda.pasc.osmhhandler.oaipmh.dao;
 
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
 
+import java.io.InputStream;
+
 /**
  * Data access object Contract for querying remote repository for RecordHeaders
  *
@@ -25,7 +27,7 @@ import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
  */
 public interface ListRecordHeadersDao {
 
-  String listRecordHeaders(String fullListRecordUrlPath) throws CustomHandlerException;
+    InputStream listRecordHeaders(String fullListRecordUrlPath) throws CustomHandlerException;
 
-  String listRecordHeadersResumption(String repoUrlWithResumptionToken) throws CustomHandlerException;
+    InputStream listRecordHeadersResumption(String repoUrlWithResumptionToken) throws CustomHandlerException;
 }

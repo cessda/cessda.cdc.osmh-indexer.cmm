@@ -17,7 +17,6 @@
 package eu.cessda.pasc.osmhhandler.oaipmh;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.FileNotFoundException;
@@ -34,19 +33,16 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 public class FileHandler {
 
-  public String getFileWithUtil(String fileName) {
-
-    String result = "";
-    try {
-      InputStream resource = getClass().getClassLoader().getResourceAsStream(fileName);
-      if (resource != null) {
-        result = IOUtils.toString(resource, StandardCharsets.UTF_8);
-      } else {
-        throw new FileNotFoundException(fileName + " could not be found");
-      }
-    } catch (IOException e) {
-      log.error("Could not read file successfully [{}]", e.getMessage());
+  public InputStream getFileAsStream(String fileName) throws FileNotFoundException {
+    InputStream resource = getClass().getClassLoader().getResourceAsStream(fileName);
+    if (resource == null) {
+      throw new FileNotFoundException(fileName + " could not be found");
     }
-    return result;
+    return resource;
+  }
+
+  public String getFileWithUtil(String fileName) throws IOException {
+    InputStream resource = getFileAsStream(fileName);
+    return new String(resource.readAllBytes(), StandardCharsets.UTF_8);
   }
 }

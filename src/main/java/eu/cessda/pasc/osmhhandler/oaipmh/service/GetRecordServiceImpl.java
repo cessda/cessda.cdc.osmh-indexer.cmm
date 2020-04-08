@@ -25,8 +25,6 @@ import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.configuration.OaiPmh;
 import eu.cessda.pasc.osmhhandler.oaipmh.models.errors.ErrorStatus;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.Charsets;
-import org.apache.commons.io.IOUtils;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
@@ -35,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.CMMStudyMapper.*;
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.RecordResponseValidator.validateResponse;
@@ -62,21 +61,20 @@ public class GetRecordServiceImpl implements GetRecordService {
   public CMMStudy getRecord(String repositoryUrl, String studyIdentifier) throws CustomHandlerException {
     log.trace("Querying Repo [{}] for StudyID [{}]", repositoryUrl, studyIdentifier);
     String fullUrl = OaiPmhHelpers.buildGetStudyFullUrl(repositoryUrl, studyIdentifier, oaiPmhHandlerConfig);
-    String recordXML = getRecordDoa.getRecordXML(fullUrl);
 
-    try {
+    try (InputStream recordXML = getRecordDoa.getRecordXML(fullUrl)) {
       return mapDDIRecordToCMMStudy(recordXML, repositoryUrl).studyXmlSourceUrl(fullUrl).build();
     } catch (JDOMException | IOException e) {
       throw new InternalSystemException(String.format("Unable to parse xml! FullUrl [%s]", fullUrl), e);
     }
   }
 
-  private CMMStudy.CMMStudyBuilder mapDDIRecordToCMMStudy(String recordXML, String repositoryUrl)
+  private CMMStudy.CMMStudyBuilder mapDDIRecordToCMMStudy(InputStream recordXML, String repositoryUrl)
           throws JDOMException, IOException, InternalSystemException {
 
     CMMStudy.CMMStudyBuilder builder = CMMStudy.builder();
     OaiPmh oaiPmh = oaiPmhHandlerConfig.getOaiPmh();
-    Document document = new SAXBuilder().build(IOUtils.toInputStream(recordXML, Charsets.UTF_8));
+    Document document = new SAXBuilder().build(recordXML);
 
     log.trace("Record XML String [{}]", document);
 

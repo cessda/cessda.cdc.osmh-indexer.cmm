@@ -16,7 +16,6 @@
 
 package eu.cessda.pasc.osmhhandler.oaipmh.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jackson.JsonLoader;
@@ -41,6 +40,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -77,7 +77,7 @@ public class GetRecordServiceImplTest {
 
     // Given
     given(getRecordDoa.getRecordXML(FULL_RECORD_URL)).willReturn(
-            CMMStudyTestData.getContent("xml/synthetic_compliant_cmm.xml")
+            CMMStudyTestData.getContentAsStream("xml/synthetic_compliant_cmm.xml")
     );
 
     // When
@@ -89,11 +89,11 @@ public class GetRecordServiceImplTest {
   }
 
   @Test
-  public void shouldHarvestedContentForLanguageSpecificDimensionFromElementWithCorrectXmlLangAttribute() throws CustomHandlerException {
+  public void shouldHarvestedContentForLanguageSpecificDimensionFromElementWithCorrectXmlLangAttribute() throws CustomHandlerException, FileNotFoundException {
 
     // Given
     given(getRecordDoa.getRecordXML(FULL_RECORD_URL)).willReturn(
-            CMMStudyTestData.getContent("xml/oai-fsd_uta_fi-FSD3187.xml")
+            CMMStudyTestData.getContentAsStream("xml/oai-fsd_uta_fi-FSD3187.xml")
     );
 
     // When
@@ -117,7 +117,7 @@ public class GetRecordServiceImplTest {
 
     // Given
     given(getRecordDoa.getRecordXML(FULL_RECORD_URL)).willReturn(
-            CMMStudyTestData.getContent("xml/ddi_record_1683.xml")
+            CMMStudyTestData.getContentAsStream("xml/ddi_record_1683.xml")
     );
 
     // When
@@ -133,7 +133,7 @@ public class GetRecordServiceImplTest {
 
     // Given
     given(getRecordDoa.getRecordXML(FULL_RECORD_URL)).willReturn(
-            CMMStudyTestData.getContent("xml/ddi_record_1683.xml")
+            CMMStudyTestData.getContentAsStream("xml/ddi_record_1683.xml")
     );
 
     // When
@@ -150,12 +150,12 @@ public class GetRecordServiceImplTest {
   }
 
   @Test
-  public void shouldExtractDefaultLanguageFromCodebookXMLLagIfPresent() throws CustomHandlerException, JsonProcessingException {
+  public void shouldExtractDefaultLanguageFromCodebookXMLLagIfPresent() throws CustomHandlerException, IOException {
 
     // Given
     String expectedCmmStudyJsonString = CMMStudyTestData.getContent("json/ddi_record_1683_with_codebookXmlLag.json");
     given(getRecordDoa.getRecordXML(FULL_RECORD_URL)).willReturn(
-            CMMStudyTestData.getContent("xml/ddi_record_1683_with_codebookXmlLag.xml")
+            CMMStudyTestData.getContentAsStream("xml/ddi_record_1683_with_codebookXmlLag.xml")
     );
 
     // When
@@ -175,7 +175,7 @@ public class GetRecordServiceImplTest {
     expectedAbstract.put("en", "1. The data+<br>2. The datafiles");
 
     given(getRecordDoa.getRecordXML(FULL_RECORD_URL)).willReturn(
-            CMMStudyTestData.getContent("xml/ddi_record_2305_fsd_repeat_abstract.xml")
+            CMMStudyTestData.getContentAsStream("xml/ddi_record_2305_fsd_repeat_abstract.xml")
     );
 
     // When
@@ -196,7 +196,7 @@ public class GetRecordServiceImplTest {
     expectedTitle.put("yy", "Enquête sociale européenne");
 
     given(getRecordDoa.getRecordXML(FULL_RECORD_URL)).willReturn(
-            CMMStudyTestData.getContent("xml/ddi_record_1683.xml")
+            CMMStudyTestData.getContentAsStream("xml/ddi_record_1683.xml")
     );
 
     // When
@@ -210,11 +210,11 @@ public class GetRecordServiceImplTest {
 
   @Test()
   public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord_MarkedAsNotActive()
-      throws CustomHandlerException {
+          throws CustomHandlerException, FileNotFoundException {
 
     // Given
     given(getRecordDoa.getRecordXML(FULL_RECORD_URL)).willReturn(
-        CMMStudyTestData.getContent("xml/ddi_record_1031_deleted.xml")
+            CMMStudyTestData.getContentAsStream("xml/ddi_record_1031_deleted.xml")
     );
 
     // When
@@ -226,11 +226,11 @@ public class GetRecordServiceImplTest {
   }
 
   @Test(expected = InternalSystemException.class)
-  public void shouldThrowExceptionForRecordWithErrorElement() throws CustomHandlerException {
+  public void shouldThrowExceptionForRecordWithErrorElement() throws CustomHandlerException, FileNotFoundException {
 
     // Given
     given(getRecordDoa.getRecordXML(FULL_RECORD_URL)).willReturn(
-        CMMStudyTestData.getContent("xml/ddi_record_WithError.xml")
+            CMMStudyTestData.getContentAsStream("xml/ddi_record_WithError.xml")
     );
 
     // When
@@ -244,7 +244,7 @@ public class GetRecordServiceImplTest {
 
     // Given
     given(getRecordDoa.getRecordXML(FULL_RECORD_URL)).willReturn(
-            CMMStudyTestData.getContent("xml/ddi_record_ukds_example.xml")
+            CMMStudyTestData.getContentAsStream("xml/ddi_record_ukds_example.xml")
     );
 
     // When

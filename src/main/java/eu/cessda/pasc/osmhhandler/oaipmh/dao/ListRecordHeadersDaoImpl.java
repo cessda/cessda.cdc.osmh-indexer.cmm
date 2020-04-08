@@ -16,10 +16,13 @@
 
 package eu.cessda.pasc.osmhhandler.oaipmh.dao;
 
+import eu.cessda.pasc.osmhhandler.oaipmh.configuration.HandlerConfigurationProperties;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.client.RestTemplate;
+
+import java.io.InputStream;
+import java.net.http.HttpClient;
 
 /**
  * Data access object contract implementation for querying remote repository for RecordHeaders.
@@ -29,18 +32,18 @@ import org.springframework.web.client.RestTemplate;
 @Repository
 public class ListRecordHeadersDaoImpl extends DaoBase implements ListRecordHeadersDao {
 
-  @Autowired
-  public ListRecordHeadersDaoImpl(RestTemplate restTemplate) {
-    super(restTemplate);
-  }
+    @Autowired
+    public ListRecordHeadersDaoImpl(HttpClient httpClient, HandlerConfigurationProperties handlerConfigurationProperties) {
+        super(httpClient, handlerConfigurationProperties);
+    }
 
-  @Override
-  public String listRecordHeaders(String fullListRecordUrlPath) throws ExternalSystemException {
-    return postForStringResponse(fullListRecordUrlPath);
-  }
+    @Override
+    public InputStream listRecordHeaders(String fullListRecordUrlPath) throws ExternalSystemException {
+        return postForStringResponse(fullListRecordUrlPath);
+    }
 
-  @Override
-  public String listRecordHeadersResumption(String repoUrlWithResumptionToken) throws ExternalSystemException {
-    return postForStringResponse(repoUrlWithResumptionToken);
-  }
+    @Override
+    public InputStream listRecordHeadersResumption(String repoUrlWithResumptionToken) throws ExternalSystemException {
+        return postForStringResponse(repoUrlWithResumptionToken);
+    }
 }

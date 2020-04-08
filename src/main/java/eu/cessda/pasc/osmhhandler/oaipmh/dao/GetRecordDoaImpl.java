@@ -16,10 +16,13 @@
 
 package eu.cessda.pasc.osmhhandler.oaipmh.dao;
 
+import eu.cessda.pasc.osmhhandler.oaipmh.configuration.HandlerConfigurationProperties;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.client.RestTemplate;
+
+import java.io.InputStream;
+import java.net.http.HttpClient;
 
 /**
  * Data access object for fetching Record from remote repositories implementation
@@ -29,14 +32,13 @@ import org.springframework.web.client.RestTemplate;
 @Repository
 public class GetRecordDoaImpl extends DaoBase implements GetRecordDoa {
 
-  @Autowired
-  public GetRecordDoaImpl(RestTemplate restTemplate) {
-    super(restTemplate);
-  }
+    @Autowired
+    public GetRecordDoaImpl(HttpClient httpClient, HandlerConfigurationProperties handlerConfigurationProperties) {
+        super(httpClient, handlerConfigurationProperties);
+    }
 
-  @Override
-  public String getRecordXML(String studyFullUrl) throws ExternalSystemException {
-
-    return postForStringResponse(studyFullUrl);
-  }
+    @Override
+    public InputStream getRecordXML(String studyFullUrl) throws ExternalSystemException {
+        return postForStringResponse(studyFullUrl);
+    }
 }
