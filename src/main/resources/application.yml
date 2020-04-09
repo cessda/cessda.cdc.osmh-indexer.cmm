@@ -107,8 +107,7 @@ osmhConsumer:
     - url: http://services.fsd.uta.fi/v0/oai
       name: 'FSD'
       handler: 'http://cdc-osmh-repo:9091'
-# Placeholder for GESIS
-    - url: 'http://dbkapps.gesis.org/dbkoai3'
+    - url: http://dbkapps.gesis.org/dbkoai3
       name: 'GESIS'
       handler: 'http://cdc-osmh-repo:9091'
     - url: https://dataspire-test.sciencespo.fr/oai
