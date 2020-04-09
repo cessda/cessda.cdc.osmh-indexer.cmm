@@ -37,7 +37,7 @@ public class ReposTestData
   public static Repo getGesisEnRepo() {
     Repo repo = new Repo();
     repo.setName("GESIS");
-    repo.setUrl("https://dbk.gesis.org/dbkoai");
+    repo.setUrl("http://dbkapps.gesis.org/dbkoai3");
     repo.setHandler("http://localhost:9091");
     return repo;
   }
@@ -45,7 +45,7 @@ public class ReposTestData
   public static Repo getGesisDeRepo() {
     Repo repo = new Repo();
     repo.setName("GESIS De");
-    repo.setUrl("https://dbk.gesis.org/dbkoai/");
+    repo.setUrl("http://dbkapps.gesis.org/dbkoai3");
     repo.setHandler("http://localhost:9091");
     return repo;
   }

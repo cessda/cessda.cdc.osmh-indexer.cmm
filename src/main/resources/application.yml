@@ -108,9 +108,9 @@ osmhConsumer:
       name: 'FSD'
       handler: 'http://cdc-osmh-repo:9091'
 # Placeholder for GESIS
-#   - url: ''
-#     name: 'GESIS'
-#     handler: 'http://cdc-osmh-repo:9091'
+    - url: 'http://dbkapps.gesis.org/dbkoai3'
+      name: 'GESIS'
+      handler: 'http://cdc-osmh-repo:9091'
     - url: https://dataspire-test.sciencespo.fr/oai
       name: 'Progedo'
       handler: 'http://cdc-osmh-repo:9091'

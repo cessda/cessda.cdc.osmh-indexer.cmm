@@ -69,24 +69,33 @@ public class ESIngestService implements IngestService {
   public boolean bulkIndex(List<CMMStudyOfLanguage> languageCMMStudiesMap, String languageIsoCode) {
     String indexName = String.format(INDEX_NAME_TEMPLATE, languageIsoCode);
     boolean isSuccessful = true;
+    int counter = 0;
 
     if (prepareIndex(indexName, esTemplate, fileHandler)) {
-      List<IndexQuery> queries = new ArrayList<>();
-      for (int counter = 0; counter < languageCMMStudiesMap.size(); counter++) {
-        CMMStudyOfLanguage cmmStudyOfLanguage = languageCMMStudiesMap.get(counter);
-        IndexQuery indexQuery = getIndexQuery(indexName, cmmStudyOfLanguage);
-        queries.add(indexQuery);
-        if (counter % INDEX_COMMIT_SIZE == 0) {
-          executeBulk(queries);
-          queries.clear();
-          log.info("Indexing [{}] index, current bulkIndex counter [{}] .", indexName, counter);
+      try {
+        List<IndexQuery> queries = new ArrayList<>();
+        for (CMMStudyOfLanguage cmmStudyOfLanguage : languageCMMStudiesMap) {
+          IndexQuery indexQuery = getIndexQuery(indexName, cmmStudyOfLanguage);
+          queries.add(indexQuery);
+          if (counter % INDEX_COMMIT_SIZE == 0) {
+            executeBulk(queries);
+            queries.clear();
+            log.info("Indexing [{}] index, current bulkIndex counter [{}] .", indexName, counter);
+          }
+          counter++;
         }
+
+        if (!queries.isEmpty()) {
+          executeBulk(queries);
+        }
+        esTemplate.refresh(indexName);
+      //  log.info("[{}] BulkIndex completed.", languageIsoCode);
+        log.info("BulkIndexing completed. For repo name [{}] and its corresponding [{}].  LangIsoCode [{}].", keyValue(REPO_NAME, repo.getName()), keyValue(REPO_ENDPOINT_URL, repo.getUrl()), keyValue(LANG_CODE, langIsoCode));
+
+      } catch (RuntimeException e) {
+        log.error("[{}] Indexing Encountered an exception with message [{}].", indexName, e.getMessage(), e);
+        isSuccessful = false;
       }
-      if (!queries.isEmpty()) {
-        executeBulk(queries);
-      }
-      esTemplate.refresh(indexName);
-      log.info("[{}] BulkIndex completed.", languageIsoCode);
     } else {
       isSuccessful = false;
     }
@@ -151,19 +160,24 @@ public class ESIngestService implements IngestService {
     }
 
     log.debug("[{}] custom index creation with settings from [{}]. Content [\n{}\n]", indexName, settingsPath, settings);
-    if (!elasticsearchTemplate.createIndex(indexName, settings)) {
-      log.error("[{}] custom index failed creation!", indexName);
-      return false;
-    } else {
-      log.info("[{}] custom index created successfully.", indexName);
-      log.debug("[{}] index mapping PUT request from [{}] with content [\n{}\n]", indexName, mappingsPath, mappings);
-      if (elasticsearchTemplate.putMapping(indexName, INDEX_TYPE, mappings)) {
-        log.info("[{}] index mapping PUT request for type [{}] was successful.", indexName, INDEX_TYPE);
-        return true;
-      } else {
-        log.error("[{}] index mapping PUT request for type [{}] was unsuccessful.", indexName, INDEX_TYPE);
+    try {
+      if (!elasticsearchTemplate.createIndex(indexName, settings)) {
+        log.error("[{}] custom index failed creation!", indexName);
         return false;
+      } else {
+        log.info("[{}] custom index created successfully.", indexName);
+        log.debug("[{}] index mapping XPUT request from [{}] with content [\n{}\n]", indexName, mappingsPath, mappings);
+        if (elasticsearchTemplate.putMapping(indexName, INDEX_TYPE, mappings)) {
+          log.info("[{}] index mapping XPUT request for type [{}] was successful.", indexName, INDEX_TYPE);
+          return true;
+        } else {
+          log.error("[{}] index mapping XPUT request for type [{}] was unsuccessful.", indexName, INDEX_TYPE);
+          return false;
+        }
       }
+    } catch (RuntimeException e) {
+      log.error("[{}] Custom Index creation failed. Message [{}]", indexName, e.getMessage(), e);
+      return false;
     }
   }
 
