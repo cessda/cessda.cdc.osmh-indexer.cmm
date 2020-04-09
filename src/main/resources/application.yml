@@ -69,8 +69,8 @@ osmhhandler:
         preferredMetadataParam: oai_ddi25
       - url: http://services.fsd.uta.fi/v0/oai
         preferredMetadataParam: oai_ddi25
-#- url: https://dbk.gesis.org/dbkoai3/
-#        preferredMetadataParam: oai_ddi25
+      - url: http://dbkapps.gesis.org/dbkoai3
+        preferredMetadataParam: oai_ddi25
       - url: http://147.213.4.44:6003/v0/oai
         preferredMetadataParam: oai_ddi25
       - url: https://dataspire-test.sciencespo.fr/oai
