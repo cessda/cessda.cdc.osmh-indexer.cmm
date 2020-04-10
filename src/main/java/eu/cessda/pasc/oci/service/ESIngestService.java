@@ -89,9 +89,7 @@ public class ESIngestService implements IngestService {
           executeBulk(queries);
         }
         esTemplate.refresh(indexName);
-      //  log.info("[{}] BulkIndex completed.", languageIsoCode);
-        log.info("BulkIndexing completed. For repo name [{}] and its corresponding [{}].  LangIsoCode [{}].", keyValue(REPO_NAME, repo.getName()), keyValue(REPO_ENDPOINT_URL, repo.getUrl()), keyValue(LANG_CODE, langIsoCode));
-
+        log.info("[{}] BulkIndex completed.", languageIsoCode);
       } catch (RuntimeException e) {
         log.error("[{}] Indexing Encountered an exception with message [{}].", indexName, e.getMessage(), e);
         isSuccessful = false;
