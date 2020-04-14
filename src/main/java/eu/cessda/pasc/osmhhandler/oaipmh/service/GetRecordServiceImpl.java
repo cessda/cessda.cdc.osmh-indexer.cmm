@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPathFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,19 +48,20 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.RecordResponseValidator.
 @Slf4j
 public class GetRecordServiceImpl implements GetRecordService {
 
-  private static final XPathFactory X_FACTORY = XPathFactory.instance();
+  private final XPathFactory xPathFactory;
   private final GetRecordDoa getRecordDoa;
   private final HandlerConfigurationProperties oaiPmhHandlerConfig;
 
   @Autowired
-  public GetRecordServiceImpl(GetRecordDoa getRecordDoa, HandlerConfigurationProperties oaiPmhHandlerConfig) {
+  public GetRecordServiceImpl(GetRecordDoa getRecordDoa, HandlerConfigurationProperties oaiPmhHandlerConfig, XPathFactory xPathFactory) {
     this.getRecordDoa = getRecordDoa;
     this.oaiPmhHandlerConfig = oaiPmhHandlerConfig;
+    this.xPathFactory = xPathFactory;
   }
 
   @Override
   public CMMStudy getRecord(String repositoryUrl, String studyIdentifier) throws CustomHandlerException {
-    log.trace("Querying Repo [{}] for StudyID [{}]", repositoryUrl, studyIdentifier);
+    log.info("Querying Repo [{}] for StudyID [{}]", repositoryUrl, studyIdentifier);
     String fullUrl = OaiPmhHelpers.buildGetStudyFullUrl(repositoryUrl, studyIdentifier, oaiPmhHandlerConfig);
 
     try (InputStream recordXML = getRecordDoa.getRecordXML(fullUrl)) {
@@ -76,37 +78,39 @@ public class GetRecordServiceImpl implements GetRecordService {
     OaiPmh oaiPmh = oaiPmhHandlerConfig.getOaiPmh();
     Document document = new SAXBuilder().build(recordXML);
 
-    log.trace("Record XML String [{}]", document);
+    if (log.isTraceEnabled()) {
+      log.trace("Record XML String [{}]", new XMLOutputter().outputString(document));
+    }
 
     // We exit if the record has an <error> element
-    ErrorStatus errorStatus = validateResponse(document, X_FACTORY);
+    ErrorStatus errorStatus = validateResponse(document, xPathFactory);
     if (errorStatus.isHasError()) {
       throw new InternalSystemException("Remote repository " + repositoryUrl + " returned error: " + errorStatus.getMessage());
     }
 
-    // Short-Circuit. We carry on to parse beyond the headers only if record is active
-    boolean isActiveRecord = parseHeaderElement(builder, document, X_FACTORY);
+    // Short-Circuit. We carry on to parse beyond the headers only if the record is active.
+    boolean isActiveRecord = parseHeaderElement(builder, document, xPathFactory);
     if (isActiveRecord) {
-      String defaultLangIsoCode = parseDefaultLanguage(document, X_FACTORY, oaiPmh);
-      parseStudyTitle(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
-      parseStudyUrl(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
-      parseAbstract(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
-      parsePidStudies(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
-      parseCreator(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
-      parseDataAccessFreeText(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
-      parseClassifications(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
-      parseKeywords(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
-      parseTypeOfTimeMethod(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
-      parseStudyAreaCountries(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
-      parseUnitTypes(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
-      parsePublisher(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
-      parseYrOfPublication(builder, document, X_FACTORY);
-      parseFileLanguages(builder, document, X_FACTORY);
-      parseTypeOfSamplingProcedure(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
-      parseSamplingProcedureFreeTexts(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
-      parseTypeOfModeOfCollection(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
-      parseDataCollectionDates(builder, document, X_FACTORY);
-      parseDataCollectionFreeTexts(builder, document, X_FACTORY, oaiPmh, defaultLangIsoCode);
+      String defaultLangIsoCode = parseDefaultLanguage(document, xPathFactory, oaiPmh);
+      parseStudyTitle(builder, document, xPathFactory, oaiPmh, defaultLangIsoCode);
+      parseStudyUrl(builder, document, xPathFactory, oaiPmh, defaultLangIsoCode);
+      parseAbstract(builder, document, xPathFactory, oaiPmh, defaultLangIsoCode);
+      parsePidStudies(builder, document, xPathFactory, oaiPmh, defaultLangIsoCode);
+      parseCreator(builder, document, xPathFactory, oaiPmh, defaultLangIsoCode);
+      parseDataAccessFreeText(builder, document, xPathFactory, oaiPmh, defaultLangIsoCode);
+      parseClassifications(builder, document, xPathFactory, oaiPmh, defaultLangIsoCode);
+      parseKeywords(builder, document, xPathFactory, oaiPmh, defaultLangIsoCode);
+      parseTypeOfTimeMethod(builder, document, xPathFactory, oaiPmh, defaultLangIsoCode);
+      parseStudyAreaCountries(builder, document, xPathFactory, oaiPmh, defaultLangIsoCode);
+      parseUnitTypes(builder, document, xPathFactory, oaiPmh, defaultLangIsoCode);
+      parsePublisher(builder, document, xPathFactory, oaiPmh, defaultLangIsoCode);
+      parseYrOfPublication(builder, document, xPathFactory);
+      parseFileLanguages(builder, document, xPathFactory);
+      parseTypeOfSamplingProcedure(builder, document, xPathFactory, oaiPmh, defaultLangIsoCode);
+      parseSamplingProcedureFreeTexts(builder, document, xPathFactory, oaiPmh, defaultLangIsoCode);
+      parseTypeOfModeOfCollection(builder, document, xPathFactory, oaiPmh, defaultLangIsoCode);
+      parseDataCollectionDates(builder, document, xPathFactory);
+      parseDataCollectionFreeTexts(builder, document, xPathFactory, oaiPmh, defaultLangIsoCode);
     }
     return builder;
   }

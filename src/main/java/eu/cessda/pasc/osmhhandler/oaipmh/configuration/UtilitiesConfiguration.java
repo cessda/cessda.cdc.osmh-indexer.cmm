@@ -64,4 +64,9 @@ public class UtilitiesConfiguration {
             .followRedirects(HttpClient.Redirect.NORMAL)
             .build();
   }
+
+  @Bean
+  public org.jdom2.xpath.XPathFactory jdomXPathFactory() {
+    return org.jdom2.xpath.XPathFactory.instance();
+  }
 }

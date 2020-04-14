@@ -40,26 +40,25 @@ class TimeUtility {
    * @param dateString to parse as a LocalDateTime.
    * @return the Optional of LocalDateTime or of empty.
    */
-  static Optional<LocalDateTime> getLocalDateTime(String dateString) {
+  Optional<LocalDateTime> getLocalDateTime(String dateString) {
     Optional<LocalDateTime> recordLastModifiedZoneDateTime;
-
     try {
       Date date = DateUtils.parseDate(dateString, EXPECTED_DATE_FORMATS);
       recordLastModifiedZoneDateTime = Optional.of(date.toInstant().atZone(UTC_ZONE_ID).toLocalDateTime());
       return recordLastModifiedZoneDateTime;
     } catch (ParseException e) {
-      log.error("Cannot parse date string [{}] using expected date formats [{}], Exception Message [{}]",
+      log.error(
+              "Cannot parse date string [{}] using expected date formats [{}], Exception Message [{}]",
               dateString,
               EXPECTED_DATE_FORMATS,
-              e.toString());
+              e.toString()
+      );
       recordLastModifiedZoneDateTime = Optional.empty();
     }
     return recordLastModifiedZoneDateTime;
   }
 
-
-  static Function<String, Optional<Integer>> dataCollYearDateFunction() {
-
+  Function<String, Optional<Integer>> dataCollYearDateFunction() {
     return dateString -> {
       Optional<LocalDateTime> localDateTime = TimeUtility.getLocalDateTime(dateString);
       if (localDateTime.isPresent()) {
