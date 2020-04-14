@@ -69,24 +69,30 @@ public class ESIngestService implements IngestService {
     public boolean bulkIndex(List<CMMStudyOfLanguage> languageCMMStudiesMap, String languageIsoCode) {
         String indexName = String.format(INDEX_NAME_TEMPLATE, languageIsoCode);
         boolean isSuccessful = true;
+    int counter = 0;
 
         if (prepareIndex(indexName, fileHandler)) {
-            List<IndexQuery> queries = new ArrayList<>();
-            for (int counter = 0; counter < languageCMMStudiesMap.size(); counter++) {
-                CMMStudyOfLanguage cmmStudyOfLanguage = languageCMMStudiesMap.get(counter);
+            try {List<IndexQuery> queries = new ArrayList<>();
+            for (
+                CMMStudyOfLanguage cmmStudyOfLanguage : languageCMMStudiesMap) {
                 IndexQuery indexQuery = getIndexQuery(indexName, cmmStudyOfLanguage);
                 queries.add(indexQuery);
                 if (counter % INDEX_COMMIT_SIZE == 0) {
                     executeBulk(queries);
                     queries.clear();
                     log.info("Indexing [{}] index, current bulkIndex counter [{}] .", indexName, counter);
+          }
+          counter++;
                 }
-            }
+
             if (!queries.isEmpty()) {
                 executeBulk(queries);
             }
             esTemplate.refresh(indexName);
-            log.info("[{}] BulkIndex completed.", languageIsoCode);
+            log.info("[{}] BulkIndex completed.", languageIsoCode);} catch (RuntimeException e) {
+        log.error("[{}] Indexing Encountered an exception with message [{}].", indexName, e.getMessage(), e);
+        isSuccessful = false;
+      }
         } else {
             isSuccessful = false;
         }
