@@ -38,14 +38,14 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
 @UtilityClass
 public class OaiPmhHelpers {
 
-  public String buildGetStudyFullUrl(String repositoryUrl, String studyIdentifier,
-                                     HandlerConfigurationProperties oaiPmhConfig)
+  public static String buildGetStudyFullUrl(String repositoryUrl, String studyIdentifier,
+                                            HandlerConfigurationProperties oaiPmhConfig)
           throws CustomHandlerException {
     String decodedStudyId = decodeStudyNumber(studyIdentifier);
     return appendGetRecordParams(repositoryUrl, decodedStudyId, oaiPmhConfig.getOaiPmh());
   }
 
-  public String appendListRecordParams(String repoUrl, OaiPmh oaiPmh) throws CustomHandlerException {
+  public static String appendListRecordParams(String repoUrl, OaiPmh oaiPmh) throws CustomHandlerException {
     Repo repoConfig = getMetadataPrefix(repoUrl, oaiPmh);
 
     if (StringUtils.isBlank(repoConfig.getSetSpec())) {
@@ -56,18 +56,18 @@ public class OaiPmhHelpers {
       return String.format(LIST_RECORD_HEADERS_PER_SET_URL_TEMPLATE, repoUrl,
               VERB_PARAM_KEY, LIST_IDENTIFIERS_VALUE, // verb=ListIdentifier
               METADATA_PREFIX_PARAM_KEY, repoConfig.getPreferredMetadataParam(), //&metadataPrefix=ddi
-          SET_SPEC_PARAM_KEY, repoConfig.getSetSpec()); //&set=my:set
+              SET_SPEC_PARAM_KEY, repoConfig.getSetSpec()); //&set=my:set
     }
   }
 
-  public String appendListRecordResumptionToken(String baseRepoUrl, String resumptionToken) {
+  public static String appendListRecordResumptionToken(String baseRepoUrl, String resumptionToken) {
     return String.format(LIST_RECORD_HEADERS_URL_TEMPLATE, baseRepoUrl,
             VERB_PARAM_KEY, LIST_IDENTIFIERS_VALUE, // verb=ListIdentifier
             RESUMPTION_TOKEN_KEY, URLEncoder.encode(resumptionToken, StandardCharsets.UTF_8) // &resumptionToken=0001/500....
     );
   }
 
-  private String appendGetRecordParams(String repositoryUrl, String identifier, OaiPmh oaiPmh)
+  private static String appendGetRecordParams(String repositoryUrl, String identifier, OaiPmh oaiPmh)
           throws CustomHandlerException {
     return String.format(
             GET_RECORD_URL_TEMPLATE, repositoryUrl,
@@ -77,13 +77,13 @@ public class OaiPmhHelpers {
     );
   }
 
-  private String decodeStudyNumber(String encodedStudyNumber) {
+  private static String decodeStudyNumber(String encodedStudyNumber) {
     return encodedStudyNumber.replace("_dt_", ".")
             .replace("_sl_", "/")
             .replace("_cl_", ":");
   }
 
-  private Repo getMetadataPrefix(String repoBaseUrl, OaiPmh oaiPmh) throws CustomHandlerException {
+  private static Repo getMetadataPrefix(String repoBaseUrl, OaiPmh oaiPmh) throws CustomHandlerException {
 
     Repo repo = oaiPmh.getRepos()
             .stream()
