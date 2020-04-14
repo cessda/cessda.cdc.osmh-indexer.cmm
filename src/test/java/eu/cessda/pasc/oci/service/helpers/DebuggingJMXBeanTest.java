@@ -17,7 +17,6 @@
 package eu.cessda.pasc.oci.service.helpers;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
-import org.assertj.core.api.Java6BDDAssertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,6 +27,8 @@ import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.IOException;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -36,24 +37,26 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
-public class DebuggingJMXBeanTest extends EmbeddedElasticsearchServer {
+public class DebuggingJMXBeanTest {
 
   // Class under test
   private DebuggingJMXBean debuggingJMXBean;
+
   @Autowired
   private AppConfigurationProperties appConfigurationProperties;
 
+  EmbeddedElasticsearchServer embeddedElasticsearchServer;
+
   @Before
   public void init() {
-    startup(ELASTICSEARCH_HOME);
-    ElasticsearchTemplate elasticsearchTemplate = new ElasticsearchTemplate(getClient());
+    embeddedElasticsearchServer = new EmbeddedElasticsearchServer();
+    ElasticsearchTemplate elasticsearchTemplate = new ElasticsearchTemplate(embeddedElasticsearchServer.getClient());
     debuggingJMXBean = new DebuggingJMXBean(elasticsearchTemplate, appConfigurationProperties);
   }
 
   @After
-  public void shutdown() {
-    closeNodeResources();
-    Java6BDDAssertions.then(this.node.isClosed()).isTrue();
+  public void shutdown() throws IOException {
+    embeddedElasticsearchServer.close();
   }
 
   @Test

@@ -15,11 +15,14 @@
  */
 package eu.cessda.pasc.oci.repository;
 
+import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
+
+import java.io.InputStream;
+import java.net.http.HttpClient;
 
 /**
  * A Pasc Harvester Service implementation
@@ -31,18 +34,18 @@ import org.springframework.web.client.RestTemplate;
 public class PascHarvesterDao extends DaoBase implements HarvesterDao {
 
 
-  @Autowired
-  public PascHarvesterDao(RestTemplate restTemplate) {
-    super(restTemplate);
-  }
+    @Autowired
+    public PascHarvesterDao(HttpClient httpClient, AppConfigurationProperties appConfigurationProperties) {
+        super(httpClient, appConfigurationProperties);
+    }
 
-  @Override
-  public String listRecordHeaders(String finalUrl) throws ExternalSystemException {
-    return postForStringResponse(finalUrl);
-  }
+    @Override
+    public InputStream listRecordHeaders(String finalUrl) throws ExternalSystemException {
+        return postForStringResponse(finalUrl);
+    }
 
-  @Override
-  public String getRecord(String finalUrl) throws ExternalSystemException {
-    return postForStringResponse(finalUrl);
-  }
+    @Override
+    public InputStream getRecord(String finalUrl) throws ExternalSystemException {
+        return postForStringResponse(finalUrl);
+    }
 }

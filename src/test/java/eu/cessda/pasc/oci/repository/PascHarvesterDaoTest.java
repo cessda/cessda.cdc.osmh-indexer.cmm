@@ -16,25 +16,21 @@
 
 package eu.cessda.pasc.oci.repository;
 
+import com.pgssoft.httpclient.HttpClientMock;
 import eu.cessda.pasc.oci.AbstractSpringTestProfileContext;
-import eu.cessda.pasc.oci.helpers.FileHandler;
+import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.test.web.client.response.MockRestResponseCreators;
-import org.springframework.web.client.RestTemplate;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import static eu.cessda.pasc.oci.data.RecordTestData.LIST_RECORDER_HEADERS_BODY_EXAMPLE;
 import static org.assertj.core.api.Java6BDDAssertions.then;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.test.web.client.ExpectedCount.once;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 
 
 /**
@@ -46,53 +42,41 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 public class PascHarvesterDaoTest extends AbstractSpringTestProfileContext {
 
   @Autowired
-  private RestTemplate restTemplate;
-  private MockRestServiceServer serverMock;
+  private AppConfigurationProperties appConfigurationProperties;
 
-  @Autowired
-  private PascHarvesterDao pascHarvesterDao;
-
-
-  @Before
-  public void setUp() {
-    serverMock = MockRestServiceServer.bindTo(restTemplate).build();
-  }
+  private HttpClientMock httpClient = new HttpClientMock();
 
   @Test
-  public void shouldReturnSuccessfulHttpResponseListRecord() throws ExternalSystemException {
+  public void shouldReturnSuccessfulHttpResponseListRecord() throws ExternalSystemException, IOException {
 
     // Given
     String expectedUrl = "http://cdc-osmh-repo:9091/v0/ListRecordHeaders?" +
-        "Repository=https://oai.ukdataservice.ac.uk:8443/oai/provider";
+            "Repository=https://oai.ukdataservice.ac.uk:8443/oai/provider";
 
-    serverMock.expect(once(), requestTo(expectedUrl))
-        .andExpect(method(GET))
-        .andRespond(MockRestResponseCreators.withSuccess(LIST_RECORDER_HEADERS_BODY_EXAMPLE, MediaType.APPLICATION_JSON)
-        );
+    httpClient.onGet(expectedUrl).doReturnJSON(LIST_RECORDER_HEADERS_BODY_EXAMPLE, StandardCharsets.UTF_8);
 
     // When
-    String recordHeaders = pascHarvesterDao.listRecordHeaders(expectedUrl);
-
-    then(recordHeaders).isEqualTo(LIST_RECORDER_HEADERS_BODY_EXAMPLE);
+    DaoBase daoBase = new DaoBase(httpClient, appConfigurationProperties);
+    try (InputStream recordHeaders = daoBase.postForStringResponse(expectedUrl)) {
+      then(new String(recordHeaders.readAllBytes(), StandardCharsets.UTF_8)).isEqualTo(LIST_RECORDER_HEADERS_BODY_EXAMPLE);
+      httpClient.verify().get().called(1);
+    }
   }
 
   @Test
-  public void shouldReturnSuccessfulHttpResponseForGetRecord() throws ExternalSystemException {
+  public void shouldReturnSuccessfulHttpResponseForGetRecord() throws ExternalSystemException, IOException {
 
     // Given
-    FileHandler fileHandler = new FileHandler();
-    String recordUkds998 = fileHandler.getFileWithUtil("record_ukds_998.json");
     String expectedUrl = "http://cdc-osmh-repo:9091/v0/GetRecord/CMMStudy/998?" +
-        "Repository=https://oai.ukdataservice.ac.uk:8443/oai/provider";
+            "Repository=https://oai.ukdataservice.ac.uk:8443/oai/provider";
 
-    serverMock.expect(once(), requestTo(expectedUrl))
-        .andExpect(method(GET))
-        .andRespond(MockRestResponseCreators.withSuccess(recordUkds998, MediaType.APPLICATION_JSON)
-        );
+    httpClient.onGet(expectedUrl).doReturnJSON(expectedUrl, StandardCharsets.UTF_8);
 
     // When
-    String record = pascHarvesterDao.getRecord(expectedUrl);
-
-    then(record).isEqualTo(recordUkds998);
+    DaoBase daoBase = new DaoBase(httpClient, appConfigurationProperties);
+    try (InputStream recordHeaders = daoBase.postForStringResponse(expectedUrl)) {
+      then(new String(recordHeaders.readAllBytes(), StandardCharsets.UTF_8)).isEqualTo(expectedUrl);
+      httpClient.verify().get().called(1);
+    }
   }
 }

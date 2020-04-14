@@ -72,7 +72,7 @@ osmhConsumer:
   languages: ['cs', 'da', 'de', 'el', 'en', 'et', 'fi', 'fr', 'hu', 'it', 'nl', 'no', 'pt', 'sk', 'sl', 'sr', 'sv']
   delay:
     # Auto Starts after delay of 1min at startup
-    initial: '60000'
+    initial: '2000'
     fixed: '315360000000'
   daily:
     # Daily Harvest and Ingestion run at 00:01am.
@@ -131,15 +131,16 @@ osmhConsumer:
     - url: https://oai-pmh.nsd.no/oai-pmh
       name: 'NSD (Nesstar)'
       handler: 'http://cdc-osmh-repo-nesstar:9842'
-#    - url:  http://nesstar.sciences-po.fr/oai-pmh
-#      name: 'Progedo (Nesstar)'
-#      handler: 'http://cdc-osmh-repo-nesstar:9842'
+    - url:  http://nesstar.sciences-po.fr/oai-pmh
+      name: 'Progedo (Nesstar)'
+      handler: 'http://cdc-osmh-repo-nesstar:9842'
     - url:  http://harvester.sodanet.gr:8080/oai/request
       name: 'SoDaNet (Nesstar)'
       handler: 'http://cdc-osmh-repo-nesstar:9842'
     - url:  http://nesstar.unidata.unimib.it/oai-pmh
       name: 'Unidata (Nesstar)'
       handler: 'http://cdc-osmh-repo-nesstar:9842'
+  restTemplateProps:
     connTimeout: 10000 # increased from 5 seconds to 10 seconds to deal with slower Nesstar repos
     connRequestTimeout: 5000 # 5 seconds
     readTimeout: 180000 # increased from 120 seconds to 180 seconds to deal with slower Nesstar repos
@@ -185,25 +186,39 @@ logging:
 osmhConsumer:
   endpoints:
     repos:
-    - url: https://nesstar2.adp.fdv.uni-lj.si/oai-pmh
-      name: 'ADP (Nesstar)'
-      handler: 'http://localhost:9842'
-    - url: http://fors-nesstar.unil.ch/oai-pmh
-      name: 'FORS Data Service (Nesstar)'
-      handler: 'http://localhost:9842'
-    - url: https://oai-pmh.nsd.no/oai-pmh
-      name: 'NSD (Nesstar)'
-      handler: 'http://localhost:9842'
-  #  - url:  http://nesstar.sciences-po.fr/oai-pmh
-  #    name: 'Progedo (Nesstar)'
-  #    handler: 'http://localhost:9842'
-    - url:  http://harvester.sodanet.gr:8080/oai/request
-      name: 'SoDaNet (Nesstar)'
-      handler: 'http://localhost:9842'
+      - url: http://194.117.18.18:6003/v0/oai
+        name: 'APIS'
+        handler: 'http://localhost:9091'
+      - url: https://data2.aussda.at/oai
+        name: 'AUSSDA'
+        handler: 'http://localhost:9091'
+      - url: https://easy.dans.knaw.nl/oai/
+        name: 'DANS'
+        handler: 'http://localhost:9091'
+      - url: https://kuha.sa.dk/v0/oai
+        name: 'DNA'
+        handler: 'http://localhost:9091'
+      - url: https://nesstar2.adp.fdv.uni-lj.si/oai-pmh
+        name: 'ADP (Nesstar)'
+        handler: 'http://localhost:9842'
+      - url: http://fors-nesstar.unil.ch/oai-pmh
+        name: 'FORS Data Service (Nesstar)'
+        handler: 'http://localhost:9842'
+      - url: https://oai-pmh.nsd.no/oai-pmh
+        name: 'NSD (Nesstar)'
+        handler: 'http://localhost:9842'
+      - url:  http://harvester.sodanet.gr:8080/oai/request
+        name: 'SoDaNet (Nesstar)'
+        handler: 'http://localhost:9842'
 ---
 spring:
   profiles: test
 logging:
   level:
-    eu.cessda.pasc.oci.service.helpers.DebuggingJMXBean: DEBUG
     eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor: DEBUG
+    eu.cessda.pasc.oci.repository.DaoBase: DEBUG
+osmhConsumer:
+  delay:
+    # For tests, the delay should be effectively disabled
+    initial: '315360000000'
+    fixed: '315360000000'

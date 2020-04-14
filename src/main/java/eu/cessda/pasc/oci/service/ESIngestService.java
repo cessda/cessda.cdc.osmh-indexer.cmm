@@ -31,6 +31,7 @@ import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,56 +49,54 @@ import static eu.cessda.pasc.oci.helpers.AppConstants.LAST_MODIFIED_FIELD;
 @Slf4j
 public class ESIngestService implements IngestService {
 
-  private static final String INDEX_NAME_TEMPLATE = "cmmstudy_%s";
-  private static final String INDEX_NAME_PATTERN = "cmmstudy_*";
-  private static final String INDEX_TYPE = "cmmstudy";
-  private static final int INDEX_COMMIT_SIZE = 500;
-  private final ElasticsearchTemplate esTemplate;
-  private final FileHandler fileHandler;
-  private final ESConfigurationProperties esConfig;
+    private static final String INDEX_NAME_TEMPLATE = "cmmstudy_%s";
+    private static final String INDEX_NAME_PATTERN = "cmmstudy_*";
+    private static final String INDEX_TYPE = "cmmstudy";
+    private static final int INDEX_COMMIT_SIZE = 500;
 
-  @Autowired
-  public ESIngestService(
-          ElasticsearchTemplate esTemplate, FileHandler fileHandler, ESConfigurationProperties esConfig) {
+    private final ElasticsearchTemplate esTemplate;
+    private final FileHandler fileHandler;
+    private final ESConfigurationProperties esConfig;
 
-    this.esTemplate = esTemplate;
-    this.fileHandler = fileHandler;
-    this.esConfig = esConfig;
-  }
+    @Autowired
+    public ESIngestService(ElasticsearchTemplate esTemplate, FileHandler fileHandler, ESConfigurationProperties esConfig) {
+        this.esTemplate = esTemplate;
+        this.fileHandler = fileHandler;
+        this.esConfig = esConfig;
+    }
 
-  @Override
-  public boolean bulkIndex(List<CMMStudyOfLanguage> languageCMMStudiesMap, String languageIsoCode) {
-    String indexName = String.format(INDEX_NAME_TEMPLATE, languageIsoCode);
-    boolean isSuccessful = true;
+    @Override
+    public boolean bulkIndex(List<CMMStudyOfLanguage> languageCMMStudiesMap, String languageIsoCode) {
+        String indexName = String.format(INDEX_NAME_TEMPLATE, languageIsoCode);
+        boolean isSuccessful = true;
     int counter = 0;
 
-    if (prepareIndex(indexName, esTemplate, fileHandler)) {
-      try {
-        List<IndexQuery> queries = new ArrayList<>();
-        for (CMMStudyOfLanguage cmmStudyOfLanguage : languageCMMStudiesMap) {
-          IndexQuery indexQuery = getIndexQuery(indexName, cmmStudyOfLanguage);
-          queries.add(indexQuery);
-          if (counter % INDEX_COMMIT_SIZE == 0) {
-            executeBulk(queries);
-            queries.clear();
-            log.info("Indexing [{}] index, current bulkIndex counter [{}] .", indexName, counter);
+        if (prepareIndex(indexName, fileHandler)) {
+            try {List<IndexQuery> queries = new ArrayList<>();
+            for (
+                CMMStudyOfLanguage cmmStudyOfLanguage : languageCMMStudiesMap) {
+                IndexQuery indexQuery = getIndexQuery(indexName, cmmStudyOfLanguage);
+                queries.add(indexQuery);
+                if (counter % INDEX_COMMIT_SIZE == 0) {
+                    executeBulk(queries);
+                    queries.clear();
+                    log.info("Indexing [{}] index, current bulkIndex counter [{}] .", indexName, counter);
           }
           counter++;
-        }
+                }
 
-        if (!queries.isEmpty()) {
-          executeBulk(queries);
-        }
-        esTemplate.refresh(indexName);
-        log.info("[{}] BulkIndex completed.", languageIsoCode);
-      } catch (RuntimeException e) {
+            if (!queries.isEmpty()) {
+                executeBulk(queries);
+            }
+            esTemplate.refresh(indexName);
+            log.info("[{}] BulkIndex completed.", languageIsoCode);} catch (RuntimeException e) {
         log.error("[{}] Indexing Encountered an exception with message [{}].", indexName, e.getMessage(), e);
         isSuccessful = false;
       }
-    } else {
-      isSuccessful = false;
-    }
-    return isSuccessful;
+        } else {
+            isSuccessful = false;
+        }
+        return isSuccessful;
   }
 
   @Override
@@ -133,50 +132,51 @@ public class ESIngestService implements IngestService {
     return indexQuery;
   }
 
-  private boolean prepareIndex(String indexName, ElasticsearchTemplate elasticsearchTemplate, FileHandler fileHandler) {
+    private boolean prepareIndex(String indexName, FileHandler fileHandler) {
 
-    if (elasticsearchTemplate.indexExists(indexName)) {
-      log.info("[{}] index name already exists, Skipping creation.", indexName);
-      return true;
-    }
-
-    log.info("[{}] index name does not exist and will be created", indexName);
-    return createIndex(indexName, elasticsearchTemplate, fileHandler);
-  }
-
-  private boolean createIndex(String indexName, ElasticsearchTemplate elasticsearchTemplate, FileHandler fileHandler) {
-    String settingsPath = String.format("elasticsearch/settings/settings_%s.json", indexName);
-    String settingsTemplate = fileHandler.getFileWithUtil(settingsPath);
-    String settings = String.format(settingsTemplate, esConfig.getNumberOfShards(), esConfig.getNumberOfReplicas());
-    String mappingsPath = String.format("elasticsearch/mappings/mappings_%s.json", indexName);
-    String mappings = fileHandler.getFileWithUtil(mappingsPath);
-
-    if (settings.isEmpty() || mappings.isEmpty()) {
-      log.warn("[{}] index creation Settings & Mappings must be define for a custom index.", indexName);
-      log.warn("[{}] index creation with no custom settings or mappings.", indexName);
-      return (elasticsearchTemplate.createIndex(indexName));
-    }
-
-    log.debug("[{}] custom index creation with settings from [{}]. Content [\n{}\n]", indexName, settingsPath, settings);
-    try {
-      if (!elasticsearchTemplate.createIndex(indexName, settings)) {
-        log.error("[{}] custom index failed creation!", indexName);
-        return false;
-      } else {
-        log.info("[{}] custom index created successfully.", indexName);
-        log.debug("[{}] index mapping XPUT request from [{}] with content [\n{}\n]", indexName, mappingsPath, mappings);
-        if (elasticsearchTemplate.putMapping(indexName, INDEX_TYPE, mappings)) {
-          log.info("[{}] index mapping XPUT request for type [{}] was successful.", indexName, INDEX_TYPE);
-          return true;
-        } else {
-          log.error("[{}] index mapping XPUT request for type [{}] was unsuccessful.", indexName, INDEX_TYPE);
-          return false;
+        if (esTemplate.indexExists(indexName)) {
+            log.debug("[{}] index name already exists, Skipping creation.", indexName);
+            return true;
         }
-      }
-    } catch (RuntimeException e) {
-      log.error("[{}] Custom Index creation failed. Message [{}]", indexName, e.getMessage(), e);
-      return false;
+
+        log.info("[{}] index name does not exist and will be created", indexName);
+        return createIndex(indexName, fileHandler);
     }
+
+    private boolean createIndex(String indexName, FileHandler fileHandler) {
+        try {
+            String settingsPath = String.format("elasticsearch/settings/settings_%s.json", indexName);
+            String settingsTemplate = fileHandler.getFileWithUtil(settingsPath);
+            String settings = String.format(settingsTemplate, esConfig.getNumberOfShards(), esConfig.getNumberOfReplicas());
+            String mappingsPath = String.format("elasticsearch/mappings/mappings_%s.json", indexName);
+            String mappings = fileHandler.getFileWithUtil(mappingsPath);
+
+            if (settings.isEmpty() || mappings.isEmpty()) {
+                log.warn("[{}] index creation Settings & Mappings must be define for a custom index.", indexName);
+                log.warn("[{}] index creation with no custom settings or mappings.", indexName);
+                return (esTemplate.createIndex(indexName));
+            }
+
+            log.debug("[{}] custom index creation with settings from [{}]. Content [\n{}\n]", indexName, settingsPath, settings);
+            if (!esTemplate.createIndex(indexName, settings)) {
+                log.error("[{}] custom index failed creation!", indexName);
+                return false;
+            } else {
+                log.info("[{}] custom index created successfully.", indexName);
+                log.debug("[{}] index mapping PUT request from [{}] with content [\n{}\n]", indexName, mappingsPath, mappings);
+                if (esTemplate.putMapping(indexName, INDEX_TYPE, mappings)) {
+                    log.info("[{}] index mapping PUT request for type [{}] was successful.", indexName, INDEX_TYPE);
+                    return true;
+                } else {
+                    log.error("[{}] index mapping PUT request for type [{}] was unsuccessful.", indexName, INDEX_TYPE);
+                    return false;
+                }
+            }
+        } catch (IOException e) {
+            log.warn("Couldn't load settings for Elasticsearch.", e);
+            log.warn("[{}] index creation with no custom settings or mappings.", indexName);
+            return (esTemplate.createIndex(indexName));
+        }
   }
 
   private void executeBulk(List<IndexQuery> queries) {
