@@ -174,13 +174,6 @@
       <scope>compile</scope>
     </dependency>
 
-    <!-- JSON Logs -->
-    <dependency>
-      <groupId>net.logstash.logback</groupId>
-      <artifactId>logstash-logback-encoder</artifactId>
-      <version>6.3</version>
-    </dependency>
-
     <!-- Test -->
     <dependency>
       <groupId>org.springframework.boot</groupId>

@@ -48,12 +48,10 @@ class TimeUtility {
       recordLastModifiedZoneDateTime = Optional.of(date.toInstant().atZone(UTC_ZONE_ID).toLocalDateTime());
       return recordLastModifiedZoneDateTime;
     } catch (ParseException | IllegalArgumentException e) {
-      String formatMsg = "Cannot parse date string [{}] using expected date formats [{}], Exception Message [{}]";
-      log.error(formatMsg,
-          dateString,
-          EXPECTED_DATE_FORMATS,
-          e.getMessage(),
-          e);
+      log.error("Cannot parse date string [{}] using expected date formats [{}], Exception Message [{}]",
+              dateString,
+              EXPECTED_DATE_FORMATS,
+              e);
       recordLastModifiedZoneDateTime = Optional.empty();
     }
     return recordLastModifiedZoneDateTime;

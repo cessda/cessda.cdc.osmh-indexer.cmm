@@ -81,7 +81,7 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
       throw new InternalSystemException(errorStatus.getMessage());
     }
 
-    log.info("ParseRecordHeaders Started:  For [{}].", baseRepoUrl);
+    log.info("Parsing record headers for [{}].", baseRepoUrl);
     List<RecordHeader> recordHeaders = retrieveRecordHeaders(new ArrayList<>(), doc, baseRepoUrl);
     int expectedRecordHeadersCount = getRecordHeadersCount(doc);
     if (expectedRecordHeadersCount != -1) {
@@ -115,7 +115,7 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
   private List<RecordHeader> retrieveRecordHeaders(List<RecordHeader> recordHeaders, Document doc, String baseRepoUrl)
           throws CustomHandlerException {
     List<RecordHeader> recordHeadersResult = retrieveRecordHeadersWorker(recordHeaders, doc, baseRepoUrl);
-    log.info("ParseRecordHeaders Ended:  No more resumption token to process for repo with url [{}].", baseRepoUrl);
+    log.debug("ParseRecordHeaders Ended:  No more resumption token to process for repo with url [{}].", baseRepoUrl);
     return recordHeadersResult;
   }
 
@@ -129,7 +129,7 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
     if (!resumptionToken.isEmpty()) {
       String repoUrlWithResumptionToken = appendListRecordResumptionToken(baseRepoUrl, resumptionToken);
       try (InputStream resumedXMLDoc = listRecordHeadersDao.listRecordHeadersResumption(repoUrlWithResumptionToken)) {
-        log.info("Looping for [{}].", repoUrlWithResumptionToken);
+        log.trace("Looping for [{}].", repoUrlWithResumptionToken);
         retrieveRecordHeadersWorker(recordHeaders, getDocument(resumedXMLDoc, repoUrlWithResumptionToken), baseRepoUrl);
       } catch (IOException e) {
         throw new InternalSystemException("IO error reading input stream", e);
