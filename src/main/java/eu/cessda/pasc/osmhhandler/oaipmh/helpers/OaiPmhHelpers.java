@@ -24,6 +24,9 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
 
 /**
@@ -35,58 +38,58 @@ import static eu.cessda.pasc.osmhhandler.oaipmh.helpers.OaiPmhConstants.*;
 @UtilityClass
 public class OaiPmhHelpers {
 
-  public static String buildGetStudyFullUrl(String repositoryUrl, String studyIdentifier,
-                                            HandlerConfigurationProperties oaiPmhConfig)
-      throws CustomHandlerException {
+  public String buildGetStudyFullUrl(String repositoryUrl, String studyIdentifier,
+                                     HandlerConfigurationProperties oaiPmhConfig)
+          throws CustomHandlerException {
     String decodedStudyId = decodeStudyNumber(studyIdentifier);
     return appendGetRecordParams(repositoryUrl, decodedStudyId, oaiPmhConfig.getOaiPmh());
   }
 
-  public static String appendListRecordParams(String repoUrl, OaiPmh oaiPmh) throws CustomHandlerException {
+  public String appendListRecordParams(String repoUrl, OaiPmh oaiPmh) throws CustomHandlerException {
     Repo repoConfig = getMetadataPrefix(repoUrl, oaiPmh);
 
     if (StringUtils.isBlank(repoConfig.getSetSpec())) {
       return String.format(LIST_RECORD_HEADERS_URL_TEMPLATE, repoUrl,
-          VERB_PARAM_KEY, LIST_IDENTIFIERS_VALUE, // verb=ListIdentifier
-          METADATA_PREFIX_PARAM_KEY, repoConfig.getPreferredMetadataParam()); //&metadataPrefix=ddi
+              VERB_PARAM_KEY, LIST_IDENTIFIERS_VALUE, // verb=ListIdentifier
+              METADATA_PREFIX_PARAM_KEY, repoConfig.getPreferredMetadataParam()); //&metadataPrefix=ddi
     } else {
       return String.format(LIST_RECORD_HEADERS_PER_SET_URL_TEMPLATE, repoUrl,
-          VERB_PARAM_KEY, LIST_IDENTIFIERS_VALUE, // verb=ListIdentifier
-          METADATA_PREFIX_PARAM_KEY, repoConfig.getPreferredMetadataParam(), //&metadataPrefix=ddi
+              VERB_PARAM_KEY, LIST_IDENTIFIERS_VALUE, // verb=ListIdentifier
+              METADATA_PREFIX_PARAM_KEY, repoConfig.getPreferredMetadataParam(), //&metadataPrefix=ddi
           SET_SPEC_PARAM_KEY, repoConfig.getSetSpec()); //&set=my:set
     }
   }
 
-  public static String appendListRecordResumptionToken(String baseRepoUrl, String resumptionToken) {
+  public String appendListRecordResumptionToken(String baseRepoUrl, String resumptionToken) {
     return String.format(LIST_RECORD_HEADERS_URL_TEMPLATE, baseRepoUrl,
-        VERB_PARAM_KEY, LIST_IDENTIFIERS_VALUE, // verb=ListIdentifier
-        RESUMPTION_TOKEN_KEY, resumptionToken // &resumptionToken=0001/500....
+            VERB_PARAM_KEY, LIST_IDENTIFIERS_VALUE, // verb=ListIdentifier
+            RESUMPTION_TOKEN_KEY, URLEncoder.encode(resumptionToken, StandardCharsets.UTF_8) // &resumptionToken=0001/500....
     );
   }
 
-  private static String appendGetRecordParams(String repositoryUrl, String identifier, OaiPmh oaiPmh)
-      throws CustomHandlerException {
+  private String appendGetRecordParams(String repositoryUrl, String identifier, OaiPmh oaiPmh)
+          throws CustomHandlerException {
     return String.format(
-        GET_RECORD_URL_TEMPLATE, repositoryUrl,
-        VERB_PARAM_KEY, GET_RECORD_VALUE, // verb=GetRecord
-        IDENTIFIER_PARAM_KEY, identifier, //&identifier=1683
-        METADATA_PREFIX_PARAM_KEY, getMetadataPrefix(repositoryUrl, oaiPmh).getPreferredMetadataParam() //&metadataPrefix=ddi
+            GET_RECORD_URL_TEMPLATE, repositoryUrl,
+            VERB_PARAM_KEY, GET_RECORD_VALUE, // verb=GetRecord
+            IDENTIFIER_PARAM_KEY, identifier, //&identifier=1683
+            METADATA_PREFIX_PARAM_KEY, getMetadataPrefix(repositoryUrl, oaiPmh).getPreferredMetadataParam() //&metadataPrefix=ddi
     );
   }
 
-  private static String decodeStudyNumber(String encodedStudyNumber) {
+  private String decodeStudyNumber(String encodedStudyNumber) {
     return encodedStudyNumber.replace("_dt_", ".")
-        .replace("_sl_", "/")
-        .replace("_cl_", ":");
+            .replace("_sl_", "/")
+            .replace("_cl_", ":");
   }
 
-  private static Repo getMetadataPrefix(String repoBaseUrl, OaiPmh oaiPmh) throws CustomHandlerException {
+  private Repo getMetadataPrefix(String repoBaseUrl, OaiPmh oaiPmh) throws CustomHandlerException {
 
     Repo repo = oaiPmh.getRepos()
-        .stream()
-        .filter(currentStreamRepo -> currentStreamRepo.getUrl().equalsIgnoreCase(repoBaseUrl))
-        .findFirst()
-        .orElseThrow(() -> new CustomHandlerException(String.format("Configuration not found for Repo [%s]", repoBaseUrl)));
+            .stream()
+            .filter(currentStreamRepo -> currentStreamRepo.getUrl().equalsIgnoreCase(repoBaseUrl))
+            .findFirst()
+            .orElseThrow(() -> new CustomHandlerException(String.format("Configuration not found for Repo [%s]", repoBaseUrl)));
 
     log.debug("Retrieved Params for repoBaseUrl [{}] as [{}]", repoBaseUrl, repo);
     return repo;
