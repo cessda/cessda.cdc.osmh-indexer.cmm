@@ -71,8 +71,12 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
   public List<RecordHeader> getRecordHeaders(String baseRepoUrl) throws CustomHandlerException {
 
     String fullListRecordUrlPath = appendListRecordParams(baseRepoUrl, config.getOaiPmh());
-    InputStream recordHeadersXMLString = listRecordHeadersDao.listRecordHeaders(fullListRecordUrlPath);
-    Document doc = getDocument(recordHeadersXMLString, fullListRecordUrlPath);
+    Document doc;
+    try (InputStream recordHeadersXMLString = listRecordHeadersDao.listRecordHeaders(fullListRecordUrlPath)) {
+      doc = getDocument(recordHeadersXMLString, fullListRecordUrlPath);
+    } catch (IOException e) {
+      throw new InternalSystemException("IO error reading input stream", e);
+    }
 
     // We exit if the response has an <error> element
     ErrorStatus errorStatus = ListIdentifiersResponseValidator.validateResponse(doc);
@@ -86,12 +90,10 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
     int expectedRecordHeadersCount = getRecordHeadersCount(doc);
     if (expectedRecordHeadersCount != -1) {
       log.info("ParseRecordHeaders retrieved [{}] of [{}] expected record headers count for repo [{}].",
-          recordHeaders.size(),
-          expectedRecordHeadersCount,
-          baseRepoUrl);
+              recordHeaders.size(), expectedRecordHeadersCount, baseRepoUrl
+      );
     } else {
-      log.warn("Unable to parse Record header's count from response. Retrieved record content [{}] for SP baseUrl [{}]",
-              doc, baseRepoUrl);
+      log.info("ParseRecordHeaders retrieved [{}] record headers for [{}].", recordHeaders.size(), baseRepoUrl);
     }
     return recordHeaders;
   }
@@ -128,12 +130,14 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
     String resumptionToken = parseResumptionToken(doc);
     if (!resumptionToken.isEmpty()) {
       String repoUrlWithResumptionToken = appendListRecordResumptionToken(baseRepoUrl, resumptionToken);
+      Document document;
       try (InputStream resumedXMLDoc = listRecordHeadersDao.listRecordHeadersResumption(repoUrlWithResumptionToken)) {
         log.trace("Looping for [{}].", repoUrlWithResumptionToken);
-        retrieveRecordHeadersWorker(recordHeaders, getDocument(resumedXMLDoc, repoUrlWithResumptionToken), baseRepoUrl);
+        document = getDocument(resumedXMLDoc, repoUrlWithResumptionToken);
       } catch (IOException e) {
         throw new InternalSystemException("IO error reading input stream", e);
       }
+      retrieveRecordHeadersWorker(recordHeaders, document, baseRepoUrl);
     }
     return recordHeaders;
   }
