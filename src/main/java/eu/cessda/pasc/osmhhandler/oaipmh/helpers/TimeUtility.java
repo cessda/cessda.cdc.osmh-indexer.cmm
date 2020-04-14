@@ -47,11 +47,11 @@ class TimeUtility {
       Date date = DateUtils.parseDate(dateString, EXPECTED_DATE_FORMATS);
       recordLastModifiedZoneDateTime = Optional.of(date.toInstant().atZone(UTC_ZONE_ID).toLocalDateTime());
       return recordLastModifiedZoneDateTime;
-    } catch (ParseException | IllegalArgumentException e) {
+    } catch (ParseException e) {
       log.error("Cannot parse date string [{}] using expected date formats [{}], Exception Message [{}]",
               dateString,
               EXPECTED_DATE_FORMATS,
-              e);
+              e.toString());
       recordLastModifiedZoneDateTime = Optional.empty();
     }
     return recordLastModifiedZoneDateTime;
