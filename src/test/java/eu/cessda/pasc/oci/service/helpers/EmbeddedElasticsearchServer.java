@@ -64,7 +64,7 @@ public class EmbeddedElasticsearchServer implements Closeable {
 
       then(node).isNotNull();
       then(node.isClosed()).isFalse();
-      log.info("Started Node and health is [{}]", clusterHealthResponse);
+      log.info("Started Node. Health is [{}]", clusterHealthResponse);
 
       Duration waitDuration = Duration.TWO_SECONDS;
       log.info("Waiting [{}ms] for the node to start", waitDuration.getValueInMS());
