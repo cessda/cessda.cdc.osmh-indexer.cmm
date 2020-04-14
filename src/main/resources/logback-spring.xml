@@ -1,7 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <contextName>pasc-osmh-handler-oai-pmh</contextName>
-  <include resource="org/springframework/boot/logging/logback/base.xml"/>
-  <jmxConfigurator/>
+  <springProfile name="!gcp">
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+  </springProfile>
+  <springProfile name="gcp">
+    <jmxConfigurator/>
+    <appender name="jsonConsoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+      <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+    </appender>
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+      <!-- Here we can refer to the variable
+       defined at the resource1.properties -->
+      <file>${user.home}${file.separator}pasc-osmh-handler${file.separator}pasc-osmh-handler-oai-pmh.log</file>
+      <encoder>
+        <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %40.40((%file:%line\)) - %message%n</pattern>
+      </encoder>
+    </appender>
+    <root level="INFO">
+      <appender-ref ref="FILE"/>
+      <appender-ref ref="jsonConsoleAppender"/>
+    </root>
+  </springProfile>
 </configuration>
-
