@@ -173,7 +173,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
     FileHandler fileHandler = new FileHandler();
     String recordUkds998 = fileHandler.getFileWithUtil("record_ukds_998.json");
     String recordID = "998";
-    String expectedUrl = "http://cdc-osmh-repo:9091/v0/GetRecord/CMMStudy/998?Repository=https://oai.ukdataservice.ac.uk:8443/oai/provider";
+    String expectedUrl = "http://localhost:9091/v0/GetRecord/CMMStudy/998?Repository=https://oai.ukdataservice.ac.uk:8443/oai/provider";
 
     when(harvesterDao.getRecord(expectedUrl)).thenReturn(
             new ByteArrayInputStream(recordUkds998.getBytes(StandardCharsets.UTF_8))
@@ -197,7 +197,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
     FileHandler fileHandler = new FileHandler();
     String recordUkds1031 = fileHandler.getFileWithUtil("record_ukds_1031_deleted.json");
     String recordID = "1031";
-    String expectedUrl = "http://cdc-osmh-repo:9091/v0/GetRecord/CMMStudy/1031?Repository=https://oai.ukdataservice.ac.uk:8443/oai/provider";
+    String expectedUrl = "http://localhost:9091/v0/GetRecord/CMMStudy/1031?Repository=https://oai.ukdataservice.ac.uk:8443/oai/provider";
 
     when(harvesterDao.getRecord(expectedUrl)).thenReturn(
             new ByteArrayInputStream(recordUkds1031.getBytes(StandardCharsets.UTF_8))

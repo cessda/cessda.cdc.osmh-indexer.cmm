@@ -28,4 +28,8 @@ import lombok.Setter;
 public class Harvester {
   private String url;
   private String version;
+
+  public enum Type {
+    OAI_PMH, NESSTAR
+  }
 }

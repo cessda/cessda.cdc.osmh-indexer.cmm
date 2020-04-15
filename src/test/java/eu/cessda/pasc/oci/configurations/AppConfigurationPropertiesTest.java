@@ -40,10 +40,6 @@ public class AppConfigurationPropertiesTest extends AbstractSpringTestProfileCon
 
   @Test
   public void shouldReturnConfigurationsForOSMHHandler() {
-
-    then(appConfigurationProperties.getHarvester().getUrl()).isEqualTo("http://localhost:9091");
-    then(appConfigurationProperties.getHarvester().getVersion()).isEqualTo("v0");
-
     List<Repo> repos = appConfigurationProperties.getEndpoints().getRepos();
     then(repos).isNotNull();
     then(repos).hasAtLeastOneElementOfType(Repo.class);

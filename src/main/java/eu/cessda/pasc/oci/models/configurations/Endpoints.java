@@ -15,21 +15,22 @@
  */
 package eu.cessda.pasc.oci.models.configurations;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Endpoints configuration model
  *
  * @author moses AT doraventures DOT com
  */
-@Getter
-@Setter
+@Data
 public class Endpoints {
 
-  private List<String> supportedApiVersions;
-  private List<String> supportedRecordTypes;
-  private List<Repo> repos;
+  private final List<String> supportedRecordTypes = new ArrayList<>();
+  private final Map<Harvester.Type, Harvester> harvesters = new ConcurrentHashMap<>();
+  private final List<Repo> repos = new ArrayList<>();
 }

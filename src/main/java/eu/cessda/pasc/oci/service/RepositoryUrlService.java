@@ -17,6 +17,7 @@ package eu.cessda.pasc.oci.service;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.helpers.FakeHarvester;
+import eu.cessda.pasc.oci.models.configurations.Harvester;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.service.helpers.StudyIdentifierEncoder;
 import lombok.extern.slf4j.Slf4j;
@@ -48,9 +49,10 @@ public class RepositoryUrlService
     {
         Optional<Repo> repoOptional = fakeHarvester.getRepoConfigurationProperties(repositoryUrl);
         if (repoOptional.isPresent()) {
+            Harvester harvester = appConfigurationProperties.getEndpoints().getHarvesters().get(repoOptional.get().getHandler());
             String finalUrl = String.format(LIST_RECORD_TEMPLATE,
-                    repoOptional.get().getHandler(),
-                    appConfigurationProperties.getHarvester().getVersion(),
+                    harvester.getUrl(),
+                    harvester.getVersion(),
                     repositoryUrl);
             log.info("[{}] Final ListHeaders Handler url [{}] constructed.", repositoryUrl, finalUrl);
             return finalUrl;
@@ -63,9 +65,10 @@ public class RepositoryUrlService
         Optional<Repo> repoOptional = fakeHarvester.getRepoConfigurationProperties(repositoryUrl);
         if (repoOptional.isPresent()) {
             String encodedStudyID = StudyIdentifierEncoder.encodeStudyIdentifier().apply(studyNumber);
+            Harvester harvester = appConfigurationProperties.getEndpoints().getHarvesters().get(repoOptional.get().getHandler());
             String finalUrl = String.format(GET_RECORD_TEMPLATE,
-                    repoOptional.get().getHandler(),
-                    appConfigurationProperties.getHarvester().getVersion(),
+                    harvester.getUrl(),
+                    harvester.getVersion(),
                     encodedStudyID,
                     repositoryUrl);
             log.trace("[{}] Final GetRecord Handler url [{}] constructed.", repositoryUrl, finalUrl);

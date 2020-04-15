@@ -17,10 +17,9 @@
 package eu.cessda.pasc.oci.data;
 
 import eu.cessda.pasc.oci.models.configurations.Endpoints;
+import eu.cessda.pasc.oci.models.configurations.Harvester;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.experimental.UtilityClass;
-
-import java.util.Collections;
 
 @UtilityClass
 public class ReposTestData
@@ -28,9 +27,9 @@ public class ReposTestData
 
   public static Repo getUKDSRepo() {
     Repo repo = new Repo();
-    repo.setName( "UKDS" );
-    repo.setUrl( "https://oai.ukdataservice.ac.uk:8443/oai/provider" );
-    repo.setHandler( "http://localhost:9091" );
+    repo.setName("UKDS");
+    repo.setUrl("https://oai.ukdataservice.ac.uk:8443/oai/provider");
+    repo.setHandler(Harvester.Type.OAI_PMH);
     return repo;
   }
 
@@ -38,7 +37,7 @@ public class ReposTestData
     Repo repo = new Repo();
     repo.setName("GESIS");
     repo.setUrl("http://dbkapps.gesis.org/dbkoai3");
-    repo.setHandler("http://localhost:9091");
+    repo.setHandler(Harvester.Type.OAI_PMH);
     return repo;
   }
 
@@ -46,13 +45,13 @@ public class ReposTestData
     Repo repo = new Repo();
     repo.setName("GESIS De");
     repo.setUrl("http://dbkapps.gesis.org/dbkoai3");
-    repo.setHandler("http://localhost:9091");
+    repo.setHandler(Harvester.Type.OAI_PMH);
     return repo;
   }
 
   public static Endpoints getEndpoints() {
     Endpoints endpoints = new Endpoints();
-    endpoints.setRepos(Collections.singletonList(getUKDSRepo()));
+    endpoints.getRepos().add(getUKDSRepo());
     return endpoints;
   }
 }
