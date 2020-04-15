@@ -38,6 +38,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -176,7 +177,8 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
     FileHandler fileHandler = new FileHandler();
     String recordUkds998 = fileHandler.getFileAsString("record_ukds_998.json");
     String recordID = "998";
-    URI expectedUrl = URI.create("http://localhost:9091/v0/GetRecord/CMMStudy/998?Repository=https://oai.ukdataservice.ac.uk:8443/oai/provider");
+    URI expectedUrl = URI.create("http://localhost:9091/v0/GetRecord/CMMStudy/998?Repository=" +
+            URLEncoder.encode("https://oai.ukdataservice.ac.uk:8443/oai/provider", StandardCharsets.UTF_8));
 
     when(harvesterDao.getRecord(expectedUrl)).thenReturn(
             new ByteArrayInputStream(recordUkds998.getBytes(StandardCharsets.UTF_8))
@@ -200,7 +202,8 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
     FileHandler fileHandler = new FileHandler();
     String recordUkds1031 = fileHandler.getFileAsString("record_ukds_1031_deleted.json");
     String recordID = "1031";
-    URI expectedUrl = URI.create("http://localhost:9091/v0/GetRecord/CMMStudy/1031?Repository=https://oai.ukdataservice.ac.uk:8443/oai/provider");
+    URI expectedUrl = URI.create("http://localhost:9091/v0/GetRecord/CMMStudy/1031?Repository=" +
+            URLEncoder.encode("https://oai.ukdataservice.ac.uk:8443/oai/provider", StandardCharsets.UTF_8));
 
     when(harvesterDao.getRecord(expectedUrl)).thenReturn(
             new ByteArrayInputStream(recordUkds1031.getBytes(StandardCharsets.UTF_8))
