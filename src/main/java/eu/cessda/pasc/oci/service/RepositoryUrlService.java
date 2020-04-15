@@ -25,6 +25,8 @@ import org.springframework.stereotype.Service;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Service
 @Slf4j
@@ -46,7 +48,7 @@ public class RepositoryUrlService
         String finalUrlString = String.format(LIST_RECORD_TEMPLATE,
                 harvester.getUrl(),
                 harvester.getVersion(),
-                repo.getUrl()
+                URLEncoder.encode(repo.getUrl().toString(), StandardCharsets.UTF_8)
         );
         URI finalUrl = new URI(finalUrlString);
         log.info("[{}] Final ListHeaders Handler url [{}] constructed.", repo.getUrl(), finalUrlString);
@@ -60,7 +62,7 @@ public class RepositoryUrlService
                 harvester.getUrl(),
                 harvester.getVersion(),
                 encodedStudyID,
-                repo.getUrl()
+                URLEncoder.encode(repo.getUrl().toString(), StandardCharsets.UTF_8)
         );
         URI finalUrl = new URI(finalUrlString);
         log.trace("[{}] Final GetRecord Handler url [{}] constructed.", repo.getUrl(), finalUrl);
