@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
+import java.net.URI;
 import java.net.http.HttpClient;
 
 /**
@@ -40,12 +41,12 @@ public class PascHarvesterDao extends DaoBase implements HarvesterDao {
     }
 
     @Override
-    public InputStream listRecordHeaders(String finalUrl) throws ExternalSystemException {
+    public InputStream listRecordHeaders(URI finalUrl) throws ExternalSystemException {
         return postForStringResponse(finalUrl);
     }
 
     @Override
-    public InputStream getRecord(String finalUrl) throws ExternalSystemException {
+    public InputStream getRecord(URI finalUrl) throws ExternalSystemException {
         return postForStringResponse(finalUrl);
     }
 }

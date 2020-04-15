@@ -33,14 +33,14 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import static eu.cessda.pasc.oci.service.helpers.StudyIdentifierEncoder.decodeStudyNumber;
 
 /**
  * Default OSMH Consumer Service implementation
@@ -71,7 +71,7 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
   public List<RecordHeader> listRecordHeaders(Repo repo, LocalDateTime lastModifiedDate) {
     List<RecordHeader> recordHeadersUnfiltered = new ArrayList<>();
     try {
-      String finalUrl = repositoryUrlService.constructListRecordUrl(repo.getUrl());
+      URI finalUrl = repositoryUrlService.constructListRecordUrl(repo);
       try (InputStream recordHeadersJsonStream = harvesterDao.listRecordHeaders(finalUrl)) {
         recordHeadersUnfiltered = recordHeaderObjectReader.readValue(recordHeadersJsonStream);
       }
@@ -79,6 +79,8 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
       log.error("ListRecordHeaders failed for repo [{}]. CDC Handler Error object Msg [{}].", repo, e.getMessage(), e);
     } catch (IOException e) {
       log.error("Error, Unable to pass ListRecordHeaders response error message [{}].", e.getMessage(), e);
+    } catch (URISyntaxException e) {
+      log.error("Unable to construct URL [{}]", e.toString());
     }
 
     return filterRecords(recordHeadersUnfiltered, lastModifiedDate);
@@ -86,9 +88,9 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
 
   @Override
   public Optional<CMMStudy> getRecord(Repo repo, String studyNumber) {
-    String finalUrl = "";
+    URI finalUrl = null;
     try {
-      finalUrl = repositoryUrlService.constructGetRecordUrl(repo.getUrl(), studyNumber);
+      finalUrl = repositoryUrlService.constructGetRecordUrl(repo, studyNumber);
       try (InputStream recordJsonStream = harvesterDao.getRecord(finalUrl)) {
         return Optional.of(cmmStudyConverter.fromJsonString(recordJsonStream));
       }
@@ -98,11 +100,13 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
                       "URL to handler for harvesting [{}].",
               e.getMessage(),
               e.getExternalResponseBody(),
-              decodeStudyNumber().apply(finalUrl));
+              finalUrl
+      );
     } catch (IOException e) {
       log.error("Error, Unable to pass GetRecord response error message [{}].", e.getMessage(), e);
+    } catch (URISyntaxException e) {
+      log.error("Unable to construct URL [{}]", e.toString());
     }
-
     return Optional.empty();
   }
 
@@ -115,7 +119,8 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
       log.info("Returning [{}] filtered recordHeaders by date greater than [{}] | out of [{}] unfiltered.",
               filteredHeaders.size(),
               ingestedLastModifiedDate,
-              unfilteredRecordHeaders.size());
+              unfilteredRecordHeaders.size()
+      );
 
       return filteredHeaders;
     }

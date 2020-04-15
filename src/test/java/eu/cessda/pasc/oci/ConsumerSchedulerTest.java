@@ -47,8 +47,6 @@ import java.util.Optional;
 
 import static eu.cessda.pasc.oci.data.RecordTestData.*;
 import static eu.cessda.pasc.oci.data.ReposTestData.getEndpoints;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.*;
 
 

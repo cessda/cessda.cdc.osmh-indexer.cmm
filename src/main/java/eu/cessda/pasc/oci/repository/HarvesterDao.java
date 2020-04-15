@@ -18,6 +18,7 @@ package eu.cessda.pasc.oci.repository;
 import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
 
 import java.io.InputStream;
+import java.net.URI;
 
 /**
  * The Open Source Metadata Harvester service.   For handling remote calls to the remote harvester
@@ -25,7 +26,7 @@ import java.io.InputStream;
  * @author moses AT doraventures DOT com
  */
 public interface HarvesterDao {
-    InputStream listRecordHeaders(String spRepository) throws ExternalSystemException;
+    InputStream listRecordHeaders(URI spRepository) throws ExternalSystemException;
 
-    InputStream getRecord(String url) throws ExternalSystemException;
+    InputStream getRecord(URI url) throws ExternalSystemException;
 }

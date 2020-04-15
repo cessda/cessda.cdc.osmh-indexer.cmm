@@ -20,6 +20,7 @@ import eu.cessda.pasc.oci.models.configurations.Endpoints;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.experimental.UtilityClass;
 
+import java.net.URI;
 import java.util.Collections;
 
 @UtilityClass
@@ -28,16 +29,16 @@ public class ReposTestData
 
   public static Repo getUKDSRepo() {
     Repo repo = new Repo();
-    repo.setName( "UKDS" );
-    repo.setUrl( "https://oai.ukdataservice.ac.uk:8443/oai/provider" );
-    repo.setHandler( "http://localhost:9091" );
+    repo.setName("UKDS");
+    repo.setUrl(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
+    repo.setHandler("http://localhost:9091");
     return repo;
   }
 
   public static Repo getGesisEnRepo() {
     Repo repo = new Repo();
     repo.setName("GESIS");
-    repo.setUrl("http://dbkapps.gesis.org/dbkoai3");
+    repo.setUrl(URI.create("http://dbkapps.gesis.org/dbkoai3"));
     repo.setHandler("http://localhost:9091");
     return repo;
   }
@@ -45,7 +46,7 @@ public class ReposTestData
   public static Repo getGesisDeRepo() {
     Repo repo = new Repo();
     repo.setName("GESIS De");
-    repo.setUrl("http://dbkapps.gesis.org/dbkoai3");
+    repo.setUrl(URI.create("http://dbkapps.gesis.org/dbkoai3"));
     repo.setHandler("http://localhost:9091");
     return repo;
   }
