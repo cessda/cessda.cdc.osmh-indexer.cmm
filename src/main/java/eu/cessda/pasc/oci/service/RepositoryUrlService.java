@@ -16,6 +16,7 @@
 package eu.cessda.pasc.oci.service;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
+import eu.cessda.pasc.oci.models.configurations.Harvester;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.service.helpers.StudyIdentifierEncoder;
 import lombok.extern.slf4j.Slf4j;
@@ -41,9 +42,10 @@ public class RepositoryUrlService
     }
 
     public URI constructListRecordUrl(Repo repo) throws URISyntaxException {
+        Harvester harvester = appConfigurationProperties.getEndpoints().getHarvesters().get(repo.getHandler());
         String finalUrlString = String.format(LIST_RECORD_TEMPLATE,
-                repo.getHandler(),
-                appConfigurationProperties.getHarvester().getVersion(),
+                harvester.getUrl(),
+                harvester.getVersion(),
                 repo.getUrl()
         );
         URI finalUrl = new URI(finalUrlString);
@@ -52,10 +54,11 @@ public class RepositoryUrlService
     }
 
     public URI constructGetRecordUrl(Repo repo, String studyNumber) throws URISyntaxException {
+        Harvester harvester = appConfigurationProperties.getEndpoints().getHarvesters().get(repo.getHandler());
         String encodedStudyID = StudyIdentifierEncoder.encodeStudyIdentifier().apply(studyNumber);
         String finalUrlString = String.format(GET_RECORD_TEMPLATE,
-                repo.getHandler(),
-                appConfigurationProperties.getHarvester().getVersion(),
+                harvester.getUrl(),
+                harvester.getVersion(),
                 encodedStudyID,
                 repo.getUrl()
         );

@@ -24,6 +24,7 @@ import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
+import eu.cessda.pasc.oci.models.configurations.Harvester;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.repository.HarvesterDao;
 import eu.cessda.pasc.oci.service.impl.DefaultHarvesterConsumerService;
@@ -160,6 +161,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
     // Given
     Repo repoMock = mock(Repo.class);
     when(repoMock.getUrl()).thenReturn(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
+    when(repoMock.getHandler()).thenReturn(Harvester.Type.OAI_PMH);
 
     when(harvesterDao.getRecord(any(URI.class))).thenThrow(new ExternalSystemException("Mocked!", null));
 

@@ -33,5 +33,5 @@ public class Repo {
 
   private URI url;
   private String name;
-  private String handler;
+  private Harvester.Type handler;
 }

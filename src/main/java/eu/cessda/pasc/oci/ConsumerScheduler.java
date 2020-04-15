@@ -153,7 +153,7 @@ public class ConsumerScheduler {
 
   private void executeBulk(Repo repo, String langIsoCode, List<CMMStudyOfLanguage> cmmStudies) {
     if (cmmStudies.isEmpty()) {
-      log.warn("CmmStudies list is empty and henceforth there is nothing to BulkIndex for repo[{}] with LangIsoCode [{}].", keyValue(REPO_NAME, repo.getName()), keyValue(LANG_CODE, langIsoCode));
+      log.debug("CmmStudies list is empty and henceforth there is nothing to BulkIndex for repo[{}] with LangIsoCode [{}].", keyValue(REPO_NAME, repo.getName()), keyValue(LANG_CODE, langIsoCode));
     } else {
       log.info("BulkIndexing repo [{}] with lang code [{}] index with [{}] CmmStudies", keyValue(REPO_NAME, repo.getName()), keyValue(LANG_CODE, langIsoCode), keyValue("cmm_studies_added", cmmStudies.size()));
       boolean isSuccessful = esIndexerService.bulkIndex(cmmStudies, langIsoCode);

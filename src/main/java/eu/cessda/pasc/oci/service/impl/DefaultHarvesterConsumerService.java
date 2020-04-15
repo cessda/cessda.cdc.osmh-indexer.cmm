@@ -95,10 +95,8 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
         return Optional.of(cmmStudyConverter.fromJsonString(recordJsonStream));
       }
     } catch (ExternalSystemException e) {
-      log.warn("Short Exception msg [{}], " +
-                      "HttpServerErrorException response detail from handler's [{}], " +
-                      "URL to handler for harvesting [{}].",
-              e.getMessage(),
+      log.warn("[{}], response detail from handler [{}], URL to handler for harvesting [{}].",
+              e.toString(),
               e.getExternalResponseBody(),
               finalUrl
       );

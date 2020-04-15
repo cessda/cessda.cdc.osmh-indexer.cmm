@@ -16,7 +16,6 @@
 package eu.cessda.pasc.oci.service.helpers;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
-import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.client.Client;
@@ -82,12 +81,13 @@ public class DebuggingJMXBean {
   @ManagedOperation(description = "Show which SP repo Endpoints are currently active.")
   public String printCurrentlyConfiguredRepoEndpoints() {
 
-    StringBuilder reposStrBuilder = new StringBuilder();
-    for (Repo repo : appConfigProps.getEndpoints().getRepos()) {
-      reposStrBuilder.append(
-          String.format("\t Repo [%s] url [%s] handler[%s] %n", repo.getName(), repo.getUrl(), repo.getHandler()));
-    }
-    String reposStr = reposStrBuilder.toString();
+    String reposStr = appConfigProps.getEndpoints().getRepos().stream().map(repo ->
+            String.format("\t Repo [%s] url [%s] handler[%s] %n",
+                    repo.getName(),
+                    repo.getUrl(),
+                    appConfigProps.getEndpoints().getHarvesters().get(repo.getHandler()).getUrl()
+            )
+    ).collect(Collectors.joining());
     log.info("Configured Repos: [\n{}]", reposStr);
     return reposStr;
   }
