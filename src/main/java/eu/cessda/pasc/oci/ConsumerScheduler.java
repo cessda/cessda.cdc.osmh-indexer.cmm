@@ -192,8 +192,8 @@ public class ConsumerScheduler {
   private void logStartStatus(OffsetDateTime localDateTime, String runDescription) {
     log.info("[{}] Consume and Ingest All SPs Repos : Started at [{}]", runDescription, localDateTime);
     log.info("Currents state before run");
-    debuggingJMXBean.printCurrentlyConfiguredRepoEndpoints();
-    debuggingJMXBean.printElasticSearchInfo();
+    log.info(debuggingJMXBean.printCurrentlyConfiguredRepoEndpoints());
+    log.info(debuggingJMXBean.printElasticSearchInfo());
   }
 
   private void logEndStatus(OffsetDateTime offsetDateTime, String runDescription) {

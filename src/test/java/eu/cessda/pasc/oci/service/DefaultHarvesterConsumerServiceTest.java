@@ -161,7 +161,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
     // Given
     Repo repoMock = mock(Repo.class);
     when(repoMock.getUrl()).thenReturn(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
-    when(repoMock.getHandler()).thenReturn(Harvester.Type.OAI_PMH);
+    when(repoMock.getHandler()).thenReturn(Harvester.Type.NESSTAR);
 
     when(harvesterDao.getRecord(any(URI.class))).thenThrow(new ExternalSystemException("Mocked!", null));
 
@@ -174,7 +174,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
   @Test
   public void shouldReturnASuccessfulResponseGetRecord() throws ExternalSystemException, IOException {
     FileHandler fileHandler = new FileHandler();
-    String recordUkds998 = fileHandler.getFileWithUtil("record_ukds_998.json");
+    String recordUkds998 = fileHandler.getFileAsString("record_ukds_998.json");
     String recordID = "998";
     URI expectedUrl = URI.create("http://localhost:9091/v0/GetRecord/CMMStudy/998?Repository=https://oai.ukdataservice.ac.uk:8443/oai/provider");
 
@@ -198,7 +198,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
   @Test
   public void shouldReturnDeletedRecordMarkedAsInactive() throws ExternalSystemException, IOException {
     FileHandler fileHandler = new FileHandler();
-    String recordUkds1031 = fileHandler.getFileWithUtil("record_ukds_1031_deleted.json");
+    String recordUkds1031 = fileHandler.getFileAsString("record_ukds_1031_deleted.json");
     String recordID = "1031";
     URI expectedUrl = URI.create("http://localhost:9091/v0/GetRecord/CMMStudy/1031?Repository=https://oai.ukdataservice.ac.uk:8443/oai/provider");
 

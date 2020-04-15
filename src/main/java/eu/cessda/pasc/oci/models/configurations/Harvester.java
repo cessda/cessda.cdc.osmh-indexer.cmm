@@ -18,6 +18,8 @@ package eu.cessda.pasc.oci.models.configurations;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.net.URI;
+
 /**
  * Harvester Configurations
  *
@@ -26,7 +28,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Harvester {
-  private String url;
+  private URI url;
   private String version;
 
   public enum Type {

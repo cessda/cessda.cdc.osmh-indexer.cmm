@@ -61,7 +61,7 @@ public class DebuggingJMXBeanTest {
 
   @Test
   public void shouldPrintElasticsearchDetails() {
-    assertThat(debuggingJMXBean.printElasticSearchInfo()).isEqualTo("Printed Health");
+    assertThat(debuggingJMXBean.printElasticSearchInfo()).startsWith("ElasticSearch Client Settings Details");
   }
 
   @Test

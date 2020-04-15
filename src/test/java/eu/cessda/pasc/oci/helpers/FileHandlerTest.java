@@ -32,13 +32,13 @@ public class FileHandlerTest {
   @Test
   public void shouldReturnContentToAValidFilePath() throws IOException {
     FileHandler fileHandler = new FileHandler();
-    String recordUkds998 = fileHandler.getFileWithUtil("record_ukds_998.json");
+    String recordUkds998 = fileHandler.getFileAsString("record_ukds_998.json");
     assertThat(recordUkds998).isNotEmpty();
   }
 
   @Test(expected = FileNotFoundException.class)
   public void shouldThrowFileNotFoundExceptionForAnInvalidValidFilePath() throws IOException {
     FileHandler fileHandler = new FileHandler();
-    fileHandler.getFileWithUtil("does_not_exist.json");
+    fileHandler.getFileAsString("does_not_exist.json");
   }
 }

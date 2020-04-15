@@ -21,16 +21,15 @@ import org.apache.commons.lang.time.DateUtils;
 
 import java.text.ParseException;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.Optional;
-
-import static eu.cessda.pasc.oci.helpers.AppConstants.EXPECTED_DATE_FORMATS;
-import static eu.cessda.pasc.oci.helpers.AppConstants.UTC_ID;
 
 @Slf4j
 @UtilityClass
 public class TimeUtility {
+
+  private static final String[] EXPECTED_DATE_FORMATS = new String[]{"yyyy-MM-dd'T'HH:mm:ss'Z'", "yyyy-MM-dd", "yyyy-MM-dd'T'HH:mm:ssZ"};
 
   /**
    * Attempts to pass date string using multiple expected date formats into a LocalDateTime.
@@ -45,7 +44,7 @@ public class TimeUtility {
     try {
       Date date = DateUtils.parseDate(dateString, EXPECTED_DATE_FORMATS);
       recordLastModifiedZoneDateTime = Optional.of(date.toInstant()
-          .atZone(ZoneId.of(UTC_ID))
+              .atZone(ZoneOffset.UTC)
           .toLocalDateTime());
       return recordLastModifiedZoneDateTime;
     } catch (ParseException | IllegalArgumentException e) {

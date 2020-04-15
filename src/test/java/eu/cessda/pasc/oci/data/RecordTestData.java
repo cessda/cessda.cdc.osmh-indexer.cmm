@@ -211,6 +211,6 @@ public final class RecordTestData {
 
   public static String getSyntheticCMMStudyOfLanguageEn() throws IOException {
     FileHandler fileHandler = new FileHandler();
-    return fileHandler.getFileWithUtil("synthetic_complaint_record_en.json");
+    return fileHandler.getFileAsString("synthetic_complaint_record_en.json");
   }
 }

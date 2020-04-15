@@ -38,8 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static eu.cessda.pasc.oci.helpers.AppConstants.LAST_MODIFIED_FIELD;
-
 /**
  * Service responsible for triggering harvesting and Metadata ingestion to the search engine
  *
@@ -49,6 +47,7 @@ import static eu.cessda.pasc.oci.helpers.AppConstants.LAST_MODIFIED_FIELD;
 @Slf4j
 public class ESIngestService implements IngestService {
 
+    private static final String LAST_MODIFIED_FIELD = "lastModified";
     private static final String INDEX_NAME_TEMPLATE = "cmmstudy_%s";
     private static final String INDEX_NAME_PATTERN = "cmmstudy_*";
     private static final String INDEX_TYPE = "cmmstudy";
@@ -146,10 +145,10 @@ public class ESIngestService implements IngestService {
     private boolean createIndex(String indexName, FileHandler fileHandler) {
         try {
             String settingsPath = String.format("elasticsearch/settings/settings_%s.json", indexName);
-            String settingsTemplate = fileHandler.getFileWithUtil(settingsPath);
+            String settingsTemplate = fileHandler.getFileAsString(settingsPath);
             String settings = String.format(settingsTemplate, esConfig.getNumberOfShards(), esConfig.getNumberOfReplicas());
             String mappingsPath = String.format("elasticsearch/mappings/mappings_%s.json", indexName);
-            String mappings = fileHandler.getFileWithUtil(mappingsPath);
+            String mappings = fileHandler.getFileAsString(mappingsPath);
 
             if (settings.isEmpty() || mappings.isEmpty()) {
                 log.warn("[{}] index creation Settings & Mappings must be define for a custom index.", indexName);

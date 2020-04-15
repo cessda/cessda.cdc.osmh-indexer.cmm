@@ -48,39 +48,39 @@ public class DebuggingJMXBean {
     this.appConfigProps = appConfigProps;
   }
 
-  @SuppressWarnings("SameReturnValue")
   @ManagedOperation(description = "Prints to log the Elasticsearch server state.")
   public String printElasticSearchInfo() {
 
     Client client = elasticsearchTemplate.getClient();
     Map<String, String> asMap = client.settings().getAsMap();
-    log.info("ElasticSearch Client Settings Details [\n{}].",
-            asMap.entrySet().stream()
-                    .map(entry -> "\n" + "*" + entry.getKey() + "=" + entry.getValue())
-                    .collect(Collectors.joining()));
+    String elasticsearchInfo = String.format("ElasticSearch Client Settings Details: [%n%s]", asMap.entrySet().stream()
+            .map(entry -> "\t" + entry.getKey() + "=" + entry.getValue() + "\n")
+            .collect(Collectors.joining())
+    );
 
     ClusterHealthResponse healths = client.admin().cluster().prepareHealth().get();
     client.admin().cluster().prepareHealth().get();
 
-    log.info("ElasticSearch Cluster Details: Cluster Name [{}] \n NumberOfDataNodes [{}] \n NumberOfNodes [{}] ] \n",
+    elasticsearchInfo += String.format("%nElasticSearch Cluster Details:%n\tCluster Name [%s]\tNumberOfDataNodes [%s]\tNumberOfNodes [%s]",
             healths.getClusterName(),
             healths.getNumberOfDataNodes(),
-            healths.getNumberOfNodes());
+            healths.getNumberOfNodes()
+    );
 
-    log.debug("ElasticSearch Cluster Nodes Report: Start--");
-    AtomicInteger counter = new AtomicInteger(1);
-    log.debug("NumberOfNodes [{}], Index Details Details:", healths.getNumberOfNodes());
+    if (log.isDebugEnabled()) {
+      log.debug("ElasticSearch Cluster Nodes Report: Start--");
+      AtomicInteger counter = new AtomicInteger(1);
+      log.debug("NumberOfNodes [{}], Index Details Details:", healths.getNumberOfNodes());
 
-    String msg = "Index [{}] [Current Index [{}] \t Status [{}] ]";
-    healths.getIndices().values()
-            .forEach(health -> log.debug(msg, counter.getAndIncrement(), health.getIndex(), health.getStatus()));
+      String msg = "Index [{}] [Current Index [{}] \t Status [{}] ]";
+      healths.getIndices().values().forEach(health -> log.debug(msg, counter.getAndIncrement(), health.getIndex(), health.getStatus()));
+    }
 
-    return "Printed Health";
+    return elasticsearchInfo;
   }
 
   @ManagedOperation(description = "Show which SP repo Endpoints are currently active.")
   public String printCurrentlyConfiguredRepoEndpoints() {
-
     String reposStr = appConfigProps.getEndpoints().getRepos().stream().map(repo ->
             String.format("\t Repo [%s] url [%s] handler[%s] %n",
                     repo.getName(),
@@ -88,7 +88,6 @@ public class DebuggingJMXBean {
                     appConfigProps.getEndpoints().getHarvesters().get(repo.getHandler()).getUrl()
             )
     ).collect(Collectors.joining());
-    log.info("Configured Repos: [\n{}]", reposStr);
-    return reposStr;
+    return String.format("Configured Repos: [%n%s]", reposStr);
   }
 }
