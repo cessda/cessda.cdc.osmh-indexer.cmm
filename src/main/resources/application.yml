@@ -71,7 +71,7 @@ elasticsearch:
 osmhConsumer:
   languages: ['cs', 'da', 'de', 'el', 'en', 'et', 'fi', 'fr', 'hu', 'it', 'nl', 'no', 'pt', 'sk', 'sl', 'sr', 'sv']
   delay:
-    # Auto Starts after delay of 1min at startup
+    # Auto Starts after delay of 2 seconds at startup
     initial: '2000'
     fixed: '315360000000'
   daily:
@@ -109,12 +109,12 @@ osmhConsumer:
       - url: http://services.fsd.uta.fi/v0/oai
         name: 'FSD'
         handler: 'OAI-PMH'
-      - url: http://dbkapps.gesis.org/dbkoai3
+      - url: http://dbkapps.gesis.org/dbkoai3/
         name: 'GESIS'
         handler: 'OAI-PMH'
-      - url: https://dataspire-test.sciencespo.fr/oai
-        name: 'Progedo'
-        handler: 'OAI-PMH'
+  #    - url: https://dataspire-test.sciencespo.fr/oai
+  #      name: 'Progedo'
+  #      handler: 'OAI-PMH'
       - url: http://147.213.4.44:6003/v0/oai
         name: 'SASD'
         handler: 'OAI-PMH'
