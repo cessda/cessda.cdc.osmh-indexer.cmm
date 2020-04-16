@@ -14,7 +14,7 @@
 */
 pipeline {
 	options {
-		buildDiscarder logRotator(artifactNumToKeepStr: '5', numToKeepStr: '10')
+		buildDiscarder logRotator(artifactNumToKeepStr: '5', numToKeepStr: '20')
 	}
 
 	environment {
