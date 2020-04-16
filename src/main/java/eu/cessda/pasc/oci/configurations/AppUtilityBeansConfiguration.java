@@ -28,7 +28,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
-import javax.annotation.PreDestroy;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.net.http.HttpClient;
@@ -91,11 +90,5 @@ public class AppUtilityBeansConfiguration {
             .connectTimeout(Duration.ofMillis(appConfigurationProperties.getRestTemplateProps().getConnTimeout()))
             .followRedirects(HttpClient.Redirect.NORMAL)
             .build();
-  }
-
-  @PreDestroy
-  public void closeElasticsearch() {
-    log.debug("Closing Elasticsearch Client");
-    client.close();
   }
 }

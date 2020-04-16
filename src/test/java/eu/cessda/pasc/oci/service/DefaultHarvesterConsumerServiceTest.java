@@ -38,6 +38,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -157,6 +158,17 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
     assertThat(recordHeaders).isEmpty();
   }
 
+  @SuppressWarnings("unchecked")
+  @Test
+  public void shouldReturnEmptyListWhenURISyntaxExceptionIsThrown() throws ExternalSystemException {
+
+    when(harvesterDao.listRecordHeaders(any(URI.class))).thenThrow(URISyntaxException.class);
+    Repo repo = getUKDSRepo();
+
+    List<RecordHeader> recordHeaders = defaultHarvesterConsumerService.listRecordHeaders(repo, null);
+    assertThat(recordHeaders).isEmpty();
+  }
+
   @Test
   public void shouldReturnEmptyCMMStudyListWhenExternalSystemExceptionIsThrown() throws ExternalSystemException {
     // Given
@@ -165,6 +177,38 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
     when(repoMock.getHandler()).thenReturn(Harvester.Type.NESSTAR);
 
     when(harvesterDao.getRecord(any(URI.class))).thenThrow(new ExternalSystemException("Mocked!", null));
+
+    Optional<CMMStudy> actualRecord = defaultHarvesterConsumerService.getRecord(repoMock, "4124325");
+
+    // Then exception is thrown caught and an empty list returned
+    then(actualRecord.isPresent()).isFalse();
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  public void shouldReturnEmptyCMMStudyListWhenIOExceptionIsThrown() throws ExternalSystemException {
+    // Given
+    Repo repoMock = mock(Repo.class);
+    when(repoMock.getUrl()).thenReturn(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
+    when(repoMock.getHandler()).thenReturn(Harvester.Type.NESSTAR);
+
+    when(harvesterDao.getRecord(any(URI.class))).thenThrow(IOException.class);
+
+    Optional<CMMStudy> actualRecord = defaultHarvesterConsumerService.getRecord(repoMock, "4124325");
+
+    // Then exception is thrown caught and an empty list returned
+    then(actualRecord.isPresent()).isFalse();
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  public void shouldReturnEmptyCMMStudyListWhenURISyntaxExceptionIsThrown() throws ExternalSystemException {
+    // Given
+    Repo repoMock = mock(Repo.class);
+    when(repoMock.getUrl()).thenReturn(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
+    when(repoMock.getHandler()).thenReturn(Harvester.Type.NESSTAR);
+
+    when(harvesterDao.getRecord(any(URI.class))).thenThrow(URISyntaxException.class);
 
     Optional<CMMStudy> actualRecord = defaultHarvesterConsumerService.getRecord(repoMock, "4124325");
 

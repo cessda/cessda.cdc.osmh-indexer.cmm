@@ -16,9 +16,11 @@
 package eu.cessda.pasc.oci.repository;
 
 import com.pgssoft.httpclient.HttpClientMock;
+import com.pgssoft.httpclient.MockedServerResponse;
 import eu.cessda.pasc.oci.AbstractSpringTestProfileContext;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
+import lombok.SneakyThrows;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,13 +41,17 @@ import static org.assertj.core.api.Java6BDDAssertions.then;
  *
  * @author moses AT doraventures DOT com
  */
-@RunWith( SpringRunner.class )
-public class DaoBaseTest extends AbstractSpringTestProfileContext
-{
+@RunWith(SpringRunner.class)
+public class DaoBaseTest extends AbstractSpringTestProfileContext {
     @Autowired
     private AppConfigurationProperties appConfigurationProperties;
 
     private final HttpClientMock httpClient = new HttpClientMock();
+
+    @SneakyThrows
+    private static void throwInterruptedException(MockedServerResponse.Builder responseBuilder) {
+        throw new InterruptedException("Mocked");
+    }
 
     @Test
     public void shouldPostForStringResponse() throws ExternalSystemException, IOException {
@@ -64,8 +70,8 @@ public class DaoBaseTest extends AbstractSpringTestProfileContext
         }
     }
 
-    @Test(expected = ExternalSystemException.class)
-    public void shouldThrowExternalSystemException() throws ExternalSystemException, IOException {
+    @Test
+    public void shouldThrowExternalSystemException() throws IOException {
 
         // Given
         String expectedUrl = "http://cdc-osmh-repo:9091/v0/ListRecordHeaders?" +
@@ -77,7 +83,36 @@ public class DaoBaseTest extends AbstractSpringTestProfileContext
         DaoBase daoBase = new DaoBase(httpClient, appConfigurationProperties);
         try (InputStream inputStream = daoBase.postForStringResponse(expectedUrl)) {
             Assert.fail(new String(inputStream.readAllBytes(), Charset.defaultCharset()));
+        } catch (ExternalSystemException e) {
+            Assert.assertNotNull(e.getExternalResponseBody());
         }
-        // then exception should be thrown.
+    }
+
+    @Test
+    public void shouldReturnEmptyStreamWhenInterrupted() throws ExternalSystemException, IOException {
+
+        // Given
+        httpClient.onGet().doAction(DaoBaseTest::throwInterruptedException);
+
+        // When
+        DaoBase daoBase = new DaoBase(httpClient, appConfigurationProperties);
+        try (InputStream empty = daoBase.postForStringResponse("http://error.endpoint/")) {
+            Assert.assertEquals(-1, empty.read());
+        }
+    }
+
+    @Test
+    public void shouldThrowExternalSystemExceptionWithNoBodyWhenIOExceptionIsThrown() throws IOException {
+
+        // Given
+        httpClient.onGet().doThrowException(new IOException("Mocked!"));
+
+        // When
+        DaoBase daoBase = new DaoBase(httpClient, appConfigurationProperties);
+        try (InputStream inputStream = daoBase.postForStringResponse("http://error.endpoint/")) {
+            Assert.fail(new String(inputStream.readAllBytes(), Charset.defaultCharset()));
+        } catch (ExternalSystemException e) {
+            Assert.assertNull(e.getExternalResponseBody());
+        }
     }
 }
