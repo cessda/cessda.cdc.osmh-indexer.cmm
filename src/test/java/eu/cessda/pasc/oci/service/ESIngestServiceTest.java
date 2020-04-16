@@ -28,10 +28,12 @@ import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.sort.SortOrder;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
@@ -70,21 +72,19 @@ public class ESIngestServiceTest {
 
   @Autowired
   private FileHandler fileHandler;
-  private IngestService ingestService; // Class under test
 
-  private EmbeddedElasticsearchServer embeddedElasticsearchServer;
+  private static EmbeddedElasticsearchServer embeddedElasticsearchServer;
 
-  @Before
-  public void init() {
+  @BeforeClass
+  public static void init() {
     embeddedElasticsearchServer = new EmbeddedElasticsearchServer();
     log.info("Embedded Server initiated");
-    ElasticsearchTemplate elasticsearchTemplate = new ElasticsearchTemplate(embeddedElasticsearchServer.getClient());
-    ingestService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp);
   }
 
-  @After
-  public void shutdown() throws IOException {
+  @AfterClass
+  public static void shutdown() throws IOException {
     embeddedElasticsearchServer.close();
+    embeddedElasticsearchServer = null;
   }
 
   @Test
@@ -94,9 +94,11 @@ public class ESIngestServiceTest {
     final JsonNode expectedTree = mapper.readTree(getSyntheticCMMStudyOfLanguageEn());
     String language = "en";
     List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX1();
+    ElasticsearchTemplate elasticsearchTemplate = new ElasticsearchTemplate(embeddedElasticsearchServer.getClient());
+    ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp);
 
     // When
-    boolean isSuccessful = this.ingestService.bulkIndex(studyOfLanguages, language);
+    boolean isSuccessful = ingestService.bulkIndex(studyOfLanguages, language);
 
     // Then
     then(isSuccessful).isTrue();
@@ -122,7 +124,9 @@ public class ESIngestServiceTest {
     // Given
     String language = "en";
     List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
-    boolean isSuccessful = this.ingestService.bulkIndex(studyOfLanguages, language);
+    ElasticsearchTemplate elasticsearchTemplate = new ElasticsearchTemplate(embeddedElasticsearchServer.getClient());
+    ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp);
+    boolean isSuccessful = ingestService.bulkIndex(studyOfLanguages, language);
     then(isSuccessful).isTrue();
     try (Client client = embeddedElasticsearchServer.getClient()) {
       SearchResponse response = client.prepareSearch(INDEX_NAME)
@@ -140,10 +144,41 @@ public class ESIngestServiceTest {
       then(response.getHits().getAt(2).getId()).isEqualTo("UK-Data-Service__1000");
 
       // When
-      Optional<LocalDateTime> mostRecentLastModified = this.ingestService.getMostRecentLastModified();
+      Optional<LocalDateTime> mostRecentLastModified = ingestService.getMostRecentLastModified();
 
       // Then
       then(mostRecentLastModified.orElse(null)).isEqualByComparingTo(LocalDateTime.parse("2017-11-17T00:00:00"));
     }
+  }
+
+  @Test
+  public void shouldReturnFalseOnIndexCreationFailure() throws IOException {
+
+    //Setup
+    ElasticsearchTemplate elasticsearchTemplate = Mockito.mock(ElasticsearchTemplate.class);
+    ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp);
+    List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
+
+    // When
+    Mockito.when(elasticsearchTemplate.createIndex(Mockito.anyString(), Mockito.any())).thenReturn(false);
+
+    boolean isSuccessful = ingestService.bulkIndex(studyOfLanguages, "en");
+    Assert.assertFalse(isSuccessful);
+  }
+
+  @Test
+  public void shouldReturnFalseOnPutMappingFailure() throws IOException {
+
+    //Setup
+    ElasticsearchTemplate elasticsearchTemplate = Mockito.mock(ElasticsearchTemplate.class);
+    ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp);
+    List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
+
+    // When
+    Mockito.when(elasticsearchTemplate.createIndex(Mockito.anyString(), Mockito.any())).thenReturn(true);
+    Mockito.when(elasticsearchTemplate.putMapping(Mockito.anyString(), Mockito.anyString(), Mockito.any())).thenReturn(false);
+
+    boolean isSuccessful = ingestService.bulkIndex(studyOfLanguages, "en");
+    Assert.assertFalse(isSuccessful);
   }
 }

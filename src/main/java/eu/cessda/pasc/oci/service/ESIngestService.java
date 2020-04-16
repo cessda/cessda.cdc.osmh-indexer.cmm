@@ -68,35 +68,35 @@ public class ESIngestService implements IngestService {
     public boolean bulkIndex(List<CMMStudyOfLanguage> languageCMMStudiesMap, String languageIsoCode) {
         String indexName = String.format(INDEX_NAME_TEMPLATE, languageIsoCode);
         boolean isSuccessful = true;
-    int counter = 0;
+        int counter = 0;
 
-        if (prepareIndex(indexName, fileHandler)) {
-            try {List<IndexQuery> queries = new ArrayList<>();
-            for (
-                CMMStudyOfLanguage cmmStudyOfLanguage : languageCMMStudiesMap) {
-                IndexQuery indexQuery = getIndexQuery(indexName, cmmStudyOfLanguage);
-                queries.add(indexQuery);
-                if (counter % INDEX_COMMIT_SIZE == 0) {
-                    executeBulk(queries);
-                    queries.clear();
-                    log.info("Indexing [{}] index, current bulkIndex counter [{}] .", indexName, counter);
-          }
-          counter++;
+        if (prepareIndex(indexName)) {
+            try {
+                List<IndexQuery> queries = new ArrayList<>();
+                for (CMMStudyOfLanguage cmmStudyOfLanguage : languageCMMStudiesMap) {
+                    IndexQuery indexQuery = getIndexQuery(indexName, cmmStudyOfLanguage);
+                    queries.add(indexQuery);
+                    if (counter % INDEX_COMMIT_SIZE == 0) {
+                        executeBulk(queries);
+                        queries.clear();
+                        log.info("Indexing [{}] index, current bulkIndex counter [{}] .", indexName, counter);
+                    }
+                    counter++;
                 }
-
-            if (!queries.isEmpty()) {
-                executeBulk(queries);
+                if (!queries.isEmpty()) {
+                    executeBulk(queries);
+                }
+                esTemplate.refresh(indexName);
+                log.info("[{}] BulkIndex completed.", languageIsoCode);
+            } catch (RuntimeException e) {
+                log.error("[{}] Indexing Encountered an exception with message [{}].", indexName, e.getMessage(), e);
+                isSuccessful = false;
             }
-            esTemplate.refresh(indexName);
-            log.info("[{}] BulkIndex completed.", languageIsoCode);} catch (RuntimeException e) {
-        log.error("[{}] Indexing Encountered an exception with message [{}].", indexName, e.getMessage(), e);
-        isSuccessful = false;
-      }
         } else {
             isSuccessful = false;
         }
         return isSuccessful;
-  }
+    }
 
   @Override
   public Optional<LocalDateTime> getMostRecentLastModified() {
@@ -131,7 +131,7 @@ public class ESIngestService implements IngestService {
     return indexQuery;
   }
 
-    private boolean prepareIndex(String indexName, FileHandler fileHandler) {
+    private boolean prepareIndex(String indexName) {
 
         if (esTemplate.indexExists(indexName)) {
             log.debug("[{}] index name already exists, Skipping creation.", indexName);
@@ -139,10 +139,10 @@ public class ESIngestService implements IngestService {
         }
 
         log.info("[{}] index name does not exist and will be created", indexName);
-        return createIndex(indexName, fileHandler);
+        return createIndex(indexName);
     }
 
-    private boolean createIndex(String indexName, FileHandler fileHandler) {
+    private boolean createIndex(String indexName) {
         try {
             String settingsPath = String.format("elasticsearch/settings/settings_%s.json", indexName);
             String settingsTemplate = fileHandler.getFileAsString(settingsPath);
