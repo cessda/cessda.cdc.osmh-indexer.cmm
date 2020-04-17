@@ -168,6 +168,9 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     // No bulk attempt should have been made for "sv" as it does not have the minimum valid cmm fields
     // 'en', 'fi', 'de' has all minimum fields
     verify(esIndexer, times(3)).bulkIndex(anyListOf(CMMStudyOfLanguage.class), anyString());
+
+    // Called for logging purposes
+    verify(esIndexer, times(1)).getTotalHitCount();
     verifyNoMoreInteractions(esIndexer);
   }
 
@@ -215,6 +218,9 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     verify(esIndexer, times(1)).getMostRecentLastModified(); // Call by incremental run to get LastModified
     // No bulk attempt should have been made for "sv" as we dont have any records for "sv". We do for 'en', 'fi', 'de'
     verify(esIndexer, times(6)).bulkIndex(anyListOf(CMMStudyOfLanguage.class), anyString());
+
+    // Called for logging purposes
+    verify(esIndexer, times(2)).getTotalHitCount();
     verifyNoMoreInteractions(esIndexer);
   }
 }
