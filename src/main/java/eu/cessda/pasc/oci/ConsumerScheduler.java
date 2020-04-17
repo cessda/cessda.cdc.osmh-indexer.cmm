@@ -89,8 +89,6 @@ public class ConsumerScheduler {
   @ManagedOperation(description = "Manual trigger to do a full harvest and ingest run")
   @Scheduled(initialDelayString = "${osmhConsumer.delay.initial}", fixedDelayString = "${osmhConsumer.delay.fixed}")
   public void fullHarvestAndIngestionAllConfiguredSPsReposRecords() {
-    // This is called on startup
-    micrometerMetrics.updateLanguageMetrics();
     try (var ignored = MDC.putCloseable(ConsumerScheduler.DEFAULT_CDC_JOB_KEY, getCdcRunjobId())) {
       OffsetDateTime date = OffsetDateTime.now(ZoneId.systemDefault());
       logStartStatus(date, FULL_RUN);
@@ -138,9 +136,10 @@ public class ConsumerScheduler {
       Map<String, List<CMMStudyOfLanguage>> langStudies = getCmmStudiesOfEachLangIsoCodeMap(repo, lastModifiedDateTime);
       langStudies.forEach((langIsoCode, cmmStudies) -> executeBulk(repo, langIsoCode, cmmStudies));
     });
-    micrometerMetrics.updateLanguageMetrics();
+    micrometerMetrics.updateMetrics();
     log.info("Total number of records stands {}", keyValue("total_cmm_studies", esIndexerService.getTotalHitCount()));
   }
+
 
   private void executeBulk(Repo repo, String langIsoCode, List<CMMStudyOfLanguage> cmmStudies) {
     if (cmmStudies.isEmpty()) {

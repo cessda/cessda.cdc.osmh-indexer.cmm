@@ -1,3 +1,18 @@
+/*
+ * Copyright © 2017-2019 CESSDA ERIC (support@cessda.eu)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.cessda.pasc.oci.metrics;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
@@ -5,6 +20,7 @@ import eu.cessda.pasc.oci.service.IngestService;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.index.IndexNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,7 +36,10 @@ import java.util.concurrent.atomic.AtomicLong;
 @Slf4j
 public class MicrometerMetrics {
 
+    public static final String LIST_RECORD = "list.record";
     public static final String LIST_RECORD_LANGCODE = "list.record.langcode";
+
+    private final AtomicLong totalRecords = new AtomicLong(0);
     private final Map<String, AtomicLong> recordsLanguagesMap = new ConcurrentHashMap<>();
 
     private final AppConfigurationProperties appConfigurationProperties;
@@ -30,13 +49,20 @@ public class MicrometerMetrics {
     public MicrometerMetrics(AppConfigurationProperties appConfigurationProperties, IngestService ingestService, MeterRegistry meterRegistry) {
         this.appConfigurationProperties = appConfigurationProperties;
         this.ingestService = ingestService;
+
+        // Total records metric
+        Gauge.builder(LIST_RECORD, totalRecords::get)
+                .description("Amount of records stored")
+                .register(meterRegistry);
+
+        // Records per language metric
         var languages = appConfigurationProperties.getLanguages();
         for (String language : languages) {
             recordsLanguagesMap.put(language, new AtomicLong());
-            Gauge.builder(LIST_RECORD_LANGCODE, () -> getRecordCount(language))
-                    .description("Amount of records stored per language")
-                    .tag("langcode", language)
-                    .register(meterRegistry);
+            var builder = Gauge.builder(LIST_RECORD_LANGCODE, () -> getRecordCount(language));
+            builder.description("Amount of records stored per language");
+            builder.tag("langcode", language);
+            builder.register(meterRegistry);
         }
     }
 
@@ -57,6 +83,8 @@ public class MicrometerMetrics {
 
     /**
      * Iterates through all configured languages and updates them
+     *
+     * @throws ElasticsearchException if Elasticsearch is unavailable
      */
     public void updateLanguageMetrics() {
         log.debug("Updating list_record_langcode metric.");
@@ -70,5 +98,29 @@ public class MicrometerMetrics {
                 log.debug("Index not found for language [{}].", language);
             }
         }
+    }
+
+    /**
+     * Updates the total records stored in Elasticsearch
+     *
+     * @throws ElasticsearchException if Elasticsearch is unavailable
+     */
+    public void updateTotalRecordsMetric() {
+        log.debug("Updating list_records metric.");
+        totalRecords.set(ingestService.getTotalHitCount());
+    }
+
+    AtomicLong getTotalRecords() {
+        return totalRecords;
+    }
+
+    /**
+     * Updates all configured metrics.
+     *
+     * @throws ElasticsearchException if Elasticsearch is unavailable
+     */
+    public void updateMetrics() {
+        updateTotalRecordsMetric();
+        updateLanguageMetrics();
     }
 }
