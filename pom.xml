@@ -60,9 +60,10 @@
     <lombok.version>1.18.6</lombok.version>
     <httpclient.version>4.5.4</httpclient.version>
     <commons-cli.version>1.4</commons-cli.version>
-    <commons-io.version>1.3.2</commons-io.version>
+    <commons-io.version>${micrometer.version}</commons-io.version>
     <spring-boot-admin-starter-client.version>1.4.5</spring-boot-admin-starter-client.version>
     <hamcrest-all.version>1.3</hamcrest-all.version>
+    <micrometer.version>1.3.2</micrometer.version>
   </properties>
 
   <dependencies>
@@ -81,6 +82,10 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
 
     <!-- Spring boot Admin-->
     <dependency>
@@ -95,13 +100,13 @@
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
     </dependency>
-     <!-- Json Encoder in Logstash for Logback -->
+    <!-- Json Encoder in Logstash for Logback -->
     <dependency>
-        <groupId>net.logstash.logback</groupId>
-        <artifactId>logstash-logback-encoder</artifactId>
-        <version>5.2</version>
-    </dependency> 
-    
+      <groupId>net.logstash.logback</groupId>
+      <artifactId>logstash-logback-encoder</artifactId>
+      <version>5.2</version>
+    </dependency>
+
     <dependency>
       <groupId>org.jolokia</groupId>
       <artifactId>jolokia-core</artifactId>
@@ -109,6 +114,18 @@
     <dependency>
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-starter</artifactId>
+    </dependency>
+
+    <!--Prometheus Metrics-->
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-spring-legacy</artifactId>
+      <version>${micrometer.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-registry-prometheus</artifactId>
+      <version>${micrometer.version}</version>
     </dependency>
 
     <!--Utils -->

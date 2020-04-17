@@ -24,6 +24,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.ElasticsearchException;
@@ -48,9 +49,12 @@ import java.util.Optional;
 public class ESIngestService implements IngestService {
 
     private static final String LAST_MODIFIED_FIELD = "lastModified";
-    private static final String INDEX_NAME_TEMPLATE = "cmmstudy_%s";
-    private static final String INDEX_NAME_PATTERN = "cmmstudy_*";
     private static final String INDEX_TYPE = "cmmstudy";
+    private static final String INDEX_NAME_TEMPLATE = INDEX_TYPE + "_%s";
+
+    /**
+     * The amount of studies to BulkIndex at once
+     */
     private static final int INDEX_COMMIT_SIZE = 500;
 
     private final ElasticsearchTemplate esTemplate;
@@ -71,54 +75,65 @@ public class ESIngestService implements IngestService {
         int counter = 0;
 
         if (prepareIndex(indexName)) {
-            try {
-                List<IndexQuery> queries = new ArrayList<>();
-                for (CMMStudyOfLanguage cmmStudyOfLanguage : languageCMMStudiesMap) {
-                    IndexQuery indexQuery = getIndexQuery(indexName, cmmStudyOfLanguage);
-                    queries.add(indexQuery);
-                    if (counter % INDEX_COMMIT_SIZE == 0) {
-                        executeBulk(queries);
-                        queries.clear();
-                        log.info("Indexing [{}] index, current bulkIndex counter [{}] .", indexName, counter);
-                    }
-                    counter++;
-                }
-                if (!queries.isEmpty()) {
+            List<IndexQuery> queries = new ArrayList<>();
+            for (CMMStudyOfLanguage cmmStudyOfLanguage : languageCMMStudiesMap) {
+                IndexQuery indexQuery = getIndexQuery(indexName, cmmStudyOfLanguage);
+                queries.add(indexQuery);
+                if (counter % INDEX_COMMIT_SIZE == 0) {
                     executeBulk(queries);
+                    queries.clear();
+                    log.info("Indexing [{}] index, current bulkIndex counter [{}] .", indexName, counter);
                 }
-                esTemplate.refresh(indexName);
-                log.info("[{}] BulkIndex completed.", languageIsoCode);
-            } catch (RuntimeException e) {
-                log.error("[{}] Indexing Encountered an exception with message [{}].", indexName, e.getMessage(), e);
-                isSuccessful = false;
+                counter++;
             }
+            if (!queries.isEmpty()) {
+                executeBulk(queries);
+            }
+            esTemplate.refresh(indexName);
+            log.info("[{}] BulkIndex completed.", languageIsoCode);
         } else {
             isSuccessful = false;
         }
         return isSuccessful;
     }
 
-  @Override
-  public Optional<LocalDateTime> getMostRecentLastModified() {
+    @Override
+    public long getTotalHitCount() {
+        return getTotalHitCount("*");
+    }
 
-    SearchResponse response = esTemplate.getClient().prepareSearch(INDEX_NAME_PATTERN)
-        .setTypes(INDEX_TYPE)
-        .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-        .setQuery(QueryBuilders.matchAllQuery())
-        .addSort(LAST_MODIFIED_FIELD, SortOrder.DESC)
-        .setSize(1)
-        .execute()
-        .actionGet();
+    @Override
+    public long getTotalHitCount(String language) {
+        SearchResponse response = esTemplate.getClient().prepareSearch(String.format(INDEX_NAME_TEMPLATE, language))
+                .setTypes(INDEX_TYPE)
+                .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+                .setQuery(QueryBuilders.matchAllQuery())
+                .get();
+        SearchHits hits = response.getHits();
+        return hits.getTotalHits();
+    }
 
-    SearchHit[] hits = response.getHits().getHits();
-    if (hits.length != 0) {
-      Map<String, Object> source = hits[0].getSource();
-      String lastModified = source.get(LAST_MODIFIED_FIELD).toString();
-      Optional<LocalDateTime> localDateTimeOpt = TimeUtility.getLocalDateTime(lastModified);
-      return localDateTimeOpt
-          .map(localDateTime -> localDateTime.withHour(0).withMinute(0).withSecond(0).withNano(0));
-    } else {
-      return Optional.empty();
+    @Override
+    public Optional<LocalDateTime> getMostRecentLastModified() {
+
+        SearchResponse response = esTemplate.getClient().prepareSearch(String.format(INDEX_NAME_TEMPLATE, "*"))
+                .setTypes(INDEX_TYPE)
+                .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+                .setQuery(QueryBuilders.matchAllQuery())
+                .addSort(LAST_MODIFIED_FIELD, SortOrder.DESC)
+                .setSize(1)
+                .execute()
+                .actionGet();
+
+        SearchHit[] hits = response.getHits().getHits();
+        if (hits.length != 0) {
+            Map<String, Object> source = hits[0].getSource();
+            String lastModified = source.get(LAST_MODIFIED_FIELD).toString();
+            Optional<LocalDateTime> localDateTimeOpt = TimeUtility.getLocalDateTime(lastModified);
+            return localDateTimeOpt
+                    .map(localDateTime -> localDateTime.withHour(0).withMinute(0).withSecond(0).withNano(0));
+        } else {
+            return Optional.empty();
     }
   }
 

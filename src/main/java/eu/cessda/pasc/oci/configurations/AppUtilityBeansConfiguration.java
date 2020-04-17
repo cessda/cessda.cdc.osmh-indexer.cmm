@@ -54,8 +54,6 @@ public class AppUtilityBeansConfiguration {
 
   private final AppConfigurationProperties appConfigurationProperties;
 
-  private Client client;
-
   @Autowired
   public AppUtilityBeansConfiguration(AppConfigurationProperties appConfigurationProperties) {
     this.appConfigurationProperties = appConfigurationProperties;
@@ -73,10 +71,9 @@ public class AppUtilityBeansConfiguration {
     Settings esSettings = Settings.settingsBuilder().put("cluster.name", esClusterName).build();
 
     // https://www.elastic.co/guide/en/elasticsearch/guide/current/_transport_client_versus_node_client.html
-    client = TransportClient.builder()
+    return TransportClient.builder()
             .settings(esSettings)
             .build().addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(esHost), esPort));
-    return client;
   }
 
   @Bean

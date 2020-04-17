@@ -32,10 +32,24 @@ public interface IngestService {
    * Bulk indices records into the search Engine.
    *
    * @param languageCMMStudiesMap of records
-   * @param languageIsoCode index post-end token
+   * @param languageIsoCode       index post-end token
    * @return true If bulkIndexing was successful with no known error.
    */
   boolean bulkIndex(List<CMMStudyOfLanguage> languageCMMStudiesMap, String languageIsoCode);
+
+  /**
+   * Gets the total number of hits for all languages using the index pattern cmmstudy_*.
+   */
+  long getTotalHitCount();
+
+  /**
+   * Gets the total number of hits for the specified language. The language is in the same form as languages configured
+   * in application.yml.
+   *
+   * @param language the language to get the total hits from.
+   * @throws org.elasticsearch.index.IndexNotFoundException if a corresponding index is not found.
+   */
+  long getTotalHitCount(String language);
 
   /**
    * Gets the most recent lastModified date from the cluster across all indices eg pattern (cmmstudy_*)
