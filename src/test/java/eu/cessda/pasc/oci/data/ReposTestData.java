@@ -39,7 +39,7 @@ public class ReposTestData
   public static Repo getGesisEnRepo() {
     Repo repo = new Repo();
     repo.setName("GESIS");
-    repo.setUrl(URI.create("http://dbkapps.gesis.org/dbkoai3"));
+    repo.setUrl(URI.create("https://dbkapps.gesis.org/dbkoai3"));
     repo.setHandler(Harvester.Type.OAI_PMH);
     return repo;
   }
@@ -47,7 +47,7 @@ public class ReposTestData
   public static Repo getGesisDeRepo() {
     Repo repo = new Repo();
     repo.setName("GESIS De");
-    repo.setUrl(URI.create("http://dbkapps.gesis.org/dbkoai3"));
+    repo.setUrl(URI.create("https://dbkapps.gesis.org/dbkoai3"));
     repo.setHandler(Harvester.Type.OAI_PMH);
     return repo;
   }
