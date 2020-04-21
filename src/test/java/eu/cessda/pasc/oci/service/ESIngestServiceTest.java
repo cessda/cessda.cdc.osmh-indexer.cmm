@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.cessda.pasc.oci.configurations.ESConfigurationProperties;
 import eu.cessda.pasc.oci.helpers.FileHandler;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
+import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
 import eu.cessda.pasc.oci.service.helpers.EmbeddedElasticsearchServer;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchResponse;
@@ -43,6 +44,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static eu.cessda.pasc.oci.data.RecordTestData.*;
@@ -95,7 +97,7 @@ public class ESIngestServiceTest {
     final JsonNode expectedTree = mapper.readTree(getSyntheticCMMStudyOfLanguageEn());
     List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX1();
     ElasticsearchTemplate elasticsearchTemplate = new ElasticsearchTemplate(embeddedElasticsearchServer.getClient());
-    ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp);
+    ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp, null);
 
     // When
     boolean isSuccessful = ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
@@ -124,7 +126,8 @@ public class ESIngestServiceTest {
     // Given
     List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
     ElasticsearchTemplate elasticsearchTemplate = new ElasticsearchTemplate(embeddedElasticsearchServer.getClient());
-    ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp);
+    CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter = new CMMStudyOfLanguageConverter(new ObjectMapper());
+    ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp, cmmStudyOfLanguageConverter);
     boolean isSuccessful = ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
     then(isSuccessful).isTrue();
     try (Client client = embeddedElasticsearchServer.getClient()) {
@@ -155,7 +158,7 @@ public class ESIngestServiceTest {
 
     //Setup
     ElasticsearchTemplate elasticsearchTemplate = Mockito.mock(ElasticsearchTemplate.class);
-    ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp);
+    ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp, null);
     List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
 
     // When
@@ -170,7 +173,7 @@ public class ESIngestServiceTest {
 
     //Setup
     ElasticsearchTemplate elasticsearchTemplate = Mockito.mock(ElasticsearchTemplate.class);
-    ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp);
+    ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp, null);
     List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
 
     // When
@@ -186,7 +189,7 @@ public class ESIngestServiceTest {
     //Setup
     FileHandler fileHandlerMock = Mockito.mock(FileHandler.class);
     ElasticsearchTemplate elasticsearchTemplate = Mockito.mock(ElasticsearchTemplate.class);
-    ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandlerMock, esConfigProp);
+    ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandlerMock, esConfigProp, null);
     List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
 
     // When
@@ -195,5 +198,23 @@ public class ESIngestServiceTest {
 
     Assert.assertTrue(ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE));
     Mockito.verify(elasticsearchTemplate).createIndex(Mockito.anyString());
+  }
+
+  @Test
+  public void shouldGetHitCountsPerRepository() throws IOException {
+
+    // Setup
+    List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
+    ElasticsearchTemplate elasticsearchTemplate = new ElasticsearchTemplate(embeddedElasticsearchServer.getClient());
+    CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter = new CMMStudyOfLanguageConverter(new ObjectMapper());
+    ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp, cmmStudyOfLanguageConverter);
+
+    // Given
+    boolean isSuccessful = ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
+    then(isSuccessful).isTrue();
+
+    // Then
+    Map<String, Integer> hitCountPerRepository = ingestService.getHitCountPerRepository();
+    Assert.assertNotEquals(0, hitCountPerRepository.size());
   }
 }

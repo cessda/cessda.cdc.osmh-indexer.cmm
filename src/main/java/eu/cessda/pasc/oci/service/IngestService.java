@@ -19,6 +19,7 @@ import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -39,6 +40,8 @@ public interface IngestService {
 
   /**
    * Gets the total number of hits for all languages using the index pattern cmmstudy_*.
+   *
+   * @throws org.elasticsearch.ElasticsearchException if an error occurs connecting to Elasticsearch.
    */
   long getTotalHitCount();
 
@@ -48,8 +51,19 @@ public interface IngestService {
    *
    * @param language the language to get the total hits from.
    * @throws org.elasticsearch.index.IndexNotFoundException if a corresponding index is not found.
+   * @throws org.elasticsearch.ElasticsearchException       if an error occurs connecting to Elasticsearch.
    */
   long getTotalHitCount(String language);
+
+  /**
+   * Gets the total number of hits mapped with a repository. Only the host part of the URI is returned.
+   * <p>
+   * <em>This is an expensive operation as it causes all studies to be read from Elasticsearch.</em>
+   * </p>
+   *
+   * @throws org.elasticsearch.ElasticsearchException if an error occurs connecting to Elasticsearch.
+   */
+  Map<String, Integer> getHitCountPerRepository();
 
   /**
    * Gets the most recent lastModified date from the cluster across all indices eg pattern (cmmstudy_*)

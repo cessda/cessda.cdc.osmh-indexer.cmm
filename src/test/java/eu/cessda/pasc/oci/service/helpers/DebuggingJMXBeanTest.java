@@ -17,8 +17,8 @@
 package eu.cessda.pasc.oci.service.helpers;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,27 +45,31 @@ public class DebuggingJMXBeanTest {
   @Autowired
   private AppConfigurationProperties appConfigurationProperties;
 
-  EmbeddedElasticsearchServer embeddedElasticsearchServer;
+  private static EmbeddedElasticsearchServer embeddedElasticsearchServer;
 
-  @Before
-  public void init() {
+  @BeforeClass
+  public static void init() {
     embeddedElasticsearchServer = new EmbeddedElasticsearchServer();
-    ElasticsearchTemplate elasticsearchTemplate = new ElasticsearchTemplate(embeddedElasticsearchServer.getClient());
-    debuggingJMXBean = new DebuggingJMXBean(elasticsearchTemplate, appConfigurationProperties);
   }
 
-  @After
-  public void shutdown() throws IOException {
+  @AfterClass
+  public static void shutdown() throws IOException {
     embeddedElasticsearchServer.close();
+    embeddedElasticsearchServer = null;
   }
 
   @Test
   public void shouldPrintElasticsearchDetails() {
+    ElasticsearchTemplate elasticsearchTemplate = new ElasticsearchTemplate(embeddedElasticsearchServer.getClient());
+    debuggingJMXBean = new DebuggingJMXBean(elasticsearchTemplate, appConfigurationProperties);
     assertThat(debuggingJMXBean.printElasticSearchInfo()).startsWith("ElasticSearch Client Settings Details");
   }
 
   @Test
   public void shouldPrintCurrentlyConfiguredRepoEndpoints() {
+    ElasticsearchTemplate elasticsearchTemplate = new ElasticsearchTemplate(embeddedElasticsearchServer.getClient());
+    debuggingJMXBean = new DebuggingJMXBean(elasticsearchTemplate, appConfigurationProperties);
+
     // When
     String actualRepos = debuggingJMXBean.printCurrentlyConfiguredRepoEndpoints();
     assertThat(actualRepos).isNotEmpty();

@@ -19,9 +19,12 @@ import eu.cessda.pasc.oci.configurations.ESConfigurationProperties;
 import eu.cessda.pasc.oci.helpers.FileHandler;
 import eu.cessda.pasc.oci.helpers.TimeUtility;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
+import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -33,11 +36,10 @@ import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.net.URI;
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Service responsible for triggering harvesting and Metadata ingestion to the search engine
@@ -60,12 +62,14 @@ public class ESIngestService implements IngestService {
     private final ElasticsearchTemplate esTemplate;
     private final FileHandler fileHandler;
     private final ESConfigurationProperties esConfig;
+    private final CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter;
 
     @Autowired
-    public ESIngestService(ElasticsearchTemplate esTemplate, FileHandler fileHandler, ESConfigurationProperties esConfig) {
+    public ESIngestService(ElasticsearchTemplate esTemplate, FileHandler fileHandler, ESConfigurationProperties esConfig, CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter) {
         this.esTemplate = esTemplate;
         this.fileHandler = fileHandler;
         this.esConfig = esConfig;
+        this.cmmStudyOfLanguageConverter = cmmStudyOfLanguageConverter;
     }
 
     @Override
@@ -76,17 +80,19 @@ public class ESIngestService implements IngestService {
 
         if (prepareIndex(indexName)) {
             List<IndexQuery> queries = new ArrayList<>();
+            log.info("Indexing [{}] index.", indexName);
             for (CMMStudyOfLanguage cmmStudyOfLanguage : languageCMMStudiesMap) {
                 IndexQuery indexQuery = getIndexQuery(indexName, cmmStudyOfLanguage);
                 queries.add(indexQuery);
+                counter++;
                 if (counter % INDEX_COMMIT_SIZE == 0) {
                     executeBulk(queries);
                     queries.clear();
-                    log.info("Indexing [{}] index, current bulkIndex counter [{}] .", indexName, counter);
+                    log.debug("[{}] Current bulkIndex counter [{}].", indexName, counter);
                 }
-                counter++;
             }
             if (!queries.isEmpty()) {
+                log.debug("[{}] Current bulkIndex counter [{}].", indexName, counter);
                 executeBulk(queries);
             }
             esTemplate.refresh(indexName);
@@ -104,13 +110,47 @@ public class ESIngestService implements IngestService {
 
     @Override
     public long getTotalHitCount(String language) {
-        SearchResponse response = esTemplate.getClient().prepareSearch(String.format(INDEX_NAME_TEMPLATE, language))
-                .setTypes(INDEX_TYPE)
-                .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-                .setQuery(QueryBuilders.matchAllQuery())
-                .get();
+        SearchRequestBuilder matchAllSearchRequest = getMatchAllSearchRequest(language).setSize(0);
+        SearchResponse response = matchAllSearchRequest.get();
         SearchHits hits = response.getHits();
         return hits.getTotalHits();
+    }
+
+    @Override
+    public Map<String, Integer> getHitCountPerRepository() {
+        var map = new HashMap<String, Integer>();
+        var timeout = new TimeValue(Duration.ofSeconds(60).toMillis());
+        SearchResponse response = getMatchAllSearchRequest("*").setScroll(timeout).get();
+
+        do {
+            for (SearchHit searchHit : response.getHits().getHits()) {
+                try {
+                    CMMStudyOfLanguage study = cmmStudyOfLanguageConverter.getReader().readValue(searchHit.sourceRef().array());
+                    if (study.getStudyXmlSourceUrl() != null) {
+                        String host = URI.create(study.getStudyXmlSourceUrl()).getHost();
+                        map.replace(host, map.computeIfAbsent(host, k -> 0) + 1);
+                    }
+                } catch (IOException e) {
+                    log.warn("Couldn't decode {} into an instance of {}", searchHit.getId(), CMMStudyOfLanguage.class.getName());
+                }
+            }
+            if (response.getScrollId() != null) {
+                response = esTemplate.getClient().prepareSearchScroll(response.getScrollId()).setScroll(timeout).get();
+            } else {
+                // The scroll id can be null if no results are returned, break
+                break;
+            }
+            // Sometimes scrolling can cause a null response, end the loop if this is the case
+        } while (response != null && response.getHits().getHits().length != 0);
+
+        return Collections.unmodifiableMap(map);
+    }
+
+    private SearchRequestBuilder getMatchAllSearchRequest(String language) {
+        return esTemplate.getClient().prepareSearch(String.format(INDEX_NAME_TEMPLATE, language))
+                .setTypes(INDEX_TYPE)
+                .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+                .setQuery(QueryBuilders.matchAllQuery());
     }
 
     @Override
@@ -122,29 +162,31 @@ public class ESIngestService implements IngestService {
                 .setQuery(QueryBuilders.matchAllQuery())
                 .addSort(LAST_MODIFIED_FIELD, SortOrder.DESC)
                 .setSize(1)
-                .execute()
-                .actionGet();
+                .get();
 
         SearchHit[] hits = response.getHits().getHits();
-        if (hits.length != 0) {
-            Map<String, Object> source = hits[0].getSource();
-            String lastModified = source.get(LAST_MODIFIED_FIELD).toString();
-            Optional<LocalDateTime> localDateTimeOpt = TimeUtility.getLocalDateTime(lastModified);
-            return localDateTimeOpt
-                    .map(localDateTime -> localDateTime.withHour(0).withMinute(0).withSecond(0).withNano(0));
-        } else {
-            return Optional.empty();
+        try {
+            if (hits.length != 0) {
+                CMMStudyOfLanguage study = cmmStudyOfLanguageConverter.getReader().readValue(hits[0].sourceRef().array());
+                String lastModified = study.getLastModified();
+                Optional<LocalDateTime> localDateTimeOpt = TimeUtility.getLocalDateTime(lastModified);
+                return localDateTimeOpt
+                        .map(localDateTime -> localDateTime.withHour(0).withMinute(0).withSecond(0).withNano(0));
+            }
+        } catch (IOException e) {
+            log.warn("Couldn't decode {} into an instance of {}", hits[0].getId(), CMMStudyOfLanguage.class.getName());
+        }
+        return Optional.empty();
     }
-  }
 
-  private static IndexQuery getIndexQuery(String indexName, CMMStudyOfLanguage cmmStudyOfLanguage) {
-    IndexQuery indexQuery = new IndexQuery();
-    indexQuery.setId(cmmStudyOfLanguage.getId());
-    indexQuery.setObject(cmmStudyOfLanguage);
-    indexQuery.setIndexName(indexName);
-    indexQuery.setType(INDEX_TYPE);
-    return indexQuery;
-  }
+    private IndexQuery getIndexQuery(String indexName, CMMStudyOfLanguage cmmStudyOfLanguage) {
+        IndexQuery indexQuery = new IndexQuery();
+        indexQuery.setId(cmmStudyOfLanguage.getId());
+        indexQuery.setObject(cmmStudyOfLanguage);
+        indexQuery.setIndexName(indexName);
+        indexQuery.setType(INDEX_TYPE);
+        return indexQuery;
+    }
 
     private boolean prepareIndex(String indexName) {
 

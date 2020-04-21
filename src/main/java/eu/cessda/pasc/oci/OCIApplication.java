@@ -44,7 +44,8 @@ public class OCIApplication {
 	public void startupMetrics(ContextRefreshedEvent contextRefreshedEvent) {
 		log.debug("Setting metrics");
 		try {
-			micrometerMetrics.updateMetrics();
+			micrometerMetrics.updateLanguageMetrics();
+			micrometerMetrics.updateTotalRecordsMetric();
 		} catch (ElasticsearchException e) {
 			log.warn("Couldn't initialise metrics on startup. \n{}", e.toString());
 		}
