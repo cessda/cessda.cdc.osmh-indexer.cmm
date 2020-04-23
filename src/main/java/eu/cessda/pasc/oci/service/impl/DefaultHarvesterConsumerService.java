@@ -60,6 +60,7 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
   private static final String REPO_NAME = "repo_name";
   private static final String LANG_CODE = "lang_code";
   private static final String REPO_ENDPOINT_URL = "repo_endpoint_url";
+  private static final String REASON = "rejection_reason";
 
   @Autowired
   public DefaultHarvesterConsumerService(HarvesterDao harvesterDao, RepositoryUrlService repositoryUrlService,
@@ -100,10 +101,12 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
         return Optional.of(cmmStudyConverter.fromJsonString(recordJsonStream));
       }
     } catch (ExternalSystemException e) {
-      log.warn("[{}], response detail from handler [{}], URL to handler for harvesting [{}].",
+      log.warn("[{}], response detail from handler [{}], URL to handler for harvesting record [{}] from repo [{}] [{}].",
               e.toString(),
-              e.getExternalResponseBody(),
-              finalUrl
+              keyValue(REASON, e.getExternalResponseBody()),
+              finalUrl,
+              keyValue(REPO_ENDPOINT_URL, repo.getUrl()),
+              keyValue(REPO_NAME, repo.getName())
       );
     } catch (IOException e) {
       log.error("Error, Unable to pass GetRecord response error message [{}].", e.getMessage(), e);
