@@ -65,6 +65,7 @@ import java.util.Set;
 @Document(indexName = "test")
 @Getter
 @EqualsAndHashCode
+@ToString
 public class CMMStudyOfLanguage {
 
   @Id

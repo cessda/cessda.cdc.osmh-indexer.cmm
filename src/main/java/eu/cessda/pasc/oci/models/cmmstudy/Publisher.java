@@ -32,6 +32,7 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @EqualsAndHashCode
+@ToString
 public class Publisher {
   @JsonProperty("abbr")
   private String iso2LetterCode;
