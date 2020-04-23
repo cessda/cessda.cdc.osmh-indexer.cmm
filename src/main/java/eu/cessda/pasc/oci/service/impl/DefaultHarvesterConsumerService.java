@@ -31,6 +31,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static net.logstash.logback.argument.StructuredArguments.keyValue;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -55,6 +57,9 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
   private final RepositoryUrlService repositoryUrlService;
   private final ObjectReader recordHeaderObjectReader;
   private final CMMStudyConverter cmmStudyConverter;
+  private static final String REPO_NAME = "repo_name";
+  private static final String LANG_CODE = "lang_code";
+  private static final String REPO_ENDPOINT_URL = "repo_endpoint_url";
 
   @Autowired
   public DefaultHarvesterConsumerService(HarvesterDao harvesterDao, RepositoryUrlService repositoryUrlService,
@@ -76,7 +81,7 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
         recordHeadersUnfiltered = recordHeaderObjectReader.readValue(recordHeadersJsonStream);
       }
     } catch (ExternalSystemException e) {
-      log.error("ListRecordHeaders failed for repo [{}]. CDC Handler Error object Msg [{}].", repo, e.getMessage(), e);
+      log.error("ListRecordHeaders failed for repo [{}] [{}]. CDC Handler Error object Msg [{}].",keyValue(REPO_NAME, repo.getName()), keyValue(REPO_ENDPOINT_URL, repo.getUrl()), e.getMessage(), e);
     } catch (IOException e) {
       log.error("Error, Unable to pass ListRecordHeaders response error message [{}].", e.getMessage(), e);
     } catch (URISyntaxException e) {
