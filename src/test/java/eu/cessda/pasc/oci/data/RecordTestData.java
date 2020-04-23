@@ -22,8 +22,6 @@ import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -212,11 +210,5 @@ public final class RecordTestData {
   public static String getSyntheticCMMStudyOfLanguageEn() throws IOException {
     FileHandler fileHandler = new FileHandler();
     return fileHandler.getFileAsString("synthetic_complaint_record_en.json");
-  }
-
-  @Test
-  public void shouldEqual() throws IOException {
-    getCmmStudyOfLanguageCodeEnX1().get(0).equals(getCmmStudyOfLanguageCodeEnX1().get(0));
-    Assert.assertEquals(getCmmStudyOfLanguageCodeEnX1().get(0), getCmmStudyOfLanguageCodeEnX1().get(0));
   }
 }
