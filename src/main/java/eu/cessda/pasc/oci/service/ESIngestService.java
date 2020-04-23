@@ -36,7 +36,6 @@ import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.net.URI;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -104,11 +103,6 @@ public class ESIngestService implements IngestService {
     }
 
     @Override
-    public long getTotalHitCount() {
-        return getTotalHitCount("*");
-    }
-
-    @Override
     public long getTotalHitCount(String language) {
         SearchRequestBuilder matchAllSearchRequest = getMatchAllSearchRequest(language).setSize(0);
         SearchResponse response = matchAllSearchRequest.get();
@@ -117,21 +111,20 @@ public class ESIngestService implements IngestService {
     }
 
     @Override
-    public Map<String, Integer> getHitCountPerRepository() {
-        var map = new HashMap<String, Integer>();
+    public Set<CMMStudyOfLanguage> getAllStudies(String language) {
+        var studies = new HashSet<CMMStudyOfLanguage>();
         var timeout = new TimeValue(Duration.ofSeconds(60).toMillis());
-        SearchResponse response = getMatchAllSearchRequest("*").setScroll(timeout).get();
+        SearchResponse response = getMatchAllSearchRequest(language).setScroll(timeout).get();
+
+        log.debug("Getting all studies for language [{}]", language);
 
         do {
             for (SearchHit searchHit : response.getHits().getHits()) {
                 try {
-                    CMMStudyOfLanguage study = cmmStudyOfLanguageConverter.getReader().readValue(searchHit.sourceRef().array());
-                    if (study.getStudyXmlSourceUrl() != null) {
-                        String host = URI.create(study.getStudyXmlSourceUrl()).getHost();
-                        map.replace(host, map.computeIfAbsent(host, k -> 0) + 1);
-                    }
+                    studies.add(cmmStudyOfLanguageConverter.getReader().readValue(searchHit.sourceRef().array()));
+                    log.trace("Retrieved study [{}]", searchHit.getId());
                 } catch (IOException e) {
-                    log.warn("Couldn't decode {} into an instance of {}", searchHit.getId(), CMMStudyOfLanguage.class.getName());
+                    log.warn("Couldn't decode {} into an instance of {}", searchHit.getId(), CMMStudyOfLanguage.class.getName(), e);
                 }
             }
             if (response.getScrollId() != null) {
@@ -143,7 +136,7 @@ public class ESIngestService implements IngestService {
             // Sometimes scrolling can cause a null response, end the loop if this is the case
         } while (response != null && response.getHits().getHits().length != 0);
 
-        return Collections.unmodifiableMap(map);
+        return Collections.unmodifiableSet(studies);
     }
 
     private SearchRequestBuilder getMatchAllSearchRequest(String language) {
@@ -218,10 +211,9 @@ public class ESIngestService implements IngestService {
                 log.error("[{}] custom index failed creation!", indexName);
                 return false;
             } else {
-                log.info("[{}] custom index created successfully.", indexName);
                 log.debug("[{}] index mapping PUT request from [{}] with content [\n{}\n]", indexName, mappingsPath, mappings);
                 if (esTemplate.putMapping(indexName, INDEX_TYPE, mappings)) {
-                    log.info("[{}] index mapping PUT request for type [{}] was successful.", indexName, INDEX_TYPE);
+                    log.info("[{}] custom index created successfully.", indexName);
                     return true;
                 } else {
                     log.error("[{}] index mapping PUT request for type [{}] was unsuccessful.", indexName, INDEX_TYPE);

@@ -44,8 +44,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static eu.cessda.pasc.oci.data.RecordTestData.*;
 import static org.assertj.core.api.Java6BDDAssertions.then;
@@ -214,7 +214,7 @@ public class ESIngestServiceTest {
     then(isSuccessful).isTrue();
 
     // Then
-    Map<String, Integer> hitCountPerRepository = ingestService.getHitCountPerRepository();
-    Assert.assertNotEquals(0, hitCountPerRepository.size());
+    Set<CMMStudyOfLanguage> hitCountPerRepository = ingestService.getAllStudies("*");
+    Assert.assertEquals(3, hitCountPerRepository.size());
   }
 }

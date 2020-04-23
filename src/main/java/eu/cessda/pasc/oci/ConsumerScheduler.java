@@ -137,7 +137,7 @@ public class ConsumerScheduler {
       langStudies.forEach((langIsoCode, cmmStudies) -> executeBulk(repo, langIsoCode, cmmStudies));
     });
     micrometerMetrics.updateMetrics();
-    log.info("Total number of records stands {}", keyValue("total_cmm_studies", esIndexerService.getTotalHitCount()));
+    log.info("Total number of records stands {}", keyValue("total_cmm_studies", esIndexerService.getTotalHitCount("*")));
   }
 
 

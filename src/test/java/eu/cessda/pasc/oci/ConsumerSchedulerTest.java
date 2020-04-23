@@ -170,7 +170,7 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     verify(esIndexer, times(3)).bulkIndex(anyListOf(CMMStudyOfLanguage.class), anyString());
 
     // Called for logging purposes
-    verify(esIndexer, times(1)).getTotalHitCount();
+    verify(esIndexer, times(1)).getTotalHitCount("*");
     verifyNoMoreInteractions(esIndexer);
   }
 
@@ -220,7 +220,7 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     verify(esIndexer, times(6)).bulkIndex(anyListOf(CMMStudyOfLanguage.class), anyString());
 
     // Called for logging purposes
-    verify(esIndexer, times(2)).getTotalHitCount();
+    verify(esIndexer, times(2)).getTotalHitCount("*");
     verifyNoMoreInteractions(esIndexer);
   }
 }

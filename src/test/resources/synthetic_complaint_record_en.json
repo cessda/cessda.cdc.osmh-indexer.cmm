@@ -168,5 +168,5 @@
     "en"
   ],
   "isActive": true,
-  "studyXmlSourceUrl": "http://oai.repo.org/oai?verb=GetRecord&identifier=10.5255%2FUKDA-FAKE-2305-1&metadataPrefix=ddi"
+  "studyXmlSourceUrl": "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=GetRecord&identifier=10.5255%2FUKDA-FAKE-2305-1&metadataPrefix=ddi"
 }

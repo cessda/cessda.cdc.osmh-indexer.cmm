@@ -19,8 +19,8 @@ import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Service interface contract for data ingestion
@@ -38,32 +38,23 @@ public interface IngestService {
    */
   boolean bulkIndex(List<CMMStudyOfLanguage> languageCMMStudiesMap, String languageIsoCode);
 
-  /**
-   * Gets the total number of hits for all languages using the index pattern cmmstudy_*.
-   *
-   * @throws org.elasticsearch.ElasticsearchException if an error occurs connecting to Elasticsearch.
-   */
-  long getTotalHitCount();
 
   /**
    * Gets the total number of hits for the specified language. The language is in the same form as languages configured
    * in application.yml.
    *
-   * @param language the language to get the total hits from.
+   * @param language the language to get the total hits from. Use * to get the hits for all languages.
    * @throws org.elasticsearch.index.IndexNotFoundException if a corresponding index is not found.
    * @throws org.elasticsearch.ElasticsearchException       if an error occurs connecting to Elasticsearch.
    */
   long getTotalHitCount(String language);
 
   /**
-   * Gets the total number of hits mapped with a repository. Only the host part of the URI is returned.
-   * <p>
-   * <em>This is an expensive operation as it causes all studies to be read from Elasticsearch.</em>
-   * </p>
+   * Gets a set of all studies stored in Elasticsearch.
    *
-   * @throws org.elasticsearch.ElasticsearchException if an error occurs connecting to Elasticsearch.
+   * @param language the language to get studies from. Use * to get all studies.
    */
-  Map<String, Integer> getHitCountPerRepository();
+  Set<CMMStudyOfLanguage> getAllStudies(String language);
 
   /**
    * Gets the most recent lastModified date from the cluster across all indices eg pattern (cmmstudy_*)
@@ -71,7 +62,7 @@ public interface IngestService {
    * Ingestion to indices can range between minutes to 6hrs meaning this dateTime stamp returned
    * might be off in minutes/hours for some indices therefore this timeStamp should be adjusted according before use.
    *
-   * @return LocalDateTime. The exact  most recent lastModified dateTime from the cluster for the indice pattern.
+   * @return LocalDateTime. The exact most recent lastModified dateTime from the cluster for the index pattern.
    */
   Optional<LocalDateTime> getMostRecentLastModified();
 }

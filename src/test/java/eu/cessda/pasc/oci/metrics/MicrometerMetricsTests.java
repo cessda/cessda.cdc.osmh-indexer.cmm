@@ -16,6 +16,7 @@
 package eu.cessda.pasc.oci.metrics;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
+import eu.cessda.pasc.oci.data.RecordTestData;
 import eu.cessda.pasc.oci.data.ReposTestData;
 import eu.cessda.pasc.oci.models.configurations.Endpoints;
 import eu.cessda.pasc.oci.models.configurations.Repo;
@@ -26,8 +27,10 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.HashSet;
 
 /**
  * Tests metrics according to https://docs.google.com/spreadsheets/d/1vkqm-9sSHCgskRzKIz1R4B_8uzyJpjy1-rFooQyeDtg/edit
@@ -115,7 +118,7 @@ public class MicrometerMetricsTests {
 
         // When
         long toBeReturned = 160L;
-        Mockito.doReturn(toBeReturned).when(ingestService).getTotalHitCount();
+        Mockito.when(ingestService.getTotalHitCount("*")).thenReturn(toBeReturned);
 
         var micrometerMetrics = new MicrometerMetrics(appConfigurationProperties, ingestService, meterRegistry);
 
@@ -146,42 +149,35 @@ public class MicrometerMetricsTests {
     }
 
     @Test
-    public void shouldContainCorrectAmountOfRecordsForEachRepository() {
+    public void shouldContainCorrectAmountOfRecordsForEachRepository() throws IOException {
         IngestService ingestService = Mockito.mock(IngestService.class);
 
         // When
-        var testMap = new HashMap<String, Integer>();
-        int expectedUKDSValue = 103;
-        int expectedGESISValue = 41;
-        testMap.put(ReposTestData.getUKDSRepo().getUrl().getHost(), expectedUKDSValue);
-        testMap.put(ReposTestData.getGesisEnRepo().getUrl().getHost(), expectedGESISValue);
-        Mockito.when(ingestService.getHitCountPerRepository()).thenReturn(testMap);
-
+        var testSet = new HashSet<>(RecordTestData.getCmmStudyOfLanguageCodeEnX3());
         var micrometerMetrics = new MicrometerMetrics(appConfigurationProperties, ingestService, meterRegistry);
 
         // Then
-        micrometerMetrics.updateEndpointsRecordsMetric();
+        micrometerMetrics.updateEndpointsRecordsMetric(testSet);
 
-        Assert.assertEquals(expectedUKDSValue, micrometerMetrics.getRecordCount(ReposTestData.getUKDSRepo()).get());
-        Assert.assertEquals(expectedGESISValue, micrometerMetrics.getRecordCount(ReposTestData.getGesisEnRepo()).get());
+        Assert.assertEquals(3, micrometerMetrics.getRecordCount(ReposTestData.getUKDSRepo()).get());
     }
 
-    @Test
-    public void shouldLogWhenAnUnexpectedEndpointIsFound() {
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldLogWhenAnUnexpectedEndpointIsFound() throws IOException {
         IngestService ingestService = Mockito.mock(IngestService.class);
 
         // When
-        var testMap = new HashMap<String, Integer>();
-        int expectedValue = 40;
-        testMap.put("strange.location", expectedValue);
-        testMap.put("stranger.location", expectedValue);
-        Mockito.when(ingestService.getHitCountPerRepository()).thenReturn(testMap);
+        var testSet = new HashSet<>(RecordTestData.getCmmStudyOfLanguageCodeEnX3());
+        AppConfigurationProperties properties = Mockito.mock(AppConfigurationProperties.class);
+        var endpoints = Mockito.mock(Endpoints.class);
+        Mockito.when(properties.getLanguages()).thenReturn(Arrays.asList("en", "de", "sv", "cz"));
+        Mockito.when(properties.getEndpoints()).thenReturn(endpoints);
+        Mockito.when(endpoints.getRepos()).thenReturn(Collections.emptyList());
 
-        var micrometerMetrics = new MicrometerMetrics(appConfigurationProperties, ingestService, meterRegistry);
+        var micrometerMetrics = new MicrometerMetrics(properties, ingestService, meterRegistry);
 
         // Then
-        micrometerMetrics.updateEndpointsRecordsMetric();
-        Assert.assertNotEquals(expectedValue, micrometerMetrics.getRecordCount(ReposTestData.getUKDSRepo()).get());
-        Assert.assertNotEquals(expectedValue, micrometerMetrics.getRecordCount(ReposTestData.getGesisEnRepo()).get());
+        micrometerMetrics.updateEndpointsRecordsMetric(testSet);
+        micrometerMetrics.getRecordCount(ReposTestData.getUKDSRepo());
     }
 }

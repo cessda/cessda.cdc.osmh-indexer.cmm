@@ -16,6 +16,8 @@
 package eu.cessda.pasc.oci.metrics;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
+import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
+import eu.cessda.pasc.oci.models.cmmstudy.Publisher;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.service.IngestService;
 import io.micrometer.core.instrument.Gauge;
@@ -26,8 +28,13 @@ import org.elasticsearch.index.IndexNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -39,21 +46,30 @@ import java.util.concurrent.atomic.AtomicLong;
 @Slf4j
 public class MicrometerMetrics {
 
+    // Defines the metric names
     public static final String NUM_RECORDS_HARVESTED = "num.records.harvested";
     public static final String LIST_RECORD_LANGCODE = "list.record.langcode";
-    private static final String LIST_RECORDS_ENDPOINT = "list_records_endpoint";
+    private static final String LIST_RECORDS_ENDPOINT = "list.records.endpoint";
+    private static final String LIST_RECORDS_PUBLISHER = "list.records.publisher";
 
+    // For logging
+    private static final String UPDATING_METRIC = "Updating {} metric.";
+
+    // Stores the metrics
     private final AtomicLong totalRecords = new AtomicLong(0);
     private final ConcurrentHashMap<String, AtomicLong> recordsLanguagesMap = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Repo, AtomicLong> recordsEndpointMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Publisher, AtomicLong> recordsPublisherMap = new ConcurrentHashMap<>();
 
     private final AppConfigurationProperties appConfigurationProperties;
     private final IngestService ingestService;
+    private final MeterRegistry meterRegistry;
 
     @Autowired
     public MicrometerMetrics(AppConfigurationProperties appConfigurationProperties, IngestService ingestService, MeterRegistry meterRegistry) {
         this.appConfigurationProperties = appConfigurationProperties;
         this.ingestService = ingestService;
+        this.meterRegistry = meterRegistry;
 
         // Total records metric
         Gauge.builder(NUM_RECORDS_HARVESTED, totalRecords::get)
@@ -102,7 +118,7 @@ public class MicrometerMetrics {
      * @throws ElasticsearchException if Elasticsearch is unavailable.
      */
     public void updateLanguageMetrics() {
-        log.debug("Updating {} metrics.", LIST_RECORD_LANGCODE);
+        log.debug(UPDATING_METRIC, LIST_RECORD_LANGCODE);
         for (var language : appConfigurationProperties.getLanguages()) {
             try {
                 getRecordCount(language).set(ingestService.getTotalHitCount(language));
@@ -121,8 +137,8 @@ public class MicrometerMetrics {
      * @throws ElasticsearchException if Elasticsearch is unavailable.
      */
     public void updateTotalRecordsMetric() {
-        log.debug("Updating {} metric.", NUM_RECORDS_HARVESTED);
-        totalRecords.set(ingestService.getTotalHitCount());
+        log.debug(UPDATING_METRIC, NUM_RECORDS_HARVESTED);
+        totalRecords.set(ingestService.getTotalHitCount("*"));
     }
 
     AtomicLong getTotalRecords() {
@@ -149,20 +165,67 @@ public class MicrometerMetrics {
      *
      * @throws ElasticsearchException if Elasticsearch is unavailable.
      */
-    public void updateEndpointsRecordsMetric() {
-        log.debug("Updating {} metric.", LIST_RECORDS_ENDPOINT);
-        var hitCountPerRepository = ingestService.getHitCountPerRepository();
-        hitCountPerRepository.forEach((host, recordCount) -> {
+    public void updateEndpointsRecordsMetric(Set<CMMStudyOfLanguage> studies) {
+        log.debug(UPDATING_METRIC, LIST_RECORDS_ENDPOINT);
+        var hitCountPerRepository = new HashMap<String, AtomicInteger>();
+
+        for (CMMStudyOfLanguage study : studies) {
+            if (study.getStudyXmlSourceUrl() != null) {
+                String host = URI.create(study.getStudyXmlSourceUrl()).getHost();
+                hitCountPerRepository.computeIfAbsent(host, k -> new AtomicInteger(0)).getAndIncrement();
+            }
+        }
+
+        for (Map.Entry<String, AtomicInteger> hostEntry : hitCountPerRepository.entrySet()) {
             try {
                 var repoAtomicLongEntry = recordsEndpointMap.entrySet().stream()
-                        .filter(repoEntry -> repoEntry.getKey().getUrl().getHost().equalsIgnoreCase(host))
+                        .filter(repoEntry -> repoEntry.getKey().getUrl().getHost().equalsIgnoreCase(hostEntry.getKey()))
                         .findAny().orElseThrow();
                 log.trace("Repository [{}] updated", repoAtomicLongEntry.getKey().getName());
-                repoAtomicLongEntry.getValue().set(recordCount);
+                repoAtomicLongEntry.getValue().set(hostEntry.getValue().get());
             } catch (NoSuchElementException e) {
-                log.warn("Repository corresponding to [{}] not configured.", host);
+                log.warn("Repository corresponding to [{}] not configured.", hostEntry.getKey());
             }
-        });
+        }
+    }
+
+    /**
+     * Updates the total records stored for each publisher.
+     *
+     * @throws ElasticsearchException if Elasticsearch is unavailable.
+     */
+    public void updatePublisherRecordsMetric(Set<CMMStudyOfLanguage> studies) {
+        log.debug(UPDATING_METRIC, LIST_RECORDS_PUBLISHER);
+        var hitCountPerPublisher = new HashMap<Publisher, AtomicInteger>();
+
+        for (CMMStudyOfLanguage study : studies) {
+            hitCountPerPublisher.computeIfAbsent(study.getPublisher(), p -> new AtomicInteger(0)).getAndIncrement();
+        }
+
+        hitCountPerPublisher.forEach((publisherKey, counter) ->
+                // This registers the metrics for each publisher on first encounter
+                recordsPublisherMap.computeIfAbsent(publisherKey, publisher -> {
+                    var builder = Gauge.builder(LIST_RECORDS_PUBLISHER, () -> getRecordCount(publisher));
+                    builder.description("Amount of records stored per publisher");
+                    builder.tag("publisher", publisher.getPublisher());
+                    builder.register(meterRegistry);
+                    return new AtomicLong(0);
+                }).set(counter.get()));
+    }
+
+    /**
+     * Gets the count of the amount of records currently stored in Elasticsearch.
+     * Setting this {@link AtomicLong} will update the Micrometer metric.
+     *
+     * @param publisher the publisher to get.
+     * @throws IllegalArgumentException if the publisher is not stored in the map.
+     */
+    AtomicLong getRecordCount(Publisher publisher) {
+        AtomicLong publisherRecord = recordsPublisherMap.get(publisher);
+        if (publisherRecord != null) {
+            return publisherRecord;
+        }
+        throw new IllegalArgumentException(String.format("Invalid publisher [%s]", publisher.getPublisher()));
     }
 
     /**
@@ -173,6 +236,8 @@ public class MicrometerMetrics {
     public void updateMetrics() {
         updateTotalRecordsMetric();
         updateLanguageMetrics();
-        updateEndpointsRecordsMetric();
+        Set<CMMStudyOfLanguage> allStudies = ingestService.getAllStudies("*");
+        updateEndpointsRecordsMetric(allStudies);
+        updatePublisherRecordsMetric(allStudies);
     }
 }
