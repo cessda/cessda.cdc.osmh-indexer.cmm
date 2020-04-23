@@ -210,7 +210,8 @@ public class MicrometerMetrics {
                     builder.tag("publisher", publisher.getPublisher());
                     builder.register(meterRegistry);
                     return new AtomicLong(0);
-                }).set(counter.get()));
+                }).set(counter.get())
+        );
     }
 
     /**
