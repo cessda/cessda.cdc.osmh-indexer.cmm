@@ -45,7 +45,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static eu.cessda.pasc.oci.data.RecordTestData.*;
 import static org.assertj.core.api.Java6BDDAssertions.then;
@@ -214,7 +213,27 @@ public class ESIngestServiceTest {
     then(isSuccessful).isTrue();
 
     // Then
-    Set<CMMStudyOfLanguage> hitCountPerRepository = ingestService.getAllStudies("*");
+    var hitCountPerRepository = ingestService.getAllStudies("*");
     Assert.assertEquals(3, hitCountPerRepository.size());
+  }
+
+  @Test
+  public void shouldGetStudy() throws IOException {
+
+    // Setup
+    List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
+    ElasticsearchTemplate elasticsearchTemplate = new ElasticsearchTemplate(embeddedElasticsearchServer.getClient());
+    CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter = new CMMStudyOfLanguageConverter(new ObjectMapper());
+    ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp, cmmStudyOfLanguageConverter);
+
+    // Given
+    boolean isSuccessful = ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
+    then(isSuccessful).isTrue();
+    var expectedStudy = studyOfLanguages.get(0);
+
+    // Then
+    var study = ingestService.getStudy(expectedStudy.getId(), "en");
+
+    Assert.assertEquals(expectedStudy, study.get());
   }
 }

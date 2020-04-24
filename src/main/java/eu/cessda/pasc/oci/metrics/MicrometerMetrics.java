@@ -29,10 +29,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -163,9 +163,10 @@ public class MicrometerMetrics {
     /**
      * Updates the total records stored in each repository.
      *
+     * @param studies a collection of studies to analyse for endpoints.
      * @throws ElasticsearchException if Elasticsearch is unavailable.
      */
-    public void updateEndpointsRecordsMetric(Set<CMMStudyOfLanguage> studies) {
+    void updateEndpointsRecordsMetric(Collection<CMMStudyOfLanguage> studies) {
         log.debug(UPDATING_METRIC, LIST_RECORDS_ENDPOINT);
         var hitCountPerRepository = new HashMap<String, AtomicInteger>();
 
@@ -192,14 +193,18 @@ public class MicrometerMetrics {
     /**
      * Updates the total records stored for each publisher.
      *
+     * @param studies a collection of studies to extract publisher information from.
      * @throws ElasticsearchException if Elasticsearch is unavailable.
      */
-    public void updatePublisherRecordsMetric(Set<CMMStudyOfLanguage> studies) {
+    void updatePublisherRecordsMetric(Collection<CMMStudyOfLanguage> studies) {
         log.debug(UPDATING_METRIC, LIST_RECORDS_PUBLISHER);
         var hitCountPerPublisher = new HashMap<Publisher, AtomicInteger>();
 
         for (CMMStudyOfLanguage study : studies) {
-            hitCountPerPublisher.computeIfAbsent(study.getPublisher(), p -> new AtomicInteger(0)).getAndIncrement();
+            // Ignore studies that don't have a publisher set
+            if (study.getPublisher() != null) {
+                hitCountPerPublisher.computeIfAbsent(study.getPublisher(), p -> new AtomicInteger(0)).getAndIncrement();
+            }
         }
 
         hitCountPerPublisher.forEach((publisherKey, counter) ->
@@ -237,7 +242,7 @@ public class MicrometerMetrics {
     public void updateMetrics() {
         updateTotalRecordsMetric();
         updateLanguageMetrics();
-        Set<CMMStudyOfLanguage> allStudies = ingestService.getAllStudies("*");
+        var allStudies = ingestService.getAllStudies("*").values();
         updateEndpointsRecordsMetric(allStudies);
         updatePublisherRecordsMetric(allStudies);
     }

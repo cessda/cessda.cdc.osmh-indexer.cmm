@@ -25,6 +25,7 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.index.IndexNotFoundException;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -75,16 +76,16 @@ public class ESIngestService implements IngestService {
     public boolean bulkIndex(List<CMMStudyOfLanguage> languageCMMStudiesMap, String languageIsoCode) {
         String indexName = String.format(INDEX_NAME_TEMPLATE, languageIsoCode);
         boolean isSuccessful = true;
-        int counter = 0;
 
         if (prepareIndex(indexName)) {
-            List<IndexQuery> queries = new ArrayList<>();
+            List<IndexQuery> queries = new ArrayList<>(INDEX_COMMIT_SIZE);
             log.info("Indexing [{}] index.", indexName);
+            int counter = 0;
             for (CMMStudyOfLanguage cmmStudyOfLanguage : languageCMMStudiesMap) {
                 IndexQuery indexQuery = getIndexQuery(indexName, cmmStudyOfLanguage);
                 queries.add(indexQuery);
                 counter++;
-                if (counter % INDEX_COMMIT_SIZE == 0) {
+                if (queries.size() == INDEX_COMMIT_SIZE) {
                     executeBulk(queries);
                     queries.clear();
                     log.debug("[{}] Current bulkIndex counter [{}].", indexName, counter);
@@ -111,17 +112,20 @@ public class ESIngestService implements IngestService {
     }
 
     @Override
-    public Set<CMMStudyOfLanguage> getAllStudies(String language) {
-        var studies = new HashSet<CMMStudyOfLanguage>();
+    public Map<String, CMMStudyOfLanguage> getAllStudies(String language) {
+        var studies = new HashMap<String, CMMStudyOfLanguage>();
         var timeout = new TimeValue(Duration.ofSeconds(60).toMillis());
         SearchResponse response = getMatchAllSearchRequest(language).setScroll(timeout).get();
 
         log.debug("Getting all studies for language [{}]", language);
 
         do {
-            for (SearchHit searchHit : response.getHits().getHits()) {
+            for (SearchHit searchHit : response.getHits()) {
                 try {
-                    studies.add(cmmStudyOfLanguageConverter.getReader().readValue(searchHit.sourceRef().array()));
+                    studies.put(
+                            searchHit.getId(),
+                            cmmStudyOfLanguageConverter.getReader().readValue(searchHit.sourceRef().array())
+                    );
                     log.trace("Retrieved study [{}]", searchHit.getId());
                 } catch (IOException e) {
                     log.warn("Couldn't decode {} into an instance of {}", searchHit.getId(), CMMStudyOfLanguage.class.getName(), e);
@@ -134,15 +138,37 @@ public class ESIngestService implements IngestService {
                 break;
             }
             // Sometimes scrolling can cause a null response, end the loop if this is the case
-        } while (response != null && response.getHits().getHits().length != 0);
+        } while (response != null && response.getHits().getHits().length > 0);
 
-        return Collections.unmodifiableSet(studies);
+        return Collections.unmodifiableMap(studies);
+    }
+
+    @Override
+    public Optional<CMMStudyOfLanguage> getStudy(String id, String language) {
+        try {
+            var response = esTemplate.getClient().prepareGet()
+                    .setIndex(String.format(INDEX_NAME_TEMPLATE, language))
+                    .setType(INDEX_TYPE)
+                    .setId(id)
+                    .get();
+
+            var sourceAsBytes = response.getSourceAsBytes();
+            if (sourceAsBytes != null) {
+                return Optional.of(cmmStudyOfLanguageConverter.getReader().readValue(sourceAsBytes));
+            }
+        } catch (IndexNotFoundException ignored) {
+            // This is expected
+            log.trace("Index for language [{}] not found", language);
+        } catch (IOException e) {
+            log.error("Failed to retrieve study [{}].", id, e);
+        }
+
+        return Optional.empty();
     }
 
     private SearchRequestBuilder getMatchAllSearchRequest(String language) {
         return esTemplate.getClient().prepareSearch(String.format(INDEX_NAME_TEMPLATE, language))
                 .setTypes(INDEX_TYPE)
-                .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
                 .setQuery(QueryBuilders.matchAllQuery());
     }
 

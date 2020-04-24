@@ -69,6 +69,7 @@ public class MicrometerMetricsTests {
         // When
         var micrometerMetrics = new MicrometerMetrics(appConfigurationProperties, null, meterRegistry);
 
+        // Then
         micrometerMetrics.getRecordCount("moon");
     }
 
@@ -84,6 +85,7 @@ public class MicrometerMetricsTests {
         Mockito.when(ingestService.getTotalHitCount(Mockito.anyString())).thenReturn(expectedEmpty);
         Mockito.when(ingestService.getTotalHitCount(language)).thenReturn(expected);
 
+        // Then
         var micrometerMetrics = new MicrometerMetrics(appConfigurationProperties, ingestService, meterRegistry);
         micrometerMetrics.updateLanguageMetrics();
 
@@ -108,6 +110,7 @@ public class MicrometerMetricsTests {
         var micrometerMetrics = new MicrometerMetrics(appConfigurationProperties, ingestService, meterRegistry);
         micrometerMetrics.getRecordCount(language).set(23);
 
+        // Then
         micrometerMetrics.updateLanguageMetrics();
 
         Assert.assertEquals(0L, micrometerMetrics.getRecordCount(language).get());
@@ -134,7 +137,7 @@ public class MicrometerMetricsTests {
         // When
         var micrometerMetrics = new MicrometerMetrics(appConfigurationProperties, null, meterRegistry);
 
-        // All configured languages should be populated, no exception should be thrown
+        // All configured repositories should be populated, no exception should be thrown
         for (var repo : appConfigurationProperties.getEndpoints().getRepos()) {
             Assert.assertNotNull(micrometerMetrics.getRecordCount(repo));
         }
@@ -146,6 +149,7 @@ public class MicrometerMetricsTests {
         // When
         var micrometerMetrics = new MicrometerMetrics(appConfigurationProperties, null, meterRegistry);
 
+        // Then
         micrometerMetrics.getRecordCount(new Repo());
     }
 
