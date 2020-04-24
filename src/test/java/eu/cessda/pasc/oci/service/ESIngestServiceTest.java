@@ -18,6 +18,7 @@ package eu.cessda.pasc.oci.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import eu.cessda.pasc.oci.configurations.ESConfigurationProperties;
 import eu.cessda.pasc.oci.helpers.FileHandler;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
@@ -45,6 +46,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static eu.cessda.pasc.oci.data.RecordTestData.*;
 import static org.assertj.core.api.Java6BDDAssertions.then;
@@ -235,5 +237,41 @@ public class ESIngestServiceTest {
     var study = ingestService.getStudy(expectedStudy.getId(), "en");
 
     Assert.assertEquals(expectedStudy, study.get());
+  }
+
+  @Test
+  public void shouldReturnEmptyOptionalOnInvalidIndex() {
+
+    // Setup
+    ElasticsearchTemplate elasticsearchTemplate = new ElasticsearchTemplate(embeddedElasticsearchServer.getClient());
+    CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter = new CMMStudyOfLanguageConverter(new ObjectMapper());
+    ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp, cmmStudyOfLanguageConverter);
+
+    // Then
+    var study = ingestService.getStudy(UUID.randomUUID().toString(), "moon");
+
+    Assert.assertEquals(Optional.empty(), study);
+  }
+
+  @Test
+  public void shouldReturnEmptyOptionalOnIOException() throws IOException {
+    // Setup
+    List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
+    ElasticsearchTemplate elasticsearchTemplate = new ElasticsearchTemplate(embeddedElasticsearchServer.getClient());
+    ObjectReader objectReader = Mockito.mock(ObjectReader.class);
+    CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter = Mockito.mock(CMMStudyOfLanguageConverter.class);
+    ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp, cmmStudyOfLanguageConverter);
+
+    // Given
+    Mockito.when(cmmStudyOfLanguageConverter.getReader()).thenReturn(objectReader);
+    Mockito.when(objectReader.readValue(Mockito.any(byte[].class))).thenThrow(new IOException());
+    boolean isSuccessful = ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
+    then(isSuccessful).isTrue();
+    var expectedStudy = studyOfLanguages.get(0);
+
+    // Then
+    var study = ingestService.getStudy(expectedStudy.getId(), "en");
+
+    Assert.assertEquals(Optional.empty(), study);
   }
 }

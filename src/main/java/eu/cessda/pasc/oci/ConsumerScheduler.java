@@ -39,9 +39,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static net.logstash.logback.argument.StructuredArguments.keyValue;
+import static net.logstash.logback.argument.StructuredArguments.value;
 
 /**
  * Service responsible for triggering Metadata Harvesting and ingestion into the search engine
@@ -145,6 +147,8 @@ public class ConsumerScheduler {
     if (cmmStudies.isEmpty()) {
       log.debug("CmmStudies list is empty and henceforth there is nothing to BulkIndex for repo[{}] with LangIsoCode [{}].", keyValue(REPO_NAME, repo.getName()), keyValue(LANG_CODE, langIsoCode));
     } else {
+      int studiesUpdated = getUpdatedStudies(langIsoCode, cmmStudies);
+      log.info("[{}] studies updated", value("updated_cmm_studies", studiesUpdated));
       log.info("BulkIndexing repo [{}] with lang code [{}] index with [{}] CmmStudies", keyValue(REPO_NAME, repo.getName()), keyValue(LANG_CODE, langIsoCode), keyValue("cmm_studies_added", cmmStudies.size()));
       boolean isSuccessful = esIndexerService.bulkIndex(cmmStudies, langIsoCode);
       if (isSuccessful) {
@@ -153,6 +157,17 @@ public class ConsumerScheduler {
         log.error("BulkIndexing was UnSuccessful. For repo name [{}] and its corresponding [{}].  LangIsoCode [{}].", keyValue(REPO_NAME, repo.getName()), keyValue(REPO_ENDPOINT_URL, repo.getUrl()), keyValue(LANG_CODE, langIsoCode));
       }
     }
+  }
+
+  private int getUpdatedStudies(String langIsoCode, List<CMMStudyOfLanguage> cmmStudies) {
+    var studiesUpdated = new AtomicInteger(0);
+    cmmStudies.parallelStream().forEach(study -> {
+      var esStudy = esIndexerService.getStudy(study.getId(), langIsoCode);
+      if (esStudy.isEmpty() || !study.equals(esStudy.get())) {
+        studiesUpdated.getAndIncrement();
+      }
+    });
+    return studiesUpdated.get();
   }
 
   private Map<String, List<CMMStudyOfLanguage>> getCmmStudiesOfEachLangIsoCodeMap(Repo repo, LocalDateTime lastModifiedDateTime) {

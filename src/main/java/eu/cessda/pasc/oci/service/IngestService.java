@@ -53,10 +53,18 @@ public interface IngestService {
    * Gets a set of all studies stored in Elasticsearch.
    *
    * @param language the language to get studies from. Use * to get all studies.
-   * @return a map containing all studies, with the key set to the study ID.
+   * @return a map containing all studies with the key set to the study ID.
    */
   Map<String, CMMStudyOfLanguage> getAllStudies(String language);
 
+  /**
+   * Gets a study with a specific ID.
+   *
+   * @param id       the id of the study to get.
+   * @param language the language of the index to search in.
+   * @return an optional containing the study, or an empty optional if the study can't be found
+   * or if an error occurs retrieving the study.
+   */
   Optional<CMMStudyOfLanguage> getStudy(String id, String language);
 
   /**

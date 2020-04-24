@@ -118,6 +118,7 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     // mock for ES bulking
     esIndexer = mock(IngestService.class);
     when(esIndexer.bulkIndex(anyListOf(CMMStudyOfLanguage.class), anyString())).thenReturn(true);
+    when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
 
     // Given
     scheduler = new ConsumerScheduler(debuggingJMXBean, appConfigurationProperties, harvesterConsumerService,
@@ -143,6 +144,7 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     // mock for ES bulking
     esIndexer = mock(IngestService.class);
     when(esIndexer.bulkIndex(anyListOf(CMMStudyOfLanguage.class), anyString())).thenReturn(true);
+    when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
 
     // Given
     scheduler = new ConsumerScheduler(debuggingJMXBean, appConfigurationProperties, harvesterConsumerService, esIndexer, extractor, languageAvailabilityMapper, micrometerMetrics);
@@ -170,6 +172,7 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     verify(esIndexer, times(3)).bulkIndex(anyListOf(CMMStudyOfLanguage.class), anyString());
 
     // Called for logging purposes
+    verify(esIndexer, atLeastOnce()).getStudy(Mockito.anyString(), Mockito.anyString());
     verify(esIndexer, times(1)).getTotalHitCount("*");
     verifyNoMoreInteractions(esIndexer);
   }
@@ -195,6 +198,7 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     esIndexer = mock(IngestService.class);
     when(esIndexer.bulkIndex(anyListOf(CMMStudyOfLanguage.class), anyString())).thenReturn(true);
     when(esIndexer.getMostRecentLastModified()).thenReturn(Optional.of(LocalDateTime.parse("2018-02-20T07:48:38")));
+    when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
 
     // Given
     scheduler = new ConsumerScheduler(debuggingJMXBean, appConfigurationProperties, harvesterConsumerService, esIndexer, extractor, languageAvailabilityMapper, micrometerMetrics);
@@ -220,6 +224,7 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     verify(esIndexer, times(6)).bulkIndex(anyListOf(CMMStudyOfLanguage.class), anyString());
 
     // Called for logging purposes
+    verify(esIndexer, atLeastOnce()).getStudy(Mockito.anyString(), Mockito.anyString());
     verify(esIndexer, times(2)).getTotalHitCount("*");
     verifyNoMoreInteractions(esIndexer);
   }

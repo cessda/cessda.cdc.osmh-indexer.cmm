@@ -145,6 +145,8 @@ public class ESIngestService implements IngestService {
 
     @Override
     public Optional<CMMStudyOfLanguage> getStudy(String id, String language) {
+        log.trace("Retrieving study [{}], language [{}]", id, language);
+
         try {
             var response = esTemplate.getClient().prepareGet()
                     .setIndex(String.format(INDEX_NAME_TEMPLATE, language))
@@ -153,12 +155,13 @@ public class ESIngestService implements IngestService {
                     .get();
 
             var sourceAsBytes = response.getSourceAsBytes();
+
             if (sourceAsBytes != null) {
                 return Optional.of(cmmStudyOfLanguageConverter.getReader().readValue(sourceAsBytes));
             }
-        } catch (IndexNotFoundException ignored) {
-            // This is expected
-            log.trace("Index for language [{}] not found", language);
+        } catch (IndexNotFoundException e) {
+            // This is expected when the index is not available
+            log.debug("Index for language [{}] not found. {}", language, e.toString());
         } catch (IOException e) {
             log.error("Failed to retrieve study [{}].", id, e);
         }
