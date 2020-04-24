@@ -16,7 +16,7 @@
 package eu.cessda.pasc.oci;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
-import eu.cessda.pasc.oci.metrics.MicrometerMetrics;
+import eu.cessda.pasc.oci.metrics.Metrics;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
@@ -69,20 +69,20 @@ public class ConsumerScheduler {
   private final IngestService esIndexerService;
   private final LanguageDocumentExtractor extractor;
   private final LanguageAvailabilityMapper languageAvailabilityMapper;
-  private final MicrometerMetrics micrometerMetrics;
+  private final Metrics micrometerMetrics;
 
   @Autowired
   public ConsumerScheduler(DebuggingJMXBean debuggingJMXBean, AppConfigurationProperties configurationProperties,
                            HarvesterConsumerService harvesterConsumerService, IngestService esIndexerService,
                            LanguageDocumentExtractor extractor, LanguageAvailabilityMapper languageAvailabilityMapper,
-                           MicrometerMetrics micrometerMetrics) {
+                           Metrics metrics) {
     this.debuggingJMXBean = debuggingJMXBean;
     this.configurationProperties = configurationProperties;
     this.harvesterConsumerService = harvesterConsumerService;
     this.esIndexerService = esIndexerService;
     this.extractor = extractor;
     this.languageAvailabilityMapper = languageAvailabilityMapper;
-    this.micrometerMetrics = micrometerMetrics;
+    this.micrometerMetrics = metrics;
   }
 
   /**

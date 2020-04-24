@@ -44,11 +44,11 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 @Component
 @Slf4j
-public class MicrometerMetrics {
+public class MicrometerMetrics implements Metrics {
 
     // Defines the metric names
-    public static final String NUM_RECORDS_HARVESTED = "num.records.harvested";
-    public static final String LIST_RECORD_LANGCODE = "list.record.langcode";
+    private static final String NUM_RECORDS_HARVESTED = "num.records.harvested";
+    private static final String LIST_RECORD_LANGCODE = "list.record.langcode";
     private static final String LIST_RECORDS_ENDPOINT = "list.records.endpoint";
     private static final String LIST_RECORDS_PUBLISHER = "list.records.publisher";
 
@@ -117,6 +117,7 @@ public class MicrometerMetrics {
      *
      * @throws ElasticsearchException if Elasticsearch is unavailable.
      */
+    @Override
     public void updateLanguageMetrics() {
         log.debug(UPDATING_METRIC, LIST_RECORD_LANGCODE);
         for (var language : appConfigurationProperties.getLanguages()) {
@@ -136,6 +137,7 @@ public class MicrometerMetrics {
      *
      * @throws ElasticsearchException if Elasticsearch is unavailable.
      */
+    @Override
     public void updateTotalRecordsMetric() {
         log.debug(UPDATING_METRIC, NUM_RECORDS_HARVESTED);
         totalRecords.set(ingestService.getTotalHitCount("*"));
@@ -239,6 +241,7 @@ public class MicrometerMetrics {
      *
      * @throws ElasticsearchException if Elasticsearch is unavailable.
      */
+    @Override
     public void updateMetrics() {
         updateTotalRecordsMetric();
         updateLanguageMetrics();

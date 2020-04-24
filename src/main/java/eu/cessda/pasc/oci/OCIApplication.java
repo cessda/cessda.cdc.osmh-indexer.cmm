@@ -15,7 +15,7 @@
  */
 package eu.cessda.pasc.oci;
 
-import eu.cessda.pasc.oci.metrics.MicrometerMetrics;
+import eu.cessda.pasc.oci.metrics.Metrics;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
 import org.springframework.boot.SpringApplication;
@@ -29,11 +29,11 @@ import org.springframework.context.event.EventListener;
 @Slf4j
 public class OCIApplication {
 
-	private final MicrometerMetrics micrometerMetrics;
+	private final Metrics metrics;
 
-	public OCIApplication(MicrometerMetrics micrometerMetrics) {
+	public OCIApplication(Metrics metrics) {
 
-		this.micrometerMetrics = micrometerMetrics;
+		this.metrics = metrics;
 	}
 
 	public static void main(String[] args) {
@@ -44,8 +44,8 @@ public class OCIApplication {
 	public void startupMetrics(ContextRefreshedEvent contextRefreshedEvent) {
 		log.debug("Setting metrics");
 		try {
-			micrometerMetrics.updateLanguageMetrics();
-			micrometerMetrics.updateTotalRecordsMetric();
+			metrics.updateLanguageMetrics();
+			metrics.updateTotalRecordsMetric();
 		} catch (ElasticsearchException e) {
 			log.warn("Couldn't initialise metrics on startup. \n{}", e.toString());
 		}
