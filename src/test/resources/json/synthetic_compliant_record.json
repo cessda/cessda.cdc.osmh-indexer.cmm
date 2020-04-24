@@ -10,11 +10,11 @@
         "pid": "10.5255\/UKDA-FAKE-2305-1"
       },
       {
-        "agency": "not available",
+        "agency": "Agency not available",
         "pid": "2305"
       },
       {
-        "agency": "not available",
+        "agency": "Agency not available",
         "pid": "2305"
       }
     ]
@@ -321,7 +321,7 @@
   "publisher": {
     "se": {
       "publisher": "Samhällsdatablad",
-      "abbr": "not available"
+      "abbr": "Language not available"
     },
     "fi": {
       "publisher": "Yhteiskuntatieteellinen tietoarkisto",

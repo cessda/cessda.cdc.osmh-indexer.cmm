@@ -124,7 +124,7 @@
   "studyAreaCountries": {
     "zz": [
       {
-        "abbr": "not available",
+        "abbr": "Language not available",
         "country": "Great Britain"
       }
     ]
@@ -141,7 +141,7 @@
   },
   "publisher": {
     "zz": {
-      "abbr": "not available",
+      "abbr": "Language not available",
       "publisher": "Leeds University Business School"
     }
   },
