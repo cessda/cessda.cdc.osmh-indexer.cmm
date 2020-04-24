@@ -16,9 +16,7 @@
 package eu.cessda.pasc.oci.models.cmmstudy;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 /**
  * DataCollectionFreeText pojo to hold
@@ -30,6 +28,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@EqualsAndHashCode
+@ToString
 public class DataCollectionFreeText {
 
   @JsonProperty("dataCollectionFreeText")

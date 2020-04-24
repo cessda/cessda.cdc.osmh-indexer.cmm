@@ -15,10 +15,7 @@
  */
 package eu.cessda.pasc.oci.models.cmmstudy;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 /**
  * TermVocabAttributes pojo this represents the attributes and terms from such a element:
@@ -35,6 +32,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
+@ToString
 public class TermVocabAttributes {
   private String vocab;
   private String vocabUri;
