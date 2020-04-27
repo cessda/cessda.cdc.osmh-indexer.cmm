@@ -19,8 +19,11 @@ package eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import lombok.experimental.UtilityClass;
+import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * CMMStudy Serialize/deserialize helpers.
@@ -34,26 +37,28 @@ import lombok.experimental.UtilityClass;
  *
  * @author moses AT doraventures DOT com
  */
-@UtilityClass
+@Component
+@Getter
 public class CMMConverter {
 
+  private final ObjectReader reader;
+  private final ObjectWriter writer;
+
   // Serialize/deserialize helpers
-
-  public static String toJsonString(CMMStudy obj) throws JsonProcessingException {
-    return getObjectWriter().writeValueAsString(obj);
+  public CMMConverter() {
+    ObjectMapper objectMapper = new ObjectMapper();
+    reader = objectMapper.readerFor(CMMStudy.class);
+    writer = objectMapper.writerFor(CMMStudy.class);
   }
 
-  private static ObjectWriter writer;
-
-  private static void instantiateMapper() {
-    ObjectMapper mapper = new ObjectMapper();
-    writer = mapper.writerFor(CMMStudy.class);
+  @Autowired
+  public CMMConverter(ObjectMapper objectMapper) {
+    reader = objectMapper.readerFor(CMMStudy.class);
+    writer = objectMapper.writerFor(CMMStudy.class);
   }
 
-  private static ObjectWriter getObjectWriter() {
-    if (writer == null) instantiateMapper();
-    return writer;
+  public String toJsonString(CMMStudy cmmStudy) throws JsonProcessingException {
+    return writer.writeValueAsString(cmmStudy);
   }
-
 
 }

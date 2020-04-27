@@ -52,11 +52,13 @@ public class GetRecordController extends ControllerBase {
 
   private final APISupportedService apiSupportedService;
   private final GetRecordService getRecordService;
+  private final CMMConverter cmmConverter;
 
   @Autowired
-  public GetRecordController(APISupportedService apiSupportedService, GetRecordService getRecordService) {
+  public GetRecordController(APISupportedService apiSupportedService, GetRecordService getRecordService, CMMConverter cmmConverter) {
     this.apiSupportedService = apiSupportedService;
     this.getRecordService = getRecordService;
+    this.cmmConverter = cmmConverter;
   }
 
   @GetMapping(value = "/CMMStudy/{studyId}")
@@ -76,7 +78,7 @@ public class GetRecordController extends ControllerBase {
         return getResponseEntityMessage(String.format(UNSUPPORTED_API_VERSION, version), HttpStatus.BAD_REQUEST);
       }
       CMMStudy cmmStudy = getRecordService.getRecord(repository, studyId);
-      String valueAsString = CMMConverter.toJsonString(cmmStudy);
+      String valueAsString = cmmConverter.toJsonString(cmmStudy);
       return getResponseEntity(valueAsString, HttpStatus.OK);
     } catch (CustomHandlerException e) {
       String message = format("CustomHandlerException occurred whilst getting record message [%s], for studyID [%s]",
