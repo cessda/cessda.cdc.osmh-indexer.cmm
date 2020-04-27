@@ -192,7 +192,7 @@ spring:
       url: http://localhost:8087
 logging:
   level:
-    eu.cessda.pasc.oci.repository: DEBUG
+    eu.cessda.pasc.oci: TRACE
 osmhConsumer:
   endpoints:
     repos:

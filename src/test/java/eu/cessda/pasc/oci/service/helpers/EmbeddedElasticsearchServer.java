@@ -48,6 +48,11 @@ public class EmbeddedElasticsearchServer implements Closeable {
 
   public EmbeddedElasticsearchServer() {
 
+    try {
+      FileUtils.deleteDirectory(DATA_DIRECTORY.toFile());
+    } catch (IOException ignored) {
+    }
+
     NodeBuilder nodeBuilder = nodeBuilder();
     nodeBuilder.settings()
             .put("path.home", DATA_DIRECTORY.toString())

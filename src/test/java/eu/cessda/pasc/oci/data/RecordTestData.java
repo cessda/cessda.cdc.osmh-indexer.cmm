@@ -22,7 +22,6 @@ import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
-import lombok.experimental.UtilityClass;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,7 +33,6 @@ import java.util.Optional;
 /**
  * @author moses AT doraventures DOT com
  */
-@UtilityClass
 public final class RecordTestData {
 
   public static final String LIST_RECORDER_HEADERS_BODY_EXAMPLE = "" +

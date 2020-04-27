@@ -16,6 +16,7 @@
 package eu.cessda.pasc.oci;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
+import eu.cessda.pasc.oci.metrics.Metrics;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
@@ -26,13 +27,8 @@ import eu.cessda.pasc.oci.service.helpers.DebuggingJMXBean;
 import eu.cessda.pasc.oci.service.helpers.LanguageAvailabilityMapper;
 import eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.SearchHits;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -43,9 +39,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static net.logstash.logback.argument.StructuredArguments.keyValue;
+import static net.logstash.logback.argument.StructuredArguments.value;
 
 /**
  * Service responsible for triggering Metadata Harvesting and ingestion into the search engine
@@ -62,31 +60,29 @@ public class ConsumerScheduler {
   private static final String REPO_NAME = "repo_name";
   private static final String LANG_CODE = "lang_code";
   private static final String REPO_ENDPOINT_URL = "repo_endpoint_url";
+  private static final String DEFAULT_CDC_JOB_KEY = "indexer_job_id";
+  private static final String DEFAULT_RESPONSE_TOKEN_HEADER = "cdc-";
+
   private final DebuggingJMXBean debuggingJMXBean;
   private final AppConfigurationProperties configurationProperties;
   private final HarvesterConsumerService harvesterConsumerService;
   private final IngestService esIndexerService;
   private final LanguageDocumentExtractor extractor;
   private final LanguageAvailabilityMapper languageAvailabilityMapper;
-  private ElasticsearchTemplate esTemplate;
-  private static final String INDEX_NAME_PATTERN = "cmmstudy_*";
-  private static final String INDEX_TYPE = "cmmstudy";
-  public static final String DEFAULT_CDC_JOB_KEY = "indexer_job_id";
-  private static final String DEFAULT_RESPONSE_TOKEN_HEADER = "cdc-";
-  private static DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+  private final Metrics micrometerMetrics;
 
   @Autowired
   public ConsumerScheduler(DebuggingJMXBean debuggingJMXBean, AppConfigurationProperties configurationProperties,
                            HarvesterConsumerService harvesterConsumerService, IngestService esIndexerService,
                            LanguageDocumentExtractor extractor, LanguageAvailabilityMapper languageAvailabilityMapper,
-                           ElasticsearchTemplate esTemplate) {
+                           Metrics metrics) {
     this.debuggingJMXBean = debuggingJMXBean;
     this.configurationProperties = configurationProperties;
     this.harvesterConsumerService = harvesterConsumerService;
     this.esIndexerService = esIndexerService;
     this.extractor = extractor;
     this.languageAvailabilityMapper = languageAvailabilityMapper;
-    this.esTemplate = esTemplate;
+    this.micrometerMetrics = metrics;
   }
 
   /**
@@ -95,12 +91,10 @@ public class ConsumerScheduler {
   @ManagedOperation(description = "Manual trigger to do a full harvest and ingest run")
   @Scheduled(initialDelayString = "${osmhConsumer.delay.initial}", fixedDelayString = "${osmhConsumer.delay.fixed}")
   public void fullHarvestAndIngestionAllConfiguredSPsReposRecords() {
-    String cdcRunjobId = getCdcRunjobId();
-    try (var ignored = MDC.putCloseable(ConsumerScheduler.DEFAULT_CDC_JOB_KEY, cdcRunjobId)) {
+    try (var ignored = MDC.putCloseable(ConsumerScheduler.DEFAULT_CDC_JOB_KEY, getCdcRunjobId())) {
       OffsetDateTime date = OffsetDateTime.now(ZoneId.systemDefault());
       logStartStatus(date, FULL_RUN);
       executeHarvestAndIngest(null);
-      currentTotalCmmStudiesInElasticSearch();
       logEndStatus(date, FULL_RUN);
     }
   }
@@ -111,12 +105,10 @@ public class ConsumerScheduler {
   @ManagedOperation(description = "Manual trigger to do an incremental harvest and ingest")
   @Scheduled(cron = "${osmhConsumer.daily.run}")
   public void dailyIncrementalHarvestAndIngestionAllConfiguredSPsReposRecords() {
-    String cdcRunjobId = getCdcRunjobId();
-    try (var ignored = MDC.putCloseable(ConsumerScheduler.DEFAULT_CDC_JOB_KEY, cdcRunjobId)) {
+    try (var ignored = MDC.putCloseable(ConsumerScheduler.DEFAULT_CDC_JOB_KEY, getCdcRunjobId())) {
       OffsetDateTime date = OffsetDateTime.now(ZoneId.systemDefault());
       logStartStatus(date, DAILY_INCREMENTAL_RUN);
       executeHarvestAndIngest(esIndexerService.getMostRecentLastModified().orElse(null));
-      currentTotalCmmStudiesInElasticSearch();
       logEndStatus(date, DAILY_INCREMENTAL_RUN);
     }
   }
@@ -126,12 +118,9 @@ public class ConsumerScheduler {
    */
   @Scheduled(cron = "${osmhConsumer.daily.sunday.run}")
   public void weeklyFullHarvestAndIngestionAllConfiguredSPsReposRecords() {
-    String cdcRunjobId = getCdcRunjobId();
-    try (var ignored = MDC.putCloseable(ConsumerScheduler.DEFAULT_CDC_JOB_KEY, cdcRunjobId)) {
-      log.info("Once a Week Full Run. Triggered by cron - STARTED");
-      fullHarvestAndIngestionAllConfiguredSPsReposRecords();
-      log.info("Once a Week Full Run. Triggered by cron - ENDED");
-    }
+    log.info("Once a Week Full Run. Triggered by cron - STARTED");
+    fullHarvestAndIngestionAllConfiguredSPsReposRecords();
+    log.info("Once a Week Full Run. Triggered by cron - ENDED");
   }
 
   /**
@@ -140,7 +129,7 @@ public class ConsumerScheduler {
    * @return the correlation id
    */
   private String getCdcRunjobId() {
-    return DEFAULT_RESPONSE_TOKEN_HEADER + formatter.format(OffsetDateTime.now(ZoneId.systemDefault()));
+    return DEFAULT_RESPONSE_TOKEN_HEADER + DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.now(ZoneId.systemDefault()));
   }
 
   private void executeHarvestAndIngest(LocalDateTime lastModifiedDateTime) {
@@ -149,12 +138,17 @@ public class ConsumerScheduler {
       Map<String, List<CMMStudyOfLanguage>> langStudies = getCmmStudiesOfEachLangIsoCodeMap(repo, lastModifiedDateTime);
       langStudies.forEach((langIsoCode, cmmStudies) -> executeBulk(repo, langIsoCode, cmmStudies));
     });
+    micrometerMetrics.updateMetrics();
+    log.info("Total number of records stands {}", keyValue("total_cmm_studies", esIndexerService.getTotalHitCount("*")));
   }
+
 
   private void executeBulk(Repo repo, String langIsoCode, List<CMMStudyOfLanguage> cmmStudies) {
     if (cmmStudies.isEmpty()) {
       log.debug("CmmStudies list is empty and henceforth there is nothing to BulkIndex for repo[{}] with LangIsoCode [{}].", keyValue(REPO_NAME, repo.getName()), keyValue(LANG_CODE, langIsoCode));
     } else {
+      int studiesUpdated = getUpdatedStudies(langIsoCode, cmmStudies);
+      log.info("[{}] studies updated", value("updated_cmm_studies", studiesUpdated));
       log.info("BulkIndexing repo [{}] with lang code [{}] index with [{}] CmmStudies", keyValue(REPO_NAME, repo.getName()), keyValue(LANG_CODE, langIsoCode), keyValue("cmm_studies_added", cmmStudies.size()));
       boolean isSuccessful = esIndexerService.bulkIndex(cmmStudies, langIsoCode);
       if (isSuccessful) {
@@ -163,6 +157,17 @@ public class ConsumerScheduler {
         log.error("BulkIndexing was UnSuccessful. For repo name [{}] and its corresponding [{}].  LangIsoCode [{}].", keyValue(REPO_NAME, repo.getName()), keyValue(REPO_ENDPOINT_URL, repo.getUrl()), keyValue(LANG_CODE, langIsoCode));
       }
     }
+  }
+
+  private int getUpdatedStudies(String langIsoCode, List<CMMStudyOfLanguage> cmmStudies) {
+    var studiesUpdated = new AtomicInteger(0);
+    cmmStudies.parallelStream().forEach(study -> {
+      var esStudy = esIndexerService.getStudy(study.getId(), langIsoCode);
+      if (esStudy.isEmpty() || !study.equals(esStudy.get())) {
+        studiesUpdated.getAndIncrement();
+      }
+    });
+    return studiesUpdated.get();
   }
 
   private Map<String, List<CMMStudyOfLanguage>> getCmmStudiesOfEachLangIsoCodeMap(Repo repo, LocalDateTime lastModifiedDateTime) {
@@ -202,15 +207,4 @@ public class ConsumerScheduler {
 
   }
 
-
-  private void currentTotalCmmStudiesInElasticSearch() {
-    SearchResponse response = esTemplate.getClient().prepareSearch(INDEX_NAME_PATTERN)
-            .setTypes(INDEX_TYPE)
-            .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-            .setQuery(QueryBuilders.matchAllQuery())
-            .get();
-    SearchHits hits = response.getHits();
-    long totalHitCount = hits.getTotalHits();
-    log.info("Total number of records stands {}", keyValue("total_cmm_studies", totalHitCount));
-  }
 }
