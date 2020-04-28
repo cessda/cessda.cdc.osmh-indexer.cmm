@@ -135,8 +135,10 @@ public class ConsumerScheduler {
   private void executeHarvestAndIngest(LocalDateTime lastModifiedDateTime) {
     List<Repo> repos = configurationProperties.getEndpoints().getRepos();
     repos.forEach(repo -> {
-      Map<String, List<CMMStudyOfLanguage>> langStudies = getCmmStudiesOfEachLangIsoCodeMap(repo, lastModifiedDateTime);
-      langStudies.forEach((langIsoCode, cmmStudies) -> executeBulk(repo, langIsoCode, cmmStudies));
+      try (var ignored = MDC.putCloseable(REPO_NAME, repo.getName())) {
+        Map<String, List<CMMStudyOfLanguage>> langStudies = getCmmStudiesOfEachLangIsoCodeMap(repo, lastModifiedDateTime);
+        langStudies.forEach((langIsoCode, cmmStudies) -> executeBulk(repo, langIsoCode, cmmStudies));
+      }
     });
     micrometerMetrics.updateMetrics();
     log.info("Total number of records stands {}", keyValue("total_cmm_studies", esIndexerService.getTotalHitCount("*")));
