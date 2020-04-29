@@ -155,7 +155,6 @@ You can find the list of all contributors [here](CONTRIBUTORS.md)
 This project is licensed under the Apache 2 License - see the [LICENSE](LICENSE.txt) file for details
 
 ## Acknowledgments
-N/A
 
 ## Edge Case and Assumptions
 
