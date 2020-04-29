@@ -151,7 +151,7 @@ public class ConsumerScheduler {
     } else {
       int studiesUpdated = getUpdatedStudies(langIsoCode, cmmStudies);
       log.info("[{}] studies updated", value("updated_cmm_studies", studiesUpdated));
-      log.info("BulkIndexing repo [{}] with lang code [{}] index with [{}] CmmStudies", keyValue(REPO_NAME, repo.getName()), keyValue(LANG_CODE, langIsoCode), keyValue("cmm_studies_added", cmmStudies.size()));
+      log.info("BulkIndexing repo [{}] with lang code [{}] index with [{}] CmmStudies.", keyValue(REPO_NAME, repo.getName()), keyValue(LANG_CODE, langIsoCode), keyValue("cmm_studies_added", cmmStudies.size()));
       boolean isSuccessful = esIndexerService.bulkIndex(cmmStudies, langIsoCode);
       if (isSuccessful) {
         log.info("BulkIndexing was Successful. For repo name [{}] and its corresponding [{}].  LangIsoCode [{}].", keyValue(REPO_NAME, repo.getName()), keyValue(REPO_ENDPOINT_URL, repo.getUrl()), keyValue(LANG_CODE, langIsoCode));
@@ -188,9 +188,9 @@ public class ConsumerScheduler {
             .map(Optional::get)
             .collect(Collectors.toList());
 
-    String msgTemplate = "Repo Name [{}] of [{}] Endpoint. There are [{}] presentCMMStudies out of [{}] totalCMMStudies from [{}] Record Identifiers. Therefore CMMStudiesRejected is  "
+    String msgTemplate = "Repo Name [{}] of [{}] Endpoint. There are [{}] presentCMMStudies out of [{}] totalCMMStudies from [{}] Record Identifiers. Therefore CMMStudies duplicated is  "
             + "";
-    log.info(msgTemplate + "" + (totalCMMStudies.size() - presentCMMStudies.size()), keyValue(REPO_NAME, repo.getName()), keyValue(REPO_ENDPOINT_URL, repo.getUrl()), keyValue("present_cmm_record", presentCMMStudies.size()), totalCMMStudies.size(), keyValue("cmm_records_rejected", totalCMMStudies.size() - presentCMMStudies.size()));
+    log.info(msgTemplate + "" + (totalCMMStudies.size() - presentCMMStudies.size()), keyValue(REPO_NAME, repo.getName()), keyValue(REPO_ENDPOINT_URL, repo.getUrl()), keyValue("present_cmm_record", presentCMMStudies.size()), totalCMMStudies.size(), keyValue("cmm_records_duplicated", totalCMMStudies.size() - presentCMMStudies.size()));
 
     presentCMMStudies.forEach(languageAvailabilityMapper::setAvailableLanguages);
     return extractor.mapLanguageDoc(presentCMMStudies, repo.getName());
