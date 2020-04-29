@@ -20,7 +20,9 @@ security:
     password: password
   basic.enabled: false            # Public API disable security on non-admin endpoints
 management.security.enabled: true # Enable security on admin endpoints
-endpoints.shutdown.enabled: true
+endpoints:
+  prometheus.sensitive: false
+  shutdown.enabled: true
 logging:
   file: ${user.home}${file.separator}pasc-oci${file.separator}pasc-oci.log
   pattern:
