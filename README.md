@@ -12,7 +12,7 @@
 [![Vulnerabilities](https://sonarqube.cessda.eu/api/project_badges/measure?project=eu.cessda.pasc%3Apasc-osmh-handler-oai-pmh&metric=vulnerabilities)](https://sonarqube.cessda.eu/dashboard?id=eu.cessda.pasc%3Apasc-osmh-handler-oai-pmh)
 
 
-# OSMH Handler OAI-PMH v2.1.0
+# OSMH Handler OAI-PMH
 
 CDC OSMH repository handler for harvesting OAI-PMH metadata format
 
@@ -91,7 +91,7 @@ Run the docker image
 ### Prerequisites
 The following is expected to be install before building running.  To install see your preferred package manager.
 On mac this can be done with `brew`
-  - Java JDK 8
+  - Java JDK 11
   - Maven
 
 `brew tap caskroom/versions`
