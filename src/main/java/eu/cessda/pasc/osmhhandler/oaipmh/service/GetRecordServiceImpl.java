@@ -33,6 +33,7 @@ import org.jdom2.xpath.XPathFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.xml.XMLConstants;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -76,7 +77,7 @@ public class GetRecordServiceImpl implements GetRecordService {
 
     CMMStudy.CMMStudyBuilder builder = CMMStudy.builder();
     OaiPmh oaiPmh = oaiPmhHandlerConfig.getOaiPmh();
-    Document document = new SAXBuilder().build(recordXML);
+    Document document = getSaxBuilder().build(recordXML);
 
     if (log.isTraceEnabled()) {
       log.trace("Record XML String [{}]", new XMLOutputter().outputString(document));
@@ -113,5 +114,12 @@ public class GetRecordServiceImpl implements GetRecordService {
       parseDataCollectionFreeTexts(builder, document, xPathFactory, oaiPmh, defaultLangIsoCode);
     }
     return builder;
+  }
+
+  private SAXBuilder getSaxBuilder() {
+    SAXBuilder saxBuilder = new SAXBuilder();
+    saxBuilder.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+    saxBuilder.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+    return saxBuilder;
   }
 }
