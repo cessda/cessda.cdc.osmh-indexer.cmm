@@ -101,10 +101,11 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
         return Optional.of(cmmStudyConverter.fromJsonString(recordJsonStream));
       }
     } catch (ExternalSystemException e) {
-      log.warn("[{}], response detail from handler [{}], URL to handler for harvesting record [{}] from repo [{}] [{}].",
+      log.warn("[{}], response detail from handler [{}], URL to handler for harvesting record [{}] with [{}] from repo [{}] [{}].",
               e.toString(),
               keyValue(REASON, e.getExternalResponseBody()),
-              finalUrl,
+              finalUrl,   
+              keyValue("study_id", studyNumber),
               keyValue(REPO_ENDPOINT_URL, repo.getUrl()),
               keyValue(REPO_NAME, repo.getName())
       );

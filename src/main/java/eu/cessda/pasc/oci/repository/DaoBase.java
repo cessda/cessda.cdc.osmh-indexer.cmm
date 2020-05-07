@@ -38,6 +38,7 @@ import java.time.Instant;
 public class DaoBase {
 
     public static final String EXCEPTION_MESSAGE = "Unsuccessful response from remote SP's Endpoint [%s]";
+    public static final String EXCEPTION_MESSAGE_REJECTED = "Records from remote SP's endpoint is rejected  [%s]";
     private final HttpClient httpClient;
     private final AppConfigurationProperties appConfigurationProperties;
 
@@ -79,7 +80,7 @@ public class DaoBase {
             }
             try (InputStream body = httpResponse.body()) {
                 throw new ExternalSystemException(
-                        String.format(EXCEPTION_MESSAGE, fullUrl),
+                        String.format(EXCEPTION_MESSAGE_REJECTED, fullUrl),
                         new IOException("Server returned " + httpResponse.statusCode()),
                         new String(body.readAllBytes(), StandardCharsets.UTF_8)
                 );
