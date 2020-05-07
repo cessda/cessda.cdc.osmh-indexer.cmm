@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [2.2.1] - 2020-05-04    
 
-OSMH Consumer Indexer - [10.5281/zenodo.3786356](https://zenodo.org/deposit/3786356)
+OSMH Consumer Indexer - [10.5281/zenodo.3786356](https://zenodo.org/record/3786356)
 
 ### Added
 - new GESIS endpoint ([#162](https://bitbucket.org/cessda/cessda.cdc.version2/issues/162))
