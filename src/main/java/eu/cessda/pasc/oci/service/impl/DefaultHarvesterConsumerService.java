@@ -16,6 +16,7 @@
 package eu.cessda.pasc.oci.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import eu.cessda.pasc.oci.helpers.TimeUtility;
 import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
@@ -30,15 +31,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static net.logstash.logback.argument.StructuredArguments.keyValue;
+
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import static eu.cessda.pasc.oci.service.helpers.StudyIdentifierEncoder.decodeStudyNumber;
 
 /**
  * Default OSMH Consumer Service implementation
@@ -51,30 +55,38 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
 
   private final HarvesterDao harvesterDao;
   private final RepositoryUrlService repositoryUrlService;
-  private final ObjectMapper mapper;
-  
-
+  private final ObjectReader recordHeaderObjectReader;
+  private final CMMStudyConverter cmmStudyConverter;
+  private static final String REPO_NAME = "repo_name";
+  private static final String LANG_CODE = "lang_code";
+  private static final String REPO_ENDPOINT_URL = "repo_endpoint_url";
+  private static final String REASON = "rejection_reason";
 
   @Autowired
   public DefaultHarvesterConsumerService(HarvesterDao harvesterDao, RepositoryUrlService repositoryUrlService,
-                                         ObjectMapper mapper) {
+                                         ObjectMapper mapper, CMMStudyConverter cmmStudyConverter) {
     this.harvesterDao = harvesterDao;
     this.repositoryUrlService = repositoryUrlService;
-    this.mapper = mapper;
+    this.cmmStudyConverter = cmmStudyConverter;
+
+    CollectionType collectionType = mapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class);
+    this.recordHeaderObjectReader = mapper.readerFor(collectionType);
   }
 
   @Override
   public List<RecordHeader> listRecordHeaders(Repo repo, LocalDateTime lastModifiedDate) {
     List<RecordHeader> recordHeadersUnfiltered = new ArrayList<>();
     try {
-      String finalUrl = repositoryUrlService.constructListRecordUrl(repo.getUrl());
-      String recordHeadersJsonString = harvesterDao.listRecordHeaders(finalUrl);
-      CollectionType collectionType = mapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class);
-      recordHeadersUnfiltered = mapper.readValue(recordHeadersJsonString, collectionType);
+      URI finalUrl = repositoryUrlService.constructListRecordUrl(repo);
+      try (InputStream recordHeadersJsonStream = harvesterDao.listRecordHeaders(finalUrl)) {
+        recordHeadersUnfiltered = recordHeaderObjectReader.readValue(recordHeadersJsonStream);
+      }
     } catch (ExternalSystemException e) {
-      log.error("ListRecordHeaders failed for repo [{}]. CDC Handler Error object Msg [{}].", repo, e.getMessage(), e);
+      log.error("ListRecordHeaders failed for repo [{}] [{}]. CDC Handler Error object Msg [{}].",keyValue(REPO_NAME, repo.getName()), keyValue(REPO_ENDPOINT_URL, repo.getUrl()), e.getMessage(), e);
     } catch (IOException e) {
       log.error("Error, Unable to pass ListRecordHeaders response error message [{}].", e.getMessage(), e);
+    } catch (URISyntaxException e) {
+      log.error("Unable to construct URL [{}]", e.toString());
     }
 
     return filterRecords(recordHeadersUnfiltered, lastModifiedDate);
@@ -82,44 +94,44 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
 
   @Override
   public Optional<CMMStudy> getRecord(Repo repo, String studyNumber) {
-    String finalUrl = "";
+    URI finalUrl = null;
     try {
-      finalUrl = repositoryUrlService.constructGetRecordUrl(repo.getUrl(), studyNumber);
-      String recordJsonString = harvesterDao.getRecord(finalUrl);
-      return Optional.ofNullable(CMMStudyConverter.fromJsonString(recordJsonString));
+      finalUrl = repositoryUrlService.constructGetRecordUrl(repo, studyNumber);
+      try (InputStream recordJsonStream = harvesterDao.getRecord(finalUrl)) {
+        return Optional.of(cmmStudyConverter.fromJsonString(recordJsonStream));
+      }
     } catch (ExternalSystemException e) {
-      log.warn("Short Exception msg [{}], " +
-                      "HttpServerErrorException response detail from handler's [{}], " +
-                      "URL to handler for harvesting [{}].",
-              e.getMessage(),
-              e.getExternalResponseBody(),
-              decodeStudyNumber().apply(finalUrl));
+      log.warn("[{}], response detail from handler [{}], URL to handler for harvesting record [{}] from repo [{}] [{}].",
+              e.toString(),
+              keyValue(REASON, e.getExternalResponseBody()),
+              finalUrl,
+              keyValue(REPO_ENDPOINT_URL, repo.getUrl()),
+              keyValue(REPO_NAME, repo.getName())
+      );
     } catch (IOException e) {
       log.error("Error, Unable to pass GetRecord response error message [{}].", e.getMessage(), e);
+    } catch (URISyntaxException e) {
+      log.error("Unable to construct URL [{}]", e.toString());
     }
-
     return Optional.empty();
   }
 
   private List<RecordHeader> filterRecords(List<RecordHeader> unfilteredRecordHeaders, LocalDateTime ingestedLastModifiedDate) {
-    Optional<LocalDateTime> ingestedLastModifiedDateOption = Optional.ofNullable(ingestedLastModifiedDate);
-    Optional<List<RecordHeader>> filteredRecordHeaders = ingestedLastModifiedDateOption.map(
-        lastModifiedDate -> unfilteredRecordHeaders
-            .stream()
-            .filter(isHeaderTimeGreater(lastModifiedDate))
-            .collect(Collectors.toList()));
+    if (ingestedLastModifiedDate != null) {
+      List<RecordHeader> filteredHeaders = unfilteredRecordHeaders.stream()
+              .filter(isHeaderTimeGreater(ingestedLastModifiedDate))
+              .collect(Collectors.toList());
 
-    if (filteredRecordHeaders.isPresent()) {
-      List<RecordHeader> filteredHeaders = filteredRecordHeaders.get();
       log.info("Returning [{}] filtered recordHeaders by date greater than [{}] | out of [{}] unfiltered.",
               filteredHeaders.size(),
               ingestedLastModifiedDate,
-              unfilteredRecordHeaders.size());
+              unfilteredRecordHeaders.size()
+      );
 
       return filteredHeaders;
     }
 
-    log.info("Nothing filterable by date [{}].", ingestedLastModifiedDate);
+    log.debug("Nothing filterable. No date specified.");
     return unfilteredRecordHeaders;
   }
 

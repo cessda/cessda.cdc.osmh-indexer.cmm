@@ -18,6 +18,9 @@ package eu.cessda.pasc.oci.helpers;
 
 import org.junit.Test;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -27,18 +30,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class FileHandlerTest {
 
   @Test
-  public void shouldReturnContentToAValidFilePath() {
-
+  public void shouldReturnContentToAValidFilePath() throws IOException {
     FileHandler fileHandler = new FileHandler();
-    String recordUkds998 = fileHandler.getFileWithUtil("record_ukds_998.json");
+    String recordUkds998 = fileHandler.getFileAsString("record_ukds_998.json");
     assertThat(recordUkds998).isNotEmpty();
   }
 
-  @Test
-  public void shouldReturnEmptyContentToAInvalidValidFilePath() {
-
+  @Test(expected = FileNotFoundException.class)
+  public void shouldThrowFileNotFoundExceptionForAnInvalidValidFilePath() throws IOException {
     FileHandler fileHandler = new FileHandler();
-    String recordUkds998 = fileHandler.getFileWithUtil("does_not_exist.json");
-    assertThat(recordUkds998).isEmpty();
+    fileHandler.getFileAsString("does_not_exist.json");
   }
 }

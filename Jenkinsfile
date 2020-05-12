@@ -14,7 +14,7 @@
 */
 pipeline {
 	options {
-		buildDiscarder logRotator(artifactNumToKeepStr: '5', numToKeepStr: '10')
+		buildDiscarder logRotator(artifactNumToKeepStr: '5', numToKeepStr: '20')
 	}
 
 	environment {
@@ -76,7 +76,7 @@ pipeline {
             steps {
                 sh 'gcloud auth configure-docker'
                 withMaven {
-                    sh "mvn jib:build -Dimage=${image_tag}"
+                    sh "./mvnw jib:build -Dimage=${image_tag}"
                 }
                 sh("gcloud container images add-tag ${image_tag} ${docker_repo}/${product_name}-${module_name}:${env.BRANCH_NAME}-latest")
             }

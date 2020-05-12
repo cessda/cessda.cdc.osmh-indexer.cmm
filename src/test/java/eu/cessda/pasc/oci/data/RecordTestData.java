@@ -16,14 +16,15 @@
 
 package eu.cessda.pasc.oci.data;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.cessda.pasc.oci.helpers.FileHandler;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
-import lombok.experimental.UtilityClass;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -32,7 +33,6 @@ import java.util.Optional;
 /**
  * @author moses AT doraventures DOT com
  */
-@UtilityClass
 public final class RecordTestData {
 
   public static final String LIST_RECORDER_HEADERS_BODY_EXAMPLE = "" +
@@ -161,7 +161,7 @@ public final class RecordTestData {
   public static List<CMMStudyOfLanguage> getCmmStudyOfLanguageCodeEnX1() throws IOException {
     List<CMMStudyOfLanguage> studyOfLanguages = new ArrayList<>();
     String syntheticCMMStudyOfLanguageEn = getSyntheticCMMStudyOfLanguageEn();
-    CMMStudyOfLanguage cmmStudyOfLanguage = CMMStudyOfLanguageConverter.fromJsonString(syntheticCMMStudyOfLanguageEn);
+    CMMStudyOfLanguage cmmStudyOfLanguage = new CMMStudyOfLanguageConverter(new ObjectMapper()).fromJsonString(syntheticCMMStudyOfLanguageEn);
     studyOfLanguages.add(cmmStudyOfLanguage);
     return studyOfLanguages;
   }
@@ -169,14 +169,15 @@ public final class RecordTestData {
   public static List<CMMStudyOfLanguage> getCmmStudyOfLanguageCodeEnX3() throws IOException {
     List<CMMStudyOfLanguage> studyOfLanguages = new ArrayList<>();
     String syntheticCMMStudyOfLanguageEn = getSyntheticCMMStudyOfLanguageEn();
-    studyOfLanguages.add(CMMStudyOfLanguageConverter.fromJsonString(syntheticCMMStudyOfLanguageEn));
+    CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter = new CMMStudyOfLanguageConverter(new ObjectMapper());
+    studyOfLanguages.add(cmmStudyOfLanguageConverter.fromJsonString(syntheticCMMStudyOfLanguageEn));
 
-    CMMStudyOfLanguage cmmStudyOfLanguage2 = CMMStudyOfLanguageConverter.fromJsonString(syntheticCMMStudyOfLanguageEn);
+    CMMStudyOfLanguage cmmStudyOfLanguage2 = cmmStudyOfLanguageConverter.fromJsonString(syntheticCMMStudyOfLanguageEn);
     cmmStudyOfLanguage2.setId("UK-Data-Service__999");
     cmmStudyOfLanguage2.setLastModified("2017-11-15T08:08:11Z");
     studyOfLanguages.add(cmmStudyOfLanguage2);
 
-    CMMStudyOfLanguage cmmStudyOfLanguage3 = CMMStudyOfLanguageConverter.fromJsonString(syntheticCMMStudyOfLanguageEn);
+    CMMStudyOfLanguage cmmStudyOfLanguage3 = cmmStudyOfLanguageConverter.fromJsonString(syntheticCMMStudyOfLanguageEn);
     cmmStudyOfLanguage3.setId("UK-Data-Service__1000");
     cmmStudyOfLanguage3.setLastModified("2017-04-05");
     studyOfLanguages.add(cmmStudyOfLanguage3);
@@ -185,8 +186,8 @@ public final class RecordTestData {
   }
 
   public static CMMStudy getSyntheticCmmStudy() throws IOException {
-    String cmmStudyString = new FileHandler().getFileWithUtil("synthetic_compliant_record.json");
-    return CMMStudyConverter.fromJsonString(cmmStudyString);
+    InputStream cmmStudyString = new FileHandler().getFileAsStream("synthetic_compliant_record.json");
+    return new CMMStudyConverter(new ObjectMapper()).fromJsonString(cmmStudyString);
   }
 
   public static CMMStudy getSyntheticCmmStudyWithNoAvailableLangsSet() throws IOException {
@@ -196,8 +197,8 @@ public final class RecordTestData {
   }
 
   private static CMMStudy getDeletedCmmStudy() throws IOException {
-    String cmmStudyString = new FileHandler().getFileWithUtil("record_ukds_1031_deleted.json");
-    return CMMStudyConverter.fromJsonString(cmmStudyString);
+    InputStream cmmStudyString = new FileHandler().getFileAsStream("record_ukds_1031_deleted.json");
+    return new CMMStudyConverter(new ObjectMapper()).fromJsonString(cmmStudyString);
   }
 
   public static Optional<CMMStudy> getSyntheticCmmStudy(String identifier) throws IOException {
@@ -206,8 +207,8 @@ public final class RecordTestData {
     return optionalCmmStudy;
   }
 
-  public static String getSyntheticCMMStudyOfLanguageEn() {
+  public static String getSyntheticCMMStudyOfLanguageEn() throws IOException {
     FileHandler fileHandler = new FileHandler();
-    return fileHandler.getFileWithUtil("synthetic_complaint_record_en.json");
+    return fileHandler.getFileAsString("synthetic_complaint_record_en.json");
   }
 }

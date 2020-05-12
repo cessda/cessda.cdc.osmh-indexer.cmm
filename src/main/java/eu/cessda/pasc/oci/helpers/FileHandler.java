@@ -16,30 +16,48 @@
 package eu.cessda.pasc.oci.helpers;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Component;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Objects;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 /**
- * File handling helper methods
+ * File handling helper methods. These methods load files using the classloader.
  *
  * @author moses AT doraventures DOT com
  */
 @Component
 @Slf4j
 public class FileHandler {
-
-  public String getFileWithUtil(String fileName) {
-
-    String result = "";
-    ClassLoader classLoader = getClass().getClassLoader();
-    try {
-      result = IOUtils.toString(Objects.requireNonNull(classLoader.getResourceAsStream(fileName)));
-    } catch (IOException | NullPointerException e) {
-      log.error("Could not read file [{}]. Exception Message [{}]", fileName, e.getMessage());
+    /**
+     * Load the specified resource and return it as an {@link InputStream}.
+     *
+     * @param fileName the resource to load
+     * @throws FileNotFoundException if the resource could not be found,
+     *                               the resource is in a package that is not opened unconditionally,
+     *                               or access to the resource is denied by the security manager.
+     */
+    public InputStream getFileAsStream(String fileName) throws FileNotFoundException {
+        InputStream resource = getClass().getClassLoader().getResourceAsStream(fileName);
+        if (resource == null) {
+            throw new FileNotFoundException(fileName + " could not be found");
+        }
+        return resource;
     }
-    return result;
-  }
+
+    /**
+     * Load the specified resource and return it as an {@link String}.
+     * The string is decoded using the {@link StandardCharsets} UTF_8 charset.
+     *
+     * @param fileName the resource to load
+     * @throws FileNotFoundException if the resource could not be found,
+     *                               the resource is in a package that is not opened unconditionally,
+     *                               or access to the resource is denied by the security manager.
+     */
+    public String getFileAsString(String fileName) throws IOException {
+        InputStream resource = getFileAsStream(fileName);
+        return new String(resource.readAllBytes(), StandardCharsets.UTF_8);
+    }
 }

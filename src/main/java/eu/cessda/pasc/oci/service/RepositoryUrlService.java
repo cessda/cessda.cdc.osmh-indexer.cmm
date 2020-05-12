@@ -16,14 +16,17 @@
 package eu.cessda.pasc.oci.service;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
-import eu.cessda.pasc.oci.helpers.FakeHarvester;
+import eu.cessda.pasc.oci.models.configurations.Harvester;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.service.helpers.StudyIdentifierEncoder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Service
 @Slf4j
@@ -33,45 +36,36 @@ public class RepositoryUrlService
     private static final String LIST_RECORD_TEMPLATE = "%s/%s/ListRecordHeaders?Repository=%s";
     private static final String GET_RECORD_TEMPLATE = "%s/%s/GetRecord/CMMStudy/%s?Repository=%s";
 
-    private final FakeHarvester fakeHarvester;
     private final AppConfigurationProperties appConfigurationProperties;
 
-
     @Autowired
-    public RepositoryUrlService( FakeHarvester fakeHarvester, AppConfigurationProperties appConfigurationProperties )
-    {
-        this.fakeHarvester = fakeHarvester;
+    public RepositoryUrlService(AppConfigurationProperties appConfigurationProperties) {
         this.appConfigurationProperties = appConfigurationProperties;
     }
 
-    public String constructListRecordUrl( String repositoryUrl )
-    {
-        Optional<Repo> repoOptional = fakeHarvester.getRepoConfigurationProperties(repositoryUrl);
-        if (repoOptional.isPresent()) {
-            String finalUrl = String.format(LIST_RECORD_TEMPLATE,
-                    repoOptional.get().getHandler(),
-                    appConfigurationProperties.getHarvester().getVersion(),
-                    repositoryUrl);
-            log.info("[{}] Final ListHeaders Handler url [{}] constructed.", repositoryUrl, finalUrl);
-            return finalUrl;
-        } else {
-            throw new IllegalStateException("Couldn't construct Final ListHeaders Handler url for repository" + repositoryUrl);
-        }
+    public URI constructListRecordUrl(Repo repo) throws URISyntaxException {
+        Harvester harvester = appConfigurationProperties.getEndpoints().getHarvesters().get(repo.getHandler());
+        String finalUrlString = String.format(LIST_RECORD_TEMPLATE,
+                harvester.getUrl(),
+                harvester.getVersion(),
+                URLEncoder.encode(repo.getUrl().toString(), StandardCharsets.UTF_8)
+        );
+        URI finalUrl = new URI(finalUrlString);
+        log.info("[{}] Final ListHeaders Handler url [{}] constructed.", repo.getUrl(), finalUrlString);
+        return finalUrl;
     }
 
-    public String constructGetRecordUrl( String repositoryUrl, String studyNumber ) {
-        Optional<Repo> repoOptional = fakeHarvester.getRepoConfigurationProperties(repositoryUrl);
-        if (repoOptional.isPresent()) {
-            String encodedStudyID = StudyIdentifierEncoder.encodeStudyIdentifier().apply(studyNumber);
-            String finalUrl = String.format(GET_RECORD_TEMPLATE,
-                    repoOptional.get().getHandler(),
-                    appConfigurationProperties.getHarvester().getVersion(),
-                    encodedStudyID,
-                    repositoryUrl);
-            log.trace("[{}] Final GetRecord Handler url [{}] constructed.", repositoryUrl, finalUrl);
-            return finalUrl;
-        } else {
-            throw new IllegalStateException("Couldn't construct Final GetRecord Handler url for repository " + repositoryUrl + " and studyNumber " + studyNumber);
-        }
+    public URI constructGetRecordUrl(Repo repo, String studyNumber) throws URISyntaxException {
+        Harvester harvester = appConfigurationProperties.getEndpoints().getHarvesters().get(repo.getHandler());
+        String encodedStudyID = StudyIdentifierEncoder.encodeStudyIdentifier().apply(studyNumber);
+        String finalUrlString = String.format(GET_RECORD_TEMPLATE,
+                harvester.getUrl(),
+                harvester.getVersion(),
+                encodedStudyID,
+                URLEncoder.encode(repo.getUrl().toString(), StandardCharsets.UTF_8)
+        );
+        URI finalUrl = new URI(finalUrlString);
+        log.trace("[{}] Final GetRecord Handler url [{}] constructed.", repo.getUrl(), finalUrl);
+        return finalUrl;
     }
 }

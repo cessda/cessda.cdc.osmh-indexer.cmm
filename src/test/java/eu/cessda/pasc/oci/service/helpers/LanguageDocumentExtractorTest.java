@@ -16,6 +16,7 @@
 
 package eu.cessda.pasc.oci.service.helpers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import eu.cessda.pasc.oci.AbstractSpringTestProfileContext;
 import eu.cessda.pasc.oci.data.RecordTestData;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
@@ -29,7 +30,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static eu.cessda.pasc.oci.data.RecordTestData.getASingleSyntheticCMMStudyAsList;
 import static eu.cessda.pasc.oci.data.RecordTestData.getSyntheticCMMStudyAndADeletedRecordAsList;
@@ -42,8 +42,12 @@ import static org.assertj.core.api.Java6BDDAssertions.then;
 public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileContext {
 
   @Autowired
-  LanguageDocumentExtractor languageDocumentExtractor;
-  private String idPrefix = "test-stub";
+  private LanguageDocumentExtractor languageDocumentExtractor;
+
+  @Autowired
+  private CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter;
+
+  private static final String ID_PREFIX = "test-stub";
 
   @Test
   public void shouldRejectRecordWhenNotInListOfLanguagesAvailableIn() throws IOException {
@@ -53,7 +57,7 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
     syntheticCmmStudy.getLangAvailableIn().remove("en");
 
     // When
-    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", idPrefix, syntheticCmmStudy);
+    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", ID_PREFIX, syntheticCmmStudy);
 
     then(validCMMStudyForLang).isFalse();
   }
@@ -65,13 +69,13 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
     CMMStudy cmmStudy = RecordTestData.getSyntheticCmmStudy();
 
     // When
-    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("de", idPrefix, cmmStudy);
+    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("de", ID_PREFIX, cmmStudy);
     then(validCMMStudyForLang).isTrue();
 
-    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", idPrefix, cmmStudy);
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", ID_PREFIX, cmmStudy);
     then(validCMMStudyForLang).isTrue();
 
-    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fi", idPrefix, cmmStudy);
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fi", ID_PREFIX, cmmStudy);
     then(validCMMStudyForLang).isTrue();
 
      //Synthetic doc does not exist, so language is skipped
@@ -96,13 +100,13 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
     syntheticCmmStudy.setActive(false);
 
     // When
-    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("de", idPrefix, syntheticCmmStudy);
+    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("de", ID_PREFIX, syntheticCmmStudy);
     then(validCMMStudyForLang).isTrue();
 
-    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", idPrefix, syntheticCmmStudy);
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", ID_PREFIX, syntheticCmmStudy);
     then(validCMMStudyForLang).isTrue();
 
-    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fi", idPrefix, syntheticCmmStudy);
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fi", ID_PREFIX, syntheticCmmStudy);
     then(validCMMStudyForLang).isTrue();
 
     //Synthetic doc does not exist, so language is skipped
@@ -120,14 +124,14 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
   }
 
   @Test
-  public void shouldReturnExtractedDocInThereRespectiveLangDocuments() {
+  public void shouldReturnExtractedDocInThereRespectiveLangDocuments() throws JsonProcessingException {
 
     // Given
     List<CMMStudy> studies = getASingleSyntheticCMMStudyAsList();
 
     // When
     Map<String, List<CMMStudyOfLanguage>> languageDocMap =
-        languageDocumentExtractor.mapLanguageDoc(studies, "UK Data Service");
+            languageDocumentExtractor.mapLanguageDoc(studies, "UK Data Service");
 
     then(languageDocMap).isNotNull();
     then(languageDocMap).hasSize(17);
@@ -142,19 +146,19 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
     //then(languageDocMap.get("sk")).hasSize(0);
 
     List<CMMStudyOfLanguage> enStudy = languageDocMap.get("en");
-    Optional<String> enCMMStudyJsonStringOpt = CMMStudyOfLanguageConverter.toJsonString(enStudy.get(0));
-    enCMMStudyJsonStringOpt.ifPresent(System.out::println);
+    String enCMMStudyJsonStringOpt = cmmStudyOfLanguageConverter.toJsonString(enStudy.get(0));
+    System.out.println(enCMMStudyJsonStringOpt);
   }
 
   @Test
-  public void shouldReturnExtractedDocInTheirRespectiveLangDocumentsIncludingDeletedRecordsMarkedAsInActive() {
+  public void shouldReturnExtractedDocInTheirRespectiveLangDocumentsIncludingDeletedRecordsMarkedAsInActive() throws JsonProcessingException {
 
     // Given
     List<CMMStudy> studies = getSyntheticCMMStudyAndADeletedRecordAsList();
 
     // When
     Map<String, List<CMMStudyOfLanguage>> languageDocMap =
-        languageDocumentExtractor.mapLanguageDoc(studies, "UK Data Service");
+            languageDocumentExtractor.mapLanguageDoc(studies, "UK Data Service");
 
     then(languageDocMap).isNotNull();
     then(languageDocMap).hasSize(17);
@@ -166,11 +170,10 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
 
     List<CMMStudyOfLanguage> enStudy = languageDocMap.get("en");
     System.out.println("Printing Records");
-    enStudy.forEach(cmmStudyOfLanguage -> {
-          Optional<String> enCMMStudyJsonStringOpt = CMMStudyOfLanguageConverter.toJsonString(cmmStudyOfLanguage);
-          enCMMStudyJsonStringOpt.ifPresent(System.out::println);
-        }
-    );
+    for (CMMStudyOfLanguage cmmStudyOfLanguage : enStudy) {
+      String enCMMStudyJsonStringOpt = cmmStudyOfLanguageConverter.toJsonString(cmmStudyOfLanguage);
+      System.out.println(enCMMStudyJsonStringOpt);
+    }
   }
 
   @Test

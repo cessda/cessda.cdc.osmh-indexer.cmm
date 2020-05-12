@@ -23,6 +23,8 @@ import eu.cessda.pasc.oci.helpers.TimeUtility;
 import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
+import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
+import eu.cessda.pasc.oci.models.configurations.Harvester;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.repository.HarvesterDao;
 import eu.cessda.pasc.oci.service.impl.DefaultHarvesterConsumerService;
@@ -33,7 +35,12 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -42,7 +49,7 @@ import static eu.cessda.pasc.oci.data.RecordTestData.*;
 import static eu.cessda.pasc.oci.data.ReposTestData.getUKDSRepo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Java6BDDAssertions.then;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -61,17 +68,22 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
   @Autowired
   ObjectMapper objectMapper;
 
+  @Autowired
+  CMMStudyConverter cmmStudyConverter;
+
   DefaultHarvesterConsumerService defaultHarvesterConsumerService;
 
   @Before
   public void setUp() {
-    defaultHarvesterConsumerService = new DefaultHarvesterConsumerService(harvesterDao, repositoryUrlService, objectMapper);
+    defaultHarvesterConsumerService = new DefaultHarvesterConsumerService(harvesterDao, repositoryUrlService, objectMapper, cmmStudyConverter);
   }
 
   @Test
   public void shouldReturnASuccessfulResponseForListingRecordHeaders() throws ExternalSystemException {
 
-    when(harvesterDao.listRecordHeaders(anyString())).thenReturn(LIST_RECORDER_HEADERS_BODY_EXAMPLE);
+    when(harvesterDao.listRecordHeaders(any(URI.class))).thenReturn(
+            new ByteArrayInputStream(LIST_RECORDER_HEADERS_BODY_EXAMPLE.getBytes(StandardCharsets.UTF_8))
+    );
     Repo repo = getUKDSRepo();
 
     List<RecordHeader> recordHeaders = defaultHarvesterConsumerService.listRecordHeaders(repo, null);
@@ -83,7 +95,9 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
     Repo repo = getUKDSRepo();
     LocalDateTime lastModifiedDateCutOff = TimeUtility.getLocalDateTime("2018-02-01T07:48:38Z").get();
 
-    when(harvesterDao.listRecordHeaders(anyString())).thenReturn(LIST_RECORDER_HEADERS_X6);
+    when(harvesterDao.listRecordHeaders(any(URI.class))).thenReturn(
+            new ByteArrayInputStream(LIST_RECORDER_HEADERS_X6.getBytes(StandardCharsets.UTF_8))
+    );
     List<RecordHeader> recordHeaders = defaultHarvesterConsumerService.listRecordHeaders(repo, lastModifiedDateCutOff);
 
     assertThat(recordHeaders).hasSize(2);
@@ -98,7 +112,9 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
     Repo repo = getUKDSRepo();
     LocalDateTime lastModifiedCutOff = TimeUtility.getLocalDateTime("2018-02-10T07:48:38Z").orElse(null);
 
-    when(harvesterDao.listRecordHeaders(anyString())).thenReturn(LIST_RECORDER_HEADERS_WITH_INVALID_DATETIME);
+    when(harvesterDao.listRecordHeaders(any(URI.class))).thenReturn(
+            new ByteArrayInputStream(LIST_RECORDER_HEADERS_WITH_INVALID_DATETIME.getBytes(StandardCharsets.UTF_8))
+    );
     List<RecordHeader> recordHeaders = defaultHarvesterConsumerService.listRecordHeaders(repo, lastModifiedCutOff);
 
     assertThat(recordHeaders).hasSize(1);
@@ -112,7 +128,9 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
   public void shouldReturnUnFilterRecordHeadersWhenLastModifiedDateIsNull() throws ExternalSystemException {
 
     // FIXME: add more mocks to LIST_RECORDER_HEADERS_BODY_EXAMPLE with very old timestamps to filter out
-    when(harvesterDao.listRecordHeaders(anyString())).thenReturn(LIST_RECORDER_HEADERS_X6);
+    when(harvesterDao.listRecordHeaders(any(URI.class))).thenReturn(
+            new ByteArrayInputStream(LIST_RECORDER_HEADERS_X6.getBytes(StandardCharsets.UTF_8))
+    );
     Repo repo = getUKDSRepo();
 
     List<RecordHeader> recordHeaders = defaultHarvesterConsumerService.listRecordHeaders(repo, null);
@@ -122,17 +140,29 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
   @Test
   public void shouldReturnEmptyHeaderListWhenExternalSystemExceptionIsThrown() throws ExternalSystemException {
 
-    when(harvesterDao.listRecordHeaders(anyString())).thenThrow(ExternalSystemException.class);
+    when(harvesterDao.listRecordHeaders(any(URI.class))).thenThrow(new ExternalSystemException("Mocked!", null));
     Repo repo = getUKDSRepo();
 
     List<RecordHeader> recordHeaders = defaultHarvesterConsumerService.listRecordHeaders(repo, null);
     assertThat(recordHeaders).isEmpty();
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void shouldReturnEmptyListWhenIOExceptionIsThrown() throws ExternalSystemException {
 
-    when(harvesterDao.listRecordHeaders(anyString())).thenThrow(IOException.class);
+    when(harvesterDao.listRecordHeaders(any(URI.class))).thenThrow(IOException.class);
+    Repo repo = getUKDSRepo();
+
+    List<RecordHeader> recordHeaders = defaultHarvesterConsumerService.listRecordHeaders(repo, null);
+    assertThat(recordHeaders).isEmpty();
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  public void shouldReturnEmptyListWhenURISyntaxExceptionIsThrown() throws ExternalSystemException {
+
+    when(harvesterDao.listRecordHeaders(any(URI.class))).thenThrow(URISyntaxException.class);
     Repo repo = getUKDSRepo();
 
     List<RecordHeader> recordHeaders = defaultHarvesterConsumerService.listRecordHeaders(repo, null);
@@ -143,9 +173,42 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
   public void shouldReturnEmptyCMMStudyListWhenExternalSystemExceptionIsThrown() throws ExternalSystemException {
     // Given
     Repo repoMock = mock(Repo.class);
-    when(repoMock.getUrl()).thenReturn("https://oai.ukdataservice.ac.uk:8443/oai/provider");
+    when(repoMock.getUrl()).thenReturn(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
+    when(repoMock.getHandler()).thenReturn(Harvester.Type.NESSTAR);
 
-    when(harvesterDao.getRecord(anyString())).thenThrow(ExternalSystemException.class);
+    when(harvesterDao.getRecord(any(URI.class))).thenThrow(new ExternalSystemException("Mocked!", null));
+
+    Optional<CMMStudy> actualRecord = defaultHarvesterConsumerService.getRecord(repoMock, "4124325");
+
+    // Then exception is thrown caught and an empty list returned
+    then(actualRecord.isPresent()).isFalse();
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  public void shouldReturnEmptyCMMStudyListWhenIOExceptionIsThrown() throws ExternalSystemException {
+    // Given
+    Repo repoMock = mock(Repo.class);
+    when(repoMock.getUrl()).thenReturn(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
+    when(repoMock.getHandler()).thenReturn(Harvester.Type.NESSTAR);
+
+    when(harvesterDao.getRecord(any(URI.class))).thenThrow(IOException.class);
+
+    Optional<CMMStudy> actualRecord = defaultHarvesterConsumerService.getRecord(repoMock, "4124325");
+
+    // Then exception is thrown caught and an empty list returned
+    then(actualRecord.isPresent()).isFalse();
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  public void shouldReturnEmptyCMMStudyListWhenURISyntaxExceptionIsThrown() throws ExternalSystemException {
+    // Given
+    Repo repoMock = mock(Repo.class);
+    when(repoMock.getUrl()).thenReturn(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
+    when(repoMock.getHandler()).thenReturn(Harvester.Type.NESSTAR);
+
+    when(harvesterDao.getRecord(any(URI.class))).thenThrow(URISyntaxException.class);
 
     Optional<CMMStudy> actualRecord = defaultHarvesterConsumerService.getRecord(repoMock, "4124325");
 
@@ -154,13 +217,16 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
   }
 
   @Test
-  public void shouldReturnASuccessfulResponseGetRecord() throws ExternalSystemException {
+  public void shouldReturnASuccessfulResponseGetRecord() throws ExternalSystemException, IOException {
     FileHandler fileHandler = new FileHandler();
-    String recordUkds998 = fileHandler.getFileWithUtil("record_ukds_998.json");
+    String recordUkds998 = fileHandler.getFileAsString("record_ukds_998.json");
     String recordID = "998";
-    String expectedUrl = "http://cdc-osmh-repo:9091/v0/GetRecord/CMMStudy/998?Repository=https://oai.ukdataservice.ac.uk:8443/oai/provider";
+    URI expectedUrl = URI.create("http://localhost:9091/v0/GetRecord/CMMStudy/998?Repository=" +
+            URLEncoder.encode("https://oai.ukdataservice.ac.uk:8443/oai/provider", StandardCharsets.UTF_8));
 
-    when(harvesterDao.getRecord(expectedUrl)).thenReturn(recordUkds998);
+    when(harvesterDao.getRecord(expectedUrl)).thenReturn(
+            new ByteArrayInputStream(recordUkds998.getBytes(StandardCharsets.UTF_8))
+    );
     Repo repo = getUKDSRepo();
 
     Optional<CMMStudy> cmmStudy = defaultHarvesterConsumerService.getRecord(repo, recordID);
@@ -176,13 +242,16 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
   }
 
   @Test
-  public void shouldReturnDeletedRecordMarkedAsInactive() throws ExternalSystemException {
+  public void shouldReturnDeletedRecordMarkedAsInactive() throws ExternalSystemException, IOException {
     FileHandler fileHandler = new FileHandler();
-    String recordUkds1031 = fileHandler.getFileWithUtil("record_ukds_1031_deleted.json");
+    String recordUkds1031 = fileHandler.getFileAsString("record_ukds_1031_deleted.json");
     String recordID = "1031";
-    String expectedUrl = "http://cdc-osmh-repo:9091/v0/GetRecord/CMMStudy/1031?Repository=https://oai.ukdataservice.ac.uk:8443/oai/provider";
+    URI expectedUrl = URI.create("http://localhost:9091/v0/GetRecord/CMMStudy/1031?Repository=" +
+            URLEncoder.encode("https://oai.ukdataservice.ac.uk:8443/oai/provider", StandardCharsets.UTF_8));
 
-    when(harvesterDao.getRecord(expectedUrl)).thenReturn(recordUkds1031);
+    when(harvesterDao.getRecord(expectedUrl)).thenReturn(
+            new ByteArrayInputStream(recordUkds1031.getBytes(StandardCharsets.UTF_8))
+    );
     Repo repo = getUKDSRepo();
 
     Optional<CMMStudy> cmmStudy = defaultHarvesterConsumerService.getRecord(repo, recordID);

@@ -20,7 +20,9 @@ security:
     password: password
   basic.enabled: false            # Public API disable security on non-admin endpoints
 management.security.enabled: true # Enable security on admin endpoints
-endpoints.shutdown.enabled: true
+endpoints:
+  prometheus.sensitive: false
+  shutdown.enabled: true
 logging:
   file: ${user.home}${file.separator}pasc-oci${file.separator}pasc-oci.log
   pattern:
@@ -71,76 +73,78 @@ elasticsearch:
 osmhConsumer:
   languages: ['cs', 'da', 'de', 'el', 'en', 'et', 'fi', 'fr', 'hu', 'it', 'nl', 'no', 'pt', 'sk', 'sl', 'sr', 'sv']
   delay:
-    # Auto Starts after delay of 1min at startup
-    initial: '60000'
+    # Auto Starts after delay of 2 seconds at startup
+    initial: '2000'
     fixed: '315360000000'
   daily:
     # Daily Harvest and Ingestion run at 00:01am.
     run: '0 01 00 * * *'
     # Then run every Sunday at 09:00
     sunday.run: '0 00 09 * * SUN'
-  harvester:
-    url: 'http://localhost:9091'
-    version: 'v0'
   endpoints:
-    supportedApiVersions:
-      - v0
+    harvesters:
+      OAI-PMH:
+        url: 'http://localhost:9091'
+        version: 'v0'
+      NESSTAR:
+        url: 'http://localhost:9842'
+        version: 'v0'
     supportedRecordTypes:
       - CMMStudy
     repos:
-    - url: http://194.117.18.18:6003/v0/oai
-      name: 'APIS'
-      handler: 'http://cdc-osmh-repo:9091'
-    - url: https://data2.aussda.at/oai
-      name: 'AUSSDA'
-      handler: 'http://cdc-osmh-repo:9091'
-    - url: https://easy.dans.knaw.nl/oai/
-      name: 'DANS'
-      handler: 'http://cdc-osmh-repo:9091'
-    - url: https://kuha.sa.dk/v0/oai
-      name: 'DNA'
-      handler: 'http://cdc-osmh-repo:9091'
-# Placeholder for FORS
-#     - url: ''
-#     name: 'FORS'
-#     handler: 'http://cdc-osmh-repo:9091'
-    - url: http://services.fsd.uta.fi/v0/oai
-      name: 'FSD'
-      handler: 'http://cdc-osmh-repo:9091'
-# Placeholder for GESIS
-#   - url: ''
-#     name: 'GESIS'
-#     handler: 'http://cdc-osmh-repo:9091'
-    - url: https://dataspire-test.sciencespo.fr/oai
-      name: 'Progedo'
-      handler: 'http://cdc-osmh-repo:9091'
-    - url: http://147.213.4.44:6003/v0/oai
-      name: 'SASD'
-      handler: 'http://cdc-osmh-repo:9091'
-    - url: https://snd.gu.se/en/oai-pmh
-      name: 'SND'
-      handler: 'http://cdc-osmh-repo:9091'
-    - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
-      name: 'UKDS'
-      handler: 'http://cdc-osmh-repo:9091'
-    - url: https://nesstar2.adp.fdv.uni-lj.si/oai-pmh
-      name: 'ADP (Nesstar)'
-      handler: 'http://cdc-osmh-repo-nesstar:9842'
-    - url: http://nesstar.soc.cas.cz/oai-pmh
-      name: 'CSDA (Nesstar)'
-      handler: 'http://cdc-osmh-repo-nesstar:9842'
-    - url: https://oai-pmh.nsd.no/oai-pmh
-      name: 'NSD (Nesstar)'
-      handler: 'http://cdc-osmh-repo-nesstar:9842'
-#    - url:  http://nesstar.sciences-po.fr/oai-pmh
-#      name: 'Progedo (Nesstar)'
-#      handler: 'http://cdc-osmh-repo-nesstar:9842'
-    - url:  http://harvester.sodanet.gr:8080/oai/request
-      name: 'SoDaNet (Nesstar)'
-      handler: 'http://cdc-osmh-repo-nesstar:9842'
-    - url:  http://nesstar.unidata.unimib.it/oai-pmh
-      name: 'Unidata (Nesstar)'
-      handler: 'http://cdc-osmh-repo-nesstar:9842'
+      - url: http://194.117.18.18:6003/v0/oai
+        name: 'APIS'
+        handler: 'OAI-PMH'
+      - url: https://data2.aussda.at/oai
+        name: 'AUSSDA'
+        handler: 'OAI-PMH'
+      - url: https://easy.dans.knaw.nl/oai/
+        name: 'DANS'
+        handler: 'OAI-PMH'
+      - url: https://kuha.sa.dk/v0/oai
+        name: 'DNA'
+        handler: 'OAI-PMH'
+        # Placeholder for FORS
+        #     - url: ''
+        #     name: 'FORS'
+        #     handler: 'OAI-PMH'
+      - url: http://services.fsd.uta.fi/v0/oai
+        name: 'FSD'
+        handler: 'OAI-PMH'
+      - url: https://dbkapps.gesis.org/dbkoai3
+        name: 'GESIS'
+        handler: 'OAI-PMH'
+      - url: https://data.sciencespo.fr/oai
+        name: 'Progedo'
+        handler: 'OAI-PMH'
+      - url: http://147.213.4.44:6003/v0/oai
+        name: 'SASD'
+        handler: 'OAI-PMH'
+      - url: https://snd.gu.se/en/oai-pmh
+        name: 'SND'
+        handler: 'OAI-PMH'
+      - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
+        name: 'UKDS'
+        handler: 'OAI-PMH'
+      - url: https://nesstar2.adp.fdv.uni-lj.si/oai-pmh
+        name: 'ADP (Nesstar)'
+        handler: 'NESSTAR'
+      - url: http://nesstar.soc.cas.cz/oai-pmh
+        name: 'CSDA (Nesstar)'
+        handler: 'NESSTAR'
+      - url: https://oai-pmh.nsd.no/oai-pmh
+        name: 'NSD (Nesstar)'
+        handler: 'NESSTAR'
+    #  - url:  http://nesstar.sciences-po.fr/oai-pmh
+    #    name: 'Progedo (Nesstar)'
+    #    handler: 'NESSTAR'
+      - url:  http://harvester.sodanet.gr:8080/oai/request
+        name: 'SoDaNet (Nesstar)'
+        handler: 'NESSTAR'
+      - url:  http://nesstar.unidata.unimib.it/oai-pmh
+        name: 'Unidata (Nesstar)'
+        handler: 'NESSTAR'
+  restTemplateProps:
     connTimeout: 10000 # increased from 5 seconds to 10 seconds to deal with slower Nesstar repos
     connRequestTimeout: 5000 # 5 seconds
     readTimeout: 180000 # increased from 120 seconds to 180 seconds to deal with slower Nesstar repos
@@ -172,6 +176,14 @@ osmhConsumer:
     # The following variables are defined using cron notation
     run: ${OSMHCONSUMER_DAILY_RUN}
     sunday.run: ${OSMHCONSUMER_DAILY_SUNDAY_RUN}
+  endpoints:
+    harvesters:
+      OAI-PMH:
+        url: 'http://cdc-osmh-repo:9091'
+        version: 'v0'
+      NESSTAR:
+        url: 'http://cdc-osmh-repo-nesstar:9842'
+        version: 'v0'
 ---
 spring:
   profiles: local
@@ -182,29 +194,43 @@ spring:
       url: http://localhost:8087
 logging:
   level:
-    eu.cessda.pasc.oci.repository: DEBUG
+    eu.cessda.pasc.oci: TRACE
 osmhConsumer:
   endpoints:
     repos:
-    - url: https://nesstar2.adp.fdv.uni-lj.si/oai-pmh
-      name: 'ADP (Nesstar)'
-      handler: 'http://localhost:9842'
-    - url: http://fors-nesstar.unil.ch/oai-pmh
-      name: 'FORS Data Service (Nesstar)'
-      handler: 'http://localhost:9842'
-    - url: https://oai-pmh.nsd.no/oai-pmh
-      name: 'NSD (Nesstar)'
-      handler: 'http://localhost:9842'
-  #  - url:  http://nesstar.sciences-po.fr/oai-pmh
-  #    name: 'Progedo (Nesstar)'
-  #    handler: 'http://localhost:9842'
-    - url:  http://harvester.sodanet.gr:8080/oai/request
-      name: 'SoDaNet (Nesstar)'
-      handler: 'http://localhost:9842'
+      - url: http://194.117.18.18:6003/v0/oai
+        name: 'APIS'
+        handler: 'OAI-PMH'
+      - url: https://data2.aussda.at/oai
+        name: 'AUSSDA'
+        handler: 'OAI-PMH'
+      - url: https://easy.dans.knaw.nl/oai/
+        name: 'DANS'
+        handler: 'OAI-PMH'
+      - url: https://kuha.sa.dk/v0/oai
+        name: 'DNA'
+        handler: 'OAI-PMH'
+      - url: https://nesstar2.adp.fdv.uni-lj.si/oai-pmh
+        name: 'ADP (Nesstar)'
+        handler: 'nesstar'
+      - url: http://fors-nesstar.unil.ch/oai-pmh
+        name: 'FORS Data Service (Nesstar)'
+        handler: 'nesstar'
+      - url: https://oai-pmh.nsd.no/oai-pmh
+        name: 'NSD (Nesstar)'
+        handler: 'nesstar'
+      - url:  http://harvester.sodanet.gr:8080/oai/request
+        name: 'SoDaNet (Nesstar)'
+        handler: 'nesstar'
 ---
 spring:
   profiles: test
 logging:
   level:
-    eu.cessda.pasc.oci.service.helpers.DebuggingJMXBean: DEBUG
     eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor: DEBUG
+    eu.cessda.pasc.oci.repository.DaoBase: DEBUG
+osmhConsumer:
+  delay:
+    # For tests, the delay should be effectively disabled
+    initial: '315360000000'
+    fixed: '315360000000'

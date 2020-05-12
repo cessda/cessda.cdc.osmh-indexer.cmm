@@ -19,6 +19,7 @@ package eu.cessda.pasc.oci;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
+import eu.cessda.pasc.oci.metrics.MicrometerMetrics;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.configurations.Repo;
@@ -36,6 +37,7 @@ import org.elasticsearch.search.SearchHits;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -47,8 +49,6 @@ import java.util.Optional;
 
 import static eu.cessda.pasc.oci.data.RecordTestData.*;
 import static eu.cessda.pasc.oci.data.ReposTestData.getEndpoints;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.*;
 
 
@@ -72,6 +72,8 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
 
   @Autowired
   ObjectMapper objectMapper;
+
+  MicrometerMetrics micrometerMetrics = Mockito.mock(MicrometerMetrics.class);
 
   ElasticsearchTemplate esTemplate;
 
@@ -116,10 +118,11 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     // mock for ES bulking
     esIndexer = mock(IngestService.class);
     when(esIndexer.bulkIndex(anyListOf(CMMStudyOfLanguage.class), anyString())).thenReturn(true);
+    when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
 
     // Given
     scheduler = new ConsumerScheduler(debuggingJMXBean, appConfigurationProperties, harvesterConsumerService,
-        esIndexer, extractor, languageAvailabilityMapper, esTemplate);
+            esIndexer, extractor, languageAvailabilityMapper, micrometerMetrics);
 
     // When
     scheduler.fullHarvestAndIngestionAllConfiguredSPsReposRecords();
@@ -141,9 +144,10 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     // mock for ES bulking
     esIndexer = mock(IngestService.class);
     when(esIndexer.bulkIndex(anyListOf(CMMStudyOfLanguage.class), anyString())).thenReturn(true);
+    when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
 
     // Given
-    scheduler = new ConsumerScheduler(debuggingJMXBean, appConfigurationProperties, harvesterConsumerService, esIndexer, extractor, languageAvailabilityMapper, esTemplate);
+    scheduler = new ConsumerScheduler(debuggingJMXBean, appConfigurationProperties, harvesterConsumerService, esIndexer, extractor, languageAvailabilityMapper, micrometerMetrics);
 
     // When
     scheduler.weeklyFullHarvestAndIngestionAllConfiguredSPsReposRecords();
@@ -166,6 +170,10 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     // No bulk attempt should have been made for "sv" as it does not have the minimum valid cmm fields
     // 'en', 'fi', 'de' has all minimum fields
     verify(esIndexer, times(3)).bulkIndex(anyListOf(CMMStudyOfLanguage.class), anyString());
+
+    // Called for logging purposes
+    verify(esIndexer, atLeastOnce()).getStudy(Mockito.anyString(), Mockito.anyString());
+    verify(esIndexer, times(1)).getTotalHitCount("*");
     verifyNoMoreInteractions(esIndexer);
   }
 
@@ -190,9 +198,10 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     esIndexer = mock(IngestService.class);
     when(esIndexer.bulkIndex(anyListOf(CMMStudyOfLanguage.class), anyString())).thenReturn(true);
     when(esIndexer.getMostRecentLastModified()).thenReturn(Optional.of(LocalDateTime.parse("2018-02-20T07:48:38")));
+    when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
 
     // Given
-    scheduler = new ConsumerScheduler(debuggingJMXBean, appConfigurationProperties, harvesterConsumerService, esIndexer, extractor, languageAvailabilityMapper, esTemplate);
+    scheduler = new ConsumerScheduler(debuggingJMXBean, appConfigurationProperties, harvesterConsumerService, esIndexer, extractor, languageAvailabilityMapper, micrometerMetrics);
 
     // When
     scheduler.fullHarvestAndIngestionAllConfiguredSPsReposRecords();
@@ -213,6 +222,10 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     verify(esIndexer, times(1)).getMostRecentLastModified(); // Call by incremental run to get LastModified
     // No bulk attempt should have been made for "sv" as we dont have any records for "sv". We do for 'en', 'fi', 'de'
     verify(esIndexer, times(6)).bulkIndex(anyListOf(CMMStudyOfLanguage.class), anyString());
+
+    // Called for logging purposes
+    verify(esIndexer, atLeastOnce()).getStudy(Mockito.anyString(), Mockito.anyString());
+    verify(esIndexer, times(2)).getTotalHitCount("*");
     verifyNoMoreInteractions(esIndexer);
   }
 }

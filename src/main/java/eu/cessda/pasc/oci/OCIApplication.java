@@ -15,14 +15,39 @@
  */
 package eu.cessda.pasc.oci;
 
+import eu.cessda.pasc.oci.metrics.Metrics;
+import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.ElasticsearchException;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.EnableMBeanExport;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 
 @SpringBootApplication
 @EnableMBeanExport
+@Slf4j
 public class OCIApplication {
+
+	private final Metrics metrics;
+
+	public OCIApplication(Metrics metrics) {
+
+		this.metrics = metrics;
+	}
+
 	public static void main(String[] args) {
 		SpringApplication.run(OCIApplication.class, args);
+	}
+
+	@EventListener
+	public void startupMetrics(ContextRefreshedEvent contextRefreshedEvent) {
+		log.debug("Setting metrics");
+		try {
+			metrics.updateLanguageMetrics();
+			metrics.updateTotalRecordsMetric();
+		} catch (ElasticsearchException e) {
+			log.warn("Couldn't initialise metrics on startup. \n{}", e.toString());
+		}
 	}
 }

@@ -20,11 +20,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import lombok.experimental.UtilityClass;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.Optional;
 
 /**
  * CMMStudyOfLanguage Serialize/deserialize helpers.
@@ -39,40 +40,24 @@ import java.util.Optional;
  * @author moses AT doraventures DOT com
  */
 @Slf4j
-@UtilityClass
+@Service
+@Getter
 public class CMMStudyOfLanguageConverter {
 
-  // Serialize/deserialize helpers
+  private final ObjectReader reader;
+  private final ObjectWriter writer;
 
-  public static CMMStudyOfLanguage fromJsonString(String json) throws IOException {
-    return getObjectReader().readValue(json);
-  }
-
-  public static Optional<String> toJsonString(CMMStudyOfLanguage obj) {
-    try {
-      return Optional.ofNullable(getObjectWriter().writeValueAsString(obj));
-    } catch (JsonProcessingException e) {
-      log.error("Failed to write CMMStudy as string [{}].", e.getMessage());
-      return Optional.empty();
-    }
-  }
-
-  private static ObjectReader reader;
-  private static ObjectWriter writer;
-
-  private static void instantiateMapper() {
-    ObjectMapper mapper = new ObjectMapper();
+  @Autowired
+  public CMMStudyOfLanguageConverter(ObjectMapper mapper) {
     reader = mapper.readerFor(CMMStudyOfLanguage.class);
     writer = mapper.writerFor(CMMStudyOfLanguage.class);
   }
 
-  private static ObjectReader getObjectReader() {
-    if (reader == null) instantiateMapper();
-    return reader;
+  public CMMStudyOfLanguage fromJsonString(String json) throws IOException {
+    return reader.readValue(json);
   }
 
-  private static ObjectWriter getObjectWriter() {
-    if (writer == null) instantiateMapper();
-    return writer;
+  public String toJsonString(CMMStudyOfLanguage cmmStudyOfLanguage) throws JsonProcessingException {
+    return writer.writeValueAsString(cmmStudyOfLanguage);
   }
 }

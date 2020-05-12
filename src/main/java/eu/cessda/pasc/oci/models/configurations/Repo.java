@@ -15,21 +15,19 @@
  */
 package eu.cessda.pasc.oci.models.configurations;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
+
+import java.net.URI;
 
 /**
  * Repo configuration model
  *
  * @author moses AT doraventures DOT com
  */
-@Getter
-@Setter
-@ToString
+@Data
 public class Repo {
 
-  private String url;
-  private String name;
-  private String handler;
+  URI url;
+  String name;
+  Harvester.Type handler;
 }
