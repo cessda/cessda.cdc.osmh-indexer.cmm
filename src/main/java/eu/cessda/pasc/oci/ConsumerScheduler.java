@@ -39,10 +39,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static net.logstash.logback.argument.StructuredArguments.keyValue;
 import static net.logstash.logback.argument.StructuredArguments.value;
 
 /**
@@ -69,7 +69,9 @@ public class ConsumerScheduler {
   private final IngestService esIndexerService;
   private final LanguageDocumentExtractor extractor;
   private final LanguageAvailabilityMapper languageAvailabilityMapper;
-  private final Metrics micrometerMetrics;
+  private final Metrics metrics;
+
+  private final AtomicBoolean indexerRunning = new AtomicBoolean(false);
 
   @Autowired
   public ConsumerScheduler(DebuggingJMXBean debuggingJMXBean, AppConfigurationProperties configurationProperties,
@@ -82,7 +84,7 @@ public class ConsumerScheduler {
     this.esIndexerService = esIndexerService;
     this.extractor = extractor;
     this.languageAvailabilityMapper = languageAvailabilityMapper;
-    this.micrometerMetrics = metrics;
+    this.metrics = metrics;
   }
 
   /**
@@ -91,7 +93,7 @@ public class ConsumerScheduler {
   @ManagedOperation(description = "Manual trigger to do a full harvest and ingest run")
   @Scheduled(initialDelayString = "${osmhConsumer.delay.initial}", fixedDelayString = "${osmhConsumer.delay.fixed}")
   public void fullHarvestAndIngestionAllConfiguredSPsReposRecords() {
-    try (var ignored = MDC.putCloseable(ConsumerScheduler.DEFAULT_CDC_JOB_KEY, getCdcRunjobId())) {
+    try (var ignored = MDC.putCloseable(ConsumerScheduler.DEFAULT_CDC_JOB_KEY, getJobId())) {
       OffsetDateTime date = OffsetDateTime.now(ZoneId.systemDefault());
       logStartStatus(date, FULL_RUN);
       executeHarvestAndIngest(null);
@@ -105,7 +107,7 @@ public class ConsumerScheduler {
   @ManagedOperation(description = "Manual trigger to do an incremental harvest and ingest")
   @Scheduled(cron = "${osmhConsumer.daily.run}")
   public void dailyIncrementalHarvestAndIngestionAllConfiguredSPsReposRecords() {
-    try (var ignored = MDC.putCloseable(ConsumerScheduler.DEFAULT_CDC_JOB_KEY, getCdcRunjobId())) {
+    try (var ignored = MDC.putCloseable(ConsumerScheduler.DEFAULT_CDC_JOB_KEY, getJobId())) {
       OffsetDateTime date = OffsetDateTime.now(ZoneId.systemDefault());
       logStartStatus(date, DAILY_INCREMENTAL_RUN);
       executeHarvestAndIngest(esIndexerService.getMostRecentLastModified().orElse(null));
@@ -128,35 +130,76 @@ public class ConsumerScheduler {
    *
    * @return the correlation id
    */
-  private String getCdcRunjobId() {
+  private String getJobId() {
     return DEFAULT_RESPONSE_TOKEN_HEADER + DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.now(ZoneId.systemDefault()));
   }
 
+  /**
+   * Starts the harvest.
+   *
+   * @param lastModifiedDateTime the DateTime to incrementally harvest from, set to null to perform a full harvest.
+   * @throws IllegalStateException if a harvest is already running.
+   */
   private void executeHarvestAndIngest(LocalDateTime lastModifiedDateTime) {
-    List<Repo> repos = configurationProperties.getEndpoints().getRepos();
-    repos.forEach(repo -> {
-      try (var ignored = MDC.putCloseable(REPO_NAME, repo.getName())) {
-        Map<String, List<CMMStudyOfLanguage>> langStudies = getCmmStudiesOfEachLangIsoCodeMap(repo, lastModifiedDateTime);
-        langStudies.forEach((langIsoCode, cmmStudies) -> executeBulk(repo, langIsoCode, cmmStudies));
+    if (!indexerRunning.getAndSet(true)) {
+      try {
+        List<Repo> repos = configurationProperties.getEndpoints().getRepos();
+
+        // Store the MDC so that it can be used in the running thread
+        Map<String, String> contextMap = MDC.getCopyOfContextMap();
+        repos.parallelStream().forEach(repo -> {
+          MDC.setContextMap(contextMap);
+
+          // Set the MDC so that the record name is attached to all downstream logs
+          try (var ignored = MDC.putCloseable(REPO_NAME, repo.getName())) {
+            Map<String, List<CMMStudyOfLanguage>> langStudies = getCmmStudiesOfEachLangIsoCodeMap(repo, lastModifiedDateTime);
+            langStudies.forEach((langIsoCode, cmmStudies) -> executeBulk(repo, langIsoCode, cmmStudies));
+          }
+
+          // Reset the MDC
+          MDC.clear();
+        });
+        log.info("Total number of records is {}", value("total_cmm_studies", esIndexerService.getTotalHitCount("*")));
+      } finally {
+        // Ensure that the running state is always set to false even if an exception is thrown
+        indexerRunning.set(false);
       }
-    });
-    micrometerMetrics.updateMetrics();
-    log.info("Total number of records stands {}", keyValue("total_cmm_studies", esIndexerService.getTotalHitCount("*")));
+    } else {
+      throw new IllegalStateException("Indexer is already running");
+    }
+    metrics.updateMetrics();
   }
 
 
+  /**
+   * Index the given CMMStudies into the Elasticsearch index.
+   *
+   * @param repo        the source repository.
+   * @param langIsoCode the language code.
+   * @param cmmStudies  the studies to index.
+   */
   private void executeBulk(Repo repo, String langIsoCode, List<CMMStudyOfLanguage> cmmStudies) {
     if (cmmStudies.isEmpty()) {
-      log.debug("CmmStudies list is empty and henceforth there is nothing to BulkIndex for repo[{}] with LangIsoCode [{}].", keyValue(REPO_NAME, repo.getName()), keyValue(LANG_CODE, langIsoCode));
+      log.debug("CmmStudies list is empty. Nothing to BulkIndex for repo[{}] with LangIsoCode [{}].",
+              value(REPO_NAME, repo.getName()),
+              value(LANG_CODE, langIsoCode));
     } else {
       int studiesUpdated = getUpdatedStudies(langIsoCode, cmmStudies);
       log.info("[{}] studies updated", value("updated_cmm_studies", studiesUpdated));
-      log.info("BulkIndexing repo [{}] with lang code [{}] index with [{}] CmmStudies.", keyValue(REPO_NAME, repo.getName()), keyValue(LANG_CODE, langIsoCode), keyValue("cmm_studies_added", cmmStudies.size()));
-      boolean isSuccessful = esIndexerService.bulkIndex(cmmStudies, langIsoCode);
-      if (isSuccessful) {
-        log.info("BulkIndexing was Successful. For repo name [{}] and its corresponding [{}].  LangIsoCode [{}].", keyValue(REPO_NAME, repo.getName()), keyValue(REPO_ENDPOINT_URL, repo.getUrl()), keyValue(LANG_CODE, langIsoCode));
+      log.info("BulkIndexing repo [{}] with lang code [{}] index with [{}] CmmStudies.",
+              value(REPO_NAME, repo.getName()),
+              value(LANG_CODE, langIsoCode),
+              value("cmm_studies_added", cmmStudies.size()));
+      if (esIndexerService.bulkIndex(cmmStudies, langIsoCode)) {
+        log.info("BulkIndexing was successful for repo name [{}] and its corresponding [{}].  LangIsoCode [{}].",
+                value(REPO_NAME, repo.getName()),
+                value(REPO_ENDPOINT_URL, repo.getUrl()),
+                value(LANG_CODE, langIsoCode));
       } else {
-        log.error("BulkIndexing was UnSuccessful. For repo name [{}] and its corresponding [{}].  LangIsoCode [{}].", keyValue(REPO_NAME, repo.getName()), keyValue(REPO_ENDPOINT_URL, repo.getUrl()), keyValue(LANG_CODE, langIsoCode));
+        log.error("BulkIndexing was unsuccessful for repo name [{}] and its corresponding [{}].  LangIsoCode [{}].",
+                value(REPO_NAME, repo.getName()),
+                value(REPO_ENDPOINT_URL, repo.getUrl()),
+                value(LANG_CODE, langIsoCode));
       }
     }
   }
@@ -176,21 +219,20 @@ public class ConsumerScheduler {
     log.info("Processing Repo [{}]", repo);
     List<RecordHeader> recordHeaders = harvesterConsumerService.listRecordHeaders(repo, lastModifiedDateTime);
 
-    int recordHeadersSize = recordHeaders.size();
-    log.info("Repo [{}].  Returned with [{}] record headers", repo, recordHeadersSize);
+    log.info("Repo [{}].  Returned with [{}] record headers", repo, recordHeaders.size());
 
-    List<Optional<CMMStudy>> totalCMMStudies = recordHeaders.stream()
+    List<CMMStudy> presentCMMStudies = recordHeaders.stream()
             .map(recordHeader -> harvesterConsumerService.getRecord(repo, recordHeader.getIdentifier()))
-            .collect(Collectors.toList());
-
-    List<CMMStudy> presentCMMStudies = totalCMMStudies.stream()
             .filter(Optional::isPresent)
             .map(Optional::get)
             .collect(Collectors.toList());
 
-    String msgTemplate = "Repo Name [{}] of [{}] Endpoint. There are [{}] presentCMMStudies out of [{}] totalCMMStudies from [{}] Record Identifiers. Therefore CMMStudies duplicated is  "
-            + "";
-    log.info(msgTemplate + "" + (totalCMMStudies.size() - presentCMMStudies.size()), keyValue(REPO_NAME, repo.getName()), keyValue(REPO_ENDPOINT_URL, repo.getUrl()), keyValue("present_cmm_record", presentCMMStudies.size()), totalCMMStudies.size(), keyValue("cmm_records_duplicated", totalCMMStudies.size() - presentCMMStudies.size()));
+    log.info("Repo Name [{}] of [{}] Endpoint. There are [{}] presentCMMStudies out of [{}] totalCMMStudies. Therefore CMMStudies duplicated is [{}]",
+            value(REPO_NAME, repo.getName()),
+            value(REPO_ENDPOINT_URL, repo.getUrl()),
+            value("present_cmm_record", presentCMMStudies.size()),
+            value("total_cmm_record", recordHeaders.size()),
+            value("cmm_records_duplicated", recordHeaders.size() - presentCMMStudies.size()));
 
     presentCMMStudies.forEach(languageAvailabilityMapper::setAvailableLanguages);
     return extractor.mapLanguageDoc(presentCMMStudies, repo.getName());
@@ -205,8 +247,6 @@ public class ConsumerScheduler {
 
   private void logEndStatus(OffsetDateTime offsetDateTime, String runDescription) {
     String formatMsg = "[{}] Consume and Ingest All SPs Repos Ended at [{}], Duration [{}]";
-    log.info(formatMsg, runDescription, offsetDateTime, keyValue("job_duration", Duration.between(offsetDateTime.toInstant(), Instant.now()).getSeconds()));
-
+    log.info(formatMsg, runDescription, offsetDateTime, value("job_duration", Duration.between(offsetDateTime.toInstant(), Instant.now()).getSeconds()));
   }
-
 }

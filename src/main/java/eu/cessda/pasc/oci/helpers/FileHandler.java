@@ -15,7 +15,6 @@
  */
 package eu.cessda.pasc.oci.helpers;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.io.FileNotFoundException;
@@ -29,7 +28,6 @@ import java.nio.charset.StandardCharsets;
  * @author moses AT doraventures DOT com
  */
 @Component
-@Slf4j
 public class FileHandler {
     /**
      * Load the specified resource and return it as an {@link InputStream}.
