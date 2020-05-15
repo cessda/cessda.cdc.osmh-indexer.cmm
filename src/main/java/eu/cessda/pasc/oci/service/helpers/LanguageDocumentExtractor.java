@@ -22,14 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
-
-import static java.util.Optional.ofNullable;
 
 /**
  * Language Document Extractor.  Helper to Extracts a custom document for each language IsoCode found in the config.
@@ -53,36 +47,30 @@ public class LanguageDocumentExtractor {
    * @param cmmStudies filtered list of present studies which generally holds fields for all languages.
    * @return map extracted documents for each language iso code.
    */
-  public Map<String, List<CMMStudyOfLanguage>> mapLanguageDoc(List<CMMStudy> cmmStudies, String spName) {
+  public Map<String, List<CMMStudyOfLanguage>> mapLanguageDoc(Collection<CMMStudy> cmmStudies, String spName) {
 
     log.info("Mapping CMMStudy to CMMStudyOfLanguage for SP[{}] with [{}] records", spName, cmmStudies.size());
     Map<String, List<CMMStudyOfLanguage>> languageDocMap = new HashMap<>();
     String idPrefix = spName.trim().replace(" ", "-") + "__"; // UK Data Service = UK-Data-Service__
 
-    appConfigurationProperties.getLanguages().forEach(langCode -> {
-          Instant start = Instant.now();
-          log.trace("Extract CMMStudyOfLanguage for [{}] language code - STARTED", langCode);
-          List<CMMStudyOfLanguage> collectLanguageCmmStudy = getCmmStudiesOfLangCode(cmmStudies, idPrefix, langCode);
-          languageDocMap.put(langCode, collectLanguageCmmStudy);
-          logTimeTook(langCode, start);
-        }
-    );
+    for (String langCode : appConfigurationProperties.getLanguages()) {
+      log.trace("Extract CMMStudyOfLanguage for [{}] language code - STARTED", langCode);
+      List<CMMStudyOfLanguage> collectLanguageCmmStudy = getCmmStudiesOfLangCode(cmmStudies, idPrefix, langCode);
+      languageDocMap.put(langCode, collectLanguageCmmStudy);
+    }
 
     if (log.isDebugEnabled()) {
-      languageDocMap.forEach((langIsoCode, cmmStudyOfLanguages) -> {
-        String formatTemplate = "langIsoCode [{}] has [{}] records that has passed CMM minimum fields validation";
-        log.debug(formatTemplate, langIsoCode, cmmStudyOfLanguages.size());
-      });
+      languageDocMap.forEach((langIsoCode, cmmStudyOfLanguages) ->
+              log.debug("langIsoCode [{}] has [{}] records that has passed CMM minimum fields validation", langIsoCode, cmmStudyOfLanguages.size())
+      );
     }
     return languageDocMap;
   }
 
-  private List<CMMStudyOfLanguage> getCmmStudiesOfLangCode(List<CMMStudy> cmmStudies, String idPrefix,
-                                                           String languageIsoCode) {
-    return cmmStudies.stream()
-        .filter(cmmStudy -> isValidCMMStudyForLang(languageIsoCode, idPrefix, cmmStudy))
-        .map(cmmStudy -> getCmmStudyOfLanguage(idPrefix, languageIsoCode, cmmStudy))
-        .collect(Collectors.toList());
+  private List<CMMStudyOfLanguage> getCmmStudiesOfLangCode(Collection<CMMStudy> cmmStudies, String idPrefix, String languageIsoCode) {
+    return cmmStudies.stream().filter(cmmStudy -> isValidCMMStudyForLang(languageIsoCode, idPrefix, cmmStudy))
+            .map(cmmStudy -> getCmmStudyOfLanguage(idPrefix, languageIsoCode, cmmStudy))
+            .collect(Collectors.toList());
   }
 
   /**
@@ -112,7 +100,7 @@ public class LanguageDocumentExtractor {
 
   private void logInvalidCMMStudy(String msgTemplate, String languageIsoCode, String idPrefix, CMMStudy cmmStudy) {
     if (log.isWarnEnabled()) {
-      final String studyNumber = idPrefix + "-" + (null != cmmStudy ? cmmStudy.getStudyNumber() : "Empty");
+      final String studyNumber = idPrefix + "-" + (Optional.ofNullable(cmmStudy).map(CMMStudy::getStudyNumber).orElse("Empty"));
       log.warn(msgTemplate, languageIsoCode, studyNumber);
     }
   }
@@ -128,40 +116,34 @@ public class LanguageDocumentExtractor {
     builder.id(idPrefix + cmmStudy.getStudyNumber())
         .studyNumber(cmmStudy.getStudyNumber())
         .active(cmmStudy.isActive())
-        .lastModified(cmmStudy.getLastModified())
-        .publicationYear(cmmStudy.getPublicationYear())
-        .fileLanguages(cmmStudy.getFileLanguages())
-        .dataCollectionPeriodStartdate(cmmStudy.getDataCollectionPeriodStartdate())
-        .dataCollectionPeriodEnddate(cmmStudy.getDataCollectionPeriodEnddate())
-        .dataCollectionYear(cmmStudy.getDataCollectionYear())
-        .langAvailableIn(cmmStudy.getLangAvailableIn())
-        .studyXmlSourceUrl(cmmStudy.getStudyXmlSourceUrl());
+            .lastModified(cmmStudy.getLastModified())
+            .publicationYear(cmmStudy.getPublicationYear())
+            .fileLanguages(cmmStudy.getFileLanguages())
+            .dataCollectionPeriodStartdate(cmmStudy.getDataCollectionPeriodStartdate())
+            .dataCollectionPeriodEnddate(cmmStudy.getDataCollectionPeriodEnddate())
+            .dataCollectionYear(cmmStudy.getDataCollectionYear())
+            .langAvailableIn(cmmStudy.getLangAvailableIn())
+            .studyXmlSourceUrl(cmmStudy.getStudyXmlSourceUrl());
 
     // Language specific field extraction
-    ofNullable(cmmStudy.getTitleStudy()).ifPresent(map -> builder.titleStudy(map.get(lang)));
-    ofNullable(cmmStudy.getAbstractField()).ifPresent(map -> builder.abstractField(map.get(lang)));
-    ofNullable(cmmStudy.getKeywords()).ifPresent(map -> builder.keywords(map.get(lang)));
-    ofNullable(cmmStudy.getClassifications()).ifPresent(map -> builder.classifications(map.get(lang)));
-    ofNullable(cmmStudy.getTypeOfTimeMethods()).ifPresent(map -> builder.typeOfTimeMethods(map.get(lang)));
-    ofNullable(cmmStudy.getStudyAreaCountries()).ifPresent(map -> builder.studyAreaCountries(map.get(lang)));
-    ofNullable(cmmStudy.getUnitTypes()).ifPresent(map -> builder.unitTypes(map.get(lang)));
-    ofNullable(cmmStudy.getPublisher()).ifPresent(map -> builder.publisher(map.get(lang)));
-    ofNullable(cmmStudy.getPidStudies()).ifPresent(map -> builder.pidStudies(map.get(lang)));
-    ofNullable(cmmStudy.getCreators()).ifPresent(map -> builder.creators(map.get(lang)));
-    ofNullable(cmmStudy.getTypeOfSamplingProcedures()).ifPresent(map -> builder.typeOfSamplingProcedures(map.get(lang)));
-    ofNullable(cmmStudy.getSamplingProcedureFreeTexts()).ifPresent(map -> builder.samplingProcedureFreeTexts(map.get(lang)));
-    ofNullable(cmmStudy.getTypeOfModeOfCollections()).ifPresent(map -> builder.typeOfModeOfCollections(map.get(lang)));
-    ofNullable(cmmStudy.getTitleStudy()).ifPresent(map -> builder.titleStudy(map.get(lang)));
-    ofNullable(cmmStudy.getDataCollectionFreeTexts()).ifPresent(map -> builder.dataCollectionFreeTexts(map.get(lang)));
-    ofNullable(cmmStudy.getDataAccessFreeTexts()).ifPresent(map -> builder.dataAccessFreeTexts(map.get(lang)));
-    ofNullable(cmmStudy.getStudyUrl()).ifPresent(map -> builder.studyUrl(map.get(lang)));
+    Optional.ofNullable(cmmStudy.getTitleStudy()).ifPresent(map -> builder.titleStudy(map.get(lang)));
+    Optional.ofNullable(cmmStudy.getAbstractField()).ifPresent(map -> builder.abstractField(map.get(lang)));
+    Optional.ofNullable(cmmStudy.getKeywords()).ifPresent(map -> builder.keywords(map.get(lang)));
+    Optional.ofNullable(cmmStudy.getClassifications()).ifPresent(map -> builder.classifications(map.get(lang)));
+    Optional.ofNullable(cmmStudy.getTypeOfTimeMethods()).ifPresent(map -> builder.typeOfTimeMethods(map.get(lang)));
+    Optional.ofNullable(cmmStudy.getStudyAreaCountries()).ifPresent(map -> builder.studyAreaCountries(map.get(lang)));
+    Optional.ofNullable(cmmStudy.getUnitTypes()).ifPresent(map -> builder.unitTypes(map.get(lang)));
+    Optional.ofNullable(cmmStudy.getPublisher()).ifPresent(map -> builder.publisher(map.get(lang)));
+    Optional.ofNullable(cmmStudy.getPidStudies()).ifPresent(map -> builder.pidStudies(map.get(lang)));
+    Optional.ofNullable(cmmStudy.getCreators()).ifPresent(map -> builder.creators(map.get(lang)));
+    Optional.ofNullable(cmmStudy.getTypeOfSamplingProcedures()).ifPresent(map -> builder.typeOfSamplingProcedures(map.get(lang)));
+    Optional.ofNullable(cmmStudy.getSamplingProcedureFreeTexts()).ifPresent(map -> builder.samplingProcedureFreeTexts(map.get(lang)));
+    Optional.ofNullable(cmmStudy.getTypeOfModeOfCollections()).ifPresent(map -> builder.typeOfModeOfCollections(map.get(lang)));
+    Optional.ofNullable(cmmStudy.getTitleStudy()).ifPresent(map -> builder.titleStudy(map.get(lang)));
+    Optional.ofNullable(cmmStudy.getDataCollectionFreeTexts()).ifPresent(map -> builder.dataCollectionFreeTexts(map.get(lang)));
+    Optional.ofNullable(cmmStudy.getDataAccessFreeTexts()).ifPresent(map -> builder.dataAccessFreeTexts(map.get(lang)));
+    Optional.ofNullable(cmmStudy.getStudyUrl()).ifPresent(map -> builder.studyUrl(map.get(lang)));
 
     return builder.build();
-  }
-
-  private static void logTimeTook(String langCode, Instant startTime) {
-    String formatMsg = "Extract CMMStudyOfLanguage for [{}] language code - COMPLETED. Duration [{}]";
-    Instant end = Instant.now();
-    log.trace(formatMsg, langCode, Duration.between(startTime, end));
   }
 }

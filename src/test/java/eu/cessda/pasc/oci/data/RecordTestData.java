@@ -202,9 +202,9 @@ public final class RecordTestData {
   }
 
   public static Optional<CMMStudy> getSyntheticCmmStudy(String identifier) throws IOException {
-    Optional<CMMStudy> optionalCmmStudy = Optional.of(getSyntheticCmmStudy());
-    optionalCmmStudy.ifPresent(cmmStudy -> cmmStudy.setStudyNumber(identifier));
-    return optionalCmmStudy;
+    var cmmStudy = getSyntheticCmmStudy();
+    cmmStudy.setStudyNumber(identifier);
+    return Optional.of(cmmStudy);
   }
 
   public static String getSyntheticCMMStudyOfLanguageEn() throws IOException {

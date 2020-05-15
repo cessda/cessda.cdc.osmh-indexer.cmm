@@ -145,6 +145,7 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     esIndexer = mock(IngestService.class);
     when(esIndexer.bulkIndex(anyListOf(CMMStudyOfLanguage.class), anyString())).thenReturn(true);
     when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
+    when(esIndexer.getStudy(Mockito.eq("UKDS__998"), Mockito.anyString())).thenReturn(Optional.of(getCmmStudyOfLanguageCodeEnX1().get(0)));
 
     // Given
     scheduler = new ConsumerScheduler(debuggingJMXBean, appConfigurationProperties, harvesterConsumerService, esIndexer, extractor, languageAvailabilityMapper, micrometerMetrics);
@@ -184,21 +185,23 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     harvesterConsumerService = mock(HarvesterConsumerService.class);
     CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class);
     List<RecordHeader> recordHeaderList = objectMapper.readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE, collectionType);
-    List<RecordHeader> recordHeaderListIncrement = objectMapper
-        .readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE_WITH_INCREMENT, collectionType);
+    List<RecordHeader> recordHeaderListIncrement = objectMapper.readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE_WITH_INCREMENT, collectionType);
     when(harvesterConsumerService.listRecordHeaders(any(Repo.class), any()))
-        .thenReturn(recordHeaderList) // First call
-        .thenReturn(recordHeaderListIncrement); // Second call / Incremental run
+            .thenReturn(recordHeaderList) // First call
+            .thenReturn(recordHeaderListIncrement); // Second call / Incremental run
+
     // mock record requests from each header
     when(harvesterConsumerService.getRecord(any(Repo.class), eq("998"))).thenReturn(getSyntheticCmmStudy("998"));
     when(harvesterConsumerService.getRecord(any(Repo.class), eq("997"))).thenReturn(getSyntheticCmmStudy("997"));
     when(harvesterConsumerService.getRecord(any(Repo.class), eq("999"))).thenReturn(getSyntheticCmmStudy("999"));
     when(harvesterConsumerService.getRecord(any(Repo.class), eq("1000"))).thenReturn(getSyntheticCmmStudy("1000"));
-    // mock for ES bulking
+
+    // mock for ES methods
     esIndexer = mock(IngestService.class);
     when(esIndexer.bulkIndex(anyListOf(CMMStudyOfLanguage.class), anyString())).thenReturn(true);
     when(esIndexer.getMostRecentLastModified()).thenReturn(Optional.of(LocalDateTime.parse("2018-02-20T07:48:38")));
     when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
+    when(esIndexer.getStudy(Mockito.eq("UKDS__999"), Mockito.anyString())).thenReturn(Optional.of(getCmmStudyOfLanguageCodeEnX1().get(0)));
 
     // Given
     scheduler = new ConsumerScheduler(debuggingJMXBean, appConfigurationProperties, harvesterConsumerService, esIndexer, extractor, languageAvailabilityMapper, micrometerMetrics);
