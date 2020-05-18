@@ -15,20 +15,23 @@
  */
 package eu.cessda.pasc.oci.helpers.exception;
 
-import lombok.Getter;
 import lombok.NonNull;
+import lombok.Value;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.Optional;
 
 /**
  * Exception for external encountered Exceptions
  *
  * @author moses AT doraventures DOT com
  */
-public class ExternalSystemException extends CustomExceptionBase {
+public class ExternalSystemException extends Exception {
 
   private static final long serialVersionUID = 928798312826959273L;
 
-  @Getter
-  private final String externalResponseBody;
+  private final ExternalResponse externalResponse;
 
   /**
    * Constructs an ExternalSystemException with the specified message and cause.
@@ -36,20 +39,38 @@ public class ExternalSystemException extends CustomExceptionBase {
    * @param message the detail message
    * @param cause   the cause
    */
-  public ExternalSystemException(String message, Throwable cause) {
+  public ExternalSystemException(@NonNull String message, @NonNull IOException cause) {
     super(message, cause);
-    externalResponseBody = null;
+    externalResponse = null;
   }
 
   /**
    * Constructs an ExternalSystemException with the specified message, cause and external response body.
    *
    * @param message              the detail message
-   * @param cause                the cause
-   * @param externalResponseBody the external response that caused this exception
+   * @param statusCode           the status code of the external response that caused this exception
+   * @param externalResponseBody the body of the external response that caused this exception
    */
-  public ExternalSystemException(String message, Throwable cause, @NonNull String externalResponseBody) {
-    super(message, cause);
-    this.externalResponseBody = externalResponseBody;
+  public ExternalSystemException(@NonNull String message, int statusCode, @NonNull String externalResponseBody) {
+    super(message);
+    externalResponse = new ExternalResponse(externalResponseBody, statusCode);
+  }
+
+  /**
+   * Gets the external response that caused this exception, or an empty optional if no response was received.
+   */
+  public Optional<ExternalResponse> getExternalResponse() {
+    return Optional.ofNullable(externalResponse);
+  }
+
+  /**
+   * An immutable object describing the status code and the body of the external response.
+   */
+  @Value
+  public static class ExternalResponse implements Serializable {
+    private static final long serialVersionUID = -7110617275735794989L;
+    @NonNull
+    String externalResponseBody;
+    int statusCode;
   }
 }

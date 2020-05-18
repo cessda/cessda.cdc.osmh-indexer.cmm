@@ -84,7 +84,7 @@ public class DaoBaseTest extends AbstractSpringTestProfileContext {
         try (InputStream inputStream = daoBase.postForStringResponse(expectedUrl)) {
             Assert.fail(new String(inputStream.readAllBytes(), Charset.defaultCharset()));
         } catch (ExternalSystemException e) {
-            Assert.assertNotNull(e.getExternalResponseBody());
+            Assert.assertTrue(e.getExternalResponse().isPresent());
         }
     }
 
@@ -112,7 +112,7 @@ public class DaoBaseTest extends AbstractSpringTestProfileContext {
         try (InputStream inputStream = daoBase.postForStringResponse("http://error.endpoint/")) {
             Assert.fail(new String(inputStream.readAllBytes(), Charset.defaultCharset()));
         } catch (ExternalSystemException e) {
-            Assert.assertNull(e.getExternalResponseBody());
+            Assert.assertFalse(e.getExternalResponse().isPresent());
         }
     }
 }

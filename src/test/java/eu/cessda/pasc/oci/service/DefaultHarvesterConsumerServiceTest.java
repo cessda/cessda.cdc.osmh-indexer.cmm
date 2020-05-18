@@ -140,7 +140,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
   @Test
   public void shouldReturnEmptyHeaderListWhenExternalSystemExceptionIsThrown() throws ExternalSystemException {
 
-    when(harvesterDao.listRecordHeaders(any(URI.class))).thenThrow(new ExternalSystemException("Mocked!", null));
+    when(harvesterDao.listRecordHeaders(any(URI.class))).thenThrow(new ExternalSystemException("Mocked!", new IOException()));
     Repo repo = getUKDSRepo();
 
     List<RecordHeader> recordHeaders = defaultHarvesterConsumerService.listRecordHeaders(repo, null);
@@ -176,7 +176,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
     when(repoMock.getUrl()).thenReturn(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
     when(repoMock.getHandler()).thenReturn(Harvester.Type.NESSTAR);
 
-    when(harvesterDao.getRecord(any(URI.class))).thenThrow(new ExternalSystemException("Mocked!", null));
+    when(harvesterDao.getRecord(any(URI.class))).thenThrow(new ExternalSystemException("Mocked!", new IOException()));
 
     Optional<CMMStudy> actualRecord = defaultHarvesterConsumerService.getRecord(repoMock, "4124325");
 

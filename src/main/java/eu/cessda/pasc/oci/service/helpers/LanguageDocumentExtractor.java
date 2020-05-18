@@ -84,7 +84,7 @@ public class LanguageDocumentExtractor {
    */
   boolean isValidCMMStudyForLang(String languageIsoCode, String idPrefix, CMMStudy cmmStudy) {
 
-    if (null == cmmStudy) {
+    if (cmmStudy == null) {
       logInvalidCMMStudy("Study is null for language[{}] with studyNumber [{}]", languageIsoCode, idPrefix, null);
       return false;
     }
@@ -100,7 +100,7 @@ public class LanguageDocumentExtractor {
 
   private void logInvalidCMMStudy(String msgTemplate, String languageIsoCode, String idPrefix, CMMStudy cmmStudy) {
     if (log.isWarnEnabled()) {
-      final String studyNumber = idPrefix + "-" + (Optional.ofNullable(cmmStudy).map(CMMStudy::getStudyNumber).orElse("Empty"));
+      final String studyNumber = idPrefix + "-" + Optional.ofNullable(cmmStudy).map(CMMStudy::getStudyNumber).orElse("Empty");
       log.warn(msgTemplate, languageIsoCode, studyNumber);
     }
   }
