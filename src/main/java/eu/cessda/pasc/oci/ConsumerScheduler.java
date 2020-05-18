@@ -26,6 +26,7 @@ import eu.cessda.pasc.oci.service.IngestService;
 import eu.cessda.pasc.oci.service.helpers.DebuggingJMXBean;
 import eu.cessda.pasc.oci.service.helpers.LanguageAvailabilityMapper;
 import eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -179,40 +181,76 @@ public class ConsumerScheduler {
    * @param cmmStudies  the studies to index.
    */
   private void executeBulk(Repo repo, String langIsoCode, List<CMMStudyOfLanguage> cmmStudies) {
-    if (cmmStudies.isEmpty()) {
-      log.debug("CmmStudies list is empty. Nothing to BulkIndex for repo[{}] with LangIsoCode [{}].",
+    if (!cmmStudies.isEmpty()) {
+      var studiesUpdated = getUpdatedStudies(cmmStudies, langIsoCode);
+      log.info("BulkIndexing repo [{}] with lang code [{}].",
               value(REPO_NAME, repo.getName()),
               value(LANG_CODE, langIsoCode));
-    } else {
-      int studiesUpdated = getUpdatedStudies(langIsoCode, cmmStudies);
-      log.info("[{}] studies updated", value("updated_cmm_studies", studiesUpdated));
-      log.info("BulkIndexing repo [{}] with lang code [{}] index with [{}] CmmStudies.",
-              value(REPO_NAME, repo.getName()),
-              value(LANG_CODE, langIsoCode),
-              value("cmm_studies_added", cmmStudies.size()));
       if (esIndexerService.bulkIndex(cmmStudies, langIsoCode)) {
-        log.info("BulkIndexing was successful for repo name [{}] and its corresponding [{}].  LangIsoCode [{}].",
+        log.info("BulkIndexing was successful for repo name [{}] and its corresponding [{}].  LangIsoCode [{}]." +
+                        " [{}] studies created, [{}] studies deleted, [{}] studies updated.",
                 value(REPO_NAME, repo.getName()),
                 value(REPO_ENDPOINT_URL, repo.getUrl()),
-                value(LANG_CODE, langIsoCode));
+                value(LANG_CODE, langIsoCode),
+                value("created_cmm_studies", studiesUpdated.studiesCreated),
+                value("deleted_cmm_studies", studiesUpdated.studiesDeleted),
+                value("updated_cmm_studies", studiesUpdated.studiesUpdated));
       } else {
         log.error("BulkIndexing was unsuccessful for repo name [{}] and its corresponding [{}].  LangIsoCode [{}].",
                 value(REPO_NAME, repo.getName()),
                 value(REPO_ENDPOINT_URL, repo.getUrl()),
                 value(LANG_CODE, langIsoCode));
       }
+    } else {
+      log.debug("CmmStudies list is empty. Nothing to BulkIndex for repo [{}] with LangIsoCode [{}].",
+              value(REPO_NAME, repo.getName()),
+              value(LANG_CODE, langIsoCode));
     }
   }
 
-  private int getUpdatedStudies(String langIsoCode, List<CMMStudyOfLanguage> cmmStudies) {
+  /**
+   * Compares the collection of studies retrieved from remote repositories to the studies stored in Elasticsearch.
+   *
+   * @param cmmStudies the list of studies, harvested from remote repositories, to compare
+   * @param language   the language of the studies
+   * @return a {@link UpdatedStudies} describing the amount of created, deleted and updated studies
+   */
+  private UpdatedStudies getUpdatedStudies(Collection<CMMStudyOfLanguage> cmmStudies, String language) {
+
+    var studiesCreated = new AtomicInteger(0);
+    var studiesDeleted = new AtomicInteger(0);
     var studiesUpdated = new AtomicInteger(0);
-    cmmStudies.parallelStream().forEach(study -> {
-      var esStudy = esIndexerService.getStudy(study.getId(), langIsoCode);
-      if (esStudy.isEmpty() || !study.equals(esStudy.get())) {
-        studiesUpdated.getAndIncrement();
+
+    cmmStudies.parallelStream().forEach(remoteStudy -> {
+      var esStudyOptional = esIndexerService.getStudy(remoteStudy.getId(), language);
+
+      // If empty then the study didn't exist in Elasticsearch, and will be created
+      if (esStudyOptional.isEmpty()) {
+        if (remoteStudy.isActive()) {
+          studiesCreated.getAndIncrement();
+        }
+      } else {
+        if (!remoteStudy.equals(esStudyOptional.get())) {
+          // If not equal
+          if (remoteStudy.isActive()) {
+            // The study has been deleted
+            studiesUpdated.getAndIncrement();
+          } else {
+            // The study has been updated
+            studiesDeleted.getAndIncrement();
+          }
+        }
       }
     });
-    return studiesUpdated.get();
+
+    return new UpdatedStudies(studiesCreated.get(), studiesDeleted.get(), studiesUpdated.get());
+  }
+
+  @Value
+  public static class UpdatedStudies {
+    int studiesCreated;
+    int studiesDeleted;
+    int studiesUpdated;
   }
 
   private Map<String, List<CMMStudyOfLanguage>> getCmmStudiesOfEachLangIsoCodeMap(Repo repo, LocalDateTime lastModifiedDateTime) {
