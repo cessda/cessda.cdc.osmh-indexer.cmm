@@ -37,8 +37,6 @@ import java.time.Instant;
 @Slf4j
 public class DaoBase {
 
-    public static final String EXCEPTION_MESSAGE = "Unsuccessful response from [%s], %s";
-
     private final HttpClient httpClient;
     private final AppConfigurationProperties appConfigurationProperties;
 
@@ -47,11 +45,11 @@ public class DaoBase {
         this.appConfigurationProperties = appConfigurationProperties;
     }
 
-    protected InputStream postForStringResponse(String fullUrl) throws ExternalSystemException {
+    protected InputStream postForStringResponse(String fullUrl) throws IOException {
         return postForStringResponse(URI.create(fullUrl));
     }
 
-    protected InputStream postForStringResponse(URI fullUrl) throws ExternalSystemException {
+    protected InputStream postForStringResponse(URI fullUrl) throws IOException {
         HttpRequest httpRequest = HttpRequest
                 .newBuilder(fullUrl)
                 .timeout(Duration.ofMillis(appConfigurationProperties.getRestTemplateProps().getReadTimeout()))
@@ -80,13 +78,11 @@ public class DaoBase {
             }
             try (InputStream body = httpResponse.body()) {
                 throw new ExternalSystemException(
-                        String.format(EXCEPTION_MESSAGE, fullUrl, String.format("Server returned %d", httpResponse.statusCode())),
+                        String.format("Server returned %d", httpResponse.statusCode()),
                         httpResponse.statusCode(),
                         new String(body.readAllBytes(), StandardCharsets.UTF_8)
                 );
             }
-        } catch (IOException e) {
-            throw new ExternalSystemException(String.format(EXCEPTION_MESSAGE, fullUrl, e), e);
         } catch (InterruptedException e) {
             log.warn("Interrupted. Request cancelled.");
             Thread.currentThread().interrupt();

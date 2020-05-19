@@ -257,7 +257,7 @@ public class ConsumerScheduler {
     log.info("Processing Repo [{}]", repo);
     List<RecordHeader> recordHeaders = harvesterConsumerService.listRecordHeaders(repo, lastModifiedDateTime);
 
-    log.info("Repo [{}].  Returned with [{}] record headers", repo, recordHeaders.size());
+    log.info("Repo [{}] returned with [{}] record headers", repo.getName(), recordHeaders.size());
 
     List<CMMStudy> presentCMMStudies = recordHeaders.stream()
             .map(recordHeader -> harvesterConsumerService.getRecord(repo, recordHeader.getIdentifier()))

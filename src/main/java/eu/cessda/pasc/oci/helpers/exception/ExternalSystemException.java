@@ -20,32 +20,20 @@ import lombok.Value;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Optional;
 
 /**
  * Exception for external encountered Exceptions
  *
  * @author moses AT doraventures DOT com
  */
-public class ExternalSystemException extends Exception {
+public class ExternalSystemException extends IOException {
 
   private static final long serialVersionUID = 928798312826959273L;
 
   private final ExternalResponse externalResponse;
 
   /**
-   * Constructs an ExternalSystemException with the specified message and cause.
-   *
-   * @param message the detail message
-   * @param cause   the cause
-   */
-  public ExternalSystemException(@NonNull String message, @NonNull IOException cause) {
-    super(message, cause);
-    externalResponse = null;
-  }
-
-  /**
-   * Constructs an ExternalSystemException with the specified message, cause and external response body.
+   * Constructs an ExternalSystemException with the specified message, status code and external response body.
    *
    * @param message              the detail message
    * @param statusCode           the status code of the external response that caused this exception
@@ -57,10 +45,11 @@ public class ExternalSystemException extends Exception {
   }
 
   /**
-   * Gets the external response that caused this exception, or an empty optional if no response was received.
+   * Gets the external response that caused this exception.
    */
-  public Optional<ExternalResponse> getExternalResponse() {
-    return Optional.ofNullable(externalResponse);
+  @NonNull
+  public ExternalResponse getExternalResponse() {
+    return externalResponse;
   }
 
   /**

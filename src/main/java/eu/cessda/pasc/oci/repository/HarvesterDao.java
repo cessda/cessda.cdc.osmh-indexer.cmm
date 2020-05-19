@@ -15,8 +15,7 @@
  */
 package eu.cessda.pasc.oci.repository;
 
-import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
-
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 
@@ -26,7 +25,7 @@ import java.net.URI;
  * @author moses AT doraventures DOT com
  */
 public interface HarvesterDao {
-    InputStream listRecordHeaders(URI spRepository) throws ExternalSystemException;
+    InputStream listRecordHeaders(URI spRepository) throws IOException;
 
-    InputStream getRecord(URI url) throws ExternalSystemException;
+    InputStream getRecord(URI url) throws IOException;
 }
