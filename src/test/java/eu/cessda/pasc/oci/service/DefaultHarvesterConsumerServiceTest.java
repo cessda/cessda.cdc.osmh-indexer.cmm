@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.cessda.pasc.oci.AbstractSpringTestProfileContext;
 import eu.cessda.pasc.oci.helpers.FileHandler;
 import eu.cessda.pasc.oci.helpers.TimeUtility;
-import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
@@ -79,7 +78,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
   }
 
   @Test
-  public void shouldReturnASuccessfulResponseForListingRecordHeaders() throws ExternalSystemException {
+  public void shouldReturnASuccessfulResponseForListingRecordHeaders() throws IOException {
 
     when(harvesterDao.listRecordHeaders(any(URI.class))).thenReturn(
             new ByteArrayInputStream(LIST_RECORDER_HEADERS_BODY_EXAMPLE.getBytes(StandardCharsets.UTF_8))
@@ -91,7 +90,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
   }
 
   @Test
-  public void shouldReturnFilterRecordHeadersByLastModifiedDate() throws ExternalSystemException {
+  public void shouldReturnFilterRecordHeadersByLastModifiedDate() throws IOException {
     Repo repo = getUKDSRepo();
     LocalDateTime lastModifiedDateCutOff = TimeUtility.getLocalDateTime("2018-02-01T07:48:38Z").get();
 
@@ -108,7 +107,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
   }
 
   @Test
-  public void shouldFilterRecordHeadersByLastModifiedDateAndInvalidLastDateTimeStrings() throws ExternalSystemException {
+  public void shouldFilterRecordHeadersByLastModifiedDateAndInvalidLastDateTimeStrings() throws IOException {
     Repo repo = getUKDSRepo();
     LocalDateTime lastModifiedCutOff = TimeUtility.getLocalDateTime("2018-02-10T07:48:38Z").orElse(null);
 
@@ -125,7 +124,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
   }
 
   @Test
-  public void shouldReturnUnFilterRecordHeadersWhenLastModifiedDateIsNull() throws ExternalSystemException {
+  public void shouldReturnUnFilterRecordHeadersWhenLastModifiedDateIsNull() throws IOException {
 
     // FIXME: add more mocks to LIST_RECORDER_HEADERS_BODY_EXAMPLE with very old timestamps to filter out
     when(harvesterDao.listRecordHeaders(any(URI.class))).thenReturn(
@@ -138,9 +137,9 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
   }
 
   @Test
-  public void shouldReturnEmptyHeaderListWhenExternalSystemExceptionIsThrown() throws ExternalSystemException {
+  public void shouldReturnEmptyHeaderListWhenExternalSystemExceptionIsThrown() throws IOException {
 
-    when(harvesterDao.listRecordHeaders(any(URI.class))).thenThrow(new ExternalSystemException("Mocked!", null));
+    when(harvesterDao.listRecordHeaders(any(URI.class))).thenThrow(new IOException("Mocked!"));
     Repo repo = getUKDSRepo();
 
     List<RecordHeader> recordHeaders = defaultHarvesterConsumerService.listRecordHeaders(repo, null);
@@ -149,7 +148,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
 
   @SuppressWarnings("unchecked")
   @Test
-  public void shouldReturnEmptyListWhenIOExceptionIsThrown() throws ExternalSystemException {
+  public void shouldReturnEmptyListWhenIOExceptionIsThrown() throws IOException {
 
     when(harvesterDao.listRecordHeaders(any(URI.class))).thenThrow(IOException.class);
     Repo repo = getUKDSRepo();
@@ -160,7 +159,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
 
   @SuppressWarnings("unchecked")
   @Test
-  public void shouldReturnEmptyListWhenURISyntaxExceptionIsThrown() throws ExternalSystemException {
+  public void shouldReturnEmptyListWhenURISyntaxExceptionIsThrown() throws IOException {
 
     when(harvesterDao.listRecordHeaders(any(URI.class))).thenThrow(URISyntaxException.class);
     Repo repo = getUKDSRepo();
@@ -170,13 +169,13 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
   }
 
   @Test
-  public void shouldReturnEmptyCMMStudyListWhenExternalSystemExceptionIsThrown() throws ExternalSystemException {
+  public void shouldReturnEmptyCMMStudyListWhenExternalSystemExceptionIsThrown() throws IOException {
     // Given
     Repo repoMock = mock(Repo.class);
     when(repoMock.getUrl()).thenReturn(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
     when(repoMock.getHandler()).thenReturn(Harvester.Type.NESSTAR);
 
-    when(harvesterDao.getRecord(any(URI.class))).thenThrow(new ExternalSystemException("Mocked!", null));
+    when(harvesterDao.getRecord(any(URI.class))).thenThrow(new IOException("Mocked!"));
 
     Optional<CMMStudy> actualRecord = defaultHarvesterConsumerService.getRecord(repoMock, "4124325");
 
@@ -186,7 +185,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
 
   @SuppressWarnings("unchecked")
   @Test
-  public void shouldReturnEmptyCMMStudyListWhenIOExceptionIsThrown() throws ExternalSystemException {
+  public void shouldReturnEmptyCMMStudyListWhenIOExceptionIsThrown() throws IOException {
     // Given
     Repo repoMock = mock(Repo.class);
     when(repoMock.getUrl()).thenReturn(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
@@ -202,7 +201,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
 
   @SuppressWarnings("unchecked")
   @Test
-  public void shouldReturnEmptyCMMStudyListWhenURISyntaxExceptionIsThrown() throws ExternalSystemException {
+  public void shouldReturnEmptyCMMStudyListWhenURISyntaxExceptionIsThrown() throws IOException {
     // Given
     Repo repoMock = mock(Repo.class);
     when(repoMock.getUrl()).thenReturn(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
@@ -217,7 +216,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
   }
 
   @Test
-  public void shouldReturnASuccessfulResponseGetRecord() throws ExternalSystemException, IOException {
+  public void shouldReturnASuccessfulResponseGetRecord() throws IOException {
     FileHandler fileHandler = new FileHandler();
     String recordUkds998 = fileHandler.getFileAsString("record_ukds_998.json");
     String recordID = "998";
@@ -242,7 +241,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
   }
 
   @Test
-  public void shouldReturnDeletedRecordMarkedAsInactive() throws ExternalSystemException, IOException {
+  public void shouldReturnDeletedRecordMarkedAsInactive() throws IOException {
     FileHandler fileHandler = new FileHandler();
     String recordUkds1031 = fileHandler.getFileAsString("record_ukds_1031_deleted.json");
     String recordID = "1031";

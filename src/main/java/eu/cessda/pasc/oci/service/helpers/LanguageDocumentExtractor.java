@@ -49,7 +49,7 @@ public class LanguageDocumentExtractor {
    */
   public Map<String, List<CMMStudyOfLanguage>> mapLanguageDoc(Collection<CMMStudy> cmmStudies, String spName) {
 
-    log.info("Mapping CMMStudy to CMMStudyOfLanguage for SP[{}] with [{}] records", spName, cmmStudies.size());
+    log.debug("Mapping CMMStudy to CMMStudyOfLanguage for SP[{}] with [{}] records", spName, cmmStudies.size());
     Map<String, List<CMMStudyOfLanguage>> languageDocMap = new HashMap<>();
     String idPrefix = spName.trim().replace(" ", "-") + "__"; // UK Data Service = UK-Data-Service__
 
@@ -84,7 +84,7 @@ public class LanguageDocumentExtractor {
    */
   boolean isValidCMMStudyForLang(String languageIsoCode, String idPrefix, CMMStudy cmmStudy) {
 
-    if (null == cmmStudy) {
+    if (cmmStudy == null) {
       logInvalidCMMStudy("Study is null for language[{}] with studyNumber [{}]", languageIsoCode, idPrefix, null);
       return false;
     }
@@ -100,7 +100,7 @@ public class LanguageDocumentExtractor {
 
   private void logInvalidCMMStudy(String msgTemplate, String languageIsoCode, String idPrefix, CMMStudy cmmStudy) {
     if (log.isWarnEnabled()) {
-      final String studyNumber = idPrefix + "-" + (Optional.ofNullable(cmmStudy).map(CMMStudy::getStudyNumber).orElse("Empty"));
+      final String studyNumber = idPrefix + "-" + Optional.ofNullable(cmmStudy).map(CMMStudy::getStudyNumber).orElse("Empty");
       log.warn(msgTemplate, languageIsoCode, studyNumber);
     }
   }

@@ -15,41 +15,51 @@
  */
 package eu.cessda.pasc.oci.helpers.exception;
 
-import lombok.Getter;
 import lombok.NonNull;
+import lombok.Value;
+
+import java.io.IOException;
+import java.io.Serializable;
 
 /**
  * Exception for external encountered Exceptions
  *
  * @author moses AT doraventures DOT com
  */
-public class ExternalSystemException extends CustomExceptionBase {
+public class ExternalSystemException extends IOException {
 
   private static final long serialVersionUID = 928798312826959273L;
 
-  @Getter
-  private final String externalResponseBody;
+  private final ExternalResponse externalResponse;
 
   /**
-   * Constructs an ExternalSystemException with the specified message and cause.
+   * Constructs an ExternalSystemException with the specified message, status code and external response body.
    *
-   * @param message the detail message
-   * @param cause   the cause
+   * @param message              the detail message
+   * @param statusCode           the status code of the external response that caused this exception
+   * @param externalResponseBody the body of the external response that caused this exception
    */
-  public ExternalSystemException(String message, Throwable cause) {
-    super(message, cause);
-    externalResponseBody = null;
+  public ExternalSystemException(@NonNull String message, int statusCode, @NonNull String externalResponseBody) {
+    super(message);
+    externalResponse = new ExternalResponse(externalResponseBody, statusCode);
   }
 
   /**
-   * Constructs an ExternalSystemException with the specified message, cause and external response body.
-   *
-   * @param message              the detail message
-   * @param cause                the cause
-   * @param externalResponseBody the external response that caused this exception
+   * Gets the external response that caused this exception.
    */
-  public ExternalSystemException(String message, Throwable cause, @NonNull String externalResponseBody) {
-    super(message, cause);
-    this.externalResponseBody = externalResponseBody;
+  @NonNull
+  public ExternalResponse getExternalResponse() {
+    return externalResponse;
+  }
+
+  /**
+   * An immutable object describing the status code and the body of the external response.
+   */
+  @Value
+  public static class ExternalResponse implements Serializable {
+    private static final long serialVersionUID = -7110617275735794989L;
+    @NonNull
+    String externalResponseBody;
+    int statusCode;
   }
 }

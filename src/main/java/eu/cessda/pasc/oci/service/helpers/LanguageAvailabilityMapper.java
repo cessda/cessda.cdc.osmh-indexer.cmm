@@ -23,9 +23,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-
-import static java.util.Optional.ofNullable;
 
 /**
  * Component responsible for extracting and mapping languages in which a given CMMStudy is available.
@@ -47,16 +44,16 @@ public class LanguageAvailabilityMapper {
   public void setAvailableLanguages(CMMStudy cmmStudy) {
 
     final List<String> propertiesLanguages = appConfigurationProperties.getLanguages();
-    propertiesLanguages.forEach(lang -> {
+    for (String lang : propertiesLanguages) {
       if (hasMinimumCmmFields(lang, cmmStudy)) {
         cmmStudy.getLangAvailableIn().add(lang);
       }
-    });
+    }
   }
 
   private boolean hasMinimumCmmFields(String languageIsoCode, CMMStudy cmmStudy) {
 
-    if (null == cmmStudy) {
+    if (cmmStudy == null) {
       return false;
     }
 
@@ -68,22 +65,22 @@ public class LanguageAvailabilityMapper {
   }
 
   private boolean hasPublisher(String languageIsoCode, CMMStudy cmmStudy) {
-    Optional<Map<String, Publisher>> publisherOpt = ofNullable(cmmStudy.getPublisher());
-    return publisherOpt.isPresent() && ofNullable(publisherOpt.get().get(languageIsoCode)).isPresent();
+    Map<String, Publisher> publisherMap = cmmStudy.getPublisher();
+    return (publisherMap != null) && (publisherMap.get(languageIsoCode) != null);
   }
 
   private boolean hasStudyNumber(CMMStudy cmmStudy) {
-    Optional<String> studyNumberOpt = ofNullable(cmmStudy.getStudyNumber());
-    return studyNumberOpt.isPresent() && !studyNumberOpt.get().isEmpty();
+    String studyNumber = cmmStudy.getStudyNumber();
+    return (studyNumber != null) && !studyNumber.isEmpty();
   }
 
   private boolean hasAbstract(String languageIsoCode, CMMStudy cmmStudy) {
-    Optional<Map<String, String>> abstractFieldOpt = ofNullable(cmmStudy.getAbstractField());
-    return abstractFieldOpt.isPresent() && ofNullable(abstractFieldOpt.get().get(languageIsoCode)).isPresent();
+    Map<String, String> abstractFieldMap = cmmStudy.getAbstractField();
+    return (abstractFieldMap != null) && (abstractFieldMap.get(languageIsoCode) != null);
   }
 
   private boolean hasTitle(String languageIsoCode, CMMStudy cmmStudy) {
-    Optional<Map<String, String>> titleStudyOpt = ofNullable(cmmStudy.getTitleStudy());
-    return titleStudyOpt.isPresent() && ofNullable(titleStudyOpt.get().get(languageIsoCode)).isPresent();
+    Map<String, String> titleStudyMap = cmmStudy.getTitleStudy();
+    return (titleStudyMap != null) && (titleStudyMap.get(languageIsoCode) != null);
   }
 }

@@ -16,11 +16,11 @@
 package eu.cessda.pasc.oci.repository;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
-import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -41,12 +41,12 @@ public class PascHarvesterDao extends DaoBase implements HarvesterDao {
     }
 
     @Override
-    public InputStream listRecordHeaders(URI finalUrl) throws ExternalSystemException {
+    public InputStream listRecordHeaders(URI finalUrl) throws IOException {
         return postForStringResponse(finalUrl);
     }
 
     @Override
-    public InputStream getRecord(URI finalUrl) throws ExternalSystemException {
+    public InputStream getRecord(URI finalUrl) throws IOException {
         return postForStringResponse(finalUrl);
     }
 }

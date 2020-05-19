@@ -31,8 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static net.logstash.logback.argument.StructuredArguments.keyValue;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -43,6 +41,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import static net.logstash.logback.argument.StructuredArguments.*;
 
 /**
  * Default OSMH Consumer Service implementation
@@ -57,8 +57,8 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
   private final RepositoryUrlService repositoryUrlService;
   private final ObjectReader recordHeaderObjectReader;
   private final CMMStudyConverter cmmStudyConverter;
+
   private static final String REPO_NAME = "repo_name";
-  private static final String LANG_CODE = "lang_code";
   private static final String REPO_ENDPOINT_URL = "repo_endpoint_url";
   private static final String REASON = "rejection_reason";
 
@@ -81,10 +81,9 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
       try (InputStream recordHeadersJsonStream = harvesterDao.listRecordHeaders(finalUrl)) {
         recordHeadersUnfiltered = recordHeaderObjectReader.readValue(recordHeadersJsonStream);
       }
-    } catch (ExternalSystemException e) {
-      log.error("ListRecordHeaders failed for repo [{}] [{}]. CDC Handler Error object Msg [{}].",keyValue(REPO_NAME, repo.getName()), keyValue(REPO_ENDPOINT_URL, repo.getUrl()), e.getMessage(), e);
     } catch (IOException e) {
-      log.error("Error, Unable to pass ListRecordHeaders response error message [{}].", e.getMessage(), e);
+      log.error("ListRecordHeaders failed for repo [{}] [{}]. {}.",
+              value(REPO_NAME, repo.getName()), value(REPO_ENDPOINT_URL, repo.getUrl()), e.toString());
     } catch (URISyntaxException e) {
       log.error("Unable to construct URL [{}]", e.toString());
     }
@@ -101,16 +100,16 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
         return Optional.of(cmmStudyConverter.fromJsonString(recordJsonStream));
       }
     } catch (ExternalSystemException e) {
-      log.warn("[{}], response detail from handler [{}], URL to handler for harvesting record [{}] with [{}] from repo [{}] [{}].",
+      log.warn("{}. Response detail from handler [{}], URL to handler for harvesting record [{}] with [{}] from repo [{}] [{}].",
               e.toString(),
-              keyValue(REASON, e.getExternalResponseBody()),
-              finalUrl,   
+              raw(REASON, e.getExternalResponse().getExternalResponseBody()),
+              finalUrl,
               keyValue("study_id", studyNumber),
-              keyValue(REPO_ENDPOINT_URL, repo.getUrl()),
-              keyValue(REPO_NAME, repo.getName())
+              value(REPO_NAME, repo.getName()),
+              value(REPO_ENDPOINT_URL, repo.getUrl())
       );
     } catch (IOException e) {
-      log.error("Error, Unable to pass GetRecord response error message [{}].", e.getMessage(), e);
+      log.error("Unable to parse GetRecord response. {}.", e.toString());
     } catch (URISyntaxException e) {
       log.error("Unable to construct URL [{}]", e.toString());
     }

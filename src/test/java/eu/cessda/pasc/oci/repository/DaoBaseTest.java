@@ -54,7 +54,7 @@ public class DaoBaseTest extends AbstractSpringTestProfileContext {
     }
 
     @Test
-    public void shouldPostForStringResponse() throws ExternalSystemException, IOException {
+    public void shouldPostForStringResponse() throws IOException {
 
         // Given
         String expectedUrl = "http://cdc-osmh-repo:9091/v0/ListRecordHeaders?" +
@@ -77,19 +77,20 @@ public class DaoBaseTest extends AbstractSpringTestProfileContext {
         String expectedUrl = "http://cdc-osmh-repo:9091/v0/ListRecordHeaders?" +
                 "Repository=https://oai.ukdataservice.ac.uk:8443/oai/provider";
 
-        httpClient.onGet(expectedUrl).doReturn(400, "The exception wasn't thrown.");
+        int expectedStatusCode = 400;
+        httpClient.onGet(expectedUrl).doReturn(expectedStatusCode, "The exception wasn't thrown.");
 
         // When
         DaoBase daoBase = new DaoBase(httpClient, appConfigurationProperties);
         try (InputStream inputStream = daoBase.postForStringResponse(expectedUrl)) {
             Assert.fail(new String(inputStream.readAllBytes(), Charset.defaultCharset()));
         } catch (ExternalSystemException e) {
-            Assert.assertNotNull(e.getExternalResponseBody());
+            Assert.assertEquals(expectedStatusCode, e.getExternalResponse().getStatusCode());
         }
     }
 
     @Test
-    public void shouldReturnEmptyStreamWhenInterrupted() throws ExternalSystemException, IOException {
+    public void shouldReturnEmptyStreamWhenInterrupted() throws IOException {
 
         // Given
         httpClient.onGet().doAction(DaoBaseTest::throwInterruptedException);
@@ -101,8 +102,8 @@ public class DaoBaseTest extends AbstractSpringTestProfileContext {
         }
     }
 
-    @Test
-    public void shouldThrowExternalSystemExceptionWithNoBodyWhenIOExceptionIsThrown() throws IOException {
+    @Test(expected = IOException.class)
+    public void shouldPassThroughIOException() throws IOException {
 
         // Given
         httpClient.onGet().doThrowException(new IOException("Mocked!"));
@@ -111,8 +112,6 @@ public class DaoBaseTest extends AbstractSpringTestProfileContext {
         DaoBase daoBase = new DaoBase(httpClient, appConfigurationProperties);
         try (InputStream inputStream = daoBase.postForStringResponse("http://error.endpoint/")) {
             Assert.fail(new String(inputStream.readAllBytes(), Charset.defaultCharset()));
-        } catch (ExternalSystemException e) {
-            Assert.assertNull(e.getExternalResponseBody());
         }
     }
 }

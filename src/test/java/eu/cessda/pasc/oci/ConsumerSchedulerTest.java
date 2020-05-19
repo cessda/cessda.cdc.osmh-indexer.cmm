@@ -73,7 +73,7 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
   @Autowired
   ObjectMapper objectMapper;
 
-  MicrometerMetrics micrometerMetrics = Mockito.mock(MicrometerMetrics.class);
+  final MicrometerMetrics micrometerMetrics = Mockito.mock(MicrometerMetrics.class);
 
   ElasticsearchTemplate esTemplate;
 

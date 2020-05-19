@@ -51,7 +51,7 @@ public class RepositoryUrlService
                 URLEncoder.encode(repo.getUrl().toString(), StandardCharsets.UTF_8)
         );
         URI finalUrl = new URI(finalUrlString);
-        log.info("[{}] Final ListHeaders Handler url [{}] constructed.", repo.getUrl(), finalUrlString);
+        log.trace("[{}] Final ListHeaders Handler url [{}] constructed.", repo.getName(), finalUrlString);
         return finalUrl;
     }
 

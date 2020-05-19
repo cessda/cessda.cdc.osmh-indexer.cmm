@@ -19,7 +19,6 @@ package eu.cessda.pasc.oci.repository;
 import com.pgssoft.httpclient.HttpClientMock;
 import eu.cessda.pasc.oci.AbstractSpringTestProfileContext;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
-import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,10 +43,10 @@ public class PascHarvesterDaoTest extends AbstractSpringTestProfileContext {
   @Autowired
   private AppConfigurationProperties appConfigurationProperties;
 
-  private HttpClientMock httpClient = new HttpClientMock();
+  private final HttpClientMock httpClient = new HttpClientMock();
 
   @Test
-  public void shouldReturnSuccessfulHttpResponseListRecord() throws ExternalSystemException, IOException {
+  public void shouldReturnSuccessfulHttpResponseListRecord() throws IOException {
 
     // Given
     String expectedUrl = "http://cdc-osmh-repo:9091/v0/ListRecordHeaders?" +
@@ -64,7 +63,7 @@ public class PascHarvesterDaoTest extends AbstractSpringTestProfileContext {
   }
 
   @Test
-  public void shouldReturnSuccessfulHttpResponseForGetRecord() throws ExternalSystemException, IOException {
+  public void shouldReturnSuccessfulHttpResponseForGetRecord() throws IOException {
 
     // Given
     String expectedUrl = "http://cdc-osmh-repo:9091/v0/GetRecord/CMMStudy/998?" +
