@@ -16,6 +16,7 @@
 package eu.cessda.pasc.oci.configurations;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.mizosoft.methanol.Methanol;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
@@ -83,8 +84,10 @@ public class AppUtilityBeansConfiguration {
 
   @Bean
   public HttpClient httpClient() {
-    return HttpClient.newBuilder()
+    return Methanol.newBuilder()
+            .autoAcceptEncoding(true)
             .connectTimeout(Duration.ofMillis(appConfigurationProperties.getRestTemplateProps().getConnTimeout()))
+            .requestTimeout(Duration.ofMillis(appConfigurationProperties.getRestTemplateProps().getReadTimeout()))
             .followRedirects(HttpClient.Redirect.NORMAL)
             .build();
   }
