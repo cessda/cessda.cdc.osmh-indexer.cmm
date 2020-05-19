@@ -33,14 +33,13 @@ public class ExternalSystemException extends IOException {
   private final ExternalResponse externalResponse;
 
   /**
-   * Constructs an ExternalSystemException with the specified message, status code and external response body.
+   * Constructs an ExternalSystemException with the specified status code and external response body.
    *
-   * @param message              the detail message
    * @param statusCode           the status code of the external response that caused this exception
    * @param externalResponseBody the body of the external response that caused this exception
    */
-  public ExternalSystemException(@NonNull String message, int statusCode, @NonNull String externalResponseBody) {
-    super(message);
+  public ExternalSystemException(int statusCode, @NonNull String externalResponseBody) {
+    super(String.format("Server returned %d", statusCode));
     externalResponse = new ExternalResponse(externalResponseBody, statusCode);
   }
 

@@ -78,7 +78,6 @@ public class DaoBase {
             }
             try (InputStream body = httpResponse.body()) {
                 throw new ExternalSystemException(
-                        String.format("Server returned %d", httpResponse.statusCode()),
                         httpResponse.statusCode(),
                         new String(body.readAllBytes(), StandardCharsets.UTF_8)
                 );
