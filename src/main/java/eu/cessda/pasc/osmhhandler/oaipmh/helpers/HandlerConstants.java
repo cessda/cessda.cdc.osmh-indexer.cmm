@@ -42,9 +42,9 @@ public class HandlerConstants {
 
   // Metadata handling
   static final String NOT_AVAIL = "not available";
-  static final String LANG_NOT_AVAIL = "Language not available";
-  static final String AGENCY_NOT_AVAIL = "Agency not available";
-  static final String DATE_NOT_AVAIL = "Date not available";
+  static final String LANG_NOT_AVAIL = "Language not specified";
+  static final String AGENCY_NOT_AVAIL = "Agency not specified";
+  static final String DATE_NOT_AVAIL = "Date not specified";
   static final String EMPTY_EL = "empty";
   public static final String STUDY = "Study";
 
