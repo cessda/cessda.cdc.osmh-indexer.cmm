@@ -40,7 +40,7 @@ class ParsingStrategies {
   static Function<Element, Optional<Country>> countryStrategyFunction() {
     return element -> {
       Country country = Country.builder()
-              .iso2LetterCode(getAttributeValue(element, ABBR_ATTR).orElse(HandlerConstants.LANG_NOT_AVAIL))
+              .iso2LetterCode(getAttributeValue(element, ABBR_ATTR).orElse(HandlerConstants.COUNTRY_NOT_AVAIL))
               .countryName(CLEAN_CHARACTER_RETURNS_STRATEGY.apply(element.getText()))
               .build();
       return Optional.of(country);
@@ -73,7 +73,7 @@ class ParsingStrategies {
 
   static Function<Element, Publisher> publisherStrategyFunction() {
     return element -> Publisher.builder()
-            .iso2LetterCode(getAttributeValue(element, ABBR_ATTR).orElse(HandlerConstants.LANG_NOT_AVAIL))
+            .iso2LetterCode(getAttributeValue(element, ABBR_ATTR).orElse(HandlerConstants.PUBLISHER_NOT_AVAIL))
             .publisher(CLEAN_CHARACTER_RETURNS_STRATEGY.apply(element.getText())).build();
   }
 
