@@ -41,10 +41,9 @@ public class HandlerConstants {
   public static final String RECORD_HEADER = "RecordHeader";
 
   // Metadata handling
-  static final String NOT_AVAIL = "not available";
+  static final String NOT_AVAIL = "Not specified";
   static final String PUBLISHER_NOT_AVAIL = "Publisher not specified";
   static final String COUNTRY_NOT_AVAIL = "Country not specified";
-  static final String LANG_NOT_AVAIL = "Language not specified";
   static final String AGENCY_NOT_AVAIL = "Agency not specified";
   static final String DATE_NOT_AVAIL = "Date not specified";
   static final String EMPTY_EL = "empty";
