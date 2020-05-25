@@ -64,7 +64,7 @@ public class GetRecordDoaImplTest {
         httpClient.onGet(expectedUrl).doReturnXML(expectedUrl, StandardCharsets.UTF_8);
 
         // When
-        GetRecordDoa recordDoa = new GetRecordDoaImpl(httpClient, handlerConfigurationProperties);
+        GetRecordDoa recordDoa = new GetRecordDoaImpl(httpClient);
         try (InputStream responseXMLRecord = recordDoa.getRecordXML(expectedUrl)) {
             then(new String(responseXMLRecord.readAllBytes(), StandardCharsets.UTF_8)).isEqualTo(expectedUrl);
         }
@@ -80,7 +80,7 @@ public class GetRecordDoaImplTest {
         httpClient.onGet(expectedFullGetRecordUrl).doReturn(500, expectedFullGetRecordUrl);
 
         // When
-        GetRecordDoa recordDoa = new GetRecordDoaImpl(httpClient, handlerConfigurationProperties);
+        GetRecordDoa recordDoa = new GetRecordDoaImpl(httpClient);
         recordDoa.getRecordXML(expectedFullGetRecordUrl);
     }
 
@@ -91,7 +91,7 @@ public class GetRecordDoaImplTest {
         httpClient.onGet().doAction(GetRecordDoaImplTest::throwInterruptedException);
 
         // When
-        GetRecordDoa recordDoa = new GetRecordDoaImpl(httpClient, handlerConfigurationProperties);
+        GetRecordDoa recordDoa = new GetRecordDoaImpl(httpClient);
         try (InputStream empty = recordDoa.getRecordXML("http://error.endpoint/")) {
             Assert.assertEquals(-1, empty.read());
         }

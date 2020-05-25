@@ -17,6 +17,7 @@
 package eu.cessda.pasc.osmhhandler.oaipmh.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.mizosoft.methanol.Methanol;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -61,8 +62,10 @@ public class UtilitiesConfiguration {
 
   @Bean
   public HttpClient httpClient() {
-    return HttpClient.newBuilder()
+    return Methanol.newBuilder()
+            .autoAcceptEncoding(true)
             .connectTimeout(Duration.ofMillis(handlerConfigurationProperties.getRestTemplateProps().getConnTimeout()))
+            .requestTimeout(Duration.ofMillis(handlerConfigurationProperties.getRestTemplateProps().getReadTimeout()))
             .followRedirects(HttpClient.Redirect.NORMAL)
             .build();
   }

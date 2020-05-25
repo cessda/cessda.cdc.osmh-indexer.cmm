@@ -16,7 +16,6 @@
 
 package eu.cessda.pasc.osmhhandler.oaipmh.dao;
 
-import eu.cessda.pasc.osmhhandler.oaipmh.configuration.HandlerConfigurationProperties;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -33,8 +32,8 @@ import java.net.http.HttpClient;
 public class ListRecordHeadersDaoImpl extends DaoBase implements ListRecordHeadersDao {
 
     @Autowired
-    public ListRecordHeadersDaoImpl(HttpClient httpClient, HandlerConfigurationProperties handlerConfigurationProperties) {
-        super(httpClient, handlerConfigurationProperties);
+    public ListRecordHeadersDaoImpl(HttpClient httpClient) {
+        super(httpClient);
     }
 
     @Override

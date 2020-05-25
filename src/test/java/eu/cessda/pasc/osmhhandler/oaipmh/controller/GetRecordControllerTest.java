@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.cessda.pasc.osmhhandler.oaipmh.configuration.HandlerConfigurationProperties;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.CustomHandlerException;
+import eu.cessda.pasc.osmhhandler.oaipmh.models.cmmstudy.CMMConverter;
 import eu.cessda.pasc.osmhhandler.oaipmh.service.APISupportedServiceImpl;
 import eu.cessda.pasc.osmhhandler.oaipmh.service.GetRecordService;
 import org.hamcrest.core.IsNull;
@@ -52,14 +53,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SuppressWarnings("ProhibitedExceptionDeclared")
 @RunWith(SpringRunner.class)
 @WebMvcTest(GetRecordController.class)
-@Import({APISupportedServiceImpl.class, HandlerConfigurationProperties.class})
+@Import({APISupportedServiceImpl.class, CMMConverter.class, HandlerConfigurationProperties.class})
 @ActiveProfiles("test")
 public class GetRecordControllerTest {
 
   @Autowired
   private MockMvc mockMvc;
-  private static final ObjectMapper MAPPER = new ObjectMapper();
   private static final CustomHandlerException mockedCustomHandlerException = new CustomHandlerException("Mocked!");
+
+  @Autowired
+  private CMMConverter cmmConverter;
 
   @MockBean
   GetRecordService getRecordService;
@@ -69,9 +72,9 @@ public class GetRecordControllerTest {
 
     // Given
     given(this.getRecordService.getRecord("http://kirkedata.nsd.uib.no", "StudyID222"))
-        .willReturn(getCMMStudy());
+            .willReturn(getCMMStudy());
 
-    String expectedCMMStudyJsonString = MAPPER.writeValueAsString(getCMMStudy());
+    String expectedCMMStudyJsonString = cmmConverter.toJsonString(getCMMStudy());
 
     // When
     this.mockMvc.perform(get("/v0/GetRecord/CMMStudy/StudyID222?Repository=http://kirkedata.nsd.uib.no")
@@ -122,7 +125,7 @@ public class GetRecordControllerTest {
     Map<String, String> message = new HashMap<>();
     String invalidVersion = "v99";
     message.put("message", String.format(UNSUPPORTED_API_VERSION, invalidVersion));
-    String expectedMessage = MAPPER.writeValueAsString(message);
+    String expectedMessage = new ObjectMapper().writeValueAsString(message);
 
     // When
     this.mockMvc.perform(
@@ -142,7 +145,7 @@ public class GetRecordControllerTest {
     Map<String, String> message = new HashMap<>();
     String invalidVersion = "v99";
     message.put("message", THE_GIVEN_URL_IS_NOT_FOUND);
-    String expectedMessage = MAPPER.writeValueAsString(message);
+    String expectedMessage = new ObjectMapper().writeValueAsString(message);
 
     // When
     this.mockMvc.perform(

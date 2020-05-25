@@ -61,6 +61,7 @@ public class GetRecordServiceImplTest {
   private final static String REPO_URL = "http://services.fsd.uta.fi/v0/oai";
   private final static String RECORD_IDENTIFIER = "http://my-example_url:80/obj/fStudy/ch.sidos.ddi.468.7773";
   private final static String FULL_RECORD_URL = REPO_URL + "?verb=GetRecord&identifier=" + RECORD_IDENTIFIER + "&metadataPrefix=oai_ddi25";
+  private final CMMConverter cmmConverter = new CMMConverter();
 
 
   @MockBean
@@ -141,7 +142,7 @@ public class GetRecordServiceImplTest {
     then(record).isNotNull();
     validateCMMStudyResultAgainstSchema(record);
     final ObjectMapper mapper = new ObjectMapper();
-    String jsonString = CMMConverter.toJsonString(record);
+    String jsonString = cmmConverter.toJsonString(record);
     final JsonNode actualTree = mapper.readTree(jsonString);
 
     then(actualTree.get("dataCollectionPeriodStartdate").asText()).isEqualTo("1976-01-01T00:00:00Z");
@@ -160,7 +161,7 @@ public class GetRecordServiceImplTest {
 
     // When
     CMMStudy record = recordService.getRecord(REPO_URL, RECORD_IDENTIFIER);
-    String actualCmmStudyJsonString = CMMConverter.toJsonString(record);
+    String actualCmmStudyJsonString = cmmConverter.toJsonString(record);
 
     // then
     JSONAssert.assertEquals(expectedCmmStudyJsonString, actualCmmStudyJsonString, false);
@@ -259,7 +260,7 @@ public class GetRecordServiceImplTest {
 
     then(record.isActive()).isTrue(); // No need to carry on validating other fields if marked as inActive
 
-    String jsonString = CMMConverter.toJsonString(record);
+    String jsonString = cmmConverter.toJsonString(record);
     JSONObject json = new JSONObject(jsonString);
     System.out.println("RETRIEVED STUDY JSON: \n" + json.toString(4));
 
@@ -275,7 +276,7 @@ public class GetRecordServiceImplTest {
   private void assertFieldsAreExtractedAsExpected(CMMStudy record) throws IOException {
 
     final ObjectMapper mapper = new ObjectMapper();
-    String jsonString = CMMConverter.toJsonString(record);
+    String jsonString = cmmConverter.toJsonString(record);
     String expectedJson = CMMStudyTestData.getContent("json/synthetic_compliant_record.json");
     final JsonNode actualTree = mapper.readTree(jsonString);
     final JsonNode expectedTree = mapper.readTree(expectedJson);
@@ -314,7 +315,7 @@ public class GetRecordServiceImplTest {
   private void assertThatCmmRequiredFieldsAreExtracted(CMMStudy record) throws IOException {
 
     final ObjectMapper mapper = new ObjectMapper();
-    String jsonString = CMMConverter.toJsonString(record);
+    String jsonString = cmmConverter.toJsonString(record);
     String expectedJson = CMMStudyTestData.getContent("json/ddi_record_ukds_example_extracted.json");
     final JsonNode actualTree = mapper.readTree(jsonString);
     final JsonNode expectedTree = mapper.readTree(expectedJson);

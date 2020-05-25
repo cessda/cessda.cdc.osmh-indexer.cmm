@@ -108,11 +108,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-      <version>${httpclient.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.apache.directory.studio</groupId>
       <artifactId>org.apache.commons.io</artifactId>
       <version>${org.apache.commons.io.version}</version>
@@ -158,6 +153,11 @@
       <groupId>de.codecentric</groupId>
       <artifactId>spring-boot-admin-starter-client</artifactId>
       <version>${spring-boot-admin-starter-client.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.mizosoft.methanol</groupId>
+      <artifactId>methanol</artifactId>
+      <version>1.1.0</version>
     </dependency>
 
     <!-- Swagger UI-->

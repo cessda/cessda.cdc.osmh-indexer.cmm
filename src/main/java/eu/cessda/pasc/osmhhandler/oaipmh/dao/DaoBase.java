@@ -16,7 +16,6 @@
 
 package eu.cessda.pasc.osmhhandler.oaipmh.dao;
 
-import eu.cessda.pasc.osmhhandler.oaipmh.configuration.HandlerConfigurationProperties;
 import eu.cessda.pasc.osmhhandler.oaipmh.exception.ExternalSystemException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,11 +39,9 @@ public class DaoBase {
 
     public static final String EXCEPTION_MESSAGE = "RestClientException! Unsuccessful response from remote SP's Endpoint [%s]";
     private final HttpClient httpClient;
-    private final HandlerConfigurationProperties handlerConfigurationProperties;
 
-    public DaoBase(HttpClient httpClient, HandlerConfigurationProperties handlerConfigurationProperties) {
+    public DaoBase(HttpClient httpClient) {
         this.httpClient = httpClient;
-        this.handlerConfigurationProperties = handlerConfigurationProperties;
     }
 
     protected InputStream postForStringResponse(String fullUrl) throws ExternalSystemException {
@@ -52,10 +49,7 @@ public class DaoBase {
     }
 
     protected InputStream postForStringResponse(URI fullUrl) throws ExternalSystemException {
-        HttpRequest httpRequest = HttpRequest
-                .newBuilder(fullUrl)
-                .timeout(Duration.ofMillis(handlerConfigurationProperties.getRestTemplateProps().getReadTimeout()))
-                .build();
+        HttpRequest httpRequest = HttpRequest.newBuilder(fullUrl).build();
         try {
             log.debug("Sending request to remote SP with url [{}].", fullUrl);
 
@@ -70,7 +64,8 @@ public class DaoBase {
                 Instant end = Instant.now();
                 assert start != null;
                 log.debug("Got response code of [{}], getting headers took [{}] ms",
-                        httpResponse.statusCode(), Duration.between(start, end).toMillis());
+                        httpResponse.statusCode(), Duration.between(start, end).toMillis()
+                );
             }
 
             // Check the returned HTTP status code, throw an exception if not a success code
