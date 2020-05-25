@@ -54,7 +54,7 @@ public class ListRecordHeadersDaoImplTest {
         httpClient.onGet(fullListRecordHeadersUrl).doReturn(fullListRecordHeadersUrl, StandardCharsets.UTF_8);
 
         // When
-        ListRecordHeadersDao listRecordHeadersDao = new ListRecordHeadersDaoImpl(httpClient, handlerConfigurationProperties);
+        ListRecordHeadersDao listRecordHeadersDao = new ListRecordHeadersDaoImpl(httpClient);
         try (InputStream inputStream = listRecordHeadersDao.listRecordHeaders(fullListRecordHeadersUrl)) {
             String recordHeadersXML = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
             System.out.println("Actual: " + recordHeadersXML);
@@ -74,7 +74,7 @@ public class ListRecordHeadersDaoImplTest {
         httpClient.onGet(fullListRecordHeadersUrl).doReturn(fullListRecordHeadersUrl, StandardCharsets.UTF_8);
 
         // When
-        ListRecordHeadersDao listRecordHeadersDao = new ListRecordHeadersDaoImpl(httpClient, handlerConfigurationProperties);
+        ListRecordHeadersDao listRecordHeadersDao = new ListRecordHeadersDaoImpl(httpClient);
         try (InputStream inputStream = listRecordHeadersDao.listRecordHeaders(fullListRecordHeadersUrl)) {
             String recordHeadersXML = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 
