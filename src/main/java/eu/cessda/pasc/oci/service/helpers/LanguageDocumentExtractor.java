@@ -114,8 +114,8 @@ public class LanguageDocumentExtractor {
 
     // Language neutral specific field extraction
     builder.id(idPrefix + cmmStudy.getStudyNumber())
-        .studyNumber(cmmStudy.getStudyNumber())
-        .active(cmmStudy.isActive())
+            .studyNumber(cmmStudy.getStudyNumber())
+            .active(cmmStudy.isActive())
             .lastModified(cmmStudy.getLastModified())
             .publicationYear(cmmStudy.getPublicationYear())
             .fileLanguages(cmmStudy.getFileLanguages())

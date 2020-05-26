@@ -23,9 +23,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.EnableMBeanExport;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.jmx.support.RegistrationPolicy;
 
 @SpringBootApplication
-@EnableMBeanExport
+@EnableMBeanExport(registration = RegistrationPolicy.REPLACE_EXISTING)
 @Slf4j
 public class OCIApplication {
 

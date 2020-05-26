@@ -17,8 +17,10 @@
 package eu.cessda.pasc.oci.dao;
 
 import com.pgssoft.httpclient.HttpClientMock;
-import eu.cessda.pasc.oci.configuration.HandlerConfigurationProperties;
+import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
 import eu.cessda.pasc.oci.exception.CustomHandlerException;
+import eu.cessda.pasc.oci.repository.ListRecordHeadersDao;
+import eu.cessda.pasc.oci.repository.ListRecordHeadersDaoImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

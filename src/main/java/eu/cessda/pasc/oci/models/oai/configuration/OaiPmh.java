@@ -14,21 +14,27 @@
  * limitations under the License.
  */
 
-package eu.cessda.pasc.oci.models.configuration;
+package eu.cessda.pasc.oci.models.oai.configuration;
 
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 /**
- * Defaults for parsing metadata fields with no xml:lang specified,
- * where lang is extracted content is to be mapped against a lang
+ * OaiPmh configuration model
  *
  * @author moses AT doraventures DOT com
  */
 @Getter
 @Setter
-public class MetadataParsingDefaultLang {
+public class OaiPmh {
 
-  private boolean active;
-  private String lang;
+  private List<String> supportedApiVersions;
+  private List<String> supportedRecordTypes;
+  private List<Repo> repos;
+  private Integer publicationYearDefault;
+  private MetadataParsingDefaultLang metadataParsingDefaultLang;
+  private boolean concatRepeatedElements;
+  private String concatSeparator;
 }

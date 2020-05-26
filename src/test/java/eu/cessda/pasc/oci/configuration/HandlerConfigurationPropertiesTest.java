@@ -16,7 +16,8 @@
 
 package eu.cessda.pasc.oci.configuration;
 
-import eu.cessda.pasc.oci.models.configuration.OaiPmh;
+import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
+import eu.cessda.pasc.oci.models.oai.configuration.OaiPmh;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

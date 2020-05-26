@@ -16,13 +16,13 @@
 
 package eu.cessda.pasc.oci.service;
 
-import eu.cessda.pasc.oci.configuration.HandlerConfigurationProperties;
-import eu.cessda.pasc.oci.dao.ListRecordHeadersDao;
+import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
 import eu.cessda.pasc.oci.exception.CustomHandlerException;
 import eu.cessda.pasc.oci.exception.InternalSystemException;
 import eu.cessda.pasc.oci.helpers.ListIdentifiersResponseValidator;
 import eu.cessda.pasc.oci.models.errors.ErrorStatus;
 import eu.cessda.pasc.oci.models.response.RecordHeader;
+import eu.cessda.pasc.oci.repository.ListRecordHeadersDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

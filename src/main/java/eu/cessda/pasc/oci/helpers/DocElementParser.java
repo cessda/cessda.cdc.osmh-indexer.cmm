@@ -18,7 +18,7 @@ package eu.cessda.pasc.oci.helpers;
 
 import eu.cessda.pasc.oci.models.cmmstudy.TermVocabAttributes;
 import eu.cessda.pasc.oci.models.cmmstudy.VocabAttributes;
-import eu.cessda.pasc.oci.models.configuration.OaiPmh;
+import eu.cessda.pasc.oci.models.oai.configuration.OaiPmh;
 import lombok.experimental.UtilityClass;
 import org.jdom2.Attribute;
 import org.jdom2.Document;

@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
-package eu.cessda.pasc.oci.dao;
+package eu.cessda.pasc.oci.models.oai.configuration;
 
-import eu.cessda.pasc.oci.exception.CustomHandlerException;
-
-import java.io.InputStream;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
- * Data access for fetching Record from remote repositories
+ * Defaults for parsing metadata fields with no xml:lang specified,
+ * where lang is extracted content is to be mapped against a lang
  *
  * @author moses AT doraventures DOT com
  */
-public interface GetRecordDoa {
+@Getter
+@Setter
+public class MetadataParsingDefaultLang {
 
-    InputStream getRecordXML(String studyFullUrl) throws CustomHandlerException;
+  private boolean active;
+  private String lang;
 }

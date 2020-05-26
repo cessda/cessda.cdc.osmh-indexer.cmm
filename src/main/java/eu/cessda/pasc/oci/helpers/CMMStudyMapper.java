@@ -18,7 +18,7 @@ package eu.cessda.pasc.oci.helpers;
 
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.Publisher;
-import eu.cessda.pasc.oci.models.configuration.OaiPmh;
+import eu.cessda.pasc.oci.models.oai.configuration.OaiPmh;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.jdom2.Attribute;

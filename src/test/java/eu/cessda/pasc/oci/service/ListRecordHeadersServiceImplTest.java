@@ -16,11 +16,11 @@
 
 package eu.cessda.pasc.oci.service;
 
-import eu.cessda.pasc.oci.dao.ListRecordHeadersDao;
 import eu.cessda.pasc.oci.exception.CustomHandlerException;
 import eu.cessda.pasc.oci.exception.InternalSystemException;
 import eu.cessda.pasc.oci.mock.data.RecordHeadersMock;
 import eu.cessda.pasc.oci.models.response.RecordHeader;
+import eu.cessda.pasc.oci.repository.ListRecordHeadersDao;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

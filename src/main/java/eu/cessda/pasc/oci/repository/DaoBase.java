@@ -15,7 +15,6 @@
  */
 package eu.cessda.pasc.oci.repository;
 
-import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,11 +37,9 @@ import java.time.Instant;
 public class DaoBase {
 
     private final HttpClient httpClient;
-    private final AppConfigurationProperties appConfigurationProperties;
 
-    public DaoBase(HttpClient httpClient, AppConfigurationProperties appConfigurationProperties) {
+    public DaoBase(HttpClient httpClient) {
         this.httpClient = httpClient;
-        this.appConfigurationProperties = appConfigurationProperties;
     }
 
     protected InputStream postForStringResponse(String fullUrl) throws IOException {
@@ -50,10 +47,7 @@ public class DaoBase {
     }
 
     protected InputStream postForStringResponse(URI fullUrl) throws IOException {
-        HttpRequest httpRequest = HttpRequest
-                .newBuilder(fullUrl)
-                .timeout(Duration.ofMillis(appConfigurationProperties.getRestTemplateProps().getReadTimeout()))
-                .build();
+        HttpRequest httpRequest = HttpRequest.newBuilder(fullUrl).build();
         try {
             log.debug("Sending request to remote SP with url [{}].", fullUrl);
 

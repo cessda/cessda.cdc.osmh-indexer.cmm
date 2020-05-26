@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package eu.cessda.pasc.oci.dao;
+package eu.cessda.pasc.oci.repository;
 
-import eu.cessda.pasc.oci.exception.ExternalSystemException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.http.HttpClient;
 
@@ -37,12 +37,12 @@ public class ListRecordHeadersDaoImpl extends DaoBase implements ListRecordHeade
     }
 
     @Override
-    public InputStream listRecordHeaders(String fullListRecordUrlPath) throws ExternalSystemException {
+    public InputStream listRecordHeaders(String fullListRecordUrlPath) throws IOException {
         return postForStringResponse(fullListRecordUrlPath);
     }
 
     @Override
-    public InputStream listRecordHeadersResumption(String repoUrlWithResumptionToken) throws ExternalSystemException {
+    public InputStream listRecordHeadersResumption(String repoUrlWithResumptionToken) throws IOException {
         return postForStringResponse(repoUrlWithResumptionToken);
     }
 }

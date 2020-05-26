@@ -14,22 +14,29 @@
  * limitations under the License.
  */
 
-package eu.cessda.pasc.oci.models.configuration;
+package eu.cessda.pasc.oci.models.oai.configuration;
 
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * RestTemplate Properties configuration model
+ * Repo configuration model
  *
  * @author moses AT doraventures DOT com
  */
 @Getter
 @Setter
-public class RestTemplateProps {
+public class Repo {
 
-  private int connTimeout;
-  private int connRequestTimeout;
-  private int readTimeout;
-  private boolean verifySSL;
+  private String url;
+  private String preferredMetadataParam;
+  private String setSpec;
+
+  public String getUrl() {
+    return url;
+  }
+
+  public String getSetSpec() {
+    return setSpec;
+  }
 }

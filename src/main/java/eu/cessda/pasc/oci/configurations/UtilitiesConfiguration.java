@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cessda.pasc.oci.configuration;
+package eu.cessda.pasc.oci.configurations;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.mizosoft.methanol.Methanol;

@@ -16,10 +16,10 @@
 
 package eu.cessda.pasc.oci.helpers;
 
-import eu.cessda.pasc.oci.configuration.HandlerConfigurationProperties;
+import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
 import eu.cessda.pasc.oci.exception.CustomHandlerException;
-import eu.cessda.pasc.oci.models.configuration.OaiPmh;
-import eu.cessda.pasc.oci.models.configuration.Repo;
+import eu.cessda.pasc.oci.models.oai.configuration.OaiPmh;
+import eu.cessda.pasc.oci.models.oai.configuration.Repo;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

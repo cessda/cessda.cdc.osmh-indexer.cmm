@@ -16,7 +16,7 @@
 
 package eu.cessda.pasc.oci.helpers;
 
-import eu.cessda.pasc.oci.configuration.HandlerConfigurationProperties;
+import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
 import eu.cessda.pasc.oci.exception.CustomHandlerException;
 import org.junit.Test;
 import org.junit.runner.RunWith;

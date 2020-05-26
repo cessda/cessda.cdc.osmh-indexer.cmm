@@ -14,20 +14,30 @@
  * limitations under the License.
  */
 
-package eu.cessda.pasc.oci.dao;
+package eu.cessda.pasc.oci.repository;
 
-import eu.cessda.pasc.oci.exception.CustomHandlerException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.http.HttpClient;
 
 /**
- * Data access object Contract for querying remote repository for RecordHeaders
+ * Data access object for fetching Record from remote repositories implementation
  *
  * @author moses AT doraventures DOT com
  */
-public interface ListRecordHeadersDao {
+@Repository
+public class GetRecordDoaImpl extends DaoBase implements GetRecordDoa {
 
-    InputStream listRecordHeaders(String fullListRecordUrlPath) throws CustomHandlerException;
+    @Autowired
+    public GetRecordDoaImpl(HttpClient httpClient) {
+        super(httpClient);
+    }
 
-    InputStream listRecordHeadersResumption(String repoUrlWithResumptionToken) throws CustomHandlerException;
+    @Override
+    public InputStream getRecordXML(String studyFullUrl) throws IOException {
+        return postForStringResponse(studyFullUrl);
+    }
 }

@@ -26,7 +26,6 @@ import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -192,7 +191,7 @@ public final class RecordTestData {
 
   public static CMMStudy getSyntheticCmmStudyWithNoAvailableLangsSet() throws IOException {
     final CMMStudy syntheticCmmStudy = getSyntheticCmmStudy();
-    syntheticCmmStudy.setLangAvailableIn(new HashSet<>());
+    syntheticCmmStudy.getLangAvailableIn().clear();
     return syntheticCmmStudy;
   }
 

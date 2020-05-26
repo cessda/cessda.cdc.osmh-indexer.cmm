@@ -14,30 +14,19 @@
  * limitations under the License.
  */
 
-package eu.cessda.pasc.oci.dao;
+package eu.cessda.pasc.oci.repository;
 
-import eu.cessda.pasc.oci.exception.ExternalSystemException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
+import eu.cessda.pasc.oci.exception.CustomHandlerException;
 
+import java.io.IOException;
 import java.io.InputStream;
-import java.net.http.HttpClient;
 
 /**
- * Data access object for fetching Record from remote repositories implementation
+ * Data access for fetching Record from remote repositories
  *
  * @author moses AT doraventures DOT com
  */
-@Repository
-public class GetRecordDoaImpl extends DaoBase implements GetRecordDoa {
+public interface GetRecordDoa {
 
-    @Autowired
-    public GetRecordDoaImpl(HttpClient httpClient) {
-        super(httpClient);
-    }
-
-    @Override
-    public InputStream getRecordXML(String studyFullUrl) throws ExternalSystemException {
-        return postForStringResponse(studyFullUrl);
-    }
+    InputStream getRecordXML(String studyFullUrl) throws CustomHandlerException, IOException;
 }

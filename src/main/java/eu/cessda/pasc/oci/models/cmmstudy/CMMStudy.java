@@ -39,16 +39,16 @@ import java.util.Set;
     "keywords",
     "typeOfTimeMethods",
     "studyAreaCountries",
-    "unitTypes",
-    "publisher",
-    "publicationYear",
-    "pidStudies",
-    "fileLanguages",
-    "creators",
-    "typeOfSamplingProcedures",
-    "samplingProcedureFreeTexts",
-    "typeOfModeOfCollections",
-    "dataCollectionPeriodStartdate",
+        "unitTypes",
+        "publisher",
+        "publicationYear",
+        "pidStudies",
+        "fileLanguages",
+        "creators",
+        "typeOfSamplingProcedures",
+        "samplingProcedureFreeTexts",
+        "typeOfModeOfCollections",
+        "dataCollectionPeriodStartdate",
         "dataCollectionPeriodEnddate",
         "dataCollectionYear",
         "dataCollectionFreeTexts",
@@ -63,6 +63,7 @@ import java.util.Set;
 @Builder
 @Getter
 @NoArgsConstructor
+@ToString
 public class CMMStudy {
 
   @JsonProperty("creators")
@@ -145,9 +146,7 @@ public class CMMStudy {
    * the minimum CMM Fields requirements for given Lang Iso Code.
    * @see eu.cessda.pasc.oci.service.helpers.LanguageAvailabilityMapper#setAvailableLanguages(CMMStudy)
    */
-  @Setter
   @Getter
-  @JsonProperty("langAvailableIn")
   @Builder.Default
   private Set<String> langAvailableIn = new HashSet<>();
 

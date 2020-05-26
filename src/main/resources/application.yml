@@ -269,8 +269,6 @@ osmhConsumer:
 ---
 spring:
   profiles: test
-  jmx:
-    enabled: false
 logging:
   level:
     eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor: DEBUG

@@ -14,27 +14,21 @@
  * limitations under the License.
  */
 
-package eu.cessda.pasc.oci.models.configuration;
+package eu.cessda.pasc.oci.repository;
 
-import lombok.Getter;
-import lombok.Setter;
+import eu.cessda.pasc.oci.exception.CustomHandlerException;
 
-import java.util.List;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
- * OaiPmh configuration model
+ * Data access object Contract for querying remote repository for RecordHeaders
  *
  * @author moses AT doraventures DOT com
  */
-@Getter
-@Setter
-public class OaiPmh {
+public interface ListRecordHeadersDao {
 
-  private List<String> supportedApiVersions;
-  private List<String> supportedRecordTypes;
-  private List<Repo> repos;
-  private Integer publicationYearDefault;
-  private MetadataParsingDefaultLang metadataParsingDefaultLang;
-  private boolean concatRepeatedElements;
-  private String concatSeparator;
+    InputStream listRecordHeaders(String fullListRecordUrlPath) throws CustomHandlerException, IOException;
+
+    InputStream listRecordHeadersResumption(String repoUrlWithResumptionToken) throws CustomHandlerException, IOException;
 }

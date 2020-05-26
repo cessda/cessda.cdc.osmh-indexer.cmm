@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package eu.cessda.pasc.oci.configuration;
+package eu.cessda.pasc.oci.configurations;
 
-import eu.cessda.pasc.oci.models.configuration.OaiPmh;
-import eu.cessda.pasc.oci.models.configuration.RestTemplateProps;
+import eu.cessda.pasc.oci.models.oai.configuration.OaiPmh;
+import eu.cessda.pasc.oci.models.oai.configuration.RestTemplateProps;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;

@@ -18,8 +18,10 @@ package eu.cessda.pasc.oci.dao;
 
 import com.pgssoft.httpclient.HttpClientMock;
 import com.pgssoft.httpclient.MockedServerResponse;
-import eu.cessda.pasc.oci.configuration.HandlerConfigurationProperties;
+import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
 import eu.cessda.pasc.oci.exception.CustomHandlerException;
+import eu.cessda.pasc.oci.repository.GetRecordDoa;
+import eu.cessda.pasc.oci.repository.GetRecordDoaImpl;
 import lombok.SneakyThrows;
 import org.junit.Assert;
 import org.junit.Test;

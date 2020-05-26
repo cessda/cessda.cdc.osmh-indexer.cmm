@@ -16,7 +16,7 @@
 
 package eu.cessda.pasc.oci.service;
 
-import eu.cessda.pasc.oci.configuration.HandlerConfigurationProperties;
+import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;

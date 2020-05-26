@@ -23,13 +23,12 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
-import eu.cessda.pasc.oci.dao.GetRecordDoa;
 import eu.cessda.pasc.oci.exception.CustomHandlerException;
 import eu.cessda.pasc.oci.exception.InternalSystemException;
-import eu.cessda.pasc.oci.helpers.FileHandler;
 import eu.cessda.pasc.oci.mock.data.CMMStudyTestData;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMConverter;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
+import eu.cessda.pasc.oci.repository.GetRecordDoa;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -68,9 +67,6 @@ public class GetRecordServiceImplTest {
 
   @Autowired
   GetRecordService recordService;
-
-  @Autowired
-  FileHandler fileHandler;
 
   @Test
   public void shouldReturnValidCMMStudyRecordFromAFullyComplaintCmmDdiRecord() throws CustomHandlerException, IOException, ProcessingException {

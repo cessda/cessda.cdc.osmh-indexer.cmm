@@ -19,7 +19,7 @@ package eu.cessda.pasc.oci.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import eu.cessda.pasc.oci.configuration.HandlerConfigurationProperties;
+import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;

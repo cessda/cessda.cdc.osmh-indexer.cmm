@@ -16,14 +16,14 @@
 
 package eu.cessda.pasc.oci.service;
 
-import eu.cessda.pasc.oci.configuration.HandlerConfigurationProperties;
-import eu.cessda.pasc.oci.dao.GetRecordDoa;
+import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
 import eu.cessda.pasc.oci.exception.CustomHandlerException;
 import eu.cessda.pasc.oci.exception.InternalSystemException;
 import eu.cessda.pasc.oci.helpers.OaiPmhHelpers;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
-import eu.cessda.pasc.oci.models.configuration.OaiPmh;
 import eu.cessda.pasc.oci.models.errors.ErrorStatus;
+import eu.cessda.pasc.oci.models.oai.configuration.OaiPmh;
+import eu.cessda.pasc.oci.repository.GetRecordDoa;
 import lombok.extern.slf4j.Slf4j;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
