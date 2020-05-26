@@ -47,8 +47,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static eu.cessda.pasc.oci.data.RecordTestData.*;
-import static eu.cessda.pasc.oci.data.ReposTestData.getEndpoints;
+import static eu.cessda.pasc.oci.mock.data.RecordTestData.*;
+import static eu.cessda.pasc.oci.mock.data.ReposTestData.getEndpoints;
 import static org.mockito.Mockito.*;
 
 

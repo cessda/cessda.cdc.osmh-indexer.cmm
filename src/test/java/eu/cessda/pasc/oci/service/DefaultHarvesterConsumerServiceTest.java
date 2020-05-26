@@ -44,8 +44,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static eu.cessda.pasc.oci.data.RecordTestData.*;
-import static eu.cessda.pasc.oci.data.ReposTestData.getUKDSRepo;
+import static eu.cessda.pasc.oci.mock.data.RecordTestData.*;
+import static eu.cessda.pasc.oci.mock.data.ReposTestData.getUKDSRepo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Java6BDDAssertions.then;
 import static org.mockito.Matchers.any;

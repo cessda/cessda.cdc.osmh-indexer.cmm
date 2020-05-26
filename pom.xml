@@ -206,16 +206,37 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.awaitility</groupId>
-      <artifactId>awaitility</artifactId>
-      <version>3.0.0</version>
-      <scope>test</scope>
+        <groupId>org.awaitility</groupId>
+        <artifactId>awaitility</artifactId>
+        <version>3.0.0</version>
+        <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>com.pgs-soft</groupId>
-      <artifactId>HttpClientMock</artifactId>
-      <version>1.0.0</version>
-    </dependency>
+      <dependency>
+          <groupId>com.pgs-soft</groupId>
+          <artifactId>HttpClientMock</artifactId>
+          <version>1.0.0</version>
+      </dependency>
+      <dependency>
+          <groupId>org.jdom</groupId>
+          <artifactId>jdom2</artifactId>
+          <version>2.0.6</version>
+      </dependency>
+      <dependency>
+          <groupId>com.github.mizosoft.methanol</groupId>
+          <artifactId>methanol</artifactId>
+          <version>1.1.0</version>
+      </dependency>
+      <dependency>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-lang3</artifactId>
+          <version>3.9</version>
+      </dependency>
+      <dependency>
+          <groupId>com.github.java-json-tools</groupId>
+          <artifactId>json-schema-validator</artifactId>
+          <version>2.2.10</version>
+          <scope>test</scope>
+      </dependency>
   </dependencies>
 
   <dependencyManagement>

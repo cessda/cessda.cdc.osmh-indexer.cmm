@@ -17,7 +17,7 @@
 package eu.cessda.pasc.oci.service.helpers;
 
 import eu.cessda.pasc.oci.AbstractSpringTestProfileContext;
-import eu.cessda.pasc.oci.data.RecordTestData;
+import eu.cessda.pasc.oci.mock.data.RecordTestData;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import org.junit.Test;
 import org.junit.runner.RunWith;

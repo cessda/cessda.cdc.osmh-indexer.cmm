@@ -18,7 +18,7 @@ package eu.cessda.pasc.oci.service.helpers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import eu.cessda.pasc.oci.AbstractSpringTestProfileContext;
-import eu.cessda.pasc.oci.data.RecordTestData;
+import eu.cessda.pasc.oci.mock.data.RecordTestData;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
@@ -31,8 +31,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import static eu.cessda.pasc.oci.data.RecordTestData.getASingleSyntheticCMMStudyAsList;
-import static eu.cessda.pasc.oci.data.RecordTestData.getSyntheticCMMStudyAndADeletedRecordAsList;
+import static eu.cessda.pasc.oci.mock.data.RecordTestData.getASingleSyntheticCMMStudyAsList;
+import static eu.cessda.pasc.oci.mock.data.RecordTestData.getSyntheticCMMStudyAndADeletedRecordAsList;
 import static org.assertj.core.api.Java6BDDAssertions.then;
 
 /**

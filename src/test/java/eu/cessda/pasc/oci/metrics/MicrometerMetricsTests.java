@@ -16,8 +16,8 @@
 package eu.cessda.pasc.oci.metrics;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
-import eu.cessda.pasc.oci.data.RecordTestData;
-import eu.cessda.pasc.oci.data.ReposTestData;
+import eu.cessda.pasc.oci.mock.data.RecordTestData;
+import eu.cessda.pasc.oci.mock.data.ReposTestData;
 import eu.cessda.pasc.oci.models.cmmstudy.Publisher;
 import eu.cessda.pasc.oci.models.configurations.Endpoints;
 import eu.cessda.pasc.oci.models.configurations.Repo;

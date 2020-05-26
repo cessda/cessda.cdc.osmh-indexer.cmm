@@ -21,7 +21,6 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,8 +29,6 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.net.http.HttpClient;
-import java.time.Duration;
 
 /**
  * Extra Util configuration
@@ -52,18 +49,10 @@ public class AppUtilityBeansConfiguration {
   @Value("${elasticsearch.clustername}")
   private String esClusterName;
 
-  private final AppConfigurationProperties appConfigurationProperties;
-
-  @Autowired
-  public AppUtilityBeansConfiguration(AppConfigurationProperties appConfigurationProperties) {
-    this.appConfigurationProperties = appConfigurationProperties;
-  }
-
   @Bean
   public ObjectMapper objectMapper() {
     return new ObjectMapper();
   }
-
 
   @Bean
   public Client client() throws UnknownHostException {
@@ -79,13 +68,5 @@ public class AppUtilityBeansConfiguration {
   @Bean
   public ElasticsearchTemplate elasticsearchTemplate() throws UnknownHostException {
     return new ElasticsearchTemplate(client());
-  }
-
-  @Bean
-  public HttpClient httpClient() {
-    return HttpClient.newBuilder()
-            .connectTimeout(Duration.ofMillis(appConfigurationProperties.getRestTemplateProps().getConnTimeout()))
-            .followRedirects(HttpClient.Redirect.NORMAL)
-            .build();
   }
 }

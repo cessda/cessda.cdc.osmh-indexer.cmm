@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static eu.cessda.pasc.oci.data.ReposTestData.*;
+import static eu.cessda.pasc.oci.mock.data.ReposTestData.*;
 import static java.lang.String.format;
 import static org.assertj.core.api.Java6BDDAssertions.then;
 

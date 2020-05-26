@@ -18,8 +18,7 @@ package eu.cessda.pasc.oci.models.cmmstudy;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.List;
@@ -50,17 +49,20 @@ import java.util.Set;
     "samplingProcedureFreeTexts",
     "typeOfModeOfCollections",
     "dataCollectionPeriodStartdate",
-    "dataCollectionPeriodEnddate",
-    "dataCollectionYear",
-    "dataCollectionFreeTexts",
-    "dataAccessFreeTexts",
-    "lastModified",
-    "studyUrl",
-    "isActive",
-    "langAvailableIn",
-    "studyXmlSourceUrl"
+        "dataCollectionPeriodEnddate",
+        "dataCollectionYear",
+        "dataCollectionFreeTexts",
+        "dataAccessFreeTexts",
+        "lastModified",
+        "studyUrl",
+        "isActive",
+        "langAvailableIn",
+        "studyXmlSourceUrl"
 })
+@AllArgsConstructor
+@Builder
 @Getter
+@NoArgsConstructor
 public class CMMStudy {
 
   @JsonProperty("creators")
@@ -146,6 +148,7 @@ public class CMMStudy {
   @Setter
   @Getter
   @JsonProperty("langAvailableIn")
+  @Builder.Default
   private Set<String> langAvailableIn = new HashSet<>();
 
   @JsonProperty("studyXmlSourceUrl")

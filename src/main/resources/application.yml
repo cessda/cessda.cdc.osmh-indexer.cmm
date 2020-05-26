@@ -149,7 +149,49 @@ osmhConsumer:
     connRequestTimeout: 5000 # 5 seconds
     readTimeout: 180000 # increased from 120 seconds to 180 seconds to deal with slower Nesstar repos
     verifySSL: true
-
+osmhhandler:
+  baseEndpoint: '/'
+  oaiPmh:
+    supportedApiVersions:
+      - v0
+    supportedRecordTypes:
+      - CMMStudy
+    repos:
+      - url: http://194.117.18.18:6003/v0/oai
+        preferredMetadataParam: oai_ddi25
+      - url: https://data2.aussda.at/oai
+        preferredMetadataParam: oai_ddi
+      - url: https://easy.dans.knaw.nl/oai/
+        preferredMetadataParam: oai_ddi25_nl
+      - url: https://easy.dans.knaw.nl/oai/
+        preferredMetadataParam: oai_ddi25_en
+      - url: https://kuha.sa.dk/v0/oai
+        preferredMetadataParam: oai_ddi25
+      - url: http://services.fsd.uta.fi/v0/oai
+        preferredMetadataParam: oai_ddi25
+      - url: https://dbkapps.gesis.org/dbkoai3
+        preferredMetadataParam: oai_ddi25
+      - url: http://147.213.4.44:6003/v0/oai
+        preferredMetadataParam: oai_ddi25
+      - url: https://data.sciencespo.fr/oai
+        preferredMetadataParam: oai_ddi
+        setSpec: CDSP
+      - url: https://snd.gu.se/en/oai-pmh
+        preferredMetadataParam: oai_ddi25
+        setSpec: discipline:social-science
+      - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
+        preferredMetadataParam: ddi
+    metadataParsingDefaultLang:
+      active: true
+      lang: 'en'
+    concatRepeatedElements: true
+    concatSeparator: "+<br>"
+    publicationYearDefault: 1970
+  restTemplateProps:
+    connTimeout: 10000 # increased from 5 seconds to 10 seconds to deal with slower Nesstar repos
+    connRequestTimeout: 5000 # 5 seconds
+    readTimeout: 180000 # increased from 120 seconds to 180 seconds to deal with slower Nesstar repos
+    verifySSL: true
 ---
 spring:
   profiles: gcp
@@ -184,6 +226,8 @@ osmhConsumer:
       NESSTAR:
         url: 'http://cdc-osmh-repo-nesstar:9842'
         version: 'v0'
+osmhhandler:
+  baseEndpoint: '/osmh-repo'
 ---
 spring:
   profiles: local
@@ -225,6 +269,8 @@ osmhConsumer:
 ---
 spring:
   profiles: test
+  jmx:
+    enabled: false
 logging:
   level:
     eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor: DEBUG
@@ -234,3 +280,23 @@ osmhConsumer:
     # For tests, the delay should be effectively disabled
     initial: '315360000000'
     fixed: '315360000000'
+osmhhandler:
+  oaiPmh:
+    supportedRecordTypes:
+      - Study
+      - StudyGroup
+      - Variable
+      - Question
+      - CMM
+    metadataParsingDefaultLang:
+      active: true
+      lang: 'en'
+    publicationYearDefault: 1970
+    repos:
+      - url: https://data2.aussda.at/oai/
+        preferredMetadataParam: oai_ddi
+      - url: http://services.fsd.uta.fi/v0/oai
+        preferredMetadataParam: oai_ddi25
+        setSpec: study_groups:energia
+      - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
+        preferredMetadataParam: ddi

@@ -24,34 +24,53 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.Optional;
+import java.util.function.Function;
 
 @Slf4j
 @UtilityClass
 public class TimeUtility {
 
-  private static final String[] EXPECTED_DATE_FORMATS = new String[]{"yyyy-MM-dd'T'HH:mm:ss'Z'", "yyyy-MM-dd", "yyyy-MM-dd'T'HH:mm:ssZ"};
+    private static final String[] EXPECTED_DATE_FORMATS = new String[]{
+            "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
+            "yyyy-MM-dd'T'HH:mm:ss'Z'",
+            "yyyy-dd-MM HH:mm:ss.SSS",
+            "yyyy-MM-dd",
+            "yyyy-MM-dd'T'HH:mm:ssZ",
+            "yyyy-MM", "yyyy"
+    };
 
-  /**
-   * Attempts to pass date string using multiple expected date formats into a LocalDateTime.
-   * If all fails return an Optional.empty().
-   *
-   * @param dateString to parse as a LocalDateTime.
-   * @return the Optional of LocalDateTime or of empty.
-   */
-  public static Optional<LocalDateTime> getLocalDateTime(String dateString) {
-    Optional<LocalDateTime> recordLastModifiedZoneDateTime;
+    /**
+     * Attempts to pass date string using multiple expected date formats into a LocalDateTime.
+     * If all fails return an Optional.empty().
+     *
+     * @param dateString to parse as a LocalDateTime.
+     * @return the Optional of LocalDateTime or of empty.
+     */
+    public static Optional<LocalDateTime> getLocalDateTime(String dateString) {
+        Optional<LocalDateTime> recordLastModifiedZoneDateTime;
 
     try {
       Date date = DateUtils.parseDate(dateString, EXPECTED_DATE_FORMATS);
       recordLastModifiedZoneDateTime = Optional.of(date.toInstant()
               .atZone(ZoneOffset.UTC)
-          .toLocalDateTime());
-      return recordLastModifiedZoneDateTime;
+              .toLocalDateTime());
+        return recordLastModifiedZoneDateTime;
     } catch (ParseException | IllegalArgumentException e) {
-      String formatMsg = "Cannot parse date string [{}] using expected date formats [{}], Exception Message [{}]";
-      log.error(formatMsg, dateString, EXPECTED_DATE_FORMATS, e.getMessage());
-      recordLastModifiedZoneDateTime = Optional.empty();
+        String formatMsg = "Cannot parse date string [{}] using expected date formats [{}], Exception Message [{}]";
+        log.error(formatMsg, dateString, EXPECTED_DATE_FORMATS, e.getMessage());
+        recordLastModifiedZoneDateTime = Optional.empty();
     }
-    return recordLastModifiedZoneDateTime;
-  }
+        return recordLastModifiedZoneDateTime;
+    }
+
+    static Function<String, Optional<Integer>> dataCollYearDateFunction() {
+        return dateString -> {
+            Optional<LocalDateTime> localDateTime = TimeUtility.getLocalDateTime(dateString);
+            if (localDateTime.isPresent()) {
+                int yearValue = localDateTime.get().getYear();
+                return Optional.of(yearValue);
+            }
+            return Optional.empty();
+        };
+    }
 }
