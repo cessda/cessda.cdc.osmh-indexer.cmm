@@ -93,6 +93,9 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
 
   @Override
   public Optional<CMMStudy> getRecord(Repo repo, String studyNumber) {
+
+    log.debug("Querying repo {} for studyNumber {}.", repo.getName(), studyNumber);
+
     URI finalUrl = null;
     try {
       finalUrl = repositoryUrlService.constructGetRecordUrl(repo, studyNumber);
@@ -109,9 +112,9 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
               value(REPO_ENDPOINT_URL, repo.getUrl())
       );
     } catch (IOException e) {
-      log.error("Unable to parse GetRecord response. {}.", e.toString());
+      log.error("Unable to parse GetRecord response: {}.", e.toString());
     } catch (URISyntaxException e) {
-      log.error("Unable to construct URL [{}]", e.toString());
+      log.error("Unable to construct URL: {}.", e.toString());
     }
     return Optional.empty();
   }
