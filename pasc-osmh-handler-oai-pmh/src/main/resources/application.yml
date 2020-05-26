@@ -1,0 +1,151 @@
+---
+server:
+  port: 9091
+#  context-path: '/osmh-repo'
+security:
+  user:
+    name: username
+    password: password
+  basic.enabled: false            # Public API disable security on non-admin endpoints
+management.security.enabled: true # Enable security on admin endpoints
+endpoints.shutdown.enabled: true
+spring:
+  output:
+    ansi:
+      enabled: DETECT
+  devtools:
+    restart:
+      enabled: false
+  application:
+    name: pasc-osmh-handler-oai-pmh
+  jmx:
+    default-domain: pasc-osmh-handler-oai-pmh
+  boot:
+    admin:
+#     url: http://localhost:8087 For dev, stg & prod set this at the specific active profile. Run app with profile set
+      username: ${SPRING_BOOT_ADMIN_USERNAME}
+      password: ${SPRING_BOOT_ADMIN_PASSWORD}
+      client.name: pasc-osmh-handler-oai-pmh
+      turbine:
+        clusters: default
+        url: http://localhost:8989/turbine.stream
+      routes:
+        endpoints: env,metrics,log,trace,dump,jolokia,info,configprops,trace,logfile,refresh,flyway,liquibase,heapdump
+      auto-deregistration: true
+      auto-registration: true
+logging:
+  file: ${user.home}${file.separator}pasc-osmh-handler${file.separator}pasc-osmh-handler-oai-pmh.log
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) %30.30((%M\)) %40.40((%file:%line\))
+      - %message%n'
+    file: '%d{yyyy-MM-dd HH:mm:ss.SSS}  %-5level  %30.30((%M\)) %40.40((%file:%line\))
+      - %message%n'
+  level:
+    .: WARN
+    org: ERROR
+    eu.cessda.pasc: INFO
+    eu.cessda.pasc.osmhhandler.oaipmh.controller: INFO
+    eu.cessda.pasc.osmhhandler.oaipmh.service: INFO
+    eu.cessda.pasc.osmhhandler.oaipmh.helpers: INFO
+    net: WARN
+    com: ERROR
+osmhhandler:
+  baseEndpoint: '/'
+  oaiPmh:
+    supportedApiVersions:
+      - v0
+    supportedRecordTypes:
+      - CMMStudy
+    repos:
+      - url: http://194.117.18.18:6003/v0/oai
+        preferredMetadataParam: oai_ddi25
+      - url: https://data2.aussda.at/oai
+        preferredMetadataParam: oai_ddi
+      - url: https://easy.dans.knaw.nl/oai/
+        preferredMetadataParam: oai_ddi25_nl
+      - url: https://easy.dans.knaw.nl/oai/
+        preferredMetadataParam: oai_ddi25_en
+      - url: https://kuha.sa.dk/v0/oai
+        preferredMetadataParam: oai_ddi25
+      - url: http://services.fsd.uta.fi/v0/oai
+        preferredMetadataParam: oai_ddi25
+      - url: https://dbkapps.gesis.org/dbkoai3
+        preferredMetadataParam: oai_ddi25
+      - url: http://147.213.4.44:6003/v0/oai
+        preferredMetadataParam: oai_ddi25
+      - url: https://data.sciencespo.fr/oai
+        preferredMetadataParam: oai_ddi
+        setSpec: CDSP
+      - url: https://snd.gu.se/en/oai-pmh
+        preferredMetadataParam: oai_ddi25
+        setSpec: discipline:social-science
+      - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
+        preferredMetadataParam: ddi
+    metadataParsingDefaultLang:
+      active: true
+      lang: 'en'
+    concatRepeatedElements: true
+    concatSeparator: "+<br>"
+    publicationYearDefault: 1970
+  restTemplateProps:
+    connTimeout: 10000 # increased from 5 seconds to 10 seconds to deal with slower Nesstar repos
+    connRequestTimeout: 5000 # 5 seconds
+    readTimeout: 180000 # increased from 120 seconds to 180 seconds to deal with slower Nesstar repos
+    verifySSL: true
+
+---
+spring:
+  profiles: test
+  main:
+    banner-mode: "off"
+osmhhandler:
+  oaiPmh:
+    supportedRecordTypes:
+      - Study
+      - StudyGroup
+      - Variable
+      - Question
+      - CMM
+    metadataParsingDefaultLang:
+      active: true
+      lang: 'en'
+    publicationYearDefault: 1970
+    repos:
+      - url: https://data2.aussda.at/oai/
+        preferredMetadataParam: oai_ddi
+      - url: http://services.fsd.uta.fi/v0/oai
+        preferredMetadataParam: oai_ddi25
+        setSpec: study_groups:energia
+      - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
+        preferredMetadataParam: ddi
+---
+spring:
+  profiles: local
+  boot.admin.url: http://localhost:8087
+osmhhandler:
+  oaiPmh:
+    repos:
+      - url: http://services.fsd.uta.fi/v0/oai
+        preferredMetadataParam: oai_ddi25
+        setSpec: study_groups:energia
+#      - url: https://snd.gu.se/en/oai-pmh
+#        preferredMetadataParam: oai_ddi25
+#      - url: https://data.aussda.at/oai
+#        preferredMetadataParam: oai_ddi
+#      - url: https://dbk.gesis.org/dbkoai/
+#        preferredMetadataParam: oai_ddi25-de
+#      - url: https://easy.dans.knaw.nl/oai/
+#        preferredMetadataParam: oai_dc
+
+---
+spring:
+  profiles: gcp
+  main:
+    banner-mode: "off"
+  boot:
+    admin:
+      client:
+        prefer-ip: true
+      url: http://localhost:8087
+osmhhandler:
+  baseEndpoint: '/osmh-repo'

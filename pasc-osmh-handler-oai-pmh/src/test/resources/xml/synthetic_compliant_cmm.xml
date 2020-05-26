@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+  <responseDate>2018-02-05T11:16:22Z</responseDate>
+  <request identifier="2305" verb="GetRecord">http://services.fsd.uta.fi/v0/oai</request>
+  <GetRecord>
+    <record>
+      <header>
+        <identifier>2305</identifier>
+        <datestamp>2017-11-17T08:08:11Z</datestamp>
+        <setSpec>language:fi</setSpec>
+        <setSpec>language:en</setSpec>
+        <setSpec>study_groups:laku</setSpec>
+      </header>
+      <metadata>
+        <codeBook xmlns="ddi:codebook:2_5" version="2.5" xsi:schemaLocation="ddi:codebook:2_5 http://www.ddialliance.org/Specification/DDI-Codebook/2.5/XMLSchema/codebook.xsd">
+          <docDscr>
+            <citation>
+              <titlStmt>
+                <titl/>
+              </titlStmt>
+              <prodStmt>
+                <!--Compliant examples -->
+                <producer xml:lang="fi" abbr="FSD">Yhteiskuntatieteellinen tietoarkisto</producer>
+                <producer xml:lang="en" abbr="FSD">Finnish Social Science Data Archive</producer>
+                <!--FSD example: Should extract all there is here -->
+                <producer xml:lang="se">Samhällsdatablad</producer>
+                <copyright xml:lang="en">Finnish Social Science Data Archive</copyright>
+                <copyright xml:lang="fi">Yhteiskuntatieteellinen tietoarkisto</copyright>
+              </prodStmt>
+              <!-- One of two possible location for study url-->
+              <holdings URI="http://urn.fi/urn:nbn:fi:fsd:T-FSD3052" xml:lang="fi"/>
+              <holdings URI="http://doi.org/10.5255/UKDA-SN-7615-2" xml:lang="en"/>
+            </citation>
+          </docDscr>
+          <stdyDscr>
+            <citation xml:lang="fi">
+              <!-- One of two possible location for study url-->
+              <holdings URI="http://urn.fi/urn:nbn:fi:fsd:T-FSD3052_stdyDscr" xml:lang="de"/>
+              <holdings URI="http://doi.org/10.5255/UKDA-SN-7615-2_stdyDscr" xml:lang="se"/>
+              <!-- Caution when duplicated! "en" was already declared above and only one will be taken-->
+              <holdings URI="http://doi.org/10.5255/UKDA-SN-7615-2_stdyDscr2" xml:lang="en"/>
+              <titlStmt>
+                <titl xml:lang="fi">Lapsesta aikuiseksi: 14-vuotiaiden haastattelu 1974: tekstiaineisto.</titl>
+                <parTitl xml:lang="fi">Lapsesta aikuiseksi: 14-vuotiaiden haastattelu 1974: tekstiaineisto</parTitl>
+                <!-- Compliant UKDS examples -->
+                <IDNo agency="UKDA">2305</IDNo>
+                <IDNo agency="datacite">10.5255/UKDA-FAKE-2305-1</IDNo>
+                <!-- FSD example: missing lang -->
+                <IDNo>2305</IDNo>
+              </titlStmt>
+              <rspStmt>
+                <AuthEnty affiliation="Jyväskylän yliopisto. Psykologian laitos" xml:lang="fi">Pulkkinen, Lea</AuthEnty>
+                <AuthEnty affiliation="Jyväskylän Essex. Department of Psychology" xml:lang="fi">David Brook</AuthEnty>
+              </rspStmt>
+              <prodStmt>
+              </prodStmt>
+              <distStmt>
+                <distDate date="1982-01-01T00:00:00Z">1982</distDate>
+              </distStmt>
+              <serStmt>
+                <serName ID="laku" xml:lang="fi">Lapsesta aikuiseksi</serName>
+              </serStmt>
+              <verStmt>
+                <version date="2008-02-08" xml:lang="fi"/>
+              </verStmt>
+            </citation>
+            <citation xml:lang="en">
+              <titlStmt>
+                <titl xml:lang="en">Jyväskylä Longitudinal Study of Personality and Social Development (JYLS): Interviews of 14-Year-Olds 1974: Text Data.</titl>
+                <parTitl xml:lang="en">Jyväskylä Longitudinal Study of Personality and Social Development (JYLS): Interviews of 14-Year-Olds 1974: Text Data</parTitl>
+                <IDNo>2305</IDNo>
+              </titlStmt>
+              <rspStmt>
+                <AuthEnty affiliation="University of Jyväskylä. Department of Psychology" xml:lang="en">En Pulkkinen, Lea</AuthEnty>
+                <AuthEnty affiliation="University of Essex. Department of Psychology" xml:lang="en">David Brook</AuthEnty>
+              </rspStmt>
+              <prodStmt>
+              </prodStmt>
+              <distStmt>
+              </distStmt>
+              <serStmt>
+                <serName ID="laku" xml:lang="en">Jyväskylä Longitudinal Study of Personality and Social Development (JYLS)</serName>
+              </serStmt>
+              <verStmt>
+                <version date="2008-02-08" xml:lang="en"/>
+              </verStmt>
+            </citation>
+            <stdyInfo>
+              <subject>
+                <!-- Compliant examples -->
+                <keyword xml:lang="sv" ID="The Id" vocab="ELSST" vocabURI="http://sv.ac.sv">The Term</keyword>
+                <keyword xml:lang="fi" ID="wxFAKE" vocab="CESSDA" vocabURI="http://fi.ac.fi">et Nationellt val</keyword>
+                <!-- FSD example -->
+                <keyword xml:lang="en" vocab="ELSST" ID="adolescents"/>
+                <!-- UKDS example: Extracting with default language -->
+                <keyword>1976</keyword>
+                <keyword vocabURI="http://lod.data-archive.ac.uk/skoshasset/9e7cc815-90cb-4f96-b8ff-a0a44ab25ea9">BUDGETS</keyword>
+                <!-- Compliant examples -->
+                <topcClas xml:lang="en" vocab="ZA Category System" ID="This it the ID" vocabURI="https://oai.ukdataservice.ac.uk/Categories.htm">This is the Term</topcClas>
+                <topcClas xml:lang="de" vocab="CESSDA Topic Classification" ID="Housing" vocabURI="https://dbk.gesis.org/madeup.htm">Wohnraum</topcClas>
+                <topcClas xml:lang="de" vocab="CESSDA Topic Classification2" ID="Housing2" vocabURI="https://dbk.gesis.org/madeup2.htm">Wohnraum 2</topcClas>="psychology"/>
+                <!-- Non-compliant examples (but should extract what is there) -->
+                <!-- FSD NC example -->
+                <topcClas xml:lang="fi" vocab="CESSDA" ID="nuoret"/>
+                <!-- UKDS NC example: Extracting with default language -->
+                <topcClas>Housing</topcClas>
+              </subject>
+              <abstract xml:lang="en">The data are part of the Jyväskylä Longitudinal Study of Personality and Social Development (JYLS), in which the same individuals have been followed over 30 years. At this research stage, the data were collected using peer nominations and teacher ratings (FSD2073), a parent interview (FSD2074), and a theme interview. This dataset contains the transcribed responses to the questions presented in the theme interview. No predetermined response categories were used. The recorded interviews were classified only afterwards, when it was possible to observe the whole range of responses. The interview topics covered family and parents, school and education, housing, identity, use of alcohol and smoking, free time activities, and hobbies.</abstract>
+              <abstract xml:lang="fi">Haastattelu on osa Lapsesta aikuiseksi -tutkimusta, joka on jatkunut samojen henkilöiden seurantana yli 30 vuotta. Tämän tutkimusvaiheen tarkoituksena oli selvittää 14-vuotiaiden sosiaalista käyttäytymistä ja kasvuoloja. Tutkimusvaiheeseen kuuluivat myös toveri- ja opettaja-arvioinnit (FSD2073) sekä vanhemman haastattelu (FSD2074). Nuorten teemahaastatteluissa käsiteltiin mm. perhettä, asuntoa ja asuinympäristöä, koulunkäyntiä, minäkuvaa, päihteiden käyttöä, vapaa-ajanviettoa ja harrastuksia. Valmiita vastausluokkia ei käytetty. Nauhoitetut haastattelut luokiteltiin vasta jälkikäteen, kun nähtiin, minkälaista vaihtelua vastauksissa esiintyi. Ensin tiedusteltiin nuoren asumisoloja ja kysyttiin, keitä perheeseen kuuluu tai on kuulunut, miten hänen päivähoito oli pienenä järjestetty ja onko perheessä ollut apulaisia. Asunnon kokoa ja mielipidettä asuinympäristöstä selvitettiin. Koulunkäyntiin liittyen tiedusteltiin, kuinka pitkä nuoren koulumatka on ja miten hän sen kulkee. Lisäksi kysyttiin, pitääkö hän koulusta yleensä ja mistä aineista pitää eniten. Haastateltava kertoi, onko hän vaihtanut koulua, miltä se on tuntunut ja onko hänellä ollut läheistä opettajaa. Omaa koulumenestystä ja vanhempien suhtautumista siihen pyydettiin arvioimaan. Koulupinnauksesta esitettiin myös kysymyksiä. Edelleen selvitettiin, miten vanhemmat suhtautuvat koulutyöhön ja kertooko nuori kotona koulun tapahtumista. Haastateltavan kavereista, suunnitelmista peruskoulun jälkeen sekä vanhempien suhtautumisesta kavereiden valintaan ja seurusteluun kyseltiin. Niin ikään selvitettiin nuoren suhtautumista väkivaltaan ja vanhempien antamia ohjeita väkivallan suhteen. Haastateltavaa pyydettiin kuvailemaan omaa äitiään ja isäänsä ja kertomaan heidän työstään ja terveydestään. Pohdittiin, minkälaiset välit hänellä on vanhempiinsa ja kuinka usein he keskustelevat erilaisista asioista. Perheen ilmapiiriä kartoitettiin myös kysymällä, puuhasteleeko nuori jotain yhdessä vanhempien kanssa, syökö perhe ilta-ateriaa yhdessä ja onko isä tai äiti paljon poissa kotoa iltaisin. Lisäksi haastateltava kertoi, miten usein heillä on erimielisyyksiä, miten tottelemattomuudesta rankaistaan ja tietävätkö vanhemmat missä ja kenen kanssa hän viettää vapaa-aikaansa. Edelleen kyseltiin, mitä nuori harrastaa, onko hänellä kotiintuloaikoja ja mistä hän saa käyttörahansa. Tupakoinnista ja alkoholinkäytöstä esitettiin kysymyksiä. Haastatteluissa tietoa kerättiin myös ns. peilitekniikan avulla. Haastateltavaa pyydettiin kuvittelemaan, että hän on jo 65-vuotias eläkeläinen ja katselee elettyä elämäänsä taaksepäin. Häntä pyydettiin kertomaan esim. perheestään, avioliitostaan ja ammatistaan. Taustamuuttujana on haastateltavan sukupuoli.</abstract>
+              <sumDscr>
+                <nation xml:lang="en" abbr="FI">Finland</nation>
+                <nation xml:lang="fr" abbr="FI">Finlande</nation>
+                <nation xml:lang="fi" abbr="FI">Suomi</nation>
+                <nation xml:lang="se" abbr="FI">finland</nation>
+                <nation xml:lang="en" abbr="FR">France</nation>
+                <nation xml:lang="fr" abbr="FR">la France</nation>
+                <nation xml:lang="fi" abbr="FR">Ranska</nation>
+                <nation xml:lang="se" abbr="FR">Frankrike</nation>
+                <!-- Compliant examples -->
+                <anlyUnit>DE: This is the term<concept xml:lang="de" vocab="DDI Analysis Unit">This is the id</concept></anlyUnit>
+                <anlyUnit xml:lang="de">DE: This is the term. XML-lang on parent element wins<concept xml:lang="ignore this" vocab="DDI Analysis Unit">This is the id</concept></anlyUnit>
+                <anlyUnit xml:lang="de">DE: This is the term. XML-lang on parent element wins regardless of missing XML-lang in concept  el<concept vocab="DDI Analysis Unit">This is the id</concept></anlyUnit>
+                <anlyUnit>Made Up<concept xml:lang="en" vocab="DDI Made Up" vocabURI="https://dbk.gesis.org/madeup.htm">MadeUpUnit</concept></anlyUnit>
+                <anlyUnit>Made Up 2<concept xml:lang="en" vocab="DDI Made Up 2" vocabURI="https://dbk.gesis.org/madeup2.htm">MadeUpUnit 2</concept></anlyUnit>
+                <!-- UKDS example -->
+                <anlyUnit>Institutions/organisations</anlyUnit>
+                <universe xml:lang="en" clusion="I">Persons who were second grade students in a school in Jyväskylä at the time of the first data collection in 1968 and who continued to participate in the longitudinal study and had belonged to extreme groups of social behaviour at ages 8 and 14. The sample was collected both from the town centre and suburbs.</universe>
+                <universe xml:lang="fi" clusion="I">Otantahetkellä vuonna 1968 kansakoulun toisluokkalaiset keskisuomalaisen kaupungin oppilaat, jotka ovat edelleen mukana pitkittäistutkimuksessa ja kuuluivat 8- ja 14 -vuotiaana sosiaalisen käyttäytymisen ääriryhmiin.</universe>
+                <!-- Valid ISO Date-->
+                <collDate date="2018-10-21T00:00:00Z" event="end">End of October(has an @Date = not be extracted)</collDate>
+                <collDate date="2010-09-20" event="start" />
+                <!-- Valid Data Collection FreeText description. Extract only when there is no @date -->
+                <collDate event="start">Spring 2018</collDate>
+                <collDate event="end">Christmas 2018</collDate>
+              </sumDscr>
+            </stdyInfo>
+            <method>
+              <dataColl>
+                <!-- 100% Compliance -->
+                <timeMeth>DE: This is the term<concept xml:lang="de" vocab="DE: DDI Time Method 1" vocabURI="http://de-lod.data-archive.ac.uk" ID="fake" >DE: This is the Id</concept></timeMeth>
+                <timeMeth xml:lang="fi">FI: This is the term. xml:lang in parent el wins over concept<concept xml:lang="FI: should ignore this" vocab="FI: DDI Time Method 1" vocabURI="http://fi-lod.data-archive.ac.uk" ID="fake" >FI: This is the Id</concept></timeMeth>
+                <timeMeth xml:lang="fi">FI: This is the term. xml:lang in parent el wins over concept regardless<concept vocab="FI: DDI Time Method 1" vocabURI="http://fi-lod.data-archive.ac.uk" ID="fi-fake" >FI: This is the Id</concept></timeMeth>
+              <!-- Suggested by PUG: Element value/term in "timeMethod" wins over "concept" -->
+                <timeMeth>DE: Längsschnitt: Panel 2<concept xml:lang="de" vocab="DE: DDI Time Method 2">DE: Longitudinal.Panel 2</concept></timeMeth>
+                <!-- UKDS example -->
+                <timeMeth>Default-lang: Repeated cross-sectional study</timeMeth>
+                <dataCollector>National Centre for Social Research</dataCollector>
+                <!-- Compliant examples -->
+                <sampProc>This is the term<concept xml:lang="en" ID="madeUp" vocab="DDI Sampling Procedure" vocabURI="urn:ddi-cv:SamplingProcedure:1.1">This is the id</concept></sampProc>
+                <sampProc>This is the term 2<concept xml:lang="en" vocab="DDI Sampling Procedure" vocabURI="urn:ddi-cv:SamplingProcedure:1.1">Probability.Stratified 2</concept></sampProc>
+                <sampProc xml:lang="en">This is the term. xml:lang in parent el wins over concept<concept xml:lang="should ignore this" vocab="DDI Sampling Procedure" vocabURI="urn:ddi-cv:SamplingProcedure:1.1">Probability.Stratified 2</concept></sampProc>
+                <sampProc xml:lang="en">This is the term. xml:lang in parent el wins over concept regardless<concept vocab="DDI Sampling Procedure" vocabURI="urn:ddi-cv:SamplingProcedure:1.1">Probability.Stratified 2</concept></sampProc>
+                <sampProc><concept xml:lang="fi" vocab="fi DDI Sampling Procedure" vocabURI="fi:urn:ddi-cv:SamplingProcedure:1.1">et Probability.Stratified</concept></sampProc>
+                <!-- FSD example: if concept element is missing, this must not be extracted TypeOfSamplingProcedure -->
+                <sampProc>Should ignore elements without a concept by TypeOfSamplingProcedures</sampProc>
+                <!-- PUG examples: valid element for SamplingProcedure extraction -->
+                <sampProc xml:lang="sv">Sannolikhetsurval: stratifierat urval</sampProc>
+                <sampProc xml:lang="fr">Quelque chose</sampProc>
+                <sampProc xml:lang="sv">Undersökningen bygger på program sända i SVT1, SVT2, SVT24, Barnkanalen, Kunskapskanalen, TV4, Sjuan, TV3, Kanal 5, TV6 och TV8 under 12 veckor 2015. Urvalet av veckor skedde obundet och slumpmässigt och stratifierades efter säsong.</sampProc>
+                <deviat>6,708 cases</deviat>
+                <!--Compliant -->
+                <collMode>This is the Term<concept xml:lang="en" vocab="DDI Mode Of Collection" vocabURI="urn:ddi-cv:ModeOfCollection:3.0">This is the Id</concept></collMode>
+                <collMode>This is the Term 2<concept xml:lang="en" vocab="DDI Mode Of Collection" vocabURI="urn:ddi-cv:ModeOfCollection:3.0">Interview.Survey-concept</concept></collMode>
+                <collMode>Enquête téléphonique<concept xml:lang="fr" vocab="DDI Mode Of Collection" vocabURI="urn:ddi-cv:ModeOfCollection:3.0">Enquête téléphonique -concept</concept></collMode>
+                <!-- FSD NC example -->
+                <collMode>Face-to-face interview</collMode>
+                <sources />
+                <weight>Weighting used. See documentation for details.</weight>
+                <cleanOps>B</cleanOps>
+              </dataColl>
+            </method>
+            <dataAccs>
+              <useStmt>
+                <restrctn xml:lang="en">1 Restriction Text en</restrctn>
+                <restrctn xml:lang="en">2 Restriction Text en</restrctn>
+                <restrctn xml:lang="fi">Restriction Text fi</restrctn>
+                <conditions xml:lang="en">Conditions Text en</conditions>
+                <specPerm xml:lang="en">SpecPerm Text en</specPerm>
+                <specPerm xml:lang="fi">SpecPerm Text fi</specPerm>
+              </useStmt>
+              <setAvail>
+                <avlStatus xml:lang="en">AvlStatus Text en</avlStatus>
+                <avlStatus xml:lang="fi">AvlStatus Text fi</avlStatus>
+              </setAvail>
+            </dataAccs>
+            <othrStdyMat>
+            </othrStdyMat>
+          </stdyDscr>
+          <fileDscr>
+            <!-- Compliant examples -->
+            <fileTxt xml:lang="aa"><fileName>daF2252.por</fileName></fileTxt>
+            <fileTxt><fileName xml:lang="bb">daF2252.por</fileName></fileTxt>
+            <!-- Made up -->
+            <fileTxt><fileName xml:lang="bb"></fileName></fileTxt>
+            <fileTxt xml:lang="ee"/>
+          </fileDscr>
+        </codeBook>
+      </metadata>
+    </record>
+  </GetRecord>
+</OAI-PMH>

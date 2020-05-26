@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-stylesheet type='text/xsl' href='oai2.xsl' ?>
+
+
+
+
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
+ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+
+  <responseDate>2018-02-09T15:05:13Z</responseDate>
+
+  <request verb="GetRecord" identifier="6684" metadataPrefix="ddi">https://oai.ukdataservice.ac.uk:8443/oai/provider</request>
+
+
+
+  <GetRecord>
+
+    <record>
+
+
+
+      <header>
+
+        <identifier>6684</identifier>
+
+        <datestamp>2018-02-09T14:36:13Z</datestamp>
+
+        <setSpec>DataCollections</setSpec>
+
+      </header>
+
+
+
+      <metadata>
+
+        <codeBook xsi:schemaLocation="ddi:codebook:2_5 http://www.ddialliance.org/Specification/DDI-Codebook/2.5/XMLSchema/codebook.xsd" version="2.5" xmlns="ddi:codebook:2_5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <docDscr>
+            <citation>
+              <titlStmt>
+                <titl>DDI2.5 XML CODEBOOK RECORD FOR STUDY NUMBER 6684</titl>
+              </titlStmt>
+              <prodStmt>
+                <prodDate>2017-04-18T15:17:21Z</prodDate>
+              </prodStmt>
+            </citation>
+          </docDscr>
+          <stdyDscr>
+            <citation>
+              <titlStmt>
+                <titl>Childcare and Early Years Provision: Parents' Survey, 2009</titl>
+                <altTitl>Childcare and Early Years Survey of Parents, 2009</altTitl>
+                <IDNo agency="UKDA">6684</IDNo>
+                <IDNo agency="datacite">10.5255/UKDA-SN-6684-1</IDNo>
+              </titlStmt>
+              <rspStmt>
+                <AuthEnty>Department for Children, Schools and Families</AuthEnty>
+                <AuthEnty>National Centre for Social Research</AuthEnty>
+                <othId>The Department for Education was formed on 12 May 2010 and took over the responsibilities and resources of the Department for Children, Schools and Families.</othId>
+              </rspStmt>
+              <prodStmt>
+                <copyright>Crown copyright material is reproduced with the permission of the Controller of HMSO and the Queen's Printer for Scotland</copyright>
+                <fundAg>Department for Children, Schools and Families</fundAg>
+              </prodStmt>
+              <distStmt>
+                <!-- Note non of the UKDS records I have seen has a @abbr. Adding one for tests -->
+                <distrbtr abbr="UKDS">UK Data Service</distrbtr>
+                <depositr>Department for Education</depositr>
+                <depDate date="2011-01-27T00:00:00Z">27 January 2011</depDate>
+                <distDate date="2011-02-04T00:00:00Z">4 February 2011</distDate>
+              </distStmt>
+              <verStmt>
+                <version date="2011-02-04T00:00:00Z">1</version>
+              </verStmt>
+              <holdings URI="http://doi.org/10.5255/UKDA-SN-6684-1" />
+            </citation>
+            <stdyInfo>
+              <subject>
+                <keyword>2009</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/e53409ed-4ff4-4c89-bb8c-a9a1f1b0e9ee">AGE</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/c9d3e816-6d7b-4ad7-ab41-f96f6d5d88da">ATTITUDES</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/85536cbe-24ba-41b0-800a-33c1d3159409">CHILD DAY CARE</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/873a1601-22b8-476d-842e-a2255956eab7">CHILD-MINDERS</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/45100da9-69d4-4eb9-b55c-cc81bf6e5125">CHILDREN</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/84065f11-6463-4951-b5fd-d1a811d7836e">CHRONIC ILLNESS</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/f8755b2e-68ea-4b6d-8f97-4361ed34fa65">DEBILITATIVE ILLNESS</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/644ced34-451e-4674-8d37-ef44f6f23795">DISABILITIES</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/b27258d6-d381-4a1b-ab81-85a38c1a0895">DISABLED CHILDREN</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/c38a3af4-5e7b-48df-b9cf-74ea175baf7c">DRIVING LICENCES</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/90e01ff5-d79e-45aa-beaf-513569d3d9c2">ECONOMIC ACTIVITY</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/74af5225-4e7e-4213-bbe8-adac44b62d68">EDUCATIONAL ATTENDANCE</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/90915ef3-08b3-41c4-b703-d44e524673a7">EDUCATIONAL DEVELOPMENT</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/bbcaa4a9-2516-449f-954f-be00444c93c3">EDUCATIONAL EXPENDITURE</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/4fd4dd2d-213e-445f-afc4-329496510a60">EDUCATIONAL FACILITIES</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/1c39545a-f756-4914-a692-97334b0ea015">EDUCATIONAL INFORMATION</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/61a206ee-9f6e-41ac-bef1-cfb586bcf482">EMPLOYMENT</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/5bace71f-4940-4f16-a129-e2df29a813c1">ENGLAND</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/4c148b10-da8b-4b9b-ab4d-11edede7d27d">ETHNIC GROUPS</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/1d15313b-048c-483a-ac23-e4d915bba490">EXTENDED FAMILY</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/370ac8ee-5745-4b8e-af66-02378e192302">FAMILY BENEFITS</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/7e1ff366-f023-4a82-8a7f-72eae2a2a936">FAMILY MEMBERS</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/3a2e165e-cec1-4e0c-aaba-aa6142f373c3">FINANCIAL SUPPORT</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/f0610fc6-e5c7-47ec-a9b2-bf5a69fd1328">FINANCING</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/ddecf80c-289c-41fe-961d-5154d9ee25ac">HOME EDUCATION</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/09cc6639-7c13-4999-a335-e23b4e3f155d">HOURS OF WORK</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/cc4ea359-5430-4d03-ab98-f4e7db74fab4">HOUSEHOLD INCOME</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/10ed2233-7048-4964-8285-93a8099a86a0">HOUSEHOLDS</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/b264b36b-5945-42a4-aa33-36e3ff28e0ca">HOUSING TENURE</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/0cf45630-da0c-435d-a4dc-f4059bc92fe3">INFORMATION SOURCES</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/11ef6c49-c9da-43de-be36-1a00d21b3d9c">LIFE EVENTS</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/31321e29-5b9c-477d-8d2e-36a6434628cf">MARITAL STATUS</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/cf9a5dbd-15bc-436d-a329-4997cdbc85a2">MATERNITY LEAVE</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/2533a88f-d768-4361-b351-6f45d5521e53">NURSERY SCHOOLS</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/cf8c87d6-abb9-43d6-95ad-adaaa3f14144">PARENT ATTITUDE</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/9ce43a18-1460-4e82-8a13-41115589e8d4">PARENTS</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/01a2dc67-9d2c-44a1-9e00-3cd66a9c541f">PRE-PRIMARY SCHOOLS</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/ede64b59-6bb6-487d-87fb-4d8cb3d43594">QUALIFICATIONS</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/d7535432-97e5-4617-9c1a-84722ddc65b4">SCHOOL CLUBS</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/8849a5b2-573b-46cb-a8ff-574c306f8001">SCHOOL HOLIDAYS</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/92b2d14c-c2b6-41ce-81c9-eea4723ace18">SELF-EMPLOYED</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/48e40db5-e8dd-470f-89b1-fd39992fe8af">SIBLINGS</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/12d03510-3347-45fd-94f7-900009231c4f">SPECIAL NEEDS STUDENTS</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/4bf9b231-1509-4a16-96c1-a26e68711fd1">SPOUSE'S ECONOMIC ACTIVITY</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/c1fad2a5-91e6-4e5b-ae3a-584bdf615794">SPOUSES</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/6a7fdd99-ebc5-428d-8fbd-ef414431d38e">TAX RELIEF</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/107576f1-52b9-4386-b1a4-49d0e61b944f">TIME</keyword>
+                <keyword vocabURI="https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/5f7e638e-9acc-4078-a10f-0f0603de21fc">WORKING MOTHERS</keyword>
+                <topcClas>Primary, pre-primary and secondary - Education</topcClas>
+                <topcClas>Social attitudes and behaviour - Society and culture</topcClas>
+                <topcClas>Child development and child rearing - Social stratification and groupings</topcClas>
+                <topcClas>Family life and marriage - Social stratification and groupings</topcClas>
+              </subject>
+              <abstract>&lt;p&gt;Abstract copyright UK Data Service and data collection copyright owner.&lt;/p&gt;The introduction of the National Childcare Strategy in 1998 marked a radical shift in government policy and for the first time put childcare provision firmly on the political map. Since then a wide range of childcare initiatives and funding streams have been introduced, and hence there is a need for regular data to aid the evaluation of recent policy interventions in these areas. The &lt;i&gt;Childcare and Early Years Provision&lt;/i&gt; survey series is divided into two survey strands: the &lt;i&gt;Parents' Survey&lt;/i&gt; and the &lt;i&gt;Providers' Survey&lt;/i&gt;. &lt;br&gt;
+                &lt;br&gt;
+                The &lt;i&gt;Parents' Survey&lt;/i&gt; provides data on parents' take-up, views and experiences of childcare.  Families in England are randomly selected from the Child Benefit Records and all parents had children aged 0-14 years. They are asked about their use and experiences of childcare for all children in the family and to give more detailed information about childcare for a particular child (selected at random where there is more than one child in the family). The current &lt;i&gt;Parents' Survey&lt;/i&gt; series replaces two previous surveys: the &lt;i&gt;Survey of Parents of Three and Four Year Old Children and Their Use of Early Years Services&lt;/i&gt; (conducted between 1997 and 2002) and the &lt;i&gt;Parents' Demand for Childcare&lt;/i&gt; (conducted in 1999 and 2001) (the latter series is held at the UK Data Archive under GN 33341).&lt;br&gt;
+                &lt;br&gt;
+                The &lt;i&gt;Providers' Survey&lt;/i&gt; monitors the characteristics and development of childcare and early years providers and the workforce in England.  Information was collected on the number and characteristics of providers, the characteristics of the children enrolled, workforce composition, qualifications and training, recruitment and retention, and business operation. The 2016 survey underwent an extensive redesign, which means findings are not comparable with previous surveys.&lt;br&gt;
+                &lt;br&gt;
+                Further information is available on the gov.uk &lt;a href="https://www.gov.uk/government/collections/statistics-childcare-and-early-years" title="Childcare and Early Years Statistics" target="_blank"&gt;Childcare and Early Years Statistics&lt;/a&gt; webpage.&lt;br&gt;
+                &lt;br&gt;
+              </abstract>
+              <abstract>The &lt;i&gt;Childcare and Early Years Provision: Parents' Survey, 2009&lt;/i&gt; aimed to provide up-to-date information to assess some important policy initiatives introduced since the last survey, carried out in 2008. The survey had two main objectives. The first was to provide up-to-date and accurate information on parents' childcare arrangements and their views of particular childcare providers and childcare provision in general. The second was to continue the time series and provide information to help monitor the progress of policies in the areas of childcare and early years education.&lt;br&gt;
+                &lt;br&gt;
+                The survey series uses an inclusive definition of childcare and early years provision as parents were asked to include any time that their child was not with resident parents or at school. This included informal care provided by grandparents and ex-partners as well as formal care; and included times when parents were working and when they were not. Parents were asked their reasons for using childcare, enabling us to report on childcare used for economic reasons, and childcare used for the child's education.&lt;br&gt;
+                &lt;br&gt;
+                Further information is available on the NatCen &lt;a href= "http://www.natcen.ac.uk/series/childcare-and-early-years-series" title ="Childcare and Early Years Series"&gt;Childcare and Early Years Series&lt;/a&gt; web page.&lt;br&gt;
+              </abstract>
+              <abstract>&lt;B&gt;Main Topics&lt;/B&gt;:&lt;br&gt;The survey broadly covered the following topics:&lt;ul&gt;&lt;li&gt;use of childcare and early years provision in the last year and in the last week&lt;/li&gt;&lt;li&gt;costs of childcare&lt;/li&gt;&lt;li&gt;sources of information on childcare provision&lt;/li&gt;&lt;li&gt;attitudes towards childcare provision in the local area&lt;/li&gt;&lt;li&gt;reasons for using and views of the main formal provider&lt;/li&gt;&lt;li&gt;reasons for using more than one provider&lt;/li&gt; &lt;li&gt;childcare and maternal employment&lt;/li&gt;&lt;li&gt;background details on the family structure&lt;/li&gt;&lt;li&gt;socio-demographics&lt;/li&gt;&lt;li&gt;parents' work details&lt;/li&gt;&lt;/ul&gt;While the 2008 and 2009 questionnaires covered similar issues, there were some changes and additions made in 2009. For example, the 2009 questionnaire expanded the section on holiday care. It introduced a section on how children's disabilities affect childcare and also new in 2009 was a section on information given to parents by providers about their children's activities and information about activities to do at home. Other changes in 2009 included the reintroduction of questions asking about the home learning environment, removing questions about Childcare Link and 'Birth to Three Matters' and changing the codes for ethnicity and academic and vocational qualifications.</abstract>
+              <sumDscr>
+                <collDate>There were two periods of fieldwork for this survey due to the timing of the long school summer break: June - August 2009 and September - December 2009. &lt;br/&gt;Some questions refer to the date of the interview, others ask specifically about the year or the week before the interview.</collDate>
+                <nation>England</nation>
+                <geogUnit>Government Office Regions</geogUnit>
+                <anlyUnit>Individuals</anlyUnit>
+                <universe>National</universe>
+                <universe>Families on the Child Benefit Records with children aged 0-14 years.</universe>
+                <dataKind>Numeric data</dataKind>
+                <dataKind> Image</dataKind>
+                <dataKind> Individual (micro) level</dataKind>
+              </sumDscr>
+            </stdyInfo>
+            <method>
+              <dataColl>
+                <timeMeth>Repeated cross-sectional study</timeMeth>
+                <dataCollector>National Centre for Social Research</dataCollector>
+                <sampProc>Multi-stage stratified random sample</sampProc>
+                <deviat>6,708 cases</deviat>
+                <collMode>Face-to-face interview</collMode>
+                <sources />
+                <weight>Weighting used. See documentation for details.</weight>
+                <cleanOps>B</cleanOps>
+              </dataColl>
+            </method>
+            <dataAccs>
+              <setAvail>
+                <accsPlac>UK Data Service</accsPlac>
+              </setAvail>
+              <useStmt>
+                <specPerm>Safeguarded</specPerm>
+                <restrctn>The depositor has specified that registration is required. Available to all registered users. The depositor may be informed about usage.</restrctn>
+                <contact>&lt;a href=http://www.ukdataservice.ac.uk/help/get-in-touch.aspx&gt;Get in touch&lt;/a&gt;</contact>
+              </useStmt>
+            </dataAccs>
+            <othrStdyMat>
+              <relStdy>5552 Childcare and Early Years Provision: Parents' Use, Views and Experiences, 2004 Safeguarded key</relStdy>
+              <relStdy>5553 Childcare and Early Years Provision: Providers' Survey, 2005 Safeguarded key</relStdy>
+              <relStdy>6057 Childcare and Early Years Provision: Parents' Survey, 2007 Safeguarded key</relStdy>
+              <relStdy>6058 Childcare and Early Years Provision: Providers' Survey, 2006 Safeguarded key</relStdy>
+              <relStdy>6059 Childcare and Early Years Provision: Providers' Survey, 2007 Safeguarded key</relStdy>
+              <relStdy>6360 Childcare and Early Years Provision: Parents' Survey, 2008 Safeguarded key</relStdy>
+              <relStdy>6866 Childcare and Early Years Provision: Providers' Survey, 2008 Safeguarded key</relStdy>
+              <relStdy>6867 Childcare and Early Years Provision: Providers' Survey, 2009 Safeguarded key</relStdy>
+              <relStdy>6882 Childcare and Early Years Provision: Providers' Survey, 2010 Safeguarded key</relStdy>
+              <relStdy>7137 Childcare and Early Years Provision: Parents' Survey, 2010 Safeguarded key</relStdy>
+              <relStdy>7161 Childcare and Early Years Provision: Providers' Survey, 2011 Safeguarded key</relStdy>
+              <relStdy>7181 Childcare Provider Finances Survey, 2012 Safeguarded key</relStdy>
+              <relStdy>7269 Childcare and Early Years Provision: Parents' Survey, 2011 Safeguarded key</relStdy>
+              <relStdy>7492 Childcare and Early Years Provision: Parents' Survey, 2012-2013 Safeguarded key</relStdy>
+              <relStdy>7711 Childcare and Early Years Provision: Providers' Survey, 2013 Safeguarded key</relStdy>
+              <relStdy>7960 Childcare and Early Years Provision: Parents' Survey, 2014-2015 Safeguarded key</relStdy>
+              <relStdy>8166 Childcare and Early Years Provision: Providers' Survey, 2016 Safeguarded key</relStdy>
+              <relStdy>8318 Childcare and Early Years Provision: Parents' Survey, 2017 Safeguarded key</relStdy>
+              <relPubl>Speight, S. Smith, R. and Lloyd, E. with Coshall, C. (2010) &lt;i&gt;Families experiencing multiple disadvantage: their use of and views on childcare provision&lt;/i&gt;, Research Report No. DCSF-RR191, London: Department for Children, Schools and Families/National Centre for Social Research. ISBN 978 1 84775 628 2. &lt;br&gt;
+                &lt;br&gt;
+                Barrett, A. (2013) &lt;i&gt;The economic contribution of older Londoners&lt;/i&gt;, GLA Economics Report, London: Greater London Authority, July. ISBN 978-1-84781-561-3. &lt;br&gt;
+                &lt;br&gt;
+                Equality and Human Rights Commission (2013) &lt;i&gt;Standard of Living&lt;/i&gt;, Measurement Framework Series Briefing Paper no.10, Manchester: Equality and Human Rights Commission. &lt;br&gt;
+                &lt;br&gt;
+                Brind, R., McGinigal, S., Lewis, J. and Ghezelayagh, S. with Ransom, H., Robson, J., Street, C., and Renton, Z.(2013) &lt;I&gt;Childcare and Early Years Providers Survey 2013&lt;/I&gt;, Research Report SFR33/2014. London: DfE/TNS BMRB.&lt;br&gt;
+                &lt;br&gt;
+                Brind, R., McGinigal, S., Lewis, J. and Ghezelayagh, S. with Ransom, H., Robson, J., Street, C., and Renton, Z.(2013) &lt;I&gt;Childcare and Early Years Providers Survey 2013&lt;/I&gt;, Summary Report SFR33/2014. London: DfE/TNS BMRB.&lt;br&gt;
+                &lt;br&gt;
+                Brind, R., McGinigal, S., Lewis, J., and Ghezelayagh, S (2013) &lt;I&gt;Childcare and Early Years Providers Survey 2013: technical report&lt;/I&gt; JN 117328/SFR33/2014. London: DfE/TNS BMRB.&lt;br&gt;
+                &lt;br&gt;
+                Panayiotou, S., McGinigal, S., Kent, J., Smit, C., Witsø, C., and Edwards-Hughes, E. (2016) Survey of Childcare and Early Years Providers, England 2016; Main Text SFR09/2017; DfE/Kantar Public&lt;br&gt;
+                &lt;br&gt;
+                Panayiotou, S., McGinigal, S., Kent, J., Smit, C., Witsø, C., and Edwards-Hughes, E. (2016) Survey of Childcare and Early Years Providers, England 2016; Research Report SFR09/2017; DfE/Kantar Public&lt;br&gt;
+                &lt;br&gt;
+                McGinigal, S., Panayiotou, S., Taylor, L., Kent, J., Smit, C., Witsø, C., and Edwards-Hughes, E. (2016) Survey of Childcare and Early Years Providers, England 2016; Technical Report SFR09/2017; DfE/Kantar Public&lt;br&gt;</relPubl>
+              <relPubl>
+              </relPubl>
+              <othRefs>Language Of Study Description: English</othRefs>
+              <othRefs>Language Of Study Documentation: English</othRefs>
+            </othrStdyMat>
+          </stdyDscr>
+        </codeBook>
+
+
+      </metadata>
+
+    </record>
+
+  </GetRecord>
+
+
+
+</OAI-PMH>
+
+
+
+
+
+
+
+
+
+
+
+
+

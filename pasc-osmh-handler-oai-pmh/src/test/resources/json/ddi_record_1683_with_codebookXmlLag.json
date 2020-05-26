@@ -1,0 +1,198 @@
+{
+  "studyNumber": "1683",
+  "titleStudy": {
+    "zz": "Machinery of Government, 1976-1977",
+    "no": "Et Machinery of Government2, 1976-1977"
+  },
+  "abstract": {
+    "zz": "<p>Abstract copyright UK Data Service and data collection copyright owner.</p>This\n                study contains a complete transcript of the Cornwall returns of the census of 1851.\n              +<br><B>Main Topics</B>:<br>Using microfiche loaned to the project by the LDS, volunteers, recruited online, transcribed the pages of the enumerators' books for the Cornwall 1851 census. Other volunteers checked the data using Free Census software. Finally, the organiser validated the data, using yet another piece of Free Census software.<br>\n                <br>\n                The original data was collected in 1851. the raw data was in the form of microfiche, organised in accordance with the PRO regulations"
+  },
+  "classifications": {
+    "zz": [
+      {
+        "vocab": "",
+        "vocabUri": "",
+        "id": "",
+        "term": "Government and political systems - Politics"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "",
+        "id": "",
+        "term": "Management and organisation - Industry and management"
+      }
+    ]
+  },
+  "keywords": {
+    "zz": [
+      {
+        "vocab": "",
+        "vocabUri": "",
+        "id": "",
+        "term": "1976"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "",
+        "id": "",
+        "term": "1977"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "http://lod.data-archive.ac.uk/skoshasset/9e7cc815-90cb-4f96-b8ff-a0a44ab25ea9",
+        "id": "",
+        "term": "BUDGETS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "http://lod.data-archive.ac.uk/skoshasset/209e0ca3-1f3a-4034-b762-744692a9258c",
+        "id": "",
+        "term": "BUREAUCRACY"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "http://lod.data-archive.ac.uk/skoshasset/0a4ca3b1-1da3-4752-9074-e14ebbfa7dcd",
+        "id": "",
+        "term": "CENTRAL GOVERNMENT"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "http://lod.data-archive.ac.uk/skoshasset/0a9e181b-54f7-456e-911d-75e42dc52bbf",
+        "id": "",
+        "term": "CIVIL SERVICE"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "http://lod.data-archive.ac.uk/skoshasset/416c9ed0-a256-4aed-b81c-a1ab1ac8a2ac",
+        "id": "",
+        "term": "GOVERNMENT DEPARTMENTS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "http://lod.data-archive.ac.uk/skoshasset/3a49ce91-4b6f-42ba-918b-07a3a55961f6",
+        "id": "",
+        "term": "GRANTS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "http://lod.data-archive.ac.uk/skoshasset/af82c5dc-19be-4ad3-8f0a-612f314e1436",
+        "id": "",
+        "term": "GREAT BRITAIN"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "http://lod.data-archive.ac.uk/skoshasset/109136cf-0d85-40d0-96de-e2584bbc42ef",
+        "id": "",
+        "term": "OCCUPATIONS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "http://lod.data-archive.ac.uk/skoshasset/d9893276-de95-4bef-a38d-95a85fdd67f5",
+        "id": "",
+        "term": "PERSONNEL"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "http://lod.data-archive.ac.uk/skoshasset/19754f6d-6c61-44e0-b406-b776712424a9",
+        "id": "",
+        "term": "PUBLIC EXPENDITURE"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "http://lod.data-archive.ac.uk/skoshasset/96c7c14b-f933-418f-81a0-29330e85acf7",
+        "id": "",
+        "term": "PURCHASING"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "http://lod.data-archive.ac.uk/skoshasset/c00fd314-8751-4f9a-8862-6b9880f38148",
+        "id": "",
+        "term": "WAGES"
+      }
+    ]
+  },
+  "typeOfTimeMethods": {
+    "zz": [
+      {
+        "vocab": "",
+        "vocabUri": "",
+        "id": "",
+        "term": "Cross-sectional (one-time) study"
+      }
+    ]
+  },
+  "studyAreaCountries": {
+    "zz": [
+      {
+        "abbr": "Country not specified",
+        "country": "Great Britain"
+      }
+    ]
+  },
+  "unitTypes": {
+    "zz": [
+      {
+        "vocab": "",
+        "vocabUri": "",
+        "id": "",
+        "term": "Institutions/organisations"
+      }
+    ]
+  },
+  "publisher": {
+    "zz": {
+      "abbr": "Publisher not specified",
+      "publisher": "Leeds University Business School"
+    }
+  },
+  "publicationYear": "1982-01-01T00:00:00Z",
+  "pidStudies": {
+    "zz": [
+      {
+        "agency": "UKDA",
+        "pid": "1683"
+      },
+      {
+        "agency": "datacite",
+        "pid": "10.5255/UKDA-SN-1683-1"
+      }
+    ]
+  },
+  "fileLanguages": [
+    "en",
+    "us"
+  ],
+  "creators": {
+    "zz": [
+      "Hood, C.C., University of York. Institute of Social and Economic Research",
+      "Dunsire, A. (institution)",
+      "Thomson, K.S., University of York. Institute of Social and Economic Research"
+    ]
+  },
+  "typeOfSamplingProcedures": {},
+  "samplingProcedureFreeTexts": {
+    "zz": [
+      "No sampling (total universe)",
+      "No sampling (total universe) TEST"
+    ]
+  },
+  "typeOfModeOfCollections": {
+    "zz": [
+      {
+        "vocab": "",
+        "vocabUri": "",
+        "id": "",
+        "term": "Compilation or synthesis of existing material"
+      }
+    ]
+  },
+  "dataCollectionPeriodStartdate": "1976-01-01T00:00:00Z",
+  "dataCollectionFreeTexts": {},
+  "dataAccessFreeTexts": {
+    "zz": [
+      "The depositor has specified that registration is required and standard conditions of use apply. The depositor may be informed about usage. See <a href=http://ukdataservice.ac.uk/get-data/how-to-access/conditions.aspx>terms and conditions of access</a> for further information."
+    ]
+  },
+  "lastModified": "2017-08-10T06:40:45Z",
+  "isActive": true
+}
