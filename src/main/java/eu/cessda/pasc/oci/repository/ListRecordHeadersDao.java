@@ -20,6 +20,7 @@ import eu.cessda.pasc.oci.exception.CustomHandlerException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 
 /**
  * Data access object Contract for querying remote repository for RecordHeaders
@@ -28,7 +29,7 @@ import java.io.InputStream;
  */
 public interface ListRecordHeadersDao {
 
-    InputStream listRecordHeaders(String fullListRecordUrlPath) throws CustomHandlerException, IOException;
+    InputStream listRecordHeaders(URI fullListRecordUrlPath) throws CustomHandlerException, IOException;
 
-    InputStream listRecordHeadersResumption(String repoUrlWithResumptionToken) throws CustomHandlerException, IOException;
+    InputStream listRecordHeadersResumption(URI repoUrlWithResumptionToken) throws CustomHandlerException, IOException;
 }

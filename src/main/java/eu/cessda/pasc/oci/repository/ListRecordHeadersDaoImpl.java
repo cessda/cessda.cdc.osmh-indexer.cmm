@@ -21,6 +21,7 @@ import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.http.HttpClient;
 
 /**
@@ -37,12 +38,12 @@ public class ListRecordHeadersDaoImpl extends DaoBase implements ListRecordHeade
     }
 
     @Override
-    public InputStream listRecordHeaders(String fullListRecordUrlPath) throws IOException {
+    public InputStream listRecordHeaders(URI fullListRecordUrlPath) throws IOException {
         return postForStringResponse(fullListRecordUrlPath);
     }
 
     @Override
-    public InputStream listRecordHeadersResumption(String repoUrlWithResumptionToken) throws IOException {
+    public InputStream listRecordHeadersResumption(URI repoUrlWithResumptionToken) throws IOException {
         return postForStringResponse(repoUrlWithResumptionToken);
     }
 }

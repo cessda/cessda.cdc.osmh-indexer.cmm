@@ -17,7 +17,7 @@
 package eu.cessda.pasc.oci.mock.data;
 
 
-import eu.cessda.pasc.oci.models.response.RecordHeader;
+import eu.cessda.pasc.oci.models.RecordHeader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,17 +27,17 @@ import java.util.List;
  *
  * @author moses AT doraventures DOT com
  */
-public class RecordHeadersMock {
+public final class RecordHeadersMock {
 
   public static List<RecordHeader> getRecordHeaders() {
 
     List<RecordHeader> recordHeaders = new ArrayList<>();
 
     recordHeaders.add(
-        RecordHeader.builder()
-            .lastModified("2016-11-30T23:59:59Z")
-            .type("Question")
-            .recordType("RecordHeader")
+            RecordHeader.builder()
+                    .lastModified("2016-11-30T23:59:59Z")
+                    .type("Question")
+                    .recordType("RecordHeader")
             .identifier("ESS1e06.5_Q2")
             .build());
 

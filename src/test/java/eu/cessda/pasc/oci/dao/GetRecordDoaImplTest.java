@@ -20,6 +20,7 @@ import com.pgssoft.httpclient.HttpClientMock;
 import com.pgssoft.httpclient.MockedServerResponse;
 import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
 import eu.cessda.pasc.oci.exception.CustomHandlerException;
+import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
 import eu.cessda.pasc.oci.repository.GetRecordDoa;
 import eu.cessda.pasc.oci.repository.GetRecordDoaImpl;
 import lombok.SneakyThrows;
@@ -33,6 +34,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.BDDAssertions.then;
@@ -67,14 +69,14 @@ public class GetRecordDoaImplTest {
 
         // When
         GetRecordDoa recordDoa = new GetRecordDoaImpl(httpClient);
-        try (InputStream responseXMLRecord = recordDoa.getRecordXML(expectedUrl)) {
+        try (InputStream responseXMLRecord = recordDoa.getRecordXML(URI.create(expectedUrl))) {
             then(new String(responseXMLRecord.readAllBytes(), StandardCharsets.UTF_8)).isEqualTo(expectedUrl);
         }
     }
 
     @SuppressWarnings("resource")
-    @Test(expected = CustomHandlerException.class)
-    public void shouldThrowExceptionWhenRemoteServerResponseIsNotSuccessful() throws CustomHandlerException {
+    @Test(expected = ExternalSystemException.class)
+    public void shouldThrowExceptionWhenRemoteServerResponseIsNotSuccessful() throws CustomHandlerException, IOException {
 
         // Given
         String expectedFullGetRecordUrl = "https://the.remote.endpoint/?verb=GetRecord&identifier=1683&metadataPrefix=ddi";
@@ -83,7 +85,7 @@ public class GetRecordDoaImplTest {
 
         // When
         GetRecordDoa recordDoa = new GetRecordDoaImpl(httpClient);
-        recordDoa.getRecordXML(expectedFullGetRecordUrl);
+        recordDoa.getRecordXML(URI.create(expectedFullGetRecordUrl));
     }
 
     @Test
@@ -94,7 +96,7 @@ public class GetRecordDoaImplTest {
 
         // When
         GetRecordDoa recordDoa = new GetRecordDoaImpl(httpClient);
-        try (InputStream empty = recordDoa.getRecordXML("http://error.endpoint/")) {
+        try (InputStream empty = recordDoa.getRecordXML(URI.create("http://error.endpoint/"))) {
             Assert.assertEquals(-1, empty.read());
         }
     }

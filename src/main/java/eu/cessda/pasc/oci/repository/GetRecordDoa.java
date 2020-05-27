@@ -20,6 +20,7 @@ import eu.cessda.pasc.oci.exception.CustomHandlerException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 
 /**
  * Data access for fetching Record from remote repositories
@@ -28,5 +29,5 @@ import java.io.InputStream;
  */
 public interface GetRecordDoa {
 
-    InputStream getRecordXML(String studyFullUrl) throws CustomHandlerException, IOException;
+    InputStream getRecordXML(URI studyFullUrl) throws CustomHandlerException, IOException;
 }

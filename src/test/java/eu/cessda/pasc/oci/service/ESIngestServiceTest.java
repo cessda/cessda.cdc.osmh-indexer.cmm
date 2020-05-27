@@ -24,6 +24,7 @@ import eu.cessda.pasc.oci.helpers.FileHandler;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
 import eu.cessda.pasc.oci.service.helpers.EmbeddedElasticsearchServer;
+import eu.cessda.pasc.oci.service.impl.ESIngestService;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;

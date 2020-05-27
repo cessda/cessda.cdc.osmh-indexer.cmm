@@ -16,6 +16,7 @@
 
 package eu.cessda.pasc.oci.service;
 
+import eu.cessda.pasc.oci.service.impl.APISupportedServiceImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

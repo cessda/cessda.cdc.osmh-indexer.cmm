@@ -30,6 +30,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.BDDAssertions.then;
@@ -57,7 +58,7 @@ public class ListRecordHeadersDaoImplTest {
 
         // When
         ListRecordHeadersDao listRecordHeadersDao = new ListRecordHeadersDaoImpl(httpClient);
-        try (InputStream inputStream = listRecordHeadersDao.listRecordHeaders(fullListRecordHeadersUrl)) {
+        try (InputStream inputStream = listRecordHeadersDao.listRecordHeaders(URI.create(fullListRecordHeadersUrl))) {
             String recordHeadersXML = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
             System.out.println("Actual: " + recordHeadersXML);
 
@@ -77,7 +78,7 @@ public class ListRecordHeadersDaoImplTest {
 
         // When
         ListRecordHeadersDao listRecordHeadersDao = new ListRecordHeadersDaoImpl(httpClient);
-        try (InputStream inputStream = listRecordHeadersDao.listRecordHeaders(fullListRecordHeadersUrl)) {
+        try (InputStream inputStream = listRecordHeadersDao.listRecordHeaders(URI.create(fullListRecordHeadersUrl))) {
             String recordHeadersXML = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 
             System.out.println("Actual: " + recordHeadersXML);

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cessda.pasc.oci.service;
+package eu.cessda.pasc.oci.service.impl;
 
 import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
 import eu.cessda.pasc.oci.exception.CustomHandlerException;
@@ -24,6 +24,7 @@ import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.errors.ErrorStatus;
 import eu.cessda.pasc.oci.models.oai.configuration.OaiPmh;
 import eu.cessda.pasc.oci.repository.GetRecordDoa;
+import eu.cessda.pasc.oci.service.GetRecordService;
 import lombok.extern.slf4j.Slf4j;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
@@ -36,6 +37,8 @@ import org.springframework.stereotype.Service;
 import javax.xml.XMLConstants;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import static eu.cessda.pasc.oci.helpers.CMMStudyMapper.*;
 import static eu.cessda.pasc.oci.helpers.RecordResponseValidator.validateResponse;
@@ -50,48 +53,52 @@ import static eu.cessda.pasc.oci.helpers.RecordResponseValidator.validateRespons
 public class GetRecordServiceImpl implements GetRecordService {
 
   private final XPathFactory xPathFactory;
-  private final GetRecordDoa getRecordDoa;
-  private final HandlerConfigurationProperties oaiPmhHandlerConfig;
+    private final GetRecordDoa getRecordDoa;
+    private final HandlerConfigurationProperties oaiPmhHandlerConfig;
 
-  @Autowired
-  public GetRecordServiceImpl(GetRecordDoa getRecordDoa, HandlerConfigurationProperties oaiPmhHandlerConfig, XPathFactory xPathFactory) {
-    this.getRecordDoa = getRecordDoa;
-    this.oaiPmhHandlerConfig = oaiPmhHandlerConfig;
-    this.xPathFactory = xPathFactory;
-  }
-
-  @Override
-  public CMMStudy getRecord(String repositoryUrl, String studyIdentifier) throws CustomHandlerException {
-    log.info("Querying Repo [{}] for StudyID [{}]", repositoryUrl, studyIdentifier);
-    String fullUrl = OaiPmhHelpers.buildGetStudyFullUrl(repositoryUrl, studyIdentifier, oaiPmhHandlerConfig);
-
-    try (InputStream recordXML = getRecordDoa.getRecordXML(fullUrl)) {
-      return mapDDIRecordToCMMStudy(recordXML, repositoryUrl).studyXmlSourceUrl(fullUrl).build();
-    } catch (JDOMException | IOException e) {
-      throw new InternalSystemException(String.format("Unable to parse xml! FullUrl [%s]", fullUrl), e);
-    }
-  }
-
-  private CMMStudy.CMMStudyBuilder mapDDIRecordToCMMStudy(InputStream recordXML, String repositoryUrl)
-          throws JDOMException, IOException, InternalSystemException {
-
-    CMMStudy.CMMStudyBuilder builder = CMMStudy.builder();
-    OaiPmh oaiPmh = oaiPmhHandlerConfig.getOaiPmh();
-    Document document = getSaxBuilder().build(recordXML);
-
-    if (log.isTraceEnabled()) {
-      log.trace("Record XML String [{}]", new XMLOutputter().outputString(document));
+    @Autowired
+    public GetRecordServiceImpl(GetRecordDoa getRecordDoa, HandlerConfigurationProperties oaiPmhHandlerConfig, XPathFactory xPathFactory) {
+        this.getRecordDoa = getRecordDoa;
+        this.oaiPmhHandlerConfig = oaiPmhHandlerConfig;
+        this.xPathFactory = xPathFactory;
     }
 
-    // We exit if the record has an <error> element
-    ErrorStatus errorStatus = validateResponse(document, xPathFactory);
-    if (errorStatus.isHasError()) {
-      throw new InternalSystemException("Remote repository " + repositoryUrl + " returned error: " + errorStatus.getMessage());
+    @Override
+    public CMMStudy getRecord(URI repositoryUrl, String studyIdentifier) throws CustomHandlerException {
+        log.debug("Querying Repo [{}] for StudyID [{}]", repositoryUrl, studyIdentifier);
+        URI fullUrl = null;
+        try {
+            fullUrl = OaiPmhHelpers.buildGetStudyFullUrl(repositoryUrl, studyIdentifier, oaiPmhHandlerConfig);
+            try (InputStream recordXML = getRecordDoa.getRecordXML(fullUrl)) {
+                return mapDDIRecordToCMMStudy(recordXML, repositoryUrl).studyXmlSourceUrl(fullUrl.toString()).build();
+            }
+        } catch (JDOMException | IOException e) {
+            throw new InternalSystemException(String.format("Unable to parse xml! FullUrl [%s]: %s", fullUrl, e.toString()), e);
+        } catch (URISyntaxException e) {
+            throw new InternalSystemException("Unable to construct URL: " + e.toString(), e);
+        }
     }
 
-    // Short-Circuit. We carry on to parse beyond the headers only if the record is active.
-    boolean isActiveRecord = parseHeaderElement(builder, document, xPathFactory);
-    if (isActiveRecord) {
+    private CMMStudy.CMMStudyBuilder mapDDIRecordToCMMStudy(InputStream recordXML, URI repositoryUrl)
+            throws JDOMException, IOException, InternalSystemException {
+
+        CMMStudy.CMMStudyBuilder builder = CMMStudy.builder();
+        OaiPmh oaiPmh = oaiPmhHandlerConfig.getOaiPmh();
+        Document document = getSaxBuilder().build(recordXML);
+
+        if (log.isTraceEnabled()) {
+            log.trace("Record XML String [{}]", new XMLOutputter().outputString(document));
+        }
+
+        // We exit if the record has an <error> element
+        ErrorStatus errorStatus = validateResponse(document, xPathFactory);
+        if (errorStatus.isHasError()) {
+            throw new InternalSystemException("Remote repository " + repositoryUrl + " returned error: " + errorStatus.getMessage());
+        }
+
+        // Short-Circuit. We carry on to parse beyond the headers only if the record is active.
+        boolean isActiveRecord = parseHeaderElement(builder, document, xPathFactory);
+        if (isActiveRecord) {
       String defaultLangIsoCode = parseDefaultLanguage(document, xPathFactory, oaiPmh);
       parseStudyTitle(builder, document, xPathFactory, oaiPmh, defaultLangIsoCode);
       parseStudyUrl(builder, document, xPathFactory, oaiPmh, defaultLangIsoCode);

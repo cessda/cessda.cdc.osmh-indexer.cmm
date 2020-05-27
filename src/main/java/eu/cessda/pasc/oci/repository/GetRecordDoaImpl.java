@@ -21,6 +21,7 @@ import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.http.HttpClient;
 
 /**
@@ -37,7 +38,7 @@ public class GetRecordDoaImpl extends DaoBase implements GetRecordDoa {
     }
 
     @Override
-    public InputStream getRecordXML(String studyFullUrl) throws IOException {
+    public InputStream getRecordXML(URI studyFullUrl) throws IOException {
         return postForStringResponse(studyFullUrl);
     }
 }

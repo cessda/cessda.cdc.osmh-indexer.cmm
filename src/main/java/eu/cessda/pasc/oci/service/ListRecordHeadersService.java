@@ -17,8 +17,9 @@
 package eu.cessda.pasc.oci.service;
 
 import eu.cessda.pasc.oci.exception.CustomHandlerException;
-import eu.cessda.pasc.oci.models.response.RecordHeader;
+import eu.cessda.pasc.oci.models.RecordHeader;
 
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -27,5 +28,5 @@ import java.util.List;
  * @author moses AT doraventures DOT com
  */
 public interface ListRecordHeadersService {
-  List<RecordHeader> getRecordHeaders(String baseRepoUrl) throws CustomHandlerException;
+    List<RecordHeader> getRecordHeaders(URI baseRepoUrl) throws CustomHandlerException;
 }

@@ -26,7 +26,7 @@ import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.configurations.Harvester;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.repository.HarvesterDao;
-import eu.cessda.pasc.oci.service.impl.DefaultHarvesterConsumerService;
+import eu.cessda.pasc.oci.service.impl.RemoteHarvesterConsumerService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,25 +56,22 @@ import static org.mockito.Mockito.when;
  * @author moses AT doraventures DOT com
  */
 @RunWith(SpringRunner.class)
-public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfileContext {
-
-  @Mock
-  private HarvesterDao harvesterDao;
+public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfileContext {
 
   @Autowired
   RepositoryUrlService repositoryUrlService;
-
   @Autowired
   ObjectMapper objectMapper;
+  RemoteHarvesterConsumerService remoteHarvesterConsumerService;
 
   @Autowired
   CMMStudyConverter cmmStudyConverter;
-
-  DefaultHarvesterConsumerService defaultHarvesterConsumerService;
+  @Mock
+  private HarvesterDao harvesterDao;
 
   @Before
   public void setUp() {
-    defaultHarvesterConsumerService = new DefaultHarvesterConsumerService(harvesterDao, repositoryUrlService, objectMapper, cmmStudyConverter);
+    remoteHarvesterConsumerService = new RemoteHarvesterConsumerService(harvesterDao, repositoryUrlService, objectMapper, cmmStudyConverter);
   }
 
   @Test
@@ -85,7 +82,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
     );
     Repo repo = getUKDSRepo();
 
-    List<RecordHeader> recordHeaders = defaultHarvesterConsumerService.listRecordHeaders(repo, null);
+    List<RecordHeader> recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(repo, null);
     assertThat(recordHeaders).hasSize(2);
   }
 
@@ -97,7 +94,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
     when(harvesterDao.listRecordHeaders(any(URI.class))).thenReturn(
             new ByteArrayInputStream(LIST_RECORDER_HEADERS_X6.getBytes(StandardCharsets.UTF_8))
     );
-    List<RecordHeader> recordHeaders = defaultHarvesterConsumerService.listRecordHeaders(repo, lastModifiedDateCutOff);
+    List<RecordHeader> recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(repo, lastModifiedDateCutOff);
 
     assertThat(recordHeaders).hasSize(2);
     recordHeaders.forEach(recordHeader -> {
@@ -114,7 +111,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
     when(harvesterDao.listRecordHeaders(any(URI.class))).thenReturn(
             new ByteArrayInputStream(LIST_RECORDER_HEADERS_WITH_INVALID_DATETIME.getBytes(StandardCharsets.UTF_8))
     );
-    List<RecordHeader> recordHeaders = defaultHarvesterConsumerService.listRecordHeaders(repo, lastModifiedCutOff);
+    List<RecordHeader> recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(repo, lastModifiedCutOff);
 
     assertThat(recordHeaders).hasSize(1);
     recordHeaders.forEach(recordHeader -> {
@@ -132,7 +129,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
     );
     Repo repo = getUKDSRepo();
 
-    List<RecordHeader> recordHeaders = defaultHarvesterConsumerService.listRecordHeaders(repo, null);
+    List<RecordHeader> recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(repo, null);
     assertThat(recordHeaders).hasSize(6);
   }
 
@@ -142,7 +139,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
     when(harvesterDao.listRecordHeaders(any(URI.class))).thenThrow(new IOException("Mocked!"));
     Repo repo = getUKDSRepo();
 
-    List<RecordHeader> recordHeaders = defaultHarvesterConsumerService.listRecordHeaders(repo, null);
+    List<RecordHeader> recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(repo, null);
     assertThat(recordHeaders).isEmpty();
   }
 
@@ -153,7 +150,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
     when(harvesterDao.listRecordHeaders(any(URI.class))).thenThrow(IOException.class);
     Repo repo = getUKDSRepo();
 
-    List<RecordHeader> recordHeaders = defaultHarvesterConsumerService.listRecordHeaders(repo, null);
+    List<RecordHeader> recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(repo, null);
     assertThat(recordHeaders).isEmpty();
   }
 
@@ -164,7 +161,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
     when(harvesterDao.listRecordHeaders(any(URI.class))).thenThrow(URISyntaxException.class);
     Repo repo = getUKDSRepo();
 
-    List<RecordHeader> recordHeaders = defaultHarvesterConsumerService.listRecordHeaders(repo, null);
+    List<RecordHeader> recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(repo, null);
     assertThat(recordHeaders).isEmpty();
   }
 
@@ -177,7 +174,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
 
     when(harvesterDao.getRecord(any(URI.class))).thenThrow(new IOException("Mocked!"));
 
-    Optional<CMMStudy> actualRecord = defaultHarvesterConsumerService.getRecord(repoMock, "4124325");
+    Optional<CMMStudy> actualRecord = remoteHarvesterConsumerService.getRecord(repoMock, "4124325");
 
     // Then exception is thrown caught and an empty list returned
     then(actualRecord.isPresent()).isFalse();
@@ -193,7 +190,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
 
     when(harvesterDao.getRecord(any(URI.class))).thenThrow(IOException.class);
 
-    Optional<CMMStudy> actualRecord = defaultHarvesterConsumerService.getRecord(repoMock, "4124325");
+    Optional<CMMStudy> actualRecord = remoteHarvesterConsumerService.getRecord(repoMock, "4124325");
 
     // Then exception is thrown caught and an empty list returned
     then(actualRecord.isPresent()).isFalse();
@@ -209,7 +206,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
 
     when(harvesterDao.getRecord(any(URI.class))).thenThrow(URISyntaxException.class);
 
-    Optional<CMMStudy> actualRecord = defaultHarvesterConsumerService.getRecord(repoMock, "4124325");
+    Optional<CMMStudy> actualRecord = remoteHarvesterConsumerService.getRecord(repoMock, "4124325");
 
     // Then exception is thrown caught and an empty list returned
     then(actualRecord.isPresent()).isFalse();
@@ -228,7 +225,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
     );
     Repo repo = getUKDSRepo();
 
-    Optional<CMMStudy> cmmStudy = defaultHarvesterConsumerService.getRecord(repo, recordID);
+    Optional<CMMStudy> cmmStudy = remoteHarvesterConsumerService.getRecord(repo, recordID);
 
     assertThat(cmmStudy.isPresent()).isTrue();
     then(cmmStudy.get().getStudyNumber()).isEqualTo("998");
@@ -253,7 +250,7 @@ public class DefaultHarvesterConsumerServiceTest extends AbstractSpringTestProfi
     );
     Repo repo = getUKDSRepo();
 
-    Optional<CMMStudy> cmmStudy = defaultHarvesterConsumerService.getRecord(repo, recordID);
+    Optional<CMMStudy> cmmStudy = remoteHarvesterConsumerService.getRecord(repo, recordID);
 
     assertThat(cmmStudy.isPresent()).isTrue();
     then(cmmStudy.get().getStudyNumber()).isEqualTo("1031");

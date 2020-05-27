@@ -77,12 +77,12 @@ public class ConsumerScheduler {
 
   @Autowired
   public ConsumerScheduler(DebuggingJMXBean debuggingJMXBean, AppConfigurationProperties configurationProperties,
-                           HarvesterConsumerService harvesterConsumerService, IngestService esIndexerService,
+                           HarvesterConsumerService localHarvesterConsumerService, IngestService esIndexerService,
                            LanguageDocumentExtractor extractor, LanguageAvailabilityMapper languageAvailabilityMapper,
                            Metrics metrics) {
     this.debuggingJMXBean = debuggingJMXBean;
     this.configurationProperties = configurationProperties;
-    this.harvesterConsumerService = harvesterConsumerService;
+    this.harvesterConsumerService = localHarvesterConsumerService;
     this.esIndexerService = esIndexerService;
     this.extractor = extractor;
     this.languageAvailabilityMapper = languageAvailabilityMapper;
@@ -255,9 +255,8 @@ public class ConsumerScheduler {
 
   private Map<String, List<CMMStudyOfLanguage>> getCmmStudiesOfEachLangIsoCodeMap(Repo repo, LocalDateTime lastModifiedDateTime) {
     log.info("Processing Repo [{}]", repo);
-    List<RecordHeader> recordHeaders = harvesterConsumerService.listRecordHeaders(repo, lastModifiedDateTime);
 
-    log.info("Repo [{}] returned with [{}] record headers", repo.getName(), recordHeaders.size());
+    List<RecordHeader> recordHeaders = harvesterConsumerService.listRecordHeaders(repo, lastModifiedDateTime);
 
     List<CMMStudy> presentCMMStudies = recordHeaders.stream()
             .map(recordHeader -> harvesterConsumerService.getRecord(repo, recordHeader.getIdentifier()))

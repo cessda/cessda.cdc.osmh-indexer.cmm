@@ -15,7 +15,6 @@
  */
 package eu.cessda.pasc.oci.repository;
 
-import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -36,8 +35,8 @@ public class PascHarvesterDao extends DaoBase implements HarvesterDao {
 
 
     @Autowired
-    public PascHarvesterDao(HttpClient httpClient, AppConfigurationProperties appConfigurationProperties) {
-        super(httpClient, appConfigurationProperties);
+    public PascHarvesterDao(HttpClient httpClient) {
+        super(httpClient);
     }
 
     @Override

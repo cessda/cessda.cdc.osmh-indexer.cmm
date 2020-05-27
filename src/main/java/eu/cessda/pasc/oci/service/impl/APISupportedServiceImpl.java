@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package eu.cessda.pasc.oci.service;
+package eu.cessda.pasc.oci.service.impl;
 
 import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
+import eu.cessda.pasc.oci.service.APISupportedService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;

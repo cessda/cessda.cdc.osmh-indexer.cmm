@@ -38,8 +38,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,9 +58,9 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 @ActiveProfiles("test")
 public class GetRecordServiceImplTest {
 
-  private final static String REPO_URL = "http://services.fsd.uta.fi/v0/oai";
+  private final static URI REPO_URL = URI.create("http://services.fsd.uta.fi/v0/oai");
   private final static String RECORD_IDENTIFIER = "http://my-example_url:80/obj/fStudy/ch.sidos.ddi.468.7773";
-  private final static String FULL_RECORD_URL = REPO_URL + "?verb=GetRecord&identifier=" + RECORD_IDENTIFIER + "&metadataPrefix=oai_ddi25";
+  private final static URI FULL_RECORD_URL = URI.create(REPO_URL + "?verb=GetRecord&identifier=" + URLEncoder.encode(RECORD_IDENTIFIER, StandardCharsets.UTF_8) + "&metadataPrefix=oai_ddi25");
   private final CMMConverter cmmConverter = new CMMConverter();
 
 
@@ -85,7 +87,7 @@ public class GetRecordServiceImplTest {
   }
 
   @Test
-  public void shouldHarvestedContentForLanguageSpecificDimensionFromElementWithCorrectXmlLangAttribute() throws CustomHandlerException, FileNotFoundException {
+  public void shouldHarvestedContentForLanguageSpecificDimensionFromElementWithCorrectXmlLangAttribute() throws CustomHandlerException, IOException {
 
     // Given
     given(getRecordDoa.getRecordXML(FULL_RECORD_URL)).willReturn(
@@ -206,7 +208,7 @@ public class GetRecordServiceImplTest {
 
   @Test()
   public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord_MarkedAsNotActive()
-          throws CustomHandlerException, FileNotFoundException {
+          throws CustomHandlerException, IOException {
 
     // Given
     given(getRecordDoa.getRecordXML(FULL_RECORD_URL)).willReturn(
@@ -222,7 +224,7 @@ public class GetRecordServiceImplTest {
   }
 
   @Test(expected = InternalSystemException.class)
-  public void shouldThrowExceptionForRecordWithErrorElement() throws CustomHandlerException, FileNotFoundException {
+  public void shouldThrowExceptionForRecordWithErrorElement() throws CustomHandlerException, IOException {
 
     // Given
     given(getRecordDoa.getRecordXML(FULL_RECORD_URL)).willReturn(

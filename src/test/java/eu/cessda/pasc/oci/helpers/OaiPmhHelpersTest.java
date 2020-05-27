@@ -25,6 +25,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import static eu.cessda.pasc.oci.helpers.OaiPmhHelpers.buildGetStudyFullUrl;
 import static org.assertj.core.api.BDDAssertions.then;
 
@@ -39,52 +42,38 @@ import static org.assertj.core.api.BDDAssertions.then;
 public class OaiPmhHelpersTest {
 
 
-  @Autowired
-  private HandlerConfigurationProperties handlerConfigurationProperties;
+    @Autowired
+    private HandlerConfigurationProperties handlerConfigurationProperties;
 
-  @Test
-  public void ShouldAppendMetaDataPrefixForGivenFSD() throws CustomHandlerException {
+    @Test
+    public void ShouldAppendMetaDataPrefixForGivenFSD() throws CustomHandlerException, URISyntaxException {
 
-    // Given
-    String fsdEndpoint = "http://services.fsd.uta.fi/v0/oai";
-    String expectedReqUrl = "http://services.fsd.uta.fi/v0/oai?verb=GetRecord&identifier=15454&metadataPrefix=oai_ddi25";
+        // Given
+        String fsdEndpoint = "http://services.fsd.uta.fi/v0/oai";
+        String expectedReqUrl = "http://services.fsd.uta.fi/v0/oai?verb=GetRecord&identifier=15454&metadataPrefix=oai_ddi25";
 
-    // When
-    String builtUrl = buildGetStudyFullUrl(fsdEndpoint, "15454", handlerConfigurationProperties);
+        // When
+        URI builtUrl = buildGetStudyFullUrl(URI.create(fsdEndpoint), "15454", handlerConfigurationProperties);
 
-    then(builtUrl).isEqualTo(expectedReqUrl);
-  }
+        then(builtUrl.toString()).isEqualTo(expectedReqUrl);
+    }
 
-  @Test
-  public void ShouldAppendMetaDataPrefixForGivenUKDS() throws CustomHandlerException {
+    @Test
+    public void ShouldAppendMetaDataPrefixForGivenUKDS() throws CustomHandlerException, URISyntaxException {
 
-    // Given
-    String fsdEndpoint = "https://oai.ukdataservice.ac.uk:8443/oai/provider";
-    String expectedReqUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=GetRecord&identifier=15454&metadataPrefix=ddi";
+        // Given
+        String fsdEndpoint = "https://oai.ukdataservice.ac.uk:8443/oai/provider";
+        String expectedReqUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=GetRecord&identifier=15454&metadataPrefix=ddi";
 
-    // When
-    String builtUrl = buildGetStudyFullUrl(fsdEndpoint, "15454", handlerConfigurationProperties);
+        // When
+        URI builtUrl = buildGetStudyFullUrl(URI.create(fsdEndpoint), "15454", handlerConfigurationProperties);
 
-    then(builtUrl).isEqualTo(expectedReqUrl);
-  }
+        then(builtUrl.toString()).isEqualTo(expectedReqUrl);
+    }
 
-  @Test(expected = CustomHandlerException.class)
-  public void ShouldThrowExceptionForANonConfiguredRepo() throws CustomHandlerException {
-    // When
-    buildGetStudyFullUrl("http://services.inthe.future/v0/oai", "15454", handlerConfigurationProperties);
-  }
-
-  @Test
-  public void shouldDecodeStudyNumberSpecialCharactersBackToOriginalForm() throws CustomHandlerException {
-
-    // Given
-    String studyNumberWithRestCharactersEncoded = "oai_cl_dbk_dt_gesis_dt_org_cl_DBK_sl_ZA0001";
-    String fsdEndpoint = "http://services.fsd.uta.fi/v0/oai";
-    String expectedReqUrl = "http://services.fsd.uta.fi/v0/oai?verb=GetRecord&identifier=oai:dbk.gesis.org:DBK/ZA0001&metadataPrefix=oai_ddi25";
-
-    // When
-    String builtUrl = buildGetStudyFullUrl(fsdEndpoint, studyNumberWithRestCharactersEncoded, handlerConfigurationProperties);
-
-    then(builtUrl).isEqualTo(expectedReqUrl);
-  }
+    @Test(expected = CustomHandlerException.class)
+    public void ShouldThrowExceptionForANonConfiguredRepo() throws CustomHandlerException, URISyntaxException {
+        // When
+        buildGetStudyFullUrl(URI.create("http://services.inthe.future/v0/oai"), "15454", handlerConfigurationProperties);
+    }
 }

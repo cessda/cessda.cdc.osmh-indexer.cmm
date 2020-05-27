@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.service;
+package eu.cessda.pasc.oci.service.impl;
 
 import eu.cessda.pasc.oci.configurations.ESConfigurationProperties;
 import eu.cessda.pasc.oci.helpers.FileHandler;
 import eu.cessda.pasc.oci.helpers.TimeUtility;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
+import eu.cessda.pasc.oci.service.IngestService;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
@@ -79,7 +80,7 @@ public class ESIngestService implements IngestService {
 
         if (prepareIndex(indexName)) {
             List<IndexQuery> queries = new ArrayList<>(INDEX_COMMIT_SIZE);
-            log.info("Indexing [{}] index.", indexName);
+            log.debug("Indexing [{}] index.", indexName);
             int counter = 0;
             for (CMMStudyOfLanguage cmmStudyOfLanguage : languageCMMStudiesMap) {
                 IndexQuery indexQuery = getIndexQuery(indexName, cmmStudyOfLanguage);
@@ -96,7 +97,7 @@ public class ESIngestService implements IngestService {
                 executeBulk(queries);
             }
             esTemplate.refresh(indexName);
-            log.info("[{}] BulkIndex completed.", languageIsoCode);
+            log.debug("[{}] BulkIndex completed.", languageIsoCode);
         } else {
             isSuccessful = false;
         }
