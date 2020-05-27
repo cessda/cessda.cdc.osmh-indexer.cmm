@@ -155,7 +155,8 @@
           "id": {
             "type": "string",
             "index": "no",
-            "ignore_above": 256
+            "ignore_above": 256,
+            "boost": 1.5
           },
           "term": {
             "type": "string",
