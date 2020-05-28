@@ -43,8 +43,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
-import static eu.cessda.pasc.oci.helpers.HandlerConstants.RECORD_HEADER;
-import static eu.cessda.pasc.oci.helpers.HandlerConstants.STUDY;
 import static eu.cessda.pasc.oci.helpers.OaiPmhConstants.*;
 import static eu.cessda.pasc.oci.helpers.OaiPmhHelpers.appendListRecordParams;
 import static eu.cessda.pasc.oci.helpers.OaiPmhHelpers.appendListRecordResumptionToken;
@@ -57,6 +55,10 @@ import static eu.cessda.pasc.oci.helpers.OaiPmhHelpers.appendListRecordResumptio
 @Service
 @Slf4j
 public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
+
+  // Messaging and Exceptions
+  private static final String RECORD_HEADER = "RecordHeader";
+  private static final String STUDY = "Study";
 
   private final DaoBase daoBase;
   private final HandlerConfigurationProperties config;
@@ -82,10 +84,9 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
     }
 
     // We exit if the response has an <error> element
-    ErrorStatus errorStatus = ListIdentifiersResponseValidator.validateResponse(doc);
-    if (errorStatus.isHasError()) {
-      log.debug("Returned response has error message [{}].", errorStatus.getMessage());
-      throw new InternalSystemException(errorStatus.getMessage());
+    Optional<ErrorStatus> errorStatus = ListIdentifiersResponseValidator.validateResponse(doc);
+    if (errorStatus.isPresent()) {
+      throw new InternalSystemException("Remote repository " + baseRepoUrl + " returned error: " + errorStatus.get().toString());
     }
 
     log.info("Parsing record headers for [{}].", baseRepoUrl);

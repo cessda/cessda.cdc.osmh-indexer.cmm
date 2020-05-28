@@ -19,13 +19,14 @@ package eu.cessda.pasc.oci.helpers;
 import eu.cessda.pasc.oci.models.cmmstudy.TermVocabAttributes;
 import eu.cessda.pasc.oci.models.cmmstudy.VocabAttributes;
 import eu.cessda.pasc.oci.models.oai.configuration.OaiPmh;
-import lombok.experimental.UtilityClass;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,18 +44,24 @@ import static java.util.stream.Collectors.toList;
  *
  * @author moses AT doraventures DOT com
  */
-@UtilityClass
+@Component
 class DocElementParser {
+
+  private final XPathFactory xFactory;
+
+  @Autowired
+  public DocElementParser(XPathFactory xFactory) {
+    this.xFactory = xFactory;
+  }
 
   /**
    * Extracts elements from doc
    *
    * @param document       the document to parse
-   * @param xFactory       the xFactory
    * @param xPathToElement the xPath
    * @return nonNull list of {@link Element}
    */
-  static List<Element> getElements(Document document, XPathFactory xFactory, String xPathToElement) {
+  List<Element> getElements(Document document, String xPathToElement) {
     XPathExpression<Element> expression = xFactory.compile(xPathToElement, Filters.element(), null, OAI_AND_DDI_NS);
     return expression.evaluate(document).stream().filter(Objects::nonNull).collect(toList());
   }
@@ -63,17 +70,16 @@ class DocElementParser {
    * Extracts Date elements from doc that has @date
    *
    * @param document       the document to parse
-   * @param xFactory       the xFactory
    * @param xPathToElement the xPath
    * @return nonNull list of {@link Element}
    */
-  private static List<Element> getElementsWithDateAttr(Document document, XPathFactory xFactory, String xPathToElement) {
+  private List<Element> getElementsWithDateAttr(Document document, String xPathToElement) {
     XPathExpression<Element> expression = xFactory.compile(xPathToElement, Filters.element(), null, OAI_AND_DDI_NS);
     return expression.evaluate(document).stream()
-        .filter(Objects::nonNull)
-        .filter(element -> getAttributeValue(element, DATE_ATTR)
-            .isPresent()) //PUG requirement: we only care about those with @date CV
-        .collect(toList());
+            .filter(Objects::nonNull)
+            .filter(element -> getAttributeValue(element, DATE_ATTR)
+                    .isPresent()) //PUG requirement: we only care about those with @date CV
+            .collect(toList());
   }
 
   static TermVocabAttributes parseTermVocabAttrAndValues(Element parentElement, Element concept, boolean hasControlledValue) {
@@ -96,44 +102,44 @@ class DocElementParser {
     VocabAttributes.VocabAttributesBuilder builder = VocabAttributes.builder();
     if (hasControlledValue) {
       builder.vocab(getAttributeValue(concept, VOCAB_ATTR).orElse(""))
-          .vocabUri(getAttributeValue(concept, VOCAB_URI_ATTR).orElse(""))
-          .id(concept.getText());
+              .vocabUri(getAttributeValue(concept, VOCAB_URI_ATTR).orElse(""))
+              .id(concept.getText());
     } else {
       builder.vocab(getAttributeValue(parentElement, VOCAB_ATTR).orElse(""))
-          .vocabUri(getAttributeValue(parentElement, VOCAB_URI_ATTR).orElse(""))
-          .id(getAttributeValue(parentElement, ID_ATTR).orElse(""));
+              .vocabUri(getAttributeValue(parentElement, VOCAB_URI_ATTR).orElse(""))
+              .id(getAttributeValue(parentElement, ID_ATTR).orElse(""));
     }
     return builder.build();
   }
 
-  static <T> Map<String, List<T>> extractMetadataObjectListForEachLang(
-      OaiPmh config, String defaultLangIsoCode, Document document, XPathFactory xFactory, String xPath,
-      Function<Element, Optional<T>> parserStrategy) {
+  <T> Map<String, List<T>> extractMetadataObjectListForEachLang(
+          OaiPmh config, String defaultLangIsoCode, Document document, String xPath,
+          Function<Element, Optional<T>> parserStrategy) {
 
     Map<String, List<T>> mapOfMetadataToLanguageCode = new HashMap<>();
-    List<Element> elements = getElements(document, xFactory, xPath);
+    List<Element> elements = getElements(document, xPath);
     elements.forEach(element -> {
-          Optional<T> parsedMetadataPojo = parserStrategy.apply(element);
-          parsedMetadataPojo.ifPresent(parsedMetadataPojoValue -> {
-            Optional<String> langCode = parseLanguageCode(config, defaultLangIsoCode, element);
-            langCode.ifPresent(code ->
-                mapMetadataToLanguageCode(mapOfMetadataToLanguageCode, parsedMetadataPojoValue, code));
-          });
-        }
+              Optional<T> parsedMetadataPojo = parserStrategy.apply(element);
+              parsedMetadataPojo.ifPresent(parsedMetadataPojoValue -> {
+                Optional<String> langCode = parseLanguageCode(config, defaultLangIsoCode, element);
+                langCode.ifPresent(code ->
+                        mapMetadataToLanguageCode(mapOfMetadataToLanguageCode, parsedMetadataPojoValue, code));
+              });
+            }
     );
 
     return mapOfMetadataToLanguageCode;
   }
 
-  static <T> Map<String, T> extractMetadataObjectForEachLang(
-      OaiPmh config, String defaultLangIsoCode, Document document, XPathFactory xFactory, String xPath, Function<Element, T> parserStrategy) {
+  <T> Map<String, T> extractMetadataObjectForEachLang(
+          OaiPmh config, String defaultLangIsoCode, Document document, String xPath, Function<Element, T> parserStrategy) {
 
     Map<String, T> mapOfMetadataToLanguageCode = new HashMap<>();
-    List<Element> elements = getElements(document, xFactory, xPath);
+    List<Element> elements = getElements(document, xPath);
     elements.forEach(element -> {
-          T parsedMetadataPojo = parserStrategy.apply(element);
-          Optional<String> langCode = parseLanguageCode(config, defaultLangIsoCode, element);
-          langCode.ifPresent(languageIsoCode ->
+      T parsedMetadataPojo = parserStrategy.apply(element);
+      Optional<String> langCode = parseLanguageCode(config, defaultLangIsoCode, element);
+      langCode.ifPresent(languageIsoCode ->
               mapOfMetadataToLanguageCode.put(languageIsoCode, parsedMetadataPojo)); //Overrides duplicates, last wins.
         }
     );
@@ -184,12 +190,12 @@ class DocElementParser {
     return ofNullable(element.getAttributeValue(idAttr));
   }
 
-  static Optional<Element> getFirstElement(Document document, XPathFactory xFactory, String xPathToElement) {
+  Optional<Element> getFirstElement(Document document, String xPathToElement) {
     XPathExpression<Element> expression = xFactory.compile(xPathToElement, Filters.element(), null, OAI_AND_DDI_NS);
     return ofNullable(expression.evaluateFirst(document));
   }
 
-  static Optional<Attribute> getFirstAttribute(Document document, XPathFactory xFactory, String xPathToElement) {
+  Optional<Attribute> getFirstAttribute(Document document, String xPathToElement) {
     XPathExpression<Attribute> expression = xFactory.compile(xPathToElement, Filters.attribute(), null, OAI_AND_DDI_NS);
     return ofNullable(expression.evaluateFirst(document));
   }
@@ -198,18 +204,16 @@ class DocElementParser {
    * Parses the array values of attributes of a given elements
    *
    * @param document     the document to parse
-   * @param xFactory     the xFactory
    * @param elementXpath the Element parent node to retrieve
    * @return Array String Values of the attributes
    */
-  static String[] getAttributeValues(Document document, XPathFactory xFactory, String elementXpath) {
-    List<Attribute> attributes = getAttributes(document, xFactory, elementXpath);
+  String[] getAttributeValues(Document document, String elementXpath) {
+    List<Attribute> attributes = getAttributes(document, elementXpath);
     return attributes.stream().map(Attribute::getValue).toArray(String[]::new);
   }
 
-  static Map<String, String> getDateElementAttributesValueMap(Document document, XPathFactory xFactory,
-                                                              String elementXpath) {
-    List<Element> elements = getElementsWithDateAttr(document, xFactory, elementXpath);
+  Map<String, String> getDateElementAttributesValueMap(Document document, String elementXpath) {
+    List<Element> elements = getElementsWithDateAttr(document, elementXpath);
     return elements.stream()
             // If the same "event" type is defined for multiple languages the following filter will only allow the first.
             // eg: <collDate xml:lang="en" date="2009-03-19" event="start"/>
@@ -217,12 +221,12 @@ class DocElementParser {
             // Currently there is no requirement to extract dates of event per language.
             .filter(element -> Objects.nonNull(element.getAttributeValue(EVENT_ATTR)))
             .filter(distinctByKey(element -> element.getAttributeValue(EVENT_ATTR)))
-        .collect(Collectors.toMap(element ->
-            element.getAttributeValue(EVENT_ATTR), element ->
-            element.getAttributeValue(DATE_ATTR)));
+            .collect(Collectors.toMap(element ->
+                    element.getAttributeValue(EVENT_ATTR), element ->
+                    element.getAttributeValue(DATE_ATTR)));
   }
 
-  private static List<Attribute> getAttributes(Document document, XPathFactory xFactory, String xPathToElement) {
+  private List<Attribute> getAttributes(Document document, String xPathToElement) {
     XPathExpression<Attribute> expression = xFactory.compile(xPathToElement, Filters.attribute(), null, DDI_NS);
     return expression.evaluate(document);
   }

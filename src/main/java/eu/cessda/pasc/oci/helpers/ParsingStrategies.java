@@ -25,7 +25,6 @@ import java.util.function.Function;
 
 import static eu.cessda.pasc.oci.helpers.DocElementParser.*;
 import static eu.cessda.pasc.oci.helpers.HTMLFilter.CLEAN_CHARACTER_RETURNS_STRATEGY;
-import static eu.cessda.pasc.oci.helpers.HandlerConstants.EMPTY_EL;
 import static eu.cessda.pasc.oci.helpers.OaiPmhConstants.*;
 import static java.util.Optional.ofNullable;
 
@@ -37,10 +36,17 @@ import static java.util.Optional.ofNullable;
 @UtilityClass
 class ParsingStrategies {
 
+  // Metadata handling
+  private static final String EMPTY_EL = "empty";
+  private static final String DATE_NOT_AVAIL = "Date not specified";
+  private static final String AGENCY_NOT_AVAIL = "Agency not specified";
+  private static final String COUNTRY_NOT_AVAIL = "Country not specified";
+  private static final String PUBLISHER_NOT_AVAIL = "Publisher not specified";
+
   static Function<Element, Optional<Country>> countryStrategyFunction() {
     return element -> {
       Country country = Country.builder()
-              .iso2LetterCode(getAttributeValue(element, ABBR_ATTR).orElse(HandlerConstants.COUNTRY_NOT_AVAIL))
+              .iso2LetterCode(getAttributeValue(element, ABBR_ATTR).orElse(COUNTRY_NOT_AVAIL))
               .countryName(CLEAN_CHARACTER_RETURNS_STRATEGY.apply(element.getText()))
               .build();
       return Optional.of(country);
@@ -50,7 +56,7 @@ class ParsingStrategies {
   static Function<Element, Optional<Pid>> pidStrategyFunction() {
     return element -> {
       Pid agency = Pid.builder()
-              .agency(getAttributeValue(element, AGENCY_ATTR).orElse(HandlerConstants.AGENCY_NOT_AVAIL))
+              .agency(getAttributeValue(element, AGENCY_ATTR).orElse(AGENCY_NOT_AVAIL))
               .pid(element.getText())
               .build();
       return Optional.of(agency);
@@ -73,7 +79,7 @@ class ParsingStrategies {
 
   static Function<Element, Publisher> publisherStrategyFunction() {
     return element -> Publisher.builder()
-            .iso2LetterCode(getAttributeValue(element, ABBR_ATTR).orElse(HandlerConstants.PUBLISHER_NOT_AVAIL))
+            .iso2LetterCode(getAttributeValue(element, ABBR_ATTR).orElse(PUBLISHER_NOT_AVAIL))
             .publisher(CLEAN_CHARACTER_RETURNS_STRATEGY.apply(element.getText())).build();
   }
 
@@ -112,7 +118,7 @@ class ParsingStrategies {
       // PUG requirement:  Only extract if there is no @date in <collDate>
       if (dateAttrValue.isEmpty()) {
         return Optional.of(DataCollectionFreeText.builder()
-                .event(getAttributeValue(element, EVENT_ATTR).orElse(HandlerConstants.DATE_NOT_AVAIL))
+                .event(getAttributeValue(element, EVENT_ATTR).orElse(DATE_NOT_AVAIL))
                 .dataCollectionFreeText(element.getText())
                 .build());
       }

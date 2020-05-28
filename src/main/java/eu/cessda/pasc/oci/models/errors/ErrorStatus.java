@@ -16,17 +16,15 @@
 
 package eu.cessda.pasc.oci.models.errors;
 
-import lombok.Builder;
-import lombok.Getter;
+import lombok.Value;
 
 /**
  * Internal placeholder for error status and messages.
  *
  * @author moses AT doraventures DOT com
  */
-@Getter
-@Builder
+@Value
 public class ErrorStatus {
+  String code;
   String message;
-  boolean hasError;
 }

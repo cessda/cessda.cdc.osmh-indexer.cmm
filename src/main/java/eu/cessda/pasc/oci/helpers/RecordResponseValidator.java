@@ -17,30 +17,38 @@
 package eu.cessda.pasc.oci.helpers;
 
 import eu.cessda.pasc.oci.models.errors.ErrorStatus;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.xpath.XPathFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class RecordResponseValidator {
+import java.util.Optional;
+
+@Component
+public class RecordResponseValidator {
+
+    private final DocElementParser docElementParser;
+
+    @Autowired
+    public RecordResponseValidator(DocElementParser docElementParser) {
+        this.docElementParser = docElementParser;
+    }
 
     /**
-     * Checks if the record has an <error> element.
+     * Checks if the record has an {@literal <error>} element.
      *
      * @param document the document to map to.
-     * @param xFactory the Path Factory.
      * @return ErrorStatus of the record.
      */
-    public static ErrorStatus validateResponse(Document document, XPathFactory xFactory) {
+    public Optional<ErrorStatus> validateResponse(Document document) {
 
-    ErrorStatus.ErrorStatusBuilder statusBuilder = ErrorStatus.builder();
-    DocElementParser.getFirstElement(document, xFactory, OaiPmhConstants.ERROR_PATH)
-        .ifPresent((Element element) ->
-            statusBuilder.hasError(true).message(element.getAttributeValue(OaiPmhConstants.CODE_ATTR) + ": " + element.getText())
-        );
+        final Optional<Element> optionalElement = docElementParser.getFirstElement(document, OaiPmhConstants.ERROR_PATH);
 
-    return statusBuilder.build();
-  }
+        if (optionalElement.isPresent()) {
+            final Element element = optionalElement.get();
+            return Optional.of(new ErrorStatus(element.getAttributeValue(OaiPmhConstants.CODE_ATTR), element.getText()));
+        }
+
+        return Optional.empty();
+    }
 }

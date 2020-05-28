@@ -29,20 +29,17 @@ import static java.util.Optional.ofNullable;
 @UtilityClass
 public class ListIdentifiersResponseValidator {
 
-    private static final String MISSING_ELEMENT_MISSING_OAI_ELEMENT = "MissingElement: Missing Oai element";
-
     /**
-     * Checks if the response has an <error> element.
+     * Checks if the response has an {@literal <error>} element.
      *
      * @param document the document to map to.
-     * @return ErrorStatus of the record.
+     * @return ErrorStatus of the record, or an empty optional if no error was present.
      */
-    public static ErrorStatus validateResponse(Document document) {
-        ErrorStatus.ErrorStatusBuilder statusBuilder = ErrorStatus.builder();
+    public static Optional<ErrorStatus> validateResponse(Document document) {
         Optional<NodeList> oAINode = ofNullable(document.getElementsByTagName(OaiPmhConstants.OAI_PMH));
 
         if (oAINode.isEmpty()) {
-            return statusBuilder.hasError(true).message(MISSING_ELEMENT_MISSING_OAI_ELEMENT).build();
+            return Optional.of(new ErrorStatus("MissingElement", "Missing OAI element"));
         }
 
         NodeList nodeList = oAINode.get();
@@ -51,13 +48,11 @@ public class ListIdentifiersResponseValidator {
             for (int childNodeIndex = 0; childNodeIndex < childNodes.getLength(); childNodeIndex++) {
                 Node item = childNodes.item(childNodeIndex);
                 if (OaiPmhConstants.ERROR.equals(item.getLocalName())) {
-                    return statusBuilder.hasError(true)
-                            .message(item.getAttributes().getNamedItem("code").getTextContent() + ": " + item.getTextContent())
-                            .build();
+                    return Optional.of(new ErrorStatus(item.getAttributes().getNamedItem("code").getTextContent(), item.getTextContent()));
                 }
             }
         }
 
-        return statusBuilder.build();
+        return Optional.empty();
     }
 }
