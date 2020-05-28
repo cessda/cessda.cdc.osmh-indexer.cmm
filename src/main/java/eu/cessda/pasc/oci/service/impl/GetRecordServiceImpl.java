@@ -23,7 +23,7 @@ import eu.cessda.pasc.oci.helpers.OaiPmhHelpers;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.errors.ErrorStatus;
 import eu.cessda.pasc.oci.models.oai.configuration.OaiPmh;
-import eu.cessda.pasc.oci.repository.GetRecordDoa;
+import eu.cessda.pasc.oci.repository.DaoBase;
 import eu.cessda.pasc.oci.service.GetRecordService;
 import lombok.extern.slf4j.Slf4j;
 import org.jdom2.Document;
@@ -52,13 +52,13 @@ import static eu.cessda.pasc.oci.helpers.RecordResponseValidator.validateRespons
 @Slf4j
 public class GetRecordServiceImpl implements GetRecordService {
 
-  private final XPathFactory xPathFactory;
-    private final GetRecordDoa getRecordDoa;
+    private final XPathFactory xPathFactory;
+    private final DaoBase daoBase;
     private final HandlerConfigurationProperties oaiPmhHandlerConfig;
 
     @Autowired
-    public GetRecordServiceImpl(GetRecordDoa getRecordDoa, HandlerConfigurationProperties oaiPmhHandlerConfig, XPathFactory xPathFactory) {
-        this.getRecordDoa = getRecordDoa;
+    public GetRecordServiceImpl(DaoBase daoBase, HandlerConfigurationProperties oaiPmhHandlerConfig, XPathFactory xPathFactory) {
+        this.daoBase = daoBase;
         this.oaiPmhHandlerConfig = oaiPmhHandlerConfig;
         this.xPathFactory = xPathFactory;
     }
@@ -69,7 +69,7 @@ public class GetRecordServiceImpl implements GetRecordService {
         URI fullUrl = null;
         try {
             fullUrl = OaiPmhHelpers.buildGetStudyFullUrl(repositoryUrl, studyIdentifier, oaiPmhHandlerConfig);
-            try (InputStream recordXML = getRecordDoa.getRecordXML(fullUrl)) {
+            try (InputStream recordXML = daoBase.getInputStream(fullUrl)) {
                 return mapDDIRecordToCMMStudy(recordXML, repositoryUrl).studyXmlSourceUrl(fullUrl.toString()).build();
             }
         } catch (JDOMException | IOException e) {

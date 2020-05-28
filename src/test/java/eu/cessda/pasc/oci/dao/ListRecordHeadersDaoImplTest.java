@@ -19,8 +19,7 @@ package eu.cessda.pasc.oci.dao;
 import com.pgssoft.httpclient.HttpClientMock;
 import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
 import eu.cessda.pasc.oci.exception.CustomHandlerException;
-import eu.cessda.pasc.oci.repository.ListRecordHeadersDao;
-import eu.cessda.pasc.oci.repository.ListRecordHeadersDaoImpl;
+import eu.cessda.pasc.oci.repository.DaoBaseImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,8 +56,8 @@ public class ListRecordHeadersDaoImplTest {
         httpClient.onGet(fullListRecordHeadersUrl).doReturn(fullListRecordHeadersUrl, StandardCharsets.UTF_8);
 
         // When
-        ListRecordHeadersDao listRecordHeadersDao = new ListRecordHeadersDaoImpl(httpClient);
-        try (InputStream inputStream = listRecordHeadersDao.listRecordHeaders(URI.create(fullListRecordHeadersUrl))) {
+        var listRecordHeadersDao = new DaoBaseImpl(httpClient);
+        try (InputStream inputStream = listRecordHeadersDao.getInputStream(URI.create(fullListRecordHeadersUrl))) {
             String recordHeadersXML = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
             System.out.println("Actual: " + recordHeadersXML);
 
@@ -77,8 +76,8 @@ public class ListRecordHeadersDaoImplTest {
         httpClient.onGet(fullListRecordHeadersUrl).doReturn(fullListRecordHeadersUrl, StandardCharsets.UTF_8);
 
         // When
-        ListRecordHeadersDao listRecordHeadersDao = new ListRecordHeadersDaoImpl(httpClient);
-        try (InputStream inputStream = listRecordHeadersDao.listRecordHeaders(URI.create(fullListRecordHeadersUrl))) {
+        var listRecordHeadersDao = new DaoBaseImpl(httpClient);
+        try (InputStream inputStream = listRecordHeadersDao.getInputStream(URI.create(fullListRecordHeadersUrl))) {
             String recordHeadersXML = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 
             System.out.println("Actual: " + recordHeadersXML);

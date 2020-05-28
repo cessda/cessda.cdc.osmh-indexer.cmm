@@ -35,7 +35,10 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.List;
@@ -96,10 +99,9 @@ public class ConsumerScheduler {
   @Scheduled(initialDelayString = "${osmhConsumer.delay.initial}", fixedDelayString = "${osmhConsumer.delay.fixed}")
   public void fullHarvestAndIngestionAllConfiguredSPsReposRecords() {
     try (var ignored = MDC.putCloseable(ConsumerScheduler.DEFAULT_CDC_JOB_KEY, getJobId())) {
-      OffsetDateTime date = OffsetDateTime.now(ZoneId.systemDefault());
-      logStartStatus(date, FULL_RUN);
+      var startTime = logStartStatus(FULL_RUN);
       executeHarvestAndIngest(null);
-      logEndStatus(date, FULL_RUN);
+      logEndStatus(startTime, FULL_RUN);
     }
   }
 
@@ -110,10 +112,9 @@ public class ConsumerScheduler {
   @Scheduled(cron = "${osmhConsumer.daily.run}")
   public void dailyIncrementalHarvestAndIngestionAllConfiguredSPsReposRecords() {
     try (var ignored = MDC.putCloseable(ConsumerScheduler.DEFAULT_CDC_JOB_KEY, getJobId())) {
-      OffsetDateTime date = OffsetDateTime.now(ZoneId.systemDefault());
-      logStartStatus(date, DAILY_INCREMENTAL_RUN);
+      var startTime = logStartStatus(DAILY_INCREMENTAL_RUN);
       executeHarvestAndIngest(esIndexerService.getMostRecentLastModified().orElse(null));
-      logEndStatus(date, DAILY_INCREMENTAL_RUN);
+      logEndStatus(startTime, DAILY_INCREMENTAL_RUN);
     }
   }
 
@@ -275,15 +276,23 @@ public class ConsumerScheduler {
     return extractor.mapLanguageDoc(presentCMMStudies, repo.getName());
   }
 
-  private void logStartStatus(OffsetDateTime localDateTime, String runDescription) {
-    log.info("[{}] Consume and Ingest All SPs Repos : Started at [{}]", runDescription, localDateTime);
-    log.info("Currents state before run");
-    log.info(debuggingJMXBean.printCurrentlyConfiguredRepoEndpoints());
-    log.info(debuggingJMXBean.printElasticSearchInfo());
+  private OffsetDateTime logStartStatus(String runDescription) {
+    final OffsetDateTime startTime = OffsetDateTime.now(ZoneId.systemDefault());
+    log.info("[{}] Consume and Ingest All SPs Repos: \nStarted at [{}]\nCurrents state before run:\n{}\n{}",
+            runDescription,
+            startTime,
+            debuggingJMXBean.printCurrentlyConfiguredRepoEndpoints(),
+            debuggingJMXBean.printElasticSearchInfo()
+    );
+    return startTime;
   }
 
-  private void logEndStatus(OffsetDateTime offsetDateTime, String runDescription) {
-    String formatMsg = "[{}] Consume and Ingest All SPs Repos Ended at [{}], Duration [{}]";
-    log.info(formatMsg, runDescription, offsetDateTime, value("job_duration", Duration.between(offsetDateTime.toInstant(), Instant.now()).getSeconds()));
+  private void logEndStatus(OffsetDateTime startTime, String runDescription) {
+    var endTime = OffsetDateTime.now(ZoneId.systemDefault());
+    log.info("[{}] Consume and Ingest All SPs Repos:\nEnded at [{}]\nDuration: [{}] seconds",
+            runDescription,
+            endTime,
+            value("job_duration", Duration.between(startTime, endTime).getSeconds())
+    );
   }
 }

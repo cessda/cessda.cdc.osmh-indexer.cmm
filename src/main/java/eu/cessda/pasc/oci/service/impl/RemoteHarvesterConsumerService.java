@@ -23,7 +23,7 @@ import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.configurations.Repo;
-import eu.cessda.pasc.oci.repository.HarvesterDao;
+import eu.cessda.pasc.oci.repository.DaoBase;
 import eu.cessda.pasc.oci.service.RepositoryUrlService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,30 +50,30 @@ import static net.logstash.logback.argument.StructuredArguments.value;
 @Slf4j
 public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerService {
 
-  private final HarvesterDao harvesterDao;
-  private final RepositoryUrlService repositoryUrlService;
+    private final DaoBase daoBase;
+    private final RepositoryUrlService repositoryUrlService;
   private final ObjectReader recordHeaderObjectReader;
   private final CMMStudyConverter cmmStudyConverter;
 
-  @Autowired
-  public RemoteHarvesterConsumerService(HarvesterDao harvesterDao, RepositoryUrlService repositoryUrlService,
-                                        ObjectMapper mapper, CMMStudyConverter cmmStudyConverter) {
-    this.harvesterDao = harvesterDao;
-    this.repositoryUrlService = repositoryUrlService;
-    this.cmmStudyConverter = cmmStudyConverter;
+    @Autowired
+    public RemoteHarvesterConsumerService(DaoBase daoBase, RepositoryUrlService repositoryUrlService,
+                                          ObjectMapper mapper, CMMStudyConverter cmmStudyConverter) {
+        this.daoBase = daoBase;
+        this.repositoryUrlService = repositoryUrlService;
+        this.cmmStudyConverter = cmmStudyConverter;
 
-    CollectionType collectionType = mapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class);
-    this.recordHeaderObjectReader = mapper.readerFor(collectionType);
-  }
+        CollectionType collectionType = mapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class);
+        this.recordHeaderObjectReader = mapper.readerFor(collectionType);
+    }
 
   @Override
   public List<RecordHeader> listRecordHeaders(Repo repo, LocalDateTime lastModifiedDate) {
     try {
       URI finalUrl = repositoryUrlService.constructListRecordUrl(repo);
-      try (InputStream recordHeadersJsonStream = harvesterDao.listRecordHeaders(finalUrl)) {
-        List<RecordHeader> recordHeadersUnfiltered = recordHeaderObjectReader.readValue(recordHeadersJsonStream);
-        return filterRecords(recordHeadersUnfiltered, lastModifiedDate);
-      }
+        try (InputStream recordHeadersJsonStream = daoBase.getInputStream(finalUrl)) {
+            List<RecordHeader> recordHeadersUnfiltered = recordHeaderObjectReader.readValue(recordHeadersJsonStream);
+            return filterRecords(recordHeadersUnfiltered, lastModifiedDate);
+        }
     } catch (IOException e) {
       log.error("ListRecordHeaders failed for repo [{}] [{}]. {}.",
               value(REPO_NAME, repo.getName()), value(REPO_ENDPOINT_URL, repo.getUrl()), e.toString());
@@ -91,9 +91,9 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
     URI finalUrl = null;
     try {
       finalUrl = repositoryUrlService.constructGetRecordUrl(repo, studyNumber);
-      try (InputStream recordJsonStream = harvesterDao.getRecord(finalUrl)) {
-        return Optional.of(cmmStudyConverter.fromJsonString(recordJsonStream));
-      }
+        try (InputStream recordJsonStream = daoBase.getInputStream(finalUrl)) {
+            return Optional.of(cmmStudyConverter.fromJsonString(recordJsonStream));
+        }
     } catch (ExternalSystemException e) {
       log.warn("{}. Response detail from handler [{}], URL to handler for harvesting record [{}] with [{}] from repo [{}] [{}].",
               e.toString(),

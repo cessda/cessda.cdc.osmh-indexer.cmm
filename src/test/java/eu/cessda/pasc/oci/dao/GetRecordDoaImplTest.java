@@ -21,8 +21,7 @@ import com.pgssoft.httpclient.MockedServerResponse;
 import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
 import eu.cessda.pasc.oci.exception.CustomHandlerException;
 import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
-import eu.cessda.pasc.oci.repository.GetRecordDoa;
-import eu.cessda.pasc.oci.repository.GetRecordDoaImpl;
+import eu.cessda.pasc.oci.repository.DaoBaseImpl;
 import lombok.SneakyThrows;
 import org.junit.Assert;
 import org.junit.Test;
@@ -52,7 +51,7 @@ public class GetRecordDoaImplTest {
     @Autowired
     private HandlerConfigurationProperties handlerConfigurationProperties;
 
-    private HttpClientMock httpClient = new HttpClientMock();
+    private final HttpClientMock httpClient = new HttpClientMock();
 
     @SneakyThrows
     private static void throwInterruptedException(MockedServerResponse.Builder responseBuilder) {
@@ -68,8 +67,8 @@ public class GetRecordDoaImplTest {
         httpClient.onGet(expectedUrl).doReturnXML(expectedUrl, StandardCharsets.UTF_8);
 
         // When
-        GetRecordDoa recordDoa = new GetRecordDoaImpl(httpClient);
-        try (InputStream responseXMLRecord = recordDoa.getRecordXML(URI.create(expectedUrl))) {
+        var recordDoa = new DaoBaseImpl(httpClient);
+        try (InputStream responseXMLRecord = recordDoa.getInputStream(URI.create(expectedUrl))) {
             then(new String(responseXMLRecord.readAllBytes(), StandardCharsets.UTF_8)).isEqualTo(expectedUrl);
         }
     }
@@ -84,8 +83,8 @@ public class GetRecordDoaImplTest {
         httpClient.onGet(expectedFullGetRecordUrl).doReturn(500, expectedFullGetRecordUrl);
 
         // When
-        GetRecordDoa recordDoa = new GetRecordDoaImpl(httpClient);
-        recordDoa.getRecordXML(URI.create(expectedFullGetRecordUrl));
+        var recordDoa = new DaoBaseImpl(httpClient);
+        recordDoa.getInputStream(URI.create(expectedFullGetRecordUrl));
     }
 
     @Test
@@ -95,8 +94,8 @@ public class GetRecordDoaImplTest {
         httpClient.onGet().doAction(GetRecordDoaImplTest::throwInterruptedException);
 
         // When
-        GetRecordDoa recordDoa = new GetRecordDoaImpl(httpClient);
-        try (InputStream empty = recordDoa.getRecordXML(URI.create("http://error.endpoint/"))) {
+        var recordDoa = new DaoBaseImpl(httpClient);
+        try (InputStream empty = recordDoa.getInputStream(URI.create("http://error.endpoint/"))) {
             Assert.assertEquals(-1, empty.read());
         }
     }

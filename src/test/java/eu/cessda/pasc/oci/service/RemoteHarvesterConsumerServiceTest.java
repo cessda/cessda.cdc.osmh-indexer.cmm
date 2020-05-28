@@ -25,7 +25,7 @@ import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.configurations.Harvester;
 import eu.cessda.pasc.oci.models.configurations.Repo;
-import eu.cessda.pasc.oci.repository.HarvesterDao;
+import eu.cessda.pasc.oci.repository.DaoBase;
 import eu.cessda.pasc.oci.service.impl.RemoteHarvesterConsumerService;
 import org.junit.Before;
 import org.junit.Test;
@@ -67,17 +67,17 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
   @Autowired
   CMMStudyConverter cmmStudyConverter;
   @Mock
-  private HarvesterDao harvesterDao;
+  private DaoBase daoBase;
 
   @Before
   public void setUp() {
-    remoteHarvesterConsumerService = new RemoteHarvesterConsumerService(harvesterDao, repositoryUrlService, objectMapper, cmmStudyConverter);
+    remoteHarvesterConsumerService = new RemoteHarvesterConsumerService(daoBase, repositoryUrlService, objectMapper, cmmStudyConverter);
   }
 
   @Test
   public void shouldReturnASuccessfulResponseForListingRecordHeaders() throws IOException {
 
-    when(harvesterDao.listRecordHeaders(any(URI.class))).thenReturn(
+    when(daoBase.getInputStream(any(URI.class))).thenReturn(
             new ByteArrayInputStream(LIST_RECORDER_HEADERS_BODY_EXAMPLE.getBytes(StandardCharsets.UTF_8))
     );
     Repo repo = getUKDSRepo();
@@ -91,7 +91,7 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
     Repo repo = getUKDSRepo();
     LocalDateTime lastModifiedDateCutOff = TimeUtility.getLocalDateTime("2018-02-01T07:48:38Z").get();
 
-    when(harvesterDao.listRecordHeaders(any(URI.class))).thenReturn(
+    when(daoBase.getInputStream(any(URI.class))).thenReturn(
             new ByteArrayInputStream(LIST_RECORDER_HEADERS_X6.getBytes(StandardCharsets.UTF_8))
     );
     List<RecordHeader> recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(repo, lastModifiedDateCutOff);
@@ -108,7 +108,7 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
     Repo repo = getUKDSRepo();
     LocalDateTime lastModifiedCutOff = TimeUtility.getLocalDateTime("2018-02-10T07:48:38Z").orElse(null);
 
-    when(harvesterDao.listRecordHeaders(any(URI.class))).thenReturn(
+    when(daoBase.getInputStream(any(URI.class))).thenReturn(
             new ByteArrayInputStream(LIST_RECORDER_HEADERS_WITH_INVALID_DATETIME.getBytes(StandardCharsets.UTF_8))
     );
     List<RecordHeader> recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(repo, lastModifiedCutOff);
@@ -124,7 +124,7 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
   public void shouldReturnUnFilterRecordHeadersWhenLastModifiedDateIsNull() throws IOException {
 
     // FIXME: add more mocks to LIST_RECORDER_HEADERS_BODY_EXAMPLE with very old timestamps to filter out
-    when(harvesterDao.listRecordHeaders(any(URI.class))).thenReturn(
+    when(daoBase.getInputStream(any(URI.class))).thenReturn(
             new ByteArrayInputStream(LIST_RECORDER_HEADERS_X6.getBytes(StandardCharsets.UTF_8))
     );
     Repo repo = getUKDSRepo();
@@ -136,7 +136,7 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
   @Test
   public void shouldReturnEmptyHeaderListWhenExternalSystemExceptionIsThrown() throws IOException {
 
-    when(harvesterDao.listRecordHeaders(any(URI.class))).thenThrow(new IOException("Mocked!"));
+    when(daoBase.getInputStream(any(URI.class))).thenThrow(new IOException("Mocked!"));
     Repo repo = getUKDSRepo();
 
     List<RecordHeader> recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(repo, null);
@@ -147,7 +147,7 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
   @Test
   public void shouldReturnEmptyListWhenIOExceptionIsThrown() throws IOException {
 
-    when(harvesterDao.listRecordHeaders(any(URI.class))).thenThrow(IOException.class);
+    when(daoBase.getInputStream(any(URI.class))).thenThrow(IOException.class);
     Repo repo = getUKDSRepo();
 
     List<RecordHeader> recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(repo, null);
@@ -158,7 +158,7 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
   @Test
   public void shouldReturnEmptyListWhenURISyntaxExceptionIsThrown() throws IOException {
 
-    when(harvesterDao.listRecordHeaders(any(URI.class))).thenThrow(URISyntaxException.class);
+    when(daoBase.getInputStream(any(URI.class))).thenThrow(URISyntaxException.class);
     Repo repo = getUKDSRepo();
 
     List<RecordHeader> recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(repo, null);
@@ -172,7 +172,7 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
     when(repoMock.getUrl()).thenReturn(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
     when(repoMock.getHandler()).thenReturn(Harvester.Type.NESSTAR);
 
-    when(harvesterDao.getRecord(any(URI.class))).thenThrow(new IOException("Mocked!"));
+    when(daoBase.getInputStream(any(URI.class))).thenThrow(new IOException("Mocked!"));
 
     Optional<CMMStudy> actualRecord = remoteHarvesterConsumerService.getRecord(repoMock, "4124325");
 
@@ -188,7 +188,7 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
     when(repoMock.getUrl()).thenReturn(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
     when(repoMock.getHandler()).thenReturn(Harvester.Type.NESSTAR);
 
-    when(harvesterDao.getRecord(any(URI.class))).thenThrow(IOException.class);
+    when(daoBase.getInputStream(any(URI.class))).thenThrow(IOException.class);
 
     Optional<CMMStudy> actualRecord = remoteHarvesterConsumerService.getRecord(repoMock, "4124325");
 
@@ -204,7 +204,7 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
     when(repoMock.getUrl()).thenReturn(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
     when(repoMock.getHandler()).thenReturn(Harvester.Type.NESSTAR);
 
-    when(harvesterDao.getRecord(any(URI.class))).thenThrow(URISyntaxException.class);
+    when(daoBase.getInputStream(any(URI.class))).thenThrow(URISyntaxException.class);
 
     Optional<CMMStudy> actualRecord = remoteHarvesterConsumerService.getRecord(repoMock, "4124325");
 
@@ -220,7 +220,7 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
     URI expectedUrl = URI.create("http://localhost:9091/v0/GetRecord/CMMStudy/998?Repository=" +
             URLEncoder.encode("https://oai.ukdataservice.ac.uk:8443/oai/provider", StandardCharsets.UTF_8));
 
-    when(harvesterDao.getRecord(expectedUrl)).thenReturn(
+    when(daoBase.getInputStream(expectedUrl)).thenReturn(
             new ByteArrayInputStream(recordUkds998.getBytes(StandardCharsets.UTF_8))
     );
     Repo repo = getUKDSRepo();
@@ -245,7 +245,7 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
     URI expectedUrl = URI.create("http://localhost:9091/v0/GetRecord/CMMStudy/1031?Repository=" +
             URLEncoder.encode("https://oai.ukdataservice.ac.uk:8443/oai/provider", StandardCharsets.UTF_8));
 
-    when(harvesterDao.getRecord(expectedUrl)).thenReturn(
+    when(daoBase.getInputStream(expectedUrl)).thenReturn(
             new ByteArrayInputStream(recordUkds1031.getBytes(StandardCharsets.UTF_8))
     );
     Repo repo = getUKDSRepo();

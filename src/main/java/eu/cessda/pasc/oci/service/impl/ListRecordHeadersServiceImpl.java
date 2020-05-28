@@ -22,7 +22,7 @@ import eu.cessda.pasc.oci.exception.InternalSystemException;
 import eu.cessda.pasc.oci.helpers.ListIdentifiersResponseValidator;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.errors.ErrorStatus;
-import eu.cessda.pasc.oci.repository.ListRecordHeadersDao;
+import eu.cessda.pasc.oci.repository.DaoBase;
 import eu.cessda.pasc.oci.service.ListRecordHeadersService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,14 +58,14 @@ import static eu.cessda.pasc.oci.helpers.OaiPmhHelpers.appendListRecordResumptio
 @Slf4j
 public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
 
-  private final ListRecordHeadersDao listRecordHeadersDao;
+  private final DaoBase daoBase;
   private final HandlerConfigurationProperties config;
   private final DocumentBuilderFactory builderFactory;
 
   @Autowired
-  public ListRecordHeadersServiceImpl(ListRecordHeadersDao listRecordHeadersDao, HandlerConfigurationProperties config,
+  public ListRecordHeadersServiceImpl(DaoBase daoBase, HandlerConfigurationProperties config,
                                       DocumentBuilderFactory builderFactory) {
-    this.listRecordHeadersDao = listRecordHeadersDao;
+    this.daoBase = daoBase;
     this.config = config;
     this.builderFactory = builderFactory;
   }
@@ -75,7 +75,7 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
 
     URI fullListRecordUrlPath = appendListRecordParams(baseRepoUrl, config.getOaiPmh());
     Document doc;
-    try (InputStream recordHeadersXMLString = listRecordHeadersDao.listRecordHeaders(fullListRecordUrlPath)) {
+    try (InputStream recordHeadersXMLString = daoBase.getInputStream(fullListRecordUrlPath)) {
       doc = getDocument(recordHeadersXMLString, fullListRecordUrlPath);
     } catch (IOException e) {
       throw new InternalSystemException("IO error reading input stream", e);
@@ -129,7 +129,7 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
     if (resumptionToken.isPresent()) {
       URI repoUrlWithResumptionToken = appendListRecordResumptionToken(baseRepoUrl, resumptionToken.get());
       Document document;
-      try (InputStream resumedXMLDoc = listRecordHeadersDao.listRecordHeadersResumption(repoUrlWithResumptionToken)) {
+      try (InputStream resumedXMLDoc = daoBase.getInputStream(repoUrlWithResumptionToken)) {
         log.trace("Looping for [{}].", repoUrlWithResumptionToken);
         document = getDocument(resumedXMLDoc, repoUrlWithResumptionToken);
       } catch (IOException e) {
