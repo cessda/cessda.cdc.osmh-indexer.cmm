@@ -121,8 +121,8 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
 
     // Given
-    scheduler = new ConsumerScheduler(debuggingJMXBean, appConfigurationProperties, harvesterConsumerService,
-            esIndexer, extractor, languageAvailabilityMapper, micrometerMetrics);
+    var harvesterRunner = new HarvesterRunner(appConfigurationProperties, harvesterConsumerService, harvesterConsumerService, esIndexer, extractor, languageAvailabilityMapper, micrometerMetrics);
+    scheduler = new ConsumerScheduler(debuggingJMXBean, esIndexer, harvesterRunner);
 
     // When
     scheduler.fullHarvestAndIngestionAllConfiguredSPsReposRecords();
@@ -148,7 +148,8 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     when(esIndexer.getStudy(Mockito.eq("UKDS__998"), Mockito.anyString())).thenReturn(Optional.of(getCmmStudyOfLanguageCodeEnX1().get(0)));
 
     // Given
-    scheduler = new ConsumerScheduler(debuggingJMXBean, appConfigurationProperties, harvesterConsumerService, esIndexer, extractor, languageAvailabilityMapper, micrometerMetrics);
+    var harvesterRunner = new HarvesterRunner(appConfigurationProperties, harvesterConsumerService, harvesterConsumerService, esIndexer, extractor, languageAvailabilityMapper, micrometerMetrics);
+    scheduler = new ConsumerScheduler(debuggingJMXBean, esIndexer, harvesterRunner);
 
     // When
     scheduler.weeklyFullHarvestAndIngestionAllConfiguredSPsReposRecords();
@@ -204,7 +205,8 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     when(esIndexer.getStudy(Mockito.eq("UKDS__999"), Mockito.anyString())).thenReturn(Optional.of(getCmmStudyOfLanguageCodeEnX1().get(0)));
 
     // Given
-    scheduler = new ConsumerScheduler(debuggingJMXBean, appConfigurationProperties, harvesterConsumerService, esIndexer, extractor, languageAvailabilityMapper, micrometerMetrics);
+    var harvesterRunner = new HarvesterRunner(appConfigurationProperties, harvesterConsumerService, harvesterConsumerService, esIndexer, extractor, languageAvailabilityMapper, micrometerMetrics);
+    scheduler = new ConsumerScheduler(debuggingJMXBean, esIndexer, harvesterRunner);
 
     // When
     scheduler.fullHarvestAndIngestionAllConfiguredSPsReposRecords();

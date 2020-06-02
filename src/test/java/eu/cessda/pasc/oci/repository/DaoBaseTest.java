@@ -19,7 +19,7 @@ import com.pgssoft.httpclient.HttpClientMock;
 import com.pgssoft.httpclient.MockedServerResponse;
 import eu.cessda.pasc.oci.AbstractSpringTestProfileContext;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
-import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
+import eu.cessda.pasc.oci.exception.ExternalSystemException;
 import lombok.SneakyThrows;
 import org.junit.Assert;
 import org.junit.Test;

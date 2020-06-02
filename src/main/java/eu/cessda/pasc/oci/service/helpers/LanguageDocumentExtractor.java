@@ -60,9 +60,9 @@ public class LanguageDocumentExtractor {
     }
 
     if (log.isDebugEnabled()) {
-      languageDocMap.forEach((langIsoCode, cmmStudyOfLanguages) ->
-              log.debug("langIsoCode [{}] has [{}] records that has passed CMM minimum fields validation", langIsoCode, cmmStudyOfLanguages.size())
-      );
+      for (Map.Entry<String, List<CMMStudyOfLanguage>> entry : languageDocMap.entrySet()) {
+        log.debug("langIsoCode [{}] has [{}] records that has passed CMM minimum fields validation", entry.getKey(), entry.getValue().size());
+      }
     }
     return languageDocMap;
   }

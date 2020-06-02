@@ -20,7 +20,7 @@ import com.pgssoft.httpclient.HttpClientMock;
 import com.pgssoft.httpclient.MockedServerResponse;
 import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
 import eu.cessda.pasc.oci.exception.CustomHandlerException;
-import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
+import eu.cessda.pasc.oci.exception.ExternalSystemException;
 import eu.cessda.pasc.oci.repository.DaoBaseImpl;
 import lombok.SneakyThrows;
 import org.junit.Assert;

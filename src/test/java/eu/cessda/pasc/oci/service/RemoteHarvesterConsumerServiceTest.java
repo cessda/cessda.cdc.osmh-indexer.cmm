@@ -18,6 +18,7 @@ package eu.cessda.pasc.oci.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.cessda.pasc.oci.AbstractSpringTestProfileContext;
+import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.helpers.FileHandler;
 import eu.cessda.pasc.oci.helpers.TimeUtility;
 import eu.cessda.pasc.oci.models.RecordHeader;
@@ -59,7 +60,8 @@ import static org.mockito.Mockito.when;
 public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfileContext {
 
   @Autowired
-  RepositoryUrlService repositoryUrlService;
+  AppConfigurationProperties appConfigurationProperties;
+
   @Autowired
   ObjectMapper objectMapper;
   RemoteHarvesterConsumerService remoteHarvesterConsumerService;
@@ -71,7 +73,7 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
 
   @Before
   public void setUp() {
-    remoteHarvesterConsumerService = new RemoteHarvesterConsumerService(daoBase, repositoryUrlService, objectMapper, cmmStudyConverter);
+    remoteHarvesterConsumerService = new RemoteHarvesterConsumerService(appConfigurationProperties, cmmStudyConverter, daoBase, objectMapper);
   }
 
   @Test

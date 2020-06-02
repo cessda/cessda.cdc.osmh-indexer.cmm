@@ -117,7 +117,6 @@ public class ESIngestService implements IngestService {
         var studies = new HashMap<String, CMMStudyOfLanguage>();
         var timeout = new TimeValue(Duration.ofSeconds(60).toMillis());
         SearchResponse response = getMatchAllSearchRequest(language).setScroll(timeout).get();
-
         log.debug("Getting all studies for language [{}]", language);
 
         do {
@@ -190,7 +189,7 @@ public class ESIngestService implements IngestService {
         SearchHit[] hits = response.getHits().getHits();
         try {
             if (hits.length != 0) {
-                CMMStudyOfLanguage study = cmmStudyOfLanguageConverter.getReader().readValue(hits[0].sourceRef().array());
+                CMMStudyOfLanguage study = cmmStudyOfLanguageConverter.getReader().readValue(hits[0].sourceRef().streamInput());
                 String lastModified = study.getLastModified();
                 Optional<LocalDateTime> localDateTimeOpt = TimeUtility.getLocalDateTime(lastModified);
                 return localDateTimeOpt

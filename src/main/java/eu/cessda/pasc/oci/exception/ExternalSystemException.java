@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.helpers.exception;
+package eu.cessda.pasc.oci.exception;
 
 import lombok.NonNull;
 import lombok.Value;
