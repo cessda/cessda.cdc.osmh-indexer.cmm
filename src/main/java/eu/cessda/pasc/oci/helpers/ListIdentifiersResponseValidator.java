@@ -39,7 +39,7 @@ public class ListIdentifiersResponseValidator {
         Optional<NodeList> oAINode = ofNullable(document.getElementsByTagName(OaiPmhConstants.OAI_PMH));
 
         if (oAINode.isEmpty()) {
-            return Optional.of(new ErrorStatus("MissingElement", "Missing OAI element"));
+            return Optional.of(new ErrorStatus("missingElement", "Missing OAI element"));
         }
 
         NodeList nodeList = oAINode.get();

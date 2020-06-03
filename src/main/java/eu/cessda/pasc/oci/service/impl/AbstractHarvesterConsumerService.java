@@ -18,9 +18,12 @@ package eu.cessda.pasc.oci.service.impl;
 import eu.cessda.pasc.oci.helpers.TimeUtility;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.service.HarvesterConsumerService;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -38,7 +41,16 @@ public abstract class AbstractHarvesterConsumerService implements HarvesterConsu
   protected static final String REPO_ENDPOINT_URL = "repo_endpoint_url";
   protected static final String REASON = "rejection_reason";
 
-  protected List<RecordHeader> filterRecords(List<RecordHeader> unfilteredRecordHeaders, LocalDateTime ingestedLastModifiedDate) {
+  /**
+   * Filter records that are newer than the specified last modified date.
+   * <p/>
+   * If ingestedLastModifiedDate is null no filtering will be performed and the returned list will have the same contents as unfilteredRecordHeaders.
+   *
+   * @param unfilteredRecordHeaders  a collection of unfiltered records.
+   * @param ingestedLastModifiedDate the last modified date to filter by, can be null.
+   * @return a list of filtered records.
+   */
+  protected List<RecordHeader> filterRecords(@NonNull Collection<RecordHeader> unfilteredRecordHeaders, LocalDateTime ingestedLastModifiedDate) {
     if (ingestedLastModifiedDate != null) {
       List<RecordHeader> filteredHeaders = unfilteredRecordHeaders.stream()
               .filter(isHeaderTimeGreater(ingestedLastModifiedDate))
@@ -54,7 +66,7 @@ public abstract class AbstractHarvesterConsumerService implements HarvesterConsu
     }
 
     log.debug("Nothing filterable. No date specified.");
-    return unfilteredRecordHeaders;
+    return new ArrayList<>(unfilteredRecordHeaders);
   }
 
   private Predicate<RecordHeader> isHeaderTimeGreater(LocalDateTime lastModifiedDate) {

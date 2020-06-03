@@ -34,7 +34,7 @@ public class OaiPmhConstants {
 
   // Name Spaces
   static final Namespace XML_NS = Namespace.getNamespace("xml", "http://www.w3.org/XML/1998/namespace");
-  static final Namespace OAI_NS = Namespace.getNamespace("oai", OaiPmhConstants.OAI_NS_PATH);
+  static final Namespace OAI_NS = Namespace.getNamespace("oai", OAI_NS_PATH);
   static final Namespace DDI_NS = Namespace.getNamespace("ddi", DDI_NS_PATH);
   static final Namespace[] OAI_AND_DDI_NS = {OAI_NS, DDI_NS};
 

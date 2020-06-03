@@ -58,7 +58,7 @@ public class ExternalSystemException extends IOException {
   public static class ExternalResponse implements Serializable {
     private static final long serialVersionUID = -7110617275735794989L;
     @NonNull
-    String externalResponseBody;
+    String body;
     int statusCode;
   }
 }
