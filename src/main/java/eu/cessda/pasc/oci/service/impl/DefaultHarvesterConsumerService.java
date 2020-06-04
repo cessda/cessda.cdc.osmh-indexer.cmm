@@ -42,7 +42,8 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static net.logstash.logback.argument.StructuredArguments.*;
+import static net.logstash.logback.argument.StructuredArguments.keyValue;
+import static net.logstash.logback.argument.StructuredArguments.value;
 
 /**
  * Default OSMH Consumer Service implementation
@@ -102,7 +103,7 @@ public class DefaultHarvesterConsumerService implements HarvesterConsumerService
     } catch (ExternalSystemException e) {
       log.warn("{}. Response detail from handler [{}], URL to handler for harvesting record [{}] with [{}] from repo [{}] [{}].",
               e.toString(),
-              raw(REASON, e.getExternalResponse().getExternalResponseBody()),
+              value(REASON, e.getExternalResponse().getExternalResponseBody()),
               finalUrl,
               keyValue("study_id", studyNumber),
               value(REPO_NAME, repo.getName()),
