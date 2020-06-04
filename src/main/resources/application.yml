@@ -168,14 +168,14 @@ logging:
     eu.cessda.pasc.oci.helpers: INFO
     eu.cessda.pasc.oci.configurations.PerfRequestSyncInterceptor: INFO
 elasticsearch:
-  host: cdc-es  # must match profile name
+  host: localhost  # must match profile name
   numberOfShards: 2
   numberOfReplicas: 2
 osmhConsumer:
   daily:
     # The following variables are defined using cron notation
-    run: ${OSMHCONSUMER_DAILY_RUN}
-    sunday.run: ${OSMHCONSUMER_DAILY_SUNDAY_RUN}
+    run: '0 01 00 * * *'
+    sunday.run: '0 00 09 * * SUN'
   endpoints:
     harvesters:
       OAI-PMH:

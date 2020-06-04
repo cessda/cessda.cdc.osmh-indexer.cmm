@@ -158,8 +158,13 @@ public class ConsumerScheduler {
             langStudies.forEach((langIsoCode, cmmStudies) -> executeBulk(repo, langIsoCode, cmmStudies));
           }
 
-
+          // Reset the MDC
+          MDC.clear();
         });
+
+        // Reset the context map - this is needed if the thread was reused
+        MDC.setContextMap(contextMap);
+
         log.info("Total number of records is {}", value("total_cmm_studies", esIndexerService.getTotalHitCount("*")));
       } finally {
         // Ensure that the running state is always set to false even if an exception is thrown
@@ -169,8 +174,6 @@ public class ConsumerScheduler {
       throw new IllegalStateException("Indexer is already running");
     }
     metrics.updateMetrics();
-    // Reset the MDC
-    MDC.clear();
   }
 
 
