@@ -55,7 +55,7 @@ public class PascHarvesterDaoTest extends AbstractSpringTestProfileContext {
     httpClient.onGet(expectedUrl).doReturnJSON(LIST_RECORDER_HEADERS_BODY_EXAMPLE, StandardCharsets.UTF_8);
 
     // When
-    DaoBase daoBase = new DaoBase(httpClient, appConfigurationProperties);
+    DaoBase daoBase = new DaoBase(httpClient);
     try (InputStream recordHeaders = daoBase.postForStringResponse(expectedUrl)) {
       then(new String(recordHeaders.readAllBytes(), StandardCharsets.UTF_8)).isEqualTo(LIST_RECORDER_HEADERS_BODY_EXAMPLE);
       httpClient.verify().get().called(1);
@@ -72,7 +72,7 @@ public class PascHarvesterDaoTest extends AbstractSpringTestProfileContext {
     httpClient.onGet(expectedUrl).doReturnJSON(expectedUrl, StandardCharsets.UTF_8);
 
     // When
-    DaoBase daoBase = new DaoBase(httpClient, appConfigurationProperties);
+    DaoBase daoBase = new DaoBase(httpClient);
     try (InputStream recordHeaders = daoBase.postForStringResponse(expectedUrl)) {
       then(new String(recordHeaders.readAllBytes(), StandardCharsets.UTF_8)).isEqualTo(expectedUrl);
       httpClient.verify().get().called(1);
