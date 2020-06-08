@@ -63,7 +63,7 @@ public class ConsumerScheduler {
   private static final String LANG_CODE = "lang_code";
   private static final String REPO_ENDPOINT_URL = "repo_endpoint_url";
   private static final String DEFAULT_CDC_JOB_KEY = "indexer_job_id";
-  private static final String DEFAULT_RESPONSE_TOKEN_HEADER = "cdc-";
+ 
 
   private final DebuggingJMXBean debuggingJMXBean;
   private final AppConfigurationProperties configurationProperties;
@@ -133,7 +133,7 @@ public class ConsumerScheduler {
    * @return the correlation id
    */
   private String getJobId() {
-    return DEFAULT_RESPONSE_TOKEN_HEADER + DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.now(ZoneId.systemDefault()));
+    return  DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.now(ZoneId.systemDefault()));
   }
 
   /**
