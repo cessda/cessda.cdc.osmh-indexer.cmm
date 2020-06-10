@@ -5,7 +5,6 @@ import eu.cessda.pasc.oci.metrics.Metrics;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
-import eu.cessda.pasc.oci.models.configurations.Harvester;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.service.HarvesterConsumerService;
 import eu.cessda.pasc.oci.service.IngestService;
@@ -168,7 +167,7 @@ public class HarvesterRunner {
         HarvesterConsumerService harvester;
 
         // OAI-PMH repositories can be handled by the internal harvester, all other types should be delegated to remote handlers
-        if (repo.getHandler() == Harvester.Type.OAI_PMH) {
+        if (repo.getHandler().equalsIgnoreCase("OAI-PMH")) {
             harvester = localHarvester;
         } else {
             harvester = remoteHarvester;

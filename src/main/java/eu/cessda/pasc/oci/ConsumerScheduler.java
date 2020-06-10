@@ -116,7 +116,7 @@ public class ConsumerScheduler {
 
   private void logEndStatus(OffsetDateTime startTime, String runDescription) {
     var endTime = OffsetDateTime.now(ZoneId.systemDefault());
-    log.info("[{}] Consume and Ingest All SPs Repos:\nEnded at [{}]\nDuration: [{}] seconds",
+    log.info("\n[{}] Consume and Ingest All SPs Repos:\nEnded at: [{}]\nDuration: [{}] seconds",
             runDescription,
             endTime,
             value("job_duration", Duration.between(startTime, endTime).getSeconds())

@@ -29,8 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Data
 public class Endpoints {
-
   private final List<String> supportedRecordTypes = new ArrayList<>();
-  private final Map<Harvester.Type, Harvester> harvesters = new ConcurrentHashMap<>();
-  private final List<Repo> repos = new ArrayList<>();
+    private final Map<String, Harvester> harvesters = new ConcurrentHashMap<>();
+    private final List<Repo> repos = new ArrayList<>();
 }

@@ -17,7 +17,6 @@
 package eu.cessda.pasc.oci.mock.data;
 
 import eu.cessda.pasc.oci.models.configurations.Endpoints;
-import eu.cessda.pasc.oci.models.configurations.Harvester;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.experimental.UtilityClass;
 
@@ -31,7 +30,7 @@ public class ReposTestData
     Repo repo = new Repo();
     repo.setName("UKDS");
     repo.setUrl(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
-    repo.setHandler(Harvester.Type.OAI_PMH);
+    repo.setHandler("OAI-PMH");
     return repo;
   }
 
@@ -39,7 +38,7 @@ public class ReposTestData
     Repo repo = new Repo();
     repo.setName("GESIS");
     repo.setUrl(URI.create("https://dbkapps.gesis.org/dbkoai3"));
-    repo.setHandler(Harvester.Type.OAI_PMH);
+    repo.setHandler("OAI-PMH");
     return repo;
   }
 
@@ -47,7 +46,7 @@ public class ReposTestData
     Repo repo = new Repo();
     repo.setName("GESIS De");
     repo.setUrl(URI.create("https://dbkapps.gesis.org/dbkoai3"));
-    repo.setHandler(Harvester.Type.OAI_PMH);
+    repo.setHandler("OAI-PMH");
     return repo;
   }
 

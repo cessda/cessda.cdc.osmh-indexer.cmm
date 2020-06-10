@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.exception.ExternalSystemException;
+import eu.cessda.pasc.oci.exception.HandlerNotFoundException;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
@@ -100,7 +101,7 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
     } catch (ExternalSystemException e) {
       log.warn("{}. Response detail from handler [{}], URL to handler for harvesting record [{}] with [{}] from repo [{}] [{}].",
               e.toString(),
-              value(REASON, e.getExternalResponse().getExternalResponseBody()),
+              value(REASON, e.getExternalResponse().getBody()),
               finalUrl,
               keyValue("study_id", studyNumber),
               value(REPO_NAME, repo.getName()),
@@ -115,28 +116,36 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
   }
 
     public URI constructListRecordUrl(Repo repo) throws URISyntaxException {
-        Harvester harvester = appConfigurationProperties.getEndpoints().getHarvesters().get(repo.getHandler());
-        String finalUrlString = String.format(LIST_RECORD_TEMPLATE,
-                harvester.getUrl(),
-                harvester.getVersion(),
-                URLEncoder.encode(repo.getUrl().toString(), StandardCharsets.UTF_8)
-        );
-        URI finalUrl = new URI(finalUrlString);
-        log.trace("[{}] Final ListHeaders Handler url [{}] constructed.", repo.getName(), finalUrlString);
-        return finalUrl;
+        Harvester harvester = appConfigurationProperties.getEndpoints().getHarvesters().get(repo.getHandler().toUpperCase());
+        if (harvester != null) {
+            String finalUrlString = String.format(LIST_RECORD_TEMPLATE,
+                    harvester.getUrl(),
+                    harvester.getVersion(),
+                    URLEncoder.encode(repo.getUrl().toString(), StandardCharsets.UTF_8)
+            );
+            URI finalUrl = new URI(finalUrlString);
+            log.trace("[{}] Final ListHeaders Handler url [{}] constructed.", repo.getName(), finalUrlString);
+            return finalUrl;
+        } else {
+            throw new HandlerNotFoundException(repo);
+        }
     }
 
     public URI constructGetRecordUrl(Repo repo, String studyNumber) throws URISyntaxException {
-        Harvester harvester = appConfigurationProperties.getEndpoints().getHarvesters().get(repo.getHandler());
-        String encodedStudyID = StudyIdentifierEncoder.encodeStudyIdentifier().apply(studyNumber);
-        String finalUrlString = String.format(GET_RECORD_TEMPLATE,
-                harvester.getUrl(),
-                harvester.getVersion(),
-                encodedStudyID,
-                URLEncoder.encode(repo.getUrl().toString(), StandardCharsets.UTF_8)
-        );
-        URI finalUrl = new URI(finalUrlString);
-        log.trace("[{}] Final GetRecord Handler url [{}] constructed.", repo.getUrl(), finalUrl);
-        return finalUrl;
+        Harvester harvester = appConfigurationProperties.getEndpoints().getHarvesters().get(repo.getHandler().toUpperCase());
+        if (harvester != null) {
+            String encodedStudyID = StudyIdentifierEncoder.encodeStudyIdentifier().apply(studyNumber);
+            String finalUrlString = String.format(GET_RECORD_TEMPLATE,
+                    harvester.getUrl(),
+                    harvester.getVersion(),
+                    encodedStudyID,
+                    URLEncoder.encode(repo.getUrl().toString(), StandardCharsets.UTF_8)
+            );
+            URI finalUrl = new URI(finalUrlString);
+            log.trace("[{}] Final GetRecord Handler url [{}] constructed.", repo.getUrl(), finalUrl);
+            return finalUrl;
+        } else {
+            throw new HandlerNotFoundException(repo);
+        }
     }
 }

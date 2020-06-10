@@ -17,6 +17,7 @@ package eu.cessda.pasc.oci.models.configurations;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.net.URI;
 
 /**
@@ -25,9 +26,11 @@ import java.net.URI;
  * @author moses AT doraventures DOT com
  */
 @Data
-public class Repo {
+public class Repo implements Serializable {
+
+  private static final long serialVersionUID = 5460376495600337528L;
 
   URI url;
   String name;
-  Harvester.Type handler;
+  String handler;
 }

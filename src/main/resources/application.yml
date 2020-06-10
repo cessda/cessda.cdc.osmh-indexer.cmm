@@ -81,11 +81,9 @@ osmhConsumer:
     run: '0 01 00 * * *'
     # Then run every Sunday at 09:00
     sunday.run: '0 00 09 * * SUN'
+  # The OAI-PMH handler is predefined, this is used for setting external handlers
   endpoints:
     harvesters:
-      OAI-PMH:
-        url: 'http://localhost:9091'
-        version: 'v0'
       NESSTAR:
         url: 'http://localhost:9842'
         version: 'v0'
@@ -274,6 +272,11 @@ logging:
     eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor: DEBUG
     eu.cessda.pasc.oci.repository.DaoBase: DEBUG
 osmhConsumer:
+  endpoints:
+    harvesters:
+      OAI-PMH:
+        url: 'http://localhost:9091'
+        version: 'v0'
   delay:
     # For tests, the delay should be effectively disabled
     initial: '315360000000'

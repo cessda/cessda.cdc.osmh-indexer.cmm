@@ -24,7 +24,6 @@ import eu.cessda.pasc.oci.helpers.TimeUtility;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
-import eu.cessda.pasc.oci.models.configurations.Harvester;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.repository.DaoBase;
 import eu.cessda.pasc.oci.service.impl.RemoteHarvesterConsumerService;
@@ -172,7 +171,7 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
     // Given
     Repo repoMock = mock(Repo.class);
     when(repoMock.getUrl()).thenReturn(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
-    when(repoMock.getHandler()).thenReturn(Harvester.Type.NESSTAR);
+    when(repoMock.getHandler()).thenReturn("NESSTAR");
 
     when(daoBase.getInputStream(any(URI.class))).thenThrow(new IOException("Mocked!"));
 
@@ -188,7 +187,7 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
     // Given
     Repo repoMock = mock(Repo.class);
     when(repoMock.getUrl()).thenReturn(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
-    when(repoMock.getHandler()).thenReturn(Harvester.Type.NESSTAR);
+    when(repoMock.getHandler()).thenReturn("NESSTAR");
 
     when(daoBase.getInputStream(any(URI.class))).thenThrow(IOException.class);
 
@@ -204,7 +203,7 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
     // Given
     Repo repoMock = mock(Repo.class);
     when(repoMock.getUrl()).thenReturn(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
-    when(repoMock.getHandler()).thenReturn(Harvester.Type.NESSTAR);
+    when(repoMock.getHandler()).thenReturn("NESSTAR");
 
     when(daoBase.getInputStream(any(URI.class))).thenThrow(URISyntaxException.class);
 
