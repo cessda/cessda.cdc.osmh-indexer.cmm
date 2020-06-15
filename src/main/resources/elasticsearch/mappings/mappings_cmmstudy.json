@@ -6,32 +6,32 @@
     },
     "properties": {
       "titleStudy": {
-        "type": "string",
+        "type": "text",
         "analyzer": "pasc_index_autocomplete_analyzer",
         "search_analyzer": "pasc_standard_analyzer",
         "term_vector": "with_positions_offsets",
         "boost": 3.5,
         "fields": {
           "raw": {
-            "type": "string",
+            "type": "text",
             "index": "not_analyzed"
           }
         }
       },
       "abstract": {
-        "type": "string",
+        "type": "text",
         "analyzer": "pasc_standard_analyzer",
         "term_vector": "with_positions_offsets",
         "boost": 2
       },
       "creators": {
-        "type": "string",
+        "type": "text",
         "analyzer": "pasc_standard_analyzer",
         "term_vector": "with_positions_offsets",
         "boost": 2
       },
       "dataAccessFreeTexts": {
-        "type": "string",
+        "type": "text",
         "analyzer": "pasc_standard_analyzer",
         "term_vector": "with_positions_offsets"
       },
@@ -39,12 +39,12 @@
         "type": "nested",
         "properties": {
           "dataCollectionFreeText": {
-            "type": "string",
+            "type": "text",
             "analyzer": "pasc_standard_analyzer",
             "term_vector": "with_positions_offsets"
           },
           "event": {
-            "type": "string",
+            "type": "text",
             "analyzer": "pasc_standard_analyzer"
           }
         }
@@ -63,13 +63,11 @@
         "type": "integer"
       },
       "fileLanguages": {
-        "type": "string",
-        "index": "not_analyzed",
+        "type": "keyword",
         "ignore_above": 256
       },
       "id": {
-        "type": "string",
-        "index": "not_analyzed",
+        "type": "keyword",
         "ignore_above": 256
       },
       "isActive": {
@@ -83,13 +81,11 @@
         "type": "nested",
         "properties": {
           "agency": {
-            "type": "string",
-            "index": "not_analyzed",
+            "type": "keyword",
             "ignore_above": 256
           },
           "pid": {
-            "type": "string",
-            "index": "not_analyzed",
+            "type": "keyword",
             "ignore_above": 256
           }
         }
@@ -103,19 +99,17 @@
         "type": "nested",
         "properties": {
           "abbr": {
-            "type": "string",
-            "index": "not_analyzed",
+            "type": "keyword",
             "ignore_above": 256
           },
           "publisher": {
-            "type": "string",
-            "index": "not_analyzed",
+            "type": "keyword",
             "ignore_above": 256
           }
         }
       },
       "samplingProcedureFreeTexts": {
-        "type": "string",
+        "type": "text",
         "analyzer": "pasc_standard_analyzer",
         "term_vector": "with_positions_offsets"
       },
@@ -123,53 +117,46 @@
         "type": "nested",
         "properties": {
           "abbr": {
-            "type": "string",
-            "index": "not_analyzed",
+            "type": "keyword",
             "ignore_above": 256
           },
           "country": {
-            "type": "string",
-            "index": "not_analyzed",
+            "type": "keyword",
             "ignore_above": 256
           }
         }
       },
       "studyNumber": {
-        "type": "string",
-        "index": "not_analyzed",
+        "type": "keyword",
         "ignore_above": 256
       },
       "studyUrl": {
-        "type": "string",
-        "index": "not_analyzed",
+        "type": "keyword",
         "ignore_above": 512
       },
       "studyXmlSourceUrl": {
-        "type": "string",
-        "index": "not_analyzed",
+        "type": "keyword",
         "ignore_above": 512
       },
       "keywords": {
         "type": "nested",
         "properties": {
           "id": {
-            "type": "string",
+            "type": "keyword",
             "index": "no",
             "ignore_above": 256
           },
           "term": {
-            "type": "string",
+            "type": "text",
             "analyzer": "pasc_standard_analyzer",
             "term_vector": "with_positions_offsets"
           },
           "vocab": {
-            "type": "string",
-            "index": "not_analyzed",
+            "type": "keyword",
             "ignore_above": 256
           },
           "vocabUri": {
-            "type": "string",
-            "index": "not_analyzed",
+            "type": "keyword",
             "ignore_above": 256
           }
         }
@@ -178,23 +165,20 @@
         "type": "nested",
         "properties": {
           "id": {
-            "type": "string",
-            "index": "not_analyzed",
+            "type": "keyword",
             "ignore_above": 256
           },
           "term": {
-            "type": "string",
+            "type": "text",
             "analyzer": "pasc_standard_analyzer",
             "term_vector": "with_positions_offsets"
           },
           "vocab": {
-            "type": "string",
-            "index": "not_analyzed",
+            "type": "keyword",
             "ignore_above": 256
           },
           "vocabUri": {
-            "type": "string",
-            "index": "not_analyzed",
+            "type": "keyword",
             "ignore_above": 256
           }
         }
@@ -203,23 +187,20 @@
         "type": "nested",
         "properties": {
           "id": {
-            "type": "string",
-            "index": "not_analyzed",
+            "type": "keyword",
             "ignore_above": 256
           },
           "term": {
-            "type": "string",
+            "type": "text",
             "analyzer": "pasc_standard_analyzer",
             "term_vector": "with_positions_offsets"
           },
           "vocab": {
-            "type": "string",
-            "index": "not_analyzed",
+            "type": "keyword",
             "ignore_above": 256
           },
           "vocabUri": {
-            "type": "string",
-            "index": "not_analyzed",
+            "type": "keyword",
             "ignore_above": 256
           }
         }
@@ -228,23 +209,20 @@
         "type": "nested",
         "properties": {
           "id": {
-            "type": "string",
-            "index": "not_analyzed",
+            "type": "keyword",
             "ignore_above": 256
           },
           "term": {
-            "type": "string",
+            "type": "text",
             "analyzer": "pasc_standard_analyzer",
             "term_vector": "with_positions_offsets"
           },
           "vocab": {
-            "type": "string",
-            "index": "not_analyzed",
+            "type": "keyword",
             "ignore_above": 256
           },
           "vocabUri": {
-            "type": "string",
-            "index": "not_analyzed",
+            "type": "keyword",
             "ignore_above": 256
           }
         }
@@ -253,23 +231,19 @@
         "type": "nested",
         "properties": {
           "id": {
-            "type": "string",
-            "index": "not_analyzed",
+            "type": "keyword",
             "ignore_above": 256
           },
           "term": {
-            "type": "string",
-            "index": "not_analyzed",
+            "type": "keyword",
             "ignore_above": 256
           },
           "vocab": {
-            "type": "string",
-            "index": "not_analyzed",
+            "type": "keyword",
             "ignore_above": 256
           },
           "vocabUri": {
-            "type": "string",
-            "index": "not_analyzed",
+            "type": "keyword",
             "ignore_above": 256
           }
         }

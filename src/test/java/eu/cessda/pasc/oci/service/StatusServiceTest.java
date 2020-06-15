@@ -50,7 +50,7 @@ public class StatusServiceTest {
     ObjectWriter prettyWriter = mock(ObjectWriter.class);
     ObjectMapper objectMapper = mock(ObjectMapper.class);
     given(objectMapper.writerWithDefaultPrettyPrinter()).willReturn(prettyWriter);
-    given(prettyWriter.writeValueAsString(anyObject())).willReturn("{\"test\":\"value\"}");
+    given(prettyWriter.writeValueAsString(any())).willReturn("{\"test\":\"value\"}");
     StatusService statusService = new StatusService(handlerConfigurationProperties, objectMapper);
 
     // when
@@ -58,7 +58,7 @@ public class StatusServiceTest {
     InOrder verifier = inOrder(prettyWriter);
 
     //then
-    verifier.verify(prettyWriter, calls(2)).writeValueAsString(anyObject());
+    verifier.verify(prettyWriter, calls(2)).writeValueAsString(any());
     then(outPut).startsWith("Config for Rest: [{\"test\":\"value\"}]");
   }
 }

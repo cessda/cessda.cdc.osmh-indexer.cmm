@@ -31,7 +31,6 @@ import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
-import org.jdom2.xpath.XPathFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,17 +49,15 @@ import java.net.URISyntaxException;
 @Slf4j
 public class GetRecordServiceImpl implements GetRecordService {
 
-    private final XPathFactory xPathFactory;
     private final CMMStudyMapper cmmStudyMapper;
     private final DaoBase daoBase;
     private final RecordResponseValidator recordResponseValidator;
     private final HandlerConfigurationProperties oaiPmhHandlerConfig;
 
     @Autowired
-    public GetRecordServiceImpl(CMMStudyMapper cmmStudyMapper, DaoBase daoBase, HandlerConfigurationProperties oaiPmhHandlerConfig, XPathFactory xPathFactory, RecordResponseValidator recordResponseValidator) {
+    public GetRecordServiceImpl(CMMStudyMapper cmmStudyMapper, DaoBase daoBase, HandlerConfigurationProperties oaiPmhHandlerConfig, RecordResponseValidator recordResponseValidator) {
         this.daoBase = daoBase;
         this.oaiPmhHandlerConfig = oaiPmhHandlerConfig;
-        this.xPathFactory = xPathFactory;
         this.cmmStudyMapper = cmmStudyMapper;
         this.recordResponseValidator = recordResponseValidator;
     }
