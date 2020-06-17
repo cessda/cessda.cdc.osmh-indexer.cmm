@@ -278,6 +278,8 @@ osmhConsumer:
         handler: 'nesstar'
 ---
 spring:
+  main:
+    banner-mode: "off"
   profiles: test
 logging:
   level:
