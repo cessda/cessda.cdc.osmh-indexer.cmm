@@ -127,6 +127,9 @@ osmhConsumer:
       - url: https://snd.gu.se/en/oai-pmh
         name: 'SND'
         handler: 'OAI-PMH'
+      - url: https://dataverse.arch.be/oai
+        name: 'SODA'
+        handler: 'OAI-PMH'
       - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
         name: 'UKDS'
         handler: 'OAI-PMH'
