@@ -115,10 +115,8 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
     return -1;
   }
 
-  private List<RecordHeader> retrieveRecordHeaders(Document doc, URI baseRepoUrl) throws InternalSystemException {
+  private List<RecordHeader> retrieveRecordHeaders(Document document, URI baseRepoUrl) throws InternalSystemException {
 
-    // Create a new object so that we don't unexpectedly alter the calling parameter
-    Document document = doc;
     Optional<String> resumptionToken;
     var recordHeaders = new ArrayList<RecordHeader>();
 
@@ -127,7 +125,7 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
       recordHeaders.addAll(parseRecordHeadersFromDoc(document));
 
       // Check and loop when there is a resumptionToken
-      resumptionToken = parseResumptionToken(doc);
+      resumptionToken = parseResumptionToken(document);
       if (resumptionToken.isPresent()) {
         URI repoUrlWithResumptionToken = appendListRecordResumptionToken(baseRepoUrl, resumptionToken.get());
         log.trace("Looping for [{}].", repoUrlWithResumptionToken);

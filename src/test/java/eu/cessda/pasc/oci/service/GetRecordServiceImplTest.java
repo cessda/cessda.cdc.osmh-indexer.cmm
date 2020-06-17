@@ -29,6 +29,7 @@ import eu.cessda.pasc.oci.mock.data.CMMStudyTestData;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMConverter;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.repository.DaoBase;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -71,12 +72,12 @@ public class GetRecordServiceImplTest {
   GetRecordService recordService;
 
   @Test
-  public void shouldReturnValidCMMStudyRecordFromAFullyComplaintCmmDdiRecord() throws CustomHandlerException, IOException, ProcessingException {
+  public void shouldReturnValidCMMStudyRecordFromAFullyComplaintCmmDdiRecord() throws CustomHandlerException, IOException, ProcessingException, JSONException {
 
     // Given
-      given(daoBase.getInputStream(FULL_RECORD_URL)).willReturn(
-              CMMStudyTestData.getContentAsStream("xml/synthetic_compliant_cmm.xml")
-      );
+    given(daoBase.getInputStream(FULL_RECORD_URL)).willReturn(
+            CMMStudyTestData.getContentAsStream("xml/synthetic_compliant_cmm.xml")
+    );
 
     // When
     CMMStudy result = recordService.getRecord(REPO_URL, RECORD_IDENTIFIER);
@@ -111,12 +112,12 @@ public class GetRecordServiceImplTest {
   }
 
   @Test
-  public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord() throws CustomHandlerException, IOException, ProcessingException {
+  public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord() throws CustomHandlerException, IOException, ProcessingException, JSONException {
 
     // Given
-      given(daoBase.getInputStream(FULL_RECORD_URL)).willReturn(
-              CMMStudyTestData.getContentAsStream("xml/ddi_record_1683.xml")
-      );
+    given(daoBase.getInputStream(FULL_RECORD_URL)).willReturn(
+            CMMStudyTestData.getContentAsStream("xml/ddi_record_1683.xml")
+    );
 
     // When
     CMMStudy record = recordService.getRecord(REPO_URL, RECORD_IDENTIFIER);
@@ -127,12 +128,12 @@ public class GetRecordServiceImplTest {
   }
 
   @Test
-  public void shouldOnlyExtractSingleDateAsStartDateForRecordsWithASingleDateAttr() throws CustomHandlerException, IOException, ProcessingException {
+  public void shouldOnlyExtractSingleDateAsStartDateForRecordsWithASingleDateAttr() throws CustomHandlerException, IOException, ProcessingException, JSONException {
 
     // Given
-      given(daoBase.getInputStream(FULL_RECORD_URL)).willReturn(
-              CMMStudyTestData.getContentAsStream("xml/ddi_record_1683.xml")
-      );
+    given(daoBase.getInputStream(FULL_RECORD_URL)).willReturn(
+            CMMStudyTestData.getContentAsStream("xml/ddi_record_1683.xml")
+    );
 
     // When
     CMMStudy record = recordService.getRecord(REPO_URL, RECORD_IDENTIFIER);
@@ -148,13 +149,13 @@ public class GetRecordServiceImplTest {
   }
 
   @Test
-  public void shouldExtractDefaultLanguageFromCodebookXMLLagIfPresent() throws CustomHandlerException, IOException {
+  public void shouldExtractDefaultLanguageFromCodebookXMLLagIfPresent() throws CustomHandlerException, IOException, JSONException {
 
     // Given
     String expectedCmmStudyJsonString = CMMStudyTestData.getContent("json/ddi_record_1683_with_codebookXmlLag.json");
-      given(daoBase.getInputStream(FULL_RECORD_URL)).willReturn(
-              CMMStudyTestData.getContentAsStream("xml/ddi_record_1683_with_codebookXmlLag.xml")
-      );
+    given(daoBase.getInputStream(FULL_RECORD_URL)).willReturn(
+            CMMStudyTestData.getContentAsStream("xml/ddi_record_1683_with_codebookXmlLag.xml")
+    );
 
     // When
     CMMStudy record = recordService.getRecord(REPO_URL, RECORD_IDENTIFIER);
@@ -165,16 +166,16 @@ public class GetRecordServiceImplTest {
   }
 
   @Test
-  public void shouldReturnCMMStudyRecordWithRepeatedAbstractConcatenated() throws CustomHandlerException, IOException, ProcessingException {
+  public void shouldReturnCMMStudyRecordWithRepeatedAbstractConcatenated() throws CustomHandlerException, IOException, ProcessingException, JSONException {
 
     Map<String, String> expectedAbstract = new HashMap<>();
     expectedAbstract.put("de", "de de");
     expectedAbstract.put("fi", "Haastattelu+<br>Jyväskylä");
     expectedAbstract.put("en", "1. The data+<br>2. The datafiles");
 
-      given(daoBase.getInputStream(FULL_RECORD_URL)).willReturn(
-              CMMStudyTestData.getContentAsStream("xml/ddi_record_2305_fsd_repeat_abstract.xml")
-      );
+    given(daoBase.getInputStream(FULL_RECORD_URL)).willReturn(
+            CMMStudyTestData.getContentAsStream("xml/ddi_record_2305_fsd_repeat_abstract.xml")
+    );
 
     // When
     CMMStudy record = recordService.getRecord(REPO_URL, RECORD_IDENTIFIER);
@@ -186,16 +187,16 @@ public class GetRecordServiceImplTest {
   }
 
   @Test // https://bitbucket.org/cessda/cessda.cdc.version2/issues/135
-  public void shouldReturnCMMStudyRecordWithOutParTitleWhenThereIsALangDifferentFromDefault() throws CustomHandlerException, IOException, ProcessingException {
+  public void shouldReturnCMMStudyRecordWithOutParTitleWhenThereIsALangDifferentFromDefault() throws CustomHandlerException, IOException, ProcessingException, JSONException {
 
     Map<String, String> expectedTitle = new HashMap<>();
     expectedTitle.put("en", "Machinery of Government, 1976-1977");
     expectedTitle.put("no", "2 - Et Machinery of Government, 1976-1977");
     expectedTitle.put("yy", "Enquête sociale européenne");
 
-      given(daoBase.getInputStream(FULL_RECORD_URL)).willReturn(
-              CMMStudyTestData.getContentAsStream("xml/ddi_record_1683.xml")
-      );
+    given(daoBase.getInputStream(FULL_RECORD_URL)).willReturn(
+            CMMStudyTestData.getContentAsStream("xml/ddi_record_1683.xml")
+    );
 
     // When
     CMMStudy record = recordService.getRecord(REPO_URL, RECORD_IDENTIFIER);
@@ -238,12 +239,12 @@ public class GetRecordServiceImplTest {
   }
 
   @Test
-  public void shouldExtractAllRequiredCMMFieldsForAGivenAUKDSRecord() throws CustomHandlerException, IOException, ProcessingException {
+  public void shouldExtractAllRequiredCMMFieldsForAGivenAUKDSRecord() throws CustomHandlerException, IOException, ProcessingException, JSONException {
 
     // Given
-      given(daoBase.getInputStream(FULL_RECORD_URL)).willReturn(
-              CMMStudyTestData.getContentAsStream("xml/ddi_record_ukds_example.xml")
-      );
+    given(daoBase.getInputStream(FULL_RECORD_URL)).willReturn(
+            CMMStudyTestData.getContentAsStream("xml/ddi_record_ukds_example.xml")
+    );
 
     // When
     CMMStudy result = recordService.getRecord(REPO_URL, RECORD_IDENTIFIER);
@@ -253,7 +254,7 @@ public class GetRecordServiceImplTest {
     assertThatCmmRequiredFieldsAreExtracted(result);
   }
 
-  private void validateCMMStudyResultAgainstSchema(CMMStudy record) throws IOException, ProcessingException {
+  private void validateCMMStudyResultAgainstSchema(CMMStudy record) throws IOException, ProcessingException, JSONException {
 
     then(record.isActive()).isTrue(); // No need to carry on validating other fields if marked as inActive
 
@@ -270,7 +271,7 @@ public class GetRecordServiceImplTest {
     }
   }
 
-  private void assertFieldsAreExtractedAsExpected(CMMStudy record) throws IOException {
+  private void assertFieldsAreExtractedAsExpected(CMMStudy record) throws IOException, JSONException {
 
     final ObjectMapper mapper = new ObjectMapper();
     String jsonString = cmmConverter.toJsonString(record);
@@ -309,7 +310,7 @@ public class GetRecordServiceImplTest {
     assertEquals(expectedTree.get("studyXmlSourceUrl").toString(), actualTree.get("studyXmlSourceUrl").toString(), true);
   }
 
-  private void assertThatCmmRequiredFieldsAreExtracted(CMMStudy record) throws IOException {
+  private void assertThatCmmRequiredFieldsAreExtracted(CMMStudy record) throws IOException, JSONException {
 
     final ObjectMapper mapper = new ObjectMapper();
     String jsonString = cmmConverter.toJsonString(record);

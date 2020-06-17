@@ -30,6 +30,7 @@ import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.sort.SortOrder;
+import org.json.JSONException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -88,7 +89,7 @@ public class ESIngestServiceTestIT {
     }
 
     @Test
-    public void shouldSuccessfullyBulkIndexAllCMMStudies() throws IOException {
+    public void shouldSuccessfullyBulkIndexAllCMMStudies() throws IOException, JSONException {
 
         // Given
         final JsonNode expectedTree = mapper.readTree(getSyntheticCMMStudyOfLanguageEn());
