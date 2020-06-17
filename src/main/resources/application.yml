@@ -23,7 +23,7 @@ management:
       base-path: "/"
       exposure.include: '*'
 logging:
-  file: ${user.home}${file.separator}pasc-oci${file.separator}pasc-oci.log
+  file: pasc-oci.log
   pattern:
     console: '%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) %40.40((%file:%line\)) - %message%n'
     file: '%d{yyyy-MM-dd HH:mm:ss.SSS}  %-5level  %40.40((%file:%line\)) - %message%n'
@@ -49,7 +49,14 @@ spring:
     default-domain: pasc-oci
   boot:
     admin:
-      client.name: pasc-oci
+      client:
+        name: pasc-oci
+        instance:
+          metadata:
+            user:
+              # Send the username and password for authentication to Spring Boot Admin
+              name: ${spring.security.user.name}
+              password: ${spring.security.user.password}
       turbine:
         clusters: default
         url: http://localhost:8989/turbine.stream
@@ -62,7 +69,7 @@ spring:
     user:
       name: user
       password: password
-    basic.enabled: false            # Public API disable security on non-admin endpoints
+      roles: ACTUATOR
 elasticsearch:
   clustername: elasticsearch
   host: 127.0.0.1
@@ -132,9 +139,9 @@ osmhConsumer:
       - url: https://oai-pmh.nsd.no/oai-pmh
         name: 'NSD (Nesstar)'
         handler: 'NESSTAR'
-    #  - url:  http://nesstar.sciences-po.fr/oai-pmh
-    #    name: 'Progedo (Nesstar)'
-    #    handler: 'NESSTAR'
+      - url:  http://nesstar.sciences-po.fr/oai-pmh
+        name: 'Progedo (Nesstar)'
+        handler: 'NESSTAR'
       - url:  http://harvester.sodanet.gr:8080/oai/request
         name: 'SoDaNet (Nesstar)'
         handler: 'NESSTAR'
@@ -197,8 +204,9 @@ spring:
   boot:
     admin:
       client:
-        prefer-ip: true
-      url: http://localhost:8087
+        instance:
+          prefer-ip: true
+        url: http://localhost:8087
   output.ansi.enabled: NEVER
 logging:
   level:
@@ -231,8 +239,9 @@ spring:
   boot:
     admin:
       client:
-        prefer-ip: true
-      url: http://localhost:8087
+        url: http://localhost:8087
+        username: user
+        password: password
 logging:
   level:
     ROOT: INFO
