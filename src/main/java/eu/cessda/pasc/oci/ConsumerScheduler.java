@@ -45,7 +45,6 @@ public class ConsumerScheduler {
   private static final String FULL_RUN = "Full Run";
   private static final String DAILY_INCREMENTAL_RUN = "Daily Incremental Run";
   private static final String DEFAULT_CDC_JOB_KEY = "indexer_job_id";
-  private static final String DEFAULT_RESPONSE_TOKEN_HEADER = "cdc-";
 
   private final DebuggingJMXBean debuggingJMXBean;
   private final IngestService esIndexerService;
@@ -100,7 +99,7 @@ public class ConsumerScheduler {
    * @return the correlation id
    */
   private String getJobId() {
-    return DEFAULT_RESPONSE_TOKEN_HEADER + DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.now(ZoneId.systemDefault()));
+    return DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.now(ZoneId.systemDefault()));
   }
 
   private OffsetDateTime logStartStatus(String runDescription) {
