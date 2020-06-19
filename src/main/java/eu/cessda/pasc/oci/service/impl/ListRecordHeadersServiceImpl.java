@@ -137,13 +137,11 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
   }
 
   private Document getRecordHeadersDocument(URI repoUrl) throws InternalSystemException {
-    Document document;
     try (InputStream resumedXMLDoc = daoBase.getInputStream(repoUrl)) {
-      document = getDocument(resumedXMLDoc, repoUrl);
+      return getDocument(resumedXMLDoc, repoUrl);
     } catch (IOException e) {
       throw new InternalSystemException("IO error reading input stream", e);
     }
-    return document;
   }
 
   private List<RecordHeader> parseRecordHeadersFromDoc(Document doc) {
