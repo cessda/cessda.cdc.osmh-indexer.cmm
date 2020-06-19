@@ -183,6 +183,8 @@ osmhhandler:
       - url: https://snd.gu.se/en/oai-pmh
         preferredMetadataParam: oai_ddi25
         setSpec: discipline:social-science
+      - url: https://dataverse.arch.be/oai
+        preferredMetadataParam: oai_ddi
       - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
         preferredMetadataParam: ddi
     metadataParsingDefaultLang:
