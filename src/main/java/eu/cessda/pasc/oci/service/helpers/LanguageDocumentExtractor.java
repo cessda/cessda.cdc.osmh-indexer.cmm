@@ -60,9 +60,9 @@ public class LanguageDocumentExtractor {
     }
 
     if (log.isDebugEnabled()) {
-      languageDocMap.forEach((langIsoCode, cmmStudyOfLanguages) ->
-              log.debug("langIsoCode [{}] has [{}] records that has passed CMM minimum fields validation", langIsoCode, cmmStudyOfLanguages.size())
-      );
+      for (Map.Entry<String, List<CMMStudyOfLanguage>> entry : languageDocMap.entrySet()) {
+        log.debug("langIsoCode [{}] has [{}] records that has passed CMM minimum fields validation", entry.getKey(), entry.getValue().size());
+      }
     }
     return languageDocMap;
   }
@@ -114,8 +114,8 @@ public class LanguageDocumentExtractor {
 
     // Language neutral specific field extraction
     builder.id(idPrefix + cmmStudy.getStudyNumber())
-        .studyNumber(cmmStudy.getStudyNumber())
-        .active(cmmStudy.isActive())
+            .studyNumber(cmmStudy.getStudyNumber())
+            .active(cmmStudy.isActive())
             .lastModified(cmmStudy.getLastModified())
             .publicationYear(cmmStudy.getPublicationYear())
             .fileLanguages(cmmStudy.getFileLanguages())

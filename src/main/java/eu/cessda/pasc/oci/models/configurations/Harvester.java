@@ -15,8 +15,7 @@
  */
 package eu.cessda.pasc.oci.models.configurations;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.net.URI;
 
@@ -25,13 +24,8 @@ import java.net.URI;
  *
  * @author moses AT doraventures DOT com
  */
-@Getter
-@Setter
+@Data
 public class Harvester {
   private URI url;
   private String version;
-
-  public enum Type {
-    OAI_PMH, NESSTAR
-  }
 }

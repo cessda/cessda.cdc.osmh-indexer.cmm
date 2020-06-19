@@ -33,7 +33,7 @@ import java.util.TimeZone;
  */
 @Configuration
 @EnableConfigurationProperties
-@ConfigurationProperties(prefix = "osmhConsumer")
+@ConfigurationProperties(prefix = "osmhconsumer")
 @Data
 public class AppConfigurationProperties {
 

@@ -18,8 +18,7 @@ package eu.cessda.pasc.oci.models.cmmstudy;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.List;
@@ -40,27 +39,31 @@ import java.util.Set;
     "keywords",
     "typeOfTimeMethods",
     "studyAreaCountries",
-    "unitTypes",
-    "publisher",
-    "publicationYear",
-    "pidStudies",
-    "fileLanguages",
-    "creators",
-    "typeOfSamplingProcedures",
-    "samplingProcedureFreeTexts",
-    "typeOfModeOfCollections",
-    "dataCollectionPeriodStartdate",
-    "dataCollectionPeriodEnddate",
-    "dataCollectionYear",
-    "dataCollectionFreeTexts",
-    "dataAccessFreeTexts",
-    "lastModified",
-    "studyUrl",
-    "isActive",
-    "langAvailableIn",
-    "studyXmlSourceUrl"
+        "unitTypes",
+        "publisher",
+        "publicationYear",
+        "pidStudies",
+        "fileLanguages",
+        "creators",
+        "typeOfSamplingProcedures",
+        "samplingProcedureFreeTexts",
+        "typeOfModeOfCollections",
+        "dataCollectionPeriodStartdate",
+        "dataCollectionPeriodEnddate",
+        "dataCollectionYear",
+        "dataCollectionFreeTexts",
+        "dataAccessFreeTexts",
+        "lastModified",
+        "studyUrl",
+        "isActive",
+        "langAvailableIn",
+        "studyXmlSourceUrl"
 })
+@AllArgsConstructor
+@Builder
 @Getter
+@NoArgsConstructor
+@ToString
 public class CMMStudy {
 
   @JsonProperty("creators")
@@ -143,9 +146,8 @@ public class CMMStudy {
    * the minimum CMM Fields requirements for given Lang Iso Code.
    * @see eu.cessda.pasc.oci.service.helpers.LanguageAvailabilityMapper#setAvailableLanguages(CMMStudy)
    */
-  @Setter
   @Getter
-  @JsonProperty("langAvailableIn")
+  @Builder.Default
   private Set<String> langAvailableIn = new HashSet<>();
 
   @JsonProperty("studyXmlSourceUrl")

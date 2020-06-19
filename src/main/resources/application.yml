@@ -13,33 +13,27 @@
 # limitations under the License.
 server:
   port: 9902
-#  context-path: '/osmh-repo'
-security:
-  user:
-    name: user
-    password: password
-  basic.enabled: false            # Public API disable security on non-admin endpoints
-management.security.enabled: true # Enable security on admin endpoints
-endpoints:
-  prometheus.sensitive: false
-  shutdown.enabled: true
+management:
+  security.enabled: false # Enable security on admin endpoints
+  endpoints:
+    health.show-details: true
+    prometheus.sensitive: false
+    shutdown.enabled: true
+    web:
+      base-path: "/"
+      exposure.include: '*'
 logging:
-  file: ${user.home}${file.separator}pasc-oci${file.separator}pasc-oci.log
+  file: pasc-oci.log
   pattern:
-    console: '%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) %40.40((%file:%line\))
-      - %message%n'
-    file: '%d{yyyy-MM-dd HH:mm:ss.SSS}  %-5level  %40.40((%file:%line\))
-      - %message%n'
+    console: '%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) %40.40((%file:%line\)) - %message%n'
+    file: '%d{yyyy-MM-dd HH:mm:ss.SSS}  %-5level  %40.40((%file:%line\)) - %message%n'
   level:
-    .: WARN
-    org: ERROR
+    ROOT: WARN
     eu.cessda.pasc: INFO
     eu.cessda.pasc.oci.service: INFO
     eu.cessda.pasc.oci.repository: INFO
     eu.cessda.pasc.oci.helpers: INFO
     eu.cessda.pasc.oci.configurations.PerfRequestSyncInterceptor: DEBUG
-    net: WARN
-    com: ERROR
 spring:
   mail:
     host: pasc-mailrelay
@@ -55,7 +49,14 @@ spring:
     default-domain: pasc-oci
   boot:
     admin:
-      client.name: pasc-oci
+      client:
+        name: pasc-oci
+        instance:
+          metadata:
+            user:
+              # Send the username and password for authentication to Spring Boot Admin
+              name: ${spring.security.user.name}
+              password: ${spring.security.user.password}
       turbine:
         clusters: default
         url: http://localhost:8989/turbine.stream
@@ -64,6 +65,11 @@ spring:
       auto-deregistration: true
       auto-registration: true
       period: 30000
+  security:
+    user:
+      name: user
+      password: password
+      roles: ACTUATOR
 elasticsearch:
   clustername: elasticsearch
   host: 127.0.0.1
@@ -81,11 +87,9 @@ osmhConsumer:
     run: '0 01 00 * * *'
     # Then run every Sunday at 09:00
     sunday.run: '0 00 09 * * SUN'
+  # The OAI-PMH handler is predefined, this is used for setting external handlers
   endpoints:
     harvesters:
-      OAI-PMH:
-        url: 'http://localhost:9091'
-        version: 'v0'
       NESSTAR:
         url: 'http://localhost:9842'
         version: 'v0'
@@ -138,9 +142,9 @@ osmhConsumer:
       - url: https://oai-pmh.nsd.no/oai-pmh
         name: 'NSD (Nesstar)'
         handler: 'NESSTAR'
-    #  - url:  http://nesstar.sciences-po.fr/oai-pmh
-    #    name: 'Progedo (Nesstar)'
-    #    handler: 'NESSTAR'
+      - url:  http://nesstar.sciences-po.fr/oai-pmh
+        name: 'Progedo (Nesstar)'
+        handler: 'NESSTAR'
       - url:  http://harvester.sodanet.gr:8080/oai/request
         name: 'SoDaNet (Nesstar)'
         handler: 'NESSTAR'
@@ -152,7 +156,49 @@ osmhConsumer:
     connRequestTimeout: 5000 # 5 seconds
     readTimeout: 180000 # increased from 120 seconds to 180 seconds to deal with slower Nesstar repos
     verifySSL: true
-
+osmhhandler:
+  baseEndpoint: '/'
+  oaiPmh:
+    supportedApiVersions:
+      - v0
+    supportedRecordTypes:
+      - CMMStudy
+    repos:
+      - url: http://194.117.18.18:6003/v0/oai
+        preferredMetadataParam: oai_ddi25
+      - url: https://data2.aussda.at/oai
+        preferredMetadataParam: oai_ddi
+      - url: https://easy.dans.knaw.nl/oai/
+        preferredMetadataParam: oai_ddi25_nl
+      - url: https://easy.dans.knaw.nl/oai/
+        preferredMetadataParam: oai_ddi25_en
+      - url: https://kuha.sa.dk/v0/oai
+        preferredMetadataParam: oai_ddi25
+      - url: http://services.fsd.uta.fi/v0/oai
+        preferredMetadataParam: oai_ddi25
+      - url: https://dbkapps.gesis.org/dbkoai3
+        preferredMetadataParam: oai_ddi25
+      - url: http://147.213.4.44:6003/v0/oai
+        preferredMetadataParam: oai_ddi25
+      - url: https://data.sciencespo.fr/oai
+        preferredMetadataParam: oai_ddi
+        setSpec: CDSP
+      - url: https://snd.gu.se/en/oai-pmh
+        preferredMetadataParam: oai_ddi25
+        setSpec: discipline:social-science
+      - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
+        preferredMetadataParam: ddi
+    metadataParsingDefaultLang:
+      active: true
+      lang: 'en'
+    concatRepeatedElements: true
+    concatSeparator: "+<br>"
+    publicationYearDefault: 1970
+  restTemplateProps:
+    connTimeout: 10000 # increased from 5 seconds to 10 seconds to deal with slower Nesstar repos
+    connRequestTimeout: 5000 # 5 seconds
+    readTimeout: 180000 # increased from 120 seconds to 180 seconds to deal with slower Nesstar repos
+    verifySSL: true
 ---
 spring:
   profiles: gcp
@@ -161,8 +207,9 @@ spring:
   boot:
     admin:
       client:
-        prefer-ip: true
-      url: http://localhost:8087
+        instance:
+          prefer-ip: true
+        url: http://localhost:8087
   output.ansi.enabled: NEVER
 logging:
   level:
@@ -187,16 +234,20 @@ osmhConsumer:
       NESSTAR:
         url: 'http://cdc-osmh-repo-nesstar:9842'
         version: 'v0'
+osmhhandler:
+  baseEndpoint: '/osmh-repo'
 ---
 spring:
   profiles: local
   boot:
     admin:
       client:
-        prefer-ip: true
-      url: http://localhost:8087
+        url: http://localhost:8087
+        username: user
+        password: password
 logging:
   level:
+    ROOT: INFO
     eu.cessda.pasc.oci: TRACE
 osmhConsumer:
   endpoints:
@@ -227,13 +278,42 @@ osmhConsumer:
         handler: 'nesstar'
 ---
 spring:
+  main:
+    banner-mode: "off"
   profiles: test
 logging:
   level:
     eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor: DEBUG
     eu.cessda.pasc.oci.repository.DaoBase: DEBUG
 osmhConsumer:
+  endpoints:
+    harvesters:
+      OAI-PMH:
+        url: 'http://localhost:9091'
+        version: 'v0'
   delay:
     # For tests, the delay should be effectively disabled
     initial: '315360000000'
     fixed: '315360000000'
+elasticsearch:
+  clustername: test
+osmhhandler:
+  oaiPmh:
+    supportedRecordTypes:
+      - Study
+      - StudyGroup
+      - Variable
+      - Question
+      - CMM
+    metadataParsingDefaultLang:
+      active: true
+      lang: 'en'
+    publicationYearDefault: 1970
+    repos:
+      - url: https://data2.aussda.at/oai/
+        preferredMetadataParam: oai_ddi
+      - url: http://services.fsd.uta.fi/v0/oai
+        preferredMetadataParam: oai_ddi25
+        setSpec: study_groups:energia
+      - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
+        preferredMetadataParam: ddi

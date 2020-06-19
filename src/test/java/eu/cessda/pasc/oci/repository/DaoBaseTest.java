@@ -19,7 +19,7 @@ import com.pgssoft.httpclient.HttpClientMock;
 import com.pgssoft.httpclient.MockedServerResponse;
 import eu.cessda.pasc.oci.AbstractSpringTestProfileContext;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
-import eu.cessda.pasc.oci.helpers.exception.ExternalSystemException;
+import eu.cessda.pasc.oci.exception.ExternalSystemException;
 import lombok.SneakyThrows;
 import org.junit.Assert;
 import org.junit.Test;
@@ -32,7 +32,7 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-import static eu.cessda.pasc.oci.data.RecordTestData.LIST_RECORDER_HEADERS_BODY_EXAMPLE;
+import static eu.cessda.pasc.oci.mock.data.RecordTestData.LIST_RECORDER_HEADERS_BODY_EXAMPLE;
 import static org.assertj.core.api.Java6BDDAssertions.then;
 
 
@@ -63,8 +63,8 @@ public class DaoBaseTest extends AbstractSpringTestProfileContext {
         httpClient.onGet(expectedUrl).doReturnJSON(LIST_RECORDER_HEADERS_BODY_EXAMPLE, StandardCharsets.UTF_8);
 
         // When
-        DaoBase daoBase = new DaoBase(httpClient);
-        try (InputStream recordHeaders = daoBase.postForStringResponse(expectedUrl)) {
+        DaoBaseImpl daoBase = new DaoBaseImpl(httpClient);
+        try (InputStream recordHeaders = daoBase.getInputStream(expectedUrl)) {
             then(new String(recordHeaders.readAllBytes(), StandardCharsets.UTF_8)).isEqualTo(LIST_RECORDER_HEADERS_BODY_EXAMPLE);
             httpClient.verify().get().called(1);
         }
@@ -81,8 +81,8 @@ public class DaoBaseTest extends AbstractSpringTestProfileContext {
         httpClient.onGet(expectedUrl).doReturn(expectedStatusCode, "The exception wasn't thrown.");
 
         // When
-        DaoBase daoBase = new DaoBase(httpClient);
-        try (InputStream inputStream = daoBase.postForStringResponse(expectedUrl)) {
+        DaoBaseImpl daoBase = new DaoBaseImpl(httpClient);
+        try (InputStream inputStream = daoBase.getInputStream(expectedUrl)) {
             Assert.fail(new String(inputStream.readAllBytes(), Charset.defaultCharset()));
         } catch (ExternalSystemException e) {
             Assert.assertEquals(expectedStatusCode, e.getExternalResponse().getStatusCode());
@@ -96,8 +96,8 @@ public class DaoBaseTest extends AbstractSpringTestProfileContext {
         httpClient.onGet().doAction(DaoBaseTest::throwInterruptedException);
 
         // When
-        DaoBase daoBase = new DaoBase(httpClient);
-        try (InputStream empty = daoBase.postForStringResponse("http://error.endpoint/")) {
+        DaoBaseImpl daoBase = new DaoBaseImpl(httpClient);
+        try (InputStream empty = daoBase.getInputStream("http://error.endpoint/")) {
             Assert.assertEquals(-1, empty.read());
         }
     }
@@ -109,8 +109,8 @@ public class DaoBaseTest extends AbstractSpringTestProfileContext {
         httpClient.onGet().doThrowException(new IOException("Mocked!"));
 
         // When
-        DaoBase daoBase = new DaoBase(httpClient);
-        try (InputStream inputStream = daoBase.postForStringResponse("http://error.endpoint/")) {
+        DaoBaseImpl daoBase = new DaoBaseImpl(httpClient);
+        try (InputStream inputStream = daoBase.getInputStream("http://error.endpoint/")) {
             Assert.fail(new String(inputStream.readAllBytes(), Charset.defaultCharset()));
         }
     }

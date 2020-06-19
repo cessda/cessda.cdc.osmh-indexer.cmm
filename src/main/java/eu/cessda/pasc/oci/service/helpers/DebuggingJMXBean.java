@@ -16,6 +16,8 @@
 package eu.cessda.pasc.oci.service.helpers;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
+import eu.cessda.pasc.oci.exception.HandlerNotFoundException;
+import eu.cessda.pasc.oci.models.configurations.Harvester;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.client.Client;
@@ -81,12 +83,27 @@ public class DebuggingJMXBean {
 
   @ManagedOperation(description = "Show which SP repo Endpoints are currently active.")
   public String printCurrentlyConfiguredRepoEndpoints() {
-    String reposStr = appConfigProps.getEndpoints().getRepos().stream().map(repo ->
-            String.format("\t Repo [%s] url [%s] handler[%s] %n",
-                    repo.getName(),
-                    repo.getUrl(),
-                    appConfigProps.getEndpoints().getHarvesters().get(repo.getHandler()).getUrl()
-            )
+    String reposStr = appConfigProps.getEndpoints().getRepos().stream().map(repo -> {
+              String handler;
+
+              if (repo.getHandler().equalsIgnoreCase("OAI-PMH")) {
+                handler = "Local";
+              } else {
+                Harvester harvester = appConfigProps.getEndpoints().getHarvesters().get(repo.getHandler().toUpperCase());
+                if (harvester != null) {
+                  handler = harvester.getUrl().toString();
+                } else {
+                  // No handler is configured, fail fast
+                  throw new HandlerNotFoundException(repo);
+                }
+              }
+
+              return String.format("\t Repo [%s] url [%s] handler[%s] %n",
+                      repo.getName(),
+                      repo.getUrl(),
+                      handler
+              );
+            }
     ).collect(Collectors.joining());
     return String.format("Configured Repos: [%n%s]", reposStr);
   }

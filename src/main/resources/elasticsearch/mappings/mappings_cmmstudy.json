@@ -1,0 +1,254 @@
+{
+  "cmmstudy": {
+    "_all": {
+      "enabled": true,
+      "analyzer": "pasc_standard_analyzer"
+    },
+    "properties": {
+      "titleStudy": {
+        "type": "text",
+        "analyzer": "pasc_index_autocomplete_analyzer",
+        "search_analyzer": "pasc_standard_analyzer",
+        "term_vector": "with_positions_offsets",
+        "boost": 3.5,
+        "fields": {
+          "raw": {
+            "type": "text",
+            "index": "not_analyzed"
+          }
+        }
+      },
+      "abstract": {
+        "type": "text",
+        "analyzer": "pasc_standard_analyzer",
+        "term_vector": "with_positions_offsets",
+        "boost": 2
+      },
+      "creators": {
+        "type": "text",
+        "analyzer": "pasc_standard_analyzer",
+        "term_vector": "with_positions_offsets",
+        "boost": 2
+      },
+      "dataAccessFreeTexts": {
+        "type": "text",
+        "analyzer": "pasc_standard_analyzer",
+        "term_vector": "with_positions_offsets"
+      },
+      "dataCollectionFreeTexts": {
+        "type": "nested",
+        "properties": {
+          "dataCollectionFreeText": {
+            "type": "text",
+            "analyzer": "pasc_standard_analyzer",
+            "term_vector": "with_positions_offsets"
+          },
+          "event": {
+            "type": "text",
+            "analyzer": "pasc_standard_analyzer"
+          }
+        }
+      },
+      "dataCollectionPeriodEnddate": {
+        "type": "date",
+        "format": "strict_date_optional_time||epoch_millis||year",
+        "ignore_malformed": true
+      },
+      "dataCollectionPeriodStartdate": {
+        "type": "date",
+        "format": "strict_date_optional_time||epoch_millis||year",
+        "ignore_malformed": true
+      },
+      "dataCollectionYear": {
+        "type": "integer"
+      },
+      "fileLanguages": {
+        "type": "keyword",
+        "ignore_above": 256
+      },
+      "id": {
+        "type": "keyword",
+        "ignore_above": 256
+      },
+      "isActive": {
+        "type": "boolean"
+      },
+      "lastModified": {
+        "type": "date",
+        "format": "strict_date_optional_time||epoch_millis"
+      },
+      "pidStudies": {
+        "type": "nested",
+        "properties": {
+          "agency": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "pid": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "publicationYear": {
+        "type": "date",
+        "format": "strict_date_optional_time||epoch_millis||year",
+        "ignore_malformed": true
+      },
+      "publisher": {
+        "type": "nested",
+        "properties": {
+          "abbr": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "publisher": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "samplingProcedureFreeTexts": {
+        "type": "text",
+        "analyzer": "pasc_standard_analyzer",
+        "term_vector": "with_positions_offsets"
+      },
+      "studyAreaCountries": {
+        "type": "nested",
+        "properties": {
+          "abbr": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "country": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "studyNumber": {
+        "type": "keyword",
+        "ignore_above": 256
+      },
+      "studyUrl": {
+        "type": "keyword",
+        "ignore_above": 512
+      },
+      "studyXmlSourceUrl": {
+        "type": "keyword",
+        "ignore_above": 512
+      },
+      "keywords": {
+        "type": "nested",
+        "properties": {
+          "id": {
+            "type": "keyword",
+            "index": "no",
+            "ignore_above": 256,
+            "boost": 1.5
+          },
+          "term": {
+            "type": "text",
+            "analyzer": "pasc_standard_analyzer",
+            "term_vector": "with_positions_offsets"
+          },
+          "vocab": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "vocabUri": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "typeOfModeOfCollections": {
+        "type": "nested",
+        "properties": {
+          "id": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "term": {
+            "type": "text",
+            "analyzer": "pasc_standard_analyzer",
+            "term_vector": "with_positions_offsets"
+          },
+          "vocab": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "vocabUri": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "typeOfTimeMethods": {
+        "type": "nested",
+        "properties": {
+          "id": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "term": {
+            "type": "text",
+            "analyzer": "pasc_standard_analyzer",
+            "term_vector": "with_positions_offsets"
+          },
+          "vocab": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "vocabUri": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "unitTypes": {
+        "type": "nested",
+        "properties": {
+          "id": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "term": {
+            "type": "text",
+            "analyzer": "pasc_standard_analyzer",
+            "term_vector": "with_positions_offsets"
+          },
+          "vocab": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "vocabUri": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "classifications": {
+        "type": "nested",
+        "properties": {
+          "id": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "term": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "vocab": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "vocabUri": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      }
+    }
+  }
+}

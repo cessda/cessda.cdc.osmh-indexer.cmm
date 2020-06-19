@@ -1,0 +1,423 @@
+{
+  "studyNumber": "6684",
+  "titleStudy": {
+    "en": "Childcare and Early Years Provision: Parents' Survey, 2009"
+  },
+  "abstract": {
+    "en": "<p>Abstract copyright UK Data Service and data collection copyright owner.</p>The introduction of the National Childcare Strategy in 1998 marked a radical shift in government policy and for the first time put childcare provision firmly on the political map. Since then a wide range of childcare initiatives and funding streams have been introduced, and hence there is a need for regular data to aid the evaluation of recent policy interventions in these areas. The <i>Childcare and Early Years Provision</i> survey series is divided into two survey strands: the <i>Parents' Survey</i> and the <i>Providers' Survey</i>. <br>\n                <br>\n                The <i>Parents' Survey</i> provides data on parents' take-up, views and experiences of childcare.  Families in England are randomly selected from the Child Benefit Records and all parents had children aged 0-14 years. They are asked about their use and experiences of childcare for all children in the family and to give more detailed information about childcare for a particular child (selected at random where there is more than one child in the family). The current <i>Parents' Survey</i> series replaces two previous surveys: the <i>Survey of Parents of Three and Four Year Old Children and Their Use of Early Years Services</i> (conducted between 1997 and 2002) and the <i>Parents' Demand for Childcare</i> (conducted in 1999 and 2001) (the latter series is held at the UK Data Archive under GN 33341).<br>\n                <br>\n                The <i>Providers' Survey</i> monitors the characteristics and development of childcare and early years providers and the workforce in England.  Information was collected on the number and characteristics of providers, the characteristics of the children enrolled, workforce composition, qualifications and training, recruitment and retention, and business operation. The 2016 survey underwent an extensive redesign, which means findings are not comparable with previous surveys.<br>\n                <br>\n                Further information is available on the gov.uk <a href=\"https://www.gov.uk/government/collections/statistics-childcare-and-early-years\" title=\"Childcare and Early Years Statistics\" target=\"_blank\">Childcare and Early Years Statistics</a> webpage.<br>\n                <br>\n              +<br>The <i>Childcare and Early Years Provision: Parents' Survey, 2009</i> aimed to provide up-to-date information to assess some important policy initiatives introduced since the last survey, carried out in 2008. The survey had two main objectives. The first was to provide up-to-date and accurate information on parents' childcare arrangements and their views of particular childcare providers and childcare provision in general. The second was to continue the time series and provide information to help monitor the progress of policies in the areas of childcare and early years education.<br>\n                <br>\n                The survey series uses an inclusive definition of childcare and early years provision as parents were asked to include any time that their child was not with resident parents or at school. This included informal care provided by grandparents and ex-partners as well as formal care; and included times when parents were working and when they were not. Parents were asked their reasons for using childcare, enabling us to report on childcare used for economic reasons, and childcare used for the child's education.<br>\n                <br>\n                Further information is available on the NatCen <a href= \"http://www.natcen.ac.uk/series/childcare-and-early-years-series\" title =\"Childcare and Early Years Series\">Childcare and Early Years Series</a> web page.<br>\n              +<br><B>Main Topics</B>:<br>The survey broadly covered the following topics:<ul><li>use of childcare and early years provision in the last year and in the last week</li><li>costs of childcare</li><li>sources of information on childcare provision</li><li>attitudes towards childcare provision in the local area</li><li>reasons for using and views of the main formal provider</li><li>reasons for using more than one provider</li> <li>childcare and maternal employment</li><li>background details on the family structure</li><li>socio-demographics</li><li>parents' work details</li></ul>While the 2008 and 2009 questionnaires covered similar issues, there were some changes and additions made in 2009. For example, the 2009 questionnaire expanded the section on holiday care. It introduced a section on how children's disabilities affect childcare and also new in 2009 was a section on information given to parents by providers about their children's activities and information about activities to do at home. Other changes in 2009 included the reintroduction of questions asking about the home learning environment, removing questions about Childcare Link and 'Birth to Three Matters' and changing the codes for ethnicity and academic and vocational qualifications."
+  },
+  "classifications": {
+    "en": [
+      {
+        "vocab": "",
+        "vocabUri": "",
+        "id": "",
+        "term": "Primary, pre-primary and secondary - Education"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "",
+        "id": "",
+        "term": "Social attitudes and behaviour - Society and culture"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "",
+        "id": "",
+        "term": "Child development and child rearing - Social stratification and groupings"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "",
+        "id": "",
+        "term": "Family life and marriage - Social stratification and groupings"
+      }
+    ]
+  },
+  "keywords": {
+    "en": [
+      {
+        "vocab": "",
+        "vocabUri": "",
+        "id": "",
+        "term": "2009"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/e53409ed-4ff4-4c89-bb8c-a9a1f1b0e9ee",
+        "id": "",
+        "term": "AGE"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/c9d3e816-6d7b-4ad7-ab41-f96f6d5d88da",
+        "id": "",
+        "term": "ATTITUDES"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/85536cbe-24ba-41b0-800a-33c1d3159409",
+        "id": "",
+        "term": "CHILD DAY CARE"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/873a1601-22b8-476d-842e-a2255956eab7",
+        "id": "",
+        "term": "CHILD-MINDERS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/45100da9-69d4-4eb9-b55c-cc81bf6e5125",
+        "id": "",
+        "term": "CHILDREN"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/84065f11-6463-4951-b5fd-d1a811d7836e",
+        "id": "",
+        "term": "CHRONIC ILLNESS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/f8755b2e-68ea-4b6d-8f97-4361ed34fa65",
+        "id": "",
+        "term": "DEBILITATIVE ILLNESS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/644ced34-451e-4674-8d37-ef44f6f23795",
+        "id": "",
+        "term": "DISABILITIES"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/b27258d6-d381-4a1b-ab81-85a38c1a0895",
+        "id": "",
+        "term": "DISABLED CHILDREN"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/c38a3af4-5e7b-48df-b9cf-74ea175baf7c",
+        "id": "",
+        "term": "DRIVING LICENCES"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/90e01ff5-d79e-45aa-beaf-513569d3d9c2",
+        "id": "",
+        "term": "ECONOMIC ACTIVITY"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/74af5225-4e7e-4213-bbe8-adac44b62d68",
+        "id": "",
+        "term": "EDUCATIONAL ATTENDANCE"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/90915ef3-08b3-41c4-b703-d44e524673a7",
+        "id": "",
+        "term": "EDUCATIONAL DEVELOPMENT"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/bbcaa4a9-2516-449f-954f-be00444c93c3",
+        "id": "",
+        "term": "EDUCATIONAL EXPENDITURE"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/4fd4dd2d-213e-445f-afc4-329496510a60",
+        "id": "",
+        "term": "EDUCATIONAL FACILITIES"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/1c39545a-f756-4914-a692-97334b0ea015",
+        "id": "",
+        "term": "EDUCATIONAL INFORMATION"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/61a206ee-9f6e-41ac-bef1-cfb586bcf482",
+        "id": "",
+        "term": "EMPLOYMENT"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/5bace71f-4940-4f16-a129-e2df29a813c1",
+        "id": "",
+        "term": "ENGLAND"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/4c148b10-da8b-4b9b-ab4d-11edede7d27d",
+        "id": "",
+        "term": "ETHNIC GROUPS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/1d15313b-048c-483a-ac23-e4d915bba490",
+        "id": "",
+        "term": "EXTENDED FAMILY"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/370ac8ee-5745-4b8e-af66-02378e192302",
+        "id": "",
+        "term": "FAMILY BENEFITS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/7e1ff366-f023-4a82-8a7f-72eae2a2a936",
+        "id": "",
+        "term": "FAMILY MEMBERS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/3a2e165e-cec1-4e0c-aaba-aa6142f373c3",
+        "id": "",
+        "term": "FINANCIAL SUPPORT"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/f0610fc6-e5c7-47ec-a9b2-bf5a69fd1328",
+        "id": "",
+        "term": "FINANCING"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/ddecf80c-289c-41fe-961d-5154d9ee25ac",
+        "id": "",
+        "term": "HOME EDUCATION"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/09cc6639-7c13-4999-a335-e23b4e3f155d",
+        "id": "",
+        "term": "HOURS OF WORK"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/cc4ea359-5430-4d03-ab98-f4e7db74fab4",
+        "id": "",
+        "term": "HOUSEHOLD INCOME"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/10ed2233-7048-4964-8285-93a8099a86a0",
+        "id": "",
+        "term": "HOUSEHOLDS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/b264b36b-5945-42a4-aa33-36e3ff28e0ca",
+        "id": "",
+        "term": "HOUSING TENURE"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/0cf45630-da0c-435d-a4dc-f4059bc92fe3",
+        "id": "",
+        "term": "INFORMATION SOURCES"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/11ef6c49-c9da-43de-be36-1a00d21b3d9c",
+        "id": "",
+        "term": "LIFE EVENTS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/31321e29-5b9c-477d-8d2e-36a6434628cf",
+        "id": "",
+        "term": "MARITAL STATUS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/cf9a5dbd-15bc-436d-a329-4997cdbc85a2",
+        "id": "",
+        "term": "MATERNITY LEAVE"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/2533a88f-d768-4361-b351-6f45d5521e53",
+        "id": "",
+        "term": "NURSERY SCHOOLS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/cf8c87d6-abb9-43d6-95ad-adaaa3f14144",
+        "id": "",
+        "term": "PARENT ATTITUDE"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/9ce43a18-1460-4e82-8a13-41115589e8d4",
+        "id": "",
+        "term": "PARENTS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/01a2dc67-9d2c-44a1-9e00-3cd66a9c541f",
+        "id": "",
+        "term": "PRE-PRIMARY SCHOOLS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/ede64b59-6bb6-487d-87fb-4d8cb3d43594",
+        "id": "",
+        "term": "QUALIFICATIONS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/d7535432-97e5-4617-9c1a-84722ddc65b4",
+        "id": "",
+        "term": "SCHOOL CLUBS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/8849a5b2-573b-46cb-a8ff-574c306f8001",
+        "id": "",
+        "term": "SCHOOL HOLIDAYS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/92b2d14c-c2b6-41ce-81c9-eea4723ace18",
+        "id": "",
+        "term": "SELF-EMPLOYED"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/48e40db5-e8dd-470f-89b1-fd39992fe8af",
+        "id": "",
+        "term": "SIBLINGS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/12d03510-3347-45fd-94f7-900009231c4f",
+        "id": "",
+        "term": "SPECIAL NEEDS STUDENTS"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/4bf9b231-1509-4a16-96c1-a26e68711fd1",
+        "id": "",
+        "term": "SPOUSE'S ECONOMIC ACTIVITY"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/c1fad2a5-91e6-4e5b-ae3a-584bdf615794",
+        "id": "",
+        "term": "SPOUSES"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/6a7fdd99-ebc5-428d-8fbd-ef414431d38e",
+        "id": "",
+        "term": "TAX RELIEF"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/107576f1-52b9-4386-b1a4-49d0e61b944f",
+        "id": "",
+        "term": "TIME"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "https://lod.data-archive.ac.uk/v2-skoshasset/page/en-GB/5f7e638e-9acc-4078-a10f-0f0603de21fc",
+        "id": "",
+        "term": "WORKING MOTHERS"
+      }
+    ]
+  },
+  "typeOfTimeMethods": {
+    "en": [
+      {
+        "vocab": "",
+        "vocabUri": "",
+        "id": "",
+        "term": "Repeated cross-sectional study"
+      }
+    ]
+  },
+  "studyAreaCountries": {
+    "en": [
+      {
+        "abbr": "not available",
+        "country": "England"
+      }
+    ]
+  },
+  "unitTypes": {
+    "en": [
+      {
+        "vocab": "",
+        "vocabUri": "",
+        "id": "",
+        "term": "Individuals"
+      }
+    ]
+  },
+  "publisher": {
+    "en": {
+      "publisher": "UK Data Service",
+      "abbr": "UKDS"
+    }
+  },
+  "publicationYear": "2011-02-04T00:00:00Z",
+  "pidStudies": {
+    "en": [
+      {
+        "agency": "UKDA",
+        "pid": "6684"
+      },
+      {
+        "agency": "datacite",
+        "pid": "10.5255/UKDA-SN-6684-1"
+      }
+    ]
+  },
+  "fileLanguages": [],
+  "creators": {
+    "en": [
+      "Department for Children, Schools and Families",
+      "National Centre for Social Research"
+    ]
+  },
+  "typeOfSamplingProcedures": {},
+  "samplingProcedureFreeTexts": {
+    "en": [
+      "Multi-stage stratified random sample"
+    ]
+  },
+  "typeOfModeOfCollections": {
+    "en": [
+      {
+        "vocab": "",
+        "vocabUri": "",
+        "id": "",
+        "term": "Face-to-face interview"
+      }
+    ]
+  },
+  "dataCollectionFreeTexts": {
+    "en": [
+      {
+        "dataCollectionFreeText": "There were two periods of fieldwork for this survey due to the timing of the long school summer break: June - August 2009 and September - December 2009. <br/>Some questions refer to the date of the interview, others ask specifically about the year or the week before the interview.",
+        "event": "not available"
+      }
+    ]
+  },
+  "dataAccessFreeTexts": {
+    "en": [
+      "The depositor has specified that registration is required. Available to all registered users. The depositor may be informed about usage."
+    ]
+  },
+  "lastModified": "2018-02-09T14:36:13Z",
+  "studyUrl": {
+    "en": "http://doi.org/10.5255/UKDA-SN-6684-1"
+  },
+  "isActive": true
+}

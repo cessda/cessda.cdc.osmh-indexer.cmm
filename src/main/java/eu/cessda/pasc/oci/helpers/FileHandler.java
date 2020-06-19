@@ -47,7 +47,7 @@ public class FileHandler {
 
     /**
      * Load the specified resource and return it as an {@link String}.
-     * The string is decoded using the {@link StandardCharsets} UTF_8 charset.
+     * The string is decoded using the {@link StandardCharsets#UTF_8} charset.
      *
      * @param fileName the resource to load
      * @throws FileNotFoundException if the resource could not be found,

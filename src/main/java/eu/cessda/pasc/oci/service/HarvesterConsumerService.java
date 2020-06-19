@@ -31,11 +31,11 @@ import java.util.Optional;
 public interface HarvesterConsumerService {
 
   /**
-   * Queries the remote repo for RecordHeaders.  RecordHeaders are filtered if lastModifiedDate is provided.
+   * Queries the remote repo for RecordHeaders. RecordHeaders are filtered if lastModifiedDate is provided.
    *
-   * @param repo repository details.
-   * @param lastModifiedDate to filter headers on.
-   * @return List RecordHeaders.
+   * @param repo             the repository to query.
+   * @param lastModifiedDate to filter headers on, can be null.
+   * @return a list of record headers retrieved from the remote repository.
    */
   List<RecordHeader> listRecordHeaders(Repo repo, LocalDateTime lastModifiedDate);
 
@@ -44,7 +44,7 @@ public interface HarvesterConsumerService {
    *
    * @param repo repository details.
    * @param studyNumber the remote Study Identifier.
-   * @return Record instance.
+   * @return a {@link CMMStudy} representing the remote record, or an empty optional if the record couldn't be retrieved.
    */
   Optional<CMMStudy> getRecord(Repo repo, String studyNumber);
 }

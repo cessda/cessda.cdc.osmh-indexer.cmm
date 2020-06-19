@@ -16,23 +16,21 @@
 package eu.cessda.pasc.oci.configurations;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.mizosoft.methanol.Methanol;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
+import javax.annotation.PreDestroy;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.net.http.HttpClient;
-import java.time.Duration;
 
 /**
  * Extra Util configuration
@@ -53,42 +51,35 @@ public class AppUtilityBeansConfiguration {
   @Value("${elasticsearch.clustername}")
   private String esClusterName;
 
-  private final AppConfigurationProperties appConfigurationProperties;
-
-  @Autowired
-  public AppUtilityBeansConfiguration(AppConfigurationProperties appConfigurationProperties) {
-    this.appConfigurationProperties = appConfigurationProperties;
-  }
+  TransportClient transportClient;
 
   @Bean
   public ObjectMapper objectMapper() {
     return new ObjectMapper();
   }
 
-
   @Bean
   public Client client() throws UnknownHostException {
-    log.debug("Creating Elasticsearch Client\nCluster name={}\nHostname={}", esClusterName, esHost);
-    Settings esSettings = Settings.settingsBuilder().put("cluster.name", esClusterName).build();
+    if (transportClient == null) {
+      log.debug("Creating Elasticsearch Client\nCluster name={}\nHostname={}", esClusterName, esHost);
+      Settings esSettings = Settings.builder().put("cluster.name", esClusterName).build();
 
-    // https://www.elastic.co/guide/en/elasticsearch/guide/current/_transport_client_versus_node_client.html
-    return TransportClient.builder()
-            .settings(esSettings)
-            .build().addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(esHost), esPort));
+      // https://www.elastic.co/guide/en/elasticsearch/guide/current/_transport_client_versus_node_client.html
+      transportClient = new PreBuiltTransportClient(esSettings).addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(esHost), esPort));
+    }
+    return transportClient;
   }
 
   @Bean
-  public ElasticsearchTemplate elasticsearchTemplate() throws UnknownHostException {
-    return new ElasticsearchTemplate(client());
+  public ElasticsearchTemplate elasticsearchTemplate(Client client) {
+    return new ElasticsearchTemplate(client);
   }
 
-  @Bean
-  public HttpClient httpClient() {
-    return Methanol.newBuilder()
-            .autoAcceptEncoding(true)
-            .connectTimeout(Duration.ofMillis(appConfigurationProperties.getRestTemplateProps().getConnTimeout()))
-            .requestTimeout(Duration.ofMillis(appConfigurationProperties.getRestTemplateProps().getReadTimeout()))
-            .followRedirects(HttpClient.Redirect.NORMAL)
-            .build();
+  @PreDestroy
+  public void closeElasticsearchClient() {
+    if (transportClient != null) {
+      transportClient.close();
+      transportClient = null;
+    }
   }
 }
