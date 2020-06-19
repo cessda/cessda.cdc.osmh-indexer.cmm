@@ -18,18 +18,12 @@ package eu.cessda.pasc.oci.dao;
 
 import com.pgssoft.httpclient.HttpClientMock;
 import com.pgssoft.httpclient.MockedServerResponse;
-import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
-import eu.cessda.pasc.oci.exception.CustomHandlerException;
 import eu.cessda.pasc.oci.exception.ExternalSystemException;
 import eu.cessda.pasc.oci.repository.DaoBaseImpl;
 import lombok.SneakyThrows;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,13 +37,9 @@ import static org.assertj.core.api.BDDAssertions.then;
  *
  * @author moses AT doraventures DOT com
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
 @ActiveProfiles("test")
 public class GetRecordDoaImplTest {
 
-    @Autowired
-    private HandlerConfigurationProperties handlerConfigurationProperties;
 
     private final HttpClientMock httpClient = new HttpClientMock();
 
@@ -59,7 +49,7 @@ public class GetRecordDoaImplTest {
     }
 
     @Test
-    public void shouldReturnXMLPayloadOfGivenRecordIdentifierFromGivenRepoURL() throws CustomHandlerException, IOException {
+    public void shouldReturnXMLPayloadOfGivenRecordIdentifierFromGivenRepoURL() throws IOException {
 
         // Given
         String expectedUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=GetRecord&identifier=1683&metadataPrefix=ddi";
@@ -75,7 +65,7 @@ public class GetRecordDoaImplTest {
 
     @SuppressWarnings("resource")
     @Test(expected = ExternalSystemException.class)
-    public void shouldThrowExceptionWhenRemoteServerResponseIsNotSuccessful() throws CustomHandlerException, IOException {
+    public void shouldThrowExceptionWhenRemoteServerResponseIsNotSuccessful() throws IOException {
 
         // Given
         String expectedFullGetRecordUrl = "https://the.remote.endpoint/?verb=GetRecord&identifier=1683&metadataPrefix=ddi";
@@ -88,7 +78,7 @@ public class GetRecordDoaImplTest {
     }
 
     @Test
-    public void shouldReturnEmptyStreamWhenInterrupted() throws IOException, CustomHandlerException {
+    public void shouldReturnEmptyStreamWhenInterrupted() throws IOException {
 
         // Given
         httpClient.onGet().doAction(GetRecordDoaImplTest::throwInterruptedException);
