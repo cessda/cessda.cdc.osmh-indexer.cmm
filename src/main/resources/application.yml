@@ -14,10 +14,8 @@
 server:
   port: 9902
 management:
-  security.enabled: false # Enable security on admin endpoints
   endpoints:
     health.show-details: true
-    prometheus.sensitive: false
     shutdown.enabled: true
     web:
       exposure.include: '*'
