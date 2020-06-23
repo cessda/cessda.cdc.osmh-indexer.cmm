@@ -16,8 +16,8 @@
 
 package eu.cessda.pasc.oci.helpers;
 
-import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
-import eu.cessda.pasc.oci.exception.CustomHandlerException;
+import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
+import eu.cessda.pasc.oci.models.configurations.Repo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,37 +43,33 @@ public class OaiPmhHelpersTest {
 
 
     @Autowired
-    private HandlerConfigurationProperties handlerConfigurationProperties;
+    private AppConfigurationProperties appConfigurationProperties;
 
     @Test
-    public void ShouldAppendMetaDataPrefixForGivenFSD() throws CustomHandlerException, URISyntaxException {
+    public void ShouldAppendMetaDataPrefixForGivenFSD() throws URISyntaxException {
 
         // Given
-        String fsdEndpoint = "http://services.fsd.uta.fi/v0/oai";
+        Repo fsdEndpoint = appConfigurationProperties.getEndpoints().getRepos()
+                .stream().filter(repo -> repo.getName().equals("FSD")).findAny().orElseThrow();
         String expectedReqUrl = "http://services.fsd.uta.fi/v0/oai?verb=GetRecord&identifier=15454&metadataPrefix=oai_ddi25";
 
         // When
-        URI builtUrl = buildGetStudyFullUrl(URI.create(fsdEndpoint), "15454", handlerConfigurationProperties);
+        URI builtUrl = buildGetStudyFullUrl(fsdEndpoint, "15454");
 
         then(builtUrl.toString()).isEqualTo(expectedReqUrl);
     }
 
     @Test
-    public void ShouldAppendMetaDataPrefixForGivenUKDS() throws CustomHandlerException, URISyntaxException {
+    public void ShouldAppendMetaDataPrefixForGivenUKDS() throws URISyntaxException {
 
         // Given
-        String fsdEndpoint = "https://oai.ukdataservice.ac.uk:8443/oai/provider";
+        Repo ukdsEndpoint = appConfigurationProperties.getEndpoints().getRepos()
+                .stream().filter(repo -> repo.getName().equals("UKDS")).findAny().orElseThrow();
         String expectedReqUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=GetRecord&identifier=15454&metadataPrefix=ddi";
 
         // When
-        URI builtUrl = buildGetStudyFullUrl(URI.create(fsdEndpoint), "15454", handlerConfigurationProperties);
+        URI builtUrl = buildGetStudyFullUrl(ukdsEndpoint, "15454");
 
         then(builtUrl.toString()).isEqualTo(expectedReqUrl);
-    }
-
-    @Test(expected = CustomHandlerException.class)
-    public void ShouldThrowExceptionForANonConfiguredRepo() throws CustomHandlerException, URISyntaxException {
-        // When
-        buildGetStudyFullUrl(URI.create("http://services.inthe.future/v0/oai"), "15454", handlerConfigurationProperties);
     }
 }

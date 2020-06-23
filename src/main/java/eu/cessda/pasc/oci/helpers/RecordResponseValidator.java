@@ -16,7 +16,7 @@
 
 package eu.cessda.pasc.oci.helpers;
 
-import eu.cessda.pasc.oci.models.errors.ErrorStatus;
+import eu.cessda.pasc.oci.exception.OaiPmhException;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,17 +38,19 @@ public class RecordResponseValidator {
      * Checks if the record has an {@literal <error>} element.
      *
      * @param document the document to map to.
-     * @return ErrorStatus of the record.
+     * @throws OaiPmhException if an {@literal <error>} element was present.
      */
-    public Optional<ErrorStatus> validateResponse(Document document) {
+    public void validateResponse(Document document) throws OaiPmhException {
 
         final Optional<Element> optionalElement = docElementParser.getFirstElement(document, OaiPmhConstants.ERROR_PATH);
 
         if (optionalElement.isPresent()) {
             final Element element = optionalElement.get();
-            return Optional.of(new ErrorStatus(element.getAttributeValue(OaiPmhConstants.CODE_ATTR), element.getText()));
+            if (element.getText() != null && !element.getText().trim().isEmpty()) {
+                throw new OaiPmhException(OaiPmhException.Code.valueOf(element.getAttributeValue(OaiPmhConstants.CODE_ATTR)), element.getText());
+            } else {
+                throw new OaiPmhException(OaiPmhException.Code.valueOf(element.getAttributeValue(OaiPmhConstants.CODE_ATTR)));
+            }
         }
-
-        return Optional.empty();
     }
 }

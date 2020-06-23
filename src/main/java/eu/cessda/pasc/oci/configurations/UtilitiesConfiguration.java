@@ -38,11 +38,11 @@ import java.time.Duration;
 @Slf4j
 public class UtilitiesConfiguration {
 
-  private final HandlerConfigurationProperties handlerConfigurationProperties;
+  private final AppConfigurationProperties appConfigurationProperties;
 
   @Autowired
-  public UtilitiesConfiguration(HandlerConfigurationProperties appConfigurationProperties) {
-    this.handlerConfigurationProperties = appConfigurationProperties;
+  public UtilitiesConfiguration(AppConfigurationProperties appConfigurationProperties) {
+    this.appConfigurationProperties = appConfigurationProperties;
   }
 
   @Bean
@@ -64,8 +64,8 @@ public class UtilitiesConfiguration {
   public HttpClient httpClient() {
     return Methanol.newBuilder()
             .autoAcceptEncoding(true)
-            .connectTimeout(Duration.ofMillis(handlerConfigurationProperties.getRestTemplateProps().getConnTimeout()))
-            .requestTimeout(Duration.ofMillis(handlerConfigurationProperties.getRestTemplateProps().getReadTimeout()))
+            .connectTimeout(Duration.ofMillis(appConfigurationProperties.getRestTemplateProps().getConnTimeout()))
+            .requestTimeout(Duration.ofMillis(appConfigurationProperties.getRestTemplateProps().getReadTimeout()))
             .followRedirects(HttpClient.Redirect.NORMAL)
             .build();
   }

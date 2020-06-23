@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.exception.ExternalSystemException;
 import eu.cessda.pasc.oci.exception.HandlerNotFoundException;
+import eu.cessda.pasc.oci.helpers.LoggingConstants;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
@@ -42,7 +43,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static net.logstash.logback.argument.StructuredArguments.keyValue;
 import static net.logstash.logback.argument.StructuredArguments.value;
 
 /**
@@ -71,49 +71,53 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
     }
 
     @Override
-  public List<RecordHeader> listRecordHeaders(Repo repo, LocalDateTime lastModifiedDate) {
-    try {
-        URI finalUrl = constructListRecordUrl(repo);
-        try (InputStream recordHeadersJsonStream = daoBase.getInputStream(finalUrl)) {
-            List<RecordHeader> recordHeadersUnfiltered = recordHeaderObjectReader.readValue(recordHeadersJsonStream);
-            return filterRecords(recordHeadersUnfiltered, lastModifiedDate);
+    public List<RecordHeader> listRecordHeaders(Repo repo, LocalDateTime lastModifiedDate) {
+        try {
+            URI finalUrl = constructListRecordUrl(repo);
+            try (InputStream recordHeadersJsonStream = daoBase.getInputStream(finalUrl)) {
+                List<RecordHeader> recordHeadersUnfiltered = recordHeaderObjectReader.readValue(recordHeadersJsonStream);
+                return filterRecords(recordHeadersUnfiltered, lastModifiedDate);
+            }
+        } catch (IOException e) {
+            log.error("[{}] ListRecordHeaders failed: {}", value(LoggingConstants.REPO_NAME, repo.getName()), e.toString());
+        } catch (URISyntaxException e) {
+            log.error("[{}] Unable to construct URL: {}", value(LoggingConstants.REPO_NAME, repo.getName()), e.toString());
         }
-    } catch (IOException e) {
-      log.error("ListRecordHeaders failed for repo [{}] [{}]. {}.",
-              value(REPO_NAME, repo.getName()), value(REPO_ENDPOINT_URL, repo.getUrl()), e.toString());
-    } catch (URISyntaxException e) {
-      log.error("Unable to construct URL [{}]", e.toString());
+        return Collections.emptyList();
     }
-    return Collections.emptyList();
-  }
 
-  @Override
-  public Optional<CMMStudy> getRecord(Repo repo, String studyNumber) {
+    @Override
+    public Optional<CMMStudy> getRecord(Repo repo, String studyNumber) {
 
-    log.debug("Querying repo {} for studyNumber {}.", repo.getName(), studyNumber);
+        log.debug("Querying repo {} for studyNumber {}.", repo.getName(), studyNumber);
 
-    URI finalUrl = null;
-    try {
-        finalUrl = constructGetRecordUrl(repo, studyNumber);
-        try (InputStream recordJsonStream = daoBase.getInputStream(finalUrl)) {
-            return Optional.of(cmmStudyConverter.fromJsonString(recordJsonStream));
+        try {
+            URI finalUrl = constructGetRecordUrl(repo, studyNumber);
+            try (InputStream recordJsonStream = daoBase.getInputStream(finalUrl)) {
+                return Optional.of(cmmStudyConverter.fromJsonString(recordJsonStream));
+            }
+        } catch (ExternalSystemException e) {
+            log.warn("[{}] Failed to get StudyId [{}]: {}: Response body [{}].",
+                    value(LoggingConstants.REPO_NAME, repo.getName()),
+                    value(LoggingConstants.STUDY_ID, studyNumber),
+                    e.toString(),
+                    value(LoggingConstants.REASON, e.getExternalResponse().getBody())
+            );
+        } catch (IOException e) {
+            log.error("[{}] Failed to get StudyId [{}]: {}",
+                    value(LoggingConstants.REPO_NAME, repo.getName()),
+                    value(LoggingConstants.STUDY_ID, studyNumber),
+                    e.toString()
+            );
+        } catch (URISyntaxException e) {
+            log.error("[{}] Unable to construct URL for StudyId [{}]: {}.",
+                    value(LoggingConstants.REPO_NAME, repo.getName()),
+                    value(LoggingConstants.STUDY_ID, studyNumber),
+                    e.toString()
+            );
         }
-    } catch (ExternalSystemException e) {
-      log.warn("{}. Response detail from handler [{}], URL to handler for harvesting record [{}] with [{}] from repo [{}] [{}].",
-              e.toString(),
-              value(REASON, e.getExternalResponse().getBody()),
-              finalUrl,
-              keyValue("study_id", studyNumber),
-              value(REPO_NAME, repo.getName()),
-              value(REPO_ENDPOINT_URL, repo.getUrl())
-      );
-    } catch (IOException e) {
-        log.error("Unable to parse GetRecord response: {}.", e.toString());
-    } catch (URISyntaxException e) {
-        log.error("Unable to construct URL: {}.", e.toString());
+        return Optional.empty();
     }
-      return Optional.empty();
-  }
 
     public URI constructListRecordUrl(Repo repo) throws URISyntaxException {
         Harvester harvester = appConfigurationProperties.getEndpoints().getHarvesters().get(repo.getHandler().toUpperCase());

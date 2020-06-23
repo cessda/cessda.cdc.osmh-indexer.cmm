@@ -16,10 +16,7 @@
 
 package eu.cessda.pasc.oci.helpers;
 
-import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
-import eu.cessda.pasc.oci.exception.CustomHandlerException;
-import eu.cessda.pasc.oci.models.oai.configuration.OaiPmh;
-import eu.cessda.pasc.oci.models.oai.configuration.Repo;
+import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -40,25 +37,22 @@ import static eu.cessda.pasc.oci.helpers.OaiPmhConstants.*;
 @UtilityClass
 public class OaiPmhHelpers {
 
-  public static URI buildGetStudyFullUrl(URI repositoryUrl, String studyIdentifier, HandlerConfigurationProperties oaiPmhConfig)
-          throws CustomHandlerException, URISyntaxException {
+  public static URI buildGetStudyFullUrl(Repo repo, String studyIdentifier) throws URISyntaxException {
     return new URI(String.format(
-            GET_RECORD_URL_TEMPLATE, repositoryUrl,
+            GET_RECORD_URL_TEMPLATE, repo.getUrl(),
             VERB_PARAM_KEY, GET_RECORD_VALUE, // verb=GetRecord
             IDENTIFIER_PARAM_KEY, URLEncoder.encode(studyIdentifier, StandardCharsets.UTF_8), //&identifier=1683
-            METADATA_PREFIX_PARAM_KEY, URLEncoder.encode(getMetadataPrefix(repositoryUrl, oaiPmhConfig.getOaiPmh()).getPreferredMetadataParam(), StandardCharsets.UTF_8) //&metadataPrefix=ddi
+            METADATA_PREFIX_PARAM_KEY, URLEncoder.encode(repo.getPreferredMetadataParam(), StandardCharsets.UTF_8) //&metadataPrefix=ddi
     ));
   }
 
-  public static URI appendListRecordParams(URI repoUrl, OaiPmh oaiPmh) throws CustomHandlerException {
-    Repo repoConfig = getMetadataPrefix(repoUrl, oaiPmh);
-
+  public static URI appendListRecordParams(Repo repoConfig) {
     if (StringUtils.isBlank(repoConfig.getSetSpec())) {
-      return URI.create(String.format(LIST_RECORD_HEADERS_URL_TEMPLATE, repoUrl,
+      return URI.create(String.format(LIST_RECORD_HEADERS_URL_TEMPLATE, repoConfig.getUrl(),
               VERB_PARAM_KEY, LIST_IDENTIFIERS_VALUE, // verb=ListIdentifier
               METADATA_PREFIX_PARAM_KEY, repoConfig.getPreferredMetadataParam())); //&metadataPrefix=ddi
     } else {
-      return URI.create(String.format(LIST_RECORD_HEADERS_PER_SET_URL_TEMPLATE, repoUrl,
+      return URI.create(String.format(LIST_RECORD_HEADERS_PER_SET_URL_TEMPLATE, repoConfig.getUrl(),
               VERB_PARAM_KEY, LIST_IDENTIFIERS_VALUE, // verb=ListIdentifier
               METADATA_PREFIX_PARAM_KEY, repoConfig.getPreferredMetadataParam(), //&metadataPrefix=ddi
               SET_SPEC_PARAM_KEY, repoConfig.getSetSpec())); //&set=my:set
@@ -72,14 +66,4 @@ public class OaiPmhHelpers {
     );
   }
 
-  private static Repo getMetadataPrefix(URI repoBaseUrl, OaiPmh oaiPmh) throws CustomHandlerException {
-
-    Repo repo = oaiPmh.getRepos().stream()
-            .filter(currentStreamRepo -> currentStreamRepo.getUrl().equalsIgnoreCase(repoBaseUrl.toString()))
-            .findFirst()
-            .orElseThrow(() -> new CustomHandlerException(String.format("Configuration not found for Repo [%s]", repoBaseUrl)));
-
-    log.debug("Retrieved Params for repoBaseUrl [{}] as [{}]", repoBaseUrl, repo);
-    return repo;
-  }
 }

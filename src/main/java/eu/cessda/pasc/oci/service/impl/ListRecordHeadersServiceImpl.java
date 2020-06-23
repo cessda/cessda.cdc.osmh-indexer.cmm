@@ -17,11 +17,13 @@
 package eu.cessda.pasc.oci.service.impl;
 
 import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
-import eu.cessda.pasc.oci.exception.CustomHandlerException;
 import eu.cessda.pasc.oci.exception.InternalSystemException;
+import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.helpers.ListIdentifiersResponseValidator;
+import eu.cessda.pasc.oci.helpers.OaiPmhConstants;
+import eu.cessda.pasc.oci.helpers.OaiPmhHelpers;
 import eu.cessda.pasc.oci.models.RecordHeader;
-import eu.cessda.pasc.oci.models.errors.ErrorStatus;
+import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.repository.DaoBase;
 import eu.cessda.pasc.oci.service.ListRecordHeadersService;
 import lombok.extern.slf4j.Slf4j;
@@ -43,10 +45,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import static eu.cessda.pasc.oci.helpers.OaiPmhConstants.*;
-import static eu.cessda.pasc.oci.helpers.OaiPmhHelpers.appendListRecordParams;
-import static eu.cessda.pasc.oci.helpers.OaiPmhHelpers.appendListRecordResumptionToken;
 
 /**
  * Service implementation to handle Listing Record Headers
@@ -73,40 +71,37 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
   }
 
   @Override
-  public List<RecordHeader> getRecordHeaders(URI baseRepoUrl) throws CustomHandlerException {
+  public List<RecordHeader> getRecordHeaders(Repo repo) throws InternalSystemException, OaiPmhException {
 
-    URI fullListRecordUrlPath = appendListRecordParams(baseRepoUrl, config.getOaiPmh());
+    URI fullListRecordUrlPath = OaiPmhHelpers.appendListRecordParams(repo);
     Document doc = getRecordHeadersDocument(fullListRecordUrlPath);
 
     // We exit if the response has an <error> element
-    Optional<ErrorStatus> errorStatus = ListIdentifiersResponseValidator.validateResponse(doc);
-    if (errorStatus.isPresent()) {
-      throw new InternalSystemException("Remote repository " + baseRepoUrl + " returned error: " + errorStatus.get().toString());
-    }
+    ListIdentifiersResponseValidator.validateResponse(doc);
 
-    log.info("Parsing record headers for [{}].", baseRepoUrl);
-    List<RecordHeader> recordHeaders = retrieveRecordHeaders(doc, baseRepoUrl);
-    log.debug("ParseRecordHeaders Ended:  No more resumption token to process for repo with url [{}].", baseRepoUrl);
+    log.info("[{}] Parsing record headers.", repo.getName());
+    List<RecordHeader> recordHeaders = retrieveRecordHeaders(doc, repo.getUrl());
+    log.debug("[{}] ParseRecordHeaders ended:  No more resumption tokens to process.", repo.getName());
 
     int expectedRecordHeadersCount = getRecordHeadersCount(doc);
     if (expectedRecordHeadersCount != -1) {
-      log.info("ParseRecordHeaders retrieved [{}] of [{}] expected record headers count for repo [{}].",
-              recordHeaders.size(), expectedRecordHeadersCount, baseRepoUrl
+      log.info("[{}] Retrieved [{}] of [{}] expected record headers.",
+              repo.getName(), recordHeaders.size(), expectedRecordHeadersCount
       );
     } else {
-      log.info("ParseRecordHeaders retrieved [{}] record headers for [{}].", recordHeaders.size(), baseRepoUrl);
+      log.info("[{}] Retrieved [{}] record headers.", repo.getName(), recordHeaders.size());
     }
     return recordHeaders;
   }
 
   private int getRecordHeadersCount(Document doc) {
 
-    NodeList resumptionToken = doc.getElementsByTagName(RESUMPTION_TOKEN_ELEMENT);
+    NodeList resumptionToken = doc.getElementsByTagName(OaiPmhConstants.RESUMPTION_TOKEN_ELEMENT);
     if (resumptionToken.getLength() > 0) {
       Node item = resumptionToken.item(0);
       NamedNodeMap attributes = item.getAttributes();
       for (int attributeIndex = 0; attributeIndex < attributes.getLength(); attributeIndex++) {
-        if (attributes.item(attributeIndex).getNodeName().equalsIgnoreCase(COMPLETE_LIST_SIZE_ATTR)) {
+        if (attributes.item(attributeIndex).getNodeName().equalsIgnoreCase(OaiPmhConstants.COMPLETE_LIST_SIZE_ATTR)) {
           return Integer.parseInt(attributes.item(attributeIndex).getTextContent());
         }
       }
@@ -127,7 +122,7 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
       // Check and loop when there is a resumptionToken
       resumptionToken = parseResumptionToken(document);
       if (resumptionToken.isPresent()) {
-        URI repoUrlWithResumptionToken = appendListRecordResumptionToken(baseRepoUrl, resumptionToken.get());
+        URI repoUrlWithResumptionToken = OaiPmhHelpers.appendListRecordResumptionToken(baseRepoUrl, resumptionToken.get());
         log.trace("Looping for [{}].", repoUrlWithResumptionToken);
         document = getRecordHeadersDocument(repoUrlWithResumptionToken);
       }
@@ -145,7 +140,7 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
   }
 
   private List<RecordHeader> parseRecordHeadersFromDoc(Document doc) {
-    NodeList headers = doc.getElementsByTagName(HEADER_ELEMENT);
+    NodeList headers = doc.getElementsByTagName(OaiPmhConstants.HEADER_ELEMENT);
 
     return IntStream.range(0, headers.getLength()).mapToObj(headerRowIndex -> headers.item(headerRowIndex).getChildNodes())
             .map(this::parseRecordHeader).collect(Collectors.toList());
@@ -153,7 +148,7 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
 
   private Optional<String> parseResumptionToken(Document doc) {
     // OAI-PMH mandatory resumption tag in response.  Value can be empty to suggest end of list
-    NodeList resumptionToken = doc.getElementsByTagName(RESUMPTION_TOKEN_ELEMENT);
+    NodeList resumptionToken = doc.getElementsByTagName(OaiPmhConstants.RESUMPTION_TOKEN_ELEMENT);
     if (resumptionToken.getLength() > 0) {
       Node item = resumptionToken.item(0);
       if (!item.getTextContent().trim().isEmpty()) {
@@ -174,15 +169,15 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
       String currentHeaderElementValue;
 
       switch (headerElementName) {
-        case IDENTIFIER_ELEMENT:
+        case OaiPmhConstants.IDENTIFIER_ELEMENT:
           currentHeaderElementValue = headerElements.item(headerElementIndex).getTextContent();
           recordHeaderBuilder.identifier(currentHeaderElementValue);
           break;
-        case DATESTAMP_ELEMENT:
+        case OaiPmhConstants.DATESTAMP_ELEMENT:
           currentHeaderElementValue = headerElements.item(headerElementIndex).getTextContent();
           recordHeaderBuilder.lastModified(currentHeaderElementValue);
           break;
-        case SET_SPEC_ELEMENT:
+        case OaiPmhConstants.SET_SPEC_ELEMENT:
           // Note:
           // 1 There might be multiple SetSpec: https://www.oaforum.org/tutorial/english/page3.htm#section7
           // 2 Depending on feedback from John Shepherdson set record type based on the SetSpec

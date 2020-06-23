@@ -20,7 +20,6 @@ management:
     web:
       exposure.include: '*'
 logging:
-  file: pasc-oci.log
   pattern:
     console: '%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) %40.40((%file:%line\)) - %message%n'
     file: '%d{yyyy-MM-dd HH:mm:ss.SSS}  %-5level  %40.40((%file:%line\)) - %message%n'
@@ -96,15 +95,19 @@ osmhConsumer:
       - url: http://194.117.18.18:6003/v0/oai
         name: 'APIS'
         handler: 'OAI-PMH'
+        preferredMetadataParam: oai_ddi25
       - url: https://data2.aussda.at/oai
         name: 'AUSSDA'
         handler: 'OAI-PMH'
+        preferredMetadataParam: oai_ddi
       - url: https://easy.dans.knaw.nl/oai/
         name: 'DANS'
         handler: 'OAI-PMH'
+        preferredMetadataParam: oai_ddi25_nl
       - url: https://kuha.sa.dk/v0/oai
         name: 'DNA'
         handler: 'OAI-PMH'
+        preferredMetadataParam: oai_ddi25_en
         # Placeholder for FORS
         #     - url: ''
         #     name: 'FORS'
@@ -112,24 +115,31 @@ osmhConsumer:
       - url: http://services.fsd.uta.fi/v0/oai
         name: 'FSD'
         handler: 'OAI-PMH'
+        preferredMetadataParam: oai_ddi25
       - url: https://dbkapps.gesis.org/dbkoai3
         name: 'GESIS'
         handler: 'OAI-PMH'
+        preferredMetadataParam: oai_ddi25
       - url: https://data.sciencespo.fr/oai
         name: 'Progedo'
         handler: 'OAI-PMH'
+        setSpec: CDSP
       - url: http://147.213.4.44:6003/v0/oai
         name: 'SASD'
         handler: 'OAI-PMH'
+        preferredMetadataParam: oai_ddi25
       - url: https://snd.gu.se/en/oai-pmh
         name: 'SND'
         handler: 'OAI-PMH'
+        setSpec: discipline:social-science
       - url: https://dataverse.arch.be/oai
         name: 'SODA'
         handler: 'OAI-PMH'
+        preferredMetadataParam: oai_ddi
       - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
         name: 'UKDS'
         handler: 'OAI-PMH'
+        preferredMetadataParam: ddi
       - url: https://nesstar2.adp.fdv.uni-lj.si/oai-pmh
         name: 'ADP (Nesstar)'
         handler: 'NESSTAR'
@@ -160,33 +170,6 @@ osmhhandler:
       - v0
     supportedRecordTypes:
       - CMMStudy
-    repos:
-      - url: http://194.117.18.18:6003/v0/oai
-        preferredMetadataParam: oai_ddi25
-      - url: https://data2.aussda.at/oai
-        preferredMetadataParam: oai_ddi
-      - url: https://easy.dans.knaw.nl/oai/
-        preferredMetadataParam: oai_ddi25_nl
-      - url: https://easy.dans.knaw.nl/oai/
-        preferredMetadataParam: oai_ddi25_en
-      - url: https://kuha.sa.dk/v0/oai
-        preferredMetadataParam: oai_ddi25
-      - url: http://services.fsd.uta.fi/v0/oai
-        preferredMetadataParam: oai_ddi25
-      - url: https://dbkapps.gesis.org/dbkoai3
-        preferredMetadataParam: oai_ddi25
-      - url: http://147.213.4.44:6003/v0/oai
-        preferredMetadataParam: oai_ddi25
-      - url: https://data.sciencespo.fr/oai
-        preferredMetadataParam: oai_ddi
-        setSpec: CDSP
-      - url: https://snd.gu.se/en/oai-pmh
-        preferredMetadataParam: oai_ddi25
-        setSpec: discipline:social-science
-      - url: https://dataverse.arch.be/oai
-        preferredMetadataParam: oai_ddi
-      - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
-        preferredMetadataParam: ddi
     metadataParsingDefaultLang:
       active: true
       lang: 'en'
@@ -211,6 +194,7 @@ spring:
         url: http://localhost:8087
   output.ansi.enabled: NEVER
 logging:
+  file: pasc-oci.log
   level:
     eu.cessda.pasc.oci.service: INFO
     eu.cessda.pasc.oci.repository: INFO
@@ -248,33 +232,6 @@ logging:
   level:
     ROOT: INFO
     eu.cessda.pasc.oci: TRACE
-osmhConsumer:
-  endpoints:
-    repos:
-      - url: http://194.117.18.18:6003/v0/oai
-        name: 'APIS'
-        handler: 'OAI-PMH'
-      - url: https://data2.aussda.at/oai
-        name: 'AUSSDA'
-        handler: 'OAI-PMH'
-      - url: https://easy.dans.knaw.nl/oai/
-        name: 'DANS'
-        handler: 'OAI-PMH'
-      - url: https://kuha.sa.dk/v0/oai
-        name: 'DNA'
-        handler: 'OAI-PMH'
-      - url: https://nesstar2.adp.fdv.uni-lj.si/oai-pmh
-        name: 'ADP (Nesstar)'
-        handler: 'nesstar'
-      - url: http://fors-nesstar.unil.ch/oai-pmh
-        name: 'FORS Data Service (Nesstar)'
-        handler: 'nesstar'
-      - url: https://oai-pmh.nsd.no/oai-pmh
-        name: 'NSD (Nesstar)'
-        handler: 'nesstar'
-      - url:  http://harvester.sodanet.gr:8080/oai/request
-        name: 'SoDaNet (Nesstar)'
-        handler: 'nesstar'
 ---
 spring:
   main:
@@ -286,10 +243,30 @@ logging:
     eu.cessda.pasc.oci.repository.DaoBase: DEBUG
 osmhConsumer:
   endpoints:
+    supportedRecordTypes:
+      - Study
+      - StudyGroup
+      - Variable
+      - Question
+      - CMM
     harvesters:
       OAI-PMH:
         url: 'http://localhost:9091'
         version: 'v0'
+    repos:
+      - url: https://data2.aussda.at/oai/
+        preferredMetadataParam: oai_ddi
+        name: 'AUSSDA'
+        handler: 'OAI-PMH'
+      - url: http://services.fsd.uta.fi/v0/oai
+        preferredMetadataParam: oai_ddi25
+        setSpec: study_groups:energia
+        name: 'FSD'
+        handler: 'OAI-PMH'
+      - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
+        preferredMetadataParam: ddi
+        name: 'UKDS'
+        handler: 'OAI-PMH'
   delay:
     # For tests, the delay should be effectively disabled
     initial: '315360000000'
@@ -298,21 +275,7 @@ elasticsearch:
   clustername: test
 osmhhandler:
   oaiPmh:
-    supportedRecordTypes:
-      - Study
-      - StudyGroup
-      - Variable
-      - Question
-      - CMM
     metadataParsingDefaultLang:
       active: true
       lang: 'en'
     publicationYearDefault: 1970
-    repos:
-      - url: https://data2.aussda.at/oai/
-        preferredMetadataParam: oai_ddi
-      - url: http://services.fsd.uta.fi/v0/oai
-        preferredMetadataParam: oai_ddi25
-        setSpec: study_groups:energia
-      - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
-        preferredMetadataParam: ddi

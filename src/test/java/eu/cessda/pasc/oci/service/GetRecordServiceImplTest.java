@@ -23,14 +23,17 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
+import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.exception.CustomHandlerException;
-import eu.cessda.pasc.oci.exception.InternalSystemException;
+import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.mock.data.CMMStudyTestData;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMConverter;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
+import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.repository.DaoBase;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,28 +62,39 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 @ActiveProfiles("test")
 public class GetRecordServiceImplTest {
 
-  private final static URI REPO_URL = URI.create("http://services.fsd.uta.fi/v0/oai");
-  private final static String RECORD_IDENTIFIER = "http://my-example_url:80/obj/fStudy/ch.sidos.ddi.468.7773";
-  private final static URI FULL_RECORD_URL = URI.create(REPO_URL + "?verb=GetRecord&identifier=" + URLEncoder.encode(RECORD_IDENTIFIER, StandardCharsets.UTF_8) + "&metadataPrefix=oai_ddi25");
+  @Autowired
+  AppConfigurationProperties appConfigurationProperties;
+  private Repo repo;
+  private String recordIdentifier;
   private final CMMConverter cmmConverter = new CMMConverter();
 
 
-    @MockBean
-    DaoBase daoBase;
+  @MockBean
+  DaoBase daoBase;
 
   @Autowired
   GetRecordService recordService;
+  private URI fullRecordUrl;
+
+  @Before
+  public void setUp() {
+    repo = appConfigurationProperties.getEndpoints().getRepos()
+            .stream().filter(repo -> repo.getName().equals("FSD")).findAny().orElseThrow();
+    ;
+    recordIdentifier = "http://my-example_url:80/obj/fStudy/ch.sidos.ddi.468.7773";
+    fullRecordUrl = URI.create(repo.getUrl() + "?verb=GetRecord&identifier=" + URLEncoder.encode(recordIdentifier, StandardCharsets.UTF_8) + "&metadataPrefix=oai_ddi25");
+  }
 
   @Test
   public void shouldReturnValidCMMStudyRecordFromAFullyComplaintCmmDdiRecord() throws CustomHandlerException, IOException, ProcessingException, JSONException {
 
     // Given
-    given(daoBase.getInputStream(FULL_RECORD_URL)).willReturn(
+    given(daoBase.getInputStream(fullRecordUrl)).willReturn(
             CMMStudyTestData.getContentAsStream("xml/synthetic_compliant_cmm.xml")
     );
 
     // When
-    CMMStudy result = recordService.getRecord(REPO_URL, RECORD_IDENTIFIER);
+    CMMStudy result = recordService.getRecord(repo, recordIdentifier);
 
     then(result).isNotNull();
     validateCMMStudyResultAgainstSchema(result);
@@ -91,12 +105,12 @@ public class GetRecordServiceImplTest {
   public void shouldHarvestedContentForLanguageSpecificDimensionFromElementWithCorrectXmlLangAttribute() throws CustomHandlerException, IOException {
 
     // Given
-      given(daoBase.getInputStream(FULL_RECORD_URL)).willReturn(
-              CMMStudyTestData.getContentAsStream("xml/oai-fsd_uta_fi-FSD3187.xml")
-      );
+    given(daoBase.getInputStream(fullRecordUrl)).willReturn(
+            CMMStudyTestData.getContentAsStream("xml/oai-fsd_uta_fi-FSD3187.xml")
+    );
 
     // When
-    CMMStudy result = recordService.getRecord(REPO_URL, RECORD_IDENTIFIER);
+    CMMStudy result = recordService.getRecord(repo, recordIdentifier);
 
     then(result).isNotNull();
 
@@ -115,12 +129,12 @@ public class GetRecordServiceImplTest {
   public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord() throws CustomHandlerException, IOException, ProcessingException, JSONException {
 
     // Given
-    given(daoBase.getInputStream(FULL_RECORD_URL)).willReturn(
+    given(daoBase.getInputStream(fullRecordUrl)).willReturn(
             CMMStudyTestData.getContentAsStream("xml/ddi_record_1683.xml")
     );
 
     // When
-    CMMStudy record = recordService.getRecord(REPO_URL, RECORD_IDENTIFIER);
+    CMMStudy record = recordService.getRecord(repo, recordIdentifier);
 
     // Then
     then(record).isNotNull();
@@ -131,12 +145,12 @@ public class GetRecordServiceImplTest {
   public void shouldOnlyExtractSingleDateAsStartDateForRecordsWithASingleDateAttr() throws CustomHandlerException, IOException, ProcessingException, JSONException {
 
     // Given
-    given(daoBase.getInputStream(FULL_RECORD_URL)).willReturn(
+    given(daoBase.getInputStream(fullRecordUrl)).willReturn(
             CMMStudyTestData.getContentAsStream("xml/ddi_record_1683.xml")
     );
 
     // When
-    CMMStudy record = recordService.getRecord(REPO_URL, RECORD_IDENTIFIER);
+    CMMStudy record = recordService.getRecord(repo, recordIdentifier);
     then(record).isNotNull();
     validateCMMStudyResultAgainstSchema(record);
     final ObjectMapper mapper = new ObjectMapper();
@@ -153,12 +167,12 @@ public class GetRecordServiceImplTest {
 
     // Given
     String expectedCmmStudyJsonString = CMMStudyTestData.getContent("json/ddi_record_1683_with_codebookXmlLag.json");
-    given(daoBase.getInputStream(FULL_RECORD_URL)).willReturn(
+    given(daoBase.getInputStream(fullRecordUrl)).willReturn(
             CMMStudyTestData.getContentAsStream("xml/ddi_record_1683_with_codebookXmlLag.xml")
     );
 
     // When
-    CMMStudy record = recordService.getRecord(REPO_URL, RECORD_IDENTIFIER);
+    CMMStudy record = recordService.getRecord(repo, recordIdentifier);
     String actualCmmStudyJsonString = cmmConverter.toJsonString(record);
 
     // then
@@ -173,12 +187,12 @@ public class GetRecordServiceImplTest {
     expectedAbstract.put("fi", "Haastattelu+<br>Jyväskylä");
     expectedAbstract.put("en", "1. The data+<br>2. The datafiles");
 
-    given(daoBase.getInputStream(FULL_RECORD_URL)).willReturn(
+    given(daoBase.getInputStream(fullRecordUrl)).willReturn(
             CMMStudyTestData.getContentAsStream("xml/ddi_record_2305_fsd_repeat_abstract.xml")
     );
 
     // When
-    CMMStudy record = recordService.getRecord(REPO_URL, RECORD_IDENTIFIER);
+    CMMStudy record = recordService.getRecord(repo, recordIdentifier);
 
     then(record).isNotNull();
     then(record.getAbstractField().size()).isEqualTo(3);
@@ -194,12 +208,12 @@ public class GetRecordServiceImplTest {
     expectedTitle.put("no", "2 - Et Machinery of Government, 1976-1977");
     expectedTitle.put("yy", "Enquête sociale européenne");
 
-    given(daoBase.getInputStream(FULL_RECORD_URL)).willReturn(
+    given(daoBase.getInputStream(fullRecordUrl)).willReturn(
             CMMStudyTestData.getContentAsStream("xml/ddi_record_1683.xml")
     );
 
     // When
-    CMMStudy record = recordService.getRecord(REPO_URL, RECORD_IDENTIFIER);
+    CMMStudy record = recordService.getRecord(repo, recordIdentifier);
 
     then(record).isNotNull();
     then(record.getTitleStudy().size()).isEqualTo(3);
@@ -212,28 +226,28 @@ public class GetRecordServiceImplTest {
           throws CustomHandlerException, IOException {
 
     // Given
-      given(daoBase.getInputStream(FULL_RECORD_URL)).willReturn(
-              CMMStudyTestData.getContentAsStream("xml/ddi_record_1031_deleted.xml")
-      );
+    given(daoBase.getInputStream(fullRecordUrl)).willReturn(
+            CMMStudyTestData.getContentAsStream("xml/ddi_record_1031_deleted.xml")
+    );
 
     // When
-    CMMStudy record = recordService.getRecord(REPO_URL, RECORD_IDENTIFIER);
+    CMMStudy record = recordService.getRecord(repo, recordIdentifier);
 
     // Then
     then(record).isNotNull();
     then(record.isActive()).isFalse();
   }
 
-  @Test(expected = InternalSystemException.class)
+  @Test(expected = OaiPmhException.class)
   public void shouldThrowExceptionForRecordWithErrorElement() throws CustomHandlerException, IOException {
 
     // Given
-      given(daoBase.getInputStream(FULL_RECORD_URL)).willReturn(
-              CMMStudyTestData.getContentAsStream("xml/ddi_record_WithError.xml")
-      );
+    given(daoBase.getInputStream(fullRecordUrl)).willReturn(
+            CMMStudyTestData.getContentAsStream("xml/ddi_record_WithError.xml")
+    );
 
     // When
-    recordService.getRecord(REPO_URL, RECORD_IDENTIFIER);
+    recordService.getRecord(repo, recordIdentifier);
 
     // Then an exception is thrown.
   }
@@ -242,12 +256,12 @@ public class GetRecordServiceImplTest {
   public void shouldExtractAllRequiredCMMFieldsForAGivenAUKDSRecord() throws CustomHandlerException, IOException, ProcessingException, JSONException {
 
     // Given
-    given(daoBase.getInputStream(FULL_RECORD_URL)).willReturn(
+    given(daoBase.getInputStream(fullRecordUrl)).willReturn(
             CMMStudyTestData.getContentAsStream("xml/ddi_record_ukds_example.xml")
     );
 
     // When
-    CMMStudy result = recordService.getRecord(REPO_URL, RECORD_IDENTIFIER);
+    CMMStudy result = recordService.getRecord(repo, recordIdentifier);
 
     then(result).isNotNull();
     validateCMMStudyResultAgainstSchema(result);

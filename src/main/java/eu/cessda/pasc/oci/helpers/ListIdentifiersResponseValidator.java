@@ -16,15 +16,14 @@
 
 package eu.cessda.pasc.oci.helpers;
 
-import eu.cessda.pasc.oci.models.errors.ErrorStatus;
+import eu.cessda.pasc.oci.exception.InternalSystemException;
+import eu.cessda.pasc.oci.exception.OaiPmhException;
 import lombok.experimental.UtilityClass;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.util.Optional;
-
-import static java.util.Optional.ofNullable;
 
 @UtilityClass
 public class ListIdentifiersResponseValidator {
@@ -33,13 +32,14 @@ public class ListIdentifiersResponseValidator {
      * Checks if the response has an {@literal <error>} element.
      *
      * @param document the document to map to.
-     * @return ErrorStatus of the record, or an empty optional if no error was present.
+     * @throws OaiPmhException         if an {@literal <error>} element was present.
+     * @throws InternalSystemException if the given document has no OAI element.
      */
-    public static Optional<ErrorStatus> validateResponse(Document document) {
-        Optional<NodeList> oAINode = ofNullable(document.getElementsByTagName(OaiPmhConstants.OAI_PMH));
+    public static void validateResponse(Document document) throws InternalSystemException, OaiPmhException {
+        Optional<NodeList> oAINode = Optional.ofNullable(document.getElementsByTagName(OaiPmhConstants.OAI_PMH));
 
         if (oAINode.isEmpty()) {
-            return Optional.of(new ErrorStatus("missingElement", "Missing OAI element"));
+            throw new InternalSystemException("Missing OAI element");
         }
 
         NodeList nodeList = oAINode.get();
@@ -48,11 +48,13 @@ public class ListIdentifiersResponseValidator {
             for (int childNodeIndex = 0; childNodeIndex < childNodes.getLength(); childNodeIndex++) {
                 Node item = childNodes.item(childNodeIndex);
                 if (OaiPmhConstants.ERROR.equals(item.getLocalName())) {
-                    return Optional.of(new ErrorStatus(item.getAttributes().getNamedItem("code").getTextContent(), item.getTextContent()));
+                    if (item.getTextContent() != null && !item.getTextContent().isEmpty()) {
+                        throw new OaiPmhException(OaiPmhException.Code.valueOf(item.getAttributes().getNamedItem("code").getTextContent()), item.getTextContent());
+                    } else {
+                        throw new OaiPmhException(OaiPmhException.Code.valueOf(item.getAttributes().getNamedItem("code").getTextContent()));
+                    }
                 }
             }
         }
-
-        return Optional.empty();
     }
 }

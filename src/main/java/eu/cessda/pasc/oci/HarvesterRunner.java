@@ -16,6 +16,7 @@
 package eu.cessda.pasc.oci;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
+import eu.cessda.pasc.oci.helpers.LoggingConstants;
 import eu.cessda.pasc.oci.metrics.Metrics;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
@@ -44,10 +45,6 @@ import static net.logstash.logback.argument.StructuredArguments.value;
 @Component
 @Slf4j
 public class HarvesterRunner {
-
-    private static final String REPO_NAME = "repo_name";
-    private static final String LANG_CODE = "lang_code";
-    private static final String REPO_ENDPOINT_URL = "repo_endpoint_url";
 
     private final AppConfigurationProperties configurationProperties;
     private final HarvesterConsumerService localHarvester;
@@ -88,11 +85,11 @@ public class HarvesterRunner {
                     MDC.setContextMap(contextMap);
 
                     // Set the MDC so that the record name is attached to all downstream logs
-                    try (var repoNameClosable = MDC.putCloseable(REPO_NAME, repo.getName())) {
+                    try (var repoNameClosable = MDC.putCloseable(LoggingConstants.REPO_NAME, repo.getName())) {
                         log.info("Processing Repo [{}]", repo);
                         Map<String, List<CMMStudyOfLanguage>> langStudies = getCmmStudiesOfEachLangIsoCodeMap(repo, lastModifiedDateTime);
                         langStudies.forEach((langIsoCode, cmmStudies) -> {
-                            try (var langClosable = MDC.putCloseable(LANG_CODE, langIsoCode)) {
+                            try (var langClosable = MDC.putCloseable(LoggingConstants.LANG_CODE, langIsoCode)) {
                                 executeBulk(repo, langIsoCode, cmmStudies);
                             }
                         });
@@ -123,19 +120,19 @@ public class HarvesterRunner {
     private void executeBulk(Repo repo, String langIsoCode, List<CMMStudyOfLanguage> cmmStudies) {
         if (!cmmStudies.isEmpty()) {
             var studiesUpdated = getUpdatedStudies(cmmStudies, langIsoCode);
-            log.info("BulkIndexing repo [{}({})].", repo.getName(), langIsoCode);
+            log.info("[{}({})] Indexing...", repo.getName(), langIsoCode);
             if (ingestService.bulkIndex(cmmStudies, langIsoCode)) {
-                log.info("BulkIndexing repo [{}({})] succeeded: [{}] studies created, [{}] studies deleted, [{}] studies updated.",
+                log.info("[{}({})] Indexing succeeded: [{}] studies created, [{}] studies deleted, [{}] studies updated.",
                         repo.getName(),
                         langIsoCode,
                         value("created_cmm_studies", studiesUpdated.studiesCreated),
                         value("deleted_cmm_studies", studiesUpdated.studiesDeleted),
                         value("updated_cmm_studies", studiesUpdated.studiesUpdated));
             } else {
-                log.error("BulkIndexing repo [{}({})] failed.", repo.getName(), langIsoCode);
+                log.error("[{}({})] Indexing failed!", repo.getName(), langIsoCode);
             }
         } else {
-            log.debug("CmmStudies list is empty. Nothing to BulkIndex for repo [{}], LangIsoCode [{}].", repo.getName(), langIsoCode);
+            log.debug("[{}({})] CmmStudies list is empty. Nothing to index.", repo.getName(), langIsoCode);
         }
     }
 
@@ -196,9 +193,8 @@ public class HarvesterRunner {
                 .map(Optional::get)
                 .collect(Collectors.toList());
 
-        log.info("Repo Name [{}] of [{}] Endpoint. There are [{}] presentCMMStudies out of [{}] totalCMMStudies. Therefore CMMStudies rejected is [{}]",
-                value(REPO_NAME, repo.getName()),
-                value(REPO_ENDPOINT_URL, repo.getUrl()),
+        log.info("[{}] There are [{}] presentCMMStudies out of [{}] totalCMMStudies. Therefore CMMStudies rejected is [{}].",
+                value(LoggingConstants.REPO_NAME, repo.getName()),
                 value("present_cmm_record", presentCMMStudies.size()),
                 value("total_cmm_record", recordHeaders.size()),
                 value("cmm_records_rejected", recordHeaders.size() - presentCMMStudies.size()));
