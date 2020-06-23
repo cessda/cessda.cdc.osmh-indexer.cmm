@@ -17,7 +17,6 @@
 package eu.cessda.pasc.oci.configurations;
 
 import eu.cessda.pasc.oci.models.oai.configuration.OaiPmh;
-import eu.cessda.pasc.oci.models.oai.configuration.RestTemplateProps;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -39,7 +38,6 @@ import java.util.TimeZone;
 public class HandlerConfigurationProperties {
 
   private final OaiPmh oaiPmh = new OaiPmh();
-  private final RestTemplateProps restTemplateProps = new RestTemplateProps();
 
   public HandlerConfigurationProperties() {
     TimeZone.setDefault(TimeZone.getTimeZone("UTC"));

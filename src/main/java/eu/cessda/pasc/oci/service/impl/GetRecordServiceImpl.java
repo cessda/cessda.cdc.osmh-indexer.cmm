@@ -17,12 +17,13 @@
 package eu.cessda.pasc.oci.service.impl;
 
 import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
-import eu.cessda.pasc.oci.exception.CustomHandlerException;
 import eu.cessda.pasc.oci.exception.InternalSystemException;
+import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.helpers.CMMStudyMapper;
 import eu.cessda.pasc.oci.helpers.OaiPmhHelpers;
 import eu.cessda.pasc.oci.helpers.RecordResponseValidator;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
+import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.models.oai.configuration.OaiPmh;
 import eu.cessda.pasc.oci.repository.DaoBase;
 import eu.cessda.pasc.oci.service.GetRecordService;
@@ -63,13 +64,13 @@ public class GetRecordServiceImpl implements GetRecordService {
     }
 
     @Override
-    public CMMStudy getRecord(URI repositoryUrl, String studyIdentifier) throws CustomHandlerException {
-        log.debug("Querying Repo [{}] for StudyID [{}]", repositoryUrl, studyIdentifier);
+    public CMMStudy getRecord(Repo repo, String studyIdentifier) throws InternalSystemException, OaiPmhException {
+        log.debug("[{}] Querying for StudyID [{}]", repo.getName(), studyIdentifier);
         URI fullUrl = null;
         try {
-            fullUrl = OaiPmhHelpers.buildGetStudyFullUrl(repositoryUrl, studyIdentifier, oaiPmhHandlerConfig);
+            fullUrl = OaiPmhHelpers.buildGetStudyFullUrl(repo, studyIdentifier);
             try (InputStream recordXML = daoBase.getInputStream(fullUrl)) {
-                return mapDDIRecordToCMMStudy(recordXML, repositoryUrl).studyXmlSourceUrl(fullUrl.toString()).build();
+                return mapDDIRecordToCMMStudy(recordXML).studyXmlSourceUrl(fullUrl.toString()).build();
             }
         } catch (JDOMException | IOException e) {
             throw new InternalSystemException(String.format("Unable to parse xml! FullUrl [%s]: %s", fullUrl, e.toString()), e);
@@ -78,8 +79,7 @@ public class GetRecordServiceImpl implements GetRecordService {
         }
     }
 
-    private CMMStudy.CMMStudyBuilder mapDDIRecordToCMMStudy(InputStream recordXML, URI repositoryUrl)
-            throws JDOMException, IOException, InternalSystemException {
+    private CMMStudy.CMMStudyBuilder mapDDIRecordToCMMStudy(InputStream recordXML) throws JDOMException, IOException, OaiPmhException {
 
         CMMStudy.CMMStudyBuilder builder = CMMStudy.builder();
         OaiPmh oaiPmh = oaiPmhHandlerConfig.getOaiPmh();
@@ -90,10 +90,7 @@ public class GetRecordServiceImpl implements GetRecordService {
         }
 
         // We exit if the record has an <error> element
-        var errorStatus = recordResponseValidator.validateResponse(document);
-        if (errorStatus.isPresent()) {
-            throw new InternalSystemException("Remote repository " + repositoryUrl + " returned error: " + errorStatus.get().toString());
-        }
+        recordResponseValidator.validateResponse(document);
 
         // Short-Circuit. We carry on to parse beyond the headers only if the record is active.
         boolean isActiveRecord = cmmStudyMapper.parseHeaderElement(builder, document);

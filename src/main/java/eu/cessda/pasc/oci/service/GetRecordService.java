@@ -18,12 +18,11 @@ package eu.cessda.pasc.oci.service;
 
 import eu.cessda.pasc.oci.exception.CustomHandlerException;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
-
-import java.net.URI;
+import eu.cessda.pasc.oci.models.configurations.Repo;
 
 /**
  * @author moses AT doraventures DOT com
  */
 public interface GetRecordService {
-    CMMStudy getRecord(URI repositoryUrl, String studyIdentifier) throws CustomHandlerException;
+    CMMStudy getRecord(Repo repositoryUrl, String studyIdentifier) throws CustomHandlerException;
 }

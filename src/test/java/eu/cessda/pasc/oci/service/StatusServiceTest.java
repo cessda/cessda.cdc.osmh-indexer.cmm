@@ -58,7 +58,7 @@ public class StatusServiceTest {
     InOrder verifier = inOrder(prettyWriter);
 
     //then
-    verifier.verify(prettyWriter, calls(2)).writeValueAsString(any());
-    then(outPut).startsWith("Config for Rest: [{\"test\":\"value\"}]");
+    verifier.verify(prettyWriter, calls(1)).writeValueAsString(any());
+    then(outPut).startsWith("Config for DDI 2.5: [{\"test\":\"value\"}]");
   }
 }

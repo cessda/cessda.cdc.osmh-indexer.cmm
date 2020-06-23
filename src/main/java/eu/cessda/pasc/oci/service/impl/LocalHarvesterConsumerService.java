@@ -16,6 +16,8 @@
 package eu.cessda.pasc.oci.service.impl;
 
 import eu.cessda.pasc.oci.exception.CustomHandlerException;
+import eu.cessda.pasc.oci.exception.OaiPmhException;
+import eu.cessda.pasc.oci.helpers.LoggingConstants;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.configurations.Repo;
@@ -48,11 +50,24 @@ public class LocalHarvesterConsumerService extends AbstractHarvesterConsumerServ
     @Override
     public List<RecordHeader> listRecordHeaders(Repo repo, LocalDateTime lastModifiedDate) {
         try {
-            List<RecordHeader> recordHeaders = listRecordHeadersService.getRecordHeaders(repo.getUrl());
+            List<RecordHeader> recordHeaders = listRecordHeadersService.getRecordHeaders(repo);
             return filterRecords(recordHeaders, lastModifiedDate);
+        } catch (OaiPmhException e) {
+            Optional<String> oaiErrorMessage = e.getOaiErrorMessage();
+            if (oaiErrorMessage.isPresent()) {
+                log.error("[{}] ListRecordHeaders failed. {}: {}",
+                        repo.getName(),
+                        value(LoggingConstants.OAI_ERROR_CODE, e.getCode()),
+                        value(LoggingConstants.OAI_ERROR_MESSAGE, oaiErrorMessage.get())
+                );
+            } else {
+                log.error("[{}] ListRecordHeaders failed. {}.",
+                        repo.getName(),
+                        value(LoggingConstants.OAI_ERROR_CODE, e.getCode())
+                );
+            }
         } catch (CustomHandlerException e) {
-            log.error("ListRecordHeaders failed for repo [{}] [{}]. {}.",
-                    value(REPO_NAME, repo.getName()), value(REPO_ENDPOINT_URL, repo.getUrl()), e.toString());
+            log.error("[{}] ListRecordHeaders failed:", value(LoggingConstants.REPO_NAME, repo.getName()), e);
         }
         return Collections.emptyList();
     }
@@ -60,15 +75,30 @@ public class LocalHarvesterConsumerService extends AbstractHarvesterConsumerServ
     @Override
     public Optional<CMMStudy> getRecord(Repo repo, String studyNumber) {
         try {
-            return Optional.of(getRecordService.getRecord(repo.getUrl(), studyNumber));
+            return Optional.of(getRecordService.getRecord(repo, studyNumber));
+        } catch (OaiPmhException e) {
+            Optional<String> oaiErrorMessage = e.getOaiErrorMessage();
+            if (oaiErrorMessage.isPresent()) {
+                log.warn("[{}] Failed to get StudyId [{}]: {}: {}",
+                        repo.getName(),
+                        value(LoggingConstants.STUDY_ID, studyNumber),
+                        value(LoggingConstants.OAI_ERROR_CODE, e.getCode()),
+                        value(LoggingConstants.OAI_ERROR_MESSAGE, oaiErrorMessage.get())
+                );
+            } else {
+                log.warn("[{}] Failed to get StudyId [{}]: {}.",
+                        repo.getName(),
+                        value(LoggingConstants.STUDY_ID, studyNumber),
+                        value(LoggingConstants.OAI_ERROR_CODE, e.getCode())
+                );
+            }
         } catch (CustomHandlerException e) {
-            log.warn("getRecord failed for StudyId [{}] from repo [{}] [{}]: {}",
-                    value("study_id", studyNumber),
-                    value(REPO_NAME, repo.getName()),
-                    value(REPO_ENDPOINT_URL, repo.getUrl()),
-                    e.toString()
+            log.warn("[{}] Failed to get StudyId [{}]",
+                    value(LoggingConstants.REPO_NAME, repo.getName()),
+                    value(LoggingConstants.STUDY_ID, studyNumber),
+                    e
             );
-            return Optional.empty();
         }
+        return Optional.empty();
     }
 }

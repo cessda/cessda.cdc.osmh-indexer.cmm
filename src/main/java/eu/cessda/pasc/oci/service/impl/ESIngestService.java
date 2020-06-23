@@ -81,7 +81,7 @@ public class ESIngestService implements IngestService {
 
         if (prepareIndex(indexName)) {
             List<IndexQuery> queries = new ArrayList<>(INDEX_COMMIT_SIZE);
-            log.debug("Indexing [{}] index.", indexName);
+            log.debug("[{}] Indexing...", indexName);
             int counter = 0;
             for (CMMStudyOfLanguage cmmStudyOfLanguage : languageCMMStudiesMap) {
                 IndexQuery indexQuery = getIndexQuery(indexName, cmmStudyOfLanguage);

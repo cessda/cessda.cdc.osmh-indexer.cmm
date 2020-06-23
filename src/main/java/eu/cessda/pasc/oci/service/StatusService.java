@@ -47,7 +47,6 @@ public class StatusService {
 
   @ManagedOperation(description = "Prints out the PaSC Handler Oai-Pmh DDI 2.5 Configurations.")
   public String printPaSCHandlerOaiPmhConfig() throws JsonProcessingException {
-    return "Config for Rest: [" + prettyPrinter.writeValueAsString(handlerConfigurationProperties.getRestTemplateProps()) + "]\n" +
-            "Config for DDI 2.5: [" + prettyPrinter.writeValueAsString(handlerConfigurationProperties.getOaiPmh()) + "]";
+    return "Config for DDI 2.5: [" + prettyPrinter.writeValueAsString(handlerConfigurationProperties.getOaiPmh()) + "]";
   }
 }

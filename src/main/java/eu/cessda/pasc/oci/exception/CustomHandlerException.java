@@ -25,11 +25,11 @@ public class CustomHandlerException extends Exception {
 
     private static final long serialVersionUID = 5715687019114712665L;
 
-    public CustomHandlerException(String message) {
+    protected CustomHandlerException(String message) {
         super(message);
     }
 
-    public CustomHandlerException(String message, Throwable cause) {
+    protected CustomHandlerException(String message, Throwable cause) {
         super(message, cause);
     }
 }

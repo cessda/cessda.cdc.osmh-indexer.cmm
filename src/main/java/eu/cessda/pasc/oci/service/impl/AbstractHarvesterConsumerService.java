@@ -37,10 +37,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public abstract class AbstractHarvesterConsumerService implements HarvesterConsumerService {
 
-  protected static final String REPO_NAME = "repo_name";
-  protected static final String REPO_ENDPOINT_URL = "repo_endpoint_url";
-  protected static final String REASON = "rejection_reason";
-
   /**
    * Filter records that are newer than the specified last modified date.
    * <p/>

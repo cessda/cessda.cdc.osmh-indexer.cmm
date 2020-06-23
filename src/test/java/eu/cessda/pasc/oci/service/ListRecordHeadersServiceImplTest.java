@@ -16,10 +16,12 @@
 
 package eu.cessda.pasc.oci.service;
 
+import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.exception.CustomHandlerException;
-import eu.cessda.pasc.oci.exception.InternalSystemException;
+import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.mock.data.RecordHeadersMock;
 import eu.cessda.pasc.oci.models.RecordHeader;
+import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.repository.DaoBase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,11 +56,15 @@ public class ListRecordHeadersServiceImplTest {
   @Autowired
   ListRecordHeadersService listRecordHeadersService;
 
+  @Autowired
+  AppConfigurationProperties appConfigurationProperties;
+
   @Test
   public void shouldReturnRecordHeadersForGivenRepo() throws CustomHandlerException, IOException {
 
     // Given
-    String repoUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider";
+    Repo ukdsEndpoint = appConfigurationProperties.getEndpoints().getRepos()
+            .stream().filter(repo -> repo.getName().equals("UKDS")).findAny().orElseThrow();
     String fullListRecordRepoUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=ListIdentifiers&metadataPrefix=ddi";
     String mockRecordHeadersXml = RecordHeadersMock.getListIdentifiersXMLResumptionEmpty();
     given(daoBase.getInputStream(URI.create(fullListRecordRepoUrl))).willReturn(
@@ -66,7 +72,7 @@ public class ListRecordHeadersServiceImplTest {
     );
 
     // When
-    List<RecordHeader> recordHeaders = listRecordHeadersService.getRecordHeaders(URI.create(repoUrl));
+    List<RecordHeader> recordHeaders = listRecordHeadersService.getRecordHeaders(ukdsEndpoint);
 
     then(recordHeaders).hasSize(3);
     then(recordHeaders).extracting("identifier").containsOnly("850229", "850232", "850235");
@@ -78,7 +84,8 @@ public class ListRecordHeadersServiceImplTest {
   public void shouldThrowWhenRequestForHeaderFails() throws CustomHandlerException, IOException {
 
     // Given
-    String repoUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider";
+    Repo ukdsEndpoint = appConfigurationProperties.getEndpoints().getRepos()
+            .stream().filter(repo -> repo.getName().equals("UKDS")).findAny().orElseThrow();
     String fullListRecordRepoUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=ListIdentifiers&metadataPrefix=ddi";
     String mockRecordHeadersXml = RecordHeadersMock.getListIdentifiersXMLResumptionTokenNotMockedForInvalid();
     given(daoBase.getInputStream(URI.create(fullListRecordRepoUrl))).willReturn(
@@ -86,7 +93,7 @@ public class ListRecordHeadersServiceImplTest {
     );
 
     // When
-    listRecordHeadersService.getRecordHeaders(URI.create(repoUrl));
+    listRecordHeadersService.getRecordHeaders(ukdsEndpoint);
   }
 
   @Test
@@ -94,16 +101,17 @@ public class ListRecordHeadersServiceImplTest {
           throws CustomHandlerException, IOException {
 
     // Given
-    URI baseRepoUrl = URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider");
-    URI fullListRecordRepoUrl = URI.create(baseRepoUrl + "?verb=ListIdentifiers&metadataPrefix=ddi");
+    Repo ukdsEndpoint = appConfigurationProperties.getEndpoints().getRepos()
+            .stream().filter(repo -> repo.getName().equals("UKDS")).findAny().orElseThrow();
+    URI fullListRecordRepoUrl = URI.create(ukdsEndpoint.getUrl().toString() + "?verb=ListIdentifiers&metadataPrefix=ddi");
     String identifiersXML = RecordHeadersMock.getListIdentifiersXML();
 
     String resumptionToken01 = "0/3/7/ddi/null/2016-06-01/null";
-    URI repoUrlWithResumptionToken01 = appendListRecordResumptionToken(baseRepoUrl, resumptionToken01);
+    URI repoUrlWithResumptionToken01 = appendListRecordResumptionToken(ukdsEndpoint.getUrl(), resumptionToken01);
     String identifiersXMLWithResumption = RecordHeadersMock.getListIdentifiersXMLWithResumption();
 
     String resumptionToken02 = "3/6/7/ddi/null/2017-01-01/null";
-    URI repoUrlWithResumptionToken02 = appendListRecordResumptionToken(baseRepoUrl, resumptionToken02);
+    URI repoUrlWithResumptionToken02 = appendListRecordResumptionToken(ukdsEndpoint.getUrl(), resumptionToken02);
     String identifiersXMLWithResumptionLastList = RecordHeadersMock.getListIdentifiersXMLWithResumptionLastList();
 
     given(daoBase.getInputStream(fullListRecordRepoUrl)).willReturn(
@@ -119,7 +127,7 @@ public class ListRecordHeadersServiceImplTest {
     );
 
     // When
-    List<RecordHeader> recordHeaders = listRecordHeadersService.getRecordHeaders(baseRepoUrl);
+    List<RecordHeader> recordHeaders = listRecordHeadersService.getRecordHeaders(ukdsEndpoint);
 
     then(recordHeaders).hasSize(7);
     then(recordHeaders).extracting("identifier")
@@ -129,11 +137,12 @@ public class ListRecordHeadersServiceImplTest {
     then(recordHeaders).extracting("type").containsOnly("Study");
   }
 
-  @Test(expected = InternalSystemException.class)
+  @Test(expected = OaiPmhException.class)
   public void shouldThrowExceptionForRecordHeadersInvalidMetadataToken() throws CustomHandlerException, IOException {
 
     // Given
-    String repoUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider";
+    Repo ukdsEndpoint = appConfigurationProperties.getEndpoints().getRepos()
+            .stream().filter(repo -> repo.getName().equals("UKDS")).findAny().orElseThrow();
     String fullListRecordRepoUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=ListIdentifiers&metadataPrefix=ddi";
 
     String mockRecordHeadersXml = RecordHeadersMock.getListIdentifiersXMLWithInvalidMetadataTokenError();
@@ -142,6 +151,6 @@ public class ListRecordHeadersServiceImplTest {
     );
 
     // When
-    listRecordHeadersService.getRecordHeaders(URI.create(repoUrl));
+    listRecordHeadersService.getRecordHeaders(ukdsEndpoint);
   }
 }

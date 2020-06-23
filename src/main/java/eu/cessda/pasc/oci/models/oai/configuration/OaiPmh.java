@@ -19,8 +19,6 @@ package eu.cessda.pasc.oci.models.oai.configuration;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
 /**
  * OaiPmh configuration model
  *
@@ -29,11 +27,6 @@ import java.util.List;
 @Getter
 @Setter
 public class OaiPmh {
-
-  private List<String> supportedApiVersions;
-  private List<String> supportedRecordTypes;
-  private List<Repo> repos;
-  private Integer publicationYearDefault;
   private MetadataParsingDefaultLang metadataParsingDefaultLang;
   private boolean concatRepeatedElements;
   private String concatSeparator;

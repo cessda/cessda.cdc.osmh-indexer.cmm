@@ -28,9 +28,11 @@ import java.net.URI;
 @Data
 public class Repo implements Serializable {
 
-  private static final long serialVersionUID = 5460376495600337528L;
+    private static final long serialVersionUID = 5460376495600337528L;
 
-  URI url;
-  String name;
-  String handler;
+    private URI url;
+    private String name;
+    private String handler;
+    private String preferredMetadataParam;
+    private String setSpec;
 }
