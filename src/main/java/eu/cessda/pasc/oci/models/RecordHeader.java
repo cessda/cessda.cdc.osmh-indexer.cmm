@@ -50,6 +50,6 @@ public class RecordHeader {
   private String identifier;
 
   public void setIdentifier(String identifier) {
-    this.identifier = CharMatcher.BREAKING_WHITESPACE.removeFrom(identifier);
+    this.identifier = CharMatcher.breakingWhitespace().removeFrom(identifier);
   }
 }

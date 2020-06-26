@@ -16,7 +16,6 @@
 
 package eu.cessda.pasc.oci.service.impl;
 
-import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
 import eu.cessda.pasc.oci.exception.InternalSystemException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.helpers.ListIdentifiersResponseValidator;
@@ -60,13 +59,11 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
   private static final String STUDY = "Study";
 
   private final DaoBase daoBase;
-  private final HandlerConfigurationProperties config;
   private final DocumentBuilderFactory builderFactory;
 
   @Autowired
-  public ListRecordHeadersServiceImpl(DaoBase daoBase, HandlerConfigurationProperties config, DocumentBuilderFactory builderFactory) {
+  public ListRecordHeadersServiceImpl(DaoBase daoBase, DocumentBuilderFactory builderFactory) {
     this.daoBase = daoBase;
-    this.config = config;
     this.builderFactory = builderFactory;
   }
 

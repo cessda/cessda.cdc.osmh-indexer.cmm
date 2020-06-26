@@ -29,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -201,15 +200,20 @@ class DocElementParser {
   }
 
   /**
-   * Parses the array values of attributes of a given elements
-   *
-   * @param document     the document to parse
-   * @param elementXpath the Element parent node to retrieve
-   * @return Array String Values of the attributes
+   * Temp request from PUG to concatenate repeated elements.
+   * <p>
    */
-  String[] getAttributeValues(Document document, String elementXpath) {
-    List<Attribute> attributes = getAttributes(document, elementXpath);
-    return attributes.stream().map(Attribute::getValue).toArray(String[]::new);
+  private static void concatRepeatedElements(String separator, Map<String, String> titlesMap, Element element, String xmlLang) {
+
+    String currentElementContent = element.getText();
+
+    if (titlesMap.containsKey(xmlLang)) {
+      String previousElementContent = titlesMap.get(xmlLang);
+      String concatenatedContent = previousElementContent + separator + currentElementContent;
+      titlesMap.put(xmlLang, concatenatedContent); // keep concatenating
+    } else {
+      titlesMap.put(xmlLang, currentElementContent); // set first
+    }
   }
 
   Map<String, String> getDateElementAttributesValueMap(Document document, String elementXpath) {
@@ -269,26 +273,20 @@ class DocElementParser {
     }
   }
 
-  /**
-   * Temp request from PUG to concatenate repeated elements.
-   * <p>
-   */
-  private static void concatRepeatedElements(
-      String separator, Map<String, String> titlesMap, Element element, String xmlLang) {
-
-    String currentElementContent = element.getText();
-
-    if (titlesMap.containsKey(xmlLang)) {
-      String previousElementContent = titlesMap.get(xmlLang);
-      String concatenatedContent = previousElementContent + separator + currentElementContent;
-      titlesMap.put(xmlLang, concatenatedContent); // keep concatenating
-    } else {
-      titlesMap.put(xmlLang, currentElementContent); // set first
-    }
+  private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+    Map<Object, Boolean> seen = new HashMap<>();
+    return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
   }
 
-  private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
-    Map<Object, Boolean> seen = new ConcurrentHashMap<>();
-    return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+  /**
+   * Parses the array values of attributes of a given elements
+   *
+   * @param document     the document to parse
+   * @param elementXpath the Element parent node to retrieve
+   * @return Array String Values of the attributes
+   */
+  List<String> getAttributeValues(Document document, String elementXpath) {
+    List<Attribute> attributes = getAttributes(document, elementXpath);
+    return attributes.stream().map(Attribute::getValue).collect(Collectors.toList());
   }
 }

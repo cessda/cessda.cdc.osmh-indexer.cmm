@@ -73,9 +73,9 @@ public class GetRecordServiceImpl implements GetRecordService {
                 return mapDDIRecordToCMMStudy(recordXML).studyXmlSourceUrl(fullUrl.toString()).build();
             }
         } catch (JDOMException | IOException e) {
-            throw new InternalSystemException(String.format("Unable to parse xml! FullUrl [%s]: %s", fullUrl, e.toString()), e);
+            throw new InternalSystemException(String.format("Unable to parse xml! FullUrl [%s]: %s", fullUrl, e), e);
         } catch (URISyntaxException e) {
-            throw new InternalSystemException("Unable to construct URL: " + e.toString(), e);
+            throw new InternalSystemException(e);
         }
     }
 
@@ -95,26 +95,29 @@ public class GetRecordServiceImpl implements GetRecordService {
         // Short-Circuit. We carry on to parse beyond the headers only if the record is active.
         boolean isActiveRecord = cmmStudyMapper.parseHeaderElement(builder, document);
         if (isActiveRecord) {
-            String defaultLangIsoCode = cmmStudyMapper.parseDefaultLanguage(document, oaiPmh);
-            cmmStudyMapper.parseStudyTitle(builder, document, oaiPmh, defaultLangIsoCode);
-            cmmStudyMapper.parseStudyUrl(builder, document, oaiPmh, defaultLangIsoCode);
-            cmmStudyMapper.parseAbstract(builder, document, oaiPmh, defaultLangIsoCode);
-            cmmStudyMapper.parsePidStudies(builder, document, oaiPmh, defaultLangIsoCode);
-            cmmStudyMapper.parseCreator(builder, document, oaiPmh, defaultLangIsoCode);
-            cmmStudyMapper.parseDataAccessFreeText(builder, document, oaiPmh, defaultLangIsoCode);
-            cmmStudyMapper.parseClassifications(builder, document, oaiPmh, defaultLangIsoCode);
-            cmmStudyMapper.parseKeywords(builder, document, oaiPmh, defaultLangIsoCode);
-            cmmStudyMapper.parseTypeOfTimeMethod(builder, document, oaiPmh, defaultLangIsoCode);
-            cmmStudyMapper.parseStudyAreaCountries(builder, document, oaiPmh, defaultLangIsoCode);
-            cmmStudyMapper.parseUnitTypes(builder, document, oaiPmh, defaultLangIsoCode);
-            cmmStudyMapper.parsePublisher(builder, document, oaiPmh, defaultLangIsoCode);
-            cmmStudyMapper.parseYrOfPublication(builder, document);
-            cmmStudyMapper.parseFileLanguages(builder, document);
-            cmmStudyMapper.parseTypeOfSamplingProcedure(builder, document, oaiPmh, defaultLangIsoCode);
-            cmmStudyMapper.parseSamplingProcedureFreeTexts(builder, document, oaiPmh, defaultLangIsoCode);
-            cmmStudyMapper.parseTypeOfModeOfCollection(builder, document, oaiPmh, defaultLangIsoCode);
-            cmmStudyMapper.parseDataCollectionDates(builder, document);
-            cmmStudyMapper.parseDataCollectionFreeTexts(builder, document, oaiPmh, defaultLangIsoCode);
+            String defaultLangIsoCode = cmmStudyMapper.parseDefaultLanguage(document);
+            builder.titleStudy(cmmStudyMapper.parseStudyTitle(document, defaultLangIsoCode));
+            builder.studyUrl(cmmStudyMapper.parseStudyUrl(document, defaultLangIsoCode));
+            builder.abstractField(cmmStudyMapper.parseAbstract(document, defaultLangIsoCode));
+            builder.pidStudies(cmmStudyMapper.parsePidStudies(document, defaultLangIsoCode));
+            builder.creators(cmmStudyMapper.parseCreator(document, defaultLangIsoCode));
+            builder.dataAccessFreeTexts(cmmStudyMapper.parseDataAccessFreeText(document, defaultLangIsoCode));
+            builder.classifications(cmmStudyMapper.parseClassifications(document, defaultLangIsoCode));
+            builder.keywords(cmmStudyMapper.parseKeywords(document, defaultLangIsoCode));
+            builder.typeOfTimeMethods(cmmStudyMapper.parseTypeOfTimeMethod(document, oaiPmh, defaultLangIsoCode));
+            builder.studyAreaCountries(cmmStudyMapper.parseStudyAreaCountries(document, defaultLangIsoCode));
+            builder.unitTypes(cmmStudyMapper.parseUnitTypes(document, defaultLangIsoCode));
+            builder.publisher(cmmStudyMapper.parsePublisher(document, defaultLangIsoCode));
+            cmmStudyMapper.parseYrOfPublication(document).ifPresent(builder::publicationYear);
+            builder.fileLanguages(cmmStudyMapper.parseFileLanguages(document));
+            builder.typeOfSamplingProcedures(cmmStudyMapper.parseTypeOfSamplingProcedure(document, defaultLangIsoCode));
+            builder.samplingProcedureFreeTexts(cmmStudyMapper.parseSamplingProcedureFreeTexts(document, defaultLangIsoCode));
+            builder.typeOfModeOfCollections(cmmStudyMapper.parseTypeOfModeOfCollection(document, defaultLangIsoCode));
+            var dataCollectionPeriod = cmmStudyMapper.parseDataCollectionDates(document);
+            dataCollectionPeriod.getStartDate().ifPresent(builder::dataCollectionPeriodStartdate);
+            dataCollectionPeriod.getEndDate().ifPresent(builder::dataCollectionPeriodEnddate);
+            builder.dataCollectionYear(dataCollectionPeriod.getDataCollectionYear());
+            builder.dataCollectionFreeTexts(cmmStudyMapper.parseDataCollectionFreeTexts(document, defaultLangIsoCode));
         }
         return builder;
     }
