@@ -15,6 +15,7 @@
  */
 package eu.cessda.pasc.oci.configurations;
 
+import eu.cessda.pasc.oci.actuator.LivenessEndpoint;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.actuate.metrics.export.prometheus.PrometheusScrapeEndpoint;
@@ -33,6 +34,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests().requestMatchers(EndpointRequest.to(HealthEndpoint.class)).permitAll()
                 .requestMatchers(EndpointRequest.to(PrometheusScrapeEndpoint.class)).permitAll()
+                .requestMatchers(EndpointRequest.to(LivenessEndpoint.class)).permitAll()
                 .requestMatchers(EndpointRequest.toAnyEndpoint()).hasRole("ACTUATOR") // Secure actuator endpoints
                 .anyRequest().permitAll() // Enable access to REST APIs without authentication
                 .and().formLogin() // Enable form based login

@@ -14,9 +14,10 @@
 server:
   port: 9902
 management:
-  endpoints:
-    health.show-details: true
+  endpoint:
+    health.show-details: always
     shutdown.enabled: true
+  endpoints:
     web:
       exposure.include: '*'
 logging:

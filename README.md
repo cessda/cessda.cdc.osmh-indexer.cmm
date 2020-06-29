@@ -90,7 +90,7 @@ Harvesting Schedule timers:
 
 ```yaml
 osmhConsumer:
- delay:
+  delay:
     # Auto Starts after delay of 60 seconds at startup
     initial: '60000'
 ```
