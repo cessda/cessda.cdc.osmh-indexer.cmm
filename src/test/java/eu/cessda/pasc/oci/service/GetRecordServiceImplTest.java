@@ -31,8 +31,10 @@ import eu.cessda.pasc.oci.models.cmmstudy.CMMConverter;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.repository.DaoBase;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -60,6 +62,7 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
+@Slf4j
 public class GetRecordServiceImplTest {
 
   @Autowired
@@ -80,7 +83,7 @@ public class GetRecordServiceImplTest {
   public void setUp() {
     repo = appConfigurationProperties.getEndpoints().getRepos()
             .stream().filter(repo -> repo.getName().equals("FSD")).findAny().orElseThrow();
-    ;
+
     recordIdentifier = "http://my-example_url:80/obj/fStudy/ch.sidos.ddi.468.7773";
     fullRecordUrl = URI.create(repo.getUrl() + "?verb=GetRecord&identifier=" + URLEncoder.encode(recordIdentifier, StandardCharsets.UTF_8) + "&metadataPrefix=oai_ddi25");
   }
@@ -274,7 +277,7 @@ public class GetRecordServiceImplTest {
 
     String jsonString = cmmConverter.toJsonString(record);
     JSONObject json = new JSONObject(jsonString);
-    System.out.println("RETRIEVED STUDY JSON: \n" + json.toString(4));
+    log.info("RETRIEVED STUDY JSON: \n" + json.toString(4));
 
     JsonNode jsonNodeRecord = JsonLoader.fromString(jsonString);
     final JsonSchema schema = JsonSchemaFactory.byDefault().getJsonSchema("resource:/json/schema/CMMStudySchema.json");
@@ -310,16 +313,11 @@ public class GetRecordServiceImplTest {
     assertEquals(expectedTree.get("publisher").toString(), actualTree.get("publisher").toString(), true);
     assertEquals(expectedTree.get("creators").toString(), actualTree.get("creators").toString(), true);
     assertEquals(expectedTree.get("fileLanguages").toString(), actualTree.get("fileLanguages").toString(), true);
-    assertEquals(expectedTree
-        .get("typeOfSamplingProcedures").toString(), actualTree.get("typeOfSamplingProcedures").toString(), true);
-    assertEquals(expectedTree
-        .get("samplingProcedureFreeTexts").toString(), actualTree.get("samplingProcedureFreeTexts").toString(), true);
-    assertEquals(expectedTree
-        .get("typeOfModeOfCollections").toString(), actualTree.get("typeOfModeOfCollections").toString(), true);
-    assertEquals(expectedTree
-        .get("dataCollectionFreeTexts").toString(), actualTree.get("dataCollectionFreeTexts").toString(), true);
-    assertEquals(expectedTree
-        .get("dataAccessFreeTexts").toString(), actualTree.get("dataAccessFreeTexts").toString(), true);
+    assertEquals(expectedTree.get("typeOfSamplingProcedures").toString(), actualTree.get("typeOfSamplingProcedures").toString(), true);
+    assertEquals(expectedTree.get("samplingProcedureFreeTexts").toString(), actualTree.get("samplingProcedureFreeTexts").toString(), true);
+    assertEquals(expectedTree.get("typeOfModeOfCollections").toString(), actualTree.get("typeOfModeOfCollections").toString(), true);
+    assertEquals(expectedTree.get("dataCollectionFreeTexts").toString(), actualTree.get("dataCollectionFreeTexts").toString(), true);
+    assertEquals(expectedTree.get("dataAccessFreeTexts").toString(), actualTree.get("dataAccessFreeTexts").toString(), true);
     assertEquals(expectedTree.get("studyUrl").toString(), actualTree.get("studyUrl").toString(), true);
     assertEquals(expectedTree.get("studyXmlSourceUrl").toString(), actualTree.get("studyXmlSourceUrl").toString(), true);
   }
@@ -338,5 +336,26 @@ public class GetRecordServiceImplTest {
     assertEquals(expectedTree.get("studyUrl").toString(), actualTree.get("studyUrl").toString(), true);
     then(expectedTree.get("studyNumber").toString()).isEqualTo(actualTree.get("studyNumber").toString());
     assertEquals(expectedTree.get("publisher").toString(), actualTree.get("publisher").toString(), true);
+  }
+
+  @Test
+  public void shouldOverrideGlobalLanguageDefaultIfAPerRepositoryOverrideIsSpecified() throws CustomHandlerException, IOException, ProcessingException, JSONException {
+
+    var repository = appConfigurationProperties.getEndpoints().getRepos()
+            .stream().filter(repo -> repo.getName().equals("UKDS-LANG-OVERRIDE")).findAny().orElseThrow();
+
+    // Given
+    given(daoBase.getInputStream(fullRecordUrl)).willReturn(
+            CMMStudyTestData.getContentAsStream("xml/ddi_record_ukds_example.xml")
+    );
+
+    // When
+    CMMStudy result = recordService.getRecord(repository, recordIdentifier);
+
+    then(result).isNotNull();
+    validateCMMStudyResultAgainstSchema(result);
+
+    // Assert the language is as expected
+    Assert.assertNotNull(result.getTitleStudy().get("zz"));
   }
 }

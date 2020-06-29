@@ -16,16 +16,14 @@
 
 package eu.cessda.pasc.oci.models.oai.configuration;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 /**
  * OaiPmh configuration model
  *
  * @author moses AT doraventures DOT com
  */
-@Getter
-@Setter
+@Data
 public class OaiPmh {
   private MetadataParsingDefaultLang metadataParsingDefaultLang;
   private boolean concatRepeatedElements;

@@ -16,8 +16,7 @@
 
 package eu.cessda.pasc.oci.models.oai.configuration;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 /**
  * Defaults for parsing metadata fields with no xml:lang specified,
@@ -25,8 +24,7 @@ import lombok.Setter;
  *
  * @author moses AT doraventures DOT com
  */
-@Getter
-@Setter
+@Data
 public class MetadataParsingDefaultLang {
 
   private boolean active;

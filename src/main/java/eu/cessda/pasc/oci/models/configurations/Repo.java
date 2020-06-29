@@ -30,9 +30,22 @@ public class Repo implements Serializable {
 
     private static final long serialVersionUID = 5460376495600337528L;
 
+    /**
+     * The URL of the repository
+     */
     private URI url;
+    /**
+     * The friendly name of the repository
+     */
     private String name;
+    /**
+     * The repository handler
+     */
     private String handler;
     private String preferredMetadataParam;
     private String setSpec;
+    /**
+     * The default language, overrides the global default if set
+     */
+    private String defaultLanguage;
 }

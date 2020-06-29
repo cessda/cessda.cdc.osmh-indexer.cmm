@@ -53,19 +53,18 @@ public class LocalHarvesterConsumerService extends AbstractHarvesterConsumerServ
             List<RecordHeader> recordHeaders = listRecordHeadersService.getRecordHeaders(repo);
             return filterRecords(recordHeaders, lastModifiedDate);
         } catch (OaiPmhException e) {
-            Optional<String> oaiErrorMessage = e.getOaiErrorMessage();
-            if (oaiErrorMessage.isPresent()) {
-                log.error("[{}] ListRecordHeaders failed. {}: {}",
-                        repo.getName(),
-                        value(LoggingConstants.OAI_ERROR_CODE, e.getCode()),
-                        value(LoggingConstants.OAI_ERROR_MESSAGE, oaiErrorMessage.get())
-                );
-            } else {
-                log.error("[{}] ListRecordHeaders failed. {}.",
-                        repo.getName(),
-                        value(LoggingConstants.OAI_ERROR_CODE, e.getCode())
-                );
-            }
+            // Check if there was a message attached to the OAI error response
+            e.getOaiErrorMessage().ifPresentOrElse(
+                    oaiErrorMessage -> log.error("[{}] ListRecordHeaders failed. {}: {}",
+                            repo.getName(),
+                            value(LoggingConstants.OAI_ERROR_CODE, e.getCode()),
+                            value(LoggingConstants.OAI_ERROR_MESSAGE, oaiErrorMessage)
+                    ),
+                    () -> log.error("[{}] ListRecordHeaders failed. {}.",
+                            repo.getName(),
+                            value(LoggingConstants.OAI_ERROR_CODE, e.getCode())
+                    )
+            );
         } catch (CustomHandlerException e) {
             log.error("[{}] ListRecordHeaders failed:", value(LoggingConstants.REPO_NAME, repo.getName()), e);
         }
@@ -77,21 +76,19 @@ public class LocalHarvesterConsumerService extends AbstractHarvesterConsumerServ
         try {
             return Optional.of(getRecordService.getRecord(repo, studyNumber));
         } catch (OaiPmhException e) {
-            Optional<String> oaiErrorMessage = e.getOaiErrorMessage();
-            if (oaiErrorMessage.isPresent()) {
-                log.warn("[{}] Failed to get StudyId [{}]: {}: {}",
-                        repo.getName(),
-                        value(LoggingConstants.STUDY_ID, studyNumber),
-                        value(LoggingConstants.OAI_ERROR_CODE, e.getCode()),
-                        value(LoggingConstants.OAI_ERROR_MESSAGE, oaiErrorMessage.get())
-                );
-            } else {
-                log.warn("[{}] Failed to get StudyId [{}]: {}.",
-                        repo.getName(),
-                        value(LoggingConstants.STUDY_ID, studyNumber),
-                        value(LoggingConstants.OAI_ERROR_CODE, e.getCode())
-                );
-            }
+            e.getOaiErrorMessage().ifPresentOrElse(
+                    oaiErrorMessage -> log.warn("[{}] Failed to get StudyId [{}]: {}: {}",
+                            repo.getName(),
+                            value(LoggingConstants.STUDY_ID, studyNumber),
+                            value(LoggingConstants.OAI_ERROR_CODE, e.getCode()),
+                            value(LoggingConstants.OAI_ERROR_MESSAGE, oaiErrorMessage)
+                    ),
+                    () -> log.warn("[{}] Failed to get StudyId [{}]: {}.",
+                            repo.getName(),
+                            value(LoggingConstants.STUDY_ID, studyNumber),
+                            value(LoggingConstants.OAI_ERROR_CODE, e.getCode())
+                    )
+            );
         } catch (CustomHandlerException e) {
             log.warn("[{}] Failed to get StudyId [{}]",
                     value(LoggingConstants.REPO_NAME, repo.getName()),

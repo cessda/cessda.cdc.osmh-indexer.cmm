@@ -41,24 +41,24 @@ public class HandlerConfigurationPropertiesTest {
     @Autowired
     AppConfigurationProperties appConfigurationProperties;
 
-  @Test
-  public void shouldReturnConfigurationsForOSMHHandler() {
+    @Test
+    public void shouldReturnConfigurationsForOSMHHandler() {
 
-      var oaiPmh = appConfigurationProperties.getEndpoints();
+        var oaiPmh = appConfigurationProperties.getEndpoints();
 
-    then(oaiPmh).isNotNull();
+        then(oaiPmh).isNotNull();
 
-    then(oaiPmh.getSupportedRecordTypes()).hasSize(5);
+        then(oaiPmh.getSupportedRecordTypes()).hasSize(5);
 
-    then(oaiPmh.getRepos()).isNotNull();
-    then(oaiPmh.getRepos()).isNotEmpty();
-      then(oaiPmh.getRepos()).hasSize(3);
-      then(oaiPmh.getRepos().get(0).getUrl()).isEqualTo(URI.create("https://data2.aussda.at/oai/"));
-      then(oaiPmh.getRepos().get(0).getPreferredMetadataParam()).isEqualTo("oai_ddi");
-      then(oaiPmh.getRepos().get(1).getUrl()).isEqualTo(URI.create("http://services.fsd.uta.fi/v0/oai"));
-      then(oaiPmh.getRepos().get(1).getPreferredMetadataParam()).isEqualTo("oai_ddi25");
-      then(oaiPmh.getRepos().get(1).getSetSpec()).isEqualTo("study_groups:energia");
-      then(oaiPmh.getRepos().get(2).getUrl()).isEqualTo(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
-      then(oaiPmh.getRepos().get(2).getPreferredMetadataParam()).isEqualTo("ddi");
-  }
+        then(oaiPmh.getRepos()).isNotNull();
+        then(oaiPmh.getRepos()).isNotEmpty();
+        then(oaiPmh.getRepos()).hasSize(4);
+        then(oaiPmh.getRepos().get(0).getUrl()).isEqualTo(URI.create("https://data2.aussda.at/oai/"));
+        then(oaiPmh.getRepos().get(0).getPreferredMetadataParam()).isEqualTo("oai_ddi");
+        then(oaiPmh.getRepos().get(1).getUrl()).isEqualTo(URI.create("http://services.fsd.uta.fi/v0/oai"));
+        then(oaiPmh.getRepos().get(1).getPreferredMetadataParam()).isEqualTo("oai_ddi25");
+        then(oaiPmh.getRepos().get(1).getSetSpec()).isEqualTo("study_groups:energia");
+        then(oaiPmh.getRepos().get(2).getUrl()).isEqualTo(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
+        then(oaiPmh.getRepos().get(2).getPreferredMetadataParam()).isEqualTo("ddi");
+    }
 }
