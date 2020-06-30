@@ -31,11 +31,11 @@ import eu.cessda.pasc.oci.service.helpers.StudyIdentifierEncoder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -53,9 +53,6 @@ import static net.logstash.logback.argument.StructuredArguments.value;
 @Service
 @Slf4j
 public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerService {
-
-    private static final String LIST_RECORD_TEMPLATE = "%s/%s/ListRecordHeaders?Repository=%s";
-    private static final String GET_RECORD_TEMPLATE = "%s/%s/GetRecord/CMMStudy/%s?Repository=%s";
 
     private final DaoBase daoBase;
     private final ObjectReader recordHeaderObjectReader;
@@ -80,8 +77,6 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
             }
         } catch (IOException e) {
             log.error("[{}] ListRecordHeaders failed: {}", value(LoggingConstants.REPO_NAME, repo.getName()), e.toString());
-        } catch (URISyntaxException e) {
-            log.error("[{}] Unable to construct URL: {}", value(LoggingConstants.REPO_NAME, repo.getName()), e.toString());
         }
         return Collections.emptyList();
     }
@@ -109,43 +104,38 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
                     value(LoggingConstants.STUDY_ID, studyNumber),
                     e.toString()
             );
-        } catch (URISyntaxException e) {
-            log.error("[{}] Unable to construct URL for StudyId [{}]: {}.",
-                    value(LoggingConstants.REPO_NAME, repo.getName()),
-                    value(LoggingConstants.STUDY_ID, studyNumber),
-                    e.toString()
-            );
         }
         return Optional.empty();
     }
 
-    public URI constructListRecordUrl(Repo repo) throws URISyntaxException {
+    public URI constructListRecordUrl(Repo repo) {
         Harvester harvester = appConfigurationProperties.getEndpoints().getHarvesters().get(repo.getHandler().toUpperCase());
         if (harvester != null) {
-            String finalUrlString = String.format(LIST_RECORD_TEMPLATE,
-                    harvester.getUrl(),
-                    harvester.getVersion(),
-                    URLEncoder.encode(repo.getUrl().toString(), StandardCharsets.UTF_8)
-            );
-            URI finalUrl = new URI(finalUrlString);
-            log.trace("[{}] Final ListHeaders Handler url [{}] constructed.", repo.getName(), finalUrlString);
+            UriComponentsBuilder finalUrlBuilder = UriComponentsBuilder.fromUri(harvester.getUrl())
+                    .path(harvester.getVersion())
+                    .path("/ListRecordHeaders")
+                    .queryParam("Repository", URLEncoder.encode(repo.getUrl().toString(), StandardCharsets.UTF_8));
+            URI finalUrl = finalUrlBuilder.build(true).toUri();
+            log.trace("[{}] Final ListHeaders Handler url [{}] constructed.", repo.getName(), finalUrl);
             return finalUrl;
         } else {
             throw new HandlerNotFoundException(repo);
         }
     }
 
-    public URI constructGetRecordUrl(Repo repo, String studyNumber) throws URISyntaxException {
+    public URI constructGetRecordUrl(Repo repo, String studyNumber) {
         Harvester harvester = appConfigurationProperties.getEndpoints().getHarvesters().get(repo.getHandler().toUpperCase());
         if (harvester != null) {
             String encodedStudyID = StudyIdentifierEncoder.encodeStudyIdentifier().apply(studyNumber);
-            String finalUrlString = String.format(GET_RECORD_TEMPLATE,
-                    harvester.getUrl(),
-                    harvester.getVersion(),
-                    encodedStudyID,
-                    URLEncoder.encode(repo.getUrl().toString(), StandardCharsets.UTF_8)
-            );
-            URI finalUrl = new URI(finalUrlString);
+            UriComponentsBuilder finalUrlBuilder = UriComponentsBuilder.fromUri(harvester.getUrl())
+                    .path(harvester.getVersion())
+                    .path("/GetRecord/CMMStudy/")
+                    .path(encodedStudyID)
+                    .queryParam("Repository", URLEncoder.encode(repo.getUrl().toString(), StandardCharsets.UTF_8));
+            if (repo.getDefaultLanguage() != null) {
+                finalUrlBuilder.queryParam("LanguageOverride", repo.getDefaultLanguage());
+            }
+            URI finalUrl = finalUrlBuilder.build(true).toUri();
             log.trace("[{}] Final GetRecord Handler url [{}] constructed.", repo.getUrl(), finalUrl);
             return finalUrl;
         } else {
