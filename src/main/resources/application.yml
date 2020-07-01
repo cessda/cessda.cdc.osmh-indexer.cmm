@@ -136,6 +136,7 @@ osmhConsumer:
         name: 'SODA'
         handler: 'OAI-PMH'
         preferredMetadataParam: oai_ddi
+        defaultLanguage: fr
       - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
         name: 'UKDS'
         handler: 'OAI-PMH'
@@ -152,9 +153,11 @@ osmhConsumer:
       - url:  http://nesstar.sciences-po.fr/oai-pmh
         name: 'Progedo (Nesstar)'
         handler: 'NESSTAR'
+        defaultLanguage: fr
       - url:  http://harvester.sodanet.gr:8080/oai/request
         name: 'SoDaNet (Nesstar)'
         handler: 'NESSTAR'
+        defaultLanguage: el
       - url:  http://nesstar.unidata.unimib.it/oai-pmh
         name: 'Unidata (Nesstar)'
         handler: 'NESSTAR'

@@ -133,7 +133,7 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
                     .path(encodedStudyID)
                     .queryParam("Repository", URLEncoder.encode(repo.getUrl().toString(), StandardCharsets.UTF_8));
             if (repo.getDefaultLanguage() != null) {
-                finalUrlBuilder.queryParam("LanguageOverride", repo.getDefaultLanguage());
+                finalUrlBuilder.queryParam("defaultLanguage", repo.getDefaultLanguage());
             }
             URI finalUrl = finalUrlBuilder.build(true).toUri();
             log.trace("[{}] Final GetRecord Handler url [{}] constructed.", repo.getUrl(), finalUrl);

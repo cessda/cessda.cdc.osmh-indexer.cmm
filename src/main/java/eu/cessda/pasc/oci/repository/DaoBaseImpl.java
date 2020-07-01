@@ -82,9 +82,8 @@ public class DaoBaseImpl implements DaoBase {
                 );
             }
         } catch (InterruptedException e) {
-            log.warn("Interrupted. Request cancelled.");
             Thread.currentThread().interrupt();
-            return InputStream.nullInputStream();
+            throw new IllegalStateException("Interrupted", e);
         }
     }
 }

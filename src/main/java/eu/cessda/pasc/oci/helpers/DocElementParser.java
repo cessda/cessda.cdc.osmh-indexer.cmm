@@ -115,18 +115,6 @@ class DocElementParser {
     return builder.build();
   }
 
-  private static Optional<Attribute> parseLangAttribute(Element element) {
-    Optional<Attribute> parentLangAttr = ofNullable(element.getAttribute(LANG_ATTR, Namespace.XML_NAMESPACE));
-    Optional<Attribute> langAttr;
-    if (parentLangAttr.isPresent()) {
-      langAttr = parentLangAttr;
-    } else {
-      Optional<Element> concept = ofNullable(element.getChild("concept", DDI_NS));
-      langAttr = concept.map(value -> value.getAttribute(LANG_ATTR, Namespace.XML_NAMESPACE));
-    }
-    return langAttr;
-  }
-
   private static <T> void mapMetadataToLanguageCode(Map<String, List<T>> mapOfMetadataToLanguageCode,
                                                     T metadataPojo, String languageCode) {
 
@@ -150,8 +138,7 @@ class DocElementParser {
       Optional<T> parsedMetadataPojo = parserStrategy.apply(element);
       parsedMetadataPojo.ifPresent(parsedMetadataPojoValue -> {
         Optional<String> langCode = parseLanguageCode(defaultLangIsoCode, element);
-        langCode.ifPresent(code ->
-                mapMetadataToLanguageCode(mapOfMetadataToLanguageCode, parsedMetadataPojoValue, code));
+        langCode.ifPresent(code -> mapMetadataToLanguageCode(mapOfMetadataToLanguageCode, parsedMetadataPojoValue, code));
       });
     }
 
@@ -165,8 +152,9 @@ class DocElementParser {
     for (Element element : elements) {
       T parsedMetadataPojo = parserStrategy.apply(element);
       Optional<String> langCode = parseLanguageCode(defaultLangIsoCode, element);
-      langCode.ifPresent(languageIsoCode ->
-              mapOfMetadataToLanguageCode.put(languageIsoCode, parsedMetadataPojo)); //Overrides duplicates, last wins.
+
+      //Overrides duplicates, last wins.
+      langCode.ifPresent(languageIsoCode -> mapOfMetadataToLanguageCode.put(languageIsoCode, parsedMetadataPojo));
     }
 
     return mapOfMetadataToLanguageCode;
@@ -175,7 +163,11 @@ class DocElementParser {
   private Optional<String> parseLanguageCode(String defaultLangIsoCode, Element element) {
     Optional<String> langCode = Optional.empty();
 
-    Optional<Attribute> langAttr = parseLangAttribute(element);
+    Optional<Attribute> langAttr = ofNullable(element.getAttribute(LANG_ATTR, Namespace.XML_NAMESPACE));
+    if (langAttr.isEmpty()) {
+      Optional<Element> concept = ofNullable(element.getChild("concept", DDI_NS));
+      langAttr = concept.map(value -> value.getAttribute(LANG_ATTR, Namespace.XML_NAMESPACE));
+    }
     if (langAttr.isPresent() && !langAttr.get().getValue().isEmpty()) {
       langCode = ofNullable(langAttr.get().getValue());
     } else if (oaiPmh.getMetadataParsingDefaultLang().isActive()) {

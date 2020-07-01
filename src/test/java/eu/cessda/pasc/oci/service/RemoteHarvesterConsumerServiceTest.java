@@ -243,7 +243,7 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
     String recordID = "998";
     URI expectedUrl = URI.create("http://localhost:9091/v0/GetRecord/CMMStudy/" + recordID + "?Repository=" +
             URLEncoder.encode("https://oai.ukdataservice.ac.uk:8443/oai/provider", StandardCharsets.UTF_8) +
-            "&LanguageOverride=zz");
+            "&defaultLanguage=zz");
 
     when(daoBase.getInputStream(expectedUrl)).thenReturn(
             new ByteArrayInputStream(recordUkds998.getBytes(StandardCharsets.UTF_8))

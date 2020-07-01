@@ -263,8 +263,7 @@ public class CMMStudyMapper {
 
     // https://bitbucket.org/cessda/cessda.cdc.version2/issues/135
     if (!titles.isEmpty()) {
-      Map<String, String> parTitles =
-              parseLanguageContentOfElement(document, langCode, PAR_TITLE_XPATH, false);
+      Map<String, String> parTitles = parseLanguageContentOfElement(document, langCode, PAR_TITLE_XPATH, false);
       parTitles.forEach(titles::putIfAbsent);  // parTitl lang must not be same as or override titl lang
     }
     HTMLFilter.cleanMapValues(titles);
