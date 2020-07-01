@@ -31,14 +31,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -50,8 +48,8 @@ import static eu.cessda.pasc.oci.mock.data.ReposTestData.getUKDSRepo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Java6BDDAssertions.then;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author moses AT doraventures DOT com
@@ -68,8 +66,12 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
 
   @Autowired
   CMMStudyConverter cmmStudyConverter;
+
+
   @Mock
   private DaoBase daoBase;
+
+  private final FileHandler fileHandler = new FileHandler();
 
   @Before
   public void setUp() {
@@ -156,18 +158,6 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
   }
 
   @Test
-  public void shouldReturnEmptyListWhenURISyntaxExceptionIsThrown() throws URISyntaxException {
-
-    RemoteHarvesterConsumerService spy = Mockito.spy(remoteHarvesterConsumerService);
-    doThrow(URISyntaxException.class).when(spy).constructListRecordUrl(any(Repo.class));
-
-    Repo repo = getUKDSRepo();
-
-    List<RecordHeader> recordHeaders = spy.listRecordHeaders(repo, null);
-    assertThat(recordHeaders).isEmpty();
-  }
-
-  @Test
   public void shouldReturnEmptyCMMStudyListWhenExternalSystemExceptionIsThrown() throws IOException {
     // Given
     Repo repoMock = mock(Repo.class);
@@ -198,24 +188,7 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
   }
 
   @Test
-  public void shouldReturnEmptyCMMStudyListWhenURISyntaxExceptionIsThrown() throws URISyntaxException {
-    // Given
-    Repo repoMock = mock(Repo.class);
-    when(repoMock.getUrl()).thenReturn(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
-    when(repoMock.getHandler()).thenReturn("NESSTAR");
-
-    RemoteHarvesterConsumerService spy = Mockito.spy(remoteHarvesterConsumerService);
-    doThrow(URISyntaxException.class).when(spy).constructGetRecordUrl(any(Repo.class), anyString());
-
-    Optional<CMMStudy> actualRecord = spy.getRecord(repoMock, "4124325");
-
-    // Then exception is thrown caught and an empty list returned
-    then(actualRecord.isPresent()).isFalse();
-  }
-
-  @Test
   public void shouldReturnASuccessfulResponseGetRecord() throws IOException {
-    FileHandler fileHandler = new FileHandler();
     String recordUkds998 = fileHandler.getFileAsString("record_ukds_998.json");
     String recordID = "998";
     URI expectedUrl = URI.create("http://localhost:9091/v0/GetRecord/CMMStudy/998?Repository=" +
@@ -240,7 +213,6 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
 
   @Test
   public void shouldReturnDeletedRecordMarkedAsInactive() throws IOException {
-    FileHandler fileHandler = new FileHandler();
     String recordUkds1031 = fileHandler.getFileAsString("record_ukds_1031_deleted.json");
     String recordID = "1031";
     URI expectedUrl = URI.create("http://localhost:9091/v0/GetRecord/CMMStudy/1031?Repository=" +
@@ -263,5 +235,25 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
     then(cmmStudy.get().getPublisher()).isNull();
     then(cmmStudy.get().getKeywords()).isNull();
     then(cmmStudy.get().getCreators()).isNull();
+  }
+
+  @Test
+  public void shouldAddLanguageOverrideIfPresent() throws IOException {
+    String recordUkds998 = fileHandler.getFileAsString("record_ukds_998.json");
+    String recordID = "998";
+    URI expectedUrl = URI.create("http://localhost:9091/v0/GetRecord/CMMStudy/" + recordID + "?Repository=" +
+            URLEncoder.encode("https://oai.ukdataservice.ac.uk:8443/oai/provider", StandardCharsets.UTF_8) +
+            "&defaultLanguage=zz");
+
+    when(daoBase.getInputStream(expectedUrl)).thenReturn(
+            new ByteArrayInputStream(recordUkds998.getBytes(StandardCharsets.UTF_8))
+    );
+
+    Repo repo = getUKDSRepo();
+    repo.setDefaultLanguage("zz");
+
+    Optional<CMMStudy> cmmStudy = remoteHarvesterConsumerService.getRecord(repo, recordID);
+
+    assertThat(cmmStudy.isPresent()).isTrue();
   }
 }

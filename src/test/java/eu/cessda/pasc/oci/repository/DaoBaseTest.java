@@ -89,8 +89,8 @@ public class DaoBaseTest extends AbstractSpringTestProfileContext {
         }
     }
 
-    @Test
-    public void shouldReturnEmptyStreamWhenInterrupted() throws IOException {
+    @Test(expected = IllegalStateException.class)
+    public void shouldThrowIllegalStateExceptionOnInterruption() throws IOException {
 
         // Given
         httpClient.onGet().doAction(DaoBaseTest::throwInterruptedException);

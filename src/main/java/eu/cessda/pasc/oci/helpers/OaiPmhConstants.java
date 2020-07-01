@@ -32,8 +32,7 @@ public class OaiPmhConstants {
   private static final String OAI_NS_PATH =  URI.create("http://www.openarchives.org/OAI/2.0/").toString();
   private static final String DDI_NS_PATH = "ddi:codebook:2_5";
 
-  // Name Spaces
-  static final Namespace XML_NS = Namespace.getNamespace("xml", "http://www.w3.org/XML/1998/namespace");
+  // Namespaces
   static final Namespace OAI_NS = Namespace.getNamespace("oai", OAI_NS_PATH);
   static final Namespace DDI_NS = Namespace.getNamespace("ddi", DDI_NS_PATH);
   static final Namespace[] OAI_AND_DDI_NS = {OAI_NS, DDI_NS};

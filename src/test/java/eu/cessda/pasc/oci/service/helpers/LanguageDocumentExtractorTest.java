@@ -176,12 +176,9 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
     }
   }
 
-  @Test
+  @Test(expected = NullPointerException.class)
   public void shouldReturnFalseForInValidCMMStudyForLang() {
-
     // When
-    boolean actual = languageDocumentExtractor.isValidCMMStudyForLang("en", "UK Data Service", null);
-
-    then(actual).isFalse();
+    languageDocumentExtractor.isValidCMMStudyForLang("en", "UK Data Service", null);
   }
 }

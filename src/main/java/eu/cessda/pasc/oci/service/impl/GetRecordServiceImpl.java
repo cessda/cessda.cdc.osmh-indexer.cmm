@@ -16,7 +16,6 @@
 
 package eu.cessda.pasc.oci.service.impl;
 
-import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
 import eu.cessda.pasc.oci.exception.InternalSystemException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.helpers.CMMStudyMapper;
@@ -24,7 +23,6 @@ import eu.cessda.pasc.oci.helpers.OaiPmhHelpers;
 import eu.cessda.pasc.oci.helpers.RecordResponseValidator;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.configurations.Repo;
-import eu.cessda.pasc.oci.models.oai.configuration.OaiPmh;
 import eu.cessda.pasc.oci.repository.DaoBase;
 import eu.cessda.pasc.oci.service.GetRecordService;
 import lombok.extern.slf4j.Slf4j;
@@ -53,12 +51,10 @@ public class GetRecordServiceImpl implements GetRecordService {
     private final CMMStudyMapper cmmStudyMapper;
     private final DaoBase daoBase;
     private final RecordResponseValidator recordResponseValidator;
-    private final HandlerConfigurationProperties oaiPmhHandlerConfig;
 
     @Autowired
-    public GetRecordServiceImpl(CMMStudyMapper cmmStudyMapper, DaoBase daoBase, HandlerConfigurationProperties oaiPmhHandlerConfig, RecordResponseValidator recordResponseValidator) {
+    public GetRecordServiceImpl(CMMStudyMapper cmmStudyMapper, DaoBase daoBase, RecordResponseValidator recordResponseValidator) {
         this.daoBase = daoBase;
-        this.oaiPmhHandlerConfig = oaiPmhHandlerConfig;
         this.cmmStudyMapper = cmmStudyMapper;
         this.recordResponseValidator = recordResponseValidator;
     }
@@ -70,19 +66,18 @@ public class GetRecordServiceImpl implements GetRecordService {
         try {
             fullUrl = OaiPmhHelpers.buildGetStudyFullUrl(repo, studyIdentifier);
             try (InputStream recordXML = daoBase.getInputStream(fullUrl)) {
-                return mapDDIRecordToCMMStudy(recordXML).studyXmlSourceUrl(fullUrl.toString()).build();
+                return mapDDIRecordToCMMStudy(recordXML, repo).studyXmlSourceUrl(fullUrl.toString()).build();
             }
         } catch (JDOMException | IOException e) {
-            throw new InternalSystemException(String.format("Unable to parse xml! FullUrl [%s]: %s", fullUrl, e.toString()), e);
+            throw new InternalSystemException(String.format("Unable to parse xml! FullUrl [%s]: %s", fullUrl, e), e);
         } catch (URISyntaxException e) {
-            throw new InternalSystemException("Unable to construct URL: " + e.toString(), e);
+            throw new InternalSystemException(e);
         }
     }
 
-    private CMMStudy.CMMStudyBuilder mapDDIRecordToCMMStudy(InputStream recordXML) throws JDOMException, IOException, OaiPmhException {
+    private CMMStudy.CMMStudyBuilder mapDDIRecordToCMMStudy(InputStream recordXML, Repo repository) throws JDOMException, IOException, OaiPmhException {
 
         CMMStudy.CMMStudyBuilder builder = CMMStudy.builder();
-        OaiPmh oaiPmh = oaiPmhHandlerConfig.getOaiPmh();
         Document document = getSaxBuilder().build(recordXML);
 
         if (log.isTraceEnabled()) {
@@ -93,28 +88,34 @@ public class GetRecordServiceImpl implements GetRecordService {
         recordResponseValidator.validateResponse(document);
 
         // Short-Circuit. We carry on to parse beyond the headers only if the record is active.
-        boolean isActiveRecord = cmmStudyMapper.parseHeaderElement(builder, document);
-        if (isActiveRecord) {
-            String defaultLangIsoCode = cmmStudyMapper.parseDefaultLanguage(document, oaiPmh);
-            cmmStudyMapper.parseStudyTitle(builder, document, oaiPmh, defaultLangIsoCode);
-            cmmStudyMapper.parseStudyUrl(builder, document, oaiPmh, defaultLangIsoCode);
-            cmmStudyMapper.parseAbstract(builder, document, oaiPmh, defaultLangIsoCode);
-            cmmStudyMapper.parsePidStudies(builder, document, oaiPmh, defaultLangIsoCode);
-            cmmStudyMapper.parseCreator(builder, document, oaiPmh, defaultLangIsoCode);
-            cmmStudyMapper.parseDataAccessFreeText(builder, document, oaiPmh, defaultLangIsoCode);
-            cmmStudyMapper.parseClassifications(builder, document, oaiPmh, defaultLangIsoCode);
-            cmmStudyMapper.parseKeywords(builder, document, oaiPmh, defaultLangIsoCode);
-            cmmStudyMapper.parseTypeOfTimeMethod(builder, document, oaiPmh, defaultLangIsoCode);
-            cmmStudyMapper.parseStudyAreaCountries(builder, document, oaiPmh, defaultLangIsoCode);
-            cmmStudyMapper.parseUnitTypes(builder, document, oaiPmh, defaultLangIsoCode);
-            cmmStudyMapper.parsePublisher(builder, document, oaiPmh, defaultLangIsoCode);
-            cmmStudyMapper.parseYrOfPublication(builder, document);
-            cmmStudyMapper.parseFileLanguages(builder, document);
-            cmmStudyMapper.parseTypeOfSamplingProcedure(builder, document, oaiPmh, defaultLangIsoCode);
-            cmmStudyMapper.parseSamplingProcedureFreeTexts(builder, document, oaiPmh, defaultLangIsoCode);
-            cmmStudyMapper.parseTypeOfModeOfCollection(builder, document, oaiPmh, defaultLangIsoCode);
-            cmmStudyMapper.parseDataCollectionDates(builder, document);
-            cmmStudyMapper.parseDataCollectionFreeTexts(builder, document, oaiPmh, defaultLangIsoCode);
+        var headerElement = cmmStudyMapper.parseHeaderElement(document);
+        headerElement.getStudyNumber().ifPresent(builder::studyNumber);
+        headerElement.getLastModified().ifPresent(builder::lastModified);
+        builder.active(headerElement.isRecordActive());
+        if (headerElement.isRecordActive()) {
+            String defaultLangIsoCode = cmmStudyMapper.parseDefaultLanguage(document, repository);
+            builder.titleStudy(cmmStudyMapper.parseStudyTitle(document, defaultLangIsoCode));
+            builder.studyUrl(cmmStudyMapper.parseStudyUrl(document, defaultLangIsoCode));
+            builder.abstractField(cmmStudyMapper.parseAbstract(document, defaultLangIsoCode));
+            builder.pidStudies(cmmStudyMapper.parsePidStudies(document, defaultLangIsoCode));
+            builder.creators(cmmStudyMapper.parseCreator(document, defaultLangIsoCode));
+            builder.dataAccessFreeTexts(cmmStudyMapper.parseDataAccessFreeText(document, defaultLangIsoCode));
+            builder.classifications(cmmStudyMapper.parseClassifications(document, defaultLangIsoCode));
+            builder.keywords(cmmStudyMapper.parseKeywords(document, defaultLangIsoCode));
+            builder.typeOfTimeMethods(cmmStudyMapper.parseTypeOfTimeMethod(document, defaultLangIsoCode));
+            builder.studyAreaCountries(cmmStudyMapper.parseStudyAreaCountries(document, defaultLangIsoCode));
+            builder.unitTypes(cmmStudyMapper.parseUnitTypes(document, defaultLangIsoCode));
+            builder.publisher(cmmStudyMapper.parsePublisher(document, defaultLangIsoCode));
+            cmmStudyMapper.parseYrOfPublication(document).ifPresent(builder::publicationYear);
+            builder.fileLanguages(cmmStudyMapper.parseFileLanguages(document));
+            builder.typeOfSamplingProcedures(cmmStudyMapper.parseTypeOfSamplingProcedure(document, defaultLangIsoCode));
+            builder.samplingProcedureFreeTexts(cmmStudyMapper.parseSamplingProcedureFreeTexts(document, defaultLangIsoCode));
+            builder.typeOfModeOfCollections(cmmStudyMapper.parseTypeOfModeOfCollection(document, defaultLangIsoCode));
+            var dataCollectionPeriod = cmmStudyMapper.parseDataCollectionDates(document);
+            dataCollectionPeriod.getStartDate().ifPresent(builder::dataCollectionPeriodStartdate);
+            dataCollectionPeriod.getEndDate().ifPresent(builder::dataCollectionPeriodEnddate);
+            builder.dataCollectionYear(dataCollectionPeriod.getDataCollectionYear());
+            builder.dataCollectionFreeTexts(cmmStudyMapper.parseDataCollectionFreeTexts(document, defaultLangIsoCode));
         }
         return builder;
     }

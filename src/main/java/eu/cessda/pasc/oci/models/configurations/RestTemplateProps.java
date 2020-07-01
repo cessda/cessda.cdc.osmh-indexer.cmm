@@ -15,20 +15,18 @@
  */
 package eu.cessda.pasc.oci.models.configurations;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 /**
  * RestTemplate Properties configuration model
  *
  * @author moses AT doraventures DOT com
  */
-@Getter
-@Setter
+@Data
 public class RestTemplateProps {
 
-  private int connTimeout;
-  private int connRequestTimeout;
-  private int readTimeout;
-  private boolean verifySSL;
+    private int connTimeout;
+    private int connRequestTimeout;
+    private int readTimeout;
+    private boolean verifySSL;
 }

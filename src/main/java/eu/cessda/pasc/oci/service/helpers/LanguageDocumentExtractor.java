@@ -18,6 +18,7 @@ package eu.cessda.pasc.oci.service.helpers;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -51,11 +52,10 @@ public class LanguageDocumentExtractor {
 
     log.debug("Mapping CMMStudy to CMMStudyOfLanguage for SP[{}] with [{}] records", spName, cmmStudies.size());
     Map<String, List<CMMStudyOfLanguage>> languageDocMap = new HashMap<>();
-    String idPrefix = spName.trim().replace(" ", "-") + "__"; // UK Data Service = UK-Data-Service__
 
     for (String langCode : appConfigurationProperties.getLanguages()) {
       log.trace("Extract CMMStudyOfLanguage for [{}] language code - STARTED", langCode);
-      List<CMMStudyOfLanguage> collectLanguageCmmStudy = getCmmStudiesOfLangCode(cmmStudies, idPrefix, langCode);
+      List<CMMStudyOfLanguage> collectLanguageCmmStudy = getCmmStudiesOfLangCode(cmmStudies, spName, langCode);
       languageDocMap.put(langCode, collectLanguageCmmStudy);
     }
 
@@ -67,9 +67,9 @@ public class LanguageDocumentExtractor {
     return languageDocMap;
   }
 
-  private List<CMMStudyOfLanguage> getCmmStudiesOfLangCode(Collection<CMMStudy> cmmStudies, String idPrefix, String languageIsoCode) {
-    return cmmStudies.stream().filter(cmmStudy -> isValidCMMStudyForLang(languageIsoCode, idPrefix, cmmStudy))
-            .map(cmmStudy -> getCmmStudyOfLanguage(idPrefix, languageIsoCode, cmmStudy))
+  private List<CMMStudyOfLanguage> getCmmStudiesOfLangCode(Collection<CMMStudy> cmmStudies, String spName, String languageIsoCode) {
+    return cmmStudies.stream().filter(cmmStudy -> isValidCMMStudyForLang(languageIsoCode, spName, cmmStudy))
+            .map(cmmStudy -> getCmmStudyOfLanguage(spName, languageIsoCode, cmmStudy))
             .collect(Collectors.toList());
   }
 
@@ -82,30 +82,25 @@ public class LanguageDocumentExtractor {
    * @param cmmStudy        the CmmStudy Object
    * @return true if Study is available in other languages
    */
-  boolean isValidCMMStudyForLang(String languageIsoCode, String idPrefix, CMMStudy cmmStudy) {
-
-    if (cmmStudy == null) {
-      logInvalidCMMStudy("Study is null for language[{}] with studyNumber [{}]", languageIsoCode, idPrefix, null);
-      return false;
-    }
+  boolean isValidCMMStudyForLang(String languageIsoCode, String idPrefix, @NonNull CMMStudy cmmStudy) {
 
     // Inactive = deleted record no need to validate against CMM below. Index as is. Filtered in Frontend.
     if (!cmmStudy.isActive()) {
-      logInvalidCMMStudy("Study is not Active for language [{}] with studyNumber [{}]", languageIsoCode, idPrefix, cmmStudy);
+      logInvalidCMMStudy(languageIsoCode, idPrefix, cmmStudy);
       return true;
     }
 
     return cmmStudy.getLangAvailableIn().contains(languageIsoCode);
   }
 
-  private void logInvalidCMMStudy(String msgTemplate, String languageIsoCode, String idPrefix, CMMStudy cmmStudy) {
+  private void logInvalidCMMStudy(String languageIsoCode, String spName, CMMStudy cmmStudy) {
     if (log.isWarnEnabled()) {
-      final String studyNumber = idPrefix + "-" + Optional.ofNullable(cmmStudy).map(CMMStudy::getStudyNumber).orElse("Empty");
-      log.warn(msgTemplate, languageIsoCode, studyNumber);
+      final String studyNumber = Optional.ofNullable(cmmStudy).map(CMMStudy::getStudyNumber).orElse("Empty");
+      log.warn("[{}] StudyId [{}] is not active for language [{}]", spName, studyNumber, languageIsoCode);
     }
   }
 
-  private CMMStudyOfLanguage getCmmStudyOfLanguage(String idPrefix, String lang, CMMStudy cmmStudy) {
+  private CMMStudyOfLanguage getCmmStudyOfLanguage(String spName, String lang, CMMStudy cmmStudy) {
 
     String formatMsg = "Extracting CMMStudyOfLang from CMMStudyNumber [{}] for lang [{}]";
     log.trace(formatMsg, cmmStudy.getStudyNumber(), lang);
@@ -113,6 +108,7 @@ public class LanguageDocumentExtractor {
     CMMStudyOfLanguage.CMMStudyOfLanguageBuilder builder = CMMStudyOfLanguage.builder();
 
     // Language neutral specific field extraction
+    String idPrefix = spName.trim().replace(" ", "-") + "__"; // UK Data Service = UK-Data-Service__
     builder.id(idPrefix + cmmStudy.getStudyNumber())
             .studyNumber(cmmStudy.getStudyNumber())
             .active(cmmStudy.isActive())

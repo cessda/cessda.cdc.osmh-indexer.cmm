@@ -32,4 +32,8 @@ public class InternalSystemException extends CustomHandlerException {
     public InternalSystemException(String message, Throwable cause) {
         super(message, cause);
     }
+
+    public InternalSystemException(Throwable cause) {
+        super(cause);
+    }
 }

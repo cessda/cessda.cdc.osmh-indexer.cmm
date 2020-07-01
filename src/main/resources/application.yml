@@ -137,6 +137,7 @@ osmhConsumer:
         name: 'SODA'
         handler: 'OAI-PMH'
         preferredMetadataParam: oai_ddi
+        defaultLanguage: fr
       - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
         name: 'UKDS'
         handler: 'OAI-PMH'
@@ -153,9 +154,11 @@ osmhConsumer:
       - url:  http://nesstar.sciences-po.fr/oai-pmh
         name: 'Progedo (Nesstar)'
         handler: 'NESSTAR'
+        defaultLanguage: fr
       - url:  http://harvester.sodanet.gr:8080/oai/request
         name: 'SoDaNet (Nesstar)'
         handler: 'NESSTAR'
+        defaultLanguage: el
       - url:  http://nesstar.unidata.unimib.it/oai-pmh
         name: 'Unidata (Nesstar)'
         handler: 'NESSTAR'
@@ -267,6 +270,11 @@ osmhConsumer:
       - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
         preferredMetadataParam: ddi
         name: 'UKDS'
+        handler: 'OAI-PMH'
+      - url: http://services.fsd.uta.fi/v0/oai
+        preferredMetadataParam: oai_ddi25
+        name: 'UKDS-LANG-OVERRIDE'
+        defaultLanguage: zz
         handler: 'OAI-PMH'
   delay:
     # For tests, the delay should be effectively disabled

@@ -32,4 +32,8 @@ public class CustomHandlerException extends Exception {
     protected CustomHandlerException(String message, Throwable cause) {
         super(message, cause);
     }
+
+    public CustomHandlerException(Throwable cause) {
+        super(cause);
+    }
 }

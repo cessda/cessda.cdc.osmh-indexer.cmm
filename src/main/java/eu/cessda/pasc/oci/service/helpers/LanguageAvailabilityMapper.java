@@ -17,12 +17,11 @@ package eu.cessda.pasc.oci.service.helpers;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
-import eu.cessda.pasc.oci.models.cmmstudy.Publisher;
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Component responsible for extracting and mapping languages in which a given CMMStudy is available.
@@ -41,46 +40,28 @@ public class LanguageAvailabilityMapper {
     this.appConfigurationProperties = appConfigurationProperties;
   }
 
-  public void setAvailableLanguages(CMMStudy cmmStudy) {
-
+  /**
+   * Sets the available language field based on whether the minimum fields for that language are available.
+   * <p>
+   * The minimum fields required for a language are a title, an abstract, a study number and a publisher.
+   *
+   * @param cmmStudy the {@link CMMStudy} to check.
+   */
+  public void setAvailableLanguages(@NonNull CMMStudy cmmStudy) {
     final List<String> propertiesLanguages = appConfigurationProperties.getLanguages();
     for (String lang : propertiesLanguages) {
-      if (hasMinimumCmmFields(lang, cmmStudy)) {
+      if (hasMinimumCmmFields(cmmStudy, lang)) {
         cmmStudy.getLangAvailableIn().add(lang);
       }
     }
   }
 
-  private boolean hasMinimumCmmFields(String languageIsoCode, CMMStudy cmmStudy) {
-
-    if (cmmStudy == null) {
-      return false;
-    }
-
+  private boolean hasMinimumCmmFields(CMMStudy cmmStudy, String languageIsoCode) {
     // the CMM record must meet the minimum CMM Fields requirements for given Lang Iso Code
-    return hasTitle(languageIsoCode, cmmStudy) &&
-        hasAbstract(languageIsoCode, cmmStudy) &&
-        hasStudyNumber(cmmStudy) &&
-        hasPublisher(languageIsoCode, cmmStudy);
-  }
-
-  private boolean hasPublisher(String languageIsoCode, CMMStudy cmmStudy) {
-    Map<String, Publisher> publisherMap = cmmStudy.getPublisher();
-    return (publisherMap != null) && (publisherMap.get(languageIsoCode) != null);
-  }
-
-  private boolean hasStudyNumber(CMMStudy cmmStudy) {
-    String studyNumber = cmmStudy.getStudyNumber();
-    return (studyNumber != null) && !studyNumber.isEmpty();
-  }
-
-  private boolean hasAbstract(String languageIsoCode, CMMStudy cmmStudy) {
-    Map<String, String> abstractFieldMap = cmmStudy.getAbstractField();
-    return (abstractFieldMap != null) && (abstractFieldMap.get(languageIsoCode) != null);
-  }
-
-  private boolean hasTitle(String languageIsoCode, CMMStudy cmmStudy) {
-    Map<String, String> titleStudyMap = cmmStudy.getTitleStudy();
-    return (titleStudyMap != null) && (titleStudyMap.get(languageIsoCode) != null);
+    // It must have a title, an abstract field, a study number and a publisher
+    return (cmmStudy.getTitleStudy() != null) && (cmmStudy.getTitleStudy().get(languageIsoCode) != null) &&
+            (cmmStudy.getAbstractField() != null) && (cmmStudy.getAbstractField().get(languageIsoCode) != null) &&
+            (cmmStudy.getStudyNumber() != null) && !cmmStudy.getStudyNumber().isEmpty() &&
+            (cmmStudy.getPublisher() != null) && (cmmStudy.getPublisher().get(languageIsoCode) != null);
   }
 }
