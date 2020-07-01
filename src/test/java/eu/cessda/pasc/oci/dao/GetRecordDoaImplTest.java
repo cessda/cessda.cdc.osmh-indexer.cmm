@@ -17,11 +17,8 @@
 package eu.cessda.pasc.oci.dao;
 
 import com.pgssoft.httpclient.HttpClientMock;
-import com.pgssoft.httpclient.MockedServerResponse;
 import eu.cessda.pasc.oci.exception.ExternalSystemException;
 import eu.cessda.pasc.oci.repository.DaoBaseImpl;
-import lombok.SneakyThrows;
-import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -42,11 +39,6 @@ public class GetRecordDoaImplTest {
 
 
     private final HttpClientMock httpClient = new HttpClientMock();
-
-    @SneakyThrows
-    private static void throwInterruptedException(MockedServerResponse.Builder responseBuilder) {
-        throw new InterruptedException("Mocked");
-    }
 
     @Test
     public void shouldReturnXMLPayloadOfGivenRecordIdentifierFromGivenRepoURL() throws IOException {
@@ -75,18 +67,5 @@ public class GetRecordDoaImplTest {
         // When
         var recordDoa = new DaoBaseImpl(httpClient);
         recordDoa.getInputStream(URI.create(expectedFullGetRecordUrl));
-    }
-
-    @Test
-    public void shouldReturnEmptyStreamWhenInterrupted() throws IOException {
-
-        // Given
-        httpClient.onGet().doAction(GetRecordDoaImplTest::throwInterruptedException);
-
-        // When
-        var recordDoa = new DaoBaseImpl(httpClient);
-        try (InputStream empty = recordDoa.getInputStream(URI.create("http://error.endpoint/"))) {
-            Assert.assertEquals(-1, empty.read());
-        }
     }
 }
