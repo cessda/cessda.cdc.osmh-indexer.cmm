@@ -52,20 +52,19 @@ public class DaoBaseImpl implements DaoBase {
     public InputStream getInputStream(URI uri) throws IOException {
         HttpRequest httpRequest = HttpRequest.newBuilder(uri).build();
         try {
-            log.debug("Sending request to remote SP with url [{}].", uri);
+            log.debug("Sending request to url [{}].", uri);
 
             Instant start = null;
-            if (log.isDebugEnabled()) {
+            if (log.isTraceEnabled()) {
                 start = Instant.now();
             }
 
             HttpResponse<InputStream> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofInputStream());
 
-            if (log.isDebugEnabled()) {
+            if (log.isTraceEnabled()) {
                 Instant end = Instant.now();
                 assert start != null;
-                log.debug("Got response code of [{}], getting headers took [{}] ms",
-                        httpResponse.statusCode(), Duration.between(start, end).toMillis());
+                log.debug("Got response code of [{}], getting headers took [{}] ms", httpResponse.statusCode(), Duration.between(start, end).toMillis());
             }
 
             // Check the returned HTTP status code, throw an exception if not a success code

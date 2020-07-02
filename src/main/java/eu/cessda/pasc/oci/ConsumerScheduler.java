@@ -104,7 +104,7 @@ public class ConsumerScheduler {
 
   private OffsetDateTime logStartStatus(String runDescription) {
     final OffsetDateTime startTime = OffsetDateTime.now(ZoneId.systemDefault());
-    log.info("[{}] Consume and Ingest All SPs Repos: \nStarted at [{}]\nCurrents state before run:\n{}\n{}",
+    log.info("[{}] Consume and Ingest All SPs Repos: \nStarted at [{}]\nCurrent state before run:\n{}\n{}",
             runDescription,
             startTime,
             debuggingJMXBean.printCurrentlyConfiguredRepoEndpoints(),

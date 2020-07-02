@@ -50,18 +50,18 @@ public class LanguageDocumentExtractor {
    */
   public Map<String, List<CMMStudyOfLanguage>> mapLanguageDoc(Collection<CMMStudy> cmmStudies, String spName) {
 
-    log.debug("Mapping CMMStudy to CMMStudyOfLanguage for SP[{}] with [{}] records", spName, cmmStudies.size());
+    log.debug("[{}] Mapping [{}] CMMStudies to CMMStudyOfLanguage", spName, cmmStudies.size());
     Map<String, List<CMMStudyOfLanguage>> languageDocMap = new HashMap<>();
 
     for (String langCode : appConfigurationProperties.getLanguages()) {
-      log.trace("Extract CMMStudyOfLanguage for [{}] language code - STARTED", langCode);
+      log.trace("[{}] Extract CMMStudyOfLanguage for [{}] language code - STARTED", spName, langCode);
       List<CMMStudyOfLanguage> collectLanguageCmmStudy = getCmmStudiesOfLangCode(cmmStudies, spName, langCode);
       languageDocMap.put(langCode, collectLanguageCmmStudy);
     }
 
     if (log.isDebugEnabled()) {
       for (Map.Entry<String, List<CMMStudyOfLanguage>> entry : languageDocMap.entrySet()) {
-        log.debug("langIsoCode [{}] has [{}] records that has passed CMM minimum fields validation", entry.getKey(), entry.getValue().size());
+        log.debug("[{}] langIsoCode [{}] has [{}] records that passed CMM minimum fields validation", spName, entry.getKey(), entry.getValue().size());
       }
     }
     return languageDocMap;

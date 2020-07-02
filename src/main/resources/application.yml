@@ -104,7 +104,7 @@ osmhConsumer:
       - url: https://kuha.sa.dk/v0/oai
         name: 'DNA'
         handler: 'OAI-PMH'
-        preferredMetadataParam: oai_ddi25_en
+        preferredMetadataParam: oai_ddi25
         # Placeholder for FORS
         #     - url: ''
         #     name: 'FORS'
@@ -244,7 +244,7 @@ spring:
 logging:
   level:
     eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor: DEBUG
-    eu.cessda.pasc.oci.repository.DaoBase: DEBUG
+    eu.cessda.pasc.oci.repository.DaoBase: TRACE
 osmhConsumer:
   endpoints:
     supportedRecordTypes:

@@ -162,7 +162,7 @@ public class ESIngestService implements IngestService {
             }
         } catch (IndexNotFoundException e) {
             // This is expected when the index is not available
-            log.debug("Index for language [{}] not found. {}", language, e.toString());
+            log.trace("Index for language [{}] not found: {}", language, e.toString());
         } catch (IOException e) {
             log.error("Failed to retrieve study [{}].", id, e);
         }
@@ -269,7 +269,7 @@ public class ESIngestService implements IngestService {
         try {
             json = fileHandler.getFileAsString(String.format(template, language));
         } catch (FileNotFoundException e) {
-            log.debug("Language specific JSON " + String.format(template, language) + " not found, falling back to " + String.format(template, INDEX_TYPE));
+            log.debug("[{}] Language specific JSON {} not found, falling back to {}", String.format(template, language), String.format(template, language), String.format(template, INDEX_TYPE));
             json = fileHandler.getFileAsString(String.format(template, INDEX_TYPE));
         }
         return json;
