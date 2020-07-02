@@ -48,7 +48,7 @@ public class DebuggingJMXBeanTestIT {
     public void shouldPrintElasticsearchDetails() {
         ElasticsearchTemplate elasticsearchTemplate = new ElasticsearchTemplate(this.elasticsearchTemplate.getClient());
         debuggingJMXBean = new DebuggingJMXBean(elasticsearchTemplate, appConfigurationProperties);
-        assertThat(debuggingJMXBean.printElasticSearchInfo()).startsWith("ElasticSearch Client Settings Details");
+        assertThat(debuggingJMXBean.printElasticSearchInfo()).startsWith("Elasticsearch Client Settings");
     }
 
     @Test
