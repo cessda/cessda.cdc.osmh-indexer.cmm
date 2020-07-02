@@ -144,6 +144,7 @@ osmhConsumer:
       - url: http://nesstar.soc.cas.cz/oai-pmh
         name: 'CSDA (Nesstar)'
         handler: 'NESSTAR'
+        defaultLanguage: cs
       - url: https://oai-pmh.nsd.no/oai-pmh
         name: 'NSD (Nesstar)'
         handler: 'NESSTAR'
