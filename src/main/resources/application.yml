@@ -26,11 +26,7 @@ logging:
     file: '%d{yyyy-MM-dd HH:mm:ss.SSS}  %-5level  %40.40((%file:%line\)) - %message%n'
   level:
     ROOT: WARN
-    eu.cessda.pasc: INFO
-    eu.cessda.pasc.oci.service: INFO
-    eu.cessda.pasc.oci.repository: INFO
-    eu.cessda.pasc.oci.helpers: INFO
-    eu.cessda.pasc.oci.configurations.PerfRequestSyncInterceptor: DEBUG
+    eu.cessda.pasc.oci: INFO
 spring:
   mail:
     host: pasc-mailrelay
@@ -209,6 +205,10 @@ elasticsearch:
   numberOfShards: 2
   numberOfReplicas: 2
 osmhConsumer:
+  delay:
+    # Auto Starts after delay of 5 minutes at startup
+    initial: '300000'
+    fixed: '315360000000'
   daily:
     # The following variables are defined using cron notation
     run: ${OSMHCONSUMER_DAILY_RUN}
@@ -235,7 +235,7 @@ spring:
 logging:
   level:
     ROOT: INFO
-    eu.cessda.pasc.oci: TRACE
+    eu.cessda.pasc.oci: DEBUG
 ---
 spring:
   main:
