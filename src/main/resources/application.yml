@@ -88,79 +88,80 @@ osmhConsumer:
         version: 'v0'
     supportedRecordTypes:
       - CMMStudy
+    # Use 'code descriptive term' taken from CDC Publisher Names CV
     repos:
       - url: http://194.117.18.18:6003/v0/oai
-        name: 'APIS'
+        name: 'Portuguese Archive of Social Information (APIS)'
         handler: 'OAI-PMH'
         preferredMetadataParam: oai_ddi25
       - url: https://data2.aussda.at/oai
-        name: 'AUSSDA'
+        name: 'Austrian Social Science Data Archive (AUSSDA)'
         handler: 'OAI-PMH'
         preferredMetadataParam: oai_ddi
       - url: https://easy.dans.knaw.nl/oai/
-        name: 'DANS'
+        name: 'DANS-KNAW'
         handler: 'OAI-PMH'
         preferredMetadataParam: oai_ddi25_nl
       - url: https://kuha.sa.dk/v0/oai
-        name: 'DNA'
+        name: 'Danish National Archives (DNA)'
         handler: 'OAI-PMH'
         preferredMetadataParam: oai_ddi25
         # Placeholder for FORS
         #     - url: ''
-        #     name: 'FORS'
+        #     name: 'TBC'
         #     handler: 'OAI-PMH'
       - url: http://services.fsd.uta.fi/v0/oai
-        name: 'FSD'
+        name: 'Finnish Social Science Data Archive (FSD)'
         handler: 'OAI-PMH'
         preferredMetadataParam: oai_ddi25
       - url: https://dbkapps.gesis.org/dbkoai3
-        name: 'GESIS'
+        name: 'GESIS - Leibniz Institute for the Social Sciences'
         handler: 'OAI-PMH'
         preferredMetadataParam: oai_ddi25
       # For testing purposes only
       - url: https://data.sciencespo.fr/oai
-        name: 'PROGEDO'
+        name: 'PROGEDO: Sciences Po'
         handler: 'OAI-PMH'
         setSpec: CDSP
         defaultLanguage: fr
       - url: http://147.213.4.44:6003/v0/oai
-        name: 'SASD'
+        name: 'Slovak Archive of Social Data (SASD)'
         handler: 'OAI-PMH'
         preferredMetadataParam: oai_ddi25
       - url: https://snd.gu.se/en/oai-pmh
-        name: 'SND'
+        name: 'Swedish National Data Service (SND)'
         handler: 'OAI-PMH'
         setSpec: discipline:social-science
       - url: https://dataverse.arch.be/oai
-        name: 'SODA'
+        name: 'Social Sciences Data Archive (SODA)'
         handler: 'OAI-PMH'
         preferredMetadataParam: oai_ddi
         defaultLanguage: fr
       - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
-        name: 'UKDS'
+        name: 'UK Data Service'
         handler: 'OAI-PMH'
         preferredMetadataParam: ddi
       - url: https://nesstar2.adp.fdv.uni-lj.si/oai-pmh
-        name: 'ADP'
+        name: 'Slovenian Social Science Data Archives (ADP)'
         handler: 'NESSTAR'
       - url: http://nesstar.soc.cas.cz/oai-pmh
-        name: 'CSDA'
+        name: 'Czech Social Science Data Archive (ČSDA)'
         handler: 'NESSTAR'
         defaultLanguage: cs
       - url: https://oai-pmh.nsd.no/oai-pmh
-        name: 'NSD'
+        name: 'NSD - Norwegian Centre for Research Data'
         handler: 'NESSTAR'
       # For production only (until further notice)
       #- url:  http://nesstar.sciences-po.fr/oai-pmh
-      #  name: 'PROGEDO'
+      #  name: 'TBC'
       #  handler: 'NESSTAR'
       #  defaultLanguage: fr
       - url:  http://harvester.sodanet.gr:8080/oai/request
-        name: 'SoDaNet'
+        name: 'SoDaNet - Greek Research Infrastructure for Social Science'
         handler: 'NESSTAR'
         defaultLanguage: el
       - url:  http://nesstar.unidata.unimib.it/oai-pmh
-        name: 'Unidata'
+        name: 'UniData - Bicocca Data Archive'
         handler: 'NESSTAR'
   restTemplateProps:
     connTimeout: 10000 # increased from 5 seconds to 10 seconds to deal with slower Nesstar repos
