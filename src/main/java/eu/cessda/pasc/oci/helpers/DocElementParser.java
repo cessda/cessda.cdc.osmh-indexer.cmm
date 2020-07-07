@@ -18,7 +18,6 @@ package eu.cessda.pasc.oci.helpers;
 
 import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
 import eu.cessda.pasc.oci.models.cmmstudy.TermVocabAttributes;
-import eu.cessda.pasc.oci.models.cmmstudy.VocabAttributes;
 import eu.cessda.pasc.oci.models.oai.configuration.OaiPmh;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
@@ -69,40 +68,22 @@ class DocElementParser {
     return expression.evaluate(document).stream().filter(Objects::nonNull).collect(toList());
   }
 
-  /**
-   * Extracts Date elements from doc that has @date
-   *
-   * @param document       the document to parse
-   * @param xPathToElement the xPath
-   * @return nonNull list of {@link Element}
-   */
-  private List<Element> getElementsWithDateAttr(Document document, String xPathToElement) {
-    XPathExpression<Element> expression = xFactory.compile(xPathToElement, Filters.element(), null, OAI_AND_DDI_NS);
-    return expression.evaluate(document).stream()
-            .filter(Objects::nonNull)
-            .filter(element -> getAttributeValue(element, DATE_ATTR)
-                    .isPresent()) //PUG requirement: we only care about those with @date CV
-            .collect(toList());
+  private static <T> void mapMetadataToLanguageCode(Map<String, List<T>> mapOfMetadataToLanguageCode, T metadataPojo, String languageCode) {
+    List<T> currentLanguageMetadataList;
+    if (mapOfMetadataToLanguageCode.containsKey(languageCode)) {
+      currentLanguageMetadataList = mapOfMetadataToLanguageCode.get(languageCode);
+    } else {
+      // set Afresh
+      currentLanguageMetadataList = new ArrayList<>();
+    }
+    currentLanguageMetadataList.add(metadataPojo);
+    mapOfMetadataToLanguageCode.put(languageCode, currentLanguageMetadataList);
   }
 
   static TermVocabAttributes parseTermVocabAttrAndValues(Element parentElement, Element concept, boolean hasControlledValue) {
     TermVocabAttributes.TermVocabAttributesBuilder builder = TermVocabAttributes.builder();
     builder.term(CLEAN_CHARACTER_RETURNS_STRATEGY.apply(parentElement.getText()));
 
-    if (hasControlledValue) {
-      builder.vocab(getAttributeValue(concept, VOCAB_ATTR).orElse(""))
-          .vocabUri(getAttributeValue(concept, VOCAB_URI_ATTR).orElse(""))
-          .id(concept.getText());
-    } else {
-      builder.vocab(getAttributeValue(parentElement, VOCAB_ATTR).orElse(""))
-          .vocabUri(getAttributeValue(parentElement, VOCAB_URI_ATTR).orElse(""))
-          .id(getAttributeValue(parentElement, ID_ATTR).orElse(""));
-    }
-    return builder.build();
-  }
-
-  static VocabAttributes parseVocabAttrAndValues(Element parentElement, Element concept, boolean hasControlledValue) {
-    VocabAttributes.VocabAttributesBuilder builder = VocabAttributes.builder();
     if (hasControlledValue) {
       builder.vocab(getAttributeValue(concept, VOCAB_ATTR).orElse(""))
               .vocabUri(getAttributeValue(concept, VOCAB_URI_ATTR).orElse(""))
@@ -115,17 +96,19 @@ class DocElementParser {
     return builder.build();
   }
 
-  private static <T> void mapMetadataToLanguageCode(Map<String, List<T>> mapOfMetadataToLanguageCode,
-                                                    T metadataPojo, String languageCode) {
-
-    List<T> currentLanguageMetadataList; // set Afresh
-    if (mapOfMetadataToLanguageCode.containsKey(languageCode)) {
-      currentLanguageMetadataList = mapOfMetadataToLanguageCode.get(languageCode);
-    } else {
-      currentLanguageMetadataList = new ArrayList<>();
-    }
-    currentLanguageMetadataList.add(metadataPojo);
-    mapOfMetadataToLanguageCode.put(languageCode, currentLanguageMetadataList);
+  /**
+   * Extracts Date elements from doc that has @date
+   *
+   * @param document       the document to parse
+   * @param xPathToElement the xPath
+   * @return nonNull list of {@link Element}
+   */
+  private List<Element> getElementsWithDateAttr(Document document, String xPathToElement) {
+    XPathExpression<Element> expression = xFactory.compile(xPathToElement, Filters.element(), null, OAI_AND_DDI_NS);
+    return expression.evaluate(document).stream()
+            .filter(Objects::nonNull)
+            .filter(element -> getAttributeValue(element, DATE_ATTR).isPresent()) //PUG requirement: we only care about those with @date CV
+            .collect(toList());
   }
 
   <T> Map<String, List<T>> extractMetadataObjectListForEachLang(
@@ -217,9 +200,7 @@ class DocElementParser {
             // Currently there is no requirement to extract dates of event per language.
             .filter(element -> Objects.nonNull(element.getAttributeValue(EVENT_ATTR)))
             .filter(distinctByKey(element -> element.getAttributeValue(EVENT_ATTR)))
-            .collect(Collectors.toMap(element ->
-                    element.getAttributeValue(EVENT_ATTR), element ->
-                    element.getAttributeValue(DATE_ATTR)));
+            .collect(Collectors.toMap(element -> element.getAttributeValue(EVENT_ATTR), element -> element.getAttributeValue(DATE_ATTR)));
   }
 
   private List<Attribute> getAttributes(Document document, String xPathToElement) {

@@ -17,6 +17,7 @@
 package eu.cessda.pasc.oci.helpers;
 
 import eu.cessda.pasc.oci.models.configurations.Repo;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -37,7 +38,11 @@ import static eu.cessda.pasc.oci.helpers.OaiPmhConstants.*;
 @UtilityClass
 public class OaiPmhHelpers {
 
-  public static URI buildGetStudyFullUrl(Repo repo, String studyIdentifier) throws URISyntaxException {
+  private static final String LIST_RECORD_HEADERS_URL_TEMPLATE = "%s?%s=%s&%s=%s";
+  private static final String LIST_RECORD_HEADERS_PER_SET_URL_TEMPLATE = "%s?%s=%s&%s=%s&%s=%s";
+  private static final String GET_RECORD_URL_TEMPLATE = "%s?%s=%s&%s=%s&%s=%s";
+
+  public static URI buildGetStudyFullUrl(@NonNull Repo repo, @NonNull String studyIdentifier) throws URISyntaxException {
     return new URI(String.format(
             GET_RECORD_URL_TEMPLATE, repo.getUrl(),
             VERB_PARAM_KEY, GET_RECORD_VALUE, // verb=GetRecord
@@ -46,7 +51,7 @@ public class OaiPmhHelpers {
     ));
   }
 
-  public static URI appendListRecordParams(Repo repoConfig) {
+  public static URI appendListRecordParams(@NonNull Repo repoConfig) {
     if (StringUtils.isBlank(repoConfig.getSetSpec())) {
       return URI.create(String.format(LIST_RECORD_HEADERS_URL_TEMPLATE, repoConfig.getUrl(),
               VERB_PARAM_KEY, LIST_IDENTIFIERS_VALUE, // verb=ListIdentifier
@@ -59,11 +64,10 @@ public class OaiPmhHelpers {
     }
   }
 
-  public static URI appendListRecordResumptionToken(URI baseRepoUrl, String resumptionToken) {
+  public static URI appendListRecordResumptionToken(@NonNull URI baseRepoUrl, @NonNull String resumptionToken) {
     return URI.create(String.format(LIST_RECORD_HEADERS_URL_TEMPLATE, baseRepoUrl,
             VERB_PARAM_KEY, LIST_IDENTIFIERS_VALUE, // verb=ListIdentifier
             RESUMPTION_TOKEN_KEY, URLEncoder.encode(resumptionToken, StandardCharsets.UTF_8)) // &resumptionToken=0001/500....
     );
   }
-
 }

@@ -41,36 +41,22 @@ public class TimeUtility {
 
     /**
      * Attempts to pass date string using multiple expected date formats into a LocalDateTime.
-     * If all fails return an Optional.empty().
      *
-     * @param dateString to parse as a LocalDateTime.
-     * @return the Optional of LocalDateTime or of empty.
+     * @param dateString to parse as a {@link LocalDateTime}.
+     * @return the {@link Optional} of {@link LocalDateTime}, or an {@link Optional#empty()} if the date failed to parse.
+     * @throws IllegalArgumentException if the string is {@code null}
      */
     public static Optional<LocalDateTime> getLocalDateTime(String dateString) {
-        Optional<LocalDateTime> recordLastModifiedZoneDateTime;
-
-    try {
-      Date date = DateUtils.parseDate(dateString, EXPECTED_DATE_FORMATS);
-      recordLastModifiedZoneDateTime = Optional.of(date.toInstant()
-              .atZone(ZoneOffset.UTC)
-              .toLocalDateTime());
-        return recordLastModifiedZoneDateTime;
-    } catch (ParseException | IllegalArgumentException e) {
-        String formatMsg = "Cannot parse date string [{}] using expected date formats [{}], Exception Message [{}]";
-        log.error(formatMsg, dateString, EXPECTED_DATE_FORMATS, e.getMessage());
-        recordLastModifiedZoneDateTime = Optional.empty();
-    }
-        return recordLastModifiedZoneDateTime;
+        try {
+            Date date = DateUtils.parseDate(dateString, EXPECTED_DATE_FORMATS);
+            return Optional.of(date.toInstant().atZone(ZoneOffset.UTC).toLocalDateTime());
+        } catch (ParseException e) {
+            log.error("Cannot parse date string [{}] using expected date formats [{}]: {}", dateString, EXPECTED_DATE_FORMATS, e.toString());
+            return Optional.empty();
+        }
     }
 
     static Function<String, Optional<Integer>> dataCollYearDateFunction() {
-        return dateString -> {
-            Optional<LocalDateTime> localDateTime = TimeUtility.getLocalDateTime(dateString);
-            if (localDateTime.isPresent()) {
-                int yearValue = localDateTime.get().getYear();
-                return Optional.of(yearValue);
-            }
-            return Optional.empty();
-        };
+        return dateString -> TimeUtility.getLocalDateTime(dateString).map(LocalDateTime::getYear);
     }
 }

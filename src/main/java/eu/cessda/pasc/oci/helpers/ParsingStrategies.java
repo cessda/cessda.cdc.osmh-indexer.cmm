@@ -23,7 +23,8 @@ import org.jdom2.Element;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static eu.cessda.pasc.oci.helpers.DocElementParser.*;
+import static eu.cessda.pasc.oci.helpers.DocElementParser.getAttributeValue;
+import static eu.cessda.pasc.oci.helpers.DocElementParser.parseTermVocabAttrAndValues;
 import static eu.cessda.pasc.oci.helpers.HTMLFilter.CLEAN_CHARACTER_RETURNS_STRATEGY;
 import static eu.cessda.pasc.oci.helpers.OaiPmhConstants.*;
 import static java.util.Optional.ofNullable;
@@ -100,12 +101,21 @@ class ParsingStrategies {
 
     return element -> {
       Optional<Element> concept = ofNullable(element.getChild(CONCEPT_EL, DDI_NS));
-      if (concept.isPresent()) {  //PUG req. only process if element has a <concept>
-        Element conceptVal = concept.orElse(new Element(EMPTY_EL));
-        VocabAttributes vocabValueAttrs = parseVocabAttrAndValues(element, conceptVal, hasControlledValue);
-        return Optional.of(vocabValueAttrs);
-      }
-      return Optional.empty();
+
+      //PUG req. only process if element has a <concept>
+      return concept.map(conceptVal -> {
+        VocabAttributes.VocabAttributesBuilder builder = VocabAttributes.builder();
+        if (hasControlledValue) {
+          builder.vocab(getAttributeValue(conceptVal, VOCAB_ATTR).orElse(""))
+                  .vocabUri(getAttributeValue(conceptVal, VOCAB_URI_ATTR).orElse(""))
+                  .id(conceptVal.getText());
+        } else {
+          builder.vocab(getAttributeValue(element, VOCAB_ATTR).orElse(""))
+                  .vocabUri(getAttributeValue(element, VOCAB_URI_ATTR).orElse(""))
+                  .id(getAttributeValue(element, ID_ATTR).orElse(""));
+        }
+        return builder.build();
+      });
     };
   }
 
