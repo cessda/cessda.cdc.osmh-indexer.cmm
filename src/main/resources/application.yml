@@ -108,7 +108,7 @@ osmhConsumer:
         preferredMetadataParam: oai_ddi25
         # Placeholder for FORS
         #     - url: ''
-        #     name: 'TBC'
+        #     name: 'FORS - Swiss Centre of Expertise in the Social Sciences'
         #     handler: 'OAI-PMH'
         #     preferredMetadataParam: oai_ddi25
       - url: http://services.fsd.uta.fi/v0/oai
@@ -149,7 +149,7 @@ osmhConsumer:
         handler: 'NESSTAR'
         preferredMetadataParam: oai_ddi
       - url: http://nesstar.soc.cas.cz/oai-pmh
-        name: 'Czech Social Science Data Archive (ČSDA)'
+        name: 'Czech Social Science Data Archive (CSDA)'
         handler: 'NESSTAR'
         preferredMetadataParam: oai_ddi
         defaultLanguage: cs
