@@ -110,6 +110,7 @@ osmhConsumer:
         #     - url: ''
         #     name: 'TBC'
         #     handler: 'OAI-PMH'
+        #     preferredMetadataParam: oai_ddi25
       - url: http://services.fsd.uta.fi/v0/oai
         name: 'Finnish Social Science Data Archive (FSD)'
         handler: 'OAI-PMH'
@@ -123,6 +124,7 @@ osmhConsumer:
         name: 'PROGEDO: Sciences Po'
         handler: 'OAI-PMH'
         setSpec: CDSP
+        preferredMetadataParam: oai_ddi
         defaultLanguage: fr
       - url: http://147.213.4.44:6003/v0/oai
         name: 'Slovak Archive of Social Data (SASD)'
@@ -132,8 +134,9 @@ osmhConsumer:
         name: 'Swedish National Data Service (SND)'
         handler: 'OAI-PMH'
         setSpec: discipline:social-science
+        preferredMetadataParam: oai_ddi25
       - url: https://dataverse.arch.be/oai
-        name: 'Social Sciences Data Archive (SODA)'
+        name: 'SODA'
         handler: 'OAI-PMH'
         preferredMetadataParam: oai_ddi
         defaultLanguage: fr
@@ -144,13 +147,16 @@ osmhConsumer:
       - url: https://nesstar2.adp.fdv.uni-lj.si/oai-pmh
         name: 'Slovenian Social Science Data Archives (ADP)'
         handler: 'NESSTAR'
+        preferredMetadataParam: oai_ddi
       - url: http://nesstar.soc.cas.cz/oai-pmh
         name: 'Czech Social Science Data Archive (ČSDA)'
         handler: 'NESSTAR'
+        preferredMetadataParam: oai_ddi
         defaultLanguage: cs
       - url: https://oai-pmh.nsd.no/oai-pmh
         name: 'NSD - Norwegian Centre for Research Data'
         handler: 'NESSTAR'
+        preferredMetadataParam: oai_ddi
       # For production only (until further notice)
       #- url:  http://nesstar.sciences-po.fr/oai-pmh
       #  name: 'TBC'
@@ -159,10 +165,12 @@ osmhConsumer:
       - url:  http://harvester.sodanet.gr:8080/oai/request
         name: 'SoDaNet - Greek Research Infrastructure for Social Science'
         handler: 'NESSTAR'
+        preferredMetadataParam: oai_ddi
         defaultLanguage: el
       - url:  http://nesstar.unidata.unimib.it/oai-pmh
         name: 'UniData - Bicocca Data Archive'
         handler: 'NESSTAR'
+        preferredMetadataParam: oai_ddi
   restTemplateProps:
     connTimeout: 10000 # increased from 5 seconds to 10 seconds to deal with slower Nesstar repos
     connRequestTimeout: 5000 # 5 seconds
