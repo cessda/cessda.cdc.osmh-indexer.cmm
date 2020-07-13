@@ -18,14 +18,11 @@ package eu.cessda.pasc.oci.mock.data;
 
 
 import eu.cessda.pasc.oci.helpers.FileHandler;
-import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import lombok.experimental.UtilityClass;
-import org.assertj.core.util.Maps;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
 
 /**
  * mock data for Record headers.
@@ -34,18 +31,6 @@ import java.util.Map;
  */
 @UtilityClass
 public class CMMStudyTestData {
-
-  public static CMMStudy getCMMStudy() {
-
-    CMMStudy.CMMStudyBuilder builder = CMMStudy.builder();
-    Map<String, String> titleStudy = Maps.newHashMap("en", "study title");
-    titleStudy.put("no", "et study title");
-    builder.titleStudy(titleStudy);
-
-    builder.studyNumber("Noi1254");
-    builder.abstractField(Maps.newHashMap("en", "my abstract description text"));
-    return builder.build();
-  }
 
   public static String getContent(String filePath) throws IOException {
     FileHandler fileHandler = new FileHandler();

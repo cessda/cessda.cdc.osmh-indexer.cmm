@@ -96,7 +96,7 @@ public class HarvesterConsumerServiceRunnerTest {
     });
 
     Map<String, Integer> repoHeadersCount = new HashMap<>();
-    repoHeadersCount.put(repo.getName(), size);
+    repoHeadersCount.put(repo.getCode(), size);
 
     return repoHeadersCount;
   }

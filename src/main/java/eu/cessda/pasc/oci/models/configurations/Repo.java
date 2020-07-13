@@ -35,6 +35,10 @@ public class Repo implements Serializable {
      */
     private URI url;
     /**
+     * The short name of the repository
+     */
+    private String code;
+    /**
      * The friendly name of the repository
      */
     private String name;

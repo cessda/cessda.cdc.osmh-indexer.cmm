@@ -64,7 +64,7 @@ public class ListRecordHeadersServiceImplTest {
 
     // Given
     Repo ukdsEndpoint = appConfigurationProperties.getEndpoints().getRepos()
-            .stream().filter(repo -> repo.getName().equals("UKDS")).findAny().orElseThrow();
+            .stream().filter(repo -> repo.getCode().equals("UKDS")).findAny().orElseThrow();
     String fullListRecordRepoUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=ListIdentifiers&metadataPrefix=ddi";
     String mockRecordHeadersXml = RecordHeadersMock.getListIdentifiersXMLResumptionEmpty();
     given(daoBase.getInputStream(URI.create(fullListRecordRepoUrl))).willReturn(
@@ -85,7 +85,7 @@ public class ListRecordHeadersServiceImplTest {
 
     // Given
     Repo ukdsEndpoint = appConfigurationProperties.getEndpoints().getRepos()
-            .stream().filter(repo -> repo.getName().equals("UKDS")).findAny().orElseThrow();
+            .stream().filter(repo -> repo.getCode().equals("UKDS")).findAny().orElseThrow();
     String fullListRecordRepoUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=ListIdentifiers&metadataPrefix=ddi";
     String mockRecordHeadersXml = RecordHeadersMock.getListIdentifiersXMLResumptionTokenNotMockedForInvalid();
     given(daoBase.getInputStream(URI.create(fullListRecordRepoUrl))).willReturn(
@@ -102,7 +102,7 @@ public class ListRecordHeadersServiceImplTest {
 
     // Given
     Repo ukdsEndpoint = appConfigurationProperties.getEndpoints().getRepos()
-            .stream().filter(repo -> repo.getName().equals("UKDS")).findAny().orElseThrow();
+            .stream().filter(repo -> repo.getCode().equals("UKDS")).findAny().orElseThrow();
     URI fullListRecordRepoUrl = URI.create(ukdsEndpoint.getUrl().toString() + "?verb=ListIdentifiers&metadataPrefix=ddi");
     String identifiersXML = RecordHeadersMock.getListIdentifiersXML();
 
@@ -142,7 +142,7 @@ public class ListRecordHeadersServiceImplTest {
 
     // Given
     Repo ukdsEndpoint = appConfigurationProperties.getEndpoints().getRepos()
-            .stream().filter(repo -> repo.getName().equals("UKDS")).findAny().orElseThrow();
+            .stream().filter(repo -> repo.getCode().equals("UKDS")).findAny().orElseThrow();
     String fullListRecordRepoUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=ListIdentifiers&metadataPrefix=ddi";
 
     String mockRecordHeadersXml = RecordHeadersMock.getListIdentifiersXMLWithInvalidMetadataTokenError();

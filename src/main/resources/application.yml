@@ -91,69 +91,84 @@ osmhConsumer:
     # Use 'code descriptive term' taken from CDC Publisher Names CV
     repos:
       - url: http://194.117.18.18:6003/v0/oai
+        code: APIS
         name: 'Portuguese Archive of Social Information (APIS)'
         handler: 'OAI-PMH'
         preferredMetadataParam: oai_ddi25
       - url: https://data2.aussda.at/oai
+        code: AUSSDA
         name: 'Austrian Social Science Data Archive (AUSSDA)'
         handler: 'OAI-PMH'
         preferredMetadataParam: oai_ddi
       - url: https://easy.dans.knaw.nl/oai/
+        code: DANS
         name: 'DANS-KNAW'
         handler: 'OAI-PMH'
         preferredMetadataParam: oai_ddi25_nl
       - url: https://kuha.sa.dk/v0/oai
+        code: DNA
         name: 'Danish National Archives (DNA)'
         handler: 'OAI-PMH'
         preferredMetadataParam: oai_ddi25
         # Placeholder for FORS
-        #     - url: ''
-        #     name: 'FORS - Swiss Centre of Expertise in the Social Sciences'
-        #     handler: 'OAI-PMH'
-        #     preferredMetadataParam: oai_ddi25
+      #      - url:
+      #        code: FORS
+      #        name: 'FORS - Swiss Centre of Expertise in the Social Sciences'
+      #        handler: 'OAI-PMH'
+      #        preferredMetadataParam: oai_ddi25
       - url: http://services.fsd.uta.fi/v0/oai
+        code: FSD
         name: 'Finnish Social Science Data Archive (FSD)'
         handler: 'OAI-PMH'
         preferredMetadataParam: oai_ddi25
       - url: https://dbkapps.gesis.org/dbkoai3
+        code: GESIS
         name: 'GESIS - Leibniz Institute for the Social Sciences'
         handler: 'OAI-PMH'
         preferredMetadataParam: oai_ddi25
       # For testing purposes only
       - url: https://data.sciencespo.fr/oai
+        code: ProgedoSciencesPo
         name: 'PROGEDO: Sciences Po'
         handler: 'OAI-PMH'
         setSpec: CDSP
         preferredMetadataParam: oai_ddi
         defaultLanguage: fr
       - url: http://147.213.4.44:6003/v0/oai
+        code: SASD
         name: 'Slovak Archive of Social Data (SASD)'
         handler: 'OAI-PMH'
         preferredMetadataParam: oai_ddi25
       - url: https://snd.gu.se/en/oai-pmh
+        code: SND
         name: 'Swedish National Data Service (SND)'
         handler: 'OAI-PMH'
         setSpec: discipline:social-science
         preferredMetadataParam: oai_ddi25
       - url: https://dataverse.arch.be/oai
+        code: SODA
         name: 'SODA'
         handler: 'OAI-PMH'
         preferredMetadataParam: oai_ddi
         defaultLanguage: fr
       - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
+        code: UKDS
         name: 'UK Data Service'
         handler: 'OAI-PMH'
         preferredMetadataParam: ddi
       - url: https://nesstar2.adp.fdv.uni-lj.si/oai-pmh
+        code: ADP
         name: 'Slovenian Social Science Data Archives (ADP)'
         handler: 'NESSTAR'
         preferredMetadataParam: oai_ddi
       - url: http://nesstar.soc.cas.cz/oai-pmh
+        code: CSDA
         name: 'Czech Social Science Data Archive (CSDA)'
         handler: 'NESSTAR'
         preferredMetadataParam: oai_ddi
         defaultLanguage: cs
       - url: https://oai-pmh.nsd.no/oai-pmh
+        code: NSD
         name: 'NSD - Norwegian Centre for Research Data'
         handler: 'NESSTAR'
         preferredMetadataParam: oai_ddi
@@ -163,11 +178,13 @@ osmhConsumer:
       #  handler: 'NESSTAR'
       #  defaultLanguage: fr
       - url:  http://harvester.sodanet.gr:8080/oai/request
+        code: SoDaNet
         name: 'SoDaNet - Greek Research Infrastructure for Social Science'
         handler: 'NESSTAR'
         preferredMetadataParam: oai_ddi
         defaultLanguage: el
       - url:  http://nesstar.unidata.unimib.it/oai-pmh
+        code: UniData
         name: 'UniData - Bicocca Data Archive'
         handler: 'NESSTAR'
         preferredMetadataParam: oai_ddi
@@ -273,20 +290,20 @@ osmhConsumer:
     repos:
       - url: https://data2.aussda.at/oai/
         preferredMetadataParam: oai_ddi
-        name: 'AUSSDA'
+        code: 'AUSSDA'
         handler: 'OAI-PMH'
       - url: http://services.fsd.uta.fi/v0/oai
         preferredMetadataParam: oai_ddi25
         setSpec: study_groups:energia
-        name: 'FSD'
+        code: 'FSD'
         handler: 'OAI-PMH'
       - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
         preferredMetadataParam: ddi
-        name: 'UKDS'
+        code: 'UKDS'
         handler: 'OAI-PMH'
       - url: http://services.fsd.uta.fi/v0/oai
         preferredMetadataParam: oai_ddi25
-        name: 'UKDS-LANG-OVERRIDE'
+        code: 'UKDS-LANG-OVERRIDE'
         defaultLanguage: zz
         handler: 'OAI-PMH'
   delay:

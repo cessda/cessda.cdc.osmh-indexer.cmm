@@ -82,7 +82,7 @@ public class GetRecordServiceImplTest {
   @Before
   public void setUp() {
     repo = appConfigurationProperties.getEndpoints().getRepos()
-            .stream().filter(repo -> repo.getName().equals("FSD")).findAny().orElseThrow();
+            .stream().filter(repo -> repo.getCode().equals("FSD")).findAny().orElseThrow();
 
     recordIdentifier = "http://my-example_url:80/obj/fStudy/ch.sidos.ddi.468.7773";
     fullRecordUrl = URI.create(repo.getUrl() + "?verb=GetRecord&identifier=" + URLEncoder.encode(recordIdentifier, StandardCharsets.UTF_8) + "&metadataPrefix=oai_ddi25");
@@ -341,8 +341,8 @@ public class GetRecordServiceImplTest {
   @Test
   public void shouldOverrideGlobalLanguageDefaultIfAPerRepositoryOverrideIsSpecified() throws CustomHandlerException, IOException, ProcessingException, JSONException {
 
-    var repository = appConfigurationProperties.getEndpoints().getRepos()
-            .stream().filter(repo -> repo.getName().equals("UKDS-LANG-OVERRIDE")).findAny().orElseThrow();
+      var repository = appConfigurationProperties.getEndpoints().getRepos()
+              .stream().filter(repo -> repo.getCode().equals("UKDS-LANG-OVERRIDE")).findAny().orElseThrow();
 
     // Given
     given(daoBase.getInputStream(fullRecordUrl)).willReturn(

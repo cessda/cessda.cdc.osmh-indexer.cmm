@@ -76,7 +76,7 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
                 return filterRecords(recordHeadersUnfiltered, lastModifiedDate);
             }
         } catch (IOException e) {
-            log.error("[{}] ListRecordHeaders failed: {}", value(LoggingConstants.REPO_NAME, repo.getName()), e.toString());
+            log.error("[{}] ListRecordHeaders failed: {}", value(LoggingConstants.REPO_NAME, repo.getCode()), e.toString());
         }
         return Collections.emptyList();
     }
@@ -84,7 +84,7 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
     @Override
     public Optional<CMMStudy> getRecord(Repo repo, String studyNumber) {
 
-        log.debug("Querying repo {} for studyNumber {}.", repo.getName(), studyNumber);
+        log.debug("Querying repo {} for studyNumber {}.", repo.getCode(), studyNumber);
 
         try {
             URI finalUrl = constructGetRecordUrl(repo, studyNumber);
@@ -93,14 +93,14 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
             }
         } catch (ExternalSystemException e) {
             log.warn("[{}] Failed to get StudyId [{}]: {}: Response body [{}].",
-                    value(LoggingConstants.REPO_NAME, repo.getName()),
+                    value(LoggingConstants.REPO_NAME, repo.getCode()),
                     value(LoggingConstants.STUDY_ID, studyNumber),
                     e.toString(),
                     value(LoggingConstants.REASON, e.getExternalResponse().getBody())
             );
         } catch (IOException e) {
             log.error("[{}] Failed to get StudyId [{}]: {}",
-                    value(LoggingConstants.REPO_NAME, repo.getName()),
+                    value(LoggingConstants.REPO_NAME, repo.getCode()),
                     value(LoggingConstants.STUDY_ID, studyNumber),
                     e.toString()
             );
@@ -116,7 +116,7 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
                     .path("/ListRecordHeaders")
                     .queryParam("Repository", URLEncoder.encode(repo.getUrl().toString(), StandardCharsets.UTF_8));
             URI finalUrl = finalUrlBuilder.build(true).toUri();
-            log.trace("[{}] Final ListHeaders Handler url [{}] constructed.", repo.getName(), finalUrl);
+            log.trace("[{}] Final ListHeaders Handler url [{}] constructed.", repo.getCode(), finalUrl);
             return finalUrl;
         } else {
             throw new HandlerNotFoundException(repo);
