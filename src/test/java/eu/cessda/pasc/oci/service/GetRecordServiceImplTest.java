@@ -277,7 +277,7 @@ public class GetRecordServiceImplTest {
 
     String jsonString = cmmConverter.toJsonString(record);
     JSONObject json = new JSONObject(jsonString);
-    log.info("RETRIEVED STUDY JSON: \n" + json.toString(4));
+    log.debug("RETRIEVED STUDY JSON: \n" + json.toString(4));
 
     JsonNode jsonNodeRecord = JsonLoader.fromString(jsonString);
     final JsonSchema schema = JsonSchemaFactory.byDefault().getJsonSchema("resource:/json/schema/CMMStudySchema.json");
