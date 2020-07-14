@@ -133,7 +133,7 @@ osmhConsumer:
       - url: https://snd.gu.se/en/oai-pmh
         name: 'Swedish National Data Service (SND)'
         handler: 'OAI-PMH'
-        setSpec: discipline:social-science
+        setSpec: subject:social-sciences
         preferredMetadataParam: oai_ddi25
       - url: https://dataverse.arch.be/oai
         name: 'SODA'
