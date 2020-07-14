@@ -85,7 +85,7 @@ public class HarvesterRunner {
                     MDC.setContextMap(contextMap);
 
                     // Set the MDC so that the record name is attached to all downstream logs
-                    try (var repoNameClosable = MDC.putCloseable(LoggingConstants.REPO_NAME, repo.getName())) {
+                    try (var repoNameClosable = MDC.putCloseable(LoggingConstants.REPO_NAME, repo.getCode())) {
                         log.info("Processing Repo [{}]", repo);
                         Map<String, List<CMMStudyOfLanguage>> langStudies = getCmmStudiesOfEachLangIsoCodeMap(repo, lastModifiedDateTime);
                         langStudies.forEach((langIsoCode, cmmStudies) -> {
@@ -120,19 +120,19 @@ public class HarvesterRunner {
     private void executeBulk(Repo repo, String langIsoCode, List<CMMStudyOfLanguage> cmmStudies) {
         if (!cmmStudies.isEmpty()) {
             var studiesUpdated = getUpdatedStudies(cmmStudies, langIsoCode);
-            log.info("[{}({})] Indexing...", repo.getName(), langIsoCode);
+            log.info("[{}({})] Indexing...", repo.getCode(), langIsoCode);
             if (ingestService.bulkIndex(cmmStudies, langIsoCode)) {
                 log.info("[{}({})] Indexing succeeded: [{}] studies created, [{}] studies deleted, [{}] studies updated.",
-                        repo.getName(),
+                        repo.getCode(),
                         langIsoCode,
                         value("created_cmm_studies", studiesUpdated.studiesCreated),
                         value("deleted_cmm_studies", studiesUpdated.studiesDeleted),
                         value("updated_cmm_studies", studiesUpdated.studiesUpdated));
             } else {
-                log.error("[{}({})] Indexing failed!", repo.getName(), langIsoCode);
+                log.error("[{}({})] Indexing failed!", repo.getCode(), langIsoCode);
             }
         } else {
-            log.debug("[{}({})] CmmStudies list is empty. Nothing to index.", repo.getName(), langIsoCode);
+            log.debug("[{}({})] CmmStudies list is empty. Nothing to index.", repo.getCode(), langIsoCode);
         }
     }
 
@@ -194,13 +194,13 @@ public class HarvesterRunner {
                 .collect(Collectors.toList());
 
         log.info("[{}] There are [{}] presentCMMStudies out of [{}] totalCMMStudies. Therefore CMMStudies rejected is [{}].",
-                value(LoggingConstants.REPO_NAME, repo.getName()),
+                value(LoggingConstants.REPO_NAME, repo.getCode()),
                 value("present_cmm_record", presentCMMStudies.size()),
                 value("total_cmm_record", recordHeaders.size()),
                 value("cmm_records_rejected", recordHeaders.size() - presentCMMStudies.size()));
 
         presentCMMStudies.forEach(languageAvailabilityMapper::setAvailableLanguages);
-        return extractor.mapLanguageDoc(presentCMMStudies, repo.getName());
+        return extractor.mapLanguageDoc(presentCMMStudies, repo.getCode());
     }
 
     @Value

@@ -164,7 +164,7 @@ public class ESIngestService implements IngestService {
             // This is expected when the index is not available
             log.trace("Index for language [{}] not found: {}", language, e.toString());
         } catch (IOException e) {
-            log.error("Failed to retrieve study [{}].", id, e);
+            log.error("Failed to retrieve study [{}]: {}", id, e.toString());
         }
 
         return Optional.empty();
@@ -193,11 +193,10 @@ public class ESIngestService implements IngestService {
                 CMMStudyOfLanguage study = cmmStudyOfLanguageConverter.getReader().readValue(hits[0].getSourceRef().streamInput());
                 String lastModified = study.getLastModified();
                 Optional<LocalDateTime> localDateTimeOpt = TimeUtility.getLocalDateTime(lastModified);
-                return localDateTimeOpt
-                        .map(localDateTime -> localDateTime.withHour(0).withMinute(0).withSecond(0).withNano(0));
+                return localDateTimeOpt.map(localDateTime -> localDateTime.withHour(0).withMinute(0).withSecond(0).withNano(0));
             }
         } catch (IOException e) {
-            log.warn("Couldn't decode {} into an instance of {}", hits[0].getId(), CMMStudyOfLanguage.class.getName());
+            log.warn("Couldn't decode {} into an instance of {}: {}", hits[0].getId(), CMMStudyOfLanguage.class.getName(), e.toString());
         }
         return Optional.empty();
     }
@@ -250,7 +249,7 @@ public class ESIngestService implements IngestService {
                 log.warn("[{}] index creation Settings & Mappings must be define for a custom index.", indexName);
             }
         } catch (IOException e) {
-            log.warn("Couldn't load settings for Elasticsearch.", e);
+            log.warn("[{}] Couldn't load settings for Elasticsearch: {}", indexName, e.toString());
         }
         log.warn("[{}] index creation with no custom settings or mappings.", indexName);
         return (esTemplate.createIndex(indexName));
@@ -264,12 +263,12 @@ public class ESIngestService implements IngestService {
         return getJson(indexName, "elasticsearch/mappings/mappings_%s.json");
     }
 
-    private String getJson(String language, String template) throws IOException {
+    private String getJson(String indexName, String template) throws IOException {
         String json;
         try {
-            json = fileHandler.getFileAsString(String.format(template, language));
+            json = fileHandler.getFileAsString(String.format(template, indexName));
         } catch (FileNotFoundException e) {
-            log.debug("[{}] Language specific JSON {} not found, falling back to {}", String.format(template, language), String.format(template, language), String.format(template, INDEX_TYPE));
+            log.debug("[{}] Language specific JSON {} not found, falling back to {}", indexName, String.format(template, indexName), String.format(template, INDEX_TYPE));
             json = fileHandler.getFileAsString(String.format(template, INDEX_TYPE));
         }
         return json;

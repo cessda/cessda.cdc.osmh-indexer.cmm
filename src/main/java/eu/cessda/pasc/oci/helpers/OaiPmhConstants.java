@@ -97,9 +97,6 @@ public class OaiPmhConstants {
   static final String OAI_PMH = "OAI-PMH";
   static final String ERROR = "error";
 
-  // Encoding
-  public static final String UTF_8 = "UTF-8";
-
   // URL Paths tokens
   static final String VERB_PARAM_KEY = "verb";
   static final String METADATA_PREFIX_PARAM_KEY = "metadataPrefix";
@@ -108,8 +105,4 @@ public class OaiPmhConstants {
   static final String RESUMPTION_TOKEN_KEY = RESUMPTION_TOKEN_ELEMENT;
   static final String LIST_IDENTIFIERS_VALUE = "ListIdentifiers";
   static final String GET_RECORD_VALUE = "GetRecord";
-
-  static final String LIST_RECORD_HEADERS_URL_TEMPLATE = "%s?%s=%s&%s=%s";
-  static final String LIST_RECORD_HEADERS_PER_SET_URL_TEMPLATE = "%s?%s=%s&%s=%s&%s=%s";
-  static final String GET_RECORD_URL_TEMPLATE = "%s?%s=%s&%s=%s&%s=%s";
 }

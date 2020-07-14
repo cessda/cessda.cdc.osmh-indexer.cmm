@@ -22,6 +22,7 @@ import eu.cessda.pasc.oci.mock.data.RecordTestData;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,7 @@ import static org.assertj.core.api.Java6BDDAssertions.then;
  * @author moses AT doraventures DOT com
  */
 @RunWith(SpringRunner.class)
+@Slf4j
 public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileContext {
 
   @Autowired
@@ -169,10 +171,10 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
     //then(languageDocMap.get("sv")).hasSize(1); // a deleted record and an active record that is not valid for lang
 
     List<CMMStudyOfLanguage> enStudy = languageDocMap.get("en");
-    System.out.println("Printing Records");
+    log.info("Printing Records");
     for (CMMStudyOfLanguage cmmStudyOfLanguage : enStudy) {
       String enCMMStudyJsonStringOpt = cmmStudyOfLanguageConverter.toJsonString(cmmStudyOfLanguage);
-      System.out.println(enCMMStudyJsonStringOpt);
+      log.info(enCMMStudyJsonStringOpt);
     }
   }
 

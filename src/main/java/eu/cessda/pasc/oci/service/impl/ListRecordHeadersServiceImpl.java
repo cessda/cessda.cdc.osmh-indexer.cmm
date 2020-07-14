@@ -76,17 +76,17 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
     // We exit if the response has an <error> element
     ListIdentifiersResponseValidator.validateResponse(doc);
 
-    log.info("[{}] Parsing record headers.", repo.getName());
+    log.info("[{}] Parsing record headers.", repo.getCode());
     List<RecordHeader> recordHeaders = retrieveRecordHeaders(doc, repo.getUrl());
-    log.debug("[{}] ParseRecordHeaders ended:  No more resumption tokens to process.", repo.getName());
+      log.debug("[{}] ParseRecordHeaders ended:  No more resumption tokens to process.", repo.getCode());
 
     int expectedRecordHeadersCount = getRecordHeadersCount(doc);
     if (expectedRecordHeadersCount != -1) {
       log.info("[{}] Retrieved [{}] of [{}] expected record headers.",
-              repo.getName(), recordHeaders.size(), expectedRecordHeadersCount
+              repo.getCode(), recordHeaders.size(), expectedRecordHeadersCount
       );
     } else {
-      log.info("[{}] Retrieved [{}] record headers.", repo.getName(), recordHeaders.size());
+        log.info("[{}] Retrieved [{}] record headers.", repo.getCode(), recordHeaders.size());
     }
     return recordHeaders;
   }

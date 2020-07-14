@@ -159,7 +159,7 @@ public class MicrometerMetrics implements Metrics {
         if (endpointRecord != null) {
             return endpointRecord;
         }
-        throw new IllegalArgumentException(String.format("Invalid repository [%s]", repository.getName()));
+        throw new IllegalArgumentException(String.format("Invalid repository [%s]", repository.getCode()));
     }
 
     /**
@@ -184,10 +184,10 @@ public class MicrometerMetrics implements Metrics {
                 var repoAtomicLongEntry = recordsEndpointMap.entrySet().stream()
                         .filter(repoEntry -> repoEntry.getKey().getUrl().getHost().equalsIgnoreCase(hostEntry.getKey()))
                         .findAny().orElseThrow();
-                log.trace("Repository [{}] updated", repoAtomicLongEntry.getKey().getName());
+                log.trace("[{}] Repository updated", repoAtomicLongEntry.getKey().getCode());
                 repoAtomicLongEntry.getValue().set(hostEntry.getValue().get());
             } catch (NoSuchElementException e) {
-                log.warn("Repository corresponding to [{}] not configured.", hostEntry.getKey());
+                log.warn("[{}] Repository not configured.", hostEntry.getKey());
             }
         }
     }

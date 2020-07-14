@@ -28,7 +28,7 @@ public class ReposTestData
 
   public static Repo getUKDSRepo() {
     Repo repo = new Repo();
-    repo.setName("UKDS");
+    repo.setCode("UKDS");
     repo.setUrl(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
     repo.setHandler("OAI-PMH");
     return repo;
@@ -36,7 +36,7 @@ public class ReposTestData
 
   public static Repo getGesisEnRepo() {
     Repo repo = new Repo();
-    repo.setName("GESIS");
+    repo.setCode("GESIS");
     repo.setUrl(URI.create("https://dbkapps.gesis.org/dbkoai3"));
     repo.setHandler("OAI-PMH");
     return repo;
@@ -44,7 +44,7 @@ public class ReposTestData
 
   public static Repo getGesisDeRepo() {
     Repo repo = new Repo();
-    repo.setName("GESIS De");
+    repo.setCode("GESIS De");
     repo.setUrl(URI.create("https://dbkapps.gesis.org/dbkoai3"));
     repo.setHandler("OAI-PMH");
     return repo;

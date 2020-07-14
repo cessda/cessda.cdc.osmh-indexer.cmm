@@ -23,7 +23,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 /**
- * File handling helper methods. These methods load files using the classloader.
+ * Resource handling helper methods. These methods load resources using the classloader.
  *
  * @author moses AT doraventures DOT com
  */

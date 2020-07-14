@@ -61,7 +61,7 @@ public class GetRecordServiceImpl implements GetRecordService {
 
     @Override
     public CMMStudy getRecord(Repo repo, String studyIdentifier) throws InternalSystemException, OaiPmhException {
-        log.debug("[{}] Querying for StudyID [{}]", repo.getName(), studyIdentifier);
+        log.debug("[{}] Querying for StudyID [{}]", repo.getCode(), studyIdentifier);
         URI fullUrl = null;
         try {
             fullUrl = OaiPmhHelpers.buildGetStudyFullUrl(repo, studyIdentifier);

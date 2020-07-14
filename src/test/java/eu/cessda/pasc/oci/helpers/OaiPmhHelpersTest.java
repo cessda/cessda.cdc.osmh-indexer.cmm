@@ -50,7 +50,7 @@ public class OaiPmhHelpersTest {
 
         // Given
         Repo fsdEndpoint = appConfigurationProperties.getEndpoints().getRepos()
-                .stream().filter(repo -> repo.getName().equals("FSD")).findAny().orElseThrow();
+                .stream().filter(repo -> repo.getCode().equals("FSD")).findAny().orElseThrow();
         String expectedReqUrl = "http://services.fsd.uta.fi/v0/oai?verb=GetRecord&identifier=15454&metadataPrefix=oai_ddi25";
 
         // When
@@ -64,7 +64,7 @@ public class OaiPmhHelpersTest {
 
         // Given
         Repo ukdsEndpoint = appConfigurationProperties.getEndpoints().getRepos()
-                .stream().filter(repo -> repo.getName().equals("UKDS")).findAny().orElseThrow();
+                .stream().filter(repo -> repo.getCode().equals("UKDS")).findAny().orElseThrow();
         String expectedReqUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=GetRecord&identifier=15454&metadataPrefix=ddi";
 
         // When
