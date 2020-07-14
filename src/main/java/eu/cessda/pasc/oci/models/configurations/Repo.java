@@ -28,25 +28,35 @@ import java.net.URI;
 @Data
 public class Repo implements Serializable {
 
-    private static final long serialVersionUID = 5460376495600337528L;
+    private static final long serialVersionUID = 1L;
 
     /**
-     * The URL of the repository
+     * The URL of the repository.
      */
     private URI url;
     /**
-     * The short name of the repository
+     * The short name of the repository.
      */
     private String code;
     /**
-     * The friendly name of the repository
+     * The friendly name of the repository.
      */
     private String name;
     /**
-     * The repository handler
+     * The repository handler.
      */
     private String handler;
+    /**
+     * The {@code metadataPrefix} of the metadata format to be retrieved from the repository.
+     *
+     * @see <a href="http://www.openarchives.org/OAI/openarchivesprotocol.html#MetadataNamespaces">http://www.openarchives.org/OAI/openarchivesprotocol.html#MetadataNamespaces</a>
+     */
     private String preferredMetadataParam;
+    /**
+     * The set of metadata records to be retrieved from the remote repository.
+     *
+     * @see <a href="http://www.openarchives.org/OAI/openarchivesprotocol.html#Set">http://www.openarchives.org/OAI/openarchivesprotocol.html#Set</a>
+     */
     private String setSpec;
     /**
      * The default language, overrides the global default if set

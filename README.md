@@ -80,11 +80,11 @@ Note that usernames (`${SECURITY_USER_NAME}` and `${SPRING_BOOT_ADMIN_USERNAME}`
 
 ### At Runtime
 
-If the app is registered at a [spring boot admin server](https://github.com/codecentric/spring-boot-admin) all environment properties can be changed at runtime.
+If the app is registered at a [Spring Boot Admin server](https://github.com/codecentric/spring-boot-admin) all environment properties can be changed at runtime.
 
 **Changes made at runtime will be effective after a context reload but are lost after an application restart unless persisted in** `application.yml`
 
-## Timers Properties
+## Timer Properties
 
 Harvesting Schedule timers:
 
@@ -97,7 +97,32 @@ osmhConsumer:
 
 The timer schedule for GCP use is defined in [CDC deployment repository's template-deployment.yaml](https://bitbucket.org/cessda/cessda.cdc.deploy/src/master/osmh-indexer/infrastructure/k8s/template-deployment.yaml), but if you are deploying the software elsewhere, then the timer settings in [application.yml](/src/main/resources/application.yml) are relevant. The profiles are defined in [application.yml](/src/main/resources/application.yml) and selected in [Dockerfile](Dockerfile).
 
-Take care with the daily/Sunday timer settings, otherwise all running instances may attempt to reharvest the same endpoints at the same time.
+Take care with the daily/Sunday timer settings, otherwise all running instances may attempt to re-harvest the same endpoints at the same time.
+
+## Declaring a repository
+
+Repositories are declared in [application.yml](/src/main/resources/application.yml) and are specified under the key `osmhConsumer.endpoints.repos`.
+
+```yaml
+- url: http://194.117.18.18:6003/v0/oai
+  code: APIS
+  name: 'Portuguese Archive of Social Information (APIS)'
+  handler: 'OAI-PMH'
+  preferredMetadataParam: oai_ddi25
+  defaultLanguage: pt
+```
+
+The URL is the OAI-PMH endpoint.
+
+The code is the short name of the repository and acts as a unique identifier. This is a mandatory field.
+
+The name is the friendly name of the repository. This is an optional parameter and will be replaced with the code if it is not present.
+
+The handler defines how the repository will be parsed. Current options are OAI-PMH which parses repositories returning DDI 2.5, and NESSTAR which parses DDI 1.2. Additional remote harvesters can be defined under the `osmhConsumer.endpoints.harvesters` key.
+
+The preferred metadata parameter sets the `metadataPrefix` parameter on OAI-PMH requests.
+
+The default language is used to set a language on a metadata record which doesn't have a language specified in the record itself. This is an optional field.
 
 ## Built With
 
@@ -123,4 +148,4 @@ This project is licensed under the Apache 2 Licence - see the [LICENSE](LICENSE.
 
 ## Edge Case and Assumptions
 
-* Note the extra "/" workaround in the [application.yml](src/main/resources/application.yml) repository configuration for repositories that separate records with a different metadata prefix per language accessed with the same basic url.  This url in a way act as a key, so the extra "/" distinguishes the two for the specific metadataPrefix to be retrieved.  There must be a better way to handle this edge case.  This workaround affects this project, and the pasc-osmh-handler-oai-pmh as well.
+* Note the extra "/" workaround in the [application.yml](src/main/resources/application.yml) repository configuration for repositories that separate records with a different metadata prefix per language accessed with the same basic url.  This url in a way act as a key, so the extra "/" distinguishes the two for the specific metadataPrefix to be retrieved.  There must be a better way to handle this edge case.
