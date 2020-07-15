@@ -1,0 +1,49 @@
+---
+# Copyright CESSDA ERIC 2017-2019
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not
+# use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+spring:
+  profiles: gcp
+  main:
+    banner-mode: "off"
+  boot:
+    admin:
+      client:
+        instance:
+          prefer-ip: true
+        url: http://localhost:8087
+  output.ansi.enabled: NEVER
+logging:
+  file: pasc-oci.log
+  level:
+    eu.cessda.pasc.oci.service: INFO
+    eu.cessda.pasc.oci.repository: INFO
+    eu.cessda.pasc.oci.helpers: INFO
+    eu.cessda.pasc.oci.configurations.PerfRequestSyncInterceptor: INFO
+elasticsearch:
+  host: cdc-es  # must match profile name
+  numberOfShards: 2
+  numberOfReplicas: 2
+osmhConsumer:
+  delay:
+    # Auto Starts after delay of 5 minutes at startup
+    initial: '300000'
+    fixed: '315360000000'
+  daily:
+    # The following variables are defined using cron notation
+    run: ${OSMHCONSUMER_DAILY_RUN}
+    sunday.run: ${OSMHCONSUMER_DAILY_SUNDAY_RUN}
+  endpoints:
+    harvesters:
+      NESSTAR:
+        url: 'http://cdc-osmh-repo-nesstar:9842'
+        version: 'v0'
