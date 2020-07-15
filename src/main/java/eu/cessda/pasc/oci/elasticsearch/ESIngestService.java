@@ -13,19 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.service.impl;
+package eu.cessda.pasc.oci.elasticsearch;
 
 import eu.cessda.pasc.oci.configurations.ESConfigurationProperties;
 import eu.cessda.pasc.oci.helpers.FileHandler;
 import eu.cessda.pasc.oci.helpers.TimeUtility;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
-import eu.cessda.pasc.oci.service.IngestService;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
-import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.IndexNotFoundException;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
@@ -39,9 +36,11 @@ import org.springframework.stereotype.Service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Service responsible for triggering harvesting and Metadata ingestion to the search engine
@@ -114,34 +113,9 @@ public class ESIngestService implements IngestService {
     }
 
     @Override
-    public Map<String, CMMStudyOfLanguage> getAllStudies(String language) {
-        var studies = new HashMap<String, CMMStudyOfLanguage>();
-        var timeout = new TimeValue(Duration.ofSeconds(60).toMillis());
-        SearchResponse response = getMatchAllSearchRequest(language).setScroll(timeout).get();
+    public ElasticsearchSet<CMMStudyOfLanguage> getAllStudies(String language) {
         log.debug("Getting all studies for language [{}]", language);
-
-        do {
-            for (SearchHit searchHit : response.getHits()) {
-                try {
-                    studies.put(
-                            searchHit.getId(),
-                            cmmStudyOfLanguageConverter.getReader().readValue(searchHit.getSourceRef().streamInput())
-                    );
-                    log.trace("Retrieved study [{}]", searchHit.getId());
-                } catch (IOException e) {
-                    log.warn("Couldn't decode {} into an instance of {}", searchHit.getId(), CMMStudyOfLanguage.class.getName(), e);
-                }
-            }
-            if (response.getScrollId() != null) {
-                response = esTemplate.getClient().prepareSearchScroll(response.getScrollId()).setScroll(timeout).get();
-            } else {
-                // The scroll id can be null if no results are returned, break
-                break;
-            }
-            // Sometimes scrolling can cause a null response, end the loop if this is the case
-        } while (response != null && response.getHits().getHits().length > 0);
-
-        return Collections.unmodifiableMap(studies);
+        return new ElasticsearchSet<>(getMatchAllSearchRequest("*"), esTemplate.getClient(), cmmStudyOfLanguageConverter.getReader());
     }
 
     @Override
@@ -179,10 +153,7 @@ public class ESIngestService implements IngestService {
     @Override
     public Optional<LocalDateTime> getMostRecentLastModified() {
 
-        SearchResponse response = esTemplate.getClient().prepareSearch(String.format(INDEX_NAME_TEMPLATE, "*"))
-                .setTypes(INDEX_TYPE)
-                .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-                .setQuery(QueryBuilders.matchAllQuery())
+        SearchResponse response = getMatchAllSearchRequest("*")
                 .addSort(LAST_MODIFIED_FIELD, SortOrder.DESC)
                 .setSize(1)
                 .get();

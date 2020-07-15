@@ -16,12 +16,12 @@
 package eu.cessda.pasc.oci.metrics;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
+import eu.cessda.pasc.oci.elasticsearch.IngestService;
 import eu.cessda.pasc.oci.mock.data.RecordTestData;
 import eu.cessda.pasc.oci.mock.data.ReposTestData;
 import eu.cessda.pasc.oci.models.cmmstudy.Publisher;
 import eu.cessda.pasc.oci.models.configurations.Endpoints;
 import eu.cessda.pasc.oci.models.configurations.Repo;
-import eu.cessda.pasc.oci.service.IngestService;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.elasticsearch.index.IndexNotFoundException;
 import org.junit.Assert;
@@ -213,6 +213,7 @@ public class MicrometerMetricsTests {
     @Test
     public void shouldUpdateAllMetrics() {
         IngestService ingestService = Mockito.mock(IngestService.class);
+        Mockito.when(ingestService.getAllStudies("*")).thenReturn(Collections.emptySet());
         var micrometerMetrics = new MicrometerMetrics(appConfigurationProperties, ingestService, meterRegistry);
 
         // Then

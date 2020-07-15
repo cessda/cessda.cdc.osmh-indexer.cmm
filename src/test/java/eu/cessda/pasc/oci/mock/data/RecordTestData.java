@@ -17,6 +17,7 @@
 package eu.cessda.pasc.oci.mock.data;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.cessda.pasc.oci.configurations.UtilitiesConfiguration;
 import eu.cessda.pasc.oci.helpers.FileHandler;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
@@ -186,7 +187,7 @@ public final class RecordTestData {
 
   public static CMMStudy getSyntheticCmmStudy() throws IOException {
     InputStream cmmStudyString = new FileHandler().getFileAsStream("synthetic_compliant_record.json");
-    return new CMMStudyConverter(new ObjectMapper()).fromJsonString(cmmStudyString);
+    return new CMMStudyConverter(new UtilitiesConfiguration(null).objectMapper()).fromJsonString(cmmStudyString);
   }
 
   public static CMMStudy getSyntheticCmmStudyWithNoAvailableLangsSet() throws IOException {
@@ -197,7 +198,7 @@ public final class RecordTestData {
 
   private static CMMStudy getDeletedCmmStudy() throws IOException {
     InputStream cmmStudyString = new FileHandler().getFileAsStream("record_ukds_1031_deleted.json");
-    return new CMMStudyConverter(new ObjectMapper()).fromJsonString(cmmStudyString);
+    return new CMMStudyConverter(new UtilitiesConfiguration(null).objectMapper()).fromJsonString(cmmStudyString);
   }
 
   public static Optional<CMMStudy> getSyntheticCmmStudy(String identifier) throws IOException {

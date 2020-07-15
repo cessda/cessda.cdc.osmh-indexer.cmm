@@ -1,0 +1,59 @@
+---
+# Copyright CESSDA ERIC 2017-2019
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not
+# use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+spring:
+  main:
+    banner-mode: "off"
+  profiles: test
+logging:
+  level:
+    eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor: DEBUG
+    eu.cessda.pasc.oci.repository.DaoBase: TRACE
+osmhConsumer:
+  endpoints:
+    supportedRecordTypes:
+      - Study
+      - StudyGroup
+      - Variable
+      - Question
+      - CMM
+    harvesters:
+      OAI-PMH:
+        url: 'http://localhost:9091'
+        version: 'v0'
+    repos:
+      - url: https://data2.aussda.at/oai/
+        preferredMetadataParam: oai_ddi
+        code: 'AUSSDA'
+        handler: 'OAI-PMH'
+      - url: http://services.fsd.uta.fi/v0/oai
+        preferredMetadataParam: oai_ddi25
+        setSpec: study_groups:energia
+        code: 'FSD'
+        handler: 'OAI-PMH'
+      - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
+        preferredMetadataParam: ddi
+        code: 'UKDS'
+        handler: 'OAI-PMH'
+      - url: http://services.fsd.uta.fi/v0/oai
+        preferredMetadataParam: oai_ddi25
+        code: 'UKDS-LANG-OVERRIDE'
+        defaultLanguage: zz
+        handler: 'OAI-PMH'
+  delay:
+    # For tests, the delay should be effectively disabled
+    initial: '315360000000'
+    fixed: '315360000000'
+elasticsearch:
+  # Because tests clear Elasticsearch after completion make sure that we don't run against live clusters
+  clustername: test

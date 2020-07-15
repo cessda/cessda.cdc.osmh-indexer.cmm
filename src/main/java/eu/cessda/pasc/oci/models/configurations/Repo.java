@@ -28,28 +28,51 @@ import java.net.URI;
 @Data
 public class Repo implements Serializable {
 
-    private static final long serialVersionUID = 5460376495600337528L;
+    private static final long serialVersionUID = 1L;
 
     /**
-     * The URL of the repository
+     * The URL of the repository.
      */
     private URI url;
     /**
-     * The short name of the repository
+     * The short name of the repository.
      */
     private String code;
     /**
-     * The friendly name of the repository
+     * The friendly name of the repository.
      */
     private String name;
     /**
-     * The repository handler
+     * The repository handler.
      */
     private String handler;
+    /**
+     * The {@code metadataPrefix} of the metadata format to be retrieved from the repository.
+     *
+     * @see <a href="http://www.openarchives.org/OAI/openarchivesprotocol.html#MetadataNamespaces">http://www.openarchives.org/OAI/openarchivesprotocol.html#MetadataNamespaces</a>
+     */
     private String preferredMetadataParam;
+    /**
+     * The set of metadata records to be retrieved from the remote repository.
+     *
+     * @see <a href="http://www.openarchives.org/OAI/openarchivesprotocol.html#Set">http://www.openarchives.org/OAI/openarchivesprotocol.html#Set</a>
+     */
     private String setSpec;
     /**
      * The default language, overrides the global default if set
      */
     private String defaultLanguage;
+
+    /**
+     * Verifies that this repository has all the required fields configured.
+     * <p/>
+     * The required fields are the {@link Repo#url}, the {@link Repo#code},
+     * the {@link Repo#handler} and the {@link Repo#preferredMetadataParam}.
+     */
+    public boolean verifyFields() {
+        return (url != null) &&
+                (code != null && !code.isEmpty()) &&
+                (handler != null && !handler.isEmpty()) &&
+                (preferredMetadataParam != null && !preferredMetadataParam.isEmpty());
+    }
 }
