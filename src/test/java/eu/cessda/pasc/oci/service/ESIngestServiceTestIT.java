@@ -286,7 +286,7 @@ public class ESIngestServiceTestIT {
 
       // Given
       Mockito.when(cmmStudyOfLanguageConverter.getReader()).thenReturn(objectReader);
-      Mockito.when(objectReader.readValue(Mockito.any(InputStream.class))).thenThrow(new IOException());
+      Mockito.when(objectReader.readValue(Mockito.any(byte[].class))).thenThrow(new IOException());
       boolean isSuccessful = ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
       then(isSuccessful).isTrue();
       var expectedStudy = studyOfLanguages.get(0);
