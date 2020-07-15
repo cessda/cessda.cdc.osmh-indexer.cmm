@@ -23,7 +23,9 @@ pipeline {
 		image_tag = "${docker_repo}/${product_name}-${module_name}:${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
 	}
 
-	agent any
+    agent {
+        label 'jnlp-himem'
+    }
 
 	stages {
 		// Building on master
