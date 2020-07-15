@@ -62,4 +62,17 @@ public class Repo implements Serializable {
      * The default language, overrides the global default if set
      */
     private String defaultLanguage;
+
+    /**
+     * Verifies that this repository has all the required fields configured.
+     * <p/>
+     * The required fields are the {@link Repo#url}, the {@link Repo#code},
+     * the {@link Repo#handler} and the {@link Repo#preferredMetadataParam}.
+     */
+    public boolean verifyFields() {
+        return (url != null) &&
+                (code != null && !code.isEmpty()) &&
+                (handler != null && !handler.isEmpty()) &&
+                (preferredMetadataParam != null && !preferredMetadataParam.isEmpty());
+    }
 }

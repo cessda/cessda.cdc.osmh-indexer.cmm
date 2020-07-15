@@ -17,64 +17,12 @@
 package eu.cessda.pasc.oci.mock.data;
 
 
-import eu.cessda.pasc.oci.models.RecordHeader;
-
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * mock data for Record headers.
  *
  * @author moses AT doraventures DOT com
  */
 public final class RecordHeadersMock {
-
-  public static List<RecordHeader> getRecordHeaders() {
-
-    List<RecordHeader> recordHeaders = new ArrayList<>();
-
-    recordHeaders.add(
-            RecordHeader.builder()
-                    .lastModified("2016-11-30T23:59:59Z")
-                    .type("Question")
-                    .recordType("RecordHeader")
-            .identifier("ESS1e06.5_Q2")
-            .build());
-
-    recordHeaders.add(
-        RecordHeader.builder()
-            .lastModified("2015-01-22T23:59:59Z")
-            .type("Study")
-            .recordType("RecordHeader")
-            .identifier("MD1998")
-            .build());
-
-    recordHeaders.add(
-        RecordHeader.builder()
-            .lastModified("2015-01-22T23:59:59Z")
-            .type("Question")
-            .recordType("RecordHeader")
-            .identifier("MD1998_Q119")
-            .build());
-
-    recordHeaders.add(
-        RecordHeader.builder()
-            .lastModified("2012-11-30T23:59:59Z")
-            .type("Study")
-            .recordType("RecordHeader")
-            .identifier("MD1999")
-            .build());
-
-    recordHeaders.add(
-        RecordHeader.builder()
-            .lastModified("2012-11-30T23:59:59Z")
-            .type("Variable")
-            .recordType("RecordHeader")
-            .identifier("MD1999_V1")
-            .build());
-
-    return recordHeaders;
-  }
 
   public static String getListIdentifiersXMLResumptionEmpty() {
     return

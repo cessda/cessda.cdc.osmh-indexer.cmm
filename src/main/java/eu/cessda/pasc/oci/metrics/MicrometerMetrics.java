@@ -16,10 +16,10 @@
 package eu.cessda.pasc.oci.metrics;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
+import eu.cessda.pasc.oci.elasticsearch.IngestService;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.Publisher;
 import eu.cessda.pasc.oci.models.configurations.Repo;
-import eu.cessda.pasc.oci.service.IngestService;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
@@ -184,10 +184,10 @@ public class MicrometerMetrics implements Metrics {
                 var repoAtomicLongEntry = recordsEndpointMap.entrySet().stream()
                         .filter(repoEntry -> repoEntry.getKey().getUrl().getHost().equalsIgnoreCase(hostEntry.getKey()))
                         .findAny().orElseThrow();
-                log.trace("[{}] Repository updated", repoAtomicLongEntry.getKey().getCode());
+                log.trace("Repository [{}] updated", repoAtomicLongEntry.getKey().getCode());
                 repoAtomicLongEntry.getValue().set(hostEntry.getValue().get());
             } catch (NoSuchElementException e) {
-                log.warn("[{}] Repository not configured.", hostEntry.getKey());
+                log.warn("Repository [{}] not configured.", hostEntry.getKey());
             }
         }
     }
@@ -245,7 +245,7 @@ public class MicrometerMetrics implements Metrics {
     public void updateMetrics() {
         updateTotalRecordsMetric();
         updateLanguageMetrics();
-        var allStudies = ingestService.getAllStudies("*").values();
+        var allStudies = ingestService.getAllStudies("*");
         updateEndpointsRecordsMetric(allStudies);
         updatePublisherRecordsMetric(allStudies);
     }

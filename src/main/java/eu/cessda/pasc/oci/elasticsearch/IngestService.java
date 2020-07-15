@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.service;
+package eu.cessda.pasc.oci.elasticsearch;
 
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Service interface contract for data ingestion
@@ -53,9 +53,9 @@ public interface IngestService {
    * Gets a set of all studies stored in Elasticsearch.
    *
    * @param language the language to get studies from. Use * to get all studies.
-   * @return a map containing all studies with the key set to the study ID.
+   * @return a set containing all studies
    */
-  Map<String, CMMStudyOfLanguage> getAllStudies(String language);
+  Set<CMMStudyOfLanguage> getAllStudies(String language);
 
   /**
    * Gets a study with a specific ID.
