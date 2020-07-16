@@ -18,6 +18,8 @@ spring:
   boot:
     admin:
       client:
+        auto-registration: true
+        auto-deregistration: true
         instance:
           prefer-ip: true
         url: http://localhost:8087
