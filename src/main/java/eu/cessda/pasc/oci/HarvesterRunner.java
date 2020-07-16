@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2019 CESSDA ERIC (support@cessda.eu)
+ * Copyright © 2017-2020 CESSDA ERIC (support@cessda.eu)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,8 @@ public class HarvesterRunner {
 
     private final AtomicBoolean indexerRunning = new AtomicBoolean(false);
 
+    private String result;
+
     public HarvesterRunner(AppConfigurationProperties configurationProperties, HarvesterConsumerService remoteHarvesterConsumerService, HarvesterConsumerService localHarvesterConsumerService,
                            IngestService ingestService, LanguageDocumentExtractor extractor, LanguageAvailabilityMapper languageAvailabilityMapper, Metrics metrics) {
         this.configurationProperties = configurationProperties;
@@ -87,6 +89,7 @@ public class HarvesterRunner {
                     // Set the MDC so that the record name is attached to all downstream logs
                     try (var repoNameClosable = MDC.putCloseable(LoggingConstants.REPO_NAME, repo.getCode())) {
                         log.info("Processing Repo [{}]", repo);
+                        result = repoNameClosable.toString();
                         Map<String, List<CMMStudyOfLanguage>> langStudies = getCmmStudiesOfEachLangIsoCodeMap(repo, lastModifiedDateTime);
                         langStudies.forEach((langIsoCode, cmmStudies) -> {
                             try (var langClosable = MDC.putCloseable(LoggingConstants.LANG_CODE, langIsoCode)) {

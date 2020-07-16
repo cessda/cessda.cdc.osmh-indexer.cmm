@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2019 CESSDA ERIC (support@cessda.eu)
+ * Copyright © 2017-2020 CESSDA ERIC (support@cessda.eu)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,6 +105,7 @@ public class GetRecordServiceImplTest {
   }
 
   @Test
+  @SuppressWarnings("PreferJavaTimeOverload")
   public void shouldHarvestedContentForLanguageSpecificDimensionFromElementWithCorrectXmlLangAttribute() throws CustomHandlerException, IOException {
 
     // Given
@@ -145,6 +146,7 @@ public class GetRecordServiceImplTest {
   }
 
   @Test
+  @SuppressWarnings("PreferJavaTimeOverload")
   public void shouldOnlyExtractSingleDateAsStartDateForRecordsWithASingleDateAttr() throws CustomHandlerException, IOException, ProcessingException, JSONException {
 
     // Given
@@ -183,6 +185,7 @@ public class GetRecordServiceImplTest {
   }
 
   @Test
+  @SuppressWarnings("PreferJavaTimeOverload")
   public void shouldReturnCMMStudyRecordWithRepeatedAbstractConcatenated() throws CustomHandlerException, IOException, ProcessingException, JSONException {
 
     Map<String, String> expectedAbstract = new HashMap<>();
@@ -204,6 +207,7 @@ public class GetRecordServiceImplTest {
   }
 
   @Test // https://bitbucket.org/cessda/cessda.cdc.version2/issues/135
+  @SuppressWarnings("PreferJavaTimeOverload")
   public void shouldReturnCMMStudyRecordWithOutParTitleWhenThereIsALangDifferentFromDefault() throws CustomHandlerException, IOException, ProcessingException, JSONException {
 
     Map<String, String> expectedTitle = new HashMap<>();
@@ -288,6 +292,7 @@ public class GetRecordServiceImplTest {
     }
   }
 
+  @SuppressWarnings("PreferJavaTimeOverload")
   private void assertFieldsAreExtractedAsExpected(CMMStudy record) throws IOException, JSONException {
 
     final ObjectMapper mapper = new ObjectMapper();
