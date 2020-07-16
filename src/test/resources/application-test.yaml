@@ -19,6 +19,7 @@ logging:
   level:
     eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor: DEBUG
     eu.cessda.pasc.oci.repository.DaoBase: TRACE
+    eu.cessda.pasc.oci.service.helpers.DebuggingJMXBean: DEBUG
 osmhConsumer:
   endpoints:
     supportedRecordTypes:

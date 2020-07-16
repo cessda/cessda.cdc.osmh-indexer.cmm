@@ -13,27 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package eu.cessda.pasc.oci.actuator;
 
-package eu.cessda.pasc.oci.exception;
+import com.vividsolutions.jts.util.Assert;
+import org.junit.Test;
 
-/**
- * Exception for internally encountered Exceptions
- *
- * @author moses AT doraventures DOT com
- */
-public class CustomHandlerException extends Exception {
+public class LivenessEndpointTest {
 
-    private static final long serialVersionUID = 5715687019114712665L;
-
-    protected CustomHandlerException(String message) {
-        super(message);
-    }
-
-    protected CustomHandlerException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    protected CustomHandlerException(Throwable cause) {
-        super(cause);
+    @Test
+    public void testLiveness() {
+        var livenessEndpoint = new LivenessEndpoint();
+        Assert.isTrue(!livenessEndpoint.testLiveness().isEmpty());
     }
 }

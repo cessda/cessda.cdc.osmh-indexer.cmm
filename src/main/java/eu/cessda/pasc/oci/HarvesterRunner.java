@@ -24,7 +24,6 @@ import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.service.HarvesterConsumerService;
-import eu.cessda.pasc.oci.service.helpers.LanguageAvailabilityMapper;
 import eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
@@ -50,19 +49,17 @@ public class HarvesterRunner {
     private final HarvesterConsumerService localHarvester;
     private final IngestService ingestService;
     private final LanguageDocumentExtractor extractor;
-    private final LanguageAvailabilityMapper languageAvailabilityMapper;
     private final Metrics metrics;
     private final HarvesterConsumerService remoteHarvester;
 
     private final AtomicBoolean indexerRunning = new AtomicBoolean(false);
 
     public HarvesterRunner(AppConfigurationProperties configurationProperties, HarvesterConsumerService remoteHarvesterConsumerService, HarvesterConsumerService localHarvesterConsumerService,
-                           IngestService ingestService, LanguageDocumentExtractor extractor, LanguageAvailabilityMapper languageAvailabilityMapper, Metrics metrics) {
+                           IngestService ingestService, LanguageDocumentExtractor extractor, Metrics metrics) {
         this.configurationProperties = configurationProperties;
         this.localHarvester = localHarvesterConsumerService;
         this.ingestService = ingestService;
         this.extractor = extractor;
-        this.languageAvailabilityMapper = languageAvailabilityMapper;
         this.metrics = metrics;
         this.remoteHarvester = remoteHarvesterConsumerService;
     }
@@ -199,7 +196,7 @@ public class HarvesterRunner {
                 value("total_cmm_record", recordHeaders.size()),
                 value("cmm_records_rejected", recordHeaders.size() - presentCMMStudies.size()));
 
-        presentCMMStudies.forEach(languageAvailabilityMapper::setAvailableLanguages);
+        presentCMMStudies.forEach(extractor::setAvailableLanguages);
         return extractor.mapLanguageDoc(presentCMMStudies, repo.getCode());
     }
 

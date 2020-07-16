@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.*;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.Document;
 
 import java.util.List;
 import java.util.Set;
@@ -62,7 +61,6 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(indexName = "test")
 @Getter
 @EqualsAndHashCode
 @ToString
@@ -71,6 +69,8 @@ public class CMMStudyOfLanguage {
   @Id
   @Setter
   private String id;
+
+  private String code;
 
   @JsonProperty("creators")
   private List<String> creators;

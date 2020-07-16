@@ -30,7 +30,7 @@ import eu.cessda.pasc.oci.service.impl.RemoteHarvesterConsumerService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -62,16 +62,18 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
 
   @Autowired
   ObjectMapper objectMapper;
-  RemoteHarvesterConsumerService remoteHarvesterConsumerService;
 
   @Autowired
   CMMStudyConverter cmmStudyConverter;
 
-
-  @Mock
-  private DaoBase daoBase;
+  private final DaoBase daoBase = Mockito.mock(DaoBase.class);
 
   private final FileHandler fileHandler = new FileHandler();
+
+  /**
+   * Class to test
+   */
+  private RemoteHarvesterConsumerService remoteHarvesterConsumerService;
 
   @Before
   public void setUp() {
@@ -201,7 +203,7 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
 
     Optional<CMMStudy> cmmStudy = remoteHarvesterConsumerService.getRecord(repo, recordID);
 
-    assertThat(cmmStudy.isPresent()).isTrue();
+    assertThat(cmmStudy).isPresent();
     then(cmmStudy.get().getStudyNumber()).isEqualTo("998");
     then(cmmStudy.get().getLastModified()).isEqualTo("2018-02-22T07:48:38Z");
     then(cmmStudy.get().getKeywords()).hasSize(1);
@@ -225,7 +227,7 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
 
     Optional<CMMStudy> cmmStudy = remoteHarvesterConsumerService.getRecord(repo, recordID);
 
-    assertThat(cmmStudy.isPresent()).isTrue();
+    assertThat(cmmStudy).isPresent();
     then(cmmStudy.get().getStudyNumber()).isEqualTo("1031");
     then(cmmStudy.get().getLastModified()).isEqualTo("2017-05-02T08:31:32Z");
     then(cmmStudy.get().isActive()).isFalse();
@@ -254,6 +256,6 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
 
     Optional<CMMStudy> cmmStudy = remoteHarvesterConsumerService.getRecord(repo, recordID);
 
-    assertThat(cmmStudy.isPresent()).isTrue();
+    assertThat(cmmStudy).isPresent();
   }
 }

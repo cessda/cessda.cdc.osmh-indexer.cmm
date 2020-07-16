@@ -68,10 +68,9 @@ public class DebuggingJMXBean {
     );
 
     if (log.isDebugEnabled()) {
-      log.debug("Elasticsearch Cluster Nodes Report: Start--");
+      log.debug("Elasticsearch Cluster Nodes Report:");
       AtomicInteger counter = new AtomicInteger(1);
-      log.debug("NumberOfNodes [{}], Index Details:", healths.getNumberOfNodes());
-
+      log.debug("Number of Nodes [{}], Index Details:", healths.getNumberOfNodes());
       String msg = "Index [{}] [Current Index [{}] \t Status [{}] ]";
       healths.getIndices().values().forEach(health -> log.debug(msg, counter.getAndIncrement(), health.getIndex(), health.getStatus()));
     }

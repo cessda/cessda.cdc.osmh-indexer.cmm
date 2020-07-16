@@ -79,7 +79,7 @@ public class ESIngestService implements IngestService {
         boolean isSuccessful = true;
 
         if (prepareIndex(indexName)) {
-            List<IndexQuery> queries = new ArrayList<>(INDEX_COMMIT_SIZE);
+            List<IndexQuery> queries = new ArrayList<>(Integer.min(languageCMMStudiesMap.size(), INDEX_COMMIT_SIZE));
             log.debug("[{}] Indexing...", indexName);
             int counter = 0;
             for (CMMStudyOfLanguage cmmStudyOfLanguage : languageCMMStudiesMap) {
@@ -144,6 +144,11 @@ public class ESIngestService implements IngestService {
         return Optional.empty();
     }
 
+    /**
+     * Gets a match all search request for the language specified.
+     *
+     * @param language the language to get results for.
+     */
     private SearchRequestBuilder getMatchAllSearchRequest(String language) {
         return esTemplate.getClient().prepareSearch(String.format(INDEX_NAME_TEMPLATE, language))
                 .setTypes(INDEX_TYPE)
@@ -182,12 +187,10 @@ public class ESIngestService implements IngestService {
     }
 
     private boolean prepareIndex(String indexName) {
-
         if (esTemplate.indexExists(indexName)) {
             log.debug("[{}] index name already exists, Skipping creation.", indexName);
             return true;
         }
-
         log.info("[{}] index name does not exist and will be created", indexName);
         return createIndex(indexName);
     }
@@ -213,6 +216,7 @@ public class ESIngestService implements IngestService {
                         return true;
                     } else {
                         log.error("[{}] index mapping PUT request for type [{}] was unsuccessful.", indexName, INDEX_TYPE);
+                        esTemplate.deleteIndex(indexName);
                         return false;
                     }
                 }

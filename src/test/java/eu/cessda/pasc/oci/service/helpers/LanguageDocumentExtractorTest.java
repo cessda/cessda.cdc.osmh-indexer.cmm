@@ -34,6 +34,7 @@ import java.util.Map;
 
 import static eu.cessda.pasc.oci.mock.data.RecordTestData.getASingleSyntheticCMMStudyAsList;
 import static eu.cessda.pasc.oci.mock.data.RecordTestData.getSyntheticCMMStudyAndADeletedRecordAsList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Java6BDDAssertions.then;
 
 /**
@@ -182,5 +183,73 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
   public void shouldReturnFalseForInValidCMMStudyForLang() {
     // When
     languageDocumentExtractor.isValidCMMStudyForLang("en", "UK Data Service", null);
+  }
+
+  @Test
+  public void shouldTagAllLanguagesThatPassMinimumCMMRequirementAsStudyAvailableInGivenLang() throws IOException {
+
+    // Given
+    final CMMStudy cmmStudyWithNoAvailableLangSet = RecordTestData.getSyntheticCmmStudyWithNoAvailableLangsSet();
+
+    // When
+    languageDocumentExtractor.setAvailableLanguages(cmmStudyWithNoAvailableLangSet);
+
+    assertThat(cmmStudyWithNoAvailableLangSet.getLangAvailableIn()).containsExactlyInAnyOrder("en", "fi", "de");
+  }
+
+  @Test
+  public void shouldNotTagAnyLangWhenCMMStudyDoesNotHaveTheRequiredCMMStudyIdentifier() throws IOException {
+
+    // Given
+    final CMMStudy cmmStudyWithNoAvailableLangSet = RecordTestData.getSyntheticCmmStudyWithNoAvailableLangsSet();
+    cmmStudyWithNoAvailableLangSet.setStudyNumber(null);
+
+    // When
+    languageDocumentExtractor.setAvailableLanguages(cmmStudyWithNoAvailableLangSet);
+
+    assertThat(cmmStudyWithNoAvailableLangSet.getLangAvailableIn()).isEmpty();
+  }
+
+  @Test
+  public void shouldNotTagEnglishWhenCMMStudyDoesNotHaveTheRequiredCMMStudyTitleForEnglish() throws IOException {
+
+    // Given
+    final CMMStudy cmmStudyWithNoAvailableLangSet = RecordTestData.getSyntheticCmmStudyWithNoAvailableLangsSet();
+    cmmStudyWithNoAvailableLangSet.getTitleStudy().remove("en");
+
+    // When
+    languageDocumentExtractor.setAvailableLanguages(cmmStudyWithNoAvailableLangSet);
+
+    assertThat(cmmStudyWithNoAvailableLangSet.getLangAvailableIn()).doesNotContain("en");
+    assertThat(cmmStudyWithNoAvailableLangSet.getLangAvailableIn()).containsExactlyInAnyOrder("fi", "de");
+  }
+
+  @Test
+  public void shouldNotTagFinishWhenCMMStudyDoesNotHaveTheRequiredCMMStudyAbstractForFinish() throws IOException {
+
+    // Given
+    final CMMStudy cmmStudyWithNoAvailableLangSet = RecordTestData.getSyntheticCmmStudyWithNoAvailableLangsSet();
+    cmmStudyWithNoAvailableLangSet.getAbstractField().remove("fi");
+
+    // When
+    languageDocumentExtractor.setAvailableLanguages(cmmStudyWithNoAvailableLangSet);
+
+    assertThat(cmmStudyWithNoAvailableLangSet.getLangAvailableIn()).doesNotContain("fi");
+    assertThat(cmmStudyWithNoAvailableLangSet.getLangAvailableIn()).containsExactlyInAnyOrder("en", "de");
+
+  }
+
+  @Test
+  public void shouldNotTagGermanWhenCMMStudyDoesNotHaveTheRequiredCMMStudyPublisherForGerman() throws IOException {
+
+    // Given
+    final CMMStudy cmmStudyWithNoAvailableLangSet = RecordTestData.getSyntheticCmmStudyWithNoAvailableLangsSet();
+    cmmStudyWithNoAvailableLangSet.getPublisher().remove("de");
+
+    // When
+    languageDocumentExtractor.setAvailableLanguages(cmmStudyWithNoAvailableLangSet);
+
+    assertThat(cmmStudyWithNoAvailableLangSet.getLangAvailableIn()).doesNotContain("de");
+    assertThat(cmmStudyWithNoAvailableLangSet.getLangAvailableIn()).containsExactlyInAnyOrder("en", "fi");
   }
 }
