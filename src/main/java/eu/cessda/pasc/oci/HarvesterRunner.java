@@ -53,10 +53,9 @@ public class HarvesterRunner {
     private final LanguageAvailabilityMapper languageAvailabilityMapper;
     private final Metrics metrics;
     private final HarvesterConsumerService remoteHarvester;
+    private String result;
 
     private final AtomicBoolean indexerRunning = new AtomicBoolean(false);
-
-    private String result;
 
     public HarvesterRunner(AppConfigurationProperties configurationProperties, HarvesterConsumerService remoteHarvesterConsumerService, HarvesterConsumerService localHarvesterConsumerService,
                            IngestService ingestService, LanguageDocumentExtractor extractor, LanguageAvailabilityMapper languageAvailabilityMapper, Metrics metrics) {
@@ -94,6 +93,7 @@ public class HarvesterRunner {
                         langStudies.forEach((langIsoCode, cmmStudies) -> {
                             try (var langClosable = MDC.putCloseable(LoggingConstants.LANG_CODE, langIsoCode)) {
                                 executeBulk(repo, langIsoCode, cmmStudies);
+                                result = langClosable.toString();
                             }
                         });
                     }
