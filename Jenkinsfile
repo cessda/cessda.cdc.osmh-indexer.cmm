@@ -92,5 +92,24 @@ pipeline {
 			}
             when { branch 'master' }
 		}
+        stage('ShiftLeft Scan') {
+            agent {
+                docker {
+                    image 'shiftleft/sast-scan'
+                    reuseNode true
+                }
+            }
+            steps {
+                // The desired build result is UNSTABLE, not FAILURE
+                catchError(buildResult: 'UNSTABLE') {
+                    sh 'scan'
+                }
+            }
+            post {
+                always {
+                    archiveArtifacts 'reports/*'
+                }
+            }
+        }
 	}
 }
