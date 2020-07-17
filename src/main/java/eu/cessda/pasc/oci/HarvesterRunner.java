@@ -53,7 +53,6 @@ public class HarvesterRunner {
     private final LanguageAvailabilityMapper languageAvailabilityMapper;
     private final Metrics metrics;
     private final HarvesterConsumerService remoteHarvester;
-    private String result;
 
     private final AtomicBoolean indexerRunning = new AtomicBoolean(false);
 
@@ -88,12 +87,10 @@ public class HarvesterRunner {
                     // Set the MDC so that the record name is attached to all downstream logs
                     try (var repoNameClosable = MDC.putCloseable(LoggingConstants.REPO_NAME, repo.getCode())) {
                         log.info("Processing Repo [{}]", repo);
-                        result = repoNameClosable.toString();
                         Map<String, List<CMMStudyOfLanguage>> langStudies = getCmmStudiesOfEachLangIsoCodeMap(repo, lastModifiedDateTime);
                         langStudies.forEach((langIsoCode, cmmStudies) -> {
                             try (var langClosable = MDC.putCloseable(LoggingConstants.LANG_CODE, langIsoCode)) {
                                 executeBulk(repo, langIsoCode, cmmStudies);
-                                result = langClosable.toString();
                             }
                         });
                     }
