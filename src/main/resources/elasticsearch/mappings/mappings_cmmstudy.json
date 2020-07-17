@@ -24,6 +24,10 @@
         "term_vector": "with_positions_offsets",
         "boost": 2
       },
+      "code": {
+        "type": "keyword",
+        "ignore_above": 256
+      },
       "creators": {
         "type": "text",
         "analyzer": "pasc_standard_analyzer",

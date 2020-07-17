@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2019 CESSDA ERIC (support@cessda.eu)
+ * Copyright © 2017-2020 CESSDA ERIC (support@cessda.eu)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package eu.cessda.pasc.oci.dao;
 
 import com.pgssoft.httpclient.HttpClientMock;
 import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
-import eu.cessda.pasc.oci.exception.CustomHandlerException;
 import eu.cessda.pasc.oci.repository.DaoBaseImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,7 +46,7 @@ public class ListRecordHeadersDaoImplTest {
     private HttpClientMock httpClient = new HttpClientMock();
 
     @Test
-    public void shouldReturnXmlPayloadOfRecordHeadersFromRemoteRepository() throws CustomHandlerException, IOException {
+    public void shouldReturnXmlPayloadOfRecordHeadersFromRemoteRepository() throws IOException {
 
         // Given
         String fullListRecordHeadersUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=ListIdentifiers&metadataPrefix=ddi";
@@ -68,7 +66,7 @@ public class ListRecordHeadersDaoImplTest {
     }
 
     @Test
-    public void shouldReturnXmlPayloadOfGivenSpecSetRecordHeadersFromRemoteRepository() throws CustomHandlerException, IOException {
+    public void shouldReturnXmlPayloadOfGivenSpecSetRecordHeadersFromRemoteRepository() throws IOException {
 
         // Given
         String fullListRecordHeadersUrl = "http://services.fsd.uta.fi/v0/oai?verb=ListIdentifiers&metadataPrefix=oai_ddi25&set=study_groups:energia";

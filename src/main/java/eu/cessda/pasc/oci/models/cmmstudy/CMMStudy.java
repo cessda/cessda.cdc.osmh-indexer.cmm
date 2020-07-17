@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2019 CESSDA ERIC (support@cessda.eu)
+ * Copyright © 2017-2020 CESSDA ERIC (support@cessda.eu)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -144,7 +144,8 @@ public class CMMStudy {
   /**
    * This is added information by this application after checking the the CMM record meets
    * the minimum CMM Fields requirements for given Lang Iso Code.
-   * @see eu.cessda.pasc.oci.service.helpers.LanguageAvailabilityMapper#setAvailableLanguages(CMMStudy)
+   *
+   * @see eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor#setAvailableLanguages(CMMStudy)
    */
   @Getter
   @Builder.Default
