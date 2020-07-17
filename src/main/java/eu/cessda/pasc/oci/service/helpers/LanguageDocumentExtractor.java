@@ -27,7 +27,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Language Document Extractor.  Helper to Extracts a custom document for each language IsoCode found in the config.
+ * Component responsible for extracting and mapping languages in which a given CMMStudy is available.
+ * <p>
+ * Note the CMM record must meet the minimum CMM Fields requirements.
  *
  * @author moses AT doraventures DOT com
  */
@@ -86,18 +88,13 @@ public class LanguageDocumentExtractor {
 
     // Inactive = deleted record no need to validate against CMM below. Index as is. Filtered in Frontend.
     if (!cmmStudy.isActive()) {
-      logInvalidCMMStudy(languageIsoCode, idPrefix, cmmStudy);
+      if (log.isWarnEnabled()) {
+        log.warn("[{}] StudyId [{}] is not active for language [{}]", idPrefix, cmmStudy.getStudyNumber(), languageIsoCode);
+      }
       return true;
     }
 
     return cmmStudy.getLangAvailableIn().contains(languageIsoCode);
-  }
-
-  private void logInvalidCMMStudy(String languageIsoCode, String spName, CMMStudy cmmStudy) {
-    if (log.isWarnEnabled()) {
-      final String studyNumber = Optional.ofNullable(cmmStudy).map(CMMStudy::getStudyNumber).orElse("Empty");
-      log.warn("[{}] StudyId [{}] is not active for language [{}]", spName, studyNumber, languageIsoCode);
-    }
   }
 
   private CMMStudyOfLanguage getCmmStudyOfLanguage(String spName, String lang, CMMStudy cmmStudy) {
@@ -110,6 +107,7 @@ public class LanguageDocumentExtractor {
     // Language neutral specific field extraction
     String idPrefix = spName.trim().replace(" ", "-") + "__"; // UK Data Service = UK-Data-Service__
     builder.id(idPrefix + cmmStudy.getStudyNumber())
+            .code(spName)
             .studyNumber(cmmStudy.getStudyNumber())
             .active(cmmStudy.isActive())
             .lastModified(cmmStudy.getLastModified())
@@ -141,5 +139,30 @@ public class LanguageDocumentExtractor {
     Optional.ofNullable(cmmStudy.getStudyUrl()).ifPresent(map -> builder.studyUrl(map.get(lang)));
 
     return builder.build();
+  }
+
+  /**
+   * Sets the available language field based on whether the minimum fields for that language are available.
+   * <p>
+   * The minimum fields required for a language are a title, an abstract, a study number and a publisher.
+   *
+   * @param cmmStudy the {@link CMMStudy} to check.
+   */
+  public void setAvailableLanguages(@NonNull CMMStudy cmmStudy) {
+    final List<String> propertiesLanguages = appConfigurationProperties.getLanguages();
+    for (String lang : propertiesLanguages) {
+      if (hasMinimumCmmFields(cmmStudy, lang)) {
+        cmmStudy.getLangAvailableIn().add(lang);
+      }
+    }
+  }
+
+  private boolean hasMinimumCmmFields(CMMStudy cmmStudy, String languageIsoCode) {
+    // the CMM record must meet the minimum CMM Fields requirements for given Lang Iso Code
+    // It must have a title, an abstract field, a study number and a publisher
+    return (cmmStudy.getTitleStudy() != null) && (cmmStudy.getTitleStudy().get(languageIsoCode) != null) &&
+            (cmmStudy.getAbstractField() != null) && (cmmStudy.getAbstractField().get(languageIsoCode) != null) &&
+            (cmmStudy.getStudyNumber() != null) && !cmmStudy.getStudyNumber().isEmpty() &&
+            (cmmStudy.getPublisher() != null) && (cmmStudy.getPublisher().get(languageIsoCode) != null);
   }
 }

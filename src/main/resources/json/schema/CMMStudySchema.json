@@ -9,9 +9,17 @@
   ],
   "additionalProperties": false,
   "properties": {
+    "code": {
+      "type": "string",
+      "description": "The short name of the repository as defined in the CESSDA Vocabularies Service."
+    },
+    "oaiIdentifier": {
+      "type": "string",
+      "description": "The OAI identifier that is returned by the OAI-PMH repository."
+    },
     "studyNumber": {
       "type": "string",
-      "description": "A studyNumber that uniquely identifies the CMMStudy within a repository."
+      "description": "A studyNumber that uniquely identifies the CMMStudy within the datacatalogue."
     },
     "abstract": {
       "type": "object",

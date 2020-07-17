@@ -50,8 +50,6 @@ public class ConsumerScheduler {
   private final IngestService esIndexerService;
   private final HarvesterRunner harvesterRunner;
 
-  private String result;
-
   @Autowired
   public ConsumerScheduler(final DebuggingJMXBean debuggingJMXBean, final IngestService esIndexerService,
       final HarvesterRunner harvesterRunner) {
@@ -65,12 +63,12 @@ public class ConsumerScheduler {
    */
   @ManagedOperation(description = "Manual trigger to do a full harvest and ingest run")
   @Scheduled(initialDelayString = "${osmhConsumer.delay.initial}", fixedDelayString = "${osmhConsumer.delay.fixed}")
+  @SuppressWarnings("try")
   public void fullHarvestAndIngestionAllConfiguredSPsReposRecords() {
-    try (var ignored = MDC.putCloseable(ConsumerScheduler.DEFAULT_CDC_JOB_KEY, getJobId())) {
+    try (var jobKeyClosable = MDC.putCloseable(ConsumerScheduler.DEFAULT_CDC_JOB_KEY, getJobId())) {
       final var startTime = logStartStatus(FULL_RUN);
       harvesterRunner.executeHarvestAndIngest(null);
       logEndStatus(startTime, FULL_RUN);
-      result = ignored.toString();
     }
   }
 
@@ -79,12 +77,12 @@ public class ConsumerScheduler {
    */
   @ManagedOperation(description = "Manual trigger to do an incremental harvest and ingest")
   @Scheduled(cron = "${osmhConsumer.daily.run}")
+  @SuppressWarnings("try")
   public void dailyIncrementalHarvestAndIngestionAllConfiguredSPsReposRecords() {
-    try (var ignored = MDC.putCloseable(ConsumerScheduler.DEFAULT_CDC_JOB_KEY, getJobId())) {
+    try (var jobKeyClosable = MDC.putCloseable(ConsumerScheduler.DEFAULT_CDC_JOB_KEY, getJobId())) {
       final var startTime = logStartStatus(DAILY_INCREMENTAL_RUN);
       harvesterRunner.executeHarvestAndIngest(esIndexerService.getMostRecentLastModified().orElse(null));
       logEndStatus(startTime, DAILY_INCREMENTAL_RUN);
-      result = ignored.toString();
     }
   }
 

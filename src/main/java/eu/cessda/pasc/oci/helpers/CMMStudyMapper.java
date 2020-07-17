@@ -38,7 +38,7 @@ import java.util.stream.Stream;
 
 import static eu.cessda.pasc.oci.helpers.OaiPmhConstants.*;
 import static eu.cessda.pasc.oci.helpers.ParsingStrategies.*;
-import static eu.cessda.pasc.oci.helpers.TimeUtility.dataCollYearDateFunction;
+import static eu.cessda.pasc.oci.helpers.TimeUtility.parseYearFromDateString;
 
 /**
  * Responsible for Mapping oai-pmh fields to a CMMStudy
@@ -336,12 +336,12 @@ public class CMMStudyMapper {
     if (dateAttrs.containsKey(SINGLE_ATTR)) {
       final String singleDateValue = dateAttrs.get(SINGLE_ATTR);
       dataCollectionPeriodBuilder.startDate(singleDateValue);
-      dataCollectionPeriodBuilder.dataCollectionYear(dataCollYearDateFunction().apply(singleDateValue).orElse(0));
+      dataCollectionPeriodBuilder.dataCollectionYear(parseYearFromDateString(singleDateValue).orElse(0));
     } else {
       if (dateAttrs.containsKey(START_ATTR)) {
         final String startDateValue = dateAttrs.get(START_ATTR);
         dataCollectionPeriodBuilder.startDate(startDateValue);
-        dataCollectionPeriodBuilder.dataCollectionYear(dataCollYearDateFunction().apply(startDateValue).orElse(0));
+        dataCollectionPeriodBuilder.dataCollectionYear(parseYearFromDateString(startDateValue).orElse(0));
       }
       if (dateAttrs.containsKey(END_ATTR)) {
         dataCollectionPeriodBuilder.endDate(dateAttrs.get(END_ATTR));

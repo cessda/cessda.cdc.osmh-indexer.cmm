@@ -24,7 +24,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.Optional;
-import java.util.function.Function;
 
 @Slf4j
 @UtilityClass
@@ -56,7 +55,7 @@ public class TimeUtility {
         }
     }
 
-    static Function<String, Optional<Integer>> dataCollYearDateFunction() {
-        return dateString -> TimeUtility.getLocalDateTime(dateString).map(LocalDateTime::getYear);
+    static Optional<Integer> parseYearFromDateString(String dateString) {
+        return TimeUtility.getLocalDateTime(dateString).map(LocalDateTime::getYear);
     }
 }

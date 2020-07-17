@@ -37,7 +37,7 @@ public class HandlerNotFoundException extends IllegalStateException {
      * @param repo the repository to construct the message from
      */
     public HandlerNotFoundException(Repo repo) {
-        super(String.format("Hander %s for repository %s not configured", repo.getHandler(), repo.getCode()));
+        super(String.format("Handler %s for repository %s not configured", repo.getHandler(), repo.getCode()));
         this.repo = repo;
     }
 }

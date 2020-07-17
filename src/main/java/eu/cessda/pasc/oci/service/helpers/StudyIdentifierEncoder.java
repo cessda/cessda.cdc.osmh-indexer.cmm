@@ -18,8 +18,6 @@ package eu.cessda.pasc.oci.service.helpers;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.util.function.Function;
-
 /**
  * Utility to encode(String replace) known Special Characters in HTTP rest context.
  * <p>
@@ -30,16 +28,9 @@ import java.util.function.Function;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class StudyIdentifierEncoder {
-
-  public static Function<String, String> encodeStudyIdentifier() {
-    return studyIdentifier -> studyIdentifier.replace(".", "_dt_")
+  public static String encodeStudyIdentifier(String studyIdentifier) {
+    return studyIdentifier.replace(".", "_dt_")
             .replace("/", "_sl_")
             .replace(":", "_cl_");
-  }
-
-  public static Function<String, String> decodeStudyNumber() {
-    return encodedStudyNumber -> encodedStudyNumber.replace("_dt_", ".")
-            .replace("_sl_", "/")
-        .replace("_cl_", ":");
   }
 }

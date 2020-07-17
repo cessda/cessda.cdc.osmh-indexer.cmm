@@ -35,7 +35,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static eu.cessda.pasc.oci.mock.data.ReposTestData.*;
-import static java.lang.String.format;
 import static org.assertj.core.api.Java6BDDAssertions.then;
 
 /**
@@ -51,10 +50,10 @@ import static org.assertj.core.api.Java6BDDAssertions.then;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@ActiveProfiles("dev")
+@ActiveProfiles("default")
 @Ignore("Ignoring: For manual Integration testing only")
 @Slf4j
-public class HarvesterConsumerServiceRunnerTest {
+public class HarvesterConsumerServiceRunnerTestIT {
 
   @Autowired
   HarvesterConsumerService harvesterConsumerService;
@@ -67,21 +66,17 @@ public class HarvesterConsumerServiceRunnerTest {
     countReport.putAll(processAndVerify(getGesisEnRepo()));
     countReport.putAll(processAndVerify(getGesisDeRepo()));
 
-    System.out.println("############################################################################################");
-    System.out.println("Printing Report for all repos");
-    System.out.println("############################################################################################");
-    countReport.forEach((repo, headerCount) -> System.out.println("#### " + headerCount + " Header count for " + repo));
+    log.info("\n############################################################################################" +
+            "\nPrinting Report for all repos" +
+            "\n############################################################################################");
+    countReport.forEach((repo, headerCount) -> log.info("#### " + headerCount + " Header count for " + repo));
     long sum = countReport.values().stream().mapToLong(l -> l).sum();
-    System.out.println("#### Total Count : " + sum);
-    System.out.println("############################################################################################");
+    log.info("Total Count : " + sum);
   }
 
   private Map<String, Integer> processAndVerify(Repo repo) {
     List<RecordHeader> recordHeaders = harvesterConsumerService.listRecordHeaders(repo, null);
-    System.out.println("############################################################################################");
-    int size = recordHeaders.size();
-    System.out.println(format("Total records found [%s]", size));
-    System.out.println("############################################################################################");
+    log.info("Total records found [{}]", recordHeaders.size());
     List<RecordHeader> top3RecordHeaders = recordHeaders.stream().skip(1000).limit(3).collect(Collectors.toList());
 
     then(top3RecordHeaders).hasSize(3);
@@ -89,14 +84,13 @@ public class HarvesterConsumerServiceRunnerTest {
     top3RecordHeaders.forEach(recordHeader -> {
       log.info("|------------------------------Record Header----------------------------------------|");
       log.info(recordHeader.toString());
-
       log.info("|------------------------------Record CmmStudy----------------------------------------|");
       Optional<CMMStudy> optionalCmmStudy = harvesterConsumerService.getRecord(repo, recordHeader.getIdentifier());
       then(optionalCmmStudy.isPresent()).isTrue();
     });
 
     Map<String, Integer> repoHeadersCount = new HashMap<>();
-    repoHeadersCount.put(repo.getCode(), size);
+    repoHeadersCount.put(repo.getCode(), recordHeaders.size());
 
     return repoHeadersCount;
   }

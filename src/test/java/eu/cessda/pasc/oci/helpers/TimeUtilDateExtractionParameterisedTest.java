@@ -60,7 +60,7 @@ public class TimeUtilDateExtractionParameterisedTest {
   public void shouldExtractDataCollYearDateFunction() {
 
     // When
-    Optional<Integer> actualYearDate = TimeUtility.dataCollYearDateFunction().apply(fInput);
+    Optional<Integer> actualYearDate = TimeUtility.parseYearFromDateString(fInput);
 
     // Then
     Java6BDDAssertions.then(actualYearDate.isPresent()).isTrue();

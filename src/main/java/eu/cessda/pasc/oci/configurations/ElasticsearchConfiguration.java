@@ -49,7 +49,7 @@ public class ElasticsearchConfiguration {
   @Value("${elasticsearch.clustername}")
   private String esClusterName;
 
-  TransportClient transportClient;
+  private TransportClient transportClient;
 
   @Bean
   public ObjectMapper objectMapper() {

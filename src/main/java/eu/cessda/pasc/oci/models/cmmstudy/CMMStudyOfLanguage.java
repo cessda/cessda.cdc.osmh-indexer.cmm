@@ -18,10 +18,8 @@ package eu.cessda.pasc.oci.models.cmmstudy;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.*;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.Document;
 
 import java.util.List;
 import java.util.Set;
@@ -32,37 +30,9 @@ import java.util.Set;
  * @author moses AT doraventures DOT com
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-    "studyNumber",
-    "titleStudy",
-    "abstract",
-    "classifications",
-    "keywords",
-    "typeOfTimeMethods",
-    "studyAreaCountries",
-    "unitTypes",
-    "publisher",
-    "publicationYear",
-    "pidStudies",
-    "fileLanguages",
-    "creators",
-    "typeOfSamplingProcedures",
-    "samplingProcedureFreeTexts",
-    "typeOfModeOfCollections",
-    "dataCollectionPeriodStartdate",
-    "dataCollectionPeriodEnddate",
-    "dataCollectionYear",
-    "dataCollectionFreeTexts",
-    "dataAccessFreeTexts",
-    "lastModified",
-    "isActive",
-    "langAvailableIn",
-    "studyXmlSourceUrl"
-})
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(indexName = "test")
 @Getter
 @EqualsAndHashCode
 @ToString
@@ -71,6 +41,9 @@ public class CMMStudyOfLanguage {
   @Id
   @Setter
   private String id;
+
+  @JsonProperty("code")
+  private String code;
 
   @JsonProperty("creators")
   private List<String> creators;

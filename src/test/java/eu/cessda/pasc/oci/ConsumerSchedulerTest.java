@@ -25,7 +25,6 @@ import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.service.HarvesterConsumerService;
 import eu.cessda.pasc.oci.service.helpers.DebuggingJMXBean;
-import eu.cessda.pasc.oci.service.helpers.LanguageAvailabilityMapper;
 import eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
@@ -65,9 +64,6 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
 
   @Autowired
   private LanguageDocumentExtractor extractor;
-
-  @Autowired
-  private LanguageAvailabilityMapper languageAvailabilityMapper;
 
   @Autowired
   ObjectMapper objectMapper;
@@ -118,7 +114,7 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
 
     // Given
-    var harvesterRunner = new HarvesterRunner(appConfigurationProperties, harvesterConsumerService, harvesterConsumerService, esIndexer, extractor, languageAvailabilityMapper, micrometerMetrics);
+    var harvesterRunner = new HarvesterRunner(appConfigurationProperties, harvesterConsumerService, harvesterConsumerService, esIndexer, extractor, micrometerMetrics);
     scheduler = new ConsumerScheduler(debuggingJMXBean, esIndexer, harvesterRunner);
 
     // When
@@ -145,7 +141,7 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     when(esIndexer.getStudy(Mockito.eq("UKDS__998"), Mockito.anyString())).thenReturn(Optional.of(getCmmStudyOfLanguageCodeEnX1().get(0)));
 
     // Given
-    var harvesterRunner = new HarvesterRunner(appConfigurationProperties, harvesterConsumerService, harvesterConsumerService, esIndexer, extractor, languageAvailabilityMapper, micrometerMetrics);
+    var harvesterRunner = new HarvesterRunner(appConfigurationProperties, harvesterConsumerService, harvesterConsumerService, esIndexer, extractor, micrometerMetrics);
     scheduler = new ConsumerScheduler(debuggingJMXBean, esIndexer, harvesterRunner);
 
     // When
@@ -202,7 +198,7 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     when(esIndexer.getStudy(Mockito.eq("UKDS__999"), Mockito.anyString())).thenReturn(Optional.of(getCmmStudyOfLanguageCodeEnX1().get(0)));
 
     // Given
-    var harvesterRunner = new HarvesterRunner(appConfigurationProperties, harvesterConsumerService, harvesterConsumerService, esIndexer, extractor, languageAvailabilityMapper, micrometerMetrics);
+    var harvesterRunner = new HarvesterRunner(appConfigurationProperties, harvesterConsumerService, harvesterConsumerService, esIndexer, extractor, micrometerMetrics);
     scheduler = new ConsumerScheduler(debuggingJMXBean, esIndexer, harvesterRunner);
 
     // When

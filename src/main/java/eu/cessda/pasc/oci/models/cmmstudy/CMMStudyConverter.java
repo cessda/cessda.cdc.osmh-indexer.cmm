@@ -16,8 +16,10 @@
 package eu.cessda.pasc.oci.models.cmmstudy;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,19 +42,38 @@ import java.io.InputStream;
 public class CMMStudyConverter {
 
   private final ObjectReader reader;
+  private final ObjectWriter writer;
+
+  // Serialize/deserialize helpers
+  public CMMStudyConverter() {
+    ObjectMapper objectMapper = new ObjectMapper();
+    reader = objectMapper.readerFor(CMMStudy.class);
+    writer = objectMapper.writerFor(CMMStudy.class);
+  }
 
   @Autowired
-  public CMMStudyConverter(ObjectMapper mapper) {
-    reader = mapper.readerFor(CMMStudy.class);
+  public CMMStudyConverter(ObjectMapper objectMapper) {
+    reader = objectMapper.readerFor(CMMStudy.class);
+    writer = objectMapper.writerFor(CMMStudy.class);
   }
 
   /**
    * Convert a JSON stream to a {@link CMMStudy} POJO.
    *
-   * @param json the input stream to parse.
+   * @param json the {@link InputStream} to parse.
    * @throws IOException if an IO error occurs when parsing the stream.
    */
-  public CMMStudy fromJsonString(InputStream json) throws IOException {
+  public CMMStudy fromJsonStream(InputStream json) throws IOException {
     return reader.readValue(json);
+  }
+
+  /**
+   * Convert a {@link CMMStudy} to a JSON string.
+   *
+   * @param cmmStudy the {@link CMMStudy} to convert.
+   * @throws JsonProcessingException when an error occurs creating the JSON representation.
+   */
+  public String toJsonString(CMMStudy cmmStudy) throws JsonProcessingException {
+    return writer.writeValueAsString(cmmStudy);
   }
 }
