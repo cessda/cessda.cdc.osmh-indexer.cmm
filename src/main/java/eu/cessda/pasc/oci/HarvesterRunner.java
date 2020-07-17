@@ -71,6 +71,7 @@ public class HarvesterRunner {
      * @param lastModifiedDateTime the DateTime to incrementally harvest from, set to null to perform a full harvest.
      * @throws IllegalStateException if a harvest is already running.
      */
+    @SuppressWarnings("try")
     public void executeHarvestAndIngest(LocalDateTime lastModifiedDateTime) {
         if (!indexerRunning.getAndSet(true)) {
             try {
