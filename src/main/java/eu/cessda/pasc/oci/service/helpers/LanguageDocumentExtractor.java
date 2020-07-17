@@ -88,18 +88,13 @@ public class LanguageDocumentExtractor {
 
     // Inactive = deleted record no need to validate against CMM below. Index as is. Filtered in Frontend.
     if (!cmmStudy.isActive()) {
-      logInvalidCMMStudy(languageIsoCode, idPrefix, cmmStudy);
+      if (log.isWarnEnabled()) {
+        log.warn("[{}] StudyId [{}] is not active for language [{}]", idPrefix, cmmStudy.getStudyNumber(), languageIsoCode);
+      }
       return true;
     }
 
     return cmmStudy.getLangAvailableIn().contains(languageIsoCode);
-  }
-
-  private void logInvalidCMMStudy(String languageIsoCode, String spName, CMMStudy cmmStudy) {
-    if (log.isWarnEnabled()) {
-      final String studyNumber = Optional.ofNullable(cmmStudy).map(CMMStudy::getStudyNumber).orElse("Empty");
-      log.warn("[{}] StudyId [{}] is not active for language [{}]", spName, studyNumber, languageIsoCode);
-    }
   }
 
   private CMMStudyOfLanguage getCmmStudyOfLanguage(String spName, String lang, CMMStudy cmmStudy) {
@@ -112,6 +107,7 @@ public class LanguageDocumentExtractor {
     // Language neutral specific field extraction
     String idPrefix = spName.trim().replace(" ", "-") + "__"; // UK Data Service = UK-Data-Service__
     builder.id(idPrefix + cmmStudy.getStudyNumber())
+            .code(spName)
             .studyNumber(cmmStudy.getStudyNumber())
             .active(cmmStudy.isActive())
             .lastModified(cmmStudy.getLastModified())

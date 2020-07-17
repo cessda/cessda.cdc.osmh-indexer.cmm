@@ -89,7 +89,7 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
         try {
             URI finalUrl = constructGetRecordUrl(repo, studyNumber);
             try (InputStream recordJsonStream = daoBase.getInputStream(finalUrl)) {
-                return Optional.of(cmmStudyConverter.fromJsonString(recordJsonStream));
+                return Optional.of(cmmStudyConverter.fromJsonStream(recordJsonStream));
             }
         } catch (ExternalSystemException e) {
             log.warn("[{}] Failed to get StudyId [{}]: {}: Response body [{}].",
@@ -126,7 +126,7 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
     public URI constructGetRecordUrl(Repo repo, String studyNumber) {
         Harvester harvester = appConfigurationProperties.getEndpoints().getHarvesters().get(repo.getHandler().toUpperCase());
         if (harvester != null) {
-            String encodedStudyID = StudyIdentifierEncoder.encodeStudyIdentifier().apply(studyNumber);
+            String encodedStudyID = StudyIdentifierEncoder.encodeStudyIdentifier(studyNumber);
             UriComponentsBuilder finalUrlBuilder = UriComponentsBuilder.fromUri(harvester.getUrl())
                     .path(harvester.getVersion())
                     .path("/GetRecord/CMMStudy/")

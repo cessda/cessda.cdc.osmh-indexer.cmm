@@ -90,10 +90,10 @@ public class LocalHarvesterConsumerService extends AbstractHarvesterConsumerServ
                     )
             );
         } catch (CustomHandlerException e) {
-            log.warn("[{}] Failed to get StudyId [{}]",
+            log.warn("[{}] Failed to get StudyId [{}]: {}",
                     value(LoggingConstants.REPO_NAME, repo.getCode()),
                     value(LoggingConstants.STUDY_ID, studyNumber),
-                    e
+                    e.toString()
             );
         }
         return Optional.empty();

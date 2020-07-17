@@ -27,8 +27,8 @@ import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.exception.CustomHandlerException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.mock.data.CMMStudyTestData;
-import eu.cessda.pasc.oci.models.cmmstudy.CMMConverter;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
+import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.repository.DaoBase;
 import lombok.extern.slf4j.Slf4j;
@@ -69,7 +69,7 @@ public class GetRecordServiceImplTest {
   AppConfigurationProperties appConfigurationProperties;
   private Repo repo;
   private String recordIdentifier;
-  private final CMMConverter cmmConverter = new CMMConverter();
+  private final CMMStudyConverter cmmConverter = new CMMStudyConverter();
 
 
   @MockBean

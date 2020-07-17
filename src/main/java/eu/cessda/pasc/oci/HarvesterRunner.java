@@ -190,7 +190,7 @@ public class HarvesterRunner {
                 .map(Optional::get)
                 .collect(Collectors.toList());
 
-        log.info("[{}] There are [{}] presentCMMStudies out of [{}] totalCMMStudies. Therefore CMMStudies rejected is [{}].",
+        log.info("[{}] Retrieved [{}] studies from [{}] header entries. [{}] studies couldn't be retrieved.",
                 value(LoggingConstants.REPO_NAME, repo.getCode()),
                 value("present_cmm_record", presentCMMStudies.size()),
                 value("total_cmm_record", recordHeaders.size()),
@@ -201,7 +201,7 @@ public class HarvesterRunner {
     }
 
     @Value
-    public static class UpdatedStudies {
+    private static class UpdatedStudies {
         int studiesCreated;
         int studiesDeleted;
         int studiesUpdated;

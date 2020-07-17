@@ -187,7 +187,7 @@ public final class RecordTestData {
 
   public static CMMStudy getSyntheticCmmStudy() throws IOException {
     InputStream cmmStudyString = new FileHandler().getFileAsStream("synthetic_compliant_record.json");
-    return new CMMStudyConverter(new UtilitiesConfiguration(null).objectMapper()).fromJsonString(cmmStudyString);
+    return new CMMStudyConverter(new UtilitiesConfiguration(null).objectMapper()).fromJsonStream(cmmStudyString);
   }
 
   public static CMMStudy getSyntheticCmmStudyWithNoAvailableLangsSet() throws IOException {
@@ -198,7 +198,7 @@ public final class RecordTestData {
 
   private static CMMStudy getDeletedCmmStudy() throws IOException {
     InputStream cmmStudyString = new FileHandler().getFileAsStream("record_ukds_1031_deleted.json");
-    return new CMMStudyConverter(new UtilitiesConfiguration(null).objectMapper()).fromJsonString(cmmStudyString);
+    return new CMMStudyConverter(new UtilitiesConfiguration(null).objectMapper()).fromJsonStream(cmmStudyString);
   }
 
   public static Optional<CMMStudy> getSyntheticCmmStudy(String identifier) throws IOException {
