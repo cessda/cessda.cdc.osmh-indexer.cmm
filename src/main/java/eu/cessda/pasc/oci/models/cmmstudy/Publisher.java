@@ -35,7 +35,7 @@ import lombok.*;
 @ToString
 public class Publisher {
   @JsonProperty("abbr")
-  private String iso2LetterCode;
+  private String abbreviation;
   @JsonProperty("publisher")
-  private String publisher;
+  private String name;
 }

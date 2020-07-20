@@ -18,6 +18,8 @@ package eu.cessda.pasc.oci.service.helpers;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
+import eu.cessda.pasc.oci.models.cmmstudy.Publisher;
+import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,28 +52,28 @@ public class LanguageDocumentExtractor {
    * @param cmmStudies filtered list of present studies which generally holds fields for all languages.
    * @return map extracted documents for each language iso code.
    */
-  public Map<String, List<CMMStudyOfLanguage>> mapLanguageDoc(Collection<CMMStudy> cmmStudies, String spName) {
+  public Map<String, List<CMMStudyOfLanguage>> mapLanguageDoc(@NonNull Collection<CMMStudy> cmmStudies, @NonNull Repo repository) {
 
-    log.debug("[{}] Mapping [{}] CMMStudies to CMMStudyOfLanguage", spName, cmmStudies.size());
-    Map<String, List<CMMStudyOfLanguage>> languageDocMap = new HashMap<>();
+    log.debug("[{}] Mapping [{}] CMMStudies to CMMStudyOfLanguage", repository.getCode(), cmmStudies.size());
+    Map<String, List<CMMStudyOfLanguage>> languageDocMap = new HashMap<>(appConfigurationProperties.getLanguages().size());
 
     for (String langCode : appConfigurationProperties.getLanguages()) {
-      log.trace("[{}] Extract CMMStudyOfLanguage for [{}] language code - STARTED", spName, langCode);
-      List<CMMStudyOfLanguage> collectLanguageCmmStudy = getCmmStudiesOfLangCode(cmmStudies, spName, langCode);
+      log.trace("[{}] Extract CMMStudyOfLanguage for [{}] language code - STARTED", repository.getCode(), langCode);
+      List<CMMStudyOfLanguage> collectLanguageCmmStudy = getCmmStudiesOfLangCode(cmmStudies, repository, langCode);
       languageDocMap.put(langCode, collectLanguageCmmStudy);
     }
 
     if (log.isDebugEnabled()) {
       for (Map.Entry<String, List<CMMStudyOfLanguage>> entry : languageDocMap.entrySet()) {
-        log.debug("[{}] langIsoCode [{}] has [{}] records that passed CMM minimum fields validation", spName, entry.getKey(), entry.getValue().size());
+        log.debug("[{}] langIsoCode [{}] has [{}] records that passed CMM minimum fields validation", repository.getCode(), entry.getKey(), entry.getValue().size());
       }
     }
     return languageDocMap;
   }
 
-  private List<CMMStudyOfLanguage> getCmmStudiesOfLangCode(Collection<CMMStudy> cmmStudies, String spName, String languageIsoCode) {
-    return cmmStudies.stream().filter(cmmStudy -> isValidCMMStudyForLang(languageIsoCode, spName, cmmStudy))
-            .map(cmmStudy -> getCmmStudyOfLanguage(spName, languageIsoCode, cmmStudy))
+  private List<CMMStudyOfLanguage> getCmmStudiesOfLangCode(Collection<CMMStudy> cmmStudies, Repo repository, String languageIsoCode) {
+    return cmmStudies.stream().filter(cmmStudy -> isValidCMMStudyForLang(cmmStudy, languageIsoCode))
+            .map(cmmStudy -> getCmmStudyOfLanguage(repository, languageIsoCode, cmmStudy))
             .collect(Collectors.toList());
   }
 
@@ -79,25 +81,22 @@ public class LanguageDocumentExtractor {
    * CMM Model minimum field check.  Restriction here has been reduced from these previous mandatory fields:
    * title, abstract, studyNumber and publisher
    *
-   * @param languageIsoCode the languageIsoCode
-   * @param idPrefix        the idPrefix
    * @param cmmStudy        the CmmStudy Object
+   * @param languageIsoCode the languageIsoCode
    * @return true if Study is available in other languages
+   * @throws NullPointerException if any of the parameters are {@code null}
    */
-  boolean isValidCMMStudyForLang(String languageIsoCode, String idPrefix, @NonNull CMMStudy cmmStudy) {
+  boolean isValidCMMStudyForLang(@NonNull CMMStudy cmmStudy, @NonNull String languageIsoCode) {
 
     // Inactive = deleted record no need to validate against CMM below. Index as is. Filtered in Frontend.
     if (!cmmStudy.isActive()) {
-      if (log.isWarnEnabled()) {
-        log.warn("[{}] StudyId [{}] is not active for language [{}]", idPrefix, cmmStudy.getStudyNumber(), languageIsoCode);
-      }
       return true;
     }
 
     return cmmStudy.getLangAvailableIn().contains(languageIsoCode);
   }
 
-  private CMMStudyOfLanguage getCmmStudyOfLanguage(String spName, String lang, CMMStudy cmmStudy) {
+  private CMMStudyOfLanguage getCmmStudyOfLanguage(Repo repository, String lang, CMMStudy cmmStudy) {
 
     String formatMsg = "Extracting CMMStudyOfLang from CMMStudyNumber [{}] for lang [{}]";
     log.trace(formatMsg, cmmStudy.getStudyNumber(), lang);
@@ -105,9 +104,9 @@ public class LanguageDocumentExtractor {
     CMMStudyOfLanguage.CMMStudyOfLanguageBuilder builder = CMMStudyOfLanguage.builder();
 
     // Language neutral specific field extraction
-    String idPrefix = spName.trim().replace(" ", "-") + "__"; // UK Data Service = UK-Data-Service__
+    String idPrefix = repository.getCode().trim().replace(" ", "-") + "__"; // UK Data Service = UK-Data-Service__
     builder.id(idPrefix + cmmStudy.getStudyNumber())
-            .code(spName)
+            .code(repository.getCode())
             .studyNumber(cmmStudy.getStudyNumber())
             .active(cmmStudy.isActive())
             .lastModified(cmmStudy.getLastModified())
@@ -119,6 +118,9 @@ public class LanguageDocumentExtractor {
             .langAvailableIn(cmmStudy.getLangAvailableIn())
             .studyXmlSourceUrl(cmmStudy.getStudyXmlSourceUrl());
 
+    // #183: The CDC user group would like the publisher to be set based on the indexer's configuration
+    builder.publisher(Publisher.builder().name(repository.getName()).abbreviation(repository.getCode()).build());
+
     // Language specific field extraction
     Optional.ofNullable(cmmStudy.getTitleStudy()).ifPresent(map -> builder.titleStudy(map.get(lang)));
     Optional.ofNullable(cmmStudy.getAbstractField()).ifPresent(map -> builder.abstractField(map.get(lang)));
@@ -127,7 +129,6 @@ public class LanguageDocumentExtractor {
     Optional.ofNullable(cmmStudy.getTypeOfTimeMethods()).ifPresent(map -> builder.typeOfTimeMethods(map.get(lang)));
     Optional.ofNullable(cmmStudy.getStudyAreaCountries()).ifPresent(map -> builder.studyAreaCountries(map.get(lang)));
     Optional.ofNullable(cmmStudy.getUnitTypes()).ifPresent(map -> builder.unitTypes(map.get(lang)));
-    Optional.ofNullable(cmmStudy.getPublisher()).ifPresent(map -> builder.publisher(map.get(lang)));
     Optional.ofNullable(cmmStudy.getPidStudies()).ifPresent(map -> builder.pidStudies(map.get(lang)));
     Optional.ofNullable(cmmStudy.getCreators()).ifPresent(map -> builder.creators(map.get(lang)));
     Optional.ofNullable(cmmStudy.getTypeOfSamplingProcedures()).ifPresent(map -> builder.typeOfSamplingProcedures(map.get(lang)));

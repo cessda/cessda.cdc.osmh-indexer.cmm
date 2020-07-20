@@ -18,6 +18,7 @@ package eu.cessda.pasc.oci.service.helpers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import eu.cessda.pasc.oci.AbstractSpringTestProfileContext;
 import eu.cessda.pasc.oci.mock.data.RecordTestData;
+import eu.cessda.pasc.oci.mock.data.ReposTestData;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
@@ -59,7 +60,7 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
     syntheticCmmStudy.getLangAvailableIn().remove("en");
 
     // When
-    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", ID_PREFIX, syntheticCmmStudy);
+    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang(syntheticCmmStudy, "en");
 
     then(validCMMStudyForLang).isFalse();
   }
@@ -71,13 +72,13 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
     CMMStudy cmmStudy = RecordTestData.getSyntheticCmmStudy();
 
     // When
-    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("de", ID_PREFIX, cmmStudy);
+    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang(cmmStudy, "de");
     then(validCMMStudyForLang).isTrue();
 
-    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", ID_PREFIX, cmmStudy);
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang(cmmStudy, "en");
     then(validCMMStudyForLang).isTrue();
 
-    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fi", ID_PREFIX, cmmStudy);
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang(cmmStudy, "fi");
     then(validCMMStudyForLang).isTrue();
 
      //Synthetic doc does not exist, so language is skipped
@@ -102,13 +103,13 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
     syntheticCmmStudy.setActive(false);
 
     // When
-    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("de", ID_PREFIX, syntheticCmmStudy);
+    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang(syntheticCmmStudy, "de");
     then(validCMMStudyForLang).isTrue();
 
-    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("en", ID_PREFIX, syntheticCmmStudy);
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang(syntheticCmmStudy, "en");
     then(validCMMStudyForLang).isTrue();
 
-    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fi", ID_PREFIX, syntheticCmmStudy);
+    validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang(syntheticCmmStudy, "fi");
     then(validCMMStudyForLang).isTrue();
 
     //Synthetic doc does not exist, so language is skipped
@@ -132,8 +133,7 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
     List<CMMStudy> studies = getASingleSyntheticCMMStudyAsList();
 
     // When
-    Map<String, List<CMMStudyOfLanguage>> languageDocMap =
-            languageDocumentExtractor.mapLanguageDoc(studies, "UK Data Service");
+    Map<String, List<CMMStudyOfLanguage>> languageDocMap = languageDocumentExtractor.mapLanguageDoc(studies, ReposTestData.getUKDSRepo());
 
     then(languageDocMap).isNotNull();
     then(languageDocMap).hasSize(17);
@@ -159,8 +159,7 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
     List<CMMStudy> studies = getSyntheticCMMStudyAndADeletedRecordAsList();
 
     // When
-    Map<String, List<CMMStudyOfLanguage>> languageDocMap =
-            languageDocumentExtractor.mapLanguageDoc(studies, "UK Data Service");
+    Map<String, List<CMMStudyOfLanguage>> languageDocMap = languageDocumentExtractor.mapLanguageDoc(studies, ReposTestData.getUKDSRepo());
 
     then(languageDocMap).isNotNull();
     then(languageDocMap).hasSize(17);
@@ -178,10 +177,11 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
     }
   }
 
+  @SuppressWarnings("ConstantConditions")
   @Test(expected = NullPointerException.class)
   public void shouldReturnFalseForInValidCMMStudyForLang() {
     // When
-    languageDocumentExtractor.isValidCMMStudyForLang("en", "UK Data Service", null);
+    languageDocumentExtractor.isValidCMMStudyForLang(null, "en");
   }
 
   @Test

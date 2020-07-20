@@ -113,7 +113,7 @@ public class MicrometerMetrics implements Metrics {
     }
 
     /**
-     * Iterates through all configured languages and updates them.
+     * {@inheritDoc}
      *
      * @throws ElasticsearchException if Elasticsearch is unavailable.
      */
@@ -133,7 +133,7 @@ public class MicrometerMetrics implements Metrics {
     }
 
     /**
-     * Updates the total records stored in Elasticsearch.
+     * {@inheritDoc}
      *
      * @throws ElasticsearchException if Elasticsearch is unavailable.
      */
@@ -214,7 +214,7 @@ public class MicrometerMetrics implements Metrics {
                 recordsPublisherMap.computeIfAbsent(publisherKey, publisher -> {
                     var builder = Gauge.builder(LIST_RECORDS_PUBLISHER, () -> getRecordCount(publisher));
                     builder.description("Amount of records stored per publisher");
-                    builder.tag("publisher", publisher.getPublisher());
+                    builder.tag("publisher", publisher.getName());
                     builder.register(meterRegistry);
                     return new AtomicLong(0);
                 }).set(counter.get())
@@ -233,11 +233,11 @@ public class MicrometerMetrics implements Metrics {
         if (publisherRecord != null) {
             return publisherRecord;
         }
-        throw new IllegalArgumentException(String.format("Invalid publisher [%s]", publisher.getPublisher()));
+        throw new IllegalArgumentException(String.format("Invalid publisher [%s]", publisher.getName()));
     }
 
     /**
-     * Updates all configured metrics.
+     * {@inheritDoc}
      *
      * @throws ElasticsearchException if Elasticsearch is unavailable.
      */
