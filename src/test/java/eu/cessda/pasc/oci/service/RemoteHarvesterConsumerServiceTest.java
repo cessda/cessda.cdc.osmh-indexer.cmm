@@ -18,8 +18,10 @@ package eu.cessda.pasc.oci.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.cessda.pasc.oci.AbstractSpringTestProfileContext;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
+import eu.cessda.pasc.oci.exception.ExternalSystemException;
 import eu.cessda.pasc.oci.helpers.FileHandler;
 import eu.cessda.pasc.oci.helpers.TimeUtility;
+import eu.cessda.pasc.oci.models.ErrorMessage;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
@@ -165,7 +167,24 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
     when(repoMock.getUrl()).thenReturn(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
     when(repoMock.getHandler()).thenReturn("NESSTAR");
 
-    when(daoBase.getInputStream(any(URI.class))).thenThrow(new IOException("Mocked!"));
+    var jsonMessage = objectMapper.writeValueAsString(new ErrorMessage("Mocked server error!"));
+
+    when(daoBase.getInputStream(any(URI.class))).thenThrow(new ExternalSystemException(500, jsonMessage));
+
+    Optional<CMMStudy> actualRecord = remoteHarvesterConsumerService.getRecord(repoMock, "4124325");
+
+    // Then exception is thrown caught and an empty list returned
+    then(actualRecord.isPresent()).isFalse();
+  }
+
+  @Test
+  public void shouldLogBodyIfErrorMessageJsonCannotBeDecoded() throws IOException {
+    // Given
+    Repo repoMock = mock(Repo.class);
+    when(repoMock.getUrl()).thenReturn(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
+    when(repoMock.getHandler()).thenReturn("NESSTAR");
+
+    when(daoBase.getInputStream(any(URI.class))).thenThrow(new ExternalSystemException(500, "Not a JSON string"));
 
     Optional<CMMStudy> actualRecord = remoteHarvesterConsumerService.getRecord(repoMock, "4124325");
 

@@ -21,6 +21,7 @@ import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.exception.ExternalSystemException;
 import eu.cessda.pasc.oci.exception.HandlerNotFoundException;
 import eu.cessda.pasc.oci.helpers.LoggingConstants;
+import eu.cessda.pasc.oci.models.ErrorMessage;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
@@ -58,6 +59,7 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
     private final ObjectReader recordHeaderObjectReader;
     private final CMMStudyConverter cmmStudyConverter;
     private final AppConfigurationProperties appConfigurationProperties;
+    private final ObjectReader errorMessageObjectReader;
 
     @Autowired
     public RemoteHarvesterConsumerService(AppConfigurationProperties appConfigurationProperties, CMMStudyConverter cmmStudyConverter, DaoBase daoBase, ObjectMapper mapper) {
@@ -65,6 +67,7 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
         this.cmmStudyConverter = cmmStudyConverter;
         this.appConfigurationProperties = appConfigurationProperties;
         this.recordHeaderObjectReader = mapper.readerFor(mapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class));
+        this.errorMessageObjectReader = mapper.readerFor(ErrorMessage.class);
     }
 
     @Override
@@ -92,14 +95,24 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
                 return Optional.of(cmmStudyConverter.fromJsonStream(recordJsonStream));
             }
         } catch (ExternalSystemException e) {
-            log.warn("[{}] Failed to get StudyId [{}]: {}: Response body [{}].",
-                    value(LoggingConstants.REPO_NAME, repo.getCode()),
-                    value(LoggingConstants.STUDY_ID, studyNumber),
-                    e.toString(),
-                    value(LoggingConstants.REASON, e.getExternalResponse().getBody())
-            );
+            try {
+                ErrorMessage errorMessage = errorMessageObjectReader.readValue(e.getExternalResponse().getBody());
+                log.warn(FAILED_TO_GET_STUDY_ID,
+                        value(LoggingConstants.REPO_NAME, repo.getCode()),
+                        value(LoggingConstants.STUDY_ID, studyNumber),
+                        value(LoggingConstants.REASON, errorMessage.getMessage())
+                );
+            } catch (IOException jsonException) {
+                log.warn(FAILED_TO_GET_STUDY_ID + ": Response body [{}].",
+                        value(LoggingConstants.REPO_NAME, repo.getCode()),
+                        value(LoggingConstants.STUDY_ID, studyNumber),
+                        e.toString(),
+                        value(LoggingConstants.REASON, e.getExternalResponse().getBody())
+                );
+                log.debug(jsonException.toString());
+            }
         } catch (IOException e) {
-            log.error("[{}] Failed to get StudyId [{}]: {}",
+            log.error(FAILED_TO_GET_STUDY_ID,
                     value(LoggingConstants.REPO_NAME, repo.getCode()),
                     value(LoggingConstants.STUDY_ID, studyNumber),
                     e.toString()
@@ -108,7 +121,7 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
         return Optional.empty();
     }
 
-    public URI constructListRecordUrl(Repo repo) {
+    private URI constructListRecordUrl(Repo repo) {
         Harvester harvester = appConfigurationProperties.getEndpoints().getHarvesters().get(repo.getHandler().toUpperCase());
         if (harvester != null) {
             UriComponentsBuilder finalUrlBuilder = UriComponentsBuilder.fromUri(harvester.getUrl())
@@ -123,7 +136,7 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
         }
     }
 
-    public URI constructGetRecordUrl(Repo repo, String studyNumber) {
+    private URI constructGetRecordUrl(Repo repo, String studyNumber) {
         Harvester harvester = appConfigurationProperties.getEndpoints().getHarvesters().get(repo.getHandler().toUpperCase());
         if (harvester != null) {
             String encodedStudyID = StudyIdentifierEncoder.encodeStudyIdentifier(studyNumber);

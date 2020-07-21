@@ -177,13 +177,6 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
     }
   }
 
-  @SuppressWarnings("ConstantConditions")
-  @Test(expected = NullPointerException.class)
-  public void shouldReturnFalseForInValidCMMStudyForLang() {
-    // When
-    languageDocumentExtractor.isValidCMMStudyForLang(null, "en");
-  }
-
   @Test
   public void shouldTagAllLanguagesThatPassMinimumCMMRequirementAsStudyAvailableInGivenLang() throws IOException {
 
