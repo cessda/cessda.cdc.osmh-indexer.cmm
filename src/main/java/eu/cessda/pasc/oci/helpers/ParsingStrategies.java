@@ -79,8 +79,8 @@ class ParsingStrategies {
 
   static Function<Element, Publisher> publisherStrategyFunction() {
     return element -> Publisher.builder()
-            .iso2LetterCode(getAttributeValue(element, ABBR_ATTR).orElse(PUBLISHER_NOT_AVAIL))
-            .publisher(CLEAN_CHARACTER_RETURNS_STRATEGY.apply(element.getText())).build();
+            .abbreviation(getAttributeValue(element, ABBR_ATTR).orElse(PUBLISHER_NOT_AVAIL))
+            .name(CLEAN_CHARACTER_RETURNS_STRATEGY.apply(element.getText())).build();
   }
 
   static Function<Element, Optional<TermVocabAttributes>> termVocabAttributeStrategyFunction(boolean hasControlledValue) {

@@ -37,6 +37,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public abstract class AbstractHarvesterConsumerService implements HarvesterConsumerService {
 
+  protected static final String FAILED_TO_GET_STUDY_ID = "[{}] Failed to get StudyId [{}]: {}";
+
   /**
    * Filter records that are newer than the specified last modified date.
    * <p/>

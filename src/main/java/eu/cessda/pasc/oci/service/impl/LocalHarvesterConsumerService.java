@@ -77,20 +77,20 @@ public class LocalHarvesterConsumerService extends AbstractHarvesterConsumerServ
             return Optional.of(getRecordService.getRecord(repo, studyNumber));
         } catch (OaiPmhException e) {
             e.getOaiErrorMessage().ifPresentOrElse(
-                    oaiErrorMessage -> log.warn("[{}] Failed to get StudyId [{}]: {}: {}",
+                    oaiErrorMessage -> log.warn(FAILED_TO_GET_STUDY_ID + ": {}",
                             repo.getCode(),
                             value(LoggingConstants.STUDY_ID, studyNumber),
                             value(LoggingConstants.OAI_ERROR_CODE, e.getCode()),
                             value(LoggingConstants.OAI_ERROR_MESSAGE, oaiErrorMessage)
                     ),
-                    () -> log.warn("[{}] Failed to get StudyId [{}]: {}.",
+                    () -> log.warn(FAILED_TO_GET_STUDY_ID,
                             repo.getCode(),
                             value(LoggingConstants.STUDY_ID, studyNumber),
                             value(LoggingConstants.OAI_ERROR_CODE, e.getCode())
                     )
             );
         } catch (CustomHandlerException e) {
-            log.warn("[{}] Failed to get StudyId [{}]: {}",
+            log.warn(FAILED_TO_GET_STUDY_ID,
                     value(LoggingConstants.REPO_NAME, repo.getCode()),
                     value(LoggingConstants.STUDY_ID, studyNumber),
                     e.toString()
