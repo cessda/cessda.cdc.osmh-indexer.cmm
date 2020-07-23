@@ -77,7 +77,7 @@ public class ListRecordHeadersServiceImpl implements ListRecordHeadersService {
 
     log.info("[{}] Parsing record headers.", repo.getCode());
     List<RecordHeader> recordHeaders = retrieveRecordHeaders(doc, repo.getUrl());
-      log.debug("[{}] ParseRecordHeaders ended:  No more resumption tokens to process.", repo.getCode());
+    log.debug("[{}] ParseRecordHeaders ended:  No more resumption tokens to process.", repo.getCode());
 
     int expectedRecordHeadersCount = getRecordHeadersCount(doc);
     if (expectedRecordHeadersCount != -1) {

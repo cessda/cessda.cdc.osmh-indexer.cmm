@@ -72,13 +72,12 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
 
     @Override
     public List<RecordHeader> listRecordHeaders(Repo repo, LocalDateTime lastModifiedDate) {
-        try {
-            URI finalUrl = constructListRecordUrl(repo);
-            try (InputStream recordHeadersJsonStream = daoBase.getInputStream(finalUrl)) {
-                List<RecordHeader> recordHeadersUnfiltered = recordHeaderObjectReader.readValue(recordHeadersJsonStream);
-                return filterRecords(recordHeadersUnfiltered, lastModifiedDate);
-            }
-        } catch (IOException e) {
+        URI finalUrl = constructListRecordUrl(repo);
+        try (InputStream recordHeadersJsonStream = daoBase.getInputStream(finalUrl)) {
+            List<RecordHeader> recordHeadersUnfiltered = recordHeaderObjectReader.readValue(recordHeadersJsonStream);
+            log.info("[{}] Retrieved [{}] record headers.", repo.getCode(), recordHeadersUnfiltered.size());
+            return filterRecords(recordHeadersUnfiltered, lastModifiedDate);
+        } catch (IOException | IllegalArgumentException e) {
             log.error("[{}] ListRecordHeaders failed: {}", value(LoggingConstants.REPO_NAME, repo.getCode()), e.toString());
         }
         return Collections.emptyList();
@@ -111,7 +110,7 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
                 );
                 log.debug(jsonException.toString());
             }
-        } catch (IOException e) {
+        } catch (IOException | IllegalArgumentException e) {
             log.error(FAILED_TO_GET_STUDY_ID,
                     value(LoggingConstants.REPO_NAME, repo.getCode()),
                     value(LoggingConstants.STUDY_ID, studyNumber),

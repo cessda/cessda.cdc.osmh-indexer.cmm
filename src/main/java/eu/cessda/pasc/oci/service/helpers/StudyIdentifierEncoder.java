@@ -31,6 +31,7 @@ public final class StudyIdentifierEncoder {
   public static String encodeStudyIdentifier(String studyIdentifier) {
     return studyIdentifier.replace(".", "_dt_")
             .replace("/", "_sl_")
-            .replace(":", "_cl_");
+            .replace(":", "_cl_")
+            .trim();
   }
 }

@@ -27,6 +27,7 @@ import eu.cessda.pasc.oci.service.HarvesterConsumerService;
 import eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.ElasticsearchException;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
@@ -97,6 +98,9 @@ public class HarvesterRunner {
                     MDC.clear();
                 });
                 log.info("Total number of records is {}.", value("total_cmm_studies", ingestService.getTotalHitCount("*")));
+                metrics.updateMetrics();
+            } catch (ElasticsearchException e) {
+                log.error("Harvest failed!: {}", e.toString());
             } finally {
                 // Ensure that the running state is always set to false even if an exception is thrown
                 indexerRunning.set(false);
@@ -104,7 +108,6 @@ public class HarvesterRunner {
         } else {
             throw new IllegalStateException("Indexer is already running");
         }
-        metrics.updateMetrics();
     }
 
 
@@ -186,6 +189,8 @@ public class HarvesterRunner {
         List<RecordHeader> recordHeaders = harvester.listRecordHeaders(repo, lastModifiedDateTime);
 
         List<CMMStudy> presentCMMStudies = recordHeaders.stream()
+                // If the harvest is cancelled, prevent the retrieval of any more records
+                .filter(recordHeader -> indexerRunning.get())
                 .map(recordHeader -> harvester.getRecord(repo, recordHeader.getIdentifier()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
