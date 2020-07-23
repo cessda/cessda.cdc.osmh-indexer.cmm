@@ -147,9 +147,15 @@ public class CMMStudy {
    *
    * @see eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor#setAvailableLanguages(CMMStudy)
    */
-  @Getter
   @Builder.Default
   private Set<String> langAvailableIn = new HashSet<>();
+
+  public Set<String> getLangAvailableIn() {
+    if (langAvailableIn == null) {
+      langAvailableIn = new HashSet<>();
+    }
+    return langAvailableIn;
+  }
 
   @JsonProperty("studyXmlSourceUrl")
   private String studyXmlSourceUrl;
