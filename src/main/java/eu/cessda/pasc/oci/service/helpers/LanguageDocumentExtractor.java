@@ -105,16 +105,18 @@ public class LanguageDocumentExtractor {
     // Language neutral specific field extraction
     String idPrefix = repository.getCode().trim().replace(" ", "-") + "__"; // UK Data Service = UK-Data-Service__
     builder.id(idPrefix + cmmStudy.getStudyNumber())
-            .code(repository.getCode())
-            .studyNumber(cmmStudy.getStudyNumber())
-            .active(cmmStudy.isActive())
-            .lastModified(cmmStudy.getLastModified())
-            .publicationYear(cmmStudy.getPublicationYear())
-            .fileLanguages(cmmStudy.getFileLanguages())
-            .dataCollectionPeriodStartdate(cmmStudy.getDataCollectionPeriodStartdate())
-            .dataCollectionPeriodEnddate(cmmStudy.getDataCollectionPeriodEnddate())
-            .dataCollectionYear(cmmStudy.getDataCollectionYear())
-            .langAvailableIn(cmmStudy.getLangAvailableIn())
+        .code(repository.getCode())
+        .studyNumber(cmmStudy.getStudyNumber())
+        .active(cmmStudy.isActive())
+        .lastModified(cmmStudy.getLastModified())
+        .publicationYear(cmmStudy.getPublicationYear())
+        .fileLanguages(cmmStudy.getFileLanguages())
+        .dataCollectionPeriodStartdate(cmmStudy.getDataCollectionPeriodStartdate())
+        .dataCollectionPeriodEnddate(cmmStudy.getDataCollectionPeriodEnddate())
+        .dataCollectionYear(cmmStudy.getDataCollectionYear())
+        .langAvailableIn(appConfigurationProperties.getLanguages().stream()
+            .filter(langCode -> hasMinimumCmmFields(cmmStudy, langCode))
+            .collect(Collectors.toSet()))
             .studyXmlSourceUrl(cmmStudy.getStudyXmlSourceUrl());
 
     // #183: The CDC user group would like the publisher to be set based on the indexer's configuration

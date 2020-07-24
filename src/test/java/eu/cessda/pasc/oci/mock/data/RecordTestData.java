@@ -189,12 +189,6 @@ public final class RecordTestData {
     return new CMMStudyConverter(new UtilitiesConfiguration(null).objectMapper()).fromJsonStream(cmmStudyString);
   }
 
-  public static CMMStudy getSyntheticCmmStudyWithNoAvailableLangsSet() throws IOException {
-    final CMMStudy syntheticCmmStudy = getSyntheticCmmStudy();
-    syntheticCmmStudy.getLangAvailableIn().clear();
-    return syntheticCmmStudy;
-  }
-
   private static CMMStudy getDeletedCmmStudy() throws IOException {
     InputStream cmmStudyString = new FileHandler().getFileAsStream("record_ukds_1031_deleted.json");
     return new CMMStudyConverter(new UtilitiesConfiguration(null).objectMapper()).fromJsonStream(cmmStudyString);

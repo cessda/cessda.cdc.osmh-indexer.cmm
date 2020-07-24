@@ -54,19 +54,6 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
   private static final String ID_PREFIX = "test-stub";
 
   @Test
-  public void shouldAcceptRecordWhenNotInListOfLanguagesIfCriteriaIsFulfilled() throws IOException {
-
-    // Given
-    CMMStudy syntheticCmmStudy = RecordTestData.getSyntheticCmmStudy();
-    syntheticCmmStudy.getLangAvailableIn().remove("en");
-
-    // When
-    boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang(syntheticCmmStudy, "en");
-
-    then(validCMMStudyForLang).isTrue();
-  }
-
-  @Test
   public void shouldValidateRecordsWhenGivenLanguageCodeIsInListOfLanguagesAvailableIn() throws IOException {
 
     // Given
@@ -149,8 +136,8 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
       //then(languageDocMap.get("sk")).hasSize(0);
 
       List<CMMStudyOfLanguage> enStudy = languageDocMap.get("en");
-    String enCMMStudyJsonStringOpt = cmmStudyOfLanguageConverter.toJsonString(enStudy.get(0));
-    System.out.println(enCMMStudyJsonStringOpt);
+      String enCMMStudyJsonStringOpt = cmmStudyOfLanguageConverter.toJsonString(enStudy.get(0));
+      System.out.println(enCMMStudyJsonStringOpt);
   }
 
   @Test
@@ -181,23 +168,24 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
   @Test
   public void shouldTagAllLanguagesThatPassMinimumCMMRequirementAsStudyAvailableInGivenLang() throws IOException {
 
-    // Given
-    final CMMStudy cmmStudyWithNoAvailableLangSet = RecordTestData.getSyntheticCmmStudyWithNoAvailableLangsSet();
+      // Given
+      final CMMStudy cmmStudyWithNoAvailableLangSet = RecordTestData.getSyntheticCmmStudy();
 
-    // When
+      // When
       var cmmStudyOfLanguage = languageDocumentExtractor.mapLanguageDoc(Collections.singleton(cmmStudyWithNoAvailableLangSet), ReposTestData.getUKDSRepo());
 
       assertThat(cmmStudyOfLanguage.keySet()).containsExactlyInAnyOrder("en", "fi", "de");
+      cmmStudyOfLanguage.values().forEach(cmmStudyOfLanguages -> assertThat(cmmStudyOfLanguages.get(0).getLangAvailableIn()).containsExactlyInAnyOrder("en", "fi", "de"));
   }
 
   @Test
   public void shouldNotTagAnyLangWhenCMMStudyDoesNotHaveTheRequiredCMMStudyIdentifier() throws IOException {
 
-    // Given
-    final CMMStudy cmmStudyWithNoAvailableLangSet = RecordTestData.getSyntheticCmmStudyWithNoAvailableLangsSet();
-    cmmStudyWithNoAvailableLangSet.setStudyNumber(null);
+      // Given
+      final CMMStudy cmmStudyWithNoAvailableLangSet = RecordTestData.getSyntheticCmmStudy();
+      cmmStudyWithNoAvailableLangSet.setStudyNumber(null);
 
-    // When
+      // When
       var cmmStudyOfLanguage = languageDocumentExtractor.mapLanguageDoc(Collections.singleton(cmmStudyWithNoAvailableLangSet), ReposTestData.getUKDSRepo());
 
       assertThat(cmmStudyOfLanguage).isEmpty();
@@ -207,7 +195,7 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
   public void shouldNotTagEnglishWhenCMMStudyDoesNotHaveTheRequiredCMMStudyTitleForEnglish() throws IOException {
 
       // Given
-      final CMMStudy cmmStudyWithNoAvailableLangSet = RecordTestData.getSyntheticCmmStudyWithNoAvailableLangsSet();
+      final CMMStudy cmmStudyWithNoAvailableLangSet = RecordTestData.getSyntheticCmmStudy();
       cmmStudyWithNoAvailableLangSet.getTitleStudy().remove("en");
 
       // When
@@ -215,13 +203,14 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
 
       assertThat(cmmStudyOfLanguage.keySet()).doesNotContain("en");
       assertThat(cmmStudyOfLanguage.keySet()).containsExactlyInAnyOrder("fi", "de");
+      cmmStudyOfLanguage.values().forEach(cmmStudyOfLanguages -> assertThat(cmmStudyOfLanguages.get(0).getLangAvailableIn()).containsExactlyInAnyOrder("fi", "de"));
   }
 
   @Test
   public void shouldNotTagFinishWhenCMMStudyDoesNotHaveTheRequiredCMMStudyAbstractForFinish() throws IOException {
 
       // Given
-      final CMMStudy cmmStudyWithNoAvailableLangSet = RecordTestData.getSyntheticCmmStudyWithNoAvailableLangsSet();
+      final CMMStudy cmmStudyWithNoAvailableLangSet = RecordTestData.getSyntheticCmmStudy();
       cmmStudyWithNoAvailableLangSet.getAbstractField().remove("fi");
 
       // When
@@ -229,14 +218,14 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
 
       assertThat(cmmStudyOfLanguage.keySet()).doesNotContain("fi");
       assertThat(cmmStudyOfLanguage.keySet()).containsExactlyInAnyOrder("en", "de");
-
+      cmmStudyOfLanguage.values().forEach(cmmStudyOfLanguages -> assertThat(cmmStudyOfLanguages.get(0).getLangAvailableIn()).containsExactlyInAnyOrder("en", "de"));
   }
 
   @Test
   public void shouldNotTagGermanWhenCMMStudyDoesNotHaveTheRequiredCMMStudyPublisherForGerman() throws IOException {
 
       // Given
-      final CMMStudy cmmStudyWithNoAvailableLangSet = RecordTestData.getSyntheticCmmStudyWithNoAvailableLangsSet();
+      final CMMStudy cmmStudyWithNoAvailableLangSet = RecordTestData.getSyntheticCmmStudy();
       cmmStudyWithNoAvailableLangSet.getPublisher().remove("de");
 
       // When
@@ -244,5 +233,6 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
 
       assertThat(cmmStudyOfLanguage.keySet()).doesNotContain("de");
       assertThat(cmmStudyOfLanguage.keySet()).containsExactlyInAnyOrder("en", "fi");
+      cmmStudyOfLanguage.values().forEach(cmmStudyOfLanguages -> assertThat(cmmStudyOfLanguages.get(0).getLangAvailableIn()).containsExactlyInAnyOrder("en", "fi"));
   }
 }
