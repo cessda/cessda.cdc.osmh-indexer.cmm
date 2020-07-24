@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.*;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -140,22 +139,6 @@ public class CMMStudy {
   @Setter
   @JsonProperty("isActive")
   private boolean active;
-
-  /**
-   * This is added information by this application after checking the the CMM record meets
-   * the minimum CMM Fields requirements for given Lang Iso Code.
-   *
-   * @see eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor#setAvailableLanguages(CMMStudy)
-   */
-  @Builder.Default
-  private Set<String> langAvailableIn = new HashSet<>();
-
-  public Set<String> getLangAvailableIn() {
-    if (langAvailableIn == null) {
-      langAvailableIn = new HashSet<>();
-    }
-    return langAvailableIn;
-  }
 
   @JsonProperty("studyXmlSourceUrl")
   private String studyXmlSourceUrl;

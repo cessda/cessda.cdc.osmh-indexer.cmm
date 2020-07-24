@@ -132,8 +132,6 @@ public class HarvesterRunner {
             } else {
                 log.error("[{}({})] Indexing failed!", repo.getCode(), langIsoCode);
             }
-        } else {
-            log.debug("[{}({})] CmmStudies list is empty. Nothing to index.", repo.getCode(), langIsoCode);
         }
     }
 
