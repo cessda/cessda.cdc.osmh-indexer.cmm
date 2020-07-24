@@ -48,13 +48,13 @@ Static code quality with verification with SonarQube
 
     mvn spring-boot:run
 
-### Run it - with profile
+### Run it — with profile
 
     java -jar -Dspring.profiles.active=dev target/pasc-oci*.jar
     java -jar -Dspring.profiles.active=uat target/pasc-oci*.jar
     java -jar -Dspring.profiles.active=prod target/pasc-oci*.jar
 
-Note if no profile flag is set the default profile will be used. This is configured to use a local Elasticsearch instance, as well as local OAI-PMH and NESSTAR repository handlers.
+If no profile is specified, the default profile will be used. The default profile is configured to use a local Elasticsearch instance, as well as a local NESSTAR repository handler.
 
 ## Notes
 
@@ -65,14 +65,15 @@ Note if no profile flag is set the default profile will be used. This is configu
 
 ### At startup
 
-Configuration is loaded and overwritten in this order
+The application loads configuration in this order
 
 * Environment Variables e.g. `SECURITY_USER_NAME`
     * Spring can use weak binding to convert environment variables into Java properties
     * e.g. `SPRING_BOOT_ADMIN_USERNAME` converts to `spring.boot.admin.username`
 * application-[dev,local,prod].yml
-  * dev, local and prod refer to Spring profiles, specified by the command line `--spring.profiles.active` or the environment variable `SPRING_PROFILES_ACTIVE`
-  * See <https://docs.spring.io/spring-boot/docs/1.5.x/reference/html/boot-features-profiles.html> for more details
+    * dev, local and prod refer to Spring profiles
+        * A Spring profile can be specified by the command line `--spring.profiles.active` or the environment variable `SPRING_PROFILES_ACTIVE`
+    * See <https://docs.spring.io/spring-boot/docs/1.5.x/reference/html/boot-features-profiles.html> for more details
 * application.yml
 * CLI parameters e.g. `--logging.level.=DEBUG` sets logging level for all classes
 
@@ -80,7 +81,7 @@ Note that usernames (`${SECURITY_USER_NAME}` and `${SPRING_BOOT_ADMIN_USERNAME}`
 
 ### At Runtime
 
-If the app is registered at a [Spring Boot Admin server](https://github.com/codecentric/spring-boot-admin) all environment properties can be changed at runtime.
+If the application is registered at a [Spring Boot Admin server](https://github.com/codecentric/spring-boot-admin), all environment properties can be changed at runtime.
 
 **Changes made at runtime will be effective after a context reload but are lost after an application restart unless persisted in** `application.yml`
 
@@ -118,7 +119,7 @@ The code is the short name of the repository and acts as a unique identifier. Th
 
 The name is the friendly name of the repository. This is an optional parameter and will be replaced with the code if it is not present.
 
-The handler defines how the repository will be parsed. Current options are OAI-PMH which parses repositories returning DDI 2.5, and NESSTAR which parses DDI 1.2. Additional remote harvesters can be defined under the `osmhConsumer.endpoints.harvesters` key.
+The handler defines how the repository will be parsed. Current options are OAI-PMH, which parses repositories returning DDI 2.5, and NESSTAR, which parses DDI 1.2. Additional remote harvesters can be defined under the `osmhConsumer.endpoints.harvesters` key.
 
 The preferred metadata parameter sets the `metadataPrefix` parameter on OAI-PMH requests.
 

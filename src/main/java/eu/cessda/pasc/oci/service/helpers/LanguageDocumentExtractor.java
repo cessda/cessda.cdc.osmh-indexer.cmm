@@ -50,40 +50,37 @@ public class LanguageDocumentExtractor {
    * Extracts a custom document for each language IsoCode found in the config.
    *
    * @param cmmStudies filtered list of present studies which generally holds fields for all languages.
+   * @param repository the repository where the study originated.
    * @return map extracted documents for each language iso code.
+   * @throws NullPointerException if any of the parameters are {@code null}
    */
   public Map<String, List<CMMStudyOfLanguage>> mapLanguageDoc(@NonNull Collection<CMMStudy> cmmStudies, @NonNull Repo repository) {
 
     log.debug("[{}] Mapping [{}] CMMStudies to CMMStudyOfLanguage", repository.getCode(), cmmStudies.size());
-    Map<String, List<CMMStudyOfLanguage>> languageDocMap = new HashMap<>(appConfigurationProperties.getLanguages().size());
+    var languageDocMap = new HashMap<String, List<CMMStudyOfLanguage>>(appConfigurationProperties.getLanguages().size());
 
     for (String langCode : appConfigurationProperties.getLanguages()) {
       log.trace("[{}] Extract CMMStudyOfLanguage for [{}] language code - STARTED", repository.getCode(), langCode);
-      List<CMMStudyOfLanguage> collectLanguageCmmStudy = getCmmStudiesOfLangCode(cmmStudies, repository, langCode);
+      var collectLanguageCmmStudy = cmmStudies.stream()
+              // Filter out if the study is not valid for the current language
+              .filter(cmmStudy -> isValidCMMStudyForLang(cmmStudy, langCode))
+              // Map the study to the language specific variant
+              .map(cmmStudy -> getCmmStudyOfLanguage(cmmStudy, langCode, repository))
+              .collect(Collectors.toList());
+      log.debug("[{}] langIsoCode [{}] has [{}] records that passed CMM minimum fields validation", repository.getCode(), langCode, collectLanguageCmmStudy.size());
       languageDocMap.put(langCode, collectLanguageCmmStudy);
     }
 
-    if (log.isDebugEnabled()) {
-      for (Map.Entry<String, List<CMMStudyOfLanguage>> entry : languageDocMap.entrySet()) {
-        log.debug("[{}] langIsoCode [{}] has [{}] records that passed CMM minimum fields validation", repository.getCode(), entry.getKey(), entry.getValue().size());
-      }
-    }
     return languageDocMap;
-  }
-
-  private List<CMMStudyOfLanguage> getCmmStudiesOfLangCode(Collection<CMMStudy> cmmStudies, Repo repository, String languageIsoCode) {
-    return cmmStudies.stream().filter(cmmStudy -> isValidCMMStudyForLang(cmmStudy, languageIsoCode))
-            .map(cmmStudy -> getCmmStudyOfLanguage(repository, languageIsoCode, cmmStudy))
-            .collect(Collectors.toList());
   }
 
   /**
    * CMM Model minimum field check.  Restriction here has been reduced from these previous mandatory fields:
    * title, abstract, studyNumber and publisher
    *
-   * @param cmmStudy        the CmmStudy Object
+   * @param cmmStudy        the {@link CMMStudy} to check
    * @param languageIsoCode the languageIsoCode
-   * @return true if Study is available in other languages
+   * @return true if Study is available in the specified language
    * @throws NullPointerException if any of the parameters are {@code null}
    */
   boolean isValidCMMStudyForLang(@NonNull CMMStudy cmmStudy, @NonNull String languageIsoCode) {
@@ -93,10 +90,10 @@ public class LanguageDocumentExtractor {
       return true;
     }
 
-    return cmmStudy.getLangAvailableIn().contains(languageIsoCode);
+    return hasMinimumCmmFields(cmmStudy, languageIsoCode);
   }
 
-  private CMMStudyOfLanguage getCmmStudyOfLanguage(Repo repository, String lang, CMMStudy cmmStudy) {
+  private CMMStudyOfLanguage getCmmStudyOfLanguage(CMMStudy cmmStudy, String lang, Repo repository) {
 
     String formatMsg = "Extracting CMMStudyOfLang from CMMStudyNumber [{}] for lang [{}]";
     log.trace(formatMsg, cmmStudy.getStudyNumber(), lang);
@@ -148,8 +145,11 @@ public class LanguageDocumentExtractor {
    * The minimum fields required for a language are a title, an abstract, a study number and a publisher.
    *
    * @param cmmStudy the {@link CMMStudy} to check.
+   * @deprecated - the check has been moved to {@link LanguageDocumentExtractor#isValidCMMStudyForLang(CMMStudy, String)}
+   * which has no side effects
    */
-  public void setAvailableLanguages(@NonNull CMMStudy cmmStudy) {
+  @Deprecated(forRemoval = true)
+  void setAvailableLanguages(@NonNull CMMStudy cmmStudy) {
     final List<String> propertiesLanguages = appConfigurationProperties.getLanguages();
     for (String lang : propertiesLanguages) {
       if (hasMinimumCmmFields(cmmStudy, lang)) {
