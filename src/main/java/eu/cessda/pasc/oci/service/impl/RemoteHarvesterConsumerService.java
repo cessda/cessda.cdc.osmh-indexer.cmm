@@ -102,11 +102,11 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
                         value(LoggingConstants.REASON, errorMessage.getMessage())
                 );
             } catch (IOException jsonException) {
-                log.warn(FAILED_TO_GET_STUDY_ID + ": Response body [{}].",
-                        value(LoggingConstants.REPO_NAME, repo.getCode()),
-                        value(LoggingConstants.STUDY_ID, studyNumber),
-                        e.toString(),
-                        value(LoggingConstants.REASON, e.getExternalResponse().getBody())
+                log.warn(FAILED_TO_GET_STUDY_ID + ": Response body: {}",
+                    value(LoggingConstants.REPO_NAME, repo.getCode()),
+                    value(LoggingConstants.STUDY_ID, studyNumber),
+                    e.toString(),
+                    value(LoggingConstants.REASON, e.getExternalResponse().getBody())
                 );
                 log.debug(jsonException.toString());
             }

@@ -15,14 +15,12 @@
  */
 package eu.cessda.pasc.oci.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Value;
 
 /**
  * Represents error messages sent from remote repository handlers.
  */
 @Value
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class ErrorMessage {
     String message;
 }
