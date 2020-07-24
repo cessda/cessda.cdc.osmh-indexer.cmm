@@ -142,8 +142,8 @@ osmhConsumer:
         setSpec: subject:social-sciences
         preferredMetadataParam: oai_ddi25
       - url: https://dataverse.arch.be/oai
-        code: SODA
-        name: 'SODA'
+        code: SODHA
+        name: 'Social Sciences and Digital Humanities Archive (SODHA)'
         handler: 'OAI-PMH'
         preferredMetadataParam: oai_ddi
         defaultLanguage: fr
