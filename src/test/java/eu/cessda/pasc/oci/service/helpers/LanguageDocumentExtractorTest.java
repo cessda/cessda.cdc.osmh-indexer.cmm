@@ -53,7 +53,7 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
   private static final String ID_PREFIX = "test-stub";
 
   @Test
-  public void shouldRejectRecordWhenNotInListOfLanguagesAvailableIn() throws IOException {
+  public void shouldAcceptRecordWhenNotInListOfLanguagesIfCriteriaIsFulfilled() throws IOException {
 
     // Given
     CMMStudy syntheticCmmStudy = RecordTestData.getSyntheticCmmStudy();
@@ -62,7 +62,7 @@ public class LanguageDocumentExtractorTest extends AbstractSpringTestProfileCont
     // When
     boolean validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang(syntheticCmmStudy, "en");
 
-    then(validCMMStudyForLang).isFalse();
+    then(validCMMStudyForLang).isTrue();
   }
 
   @Test

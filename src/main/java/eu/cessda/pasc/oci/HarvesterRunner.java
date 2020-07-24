@@ -197,7 +197,6 @@ public class HarvesterRunner {
                 value("total_cmm_record", recordHeaders.size()),
                 value("cmm_records_rejected", recordHeaders.size() - presentCMMStudies.size()));
 
-        presentCMMStudies.forEach(extractor::setAvailableLanguages);
         return extractor.mapLanguageDoc(presentCMMStudies, repo);
     }
 
