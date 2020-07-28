@@ -93,9 +93,6 @@ public class HarvesterRunner {
                             }
                         });
                     }
-
-                    // Reset the MDC
-                    MDC.clear();
                 });
                 log.info("Total number of records is {}.", value("total_cmm_studies", ingestService.getTotalHitCount("*")));
                 metrics.updateMetrics();
@@ -108,6 +105,8 @@ public class HarvesterRunner {
         } else {
             throw new IllegalStateException("Indexer is already running");
         }
+        // Reset the MDC
+        MDC.clear();
     }
 
 
