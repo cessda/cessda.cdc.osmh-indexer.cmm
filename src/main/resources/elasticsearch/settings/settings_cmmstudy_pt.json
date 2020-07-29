@@ -33,7 +33,7 @@
       },
       "portuguese_stop": {
         "type": "stop",
-        "stopwords": "_none_"
+        "stopwords": "_portuguese_"
       }
     }
   }
