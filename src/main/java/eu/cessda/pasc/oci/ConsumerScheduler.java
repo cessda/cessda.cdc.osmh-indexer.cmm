@@ -119,6 +119,7 @@ public class ConsumerScheduler {
 
   private void logEndStatus(final OffsetDateTime startTime, final String runDescription) {
 	 try (var jobKeyClosable = MDC.putCloseable(ConsumerScheduler.DEFAULT_CDC_JOB_KEY, getJobId())) {
+    this.jobKey = jobKeyClosable.toString();
     final var endTime = OffsetDateTime.now(ZoneId.systemDefault());
     log.info("\n[{}] Consume and Ingest All SPs Repos:\nEnded at: [{}]\nDuration: [{}] seconds",
             runDescription,
