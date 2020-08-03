@@ -33,7 +33,7 @@
       },
       "hungarian_stop": {
         "type": "stop",
-        "stopwords": "_none_"
+        "stopwords": "_hungarian_"
       }
     }
   }
