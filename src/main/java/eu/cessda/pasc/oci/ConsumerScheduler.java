@@ -19,7 +19,6 @@ import eu.cessda.pasc.oci.elasticsearch.IngestService;
 import eu.cessda.pasc.oci.service.helpers.DebuggingJMXBean;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
-import org.slf4j.MDC.MDCCloseable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
@@ -50,7 +49,6 @@ public class ConsumerScheduler {
   private final DebuggingJMXBean debuggingJMXBean;
   private final IngestService esIndexerService;
   private final HarvesterRunner harvesterRunner;
-  private String jobKey;
 
   @Autowired
   public ConsumerScheduler(final DebuggingJMXBean debuggingJMXBean, final IngestService esIndexerService,
@@ -68,9 +66,8 @@ public class ConsumerScheduler {
   @SuppressWarnings("try")
   public void fullHarvestAndIngestionAllConfiguredSPsReposRecords() {
     try (var jobKeyClosable = MDC.putCloseable(ConsumerScheduler.DEFAULT_CDC_JOB_KEY, getJobId())) {
-      this.jobKey = jobKeyClosable.toString();
       final var startTime = logStartStatus(FULL_RUN);
-      this.harvesterRunner.executeHarvestAndIngest(null);
+      harvesterRunner.executeHarvestAndIngest(null);
       logEndStatus(startTime, FULL_RUN);
     }
   }
@@ -83,9 +80,8 @@ public class ConsumerScheduler {
   @SuppressWarnings("try")
   public void dailyIncrementalHarvestAndIngestionAllConfiguredSPsReposRecords() {
     try (var jobKeyClosable = MDC.putCloseable(ConsumerScheduler.DEFAULT_CDC_JOB_KEY, getJobId())) {
-      this.jobKey = jobKeyClosable.toString();
       final var startTime = logStartStatus(DAILY_INCREMENTAL_RUN);
-      this.harvesterRunner.executeHarvestAndIngest(esIndexerService.getMostRecentLastModified().orElse(null));
+      harvesterRunner.executeHarvestAndIngest(esIndexerService.getMostRecentLastModified().orElse(null));
       logEndStatus(startTime, DAILY_INCREMENTAL_RUN);
     }
   }
@@ -118,14 +114,11 @@ public class ConsumerScheduler {
   }
 
   private void logEndStatus(final OffsetDateTime startTime, final String runDescription) {
-	 try (var jobKeyClosable = MDC.putCloseable(ConsumerScheduler.DEFAULT_CDC_JOB_KEY, getJobId())) {
-    this.jobKey = jobKeyClosable.toString();
     final var endTime = OffsetDateTime.now(ZoneId.systemDefault());
     log.info("\n[{}] Consume and Ingest All SPs Repos:\nEnded at: [{}]\nDuration: [{}] seconds",
             runDescription,
             endTime,
             value("job_duration", Duration.between(startTime, endTime).getSeconds())
     );
-	 }
   }
 }
