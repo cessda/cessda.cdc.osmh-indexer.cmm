@@ -18,8 +18,6 @@ package eu.cessda.pasc.oci.helpers;
 import lombok.experimental.UtilityClass;
 import org.jdom2.Namespace;
 
-import java.net.URI;
-
 /**
  * OaiPmh related attributes and element Constants
  *
@@ -28,22 +26,19 @@ import java.net.URI;
 @UtilityClass
 public class OaiPmhConstants {
 
-  private static final String OAI_NS_PATH =  URI.create("http://www.openarchives.org/OAI/2.0/").toString();
-  private static final String DDI_NS_PATH = "ddi:codebook:2_5";
+    // Namespaces
+    static final Namespace OAI_NS = Namespace.getNamespace("oai", "http://www.openarchives.org/OAI/2.0/");
+    static final Namespace DDI_NS = Namespace.getNamespace("ddi", "ddi:codebook:2_5");
+    static final Namespace[] OAI_AND_DDI_NS = {OAI_NS, DDI_NS};
 
-  // Namespaces
-  static final Namespace OAI_NS = Namespace.getNamespace("oai", OAI_NS_PATH);
-  static final Namespace DDI_NS = Namespace.getNamespace("ddi", DDI_NS_PATH);
-  static final Namespace[] OAI_AND_DDI_NS = {OAI_NS, DDI_NS};
+    // General Paths
+    static final String IDENTIFIER_XPATH = "//oai:header/oai:identifier[1]";
+    static final String RECORD_STATUS_XPATH = "//oai:header/@status";
+    static final String LAST_MODIFIED_DATE_XPATH = "//oai:header/oai:datestamp[1]";
+    static final String ERROR_PATH = "//oai:error";
 
-  // General Paths
-  static final String IDENTIFIER_XPATH = "//oai:header/oai:identifier[1]";
-  static final String RECORD_STATUS_XPATH = "//oai:header/@status";
-  static final String LAST_MODIFIED_DATE_XPATH = "//oai:header/oai:datestamp[1]";
-  static final String ERROR_PATH = "//oai:error";
-
-  // Codebook Paths
-  static final String RECORD_DEFAULT_LANGUAGE= "//ddi:codeBook/@xml:lang";
+    // Codebook Paths
+    static final String RECORD_DEFAULT_LANGUAGE = "//ddi:codeBook/@xml:lang";
   static final String ABSTRACT_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:abstract";
   static final String TITLE_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:titl";
   static final String PAR_TITLE_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:parTitl";

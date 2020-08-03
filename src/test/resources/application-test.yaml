@@ -46,11 +46,6 @@ osmhConsumer:
         preferredMetadataParam: ddi
         code: 'UKDS'
         handler: 'OAI-PMH'
-      - url: http://services.fsd.uta.fi/v0/oai
-        preferredMetadataParam: oai_ddi25
-        code: 'UKDS-LANG-OVERRIDE'
-        defaultLanguage: zz
-        handler: 'OAI-PMH'
   delay:
     # For tests, the delay should be effectively disabled
     initial: '315360000000'

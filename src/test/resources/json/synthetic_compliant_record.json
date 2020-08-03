@@ -365,5 +365,5 @@
       }
     ]
   },
-  "studyXmlSourceUrl": "http://services.fsd.uta.fi/v0/oai?verb=GetRecord&identifier=http%3A%2F%2Fmy-example_url%3A80%2Fobj%2FfStudy%2Fch.sidos.ddi.468.7773&metadataPrefix=oai_ddi25"
+  "studyXmlSourceUrl": "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=GetRecord&identifier=http%3A%2F%2Fmy-example_url%3A80%2Fobj%2FfStudy%2Fch.sidos.ddi.468.7773&metadataPrefix=oai_ddi25"
 }

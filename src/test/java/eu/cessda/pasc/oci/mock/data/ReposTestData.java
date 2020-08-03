@@ -25,23 +25,30 @@ import java.net.URI;
 public class ReposTestData
 {
 
-  public static Repo getUKDSRepo() {
-    Repo repo = new Repo();
-    repo.setCode("UKDS");
-    repo.setUrl(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
-    repo.setHandler("OAI-PMH");
-    return repo;
-  }
+    public static Repo getUKDSRepo() {
+        Repo repo = new Repo();
+        repo.setCode("UKDS");
+        repo.setUrl(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
+        repo.setHandler("OAI-PMH");
+        repo.setPreferredMetadataParam("oai_ddi25");
+        return repo;
+    }
 
-  public static Repo getGesisEnRepo() {
-    Repo repo = new Repo();
-    repo.setCode("GESIS");
-    repo.setUrl(URI.create("https://dbkapps.gesis.org/dbkoai3"));
-    repo.setHandler("OAI-PMH");
-    return repo;
-  }
+    public static Repo getUKDSLanguageOverrideRepository() {
+        Repo repo = getUKDSRepo();
+        repo.setDefaultLanguage("zz");
+        return repo;
+    }
 
-  public static Repo getGesisDeRepo() {
+    public static Repo getGesisEnRepo() {
+        Repo repo = new Repo();
+        repo.setCode("GESIS");
+        repo.setUrl(URI.create("https://dbkapps.gesis.org/dbkoai3"));
+        repo.setHandler("OAI-PMH");
+        return repo;
+    }
+
+    public static Repo getGesisDeRepo() {
     Repo repo = new Repo();
     repo.setCode("GESIS De");
     repo.setUrl(URI.create("https://dbkapps.gesis.org/dbkoai3"));
