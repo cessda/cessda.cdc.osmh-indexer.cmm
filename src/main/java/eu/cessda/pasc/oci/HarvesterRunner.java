@@ -31,6 +31,7 @@ import org.elasticsearch.ElasticsearchException;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PreDestroy;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -209,5 +210,10 @@ public class HarvesterRunner {
         int studiesCreated;
         int studiesDeleted;
         int studiesUpdated;
+    }
+
+    @PreDestroy
+    private void shutdown() {
+        indexerRunning.set(false);
     }
 }
