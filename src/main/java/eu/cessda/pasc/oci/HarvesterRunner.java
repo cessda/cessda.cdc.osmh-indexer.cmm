@@ -105,8 +105,7 @@ public class HarvesterRunner {
         } else {
             throw new IllegalStateException("Indexer is already running");
         }
-        // Reset the MDC
-        MDC.clear();
+
     }
 
 
