@@ -79,7 +79,7 @@ public class GetRecordServiceImplTest {
     public GetRecordServiceImplTest() {
         repo = ReposTestData.getUKDSRepo();
         recordIdentifier = "http://my-example_url:80/obj/fStudy/ch.sidos.ddi.468.7773";
-        fullRecordUrl = URI.create(repo.getUrl() + "?verb=GetRecord&identifier=" + URLEncoder.encode(recordIdentifier, StandardCharsets.UTF_8) + "&metadataPrefix=oai_ddi25");
+        fullRecordUrl = URI.create(repo.getUrl() + "?verb=GetRecord&identifier=" + URLEncoder.encode(recordIdentifier, StandardCharsets.UTF_8) + "&metadataPrefix=ddi");
     }
 
     @Test

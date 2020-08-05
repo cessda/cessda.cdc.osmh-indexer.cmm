@@ -213,6 +213,7 @@ public class HarvesterRunner {
     }
 
     @PreDestroy
+    @SuppressWarnings("unused")
     private void shutdown() {
         indexerRunning.set(false);
     }

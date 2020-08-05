@@ -18,6 +18,7 @@ package eu.cessda.pasc.oci;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
+import eu.cessda.pasc.oci.configurations.UtilitiesConfiguration;
 import eu.cessda.pasc.oci.elasticsearch.IngestService;
 import eu.cessda.pasc.oci.metrics.MicrometerMetrics;
 import eu.cessda.pasc.oci.models.RecordHeader;
@@ -25,22 +26,12 @@ import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.service.HarvesterConsumerService;
 import eu.cessda.pasc.oci.service.helpers.DebuggingJMXBean;
 import eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor;
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.index.query.MatchAllQueryBuilder;
-import org.elasticsearch.search.SearchHits;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,50 +43,27 @@ import static org.mockito.Mockito.*;
 /**
  * @author moses AT doraventures DOT com
  */
-@RunWith(SpringRunner.class)
 public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
-  // Class under test
-  private ConsumerScheduler scheduler;
-  private DebuggingJMXBean debuggingJMXBean;
-  private HarvesterConsumerService harvesterConsumerService;
-  private AppConfigurationProperties appConfigurationProperties;
-  private IngestService esIndexer;
-
-  @Autowired
-  private LanguageDocumentExtractor extractor;
-
-  @Autowired
-  ObjectMapper objectMapper;
-
-  private final MicrometerMetrics micrometerMetrics = mock(MicrometerMetrics.class);
-  private final ElasticsearchTemplate esTemplate = mock(ElasticsearchTemplate.class);
-
-  @Before
-  public void setUp() {
-
     // mock for debug logging
-    debuggingJMXBean = mock(DebuggingJMXBean.class);
-    when(debuggingJMXBean.printCurrentlyConfiguredRepoEndpoints()).thenReturn("printed repo info");
-    when(debuggingJMXBean.printElasticSearchInfo()).thenReturn("printed ES Info");
+    private final DebuggingJMXBean debuggingJMXBean = mock(DebuggingJMXBean.class);
+    private final AppConfigurationProperties appConfigurationProperties = mock(AppConfigurationProperties.class);
+    private final IngestService esIndexer = mock(IngestService.class);
+    private final LanguageDocumentExtractor extractor = new LanguageDocumentExtractor(appConfigurationProperties);
+    private final ObjectMapper objectMapper = new UtilitiesConfiguration(null).objectMapper();
+    private final MicrometerMetrics micrometerMetrics = mock(MicrometerMetrics.class);
+    // Class under test
+    private ConsumerScheduler scheduler;
+    private HarvesterConsumerService harvesterConsumerService;
 
-    // mock for configuration of our repos
-    appConfigurationProperties = mock(AppConfigurationProperties.class);
-    when(appConfigurationProperties.getEndpoints()).thenReturn(getEndpoints());
+    public ConsumerSchedulerTest() {
 
-    // mock the elasticsearch
-    Client esClient = mock(Client.class);
-    when(esTemplate.getClient()).thenReturn(esClient);
-    SearchRequestBuilder builder = mock(SearchRequestBuilder.class);
-    when(esClient.prepareSearch(anyString())).thenReturn(builder);
-    SearchHits mockSearchHits = mock(SearchHits.class);
-    when(mockSearchHits.getTotalHits()).thenReturn(20L);
-    SearchResponse response = mock(SearchResponse.class);
-    when(response.getHits()).thenReturn(mockSearchHits);
-    when(builder.setTypes(anyString())).thenReturn(builder);
-    when(builder.setSearchType(any(SearchType.class))).thenReturn(builder);
-    when(builder.setQuery(any(MatchAllQueryBuilder.class))).thenReturn(builder);
-    when(builder.get()).thenReturn(response);
-  }
+        when(debuggingJMXBean.printCurrentlyConfiguredRepoEndpoints()).thenReturn("printed repo info");
+        when(debuggingJMXBean.printElasticSearchInfo()).thenReturn("printed ES Info");
+
+        // mock for configuration of our repos
+        when(appConfigurationProperties.getEndpoints()).thenReturn(getEndpoints());
+        when(appConfigurationProperties.getLanguages()).thenReturn(Arrays.asList("cs", "da", "de", "el", "en", "et", "fi", "fr", "hu", "it", "nl", "no", "pt", "sk", "sl", "sr", "sv"));
+    }
 
   @Test
   public void shouldHarvestAndIngestAllMetadata() throws IOException {
@@ -108,7 +76,6 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     when(harvesterConsumerService.getRecord(any(Repo.class), eq("998"))).thenReturn(getSyntheticCmmStudy("998"));
     when(harvesterConsumerService.getRecord(any(Repo.class), eq("997"))).thenReturn(getSyntheticCmmStudy("997"));
     // mock for ES bulking
-    esIndexer = mock(IngestService.class);
     when(esIndexer.bulkIndex(anyList(), anyString())).thenReturn(true);
     when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
 
@@ -134,7 +101,6 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     when(harvesterConsumerService.getRecord(any(Repo.class), eq("998"))).thenReturn(getSyntheticCmmStudy("998"));
     when(harvesterConsumerService.getRecord(any(Repo.class), eq("997"))).thenReturn(getSyntheticCmmStudy("997"));
     // mock for ES bulking
-    esIndexer = mock(IngestService.class);
     when(esIndexer.bulkIndex(anyList(), anyString())).thenReturn(true);
     when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
     when(esIndexer.getStudy(Mockito.eq("UKDS__998"), Mockito.anyString())).thenReturn(Optional.of(getCmmStudyOfLanguageCodeEnX1().get(0)));
@@ -150,22 +116,23 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
   }
 
   private void thenVerifyFullRun() {
-    verify(debuggingJMXBean, times(1)).printElasticSearchInfo();
-    verify(debuggingJMXBean, times(1)).printCurrentlyConfiguredRepoEndpoints();
-    verifyNoMoreInteractions(debuggingJMXBean);
+      verify(debuggingJMXBean, times(1)).printElasticSearchInfo();
+      verify(debuggingJMXBean, times(1)).printCurrentlyConfiguredRepoEndpoints();
+      verifyNoMoreInteractions(debuggingJMXBean);
 
-    verify(appConfigurationProperties, times(1)).getEndpoints();
-    verifyNoMoreInteractions(appConfigurationProperties);
+      verify(appConfigurationProperties, times(1)).getEndpoints();
+      verify(appConfigurationProperties, atLeastOnce()).getLanguages();
+      verifyNoMoreInteractions(appConfigurationProperties);
 
-    verify(harvesterConsumerService, times(1)).listRecordHeaders(any(Repo.class), any());
-    verify(harvesterConsumerService, times(2)).getRecord(any(Repo.class), anyString());
-    verifyNoMoreInteractions(harvesterConsumerService);
+      verify(harvesterConsumerService, times(1)).listRecordHeaders(any(Repo.class), any());
+      verify(harvesterConsumerService, times(2)).getRecord(any(Repo.class), anyString());
+      verifyNoMoreInteractions(harvesterConsumerService);
 
-    // No bulk attempt should have been made for "sv" as it does not have the minimum valid cmm fields
-    // 'en', 'fi', 'de' has all minimum fields
-    verify(esIndexer, times(3)).bulkIndex(anyList(), anyString());
+      // No bulk attempt should have been made for "sv" as it does not have the minimum valid cmm fields
+      // 'en', 'fi', 'de' has all minimum fields
+      verify(esIndexer, times(3)).bulkIndex(anyList(), anyString());
 
-    // Called for logging purposes
+      // Called for logging purposes
     verify(esIndexer, atLeastOnce()).getStudy(Mockito.anyString(), Mockito.anyString());
     verify(esIndexer, times(1)).getTotalHitCount("*");
     verifyNoMoreInteractions(esIndexer);
@@ -190,7 +157,6 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     when(harvesterConsumerService.getRecord(any(Repo.class), eq("1000"))).thenReturn(getSyntheticCmmStudy("1000"));
 
     // mock for ES methods
-    esIndexer = mock(IngestService.class);
     when(esIndexer.bulkIndex(anyList(), anyString())).thenReturn(true);
     when(esIndexer.getMostRecentLastModified()).thenReturn(Optional.of(LocalDateTime.parse("2018-02-20T07:48:38")));
     when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
@@ -198,27 +164,28 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
 
     // Given
     var harvesterRunner = new HarvesterRunner(appConfigurationProperties, harvesterConsumerService, harvesterConsumerService, esIndexer, extractor, micrometerMetrics);
-    scheduler = new ConsumerScheduler(debuggingJMXBean, esIndexer, harvesterRunner);
+      scheduler = new ConsumerScheduler(debuggingJMXBean, esIndexer, harvesterRunner);
 
-    // When
-    scheduler.fullHarvestAndIngestionAllConfiguredSPsReposRecords();
-    scheduler.dailyIncrementalHarvestAndIngestionAllConfiguredSPsReposRecords();
+      // When
+      scheduler.fullHarvestAndIngestionAllConfiguredSPsReposRecords();
+      scheduler.dailyIncrementalHarvestAndIngestionAllConfiguredSPsReposRecords();
 
-    verify(debuggingJMXBean, times(2)).printElasticSearchInfo();
-    verify(debuggingJMXBean, times(2)).printCurrentlyConfiguredRepoEndpoints();
-    verifyNoMoreInteractions(debuggingJMXBean);
+      verify(debuggingJMXBean, times(2)).printElasticSearchInfo();
+      verify(debuggingJMXBean, times(2)).printCurrentlyConfiguredRepoEndpoints();
+      verifyNoMoreInteractions(debuggingJMXBean);
 
-    verify(appConfigurationProperties, times(2)).getEndpoints();
-    verifyNoMoreInteractions(appConfigurationProperties);
+      verify(appConfigurationProperties, times(2)).getEndpoints();
+      verify(appConfigurationProperties, atLeastOnce()).getLanguages();
+      verifyNoMoreInteractions(appConfigurationProperties);
 
-    verify(harvesterConsumerService, times(2)).listRecordHeaders(any(Repo.class), any());
-    // Expects 5 GetRecord call 2 from Full run and 3 from incremental run (minuses old lastModified record)
-    verify(harvesterConsumerService, times(5)).getRecord(any(Repo.class), anyString());
-    verifyNoMoreInteractions(harvesterConsumerService);
+      verify(harvesterConsumerService, times(2)).listRecordHeaders(any(Repo.class), any());
+      // Expects 5 GetRecord call 2 from Full run and 3 from incremental run (minuses old lastModified record)
+      verify(harvesterConsumerService, times(5)).getRecord(any(Repo.class), anyString());
+      verifyNoMoreInteractions(harvesterConsumerService);
 
-    verify(esIndexer, times(1)).getMostRecentLastModified(); // Call by incremental run to get LastModified
-    // No bulk attempt should have been made for "sv" as we dont have any records for "sv". We do for 'en', 'fi', 'de'
-    verify(esIndexer, times(6)).bulkIndex(anyList(), anyString());
+      verify(esIndexer, times(1)).getMostRecentLastModified(); // Call by incremental run to get LastModified
+      // No bulk attempt should have been made for "sv" as we dont have any records for "sv". We do for 'en', 'fi', 'de'
+      verify(esIndexer, times(6)).bulkIndex(anyList(), anyString());
 
     // Called for logging purposes
     verify(esIndexer, atLeastOnce()).getStudy(Mockito.anyString(), Mockito.anyString());

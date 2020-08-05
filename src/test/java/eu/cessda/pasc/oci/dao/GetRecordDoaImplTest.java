@@ -19,7 +19,6 @@ import com.pgssoft.httpclient.HttpClientMock;
 import eu.cessda.pasc.oci.exception.ExternalSystemException;
 import eu.cessda.pasc.oci.repository.DaoBaseImpl;
 import org.junit.Test;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,7 +32,6 @@ import static org.assertj.core.api.BDDAssertions.then;
  *
  * @author moses AT doraventures DOT com
  */
-@ActiveProfiles("test")
 public class GetRecordDoaImplTest {
 
 

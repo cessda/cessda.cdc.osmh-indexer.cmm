@@ -16,14 +16,8 @@
 package eu.cessda.pasc.oci.dao;
 
 import com.pgssoft.httpclient.HttpClientMock;
-import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
 import eu.cessda.pasc.oci.repository.DaoBaseImpl;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,15 +29,9 @@ import static org.assertj.core.api.BDDAssertions.then;
 /**
  * @author moses AT doraventures DOT com
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@ActiveProfiles("test")
 public class ListRecordHeadersDaoImplTest {
 
-    @Autowired
-    private HandlerConfigurationProperties handlerConfigurationProperties;
-
-    private HttpClientMock httpClient = new HttpClientMock();
+    private final HttpClientMock httpClient = new HttpClientMock();
 
     @Test
     public void shouldReturnXmlPayloadOfRecordHeadersFromRemoteRepository() throws IOException {
