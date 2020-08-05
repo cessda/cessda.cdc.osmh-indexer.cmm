@@ -26,6 +26,7 @@ import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -158,26 +159,24 @@ public final class RecordTestData {
   }
 
   public static List<CMMStudyOfLanguage> getCmmStudyOfLanguageCodeEnX1() throws IOException {
-    List<CMMStudyOfLanguage> studyOfLanguages = new ArrayList<>();
-    String syntheticCMMStudyOfLanguageEn = getSyntheticCMMStudyOfLanguageEn();
-    CMMStudyOfLanguage cmmStudyOfLanguage = new CMMStudyOfLanguageConverter(new ObjectMapper()).fromJsonString(syntheticCMMStudyOfLanguageEn);
-    studyOfLanguages.add(cmmStudyOfLanguage);
-    return studyOfLanguages;
+      String syntheticCMMStudyOfLanguageEn = getSyntheticCMMStudyOfLanguageEn();
+      CMMStudyOfLanguage cmmStudyOfLanguage = new CMMStudyOfLanguageConverter(new ObjectMapper()).fromJsonString(syntheticCMMStudyOfLanguageEn);
+      return Collections.singletonList(cmmStudyOfLanguage);
   }
 
   public static List<CMMStudyOfLanguage> getCmmStudyOfLanguageCodeEnX3() throws IOException {
-    List<CMMStudyOfLanguage> studyOfLanguages = new ArrayList<>();
-    String syntheticCMMStudyOfLanguageEn = getSyntheticCMMStudyOfLanguageEn();
-    CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter = new CMMStudyOfLanguageConverter(new ObjectMapper());
-    studyOfLanguages.add(cmmStudyOfLanguageConverter.fromJsonString(syntheticCMMStudyOfLanguageEn));
+      var studyOfLanguages = new ArrayList<CMMStudyOfLanguage>();
+      String syntheticCMMStudyOfLanguageEn = getSyntheticCMMStudyOfLanguageEn();
+      CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter = new CMMStudyOfLanguageConverter(new ObjectMapper());
+      studyOfLanguages.add(cmmStudyOfLanguageConverter.fromJsonString(syntheticCMMStudyOfLanguageEn));
 
-    CMMStudyOfLanguage cmmStudyOfLanguage2 = cmmStudyOfLanguageConverter.fromJsonString(syntheticCMMStudyOfLanguageEn);
-    cmmStudyOfLanguage2.setId("UK-Data-Service__999");
-    cmmStudyOfLanguage2.setLastModified("2017-11-15T08:08:11Z");
-    studyOfLanguages.add(cmmStudyOfLanguage2);
+      CMMStudyOfLanguage cmmStudyOfLanguage2 = cmmStudyOfLanguageConverter.fromJsonString(syntheticCMMStudyOfLanguageEn);
+      cmmStudyOfLanguage2.setId("UK-Data-Service__999");
+      cmmStudyOfLanguage2.setLastModified("2017-11-15T08:08:11Z");
+      studyOfLanguages.add(cmmStudyOfLanguage2);
 
-    CMMStudyOfLanguage cmmStudyOfLanguage3 = cmmStudyOfLanguageConverter.fromJsonString(syntheticCMMStudyOfLanguageEn);
-    cmmStudyOfLanguage3.setId("UK-Data-Service__1000");
+      CMMStudyOfLanguage cmmStudyOfLanguage3 = cmmStudyOfLanguageConverter.fromJsonString(syntheticCMMStudyOfLanguageEn);
+      cmmStudyOfLanguage3.setId("UK-Data-Service__1000");
     cmmStudyOfLanguage3.setLastModified("2017-04-05");
     studyOfLanguages.add(cmmStudyOfLanguage3);
 

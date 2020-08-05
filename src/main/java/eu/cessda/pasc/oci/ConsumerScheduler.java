@@ -114,11 +114,11 @@ public class ConsumerScheduler {
   }
 
   private void logEndStatus(final OffsetDateTime startTime, final String runDescription) {
-    final var endTime = OffsetDateTime.now(ZoneId.systemDefault());
-    log.info("\n[{}] Consume and Ingest All SPs Repos:\nEnded at: [{}]\nDuration: [{}] seconds",
-            runDescription,
-            endTime,
-            value("job_duration", Duration.between(startTime, endTime).getSeconds())
-    );
+      final var endTime = OffsetDateTime.now(ZoneId.systemDefault());
+      log.info("[{}] Consume and Ingest All SPs Repos:\nEnded at: [{}]\nDuration: [{}] seconds",
+          runDescription,
+          endTime,
+          value("job_duration", Duration.between(startTime, endTime).getSeconds())
+      );
   }
 }

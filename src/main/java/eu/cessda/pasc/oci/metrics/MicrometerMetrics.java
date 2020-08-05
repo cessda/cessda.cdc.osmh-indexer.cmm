@@ -17,12 +17,14 @@ package eu.cessda.pasc.oci.metrics;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.elasticsearch.IngestService;
+import eu.cessda.pasc.oci.helpers.LoggingConstants;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.Publisher;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
+import net.logstash.logback.argument.StructuredArguments;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.index.IndexNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,7 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 /**
  * Implements metrics according to https://docs.google.com/spreadsheets/d/1vkqm-9sSHCgskRzKIz1R4B_8uzyJpjy1-rFooQyeDtg/edit
@@ -122,8 +125,10 @@ public class MicrometerMetrics implements Metrics {
         log.debug(UPDATING_METRIC, LIST_RECORD_LANGCODE);
         for (var language : appConfigurationProperties.getLanguages()) {
             try {
-                getRecordCount(language).set(ingestService.getTotalHitCount(language));
-                log.trace("Language [{}] updated.", language);
+                long totalHitCount = ingestService.getTotalHitCount(language);
+                getRecordCount(language).set(totalHitCount);
+                log.info("[{}] Current records [{}]", StructuredArguments.value(LoggingConstants.LANG_CODE, language),
+                    StructuredArguments.value("language_record_count", totalHitCount));
             } catch (IndexNotFoundException e) {
                 // There are no records in an index that does not exist
                 getRecordCount(language).set(0);
@@ -170,22 +175,20 @@ public class MicrometerMetrics implements Metrics {
      */
     void updateEndpointsRecordsMetric(Collection<CMMStudyOfLanguage> studies) {
         log.debug(UPDATING_METRIC, LIST_RECORDS_ENDPOINT);
-        var hitCountPerRepository = new HashMap<String, AtomicInteger>();
 
-        for (CMMStudyOfLanguage study : studies) {
-            if (study.getStudyXmlSourceUrl() != null) {
-                String host = URI.create(study.getStudyXmlSourceUrl()).getHost();
-                hitCountPerRepository.computeIfAbsent(host, k -> new AtomicInteger(0)).getAndIncrement();
-            }
-        }
+        var hostEntryMap = studies.stream().filter(study -> study.getStudyXmlSourceUrl() != null)
+            .map(study -> URI.create(study.getStudyXmlSourceUrl()))
+            .collect(Collectors.groupingBy(URI::getHost, Collectors.counting()));
 
-        for (Map.Entry<String, AtomicInteger> hostEntry : hitCountPerRepository.entrySet()) {
+        for (Map.Entry<String, Long> hostEntry : hostEntryMap.entrySet()) {
             try {
                 var repoAtomicLongEntry = recordsEndpointMap.entrySet().stream()
-                        .filter(repoEntry -> repoEntry.getKey().getUrl().getHost().equalsIgnoreCase(hostEntry.getKey()))
-                        .findAny().orElseThrow();
-                log.trace("Repository [{}] updated", repoAtomicLongEntry.getKey().getCode());
-                repoAtomicLongEntry.getValue().set(hostEntry.getValue().get());
+                    .filter(repoEntry -> repoEntry.getKey().getUrl().getHost().equalsIgnoreCase(hostEntry.getKey()))
+                    .findAny().orElseThrow();
+                repoAtomicLongEntry.getValue().set(hostEntry.getValue());
+                log.info("[{}] Current records: [{}]",
+                    StructuredArguments.value(LoggingConstants.REPO_NAME, repoAtomicLongEntry.getKey().getCode()),
+                    StructuredArguments.value("repo_record_count", hostEntry.getValue()));
             } catch (NoSuchElementException e) {
                 log.warn("Repository [{}] not configured.", hostEntry.getKey());
             }
@@ -198,6 +201,7 @@ public class MicrometerMetrics implements Metrics {
      * @param studies a collection of studies to extract publisher information from.
      * @throws ElasticsearchException if Elasticsearch is unavailable.
      */
+    // TODO: Determine if this is redundant
     void updatePublisherRecordsMetric(Collection<CMMStudyOfLanguage> studies) {
         log.debug(UPDATING_METRIC, LIST_RECORDS_PUBLISHER);
         var hitCountPerPublisher = new HashMap<Publisher, AtomicInteger>();
@@ -209,15 +213,14 @@ public class MicrometerMetrics implements Metrics {
             }
         }
 
-        hitCountPerPublisher.forEach((publisherKey, counter) ->
-                // This registers the metrics for each publisher on first encounter
-                recordsPublisherMap.computeIfAbsent(publisherKey, publisher -> {
-                    var builder = Gauge.builder(LIST_RECORDS_PUBLISHER, () -> getRecordCount(publisher));
-                    builder.description("Amount of records stored per publisher");
-                    builder.tag("publisher", publisher.getName());
-                    builder.register(meterRegistry);
-                    return new AtomicLong(0);
-                }).set(counter.get())
+        // This registers the metrics for each publisher on first encounter
+        hitCountPerPublisher.forEach((publisherKey, counter) -> recordsPublisherMap.computeIfAbsent(publisherKey, publisher -> {
+                var builder = Gauge.builder(LIST_RECORDS_PUBLISHER, () -> getRecordCount(publisher));
+                builder.description("Amount of records stored per publisher");
+                builder.tag("publisher", publisher.getName());
+                builder.register(meterRegistry);
+                return new AtomicLong(0);
+            }).set(counter.get())
         );
     }
 

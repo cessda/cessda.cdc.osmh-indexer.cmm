@@ -39,7 +39,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -253,13 +252,9 @@ public class ESIngestService implements IngestService {
         try {
             esTemplate.bulkIndex(queries);
         } catch (ElasticsearchException e) {
-            log.error("BulkIndexing ElasticsearchException with message [{}]", e.getMessage(), e);
-            Map<String, String> failedDocs = e.getFailedDocuments();
-
-            if (!failedDocs.isEmpty()) {
-                log.error("BulkIndexing failed to index all documents, see errors below alongside documents Ids");
-                failedDocs.forEach((key, value) -> log.error("Failed to index Id [{}], message [{}]", key, value));
-            }
+            var failedDocuments = new StringBuilder();
+            e.getFailedDocuments().forEach((key, value) -> failedDocuments.append(String.format("%nFailed to index id [%s]: [%s]", key, value)));
+            log.error("Failed to index all documents: {}: {}", e.toString(), failedDocuments);
         }
     }
 }
