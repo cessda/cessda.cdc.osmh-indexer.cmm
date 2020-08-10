@@ -15,6 +15,7 @@
  */
 package eu.cessda.pasc.oci.service;
 
+import eu.cessda.pasc.oci.harvester.HarvesterConsumerService;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.configurations.Repo;

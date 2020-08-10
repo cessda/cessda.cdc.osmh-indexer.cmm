@@ -13,19 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.service;
+package eu.cessda.pasc.oci.harvester;
 
-import eu.cessda.pasc.oci.exception.CustomHandlerException;
 import eu.cessda.pasc.oci.models.RecordHeader;
+import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 /**
- * Service interface contract to handle Listing Record Headers
+ * Service responsible for consuming harvested and Metadata via OSMH Harvester
  *
  * @author moses AT doraventures DOT com
  */
-public interface ListRecordHeadersService {
-    List<RecordHeader> getRecordHeaders(Repo baseRepoUrl) throws CustomHandlerException;
+public interface HarvesterConsumerService {
+    /**
+     * Queries the remote repo for RecordHeaders. RecordHeaders are filtered if lastModifiedDate is provided.
+     *
+     * @param repo             the repository to query.
+     * @param lastModifiedDate to filter headers on, can be null.
+     * @return a list of record headers retrieved from the remote repository.
+     */
+    List<RecordHeader> listRecordHeaders(Repo repo, LocalDateTime lastModifiedDate);
+
+    Optional<CMMStudy> getRecord(Repo repo, String studyNumber);
 }

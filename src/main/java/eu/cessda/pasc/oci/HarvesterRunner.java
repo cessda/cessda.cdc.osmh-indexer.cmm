@@ -17,14 +17,14 @@ package eu.cessda.pasc.oci;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.elasticsearch.IngestService;
+import eu.cessda.pasc.oci.harvester.HarvesterConsumerService;
+import eu.cessda.pasc.oci.harvester.LanguageDocumentExtractor;
 import eu.cessda.pasc.oci.helpers.LoggingConstants;
 import eu.cessda.pasc.oci.metrics.Metrics;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.configurations.Repo;
-import eu.cessda.pasc.oci.service.HarvesterConsumerService;
-import eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
@@ -99,7 +99,8 @@ public class HarvesterRunner {
                     MDC.clear();
                 });
                 MDC.setContextMap(contextMap);
-                log.info("Total number of records is {}.", value("total_cmm_studies", ingestService.getTotalHitCount("*")));
+                log.info("Harvest finished. Summary of the current state:");
+                log.info("Total number of records: {}", value("total_cmm_studies", ingestService.getTotalHitCount("*")));
                 metrics.updateMetrics();
             } catch (ElasticsearchException e) {
                 log.error("Harvest failed!: {}", e.toString());

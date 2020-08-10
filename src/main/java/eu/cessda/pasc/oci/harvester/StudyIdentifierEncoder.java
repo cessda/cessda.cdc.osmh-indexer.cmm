@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.service.helpers;
+package eu.cessda.pasc.oci.harvester;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -28,10 +28,9 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class StudyIdentifierEncoder {
-  public static String encodeStudyIdentifier(String studyIdentifier) {
-    return studyIdentifier.replace(".", "_dt_")
+    public static String encodeStudyIdentifier(String studyIdentifier) {
+        return studyIdentifier.replace(".", "_dt_")
             .replace("/", "_sl_")
-            .replace(":", "_cl_")
-            .trim();
-  }
+            .replace(":", "_cl_");
+    }
 }

@@ -13,16 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.service.impl;
+package eu.cessda.pasc.oci.harvester;
 
-import eu.cessda.pasc.oci.exception.CustomHandlerException;
+import eu.cessda.pasc.oci.exception.InternalSystemException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.helpers.LoggingConstants;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.configurations.Repo;
-import eu.cessda.pasc.oci.service.GetRecordService;
-import eu.cessda.pasc.oci.service.ListRecordHeadersService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -55,17 +53,17 @@ public class LocalHarvesterConsumerService extends AbstractHarvesterConsumerServ
         } catch (OaiPmhException e) {
             // Check if there was a message attached to the OAI error response
             e.getOaiErrorMessage().ifPresentOrElse(
-                    oaiErrorMessage -> log.error("[{}] ListRecordHeaders failed. {}: {}",
-                            repo.getCode(),
-                            value(LoggingConstants.OAI_ERROR_CODE, e.getCode()),
-                            value(LoggingConstants.OAI_ERROR_MESSAGE, oaiErrorMessage)
-                    ),
-                    () -> log.error("[{}] ListRecordHeaders failed. {}.",
-                            repo.getCode(),
-                            value(LoggingConstants.OAI_ERROR_CODE, e.getCode())
-                    )
+                oaiErrorMessage -> log.error("[{}] ListRecordHeaders failed. {}: {}",
+                    repo.getCode(),
+                    value(LoggingConstants.OAI_ERROR_CODE, e.getCode()),
+                    value(LoggingConstants.OAI_ERROR_MESSAGE, oaiErrorMessage)
+                ),
+                () -> log.error("[{}] ListRecordHeaders failed. {}.",
+                    repo.getCode(),
+                    value(LoggingConstants.OAI_ERROR_CODE, e.getCode())
+                )
             );
-        } catch (CustomHandlerException e) {
+        } catch (InternalSystemException e) {
             log.error("[{}] ListRecordHeaders failed:", value(LoggingConstants.REPO_NAME, repo.getCode()), e);
         }
         return Collections.emptyList();
@@ -77,23 +75,23 @@ public class LocalHarvesterConsumerService extends AbstractHarvesterConsumerServ
             return Optional.of(getRecordService.getRecord(repo, studyNumber));
         } catch (OaiPmhException e) {
             e.getOaiErrorMessage().ifPresentOrElse(
-                    oaiErrorMessage -> log.warn(FAILED_TO_GET_STUDY_ID + ": {}",
-                            repo.getCode(),
-                            value(LoggingConstants.STUDY_ID, studyNumber),
-                            value(LoggingConstants.OAI_ERROR_CODE, e.getCode()),
-                            value(LoggingConstants.OAI_ERROR_MESSAGE, oaiErrorMessage)
-                    ),
-                    () -> log.warn(FAILED_TO_GET_STUDY_ID,
-                            repo.getCode(),
-                            value(LoggingConstants.STUDY_ID, studyNumber),
-                            value(LoggingConstants.OAI_ERROR_CODE, e.getCode())
-                    )
-            );
-        } catch (CustomHandlerException e) {
-            log.warn(FAILED_TO_GET_STUDY_ID,
-                    value(LoggingConstants.REPO_NAME, repo.getCode()),
+                oaiErrorMessage -> log.warn(FAILED_TO_GET_STUDY_ID + ": {}",
+                    repo.getCode(),
                     value(LoggingConstants.STUDY_ID, studyNumber),
-                    e.toString()
+                    value(LoggingConstants.OAI_ERROR_CODE, e.getCode()),
+                    value(LoggingConstants.OAI_ERROR_MESSAGE, oaiErrorMessage)
+                ),
+                () -> log.warn(FAILED_TO_GET_STUDY_ID,
+                    repo.getCode(),
+                    value(LoggingConstants.STUDY_ID, studyNumber),
+                    value(LoggingConstants.OAI_ERROR_CODE, e.getCode())
+                )
+            );
+        } catch (InternalSystemException e) {
+            log.warn(FAILED_TO_GET_STUDY_ID,
+                value(LoggingConstants.REPO_NAME, repo.getCode()),
+                value(LoggingConstants.STUDY_ID, studyNumber),
+                e.toString()
             );
         }
         return Optional.empty();

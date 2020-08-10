@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.service.impl;
+package eu.cessda.pasc.oci.harvester;
 
 import eu.cessda.pasc.oci.exception.InternalSystemException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
@@ -23,7 +23,6 @@ import eu.cessda.pasc.oci.helpers.RecordResponseValidator;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.repository.DaoBase;
-import eu.cessda.pasc.oci.service.GetRecordService;
 import lombok.extern.slf4j.Slf4j;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
@@ -45,20 +44,19 @@ import java.net.URISyntaxException;
  */
 @Service
 @Slf4j
-public class GetRecordServiceImpl implements GetRecordService {
+class GetRecordService {
 
     private final CMMStudyMapper cmmStudyMapper;
     private final DaoBase daoBase;
     private final RecordResponseValidator recordResponseValidator;
 
     @Autowired
-    public GetRecordServiceImpl(CMMStudyMapper cmmStudyMapper, DaoBase daoBase, RecordResponseValidator recordResponseValidator) {
+    public GetRecordService(CMMStudyMapper cmmStudyMapper, DaoBase daoBase, RecordResponseValidator recordResponseValidator) {
         this.daoBase = daoBase;
         this.cmmStudyMapper = cmmStudyMapper;
         this.recordResponseValidator = recordResponseValidator;
     }
 
-    @Override
     public CMMStudy getRecord(Repo repo, String studyIdentifier) throws InternalSystemException, OaiPmhException {
         log.debug("[{}] Querying for StudyID [{}]", repo.getCode(), studyIdentifier);
         URI fullUrl = null;

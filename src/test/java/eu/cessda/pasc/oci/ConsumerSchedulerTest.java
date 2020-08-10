@@ -20,12 +20,12 @@ import com.fasterxml.jackson.databind.type.CollectionType;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.configurations.UtilitiesConfiguration;
 import eu.cessda.pasc.oci.elasticsearch.IngestService;
+import eu.cessda.pasc.oci.harvester.HarvesterConsumerService;
+import eu.cessda.pasc.oci.harvester.LanguageDocumentExtractor;
 import eu.cessda.pasc.oci.metrics.MicrometerMetrics;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.configurations.Repo;
-import eu.cessda.pasc.oci.service.HarvesterConsumerService;
 import eu.cessda.pasc.oci.service.helpers.DebuggingJMXBean;
-import eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor;
 import org.junit.Test;
 import org.mockito.Mockito;
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.service;
+package eu.cessda.pasc.oci.harvester;
 
 import eu.cessda.pasc.oci.configurations.UtilitiesConfiguration;
 import eu.cessda.pasc.oci.exception.InternalSystemException;
@@ -23,7 +23,6 @@ import eu.cessda.pasc.oci.mock.data.ReposTestData;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.repository.DaoBase;
-import eu.cessda.pasc.oci.service.impl.ListRecordHeadersServiceImpl;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -42,14 +41,14 @@ import static org.mockito.BDDMockito.given;
 /**
  * @author moses AT doraventures DOT com
  */
-public class ListRecordHeadersServiceImplTest {
+public class ListRecordHeadersServiceTest {
 
     private final DaoBase daoBase = Mockito.mock(DaoBase.class);
 
-    private final ListRecordHeadersServiceImpl listRecordHeadersService;
+    private final ListRecordHeadersService listRecordHeadersService;
 
-    public ListRecordHeadersServiceImplTest() throws ParserConfigurationException {
-        listRecordHeadersService = new ListRecordHeadersServiceImpl(daoBase, new UtilitiesConfiguration(null).documentBuilderFactory());
+    public ListRecordHeadersServiceTest() throws ParserConfigurationException {
+        listRecordHeadersService = new ListRecordHeadersService(daoBase, new UtilitiesConfiguration(null).documentBuilderFactory());
     }
 
     @Test
@@ -110,13 +109,13 @@ public class ListRecordHeadersServiceImplTest {
 
         given(daoBase.getInputStream(repoUrlWithResumptionToken01)).willReturn(
             new ByteArrayInputStream(identifiersXMLWithResumption.getBytes(StandardCharsets.UTF_8))
-    );
+        );
 
-    given(daoBase.getInputStream(repoUrlWithResumptionToken02)).willReturn(
+        given(daoBase.getInputStream(repoUrlWithResumptionToken02)).willReturn(
             new ByteArrayInputStream(identifiersXMLWithResumptionLastList.getBytes(StandardCharsets.UTF_8))
-    );
+        );
 
-    // When
+        // When
         List<RecordHeader> recordHeaders = listRecordHeadersService.getRecordHeaders(ukdsEndpoint);
 
         then(recordHeaders).hasSize(7);

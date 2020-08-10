@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.service;
+package eu.cessda.pasc.oci.harvester;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,7 +32,6 @@ import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.repository.DaoBase;
-import eu.cessda.pasc.oci.service.impl.GetRecordServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -64,7 +63,7 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 @SpringBootTest
 @ActiveProfiles("test")
 @Slf4j
-public class GetRecordServiceImplTest {
+public class GetRecordServiceTest {
 
     private final CMMStudyConverter cmmConverter = new CMMStudyConverter();
     private final DaoBase daoBase = Mockito.mock(DaoBase.class);
@@ -76,7 +75,7 @@ public class GetRecordServiceImplTest {
     @Autowired
     private RecordResponseValidator recordResponseValidator;
 
-    public GetRecordServiceImplTest() {
+    public GetRecordServiceTest() {
         repo = ReposTestData.getUKDSRepo();
         recordIdentifier = "http://my-example_url:80/obj/fStudy/ch.sidos.ddi.468.7773";
         fullRecordUrl = URI.create(repo.getUrl() + "?verb=GetRecord&identifier=" + URLEncoder.encode(recordIdentifier, StandardCharsets.UTF_8) + "&metadataPrefix=ddi");
@@ -91,7 +90,7 @@ public class GetRecordServiceImplTest {
         );
 
         // When
-        CMMStudy result = new GetRecordServiceImpl(cmmStudyMapper, daoBase, recordResponseValidator).getRecord(repo, recordIdentifier);
+        CMMStudy result = new GetRecordService(cmmStudyMapper, daoBase, recordResponseValidator).getRecord(repo, recordIdentifier);
 
         then(result).isNotNull();
         validateCMMStudyResultAgainstSchema(result);
@@ -108,7 +107,7 @@ public class GetRecordServiceImplTest {
         );
 
         // When
-        CMMStudy result = new GetRecordServiceImpl(cmmStudyMapper, daoBase, recordResponseValidator).getRecord(repo, recordIdentifier);
+        CMMStudy result = new GetRecordService(cmmStudyMapper, daoBase, recordResponseValidator).getRecord(repo, recordIdentifier);
 
         then(result).isNotNull();
 
@@ -132,7 +131,7 @@ public class GetRecordServiceImplTest {
         );
 
         // When
-        CMMStudy record = new GetRecordServiceImpl(cmmStudyMapper, daoBase, recordResponseValidator).getRecord(repo, recordIdentifier);
+        CMMStudy record = new GetRecordService(cmmStudyMapper, daoBase, recordResponseValidator).getRecord(repo, recordIdentifier);
 
         // Then
         then(record).isNotNull();
@@ -149,7 +148,7 @@ public class GetRecordServiceImplTest {
         );
 
         // When
-        CMMStudy record = new GetRecordServiceImpl(cmmStudyMapper, daoBase, recordResponseValidator).getRecord(repo, recordIdentifier);
+        CMMStudy record = new GetRecordService(cmmStudyMapper, daoBase, recordResponseValidator).getRecord(repo, recordIdentifier);
         then(record).isNotNull();
         validateCMMStudyResultAgainstSchema(record);
         final ObjectMapper mapper = new ObjectMapper();
@@ -171,7 +170,7 @@ public class GetRecordServiceImplTest {
         );
 
         // When
-        CMMStudy record = new GetRecordServiceImpl(cmmStudyMapper, daoBase, recordResponseValidator).getRecord(repo, recordIdentifier);
+        CMMStudy record = new GetRecordService(cmmStudyMapper, daoBase, recordResponseValidator).getRecord(repo, recordIdentifier);
         String actualCmmStudyJsonString = cmmConverter.toJsonString(record);
 
         // then
@@ -192,7 +191,7 @@ public class GetRecordServiceImplTest {
         );
 
         // When
-        CMMStudy record = new GetRecordServiceImpl(cmmStudyMapper, daoBase, recordResponseValidator).getRecord(repo, recordIdentifier);
+        CMMStudy record = new GetRecordService(cmmStudyMapper, daoBase, recordResponseValidator).getRecord(repo, recordIdentifier);
 
         then(record).isNotNull();
         then(record.getAbstractField().size()).isEqualTo(3);
@@ -214,7 +213,7 @@ public class GetRecordServiceImplTest {
         );
 
         // When
-        CMMStudy record = new GetRecordServiceImpl(cmmStudyMapper, daoBase, recordResponseValidator).getRecord(repo, recordIdentifier);
+        CMMStudy record = new GetRecordService(cmmStudyMapper, daoBase, recordResponseValidator).getRecord(repo, recordIdentifier);
 
         then(record).isNotNull();
         then(record.getTitleStudy().size()).isEqualTo(3);
@@ -231,7 +230,7 @@ public class GetRecordServiceImplTest {
         );
 
         // When
-        CMMStudy record = new GetRecordServiceImpl(cmmStudyMapper, daoBase, recordResponseValidator).getRecord(repo, recordIdentifier);
+        CMMStudy record = new GetRecordService(cmmStudyMapper, daoBase, recordResponseValidator).getRecord(repo, recordIdentifier);
 
         // Then
         then(record).isNotNull();
@@ -247,7 +246,7 @@ public class GetRecordServiceImplTest {
         );
 
         // When
-        new GetRecordServiceImpl(cmmStudyMapper, daoBase, recordResponseValidator).getRecord(repo, recordIdentifier);
+        new GetRecordService(cmmStudyMapper, daoBase, recordResponseValidator).getRecord(repo, recordIdentifier);
 
         // Then an exception is thrown.
     }
@@ -261,7 +260,7 @@ public class GetRecordServiceImplTest {
         );
 
         // When
-        CMMStudy result = new GetRecordServiceImpl(cmmStudyMapper, daoBase, recordResponseValidator).getRecord(repo, recordIdentifier);
+        CMMStudy result = new GetRecordService(cmmStudyMapper, daoBase, recordResponseValidator).getRecord(repo, recordIdentifier);
 
         then(result).isNotNull();
         validateCMMStudyResultAgainstSchema(result);
@@ -347,7 +346,7 @@ public class GetRecordServiceImplTest {
         );
 
         // When
-        CMMStudy result = new GetRecordServiceImpl(cmmStudyMapper, daoBase, recordResponseValidator).getRecord(repository, recordIdentifier);
+        CMMStudy result = new GetRecordService(cmmStudyMapper, daoBase, recordResponseValidator).getRecord(repository, recordIdentifier);
 
         then(result).isNotNull();
         validateCMMStudyResultAgainstSchema(result);
