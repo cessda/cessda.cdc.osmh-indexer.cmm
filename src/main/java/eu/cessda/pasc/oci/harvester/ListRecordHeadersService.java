@@ -17,11 +17,11 @@ package eu.cessda.pasc.oci.harvester;
 
 import eu.cessda.pasc.oci.exception.InternalSystemException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
-import eu.cessda.pasc.oci.helpers.ListIdentifiersResponseValidator;
-import eu.cessda.pasc.oci.helpers.OaiPmhConstants;
-import eu.cessda.pasc.oci.helpers.OaiPmhHelpers;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.configurations.Repo;
+import eu.cessda.pasc.oci.parser.ListIdentifiersResponseValidator;
+import eu.cessda.pasc.oci.parser.OaiPmhConstants;
+import eu.cessda.pasc.oci.parser.OaiPmhHelpers;
 import eu.cessda.pasc.oci.repository.DaoBase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

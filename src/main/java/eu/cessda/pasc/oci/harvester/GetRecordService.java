@@ -17,11 +17,10 @@ package eu.cessda.pasc.oci.harvester;
 
 import eu.cessda.pasc.oci.exception.InternalSystemException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
-import eu.cessda.pasc.oci.helpers.CMMStudyMapper;
-import eu.cessda.pasc.oci.helpers.OaiPmhHelpers;
-import eu.cessda.pasc.oci.helpers.RecordResponseValidator;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.configurations.Repo;
+import eu.cessda.pasc.oci.parser.CMMStudyMapper;
+import eu.cessda.pasc.oci.parser.OaiPmhHelpers;
 import eu.cessda.pasc.oci.repository.DaoBase;
 import lombok.extern.slf4j.Slf4j;
 import org.jdom2.Document;
@@ -48,13 +47,11 @@ class GetRecordService {
 
     private final CMMStudyMapper cmmStudyMapper;
     private final DaoBase daoBase;
-    private final RecordResponseValidator recordResponseValidator;
 
     @Autowired
-    public GetRecordService(CMMStudyMapper cmmStudyMapper, DaoBase daoBase, RecordResponseValidator recordResponseValidator) {
+    public GetRecordService(CMMStudyMapper cmmStudyMapper, DaoBase daoBase) {
         this.daoBase = daoBase;
         this.cmmStudyMapper = cmmStudyMapper;
-        this.recordResponseValidator = recordResponseValidator;
     }
 
     public CMMStudy getRecord(Repo repo, String studyIdentifier) throws InternalSystemException, OaiPmhException {
@@ -80,9 +77,6 @@ class GetRecordService {
         if (log.isTraceEnabled()) {
             log.trace("Record XML String [{}]", new XMLOutputter().outputString(document));
         }
-
-        // We exit if the record has an <error> element
-        recordResponseValidator.validateResponse(document);
 
         // Short-Circuit. We carry on to parse beyond the headers only if the record is active.
         var headerElement = cmmStudyMapper.parseHeaderElement(document);

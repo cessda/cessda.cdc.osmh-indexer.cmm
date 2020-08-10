@@ -15,9 +15,9 @@
  */
 package eu.cessda.pasc.oci.harvester;
 
+import eu.cessda.pasc.oci.LoggingConstants;
 import eu.cessda.pasc.oci.exception.InternalSystemException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
-import eu.cessda.pasc.oci.helpers.LoggingConstants;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.configurations.Repo;

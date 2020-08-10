@@ -33,7 +33,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import static eu.cessda.pasc.oci.helpers.OaiPmhHelpers.appendListRecordResumptionToken;
+import static eu.cessda.pasc.oci.parser.OaiPmhHelpers.appendListRecordResumptionToken;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.mockito.BDDMockito.given;
 

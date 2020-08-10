@@ -15,7 +15,7 @@
  */
 package eu.cessda.pasc.oci.harvester;
 
-import eu.cessda.pasc.oci.exception.CustomHandlerException;
+import eu.cessda.pasc.oci.exception.InternalSystemException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.configurations.Repo;
@@ -49,7 +49,7 @@ public class LocalHarvesterConsumerServiceTest {
     }
 
     @Test
-    public void shouldLogOaiErrorCodeAndMessageWhenAnOaiExceptionIsThrown() throws CustomHandlerException {
+    public void shouldLogOaiErrorCodeAndMessageWhenAnOaiExceptionIsThrown() throws InternalSystemException, OaiPmhException {
         // When;
         Mockito.when(listRecordHeadersService.getRecordHeaders(UKDS_REPO)).thenThrow(new OaiPmhException(OaiPmhException.Code.badArgument, "Invalid argument"));
 
@@ -59,7 +59,7 @@ public class LocalHarvesterConsumerServiceTest {
     }
 
     @Test
-    public void shouldLogOaiErrorCodeWhenAnOaiExceptionIsThrown() throws CustomHandlerException {
+    public void shouldLogOaiErrorCodeWhenAnOaiExceptionIsThrown() throws InternalSystemException, OaiPmhException {
         // When
         Mockito.when(listRecordHeadersService.getRecordHeaders(UKDS_REPO)).thenThrow(new OaiPmhException(OaiPmhException.Code.badArgument));
 
@@ -69,9 +69,9 @@ public class LocalHarvesterConsumerServiceTest {
     }
 
     @Test
-    public void shouldLogWhenACustomHandlerExceptionIsThrown() throws CustomHandlerException {
+    public void shouldLogWhenACustomHandlerExceptionIsThrown() throws InternalSystemException, OaiPmhException {
         // When
-        Mockito.when(listRecordHeadersService.getRecordHeaders(UKDS_REPO)).thenThrow(CustomHandlerException.class);
+        Mockito.when(listRecordHeadersService.getRecordHeaders(UKDS_REPO)).thenThrow(InternalSystemException.class);
 
         // Then
         List<RecordHeader> recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(UKDS_REPO, null);
@@ -79,7 +79,7 @@ public class LocalHarvesterConsumerServiceTest {
     }
 
     @Test
-    public void getRecordShouldLogOaiErrorCodeAndMessageWhenAnOaiExceptionIsThrown() throws CustomHandlerException {
+    public void getRecordShouldLogOaiErrorCodeAndMessageWhenAnOaiExceptionIsThrown() throws InternalSystemException, OaiPmhException {
         // When
         Mockito.when(getRecordService.getRecord(UKDS_REPO, STUDY_NUMBER)).thenThrow(new OaiPmhException(OaiPmhException.Code.badArgument, "Invalid argument"));
 
@@ -89,7 +89,7 @@ public class LocalHarvesterConsumerServiceTest {
     }
 
     @Test
-    public void getRecordShouldLogOaiErrorCodeWhenAnOaiExceptionIsThrown() throws CustomHandlerException {
+    public void getRecordShouldLogOaiErrorCodeWhenAnOaiExceptionIsThrown() throws InternalSystemException, OaiPmhException {
         // When
         Mockito.when(getRecordService.getRecord(UKDS_REPO, STUDY_NUMBER)).thenThrow(new OaiPmhException(OaiPmhException.Code.badArgument));
 
@@ -99,9 +99,9 @@ public class LocalHarvesterConsumerServiceTest {
     }
 
     @Test
-    public void getRecordShouldLogWhenACustomHandlerExceptionIsThrown() throws CustomHandlerException {
+    public void getRecordShouldLogWhenACustomHandlerExceptionIsThrown() throws InternalSystemException, OaiPmhException {
         // When
-        Mockito.when(getRecordService.getRecord(UKDS_REPO, STUDY_NUMBER)).thenThrow(CustomHandlerException.class);
+        Mockito.when(getRecordService.getRecord(UKDS_REPO, STUDY_NUMBER)).thenThrow(InternalSystemException.class);
 
         // Then
         var record = remoteHarvesterConsumerService.getRecord(UKDS_REPO, STUDY_NUMBER);

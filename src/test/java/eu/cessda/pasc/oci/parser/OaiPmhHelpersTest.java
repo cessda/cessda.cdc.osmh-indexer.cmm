@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.helpers;
+package eu.cessda.pasc.oci.parser;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.models.configurations.Repo;
@@ -27,7 +27,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import static eu.cessda.pasc.oci.helpers.OaiPmhHelpers.buildGetStudyFullUrl;
+import static eu.cessda.pasc.oci.parser.OaiPmhHelpers.buildGetStudyFullUrl;
 import static org.assertj.core.api.BDDAssertions.then;
 
 /**

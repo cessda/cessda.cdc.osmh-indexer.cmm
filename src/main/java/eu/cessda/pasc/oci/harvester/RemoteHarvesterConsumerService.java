@@ -17,10 +17,10 @@ package eu.cessda.pasc.oci.harvester;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import eu.cessda.pasc.oci.LoggingConstants;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.exception.ExternalSystemException;
 import eu.cessda.pasc.oci.exception.HandlerNotFoundException;
-import eu.cessda.pasc.oci.helpers.LoggingConstants;
 import eu.cessda.pasc.oci.models.ErrorMessage;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;

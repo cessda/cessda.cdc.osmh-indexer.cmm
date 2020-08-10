@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.helpers;
+package eu.cessda.pasc.oci.parser;
 
 import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
+import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.models.cmmstudy.TermVocabAttributes;
 import eu.cessda.pasc.oci.models.oai.configuration.OaiPmh;
 import org.jdom2.Attribute;
@@ -33,8 +34,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static eu.cessda.pasc.oci.helpers.HTMLFilter.CLEAN_CHARACTER_RETURNS_STRATEGY;
-import static eu.cessda.pasc.oci.helpers.OaiPmhConstants.*;
+import static eu.cessda.pasc.oci.parser.HTMLFilter.cleanCharacterReturns;
+import static eu.cessda.pasc.oci.parser.OaiPmhConstants.*;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
@@ -81,7 +82,7 @@ class DocElementParser {
 
   static TermVocabAttributes parseTermVocabAttrAndValues(Element parentElement, Element concept, boolean hasControlledValue) {
     TermVocabAttributes.TermVocabAttributesBuilder builder = TermVocabAttributes.builder();
-    builder.term(CLEAN_CHARACTER_RETURNS_STRATEGY.apply(parentElement.getText()));
+      builder.term(cleanCharacterReturns(parentElement.getText()));
 
     if (hasControlledValue) {
       builder.vocab(getAttributeValue(concept, VOCAB_ATTR).orElse(""))
@@ -257,7 +258,27 @@ class DocElementParser {
    * @return Array String Values of the attributes
    */
   List<String> getAttributeValues(Document document, String elementXpath) {
-    List<Attribute> attributes = getAttributes(document, elementXpath);
-    return attributes.stream().map(Attribute::getValue).collect(Collectors.toList());
+      List<Attribute> attributes = getAttributes(document, elementXpath);
+      return attributes.stream().map(Attribute::getValue).collect(Collectors.toList());
   }
+
+    /**
+     * Checks if the record has an {@literal <error>} element.
+     *
+     * @param document the document to map to.
+     * @throws OaiPmhException if an {@literal <error>} element was present.
+     */
+    void validateResponse(Document document) throws OaiPmhException {
+
+        final Optional<Element> optionalElement = getFirstElement(document, ERROR_PATH);
+
+        if (optionalElement.isPresent()) {
+            final Element element = optionalElement.get();
+            if (element.getText() != null && !element.getText().trim().isEmpty()) {
+                throw new OaiPmhException(OaiPmhException.Code.valueOf(element.getAttributeValue(CODE_ATTR)), element.getText());
+            } else {
+                throw new OaiPmhException(OaiPmhException.Code.valueOf(element.getAttributeValue(CODE_ATTR)));
+            }
+        }
+    }
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.helpers;
+package eu.cessda.pasc.oci.parser;
 
 import eu.cessda.pasc.oci.models.cmmstudy.*;
 import lombok.experimental.UtilityClass;
@@ -22,10 +22,10 @@ import org.jdom2.Element;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static eu.cessda.pasc.oci.helpers.DocElementParser.getAttributeValue;
-import static eu.cessda.pasc.oci.helpers.DocElementParser.parseTermVocabAttrAndValues;
-import static eu.cessda.pasc.oci.helpers.HTMLFilter.CLEAN_CHARACTER_RETURNS_STRATEGY;
-import static eu.cessda.pasc.oci.helpers.OaiPmhConstants.*;
+import static eu.cessda.pasc.oci.parser.DocElementParser.getAttributeValue;
+import static eu.cessda.pasc.oci.parser.DocElementParser.parseTermVocabAttrAndValues;
+import static eu.cessda.pasc.oci.parser.HTMLFilter.cleanCharacterReturns;
+import static eu.cessda.pasc.oci.parser.OaiPmhConstants.*;
 import static java.util.Optional.ofNullable;
 
 /**
@@ -46,8 +46,8 @@ class ParsingStrategies {
   static Function<Element, Optional<Country>> countryStrategyFunction() {
     return element -> {
       Country country = Country.builder()
-              .iso2LetterCode(getAttributeValue(element, ABBR_ATTR).orElse(COUNTRY_NOT_AVAIL))
-              .countryName(CLEAN_CHARACTER_RETURNS_STRATEGY.apply(element.getText()))
+          .iso2LetterCode(getAttributeValue(element, ABBR_ATTR).orElse(COUNTRY_NOT_AVAIL))
+          .countryName(cleanCharacterReturns(element.getText()))
               .build();
       return Optional.of(country);
     };
@@ -78,9 +78,9 @@ class ParsingStrategies {
   }
 
   static Function<Element, Publisher> publisherStrategyFunction() {
-    return element -> Publisher.builder()
-            .abbreviation(getAttributeValue(element, ABBR_ATTR).orElse(PUBLISHER_NOT_AVAIL))
-            .name(CLEAN_CHARACTER_RETURNS_STRATEGY.apply(element.getText())).build();
+      return element -> Publisher.builder()
+          .abbreviation(getAttributeValue(element, ABBR_ATTR).orElse(PUBLISHER_NOT_AVAIL))
+          .name(cleanCharacterReturns(element.getText())).build();
   }
 
   static Function<Element, Optional<TermVocabAttributes>> termVocabAttributeStrategyFunction(boolean hasControlledValue) {

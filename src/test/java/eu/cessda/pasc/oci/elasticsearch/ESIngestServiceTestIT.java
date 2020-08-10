@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.service;
+package eu.cessda.pasc.oci.elasticsearch;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import eu.cessda.pasc.oci.configurations.ESConfigurationProperties;
-import eu.cessda.pasc.oci.elasticsearch.ESIngestService;
-import eu.cessda.pasc.oci.helpers.FileHandler;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
+import eu.cessda.pasc.oci.parser.FileHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;

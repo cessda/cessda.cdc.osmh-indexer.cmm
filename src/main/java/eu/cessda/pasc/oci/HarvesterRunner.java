@@ -19,7 +19,6 @@ import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.elasticsearch.IngestService;
 import eu.cessda.pasc.oci.harvester.HarvesterConsumerService;
 import eu.cessda.pasc.oci.harvester.LanguageDocumentExtractor;
-import eu.cessda.pasc.oci.helpers.LoggingConstants;
 import eu.cessda.pasc.oci.metrics.Metrics;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;

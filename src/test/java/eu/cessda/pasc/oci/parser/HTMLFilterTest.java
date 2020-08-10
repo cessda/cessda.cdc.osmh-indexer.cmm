@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.helpers;
+package eu.cessda.pasc.oci.parser;
 
 import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static eu.cessda.pasc.oci.helpers.HTMLFilter.CLEAN_CHARACTER_RETURNS_STRATEGY;
+import static eu.cessda.pasc.oci.parser.HTMLFilter.cleanCharacterReturns;
 import static org.assertj.core.api.BDDAssertions.then;
 
 public class HTMLFilterTest {
@@ -33,7 +33,7 @@ public class HTMLFilterTest {
         "Gun Culture and Cultural Origins of the Second \nAmendment to the U.S. Constitution\n";
 
     // When
-    String actualCleanText = CLEAN_CHARACTER_RETURNS_STRATEGY.apply(raw);
+      String actualCleanText = cleanCharacterReturns(raw);
 
     then(actualCleanText).isEqualTo("\"Arma sunt necessaria\" (Arms are necessary) Guns, " +
         "Gun Culture and Cultural Origins of the Second Amendment to the U.S. Constitution");
@@ -49,7 +49,7 @@ public class HTMLFilterTest {
     titleMap.put("fi", "\n Documentation pour \"European Social Survey in Switzerland - 2004\"");
 
     // When
-    HTMLFilter.cleanMapValues(titleMap);
+      titleMap.replaceAll((key, value) -> HTMLFilter.cleanCharacterReturns(value));
 
     then(titleMap.get("en")).isEqualTo("\"Arma sunt necessaria\" (Arms are necessary) Guns Constitution");
     then(titleMap.get("sv")).isEqualTo("\"Arma sunt necessaria\" (Arms are necessary) Guns Constitution");

@@ -78,6 +78,7 @@ public class OaiPmhException extends CustomHandlerException {
     /**
      * OAI-PMH error codes
      */
+    @SuppressWarnings("unused")
     public enum Code {
         badArgument,
         badResumptionToken,

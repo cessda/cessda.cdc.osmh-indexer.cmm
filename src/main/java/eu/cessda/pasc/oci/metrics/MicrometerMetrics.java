@@ -15,9 +15,9 @@
  */
 package eu.cessda.pasc.oci.metrics;
 
+import eu.cessda.pasc.oci.LoggingConstants;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.elasticsearch.IngestService;
-import eu.cessda.pasc.oci.helpers.LoggingConstants;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.Publisher;
 import eu.cessda.pasc.oci.models.configurations.Repo;

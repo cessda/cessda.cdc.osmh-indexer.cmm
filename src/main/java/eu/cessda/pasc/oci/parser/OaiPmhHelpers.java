@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.helpers;
+package eu.cessda.pasc.oci.parser;
 
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.NonNull;
@@ -26,7 +26,7 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-import static eu.cessda.pasc.oci.helpers.OaiPmhConstants.*;
+import static eu.cessda.pasc.oci.parser.OaiPmhConstants.*;
 
 /**
  * Helper methods to deal with Oai-pmh protocol

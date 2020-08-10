@@ -13,12 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.helpers;
+package eu.cessda.pasc.oci.parser;
 
 import lombok.experimental.UtilityClass;
-
-import java.util.Map;
-import java.util.function.UnaryOperator;
 
 /**
  * Utility class for cleaning html characters
@@ -27,10 +24,7 @@ import java.util.function.UnaryOperator;
  */
 @UtilityClass
 class HTMLFilter {
-
-  static final UnaryOperator<String> CLEAN_CHARACTER_RETURNS_STRATEGY = candidate -> candidate.replace("\n", "").trim();
-
-  static void cleanMapValues(Map<String, String> candidateMap) {
-    candidateMap.replaceAll((key, value) -> CLEAN_CHARACTER_RETURNS_STRATEGY.apply(value));
-  }
+    static String cleanCharacterReturns(String candidate) {
+        return candidate.replace("\n", "").trim();
+    }
 }

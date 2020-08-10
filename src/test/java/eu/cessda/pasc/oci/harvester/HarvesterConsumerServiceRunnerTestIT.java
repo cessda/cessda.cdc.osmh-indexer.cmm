@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.service;
+package eu.cessda.pasc.oci.harvester;
 
-import eu.cessda.pasc.oci.harvester.HarvesterConsumerService;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.configurations.Repo;

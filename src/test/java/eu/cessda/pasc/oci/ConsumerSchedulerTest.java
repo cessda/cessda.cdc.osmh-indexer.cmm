@@ -25,7 +25,7 @@ import eu.cessda.pasc.oci.harvester.LanguageDocumentExtractor;
 import eu.cessda.pasc.oci.metrics.MicrometerMetrics;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.configurations.Repo;
-import eu.cessda.pasc.oci.service.helpers.DebuggingJMXBean;
+import eu.cessda.pasc.oci.service.DebuggingJMXBean;
 import org.junit.Test;
 import org.mockito.Mockito;
 

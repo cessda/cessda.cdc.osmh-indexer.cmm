@@ -44,7 +44,7 @@ public class StatusService {
     this.prettyPrinter = objectMapper.writerWithDefaultPrettyPrinter();
   }
 
-  @ManagedOperation(description = "Prints out the PaSC Handler Oai-Pmh DDI 2.5 Configurations.")
+  @ManagedOperation(description = "Prints out the CDC Handler OAI-PMH DDI 2.5 Configuration")
   public String printPaSCHandlerOaiPmhConfig() throws JsonProcessingException {
     return "Config for DDI 2.5: [" + prettyPrinter.writeValueAsString(handlerConfigurationProperties.getOaiPmh()) + "]";
   }

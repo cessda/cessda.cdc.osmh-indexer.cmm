@@ -16,7 +16,7 @@
 package eu.cessda.pasc.oci;
 
 import eu.cessda.pasc.oci.elasticsearch.IngestService;
-import eu.cessda.pasc.oci.service.helpers.DebuggingJMXBean;
+import eu.cessda.pasc.oci.service.DebuggingJMXBean;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;

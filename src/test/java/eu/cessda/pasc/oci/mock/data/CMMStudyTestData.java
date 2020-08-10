@@ -16,7 +16,7 @@
 package eu.cessda.pasc.oci.mock.data;
 
 
-import eu.cessda.pasc.oci.helpers.FileHandler;
+import eu.cessda.pasc.oci.parser.FileHandler;
 import lombok.experimental.UtilityClass;
 
 import java.io.FileNotFoundException;

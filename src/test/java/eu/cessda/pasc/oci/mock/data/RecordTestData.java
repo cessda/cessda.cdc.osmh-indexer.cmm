@@ -17,11 +17,11 @@ package eu.cessda.pasc.oci.mock.data;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.cessda.pasc.oci.configurations.UtilitiesConfiguration;
-import eu.cessda.pasc.oci.helpers.FileHandler;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
+import eu.cessda.pasc.oci.parser.FileHandler;
 
 import java.io.IOException;
 import java.io.InputStream;

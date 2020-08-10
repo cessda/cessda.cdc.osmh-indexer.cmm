@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.helpers;
+package eu.cessda.pasc.oci;
 
 import lombok.experimental.UtilityClass;
 
@@ -24,6 +24,5 @@ public class LoggingConstants {
     public static final String OAI_ERROR_MESSAGE = "oai_error_message";
     public static final String REPO_NAME = "repo_name";
     public static final String LANG_CODE = "lang_code";
-    public static final String REPO_ENDPOINT_URL = "repo_endpoint_url";
     public static final String REASON = "rejection_reason";
 }

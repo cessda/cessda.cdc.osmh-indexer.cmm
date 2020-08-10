@@ -15,8 +15,8 @@
  */
 package eu.cessda.pasc.oci.harvester;
 
-import eu.cessda.pasc.oci.helpers.TimeUtility;
 import eu.cessda.pasc.oci.models.RecordHeader;
+import eu.cessda.pasc.oci.parser.TimeUtility;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
