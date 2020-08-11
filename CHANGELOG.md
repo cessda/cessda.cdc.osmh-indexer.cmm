@@ -5,26 +5,51 @@ All notable changes to the OSMH Consumer Indexer will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-*For each release, use the following sub-sections:* 
-*- Added (for new features)* 
-*- Changed (for changes in existing functionality)* 
-*- Deprecated (for soon-to-be removed features)* 
-*- Removed (for now removed features)* 
-*- Fixed (for any bug fixes)* 
+*For each release, use the following sub-sections:*
+*- Added (for new features)*
+*- Changed (for changes in existing functionality)*
+*- Deprecated (for soon-to-be removed features)*
+*- Removed (for now removed features)*
+*- Fixed (for any bug fixes)*
 *- Security (in case of vulnerabilities)*
 
 ## [Unreleased]
 
-- Add HTTP compression to the repository handlers	([#167](https://bitbucket.org/cessda/cessda.cdc.version2/issues/167))
-- Add Code of Conduct file	([#174](https://bitbucket.org/cessda/cessda.cdc.version2/issues/174))
-- Add new PROGEDO endpoint	([#177](https://bitbucket.org/cessda/cessda.cdc.version2/issues/177))
-- Add SODA endpoint	([#190](https://bitbucket.org/cessda/cessda.cdc.version2/issues/190))
-- Add option to set default language as part of endpoint specification	([#192](https://bitbucket.org/cessda/cessda.cdc.version2/issues/192))
-- Add more details to 'Configured Repos' log output	([#195](https://bitbucket.org/cessda/cessda.cdc.version2/issues/195))
-- Add code as an additional field in the indexer model	([#199](https://bitbucket.org/cessda/cessda.cdc.version2/issues/199))
-- Add ADP Kuha2 Endpoint	([#201](https://bitbucket.org/cessda/cessda.cdc.version2/issues/201))
-- Add stopwords for Hungarian and Portuguese language analysers	([#204](https://bitbucket.org/cessda/cessda.cdc.version2/issues/204))
+### Additions
 
+- Add HTTP compression to the repository handler ([#167](https://bitbucket.org/cessda/cessda.cdc.version2/issues/167))
+- Add Code of Conduct file ([#174](https://bitbucket.org/cessda/cessda.cdc.version2/issues/174))
+- Add new PROGEDO endpoint ([#177](https://bitbucket.org/cessda/cessda.cdc.version2/issues/177))
+- Add SODA endpoint ([#190](https://bitbucket.org/cessda/cessda.cdc.version2/issues/190))
+- Add option to set default language as part of endpoint specification
+    ([#192](https://bitbucket.org/cessda/cessda.cdc.version2/issues/192))
+- Add more details to 'Configured Repos' log output ([#195](https://bitbucket.org/cessda/cessda.cdc.version2/issues/195))
+- Add code as an additional field in the indexer model ([#199](https://bitbucket.org/cessda/cessda.cdc.version2/issues/199))
+- Add ADP Kuha2 Endpoint ([#201](https://bitbucket.org/cessda/cessda.cdc.version2/issues/201))
+- Add stopwords for Hungarian and Portuguese language analysers ([#204](https://bitbucket.org/cessda/cessda.cdc.version2/issues/204))
+
+### Changes
+
+- Revise XML Schema Definition to ensure compliance with system implementation
+    ([#59](https://bitbucket.org/cessda/cessda.cdc.version2/issues/59))
+- Search Optimisation ([#131](https://bitbucket.org/cessda/cessda.cdc.version2/issues/131))
+- Remove (not available) if no PID agency ([#156](https://bitbucket.org/cessda/cessda.cdc.version2/issues/156))
+- Modify Harvester to output Required logs ([#159](https://bitbucket.org/cessda/cessda.cdc.version2/issues/159))
+- Disable access to external XML entities in the repository handlers
+    ([#176](https://bitbucket.org/cessda/cessda.cdc.version2/issues/176))
+- Harvest separate repositories in parallel ([#178](https://bitbucket.org/cessda/cessda.cdc.version2/issues/178))
+- Log statistics for created, deleted and updated studies ([#181](https://bitbucket.org/cessda/cessda.cdc.version2/issues/181))
+- Cleaning Publisher filter ([#183](https://bitbucket.org/cessda/cessda.cdc.version2/issues/183))
+- Update Elasticsearch to 5.6 ([#188](https://bitbucket.org/cessda/cessda.cdc.version2/issues/188))
+- Update Spring Boot Admin to 2.2.3 ([#191](https://bitbucket.org/cessda/cessda.cdc.version2/issues/191))
+- Add more details to 'Configured Repos' log output ([#194](https://bitbucket.org/cessda/cessda.cdc.version2/issues/194))
+- Change SODA publisher name ([#197](https://bitbucket.org/cessda/cessda.cdc.version2/issues/197))
+- Update SND set spec ([#200](https://bitbucket.org/cessda/cessda.cdc.version2/issues/200))
+
+### Fixes
+
+- Cleanup code ([#203](https://bitbucket.org/cessda/cessda.cdc.version2/issues/203))
+- Fix rejection reason not showing in the logs ([#184](https://bitbucket.org/cessda/cessda.cdc.version2/issues/184))
 
 ## [2.2.1] - 2020-05-04
 
@@ -56,10 +81,12 @@ OSMH Consumer Indexer - [10.5281/zenodo.3786356](https://zenodo.org/record/37863
 - refactored the error handling code in DaoBase.postForStringResponse to better align with Java best practices
 - refactored exception handling to avoid catching RuntimeException and a cast
 - print the config in StatusService.printPaSCHandlerOaiPmhConfig() directly
-- change behaviour when Study PID Agency is not specified. Before: '10.5279/DK-SA-DDA-868 (not available)'. After: '10.5279/DK-SA-DDA-868 (Agency not available)' ([#156](https://bitbucket.org/cessda/cessda.cdc.version2/issues/156))
+- change behaviour when Study PID Agency is not specified. Before: '10.5279/DK-SA-DDA-868 (not available)'.
+    After: '10.5279/DK-SA-DDA-868 (Agency not available)' ([#156](https://bitbucket.org/cessda/cessda.cdc.version2/issues/156))
 - log queries at the info level
 - moved recursion out of the try-with-resources block to reduce resource consumption
-- reformatted the message when the record headers could not be parsed (because the parser could have failed at any point and left the InputStream is in an inconsistent state
+- reformatted the message when the record headers could not be parsed (because the parser could have failed at any point and left
+    the InputStream is in an inconsistent state
 - use input streams instead of strings (avoids a double copy)
 - renamed 'dev' profile to *gcp*
 - improved logging to help determine quality of harvested metadata ([#191](https://bitbucket.org/cessda/cessda.cdc.version2/issues/91))
