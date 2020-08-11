@@ -1,26 +1,37 @@
 # Changelog
+
 All notable changes to the OSMH Consumer Indexer will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-*For each release, use the following sub-sections:*  
-*- Added (for new features)*  
-*- Changed (for changes in existing functionality)*  
-*- Deprecated (for soon-to-be removed features)*  
-*- Removed (for now removed features)*  
-*- Fixed (for any bug fixes)*  
+*For each release, use the following sub-sections:* 
+*- Added (for new features)* 
+*- Changed (for changes in existing functionality)* 
+*- Deprecated (for soon-to-be removed features)* 
+*- Removed (for now removed features)* 
+*- Fixed (for any bug fixes)* 
 *- Security (in case of vulnerabilities)*
 
 ## [Unreleased]
-- Added Code of Conduct
+
+- Add HTTP compression to the repository handlers	([#167](https://bitbucket.org/cessda/cessda.cdc.version2/issues/167))
+- Add Code of Conduct file	([#174](https://bitbucket.org/cessda/cessda.cdc.version2/issues/174))
+- Add new PROGEDO endpoint	([#177](https://bitbucket.org/cessda/cessda.cdc.version2/issues/177))
+- Add SODA endpoint	([#190](https://bitbucket.org/cessda/cessda.cdc.version2/issues/190))
+- Add option to set default language as part of endpoint specification	([#192](https://bitbucket.org/cessda/cessda.cdc.version2/issues/192))
+- Add more details to 'Configured Repos' log output	([#195](https://bitbucket.org/cessda/cessda.cdc.version2/issues/195))
+- Add code as an additional field in the indexer model	([#199](https://bitbucket.org/cessda/cessda.cdc.version2/issues/199))
+- Add ADP Kuha2 Endpoint	([#201](https://bitbucket.org/cessda/cessda.cdc.version2/issues/201))
+- Add stopwords for Hungarian and Portuguese language analysers	([#204](https://bitbucket.org/cessda/cessda.cdc.version2/issues/204))
 
 
-## [2.2.1] - 2020-05-04    
+## [2.2.1] - 2020-05-04
 
 OSMH Consumer Indexer - [10.5281/zenodo.3786356](https://zenodo.org/record/3786356)
 
 ### Added
+
 - new GESIS endpoint ([#162](https://bitbucket.org/cessda/cessda.cdc.version2/issues/162))
 - file appender
 - format error log message for successful indexing
@@ -29,6 +40,7 @@ OSMH Consumer Indexer - [10.5281/zenodo.3786356](https://zenodo.org/record/37863
 - dependency for JSON logging support (logstash-logback-encoder 5.2)
 
 ### Changed
+
 - changed GESIS endpoint from HTTP to HTTPS ([#162](https://bitbucket.org/cessda/cessda.cdc.version2/issues/162))
 - use Java Time APIs for the PerfRequestSyncInterceptor stopwatch
 - increased test coverage
@@ -53,14 +65,17 @@ OSMH Consumer Indexer - [10.5281/zenodo.3786356](https://zenodo.org/record/37863
 - improved logging to help determine quality of harvested metadata ([#191](https://bitbucket.org/cessda/cessda.cdc.version2/issues/91))
 
 ### Deprecated
+
 - N/A
 
 ### Removed
+
 - caches of RuntimeException in ESIngestService
 - option to disable HTTPS verification
 - unnecessary null check
 
 ### Fixed
+
 - compiler warnings, as recommended by Error Prone
 - time zone bugs
 - logging pattern for the file logger
@@ -73,5 +88,6 @@ OSMH Consumer Indexer - [10.5281/zenodo.3786356](https://zenodo.org/record/37863
 - time zone bugs
 
 ### Security
+
 - verify SSL
 - removed the option to disable HTTPS verification
