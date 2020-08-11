@@ -17,6 +17,9 @@ package eu.cessda.pasc.oci;
 
 import lombok.experimental.UtilityClass;
 
+/**
+ * Contains static logging fields that are used for structured logging
+ */
 @UtilityClass
 public class LoggingConstants {
     public static final String STUDY_ID = "study_id";

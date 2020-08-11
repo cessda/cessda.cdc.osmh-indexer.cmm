@@ -48,17 +48,9 @@ public class ReposTestData
         return repo;
     }
 
-    public static Repo getGesisDeRepo() {
-    Repo repo = new Repo();
-    repo.setCode("GESIS De");
-    repo.setUrl(URI.create("https://dbkapps.gesis.org/dbkoai3"));
-    repo.setHandler("OAI-PMH");
-    return repo;
-  }
-
-  public static Endpoints getEndpoints() {
-    Endpoints endpoints = new Endpoints();
-    endpoints.getRepos().add(getUKDSRepo());
-    return endpoints;
-  }
+    public static Endpoints getEndpoints() {
+        Endpoints endpoints = new Endpoints();
+        endpoints.getRepos().add(getUKDSRepo());
+        return endpoints;
+    }
 }

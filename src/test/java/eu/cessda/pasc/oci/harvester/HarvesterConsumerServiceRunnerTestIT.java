@@ -15,8 +15,7 @@
  */
 package eu.cessda.pasc.oci.harvester;
 
-import eu.cessda.pasc.oci.models.RecordHeader;
-import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
+import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Ignore;
@@ -27,14 +26,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.stream.Collectors;
-
-import static eu.cessda.pasc.oci.mock.data.ReposTestData.*;
-import static org.assertj.core.api.Java6BDDAssertions.then;
 
 /**
  * Manual Consumer test class this can be used to explore end to end behavior of this consumer and to some extend some
@@ -49,48 +42,45 @@ import static org.assertj.core.api.Java6BDDAssertions.then;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@ActiveProfiles("default")
+@ActiveProfiles("test")
 @Ignore("Ignoring: For manual Integration testing only")
 @Slf4j
 public class HarvesterConsumerServiceRunnerTestIT {
 
-  @Autowired
-  HarvesterConsumerService harvesterConsumerService;
+    @Autowired
+    private HarvesterConsumerService localHarvesterConsumerService;
 
-  @Test
-  public void shouldReturnASuccessfulResponseForUKDS() {
+    @Autowired
+    private AppConfigurationProperties appConfigurationProperties;
 
-    Map<String, Integer> countReport = new HashMap<>();
-    countReport.putAll(processAndVerify(getUKDSRepo()));
-    countReport.putAll(processAndVerify(getGesisEnRepo()));
-    countReport.putAll(processAndVerify(getGesisDeRepo()));
+    @Test
+    public void shouldReturnASuccessfulResponseForAllConfiguredRepositories() {
 
-    log.info("\n############################################################################################" +
+        var repos = appConfigurationProperties.getEndpoints().getRepos();
+        var countReport = repos.stream().collect(Collectors.toMap(Repo::getCode, this::processAndVerify));
+
+        log.info("\n#############################" +
             "\nPrinting Report for all repos" +
-            "\n############################################################################################");
-    countReport.forEach((repo, headerCount) -> log.info("#### " + headerCount + " Header count for " + repo));
-    long sum = countReport.values().stream().mapToLong(l -> l).sum();
-    log.info("Total Count : " + sum);
-  }
+            "\n#############################");
+        countReport.forEach((repo, headerCount) -> log.info("Header count for {}: [{}]", repo, headerCount));
+        long sum = countReport.values().stream().mapToLong(l -> l).sum();
+        log.info("Total Count: [{}]", sum);
+    }
 
-  private Map<String, Integer> processAndVerify(Repo repo) {
-    List<RecordHeader> recordHeaders = harvesterConsumerService.listRecordHeaders(repo, null);
-    log.info("Total records found [{}]", recordHeaders.size());
-    List<RecordHeader> top3RecordHeaders = recordHeaders.stream().skip(1000).limit(3).collect(Collectors.toList());
+    private int processAndVerify(Repo repo) {
+        var recordHeaders = localHarvesterConsumerService.listRecordHeaders(repo, null);
+        log.info("Total records found: [{}]", recordHeaders.size());
 
-    then(top3RecordHeaders).hasSize(3);
+        // We are only interested in the first valid record
+        recordHeaders.stream().map(recordHeader -> {
+            var record = localHarvesterConsumerService.getRecord(repo, recordHeader.getIdentifier()).orElse(null);
+            log.info("|------------------------------Record Header----------------------------------------|");
+            log.info(recordHeader.toString());
+            log.info("|------------------------------Record CmmStudy--------------------------------------|");
+            log.info(String.valueOf(record));
+            return record;
+        }).filter(Objects::nonNull).findFirst().orElseThrow(); // If no records can be retrieved, fail the test
 
-    top3RecordHeaders.forEach(recordHeader -> {
-      log.info("|------------------------------Record Header----------------------------------------|");
-      log.info(recordHeader.toString());
-      log.info("|------------------------------Record CmmStudy----------------------------------------|");
-      Optional<CMMStudy> optionalCmmStudy = harvesterConsumerService.getRecord(repo, recordHeader.getIdentifier());
-      then(optionalCmmStudy.isPresent()).isTrue();
-    });
-
-    Map<String, Integer> repoHeadersCount = new HashMap<>();
-    repoHeadersCount.put(repo.getCode(), recordHeaders.size());
-
-    return repoHeadersCount;
-  }
+        return recordHeaders.size();
+    }
 }
