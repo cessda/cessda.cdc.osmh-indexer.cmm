@@ -41,14 +41,14 @@ import static org.mockito.BDDMockito.given;
 /**
  * @author moses AT doraventures DOT com
  */
-public class ListRecordHeadersServiceTest {
+public class RecordHeaderParserTest {
 
     private final DaoBase daoBase = Mockito.mock(DaoBase.class);
 
-    private final ListRecordHeadersService listRecordHeadersService;
+    private final RecordHeaderParser recordHeaderParser;
 
-    public ListRecordHeadersServiceTest() throws ParserConfigurationException {
-        listRecordHeadersService = new ListRecordHeadersService(daoBase, new UtilitiesConfiguration(null).documentBuilderFactory());
+    public RecordHeaderParserTest() throws ParserConfigurationException {
+        recordHeaderParser = new RecordHeaderParser(daoBase, new UtilitiesConfiguration(null).documentBuilderFactory());
     }
 
     @Test
@@ -63,7 +63,7 @@ public class ListRecordHeadersServiceTest {
         );
 
         // When
-        List<RecordHeader> recordHeaders = listRecordHeadersService.getRecordHeaders(ukdsEndpoint);
+        List<RecordHeader> recordHeaders = recordHeaderParser.getRecordHeaders(ukdsEndpoint);
 
         then(recordHeaders).hasSize(3);
         then(recordHeaders).extracting("identifier").containsOnly("850229", "850232", "850235");
@@ -83,7 +83,7 @@ public class ListRecordHeadersServiceTest {
         );
 
         // When
-        listRecordHeadersService.getRecordHeaders(ukdsEndpoint);
+        recordHeaderParser.getRecordHeaders(ukdsEndpoint);
     }
 
     @Test
@@ -116,7 +116,7 @@ public class ListRecordHeadersServiceTest {
         );
 
         // When
-        List<RecordHeader> recordHeaders = listRecordHeadersService.getRecordHeaders(ukdsEndpoint);
+        List<RecordHeader> recordHeaders = recordHeaderParser.getRecordHeaders(ukdsEndpoint);
 
         then(recordHeaders).hasSize(7);
         then(recordHeaders).extracting("identifier")
@@ -140,6 +140,6 @@ public class ListRecordHeadersServiceTest {
         );
 
         // When
-        listRecordHeadersService.getRecordHeaders(ukdsEndpoint);
+        recordHeaderParser.getRecordHeaders(ukdsEndpoint);
     }
 }

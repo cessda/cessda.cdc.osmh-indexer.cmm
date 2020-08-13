@@ -25,7 +25,6 @@ import org.jdom2.Namespace;
  */
 @UtilityClass
 public class OaiPmhConstants {
-
     // Namespaces
     static final Namespace OAI_NS = Namespace.getNamespace("oai", "http://www.openarchives.org/OAI/2.0/");
     static final Namespace DDI_NS = Namespace.getNamespace("ddi", "ddi:codebook:2_5");
@@ -39,64 +38,61 @@ public class OaiPmhConstants {
 
     // Codebook Paths
     static final String RECORD_DEFAULT_LANGUAGE = "//ddi:codeBook/@xml:lang";
-  static final String ABSTRACT_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:abstract";
-  static final String TITLE_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:titl";
-  static final String PAR_TITLE_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:parTitl";
-  static final String STUDY_URL_DOC_DSCR_XPATH = "//ddi:codeBook/ddi:docDscr/ddi:citation/ddi:holdings";
-  static final String STUDY_URL_STDY_DSCR_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:holdings";
-  static final String PID_STUDY_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo"; //use @agency instead?
-  static final String CREATORS_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty";
-  static final String DATA_RESTRCTN_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:restrctn";
-  static final String DATA_COLLECTION_PERIODS_PATH = "//ddi:codeBook//ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate";
-  static final String YEAR_OF_PUB_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:distDate[1]/@date";
-  static final String CLASSIFICATIONS_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:subject/ddi:topcClas";
-
-  static final String KEYWORDS_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:subject/ddi:keyword";
-  static final String TYPE_OF_TIME_METHOD_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:timeMeth";
-  static final String STUDY_AREA_COUNTRIES_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:nation";
-  static final String UNIT_TYPE_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:anlyUnit";
-
-  static final String PUBLISHER_XPATH = "//ddi:codeBook/ddi:docDscr/ddi:citation/ddi:prodStmt/ddi:producer";
-  static final String DISTRIBUTOR_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:distrbtr";
-  static final String FILE_TXT_LANGUAGES_XPATH = "//ddi:codeBook/ddi:fileDscr/ddi:fileTxt/@xml:lang";
-  static final String FILENAME_LANGUAGES_XPATH = "//ddi:codeBook/ddi:fileDscr/ddi:fileTxt/ddi:fileName/@xml:lang";
-  static final String TYPE_OF_SAMPLING_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:sampProc";
-  static final String SAMPLING_XPATH = TYPE_OF_SAMPLING_XPATH;
-  static final String TYPE_OF_MODE_OF_COLLECTION_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:collMode";
-
-  // Elements
-  static final String LANG_ATTR = "lang";
-  public static final String IDENTIFIER_ELEMENT = "identifier";
-  public static final String DATESTAMP_ELEMENT = "datestamp";
-  public static final String SET_SPEC_ELEMENT = "setSpec";
-  public static final String HEADER_ELEMENT = "header";
-  public static final String RESUMPTION_TOKEN_ELEMENT = "resumptionToken";
-
-  // Attributes
-  static final String DATE_ATTR = "date";
-  static final String END_ATTR = "end";
-  static final String START_ATTR = "start";
-  static final String SINGLE_ATTR = "single";
-  static final String EVENT_ATTR = "event";
-  static final String CODE_ATTR = "code";
-  static final String CREATOR_AFFILIATION_ATTR = "affiliation";
-  static final String VOCAB_ATTR = "vocab";
-  static final String VOCAB_URI_ATTR = "vocabURI";
-  static final String ID_ATTR = "ID";
-  static final String ABBR_ATTR = "abbr";
-  static final String AGENCY_ATTR = "agency";
-  static final String CONCEPT_EL = "concept";
-  static final String URI_ATTR = "URI";
-  public static final String COMPLETE_LIST_SIZE_ATTR = "completeListSize";
-  static final String OAI_PMH = "OAI-PMH";
-  static final String ERROR = "error";
-
-  // URL Paths tokens
-  static final String VERB_PARAM_KEY = "verb";
-  static final String METADATA_PREFIX_PARAM_KEY = "metadataPrefix";
-  static final String SET_SPEC_PARAM_KEY = "set";
-  static final String IDENTIFIER_PARAM_KEY = IDENTIFIER_ELEMENT;
-  static final String RESUMPTION_TOKEN_KEY = RESUMPTION_TOKEN_ELEMENT;
-  static final String LIST_IDENTIFIERS_VALUE = "ListIdentifiers";
-  static final String GET_RECORD_VALUE = "GetRecord";
+    public static final String IDENTIFIER_ELEMENT = "identifier";
+    public static final String DATESTAMP_ELEMENT = "datestamp";
+    public static final String SET_SPEC_ELEMENT = "setSpec";
+    public static final String HEADER_ELEMENT = "header";
+    public static final String RESUMPTION_TOKEN_ELEMENT = "resumptionToken";
+    public static final String COMPLETE_LIST_SIZE_ATTR = "completeListSize";
+    public static final String STATUS_ATTR = "status";
+    public static final String DELETED = "deleted";
+    static final String ABSTRACT_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:abstract";
+    static final String TITLE_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:titl";
+    static final String PAR_TITLE_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:parTitl";
+    static final String STUDY_URL_DOC_DSCR_XPATH = "//ddi:codeBook/ddi:docDscr/ddi:citation/ddi:holdings";
+    static final String STUDY_URL_STDY_DSCR_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:holdings";
+    static final String PID_STUDY_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo"; //use @agency instead?
+    static final String CREATORS_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty";
+    static final String DATA_RESTRCTN_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:restrctn";
+    static final String DATA_COLLECTION_PERIODS_PATH = "//ddi:codeBook//ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate";
+    static final String YEAR_OF_PUB_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:distDate[1]/@date";
+    static final String CLASSIFICATIONS_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:subject/ddi:topcClas";
+    static final String KEYWORDS_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:subject/ddi:keyword";
+    static final String TYPE_OF_TIME_METHOD_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:timeMeth";
+    static final String STUDY_AREA_COUNTRIES_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:nation";
+    static final String UNIT_TYPE_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:anlyUnit";
+    static final String PUBLISHER_XPATH = "//ddi:codeBook/ddi:docDscr/ddi:citation/ddi:prodStmt/ddi:producer";
+    static final String DISTRIBUTOR_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:distrbtr";
+    static final String FILE_TXT_LANGUAGES_XPATH = "//ddi:codeBook/ddi:fileDscr/ddi:fileTxt/@xml:lang";
+    static final String FILENAME_LANGUAGES_XPATH = "//ddi:codeBook/ddi:fileDscr/ddi:fileTxt/ddi:fileName/@xml:lang";
+    static final String TYPE_OF_SAMPLING_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:sampProc";
+    static final String SAMPLING_XPATH = TYPE_OF_SAMPLING_XPATH;
+    static final String TYPE_OF_MODE_OF_COLLECTION_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:collMode";
+    // Elements
+    static final String LANG_ATTR = "lang";
+    // Attributes
+    static final String DATE_ATTR = "date";
+    static final String END_ATTR = "end";
+    static final String START_ATTR = "start";
+    static final String SINGLE_ATTR = "single";
+    static final String EVENT_ATTR = "event";
+    static final String CODE_ATTR = "code";
+    static final String CREATOR_AFFILIATION_ATTR = "affiliation";
+    static final String VOCAB_ATTR = "vocab";
+    static final String VOCAB_URI_ATTR = "vocabURI";
+    static final String ID_ATTR = "ID";
+    static final String ABBR_ATTR = "abbr";
+    static final String AGENCY_ATTR = "agency";
+    static final String CONCEPT_EL = "concept";
+    static final String URI_ATTR = "URI";
+    static final String OAI_PMH = "OAI-PMH";
+    static final String ERROR = "error";
+    // URL Paths tokens
+    static final String VERB_PARAM_KEY = "verb";
+    static final String METADATA_PREFIX_PARAM_KEY = "metadataPrefix";
+    static final String SET_SPEC_PARAM_KEY = "set";
+    static final String IDENTIFIER_PARAM_KEY = IDENTIFIER_ELEMENT;
+    static final String RESUMPTION_TOKEN_KEY = RESUMPTION_TOKEN_ELEMENT;
+    static final String LIST_IDENTIFIERS_VALUE = "ListIdentifiers";
+    static final String GET_RECORD_VALUE = "GetRecord";
 }

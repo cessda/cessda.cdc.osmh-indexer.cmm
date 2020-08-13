@@ -36,7 +36,7 @@ public class LocalHarvesterConsumerServiceTest {
 
     private static final Repo UKDS_REPO = getUKDSRepo();
     private static final String STUDY_NUMBER = "oai:ukds/5436";
-    private final ListRecordHeadersService listRecordHeadersService = Mockito.mock(ListRecordHeadersService.class);
+    private final RecordHeaderParser recordHeaderParser = Mockito.mock(RecordHeaderParser.class);
     private final GetRecordService getRecordService = Mockito.mock(GetRecordService.class);
     /**
      * Class to test
@@ -45,13 +45,13 @@ public class LocalHarvesterConsumerServiceTest {
 
     @Before
     public void setUp() {
-        remoteHarvesterConsumerService = new LocalHarvesterConsumerService(listRecordHeadersService, getRecordService);
+        remoteHarvesterConsumerService = new LocalHarvesterConsumerService(recordHeaderParser, getRecordService);
     }
 
     @Test
     public void shouldLogOaiErrorCodeAndMessageWhenAnOaiExceptionIsThrown() throws InternalSystemException, OaiPmhException {
         // When;
-        Mockito.when(listRecordHeadersService.getRecordHeaders(UKDS_REPO)).thenThrow(new OaiPmhException(OaiPmhException.Code.badArgument, "Invalid argument"));
+        Mockito.when(recordHeaderParser.getRecordHeaders(UKDS_REPO)).thenThrow(new OaiPmhException(OaiPmhException.Code.badArgument, "Invalid argument"));
 
         // Then
         List<RecordHeader> recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(UKDS_REPO, null);
@@ -61,7 +61,7 @@ public class LocalHarvesterConsumerServiceTest {
     @Test
     public void shouldLogOaiErrorCodeWhenAnOaiExceptionIsThrown() throws InternalSystemException, OaiPmhException {
         // When
-        Mockito.when(listRecordHeadersService.getRecordHeaders(UKDS_REPO)).thenThrow(new OaiPmhException(OaiPmhException.Code.badArgument));
+        Mockito.when(recordHeaderParser.getRecordHeaders(UKDS_REPO)).thenThrow(new OaiPmhException(OaiPmhException.Code.badArgument));
 
         // Then
         List<RecordHeader> recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(UKDS_REPO, null);
@@ -71,7 +71,7 @@ public class LocalHarvesterConsumerServiceTest {
     @Test
     public void shouldLogWhenACustomHandlerExceptionIsThrown() throws InternalSystemException, OaiPmhException {
         // When
-        Mockito.when(listRecordHeadersService.getRecordHeaders(UKDS_REPO)).thenThrow(InternalSystemException.class);
+        Mockito.when(recordHeaderParser.getRecordHeaders(UKDS_REPO)).thenThrow(InternalSystemException.class);
 
         // Then
         List<RecordHeader> recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(UKDS_REPO, null);

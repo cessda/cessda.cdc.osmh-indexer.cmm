@@ -20,7 +20,7 @@ package eu.cessda.pasc.oci.exception;
  *
  * @author moses AT doraventures DOT com
  */
-public class InternalSystemException extends CustomHandlerException {
+public class InternalSystemException extends Exception {
 
     private static final long serialVersionUID = -1848837478104997356L;
 

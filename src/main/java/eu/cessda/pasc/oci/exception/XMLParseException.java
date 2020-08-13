@@ -15,24 +15,13 @@
  */
 package eu.cessda.pasc.oci.exception;
 
-/**
- * Exception for internally encountered Exceptions
- *
- * @author moses AT doraventures DOT com
- */
-public class CustomHandlerException extends Exception {
+import java.net.URI;
 
-    private static final long serialVersionUID = 5715687019114712665L;
+public class XMLParseException extends InternalSystemException {
 
-    public CustomHandlerException(String message) {
-        super(message);
-    }
+    private static final long serialVersionUID = -1280955307589066817L;
 
-    public CustomHandlerException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public CustomHandlerException(Throwable cause) {
-        super(cause);
+    public XMLParseException(URI xmlSource, Throwable cause) {
+        super(String.format("Parsing %s failed: %s", xmlSource, cause), cause);
     }
 }

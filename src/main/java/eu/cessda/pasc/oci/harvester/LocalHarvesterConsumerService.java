@@ -36,19 +36,19 @@ import static net.logstash.logback.argument.StructuredArguments.value;
 @Slf4j
 public class LocalHarvesterConsumerService extends AbstractHarvesterConsumerService {
 
-    private final ListRecordHeadersService listRecordHeadersService;
+    private final RecordHeaderParser recordHeaderParser;
     private final GetRecordService getRecordService;
 
     @Autowired
-    public LocalHarvesterConsumerService(ListRecordHeadersService listRecordHeadersService, GetRecordService getRecordService) {
-        this.listRecordHeadersService = listRecordHeadersService;
+    public LocalHarvesterConsumerService(RecordHeaderParser recordHeaderParser, GetRecordService getRecordService) {
+        this.recordHeaderParser = recordHeaderParser;
         this.getRecordService = getRecordService;
     }
 
     @Override
     public List<RecordHeader> listRecordHeaders(Repo repo, LocalDateTime lastModifiedDate) {
         try {
-            List<RecordHeader> recordHeaders = listRecordHeadersService.getRecordHeaders(repo);
+            List<RecordHeader> recordHeaders = recordHeaderParser.getRecordHeaders(repo);
             return filterRecords(recordHeaders, lastModifiedDate);
         } catch (OaiPmhException e) {
             // Check if there was a message attached to the OAI error response
