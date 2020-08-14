@@ -15,7 +15,7 @@
  */
 package eu.cessda.pasc.oci.parser;
 
-import eu.cessda.pasc.oci.exception.InternalSystemException;
+import eu.cessda.pasc.oci.exception.HarvesterException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import lombok.experimental.UtilityClass;
 import org.w3c.dom.Document;
@@ -32,13 +32,13 @@ public class ListIdentifiersResponseValidator {
      *
      * @param document the document to map to.
      * @throws OaiPmhException         if an {@literal <error>} element was present.
-     * @throws InternalSystemException if the given document has no OAI element.
+     * @throws HarvesterException if the given document has no OAI element.
      */
-    public static void validateResponse(Document document) throws InternalSystemException, OaiPmhException {
+    public static void validateResponse(Document document) throws HarvesterException, OaiPmhException {
         Optional<NodeList> oAINode = Optional.ofNullable(document.getElementsByTagName(OaiPmhConstants.OAI_PMH));
 
         if (oAINode.isEmpty()) {
-            throw new InternalSystemException("Missing OAI element");
+            throw new HarvesterException("Missing OAI element");
         }
 
         NodeList nodeList = oAINode.get();

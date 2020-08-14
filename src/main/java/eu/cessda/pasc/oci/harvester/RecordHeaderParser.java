@@ -15,8 +15,7 @@
  */
 package eu.cessda.pasc.oci.harvester;
 
-import eu.cessda.pasc.oci.exception.InternalSystemException;
-import eu.cessda.pasc.oci.exception.OaiPmhException;
+import eu.cessda.pasc.oci.exception.HarvesterException;
 import eu.cessda.pasc.oci.exception.XMLParseException;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.configurations.Repo;
@@ -66,7 +65,7 @@ class RecordHeaderParser {
         this.builderFactory = builderFactory;
     }
 
-    List<RecordHeader> getRecordHeaders(Repo repo) throws InternalSystemException, OaiPmhException {
+    List<RecordHeader> getRecordHeaders(Repo repo) throws HarvesterException {
 
         URI fullListRecordUrlPath = OaiPmhHelpers.appendListRecordParams(repo);
         Document recordHeadersDocument = getRecordHeadersDocument(fullListRecordUrlPath);
@@ -170,7 +169,7 @@ class RecordHeaderParser {
         for (int headerElementIndex = 0; headerElementIndex < headerElementsLength; headerElementIndex++) {
             Node headerElement = headerElements.item(headerElementIndex);
             String currentHeaderElementValue;
-            switch (headerElement.getTextContent()) {
+            switch (headerElement.getNodeName()) {
                 case OaiPmhConstants.IDENTIFIER_ELEMENT:
                     currentHeaderElementValue = headerElement.getTextContent();
                     recordHeaderBuilder.identifier(currentHeaderElementValue);

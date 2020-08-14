@@ -32,7 +32,7 @@ import static org.assertj.core.api.BDDAssertions.then;
  * @author moses AT doraventures DOT com
  */
 @RunWith(SpringRunner.class)
-public class AppConfigurationPropertiesTest extends AbstractSpringTestProfileContext{
+public class AppConfigurationPropertiesTestIT extends AbstractSpringTestProfileContext{
 
   @Autowired
   AppConfigurationProperties appConfigurationProperties;

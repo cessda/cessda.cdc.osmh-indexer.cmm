@@ -34,6 +34,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static eu.cessda.pasc.oci.mock.data.RecordTestData.*;
 import static eu.cessda.pasc.oci.mock.data.ReposTestData.getEndpoints;
@@ -70,11 +71,12 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     // mock for our record headers
     harvesterConsumerService = mock(HarvesterConsumerService.class);
     CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class);
-    List<RecordHeader> recordHeaderList = objectMapper.readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE, collectionType);
-    when(harvesterConsumerService.listRecordHeaders(any(Repo.class), any())).thenReturn(recordHeaderList);
+    var recordHeaderMap = objectMapper.<List<RecordHeader>>readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE, collectionType)
+          .stream().collect(Collectors.toMap(RecordHeader::getIdentifier, recordHeader -> recordHeader));
+      when(harvesterConsumerService.listRecordHeaders(any(Repo.class), any())).thenReturn(objectMapper.readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE, collectionType));
     // mock record requests from each header
-    when(harvesterConsumerService.getRecord(any(Repo.class), eq("998"))).thenReturn(getSyntheticCmmStudy("998"));
-    when(harvesterConsumerService.getRecord(any(Repo.class), eq("997"))).thenReturn(getSyntheticCmmStudy("997"));
+    when(harvesterConsumerService.getRecord(any(Repo.class), eq(recordHeaderMap.get("998")))).thenReturn(getSyntheticCmmStudy("998"));
+    when(harvesterConsumerService.getRecord(any(Repo.class), eq(recordHeaderMap.get("997")))).thenReturn(getSyntheticCmmStudy("997"));
     // mock for ES bulking
     when(esIndexer.bulkIndex(anyList(), anyString())).thenReturn(true);
     when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
@@ -94,12 +96,13 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
 
     // mock for our record headers
     harvesterConsumerService = mock(HarvesterConsumerService.class);
-    CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class);
-    List<RecordHeader> recordHeaderList = objectMapper.readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE, collectionType);
-    when(harvesterConsumerService.listRecordHeaders(any(Repo.class), any())).thenReturn(recordHeaderList);
-    // mock record requests from each header
-    when(harvesterConsumerService.getRecord(any(Repo.class), eq("998"))).thenReturn(getSyntheticCmmStudy("998"));
-    when(harvesterConsumerService.getRecord(any(Repo.class), eq("997"))).thenReturn(getSyntheticCmmStudy("997"));
+      CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class);
+      var recordHeaderMap = objectMapper.<List<RecordHeader>>readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE, collectionType)
+          .stream().collect(Collectors.toMap(RecordHeader::getIdentifier, recordHeader -> recordHeader));
+      when(harvesterConsumerService.listRecordHeaders(any(Repo.class), any())).thenReturn(objectMapper.readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE, collectionType));
+      // mock record requests from each header
+      when(harvesterConsumerService.getRecord(any(Repo.class), eq(recordHeaderMap.get("998")))).thenReturn(getSyntheticCmmStudy("998"));
+      when(harvesterConsumerService.getRecord(any(Repo.class), eq(recordHeaderMap.get("997")))).thenReturn(getSyntheticCmmStudy("997"));
     // mock for ES bulking
     when(esIndexer.bulkIndex(anyList(), anyString())).thenReturn(true);
     when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
@@ -125,7 +128,7 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
       verifyNoMoreInteractions(appConfigurationProperties);
 
       verify(harvesterConsumerService, times(1)).listRecordHeaders(any(Repo.class), any());
-      verify(harvesterConsumerService, times(2)).getRecord(any(Repo.class), anyString());
+      verify(harvesterConsumerService, times(2)).getRecord(any(Repo.class), any(RecordHeader.class));
       verifyNoMoreInteractions(harvesterConsumerService);
 
       // No bulk attempt should have been made for "sv" as it does not have the minimum valid cmm fields
@@ -145,16 +148,17 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     harvesterConsumerService = mock(HarvesterConsumerService.class);
     CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class);
     List<RecordHeader> recordHeaderList = objectMapper.readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE, collectionType);
+    var recordHeaderMap = recordHeaderList.stream().collect(Collectors.toMap(RecordHeader::getIdentifier, recordHeader -> recordHeader));
     List<RecordHeader> recordHeaderListIncrement = objectMapper.readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE_WITH_INCREMENT, collectionType);
     when(harvesterConsumerService.listRecordHeaders(any(Repo.class), any()))
             .thenReturn(recordHeaderList) // First call
             .thenReturn(recordHeaderListIncrement); // Second call / Incremental run
 
     // mock record requests from each header
-    when(harvesterConsumerService.getRecord(any(Repo.class), eq("998"))).thenReturn(getSyntheticCmmStudy("998"));
-    when(harvesterConsumerService.getRecord(any(Repo.class), eq("997"))).thenReturn(getSyntheticCmmStudy("997"));
-    when(harvesterConsumerService.getRecord(any(Repo.class), eq("999"))).thenReturn(getSyntheticCmmStudy("999"));
-    when(harvesterConsumerService.getRecord(any(Repo.class), eq("1000"))).thenReturn(getSyntheticCmmStudy("1000"));
+    when(harvesterConsumerService.getRecord(any(Repo.class), eq(recordHeaderMap.get("998")))).thenReturn(getSyntheticCmmStudy("998"));
+    when(harvesterConsumerService.getRecord(any(Repo.class), eq(recordHeaderMap.get("997")))).thenReturn(getSyntheticCmmStudy("997"));
+    when(harvesterConsumerService.getRecord(any(Repo.class), eq(recordHeaderMap.get("999")))).thenReturn(getSyntheticCmmStudy("999"));
+    when(harvesterConsumerService.getRecord(any(Repo.class), eq(recordHeaderMap.get("1000")))).thenReturn(getSyntheticCmmStudy("1000"));
 
     // mock for ES methods
     when(esIndexer.bulkIndex(anyList(), anyString())).thenReturn(true);
@@ -180,7 +184,7 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
 
       verify(harvesterConsumerService, times(2)).listRecordHeaders(any(Repo.class), any());
       // Expects 5 GetRecord call 2 from Full run and 3 from incremental run (minuses old lastModified record)
-      verify(harvesterConsumerService, times(5)).getRecord(any(Repo.class), anyString());
+      verify(harvesterConsumerService, times(5)).getRecord(any(Repo.class), any(RecordHeader.class));
       verifyNoMoreInteractions(harvesterConsumerService);
 
       verify(esIndexer, times(1)).getMostRecentLastModified(); // Call by incremental run to get LastModified

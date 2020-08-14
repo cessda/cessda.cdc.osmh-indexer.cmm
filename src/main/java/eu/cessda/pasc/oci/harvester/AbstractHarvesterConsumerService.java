@@ -16,8 +16,9 @@
 package eu.cessda.pasc.oci.harvester;
 
 import eu.cessda.pasc.oci.models.RecordHeader;
+import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
+import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.parser.TimeUtility;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
@@ -25,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -38,6 +38,15 @@ abstract class AbstractHarvesterConsumerService implements HarvesterConsumerServ
 
     protected static final String FAILED_TO_GET_STUDY_ID = "[{}] Failed to get StudyId [{}]: {}";
 
+    @Override
+    public Optional<CMMStudy> getRecord(Repo repo, RecordHeader recordHeader) {
+        // Handle deleted records
+        if (recordHeader.isDeleted()) {
+            return Optional.of(createInactiveRecord(recordHeader));
+        }
+        return getRecordFromRemote(repo,recordHeader);
+    }
+
     /**
      * Filter records that are newer than the specified last modified date.
      * <p/>
@@ -47,10 +56,10 @@ abstract class AbstractHarvesterConsumerService implements HarvesterConsumerServ
      * @param ingestedLastModifiedDate the last modified date to filter by, can be null.
      * @return a list of filtered records.
      */
-    protected List<RecordHeader> filterRecords(@NonNull Collection<RecordHeader> unfilteredRecordHeaders, LocalDateTime ingestedLastModifiedDate) {
+    protected List<RecordHeader> filterRecords(Collection<RecordHeader> unfilteredRecordHeaders, LocalDateTime ingestedLastModifiedDate) {
         if (ingestedLastModifiedDate != null) {
             List<RecordHeader> filteredHeaders = unfilteredRecordHeaders.stream()
-                .filter(isHeaderTimeGreater(ingestedLastModifiedDate))
+                .filter(recordHeader ->  isHeaderTimeGreater(recordHeader, ingestedLastModifiedDate))
                 .collect(Collectors.toList());
 
             log.info("Returning [{}] filtered recordHeaders by date greater than [{}] | out of [{}] unfiltered.",
@@ -66,16 +75,28 @@ abstract class AbstractHarvesterConsumerService implements HarvesterConsumerServ
         return new ArrayList<>(unfilteredRecordHeaders);
     }
 
-    private Predicate<RecordHeader> isHeaderTimeGreater(LocalDateTime lastModifiedDate) {
-        return recordHeader -> {
-            String lastModified = recordHeader.getLastModified();
-            Optional<LocalDateTime> currentHeaderLastModified = TimeUtility.getLocalDateTime(lastModified);
-            return currentHeaderLastModified
-                .map(localDateTime -> localDateTime.isAfter(lastModifiedDate))
-                .orElseGet(() -> {
-                    log.warn("Could not parse RecordIdentifier lastModifiedDate [{}]. Filtering out from list.", lastModified);
-                    return false;
-                });
-        };
+    protected abstract Optional<CMMStudy> getRecordFromRemote(Repo repo,RecordHeader recordHeader);
+
+    /**
+     * Creates an inactive {@link CMMStudy} using the details in the record header.
+     * <p>
+     *
+     * @param recordHeader the deleted record header
+     */
+    private CMMStudy createInactiveRecord(RecordHeader recordHeader) {
+        return CMMStudy.builder().active(false)
+            .studyNumber(recordHeader.getIdentifier())
+            .lastModified(recordHeader.getLastModified())
+            .build();
+    }
+
+    private boolean isHeaderTimeGreater(RecordHeader recordHeader, LocalDateTime lastModifiedDate) {
+        String lastModified = recordHeader.getLastModified();
+        Optional<LocalDateTime> currentHeaderLastModified = TimeUtility.getLocalDateTime(lastModified);
+        return currentHeaderLastModified.map(localDateTime -> localDateTime.isAfter(lastModifiedDate))
+            .orElseGet(() -> {
+                log.warn("Could not parse RecordIdentifier lastModifiedDate [{}]. Filtering out from list.", lastModified);
+                return false;
+            });
     }
 }

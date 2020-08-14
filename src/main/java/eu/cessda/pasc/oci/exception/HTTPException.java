@@ -22,11 +22,13 @@ import java.io.IOException;
 import java.io.Serializable;
 
 /**
- * Exception for external encountered Exceptions
+ * Exception for HTTP level failures that prevent a request from completing.
+ * The body of the HTTP response is stored for logging purposes.
  *
  * @author moses AT doraventures DOT com
+ * @author Matthew Morris
  */
-public class ExternalSystemException extends IOException {
+public class HTTPException extends IOException {
 
   private static final long serialVersionUID = 928798312826959273L;
 
@@ -38,7 +40,7 @@ public class ExternalSystemException extends IOException {
    * @param statusCode           the status code of the external response that caused this exception
    * @param externalResponseBody the body of the external response that caused this exception
    */
-  public ExternalSystemException(int statusCode, @NonNull String externalResponseBody) {
+  public HTTPException(int statusCode, @NonNull String externalResponseBody) {
     super(String.format("Server returned %d", statusCode));
     externalResponse = new ExternalResponse(externalResponseBody, statusCode);
   }

@@ -16,13 +16,14 @@
 package eu.cessda.pasc.oci.harvester;
 
 import eu.cessda.pasc.oci.configurations.UtilitiesConfiguration;
-import eu.cessda.pasc.oci.exception.InternalSystemException;
+import eu.cessda.pasc.oci.exception.HarvesterException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.mock.data.RecordHeadersMock;
 import eu.cessda.pasc.oci.mock.data.ReposTestData;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.repository.DaoBase;
+import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -52,7 +53,7 @@ public class RecordHeaderParserTest {
     }
 
     @Test
-    public void shouldReturnRecordHeadersForGivenRepo() throws IOException, InternalSystemException, OaiPmhException {
+    public void shouldReturnRecordHeadersForGivenRepo() throws IOException, HarvesterException {
 
         // Given
         Repo ukdsEndpoint = ReposTestData.getUKDSRepo();
@@ -72,7 +73,7 @@ public class RecordHeaderParserTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouldThrowWhenRequestForHeaderFails() throws IOException, InternalSystemException, OaiPmhException {
+    public void shouldThrowWhenRequestForHeaderFails() throws IOException, HarvesterException {
 
         // Given
         Repo ukdsEndpoint = ReposTestData.getUKDSRepo();
@@ -88,7 +89,7 @@ public class RecordHeaderParserTest {
 
     @Test
     public void shouldRecursivelyLoopThroughTheOaiPMHResponseResumptionTokenToRetrieveReposCompleteListSize()
-        throws IOException, InternalSystemException, OaiPmhException {
+        throws IOException, HarvesterException {
 
         // Given
         Repo ukdsEndpoint = ReposTestData.getUKDSRepo();
@@ -127,7 +128,7 @@ public class RecordHeaderParserTest {
     }
 
     @Test(expected = OaiPmhException.class)
-    public void shouldThrowExceptionForRecordHeadersInvalidMetadataToken() throws IOException, InternalSystemException, OaiPmhException {
+    public void shouldThrowExceptionForRecordHeadersInvalidMetadataToken() throws IOException, HarvesterException {
 
         // Given
         Repo ukdsEndpoint = ReposTestData.getUKDSRepo();
@@ -141,5 +142,22 @@ public class RecordHeaderParserTest {
 
         // When
         recordHeaderParser.getRecordHeaders(ukdsEndpoint);
+    }
+
+    @Test
+    public void shouldReturnDeletedRecordHeaderWhenStudyIsDeleted() throws IOException, HarvesterException {
+        // Given
+        Repo ukdsEndpoint = ReposTestData.getUKDSRepo();
+
+        String fullListRecordRepoUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=ListIdentifiers&metadataPrefix=ddi";
+
+        String mockRecordHeadersXml = RecordHeadersMock.getListIdentifiersXMLWithADeletedRecord();
+        given(daoBase.getInputStream(URI.create(fullListRecordRepoUrl))).willReturn(
+            new ByteArrayInputStream(mockRecordHeadersXml.getBytes(StandardCharsets.UTF_8))
+        );
+
+        // When
+        List<RecordHeader> recordHeaders = recordHeaderParser.getRecordHeaders(ukdsEndpoint);
+        Assert.assertTrue(recordHeaders.get(0).isDeleted());
     }
 }

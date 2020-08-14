@@ -16,23 +16,23 @@
 package eu.cessda.pasc.oci.exception;
 
 /**
- * Exception for internally encountered Exceptions
+ * Exception for problems that prevent proper harvesting.
  *
  * @author moses AT doraventures DOT com
  */
-public class InternalSystemException extends Exception {
+public class HarvesterException extends Exception {
 
     private static final long serialVersionUID = -1848837478104997356L;
 
-    public InternalSystemException(String message) {
+    public HarvesterException(String message) {
         super(message);
     }
 
-    public InternalSystemException(String message, Throwable cause) {
+    public HarvesterException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public InternalSystemException(Throwable cause) {
+    public HarvesterException(Throwable cause) {
         super(cause);
     }
 }

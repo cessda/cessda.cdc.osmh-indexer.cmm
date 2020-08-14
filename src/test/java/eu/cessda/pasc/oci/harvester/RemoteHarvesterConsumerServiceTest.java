@@ -18,7 +18,7 @@ package eu.cessda.pasc.oci.harvester;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.cessda.pasc.oci.AbstractSpringTestProfileContext;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
-import eu.cessda.pasc.oci.exception.ExternalSystemException;
+import eu.cessda.pasc.oci.exception.HTTPException;
 import eu.cessda.pasc.oci.models.ErrorMessage;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
@@ -61,10 +61,11 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
     private final FileHandler fileHandler = new FileHandler();
     @Autowired
     AppConfigurationProperties appConfigurationProperties;
-    @Autowired
-    ObjectMapper objectMapper;
+    private static final RecordHeader STUDY_NUMBER = RecordHeader.builder().identifier("4124325").build();
     @Autowired
     CMMStudyConverter cmmStudyConverter;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     /**
      * Class to test
      */
@@ -163,9 +164,9 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
 
         var jsonMessage = objectMapper.writeValueAsString(new ErrorMessage("Mocked server error!"));
 
-        when(daoBase.getInputStream(any(URI.class))).thenThrow(new ExternalSystemException(500, jsonMessage));
+        when(daoBase.getInputStream(any(URI.class))).thenThrow(new HTTPException(500, jsonMessage));
 
-        Optional<CMMStudy> actualRecord = remoteHarvesterConsumerService.getRecord(repoMock, "4124325");
+        Optional<CMMStudy> actualRecord = remoteHarvesterConsumerService.getRecord(repoMock, STUDY_NUMBER);
 
         // Then exception is thrown caught and an empty list returned
         then(actualRecord.isPresent()).isFalse();
@@ -178,9 +179,9 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
         when(repoMock.getUrl()).thenReturn(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
         when(repoMock.getHandler()).thenReturn("NESSTAR");
 
-        when(daoBase.getInputStream(any(URI.class))).thenThrow(new ExternalSystemException(500, "Not a JSON string"));
+        when(daoBase.getInputStream(any(URI.class))).thenThrow(new HTTPException(500, "Not a JSON string"));
 
-        Optional<CMMStudy> actualRecord = remoteHarvesterConsumerService.getRecord(repoMock, "4124325");
+        Optional<CMMStudy> actualRecord = remoteHarvesterConsumerService.getRecord(repoMock, STUDY_NUMBER);
 
         // Then exception is thrown caught and an empty list returned
         then(actualRecord.isPresent()).isFalse();
@@ -195,7 +196,7 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
 
         when(daoBase.getInputStream(any(URI.class))).thenThrow(IOException.class);
 
-        Optional<CMMStudy> actualRecord = remoteHarvesterConsumerService.getRecord(repoMock, "4124325");
+        Optional<CMMStudy> actualRecord = remoteHarvesterConsumerService.getRecord(repoMock, STUDY_NUMBER);
 
         // Then exception is thrown caught and an empty list returned
         then(actualRecord.isPresent()).isFalse();
@@ -204,7 +205,7 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
     @Test
     public void shouldReturnASuccessfulResponseGetRecord() throws IOException {
         String recordUkds998 = fileHandler.getFileAsString("record_ukds_998.json");
-        String recordID = "998";
+        var recordID = RecordHeader.builder().identifier("998").build();
         URI expectedUrl = URI.create("http://localhost:9091/v0/GetRecord/CMMStudy/998?Repository=" +
             URLEncoder.encode("https://oai.ukdataservice.ac.uk:8443/oai/provider", StandardCharsets.UTF_8));
 
@@ -228,7 +229,7 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
     @Test
     public void shouldReturnDeletedRecordMarkedAsInactive() throws IOException {
         String recordUkds1031 = fileHandler.getFileAsString("record_ukds_1031_deleted.json");
-        String recordID = "1031";
+        var recordID = RecordHeader.builder().identifier("1031").build();
         URI expectedUrl = URI.create("http://localhost:9091/v0/GetRecord/CMMStudy/1031?Repository=" +
             URLEncoder.encode("https://oai.ukdataservice.ac.uk:8443/oai/provider", StandardCharsets.UTF_8));
 
@@ -254,8 +255,8 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
     @Test
     public void shouldAddLanguageOverrideIfPresent() throws IOException {
         String recordUkds998 = fileHandler.getFileAsString("record_ukds_998.json");
-        String recordID = "998";
-        URI expectedUrl = URI.create("http://localhost:9091/v0/GetRecord/CMMStudy/" + recordID + "?Repository=" +
+        var recordID = RecordHeader.builder().identifier("998").build();
+        URI expectedUrl = URI.create("http://localhost:9091/v0/GetRecord/CMMStudy/" + recordID.getIdentifier() + "?Repository=" +
             URLEncoder.encode("https://oai.ukdataservice.ac.uk:8443/oai/provider", StandardCharsets.UTF_8) +
             "&defaultLanguage=zz");
 

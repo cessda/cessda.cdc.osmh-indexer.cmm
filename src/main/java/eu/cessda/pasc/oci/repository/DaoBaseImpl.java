@@ -15,7 +15,7 @@
  */
 package eu.cessda.pasc.oci.repository;
 
-import eu.cessda.pasc.oci.exception.ExternalSystemException;
+import eu.cessda.pasc.oci.exception.HTTPException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -75,7 +75,7 @@ public class DaoBaseImpl implements DaoBase {
 
             // The HTTP request wasn't successful, attempt to read the body
             try (InputStream body = httpResponse.body()) {
-                throw new ExternalSystemException(
+                throw new HTTPException(
                         httpResponse.statusCode(),
                         new String(body.readAllBytes(), StandardCharsets.UTF_8)
                 );

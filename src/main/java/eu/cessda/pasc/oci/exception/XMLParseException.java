@@ -15,13 +15,28 @@
  */
 package eu.cessda.pasc.oci.exception;
 
+import lombok.Getter;
+
 import java.net.URI;
 
-public class XMLParseException extends InternalSystemException {
+/**
+ * Thrown when an error occurs parsing XML.
+ */
+@Getter
+public class XMLParseException extends HarvesterException {
 
     private static final long serialVersionUID = -1280955307589066817L;
 
+    private final URI xmlSource;
+
+    /**
+     * Constructs a new exception with the specified XML source and caught exception.
+     *
+     * @param xmlSource The URL that the XML was located at.
+     * @param cause The exception that caused the XML parsing to fail.
+     */
     public XMLParseException(URI xmlSource, Throwable cause) {
         super(String.format("Parsing %s failed: %s", xmlSource, cause), cause);
+        this.xmlSource = xmlSource;
     }
 }

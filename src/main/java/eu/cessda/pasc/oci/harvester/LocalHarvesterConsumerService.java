@@ -16,7 +16,7 @@
 package eu.cessda.pasc.oci.harvester;
 
 import eu.cessda.pasc.oci.LoggingConstants;
-import eu.cessda.pasc.oci.exception.InternalSystemException;
+import eu.cessda.pasc.oci.exception.HarvesterException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
@@ -63,34 +63,34 @@ public class LocalHarvesterConsumerService extends AbstractHarvesterConsumerServ
                     value(LoggingConstants.OAI_ERROR_CODE, e.getCode())
                 )
             );
-        } catch (InternalSystemException e) {
+        } catch (HarvesterException e) {
             log.error("[{}] ListRecordHeaders failed:", value(LoggingConstants.REPO_NAME, repo.getCode()), e);
         }
         return Collections.emptyList();
     }
 
     @Override
-    public Optional<CMMStudy> getRecord(Repo repo, String studyNumber) {
+    public Optional<CMMStudy> getRecordFromRemote(Repo repo, RecordHeader recordHeader) {
         try {
-            return Optional.of(getRecordService.getRecord(repo, studyNumber));
+            return Optional.of(getRecordService.getRecord(repo, recordHeader.getIdentifier()));
         } catch (OaiPmhException e) {
             e.getOaiErrorMessage().ifPresentOrElse(
                 oaiErrorMessage -> log.warn(FAILED_TO_GET_STUDY_ID + ": {}",
                     repo.getCode(),
-                    value(LoggingConstants.STUDY_ID, studyNumber),
+                    value(LoggingConstants.STUDY_ID, recordHeader.getIdentifier()),
                     value(LoggingConstants.OAI_ERROR_CODE, e.getCode()),
                     value(LoggingConstants.OAI_ERROR_MESSAGE, oaiErrorMessage)
                 ),
                 () -> log.warn(FAILED_TO_GET_STUDY_ID,
                     repo.getCode(),
-                    value(LoggingConstants.STUDY_ID, studyNumber),
+                    value(LoggingConstants.STUDY_ID, recordHeader.getIdentifier()),
                     value(LoggingConstants.OAI_ERROR_CODE, e.getCode())
                 )
             );
-        } catch (InternalSystemException e) {
+        } catch (HarvesterException e) {
             log.warn(FAILED_TO_GET_STUDY_ID,
                 value(LoggingConstants.REPO_NAME, repo.getCode()),
-                value(LoggingConstants.STUDY_ID, studyNumber),
+                value(LoggingConstants.STUDY_ID, recordHeader.getIdentifier()),
                 e.toString()
             );
         }

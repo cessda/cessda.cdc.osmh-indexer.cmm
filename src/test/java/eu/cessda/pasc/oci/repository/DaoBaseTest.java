@@ -19,7 +19,7 @@ import com.pgssoft.httpclient.HttpClientMock;
 import com.pgssoft.httpclient.MockedServerResponse;
 import eu.cessda.pasc.oci.AbstractSpringTestProfileContext;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
-import eu.cessda.pasc.oci.exception.ExternalSystemException;
+import eu.cessda.pasc.oci.exception.HTTPException;
 import lombok.SneakyThrows;
 import org.junit.Assert;
 import org.junit.Test;
@@ -84,7 +84,7 @@ public class DaoBaseTest extends AbstractSpringTestProfileContext {
         DaoBaseImpl daoBase = new DaoBaseImpl(httpClient);
         try (InputStream inputStream = daoBase.getInputStream(expectedUrl)) {
             Assert.fail(new String(inputStream.readAllBytes(), Charset.defaultCharset()));
-        } catch (ExternalSystemException e) {
+        } catch (HTTPException e) {
             Assert.assertEquals(expectedStatusCode, e.getExternalResponse().getStatusCode());
         }
     }

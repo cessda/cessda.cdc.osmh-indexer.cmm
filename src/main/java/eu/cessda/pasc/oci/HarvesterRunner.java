@@ -192,7 +192,7 @@ public class HarvesterRunner {
             // If the harvest is cancelled, prevent the retrieval of any more records
             .filter(recordHeader -> indexerRunning.get())
             .filter(recordHeader -> !recordHeader.isDeleted())
-            .map(recordHeader -> harvester.getRecord(repo, recordHeader.getIdentifier()))
+            .map(recordHeader -> harvester.getRecord(repo, recordHeader))
             .filter(Optional::isPresent)
             .map(Optional::get)
             .collect(Collectors.toList());

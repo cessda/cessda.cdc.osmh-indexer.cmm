@@ -15,8 +15,9 @@
  */
 package eu.cessda.pasc.oci.harvester;
 
-import eu.cessda.pasc.oci.exception.InternalSystemException;
+import eu.cessda.pasc.oci.exception.HarvesterException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
+import eu.cessda.pasc.oci.exception.XMLParseException;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.parser.CMMStudyMapper;
@@ -54,22 +55,22 @@ class GetRecordService {
         this.cmmStudyMapper = cmmStudyMapper;
     }
 
-    public CMMStudy getRecord(Repo repo, String studyIdentifier) throws InternalSystemException, OaiPmhException {
+    public CMMStudy getRecord(Repo repo, String studyIdentifier) throws HarvesterException {
         log.debug("[{}] Querying for StudyID [{}]", repo.getCode(), studyIdentifier);
         URI fullUrl = null;
         try {
             fullUrl = OaiPmhHelpers.buildGetStudyFullUrl(repo, studyIdentifier);
             try (InputStream recordXML = daoBase.getInputStream(fullUrl)) {
-                return mapDDIRecordToCMMStudy(recordXML, repo).studyXmlSourceUrl(fullUrl.toString()).build();
+                return mapDDIRecordToCMMStudy(recordXML, fullUrl, repo);
             }
         } catch (JDOMException | IOException e) {
-            throw new InternalSystemException(String.format("Unable to parse xml! FullUrl [%s]: %s", fullUrl, e), e);
+            throw new XMLParseException(fullUrl, e);
         } catch (URISyntaxException e) {
-            throw new InternalSystemException(e);
+            throw new HarvesterException(e);
         }
     }
 
-    private CMMStudy.CMMStudyBuilder mapDDIRecordToCMMStudy(InputStream recordXML, Repo repository) throws JDOMException, IOException, OaiPmhException {
+    private CMMStudy mapDDIRecordToCMMStudy(InputStream recordXML, URI sourceUri, Repo repository) throws JDOMException, IOException, OaiPmhException {
 
         CMMStudy.CMMStudyBuilder builder = CMMStudy.builder();
         Document document = getSaxBuilder().build(recordXML);
@@ -108,7 +109,7 @@ class GetRecordService {
             builder.dataCollectionYear(dataCollectionPeriod.getDataCollectionYear());
             builder.dataCollectionFreeTexts(cmmStudyMapper.parseDataCollectionFreeTexts(document, defaultLangIsoCode));
         }
-        return builder;
+        return builder.studyXmlSourceUrl(sourceUri.toString()).build();
     }
 
     private SAXBuilder getSaxBuilder() {
