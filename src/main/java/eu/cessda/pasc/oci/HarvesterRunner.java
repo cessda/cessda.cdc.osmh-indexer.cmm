@@ -191,7 +191,6 @@ public class HarvesterRunner {
         List<CMMStudy> presentCMMStudies = recordHeaders.stream()
             // If the harvest is cancelled, prevent the retrieval of any more records
             .filter(recordHeader -> indexerRunning.get())
-            .filter(recordHeader -> !recordHeader.isDeleted())
             .map(recordHeader -> harvester.getRecord(repo, recordHeader))
             .filter(Optional::isPresent)
             .map(Optional::get)
@@ -214,7 +213,6 @@ public class HarvesterRunner {
     }
 
     @PreDestroy
-    @SuppressWarnings("unused")
     private void shutdown() {
         if (indexerRunning.getAndSet(false)) {
             log.info("Harvest cancelled");

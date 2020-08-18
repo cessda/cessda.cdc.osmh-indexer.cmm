@@ -34,7 +34,7 @@ public class ListIdentifiersResponseValidator {
      * @throws OaiPmhException         if an {@literal <error>} element was present.
      * @throws HarvesterException if the given document has no OAI element.
      */
-    public static void validateResponse(Document document) throws HarvesterException, OaiPmhException {
+    public static void validateResponse(Document document) throws HarvesterException {
         Optional<NodeList> oAINode = Optional.ofNullable(document.getElementsByTagName(OaiPmhConstants.OAI_PMH));
 
         if (oAINode.isEmpty()) {
