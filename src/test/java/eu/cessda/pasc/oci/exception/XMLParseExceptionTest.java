@@ -13,25 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.repository;
+package eu.cessda.pasc.oci.exception;
 
-import eu.cessda.pasc.oci.exception.HTTPException;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 
-/**
- * Interface for HTTP client methods.
- */
-public interface DaoBase {
-    /**
-     * Performs a HTTP Get request to the specified URL.
-     *
-     * @return An {@link InputStream} of the response body.
-     * @throws HTTPException if the server returns a failure code.
-     *                                 The status code and the body of the response will be attached to the exception.
-     * @throws IOException             if an IO Error occurs.
-     */
-    InputStream getInputStream(URI uri) throws IOException;
+public class XMLParseExceptionTest {
+    @Test
+    public void shouldInstance() {
+        // When
+        var uri = URI.create("http://example.local/xml");
+        var cause = new IOException();
+
+        // Then
+        var xmlException = new XMLParseException(uri, cause);
+
+        // Should contain the url and cause
+        Assert.assertEquals(uri, xmlException.getXmlSource());
+        Assert.assertEquals(cause, xmlException.getCause());
+    }
 }

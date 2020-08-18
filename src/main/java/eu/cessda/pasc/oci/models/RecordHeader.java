@@ -29,7 +29,8 @@ import lombok.*;
     "lastModified",
     "type",
     "recordType",
-    "identifier"
+    "identifier",
+    "deleted"
 })
 @Builder
 @NoArgsConstructor
@@ -39,16 +40,21 @@ import lombok.*;
 @ToString
 public class RecordHeader {
 
-  @JsonProperty("lastModified")
-  private String lastModified;
-  @JsonProperty("type")
-  private String type;
-  @JsonProperty("recordType")
-  private String recordType;
-  @JsonProperty("identifier")
-  private String identifier;
+    @JsonProperty("lastModified")
+    private String lastModified;
+    @JsonProperty("type")
+    private String type;
+    @JsonProperty("recordType")
+    private String recordType;
+    @JsonProperty("identifier")
+    private String identifier;
+    /**
+     * Deletion status on the remote repository
+     */
+    @JsonProperty("deleted")
+    private boolean deleted;
 
-  public void setIdentifier(String identifier) {
-    this.identifier = CharMatcher.breakingWhitespace().removeFrom(identifier);
-  }
+    public void setIdentifier(String identifier) {
+        this.identifier = CharMatcher.breakingWhitespace().removeFrom(identifier);
+    }
 }

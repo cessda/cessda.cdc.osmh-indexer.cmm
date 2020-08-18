@@ -51,12 +51,11 @@ public class CMMStudyMapper {
 
     private final OaiPmh oaiPmh;
     private final DocElementParser docElementParser;
-    private final XPathFactory xFactory;
+    private final XPathFactory xFactory = XPathFactory.instance();
 
     @Autowired
-    public CMMStudyMapper(DocElementParser docElementParser, XPathFactory xFactory, HandlerConfigurationProperties handlerConfigurationProperties) {
+    public CMMStudyMapper(DocElementParser docElementParser, HandlerConfigurationProperties handlerConfigurationProperties) {
         this.docElementParser = docElementParser;
-        this.xFactory = xFactory;
         this.oaiPmh = handlerConfigurationProperties.getOaiPmh();
     }
 
@@ -283,17 +282,17 @@ public class CMMStudyMapper {
      */
     public Map<String, String> parseStudyUrl(Document document, String langCode) {
 
-        List<Element> docDscrElement = docElementParser.getElements(document, STUDY_URL_DOC_DSCR_XPATH);
-        List<Element> stdyDscrElements = docElementParser.getElements(document, STUDY_URL_STDY_DSCR_XPATH);
-        Map<String, String> urlFromDocDscr =
-            docElementParser.getLanguageKeyValuePairs(docDscrElement, false, langCode, uriStrategyFunction());
-        Map<String, String> urlFromStdyDscr =
-            docElementParser.getLanguageKeyValuePairs(stdyDscrElements, false, langCode, uriStrategyFunction());
+        var docDscrElement = docElementParser.getElements(document, STUDY_URL_DOC_DSCR_XPATH);
+        var stdyDscrElements = docElementParser.getElements(document, STUDY_URL_STDY_DSCR_XPATH);
+        var urlFromDocDscr = docElementParser.getLanguageKeyValuePairs(docDscrElement, false, langCode, uriStrategyFunction());
+        var urlFromStdyDscr = docElementParser.getLanguageKeyValuePairs(stdyDscrElements, false, langCode, uriStrategyFunction());
 
-        Map<String, String> mergedStudyUrls = new HashMap<>(urlFromDocDscr);
-        urlFromStdyDscr.forEach((k, v) -> mergedStudyUrls.merge(k, v, (docDscrValue, stdyDscrValue) -> docDscrValue));
+        var mergedStudyUrls = new HashMap<>(urlFromDocDscr);
+
+        // If absent, use the URL from mergedStudyUrls
+        urlFromStdyDscr.forEach(mergedStudyUrls::putIfAbsent);
+
         return mergedStudyUrls;
-
     }
 
     /**

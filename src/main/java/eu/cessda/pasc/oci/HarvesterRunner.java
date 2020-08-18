@@ -189,12 +189,13 @@ public class HarvesterRunner {
         List<RecordHeader> recordHeaders = harvester.listRecordHeaders(repo, lastModifiedDateTime);
 
         List<CMMStudy> presentCMMStudies = recordHeaders.stream()
-                // If the harvest is cancelled, prevent the retrieval of any more records
-                .filter(recordHeader -> indexerRunning.get())
-                .map(recordHeader -> harvester.getRecord(repo, recordHeader.getIdentifier()))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
+            // If the harvest is cancelled, prevent the retrieval of any more records
+            .filter(recordHeader -> indexerRunning.get())
+            .filter(recordHeader -> !recordHeader.isDeleted())
+            .map(recordHeader -> harvester.getRecord(repo, recordHeader))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .collect(Collectors.toList());
 
         log.info("[{}] Retrieved [{}] studies from [{}] header entries. [{}] studies couldn't be retrieved.",
                 value(LoggingConstants.REPO_NAME, repo.getCode()),
@@ -215,6 +216,8 @@ public class HarvesterRunner {
     @PreDestroy
     @SuppressWarnings("unused")
     private void shutdown() {
-        indexerRunning.set(false);
+        if (indexerRunning.getAndSet(false)) {
+            log.info("Harvest cancelled");
+        }
     }
 }

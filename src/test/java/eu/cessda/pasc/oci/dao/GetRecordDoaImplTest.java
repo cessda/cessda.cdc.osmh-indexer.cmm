@@ -16,7 +16,7 @@
 package eu.cessda.pasc.oci.dao;
 
 import com.pgssoft.httpclient.HttpClientMock;
-import eu.cessda.pasc.oci.exception.ExternalSystemException;
+import eu.cessda.pasc.oci.exception.HTTPException;
 import eu.cessda.pasc.oci.repository.DaoBaseImpl;
 import org.junit.Test;
 
@@ -53,7 +53,7 @@ public class GetRecordDoaImplTest {
     }
 
     @SuppressWarnings("resource")
-    @Test(expected = ExternalSystemException.class)
+    @Test(expected = HTTPException.class)
     public void shouldThrowExceptionWhenRemoteServerResponseIsNotSuccessful() throws IOException {
 
         // Given

@@ -200,8 +200,9 @@ public class MicrometerMetrics implements Metrics {
      *
      * @param studies a collection of studies to extract publisher information from.
      * @throws ElasticsearchException if Elasticsearch is unavailable.
+     * @deprecated - redundant - see {@link}
      */
-    // TODO: Determine if this is redundant
+    @Deprecated(forRemoval = true)
     void updatePublisherRecordsMetric(Collection<CMMStudyOfLanguage> studies) {
         log.debug(UPDATING_METRIC, LIST_RECORDS_PUBLISHER);
         var hitCountPerPublisher = new HashMap<Publisher, AtomicInteger>();

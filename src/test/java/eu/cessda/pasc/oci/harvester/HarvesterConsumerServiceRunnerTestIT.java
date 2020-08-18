@@ -63,7 +63,7 @@ public class HarvesterConsumerServiceRunnerTestIT {
             "\nPrinting Report for all repos" +
             "\n#############################");
         countReport.forEach((repo, headerCount) -> log.info("Header count for {}: [{}]", repo, headerCount));
-        long sum = countReport.values().stream().mapToLong(l -> l).sum();
+        int sum = countReport.values().stream().reduce(0, Integer::sum);
         log.info("Total Count: [{}]", sum);
     }
 
@@ -73,13 +73,13 @@ public class HarvesterConsumerServiceRunnerTestIT {
 
         // We are only interested in the first valid record
         recordHeaders.stream().map(recordHeader -> {
-            var record = localHarvesterConsumerService.getRecord(repo, recordHeader.getIdentifier()).orElse(null);
+            var record = localHarvesterConsumerService.getRecord(repo, recordHeader).orElse(null);
             log.info("|------------------------------Record Header----------------------------------------|");
             log.info(recordHeader.toString());
             log.info("|------------------------------Record CmmStudy--------------------------------------|");
             log.info(String.valueOf(record));
             return record;
-        }).filter(Objects::nonNull).findFirst().orElseThrow(); // If no records can be retrieved, fail the test
+        }).filter(Objects::nonNull).findAny().orElseThrow(); // If no records can be retrieved, fail the test
 
         return recordHeaders.size();
     }

@@ -172,4 +172,25 @@ public final class RecordHeadersMock {
             "  <error code=\"cannotDisseminateFormat\">Metadata format not supported by this repository</error>\n" +
             "</OAI-PMH>";
   }
+
+  public static String getListIdentifiersXMLWithADeletedRecord() {
+      return "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
+          "<?xml-stylesheet type='text/xsl' href='oai2.xsl' ?>\n" +
+          "<OAI-PMH xmlns=\"http://www.openarchives.org/OAI/2.0/\"\n" +
+          "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+          "         xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/\n" +
+          " http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd\">\n" +
+          "<responseDate>2018-01-10T16:31:14Z</responseDate>\n" +
+          "<request verb=\"ListIdentifiers\" metadataPrefix=\"ddi\" from=\"2016-06-01\">\n" +
+          "    https://oai.ukdataservice.ac.uk:8443/oai/provider</request>\n" +
+          "<ListIdentifiers>\n" +
+          "    <header status=\"deleted\">\n" +
+          "        <identifier>1031</identifier>\n" +
+          "        <datestamp>2017-05-02T08:31:32Z</datestamp>\n" +
+          "        <setSpec>DataCollections</setSpec>\n" +
+          "    </header>\n" +
+          "    <resumptionToken completeListSize=\"1\" cursor=\"0\"></resumptionToken>\n" +
+          "</ListIdentifiers>\n" +
+          "</OAI-PMH>";
+  }
 }

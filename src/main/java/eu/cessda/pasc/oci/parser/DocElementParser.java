@@ -31,7 +31,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static eu.cessda.pasc.oci.parser.HTMLFilter.cleanCharacterReturns;
@@ -48,12 +47,11 @@ import static java.util.stream.Collectors.toList;
 class DocElementParser {
 
   private final OaiPmh oaiPmh;
-  private final XPathFactory xFactory;
+  private final XPathFactory xFactory = XPathFactory.instance();
 
   @Autowired
-  public DocElementParser(HandlerConfigurationProperties handlerConfigurationProperties, XPathFactory xFactory) {
+  public DocElementParser(HandlerConfigurationProperties handlerConfigurationProperties) {
     this.oaiPmh = handlerConfigurationProperties.getOaiPmh();
-    this.xFactory = xFactory;
   }
 
   /**
@@ -68,19 +66,7 @@ class DocElementParser {
     return expression.evaluate(document).stream().filter(Objects::nonNull).collect(toList());
   }
 
-  private static <T> void mapMetadataToLanguageCode(Map<String, List<T>> mapOfMetadataToLanguageCode, T metadataPojo, String languageCode) {
-    List<T> currentLanguageMetadataList;
-    if (mapOfMetadataToLanguageCode.containsKey(languageCode)) {
-      currentLanguageMetadataList = mapOfMetadataToLanguageCode.get(languageCode);
-    } else {
-      // set Afresh
-      currentLanguageMetadataList = new ArrayList<>();
-    }
-    currentLanguageMetadataList.add(metadataPojo);
-    mapOfMetadataToLanguageCode.put(languageCode, currentLanguageMetadataList);
-  }
-
-  static TermVocabAttributes parseTermVocabAttrAndValues(Element parentElement, Element concept, boolean hasControlledValue) {
+    static TermVocabAttributes parseTermVocabAttrAndValues(Element parentElement, Element concept, boolean hasControlledValue) {
     TermVocabAttributes.TermVocabAttributesBuilder builder = TermVocabAttributes.builder();
       builder.term(cleanCharacterReturns(parentElement.getText()));
 
@@ -117,15 +103,13 @@ class DocElementParser {
 
     Map<String, List<T>> mapOfMetadataToLanguageCode = new HashMap<>();
     List<Element> elements = getElements(document, xPath);
-    for (Element element : elements) {
-      Optional<T> parsedMetadataPojo = parserStrategy.apply(element);
-      parsedMetadataPojo.ifPresent(parsedMetadataPojoValue -> {
-        Optional<String> langCode = parseLanguageCode(defaultLangIsoCode, element);
-        langCode.ifPresent(code -> mapMetadataToLanguageCode(mapOfMetadataToLanguageCode, parsedMetadataPojoValue, code));
-      });
-    }
+      for (Element element : elements) {
+          parserStrategy.apply(element).ifPresent(parsedMetadataPojoValue ->
+              parseLanguageCode(defaultLangIsoCode, element).ifPresent(code ->
+                  mapOfMetadataToLanguageCode.computeIfAbsent(code, k -> new ArrayList<>()).add(parsedMetadataPojoValue)));
+      }
 
-    return mapOfMetadataToLanguageCode;
+      return mapOfMetadataToLanguageCode;
   }
 
   <T> Map<String, T> extractMetadataObjectForEachLang(String defaultLangIsoCode, Document document, String xPath, Function<Element, T> parserStrategy) {
@@ -134,30 +118,30 @@ class DocElementParser {
     List<Element> elements = getElements(document, xPath);
     for (Element element : elements) {
       T parsedMetadataPojo = parserStrategy.apply(element);
-      Optional<String> langCode = parseLanguageCode(defaultLangIsoCode, element);
 
-      //Overrides duplicates, last wins.
-      langCode.ifPresent(languageIsoCode -> mapOfMetadataToLanguageCode.put(languageIsoCode, parsedMetadataPojo));
+        //Overrides duplicates, last wins.
+      parseLanguageCode(defaultLangIsoCode, element).ifPresent(languageIsoCode -> mapOfMetadataToLanguageCode.put(languageIsoCode, parsedMetadataPojo));
     }
 
     return mapOfMetadataToLanguageCode;
   }
 
   private Optional<String> parseLanguageCode(String defaultLangIsoCode, Element element) {
-    Optional<String> langCode = Optional.empty();
 
-    Optional<Attribute> langAttr = ofNullable(element.getAttribute(LANG_ATTR, Namespace.XML_NAMESPACE));
-    if (langAttr.isEmpty()) {
-      Optional<Element> concept = ofNullable(element.getChild("concept", DDI_NS));
-      langAttr = concept.map(value -> value.getAttribute(LANG_ATTR, Namespace.XML_NAMESPACE));
+    Attribute langAttr = element.getAttribute(LANG_ATTR, Namespace.XML_NAMESPACE);
+    if (langAttr == null) {
+      Element concept = element.getChild("concept", DDI_NS);
+      if (concept != null) {
+          langAttr = concept.getAttribute(LANG_ATTR, Namespace.XML_NAMESPACE);
+      }
     }
-    if (langAttr.isPresent() && !langAttr.get().getValue().isEmpty()) {
-      langCode = ofNullable(langAttr.get().getValue());
+    if (langAttr != null && !langAttr.getValue().isEmpty()) {
+      return ofNullable(langAttr.getValue());
     } else if (oaiPmh.getMetadataParsingDefaultLang().isActive()) {
-      langCode = ofNullable(defaultLangIsoCode);
+      return ofNullable(defaultLangIsoCode);
     }
 
-    return langCode;
+    return Optional.empty();
   }
 
   static Optional<String> getAttributeValue(Element element, String idAttr) {
@@ -199,8 +183,7 @@ class DocElementParser {
             //     <collDate xml:lang="fi" date="2009-03-19" event="start"/>
             // Currently there is no requirement to extract dates of event per language.
             .filter(element -> Objects.nonNull(element.getAttributeValue(EVENT_ATTR)))
-            .filter(distinctByKey(element -> element.getAttributeValue(EVENT_ATTR)))
-            .collect(Collectors.toMap(element -> element.getAttributeValue(EVENT_ATTR), element -> element.getAttributeValue(DATE_ATTR)));
+            .collect(Collectors.toMap(element -> element.getAttributeValue(EVENT_ATTR), element -> element.getAttributeValue(DATE_ATTR), (a, b) -> a));
   }
 
   private List<Attribute> getAttributes(Document document, String xPathToElement) {
@@ -245,12 +228,7 @@ class DocElementParser {
     }
   }
 
-  private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
-    Map<Object, Boolean> seen = new HashMap<>();
-    return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
-  }
-
-  /**
+    /**
    * Parses the array values of attributes of a given elements
    *
    * @param document     the document to parse

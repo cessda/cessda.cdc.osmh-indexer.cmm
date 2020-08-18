@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import eu.cessda.pasc.oci.LoggingConstants;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
-import eu.cessda.pasc.oci.exception.ExternalSystemException;
+import eu.cessda.pasc.oci.exception.HTTPException;
 import eu.cessda.pasc.oci.exception.HandlerNotFoundException;
 import eu.cessda.pasc.oci.models.ErrorMessage;
 import eu.cessda.pasc.oci.models.RecordHeader;
@@ -85,27 +85,27 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
     }
 
     @Override
-    public Optional<CMMStudy> getRecord(Repo repo, String studyNumber) {
+    public Optional<CMMStudy> getRecordFromRemote(Repo repo, RecordHeader recordHeader) {
 
-        log.debug("Querying repo {} for studyNumber {}.", repo.getCode(), studyNumber);
+        log.debug("[{}] Querying repository handler {} for studyNumber {}.", repo.getHandler(), repo.getCode(), recordHeader.getIdentifier());
 
         try {
-            URI finalUrl = constructGetRecordUrl(repo, studyNumber);
+            URI finalUrl = constructGetRecordUrl(repo, recordHeader.getIdentifier());
             try (InputStream recordJsonStream = daoBase.getInputStream(finalUrl)) {
                 return Optional.of(cmmStudyConverter.fromJsonStream(recordJsonStream));
             }
-        } catch (ExternalSystemException e) {
+        } catch (HTTPException e) {
             try {
                 ErrorMessage errorMessage = errorMessageObjectReader.readValue(e.getExternalResponse().getBody());
                 log.warn(FAILED_TO_GET_STUDY_ID,
                     value(LoggingConstants.REPO_NAME, repo.getCode()),
-                    value(LoggingConstants.STUDY_ID, studyNumber),
+                    value(LoggingConstants.STUDY_ID, recordHeader.getIdentifier()),
                     value(LoggingConstants.REASON, errorMessage.getMessage())
                 );
             } catch (IOException jsonException) {
                 log.warn(FAILED_TO_GET_STUDY_ID + ": Response body: {}",
                     value(LoggingConstants.REPO_NAME, repo.getCode()),
-                    value(LoggingConstants.STUDY_ID, studyNumber),
+                    value(LoggingConstants.STUDY_ID, recordHeader.getIdentifier()),
                     e.toString(),
                     value(LoggingConstants.REASON, e.getExternalResponse().getBody())
                 );
@@ -114,7 +114,7 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
         } catch (IOException | IllegalArgumentException | URISyntaxException e) {
             log.error(FAILED_TO_GET_STUDY_ID,
                 value(LoggingConstants.REPO_NAME, repo.getCode()),
-                value(LoggingConstants.STUDY_ID, studyNumber),
+                value(LoggingConstants.STUDY_ID, recordHeader.getIdentifier()),
                 e.toString()
             );
         }

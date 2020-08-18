@@ -15,8 +15,8 @@
  */
 package eu.cessda.pasc.oci.harvester;
 
-import eu.cessda.pasc.oci.exception.InternalSystemException;
-import eu.cessda.pasc.oci.exception.OaiPmhException;
+import eu.cessda.pasc.oci.exception.HarvesterException;
+import eu.cessda.pasc.oci.exception.XMLParseException;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.parser.ListIdentifiersResponseValidator;
@@ -50,7 +50,7 @@ import java.util.stream.IntStream;
  */
 @Service
 @Slf4j
-class ListRecordHeadersService {
+class RecordHeaderParser {
 
     // Messaging and Exceptions
     private static final String RECORD_HEADER = "RecordHeader";
@@ -60,24 +60,24 @@ class ListRecordHeadersService {
     private final DocumentBuilderFactory builderFactory;
 
     @Autowired
-    public ListRecordHeadersService(DaoBase daoBase, DocumentBuilderFactory builderFactory) {
+    public RecordHeaderParser(DaoBase daoBase, DocumentBuilderFactory builderFactory) {
         this.daoBase = daoBase;
         this.builderFactory = builderFactory;
     }
 
-    public List<RecordHeader> getRecordHeaders(Repo repo) throws InternalSystemException, OaiPmhException {
+    List<RecordHeader> getRecordHeaders(Repo repo) throws HarvesterException {
 
         URI fullListRecordUrlPath = OaiPmhHelpers.appendListRecordParams(repo);
-        Document doc = getRecordHeadersDocument(fullListRecordUrlPath);
+        Document recordHeadersDocument = getRecordHeadersDocument(fullListRecordUrlPath);
 
         // We exit if the response has an <error> element
-        ListIdentifiersResponseValidator.validateResponse(doc);
+        ListIdentifiersResponseValidator.validateResponse(recordHeadersDocument);
 
         log.info("[{}] Parsing record headers.", repo.getCode());
-        List<RecordHeader> recordHeaders = retrieveRecordHeaders(doc, repo.getUrl());
+        List<RecordHeader> recordHeaders = retrieveRecordHeaders(recordHeadersDocument, repo.getUrl());
         log.debug("[{}] ParseRecordHeaders ended:  No more resumption tokens to process.", repo.getCode());
 
-        int expectedRecordHeadersCount = getRecordHeadersCount(doc);
+        int expectedRecordHeadersCount = getRecordHeadersCount(recordHeadersDocument);
         if (expectedRecordHeadersCount != -1) {
             log.info("[{}] Retrieved [{}] of [{}] expected record headers.",
                 repo.getCode(), recordHeaders.size(), expectedRecordHeadersCount
@@ -104,7 +104,7 @@ class ListRecordHeadersService {
         return -1;
     }
 
-    private List<RecordHeader> retrieveRecordHeaders(Document document, URI baseRepoUrl) throws InternalSystemException {
+    private List<RecordHeader> retrieveRecordHeaders(Document document, URI baseRepoUrl) throws XMLParseException {
 
         Optional<String> resumptionToken;
         var recordHeaders = new ArrayList<RecordHeader>();
@@ -125,19 +125,20 @@ class ListRecordHeadersService {
         return recordHeaders;
     }
 
-    private Document getRecordHeadersDocument(URI repoUrl) throws InternalSystemException {
-        try (InputStream resumedXMLDoc = daoBase.getInputStream(repoUrl)) {
-            return getDocument(resumedXMLDoc, repoUrl);
-        } catch (IOException e) {
-            throw new InternalSystemException("IO error reading input stream", e);
+    private Document getRecordHeadersDocument(URI repoUrl) throws XMLParseException {
+        try (InputStream documentInputStream = daoBase.getInputStream(repoUrl)) {
+            return builderFactory.newDocumentBuilder().parse(documentInputStream);
+        } catch (IOException | SAXException | ParserConfigurationException e) {
+            throw new XMLParseException(repoUrl, e);
         }
     }
 
     private List<RecordHeader> parseRecordHeadersFromDoc(Document doc) {
         NodeList headers = doc.getElementsByTagName(OaiPmhConstants.HEADER_ELEMENT);
 
-        return IntStream.range(0, headers.getLength()).mapToObj(headerRowIndex -> headers.item(headerRowIndex).getChildNodes())
-            .map(this::parseRecordHeader).collect(Collectors.toList());
+        return IntStream.range(0, headers.getLength()).mapToObj(headers::item)
+            .map(this::parseRecordHeader)
+            .collect(Collectors.toList());
     }
 
     private Optional<String> parseResumptionToken(Document doc) {
@@ -149,26 +150,32 @@ class ListRecordHeadersService {
                 return Optional.ofNullable(item.getTextContent());
             }
         }
-        log.debug("ParseRecordHeaders: Resumption token empty.");
+        log.debug("Resumption token empty.");
         return Optional.empty();
     }
 
-    private RecordHeader parseRecordHeader(NodeList headerElements) {
+    private RecordHeader parseRecordHeader(Node headerNode) {
 
-        RecordHeader.RecordHeaderBuilder recordHeaderBuilder = RecordHeader.builder();
+        var recordHeaderBuilder = RecordHeader.builder();
         recordHeaderBuilder.recordType(RECORD_HEADER);
 
-        for (int headerElementIndex = 0; headerElementIndex < headerElements.getLength(); headerElementIndex++) {
-            String headerElementName = headerElements.item(headerElementIndex).getNodeName();
-            String currentHeaderElementValue;
+        // Check if the record is deleted
+        if (headerNode.hasAttributes()) {
+            recordHeaderBuilder.deleted(OaiPmhConstants.DELETED.equals(headerNode.getAttributes().getNamedItem(OaiPmhConstants.STATUS_ATTR).getNodeValue()));
+        }
 
-            switch (headerElementName) {
+        var headerElements = headerNode.getChildNodes();
+        int headerElementsLength = headerElements.getLength();
+        for (int headerElementIndex = 0; headerElementIndex < headerElementsLength; headerElementIndex++) {
+            Node headerElement = headerElements.item(headerElementIndex);
+            String currentHeaderElementValue;
+            switch (headerElement.getNodeName()) {
                 case OaiPmhConstants.IDENTIFIER_ELEMENT:
-                    currentHeaderElementValue = headerElements.item(headerElementIndex).getTextContent();
+                    currentHeaderElementValue = headerElement.getTextContent();
                     recordHeaderBuilder.identifier(currentHeaderElementValue);
                     break;
                 case OaiPmhConstants.DATESTAMP_ELEMENT:
-                    currentHeaderElementValue = headerElements.item(headerElementIndex).getTextContent();
+                    currentHeaderElementValue = headerElement.getTextContent();
                     recordHeaderBuilder.lastModified(currentHeaderElementValue);
                     break;
                 case OaiPmhConstants.SET_SPEC_ELEMENT:
@@ -185,14 +192,5 @@ class ListRecordHeadersService {
             }
         }
         return recordHeaderBuilder.build();
-    }
-
-    private Document getDocument(InputStream documentStream, URI fullListRecordUrlPath) throws InternalSystemException {
-        try {
-            return builderFactory.newDocumentBuilder().parse(documentStream);
-        } catch (SAXException | IOException | ParserConfigurationException e) {
-            String msg = String.format("Unable to parse repo RecordHeader response bytes for path [%s].", fullListRecordUrlPath);
-            throw new InternalSystemException(msg, e);
-        }
     }
 }

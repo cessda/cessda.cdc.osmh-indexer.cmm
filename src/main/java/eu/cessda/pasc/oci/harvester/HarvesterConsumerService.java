@@ -38,5 +38,5 @@ public interface HarvesterConsumerService {
      */
     List<RecordHeader> listRecordHeaders(Repo repo, LocalDateTime lastModifiedDate);
 
-    Optional<CMMStudy> getRecord(Repo repo, String studyNumber);
+    Optional<CMMStudy> getRecord(Repo repo, RecordHeader recordHeader);
 }

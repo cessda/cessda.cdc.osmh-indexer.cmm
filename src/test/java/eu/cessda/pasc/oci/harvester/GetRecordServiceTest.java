@@ -22,7 +22,7 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
-import eu.cessda.pasc.oci.exception.InternalSystemException;
+import eu.cessda.pasc.oci.exception.HarvesterException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.mock.data.CMMStudyTestData;
 import eu.cessda.pasc.oci.mock.data.ReposTestData;
@@ -79,7 +79,7 @@ public class GetRecordServiceTest {
     }
 
     @Test
-    public void shouldReturnValidCMMStudyRecordFromAFullyComplaintCmmDdiRecord() throws IOException, ProcessingException, JSONException, InternalSystemException, OaiPmhException {
+    public void shouldReturnValidCMMStudyRecordFromAFullyComplaintCmmDdiRecord() throws IOException, ProcessingException, JSONException, HarvesterException {
 
         // Given
         given(daoBase.getInputStream(fullRecordUrl)).willReturn(
@@ -96,7 +96,7 @@ public class GetRecordServiceTest {
 
     @Test
     @SuppressWarnings("PreferJavaTimeOverload")
-    public void shouldHarvestedContentForLanguageSpecificDimensionFromElementWithCorrectXmlLangAttribute() throws IOException, InternalSystemException, OaiPmhException {
+    public void shouldHarvestedContentForLanguageSpecificDimensionFromElementWithCorrectXmlLangAttribute() throws IOException, HarvesterException {
 
         // Given
         given(daoBase.getInputStream(fullRecordUrl)).willReturn(
@@ -120,7 +120,7 @@ public class GetRecordServiceTest {
     }
 
     @Test
-    public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord() throws IOException, ProcessingException, JSONException, InternalSystemException, OaiPmhException {
+    public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord() throws IOException, ProcessingException, JSONException, HarvesterException {
 
         // Given
         given(daoBase.getInputStream(fullRecordUrl)).willReturn(
@@ -137,7 +137,7 @@ public class GetRecordServiceTest {
 
     @Test
     @SuppressWarnings("PreferJavaTimeOverload")
-    public void shouldOnlyExtractSingleDateAsStartDateForRecordsWithASingleDateAttr() throws IOException, ProcessingException, JSONException, InternalSystemException, OaiPmhException {
+    public void shouldOnlyExtractSingleDateAsStartDateForRecordsWithASingleDateAttr() throws IOException, ProcessingException, JSONException, HarvesterException {
 
         // Given
         given(daoBase.getInputStream(fullRecordUrl)).willReturn(
@@ -158,7 +158,7 @@ public class GetRecordServiceTest {
     }
 
     @Test
-    public void shouldExtractDefaultLanguageFromCodebookXMLLagIfPresent() throws IOException, JSONException, InternalSystemException, OaiPmhException {
+    public void shouldExtractDefaultLanguageFromCodebookXMLLagIfPresent() throws IOException, JSONException, HarvesterException {
 
         // Given
         String expectedCmmStudyJsonString = CMMStudyTestData.getContent("json/ddi_record_1683_with_codebookXmlLag.json");
@@ -176,7 +176,7 @@ public class GetRecordServiceTest {
 
     @Test
     @SuppressWarnings("PreferJavaTimeOverload")
-    public void shouldReturnCMMStudyRecordWithRepeatedAbstractConcatenated() throws IOException, ProcessingException, JSONException, InternalSystemException, OaiPmhException {
+    public void shouldReturnCMMStudyRecordWithRepeatedAbstractConcatenated() throws IOException, ProcessingException, JSONException, HarvesterException {
 
         Map<String, String> expectedAbstract = new HashMap<>();
         expectedAbstract.put("de", "de de");
@@ -198,7 +198,7 @@ public class GetRecordServiceTest {
 
     @Test // https://bitbucket.org/cessda/cessda.cdc.version2/issues/135
     @SuppressWarnings("PreferJavaTimeOverload")
-    public void shouldReturnCMMStudyRecordWithOutParTitleWhenThereIsALangDifferentFromDefault() throws IOException, ProcessingException, JSONException, InternalSystemException, OaiPmhException {
+    public void shouldReturnCMMStudyRecordWithOutParTitleWhenThereIsALangDifferentFromDefault() throws IOException, ProcessingException, JSONException, HarvesterException {
 
         Map<String, String> expectedTitle = new HashMap<>();
         expectedTitle.put("en", "Machinery of Government, 1976-1977");
@@ -219,7 +219,7 @@ public class GetRecordServiceTest {
     }
 
     @Test()
-    public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord_MarkedAsNotActive() throws IOException, InternalSystemException, OaiPmhException {
+    public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord_MarkedAsNotActive() throws IOException, HarvesterException {
 
         // Given
         given(daoBase.getInputStream(fullRecordUrl)).willReturn(
@@ -235,7 +235,7 @@ public class GetRecordServiceTest {
     }
 
     @Test(expected = OaiPmhException.class)
-    public void shouldThrowExceptionForRecordWithErrorElement() throws IOException, InternalSystemException, OaiPmhException {
+    public void shouldThrowExceptionForRecordWithErrorElement() throws IOException, HarvesterException {
 
         // Given
         given(daoBase.getInputStream(fullRecordUrl)).willReturn(
@@ -249,7 +249,7 @@ public class GetRecordServiceTest {
     }
 
     @Test
-    public void shouldExtractAllRequiredCMMFieldsForAGivenAUKDSRecord() throws IOException, ProcessingException, JSONException, InternalSystemException, OaiPmhException {
+    public void shouldExtractAllRequiredCMMFieldsForAGivenAUKDSRecord() throws IOException, ProcessingException, JSONException, HarvesterException {
 
         // Given
         given(daoBase.getInputStream(fullRecordUrl)).willReturn(
@@ -333,7 +333,7 @@ public class GetRecordServiceTest {
     }
 
     @Test
-    public void shouldOverrideGlobalLanguageDefaultIfAPerRepositoryOverrideIsSpecified() throws IOException, ProcessingException, JSONException, InternalSystemException, OaiPmhException {
+    public void shouldOverrideGlobalLanguageDefaultIfAPerRepositoryOverrideIsSpecified() throws IOException, ProcessingException, JSONException, HarvesterException {
 
         var repository = ReposTestData.getUKDSLanguageOverrideRepository();
 
