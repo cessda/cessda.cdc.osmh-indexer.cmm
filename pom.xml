@@ -341,7 +341,6 @@
                         <ports>
                             9902
                         </ports>
-                        <user>1000</user>
                     </container>
                 </configuration>
             </plugin>
