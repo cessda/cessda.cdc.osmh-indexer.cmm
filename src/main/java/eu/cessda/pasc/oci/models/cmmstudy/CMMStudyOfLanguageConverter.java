@@ -44,18 +44,22 @@ import java.io.IOException;
 @Getter
 public class CMMStudyOfLanguageConverter {
 
-  private final ObjectReader reader;
-  private final ObjectWriter writer;
+    private final ObjectReader reader;
+    private final ObjectWriter writer;
 
-  @Autowired
-  public CMMStudyOfLanguageConverter(ObjectMapper mapper) {
-    reader = mapper.readerFor(CMMStudyOfLanguage.class);
-    writer = mapper.writerFor(CMMStudyOfLanguage.class);
-  }
+    public CMMStudyOfLanguageConverter() {
+        this(new ObjectMapper());
+    }
 
-  public CMMStudyOfLanguage fromJsonString(String json) throws IOException {
-    return reader.readValue(json);
-  }
+    @Autowired
+    private CMMStudyOfLanguageConverter(ObjectMapper mapper) {
+        reader = mapper.readerFor(CMMStudyOfLanguage.class);
+        writer = mapper.writerFor(CMMStudyOfLanguage.class);
+    }
+
+    public CMMStudyOfLanguage fromJsonString(String json) throws IOException {
+        return reader.readValue(json);
+    }
 
   public String toJsonString(CMMStudyOfLanguage cmmStudyOfLanguage) throws JsonProcessingException {
     return writer.writeValueAsString(cmmStudyOfLanguage);

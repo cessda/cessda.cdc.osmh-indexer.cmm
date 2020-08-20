@@ -17,15 +17,10 @@ package eu.cessda.pasc.oci.repository;
 
 import com.pgssoft.httpclient.HttpClientMock;
 import com.pgssoft.httpclient.MockedServerResponse;
-import eu.cessda.pasc.oci.AbstractSpringTestProfileContext;
-import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.exception.HTTPException;
 import lombok.SneakyThrows;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,10 +36,7 @@ import static org.assertj.core.api.Java6BDDAssertions.then;
  *
  * @author moses AT doraventures DOT com
  */
-@RunWith(SpringRunner.class)
-public class DaoBaseTest extends AbstractSpringTestProfileContext {
-    @Autowired
-    private AppConfigurationProperties appConfigurationProperties;
+public class DaoBaseTest {
 
     private final HttpClientMock httpClient = new HttpClientMock();
 

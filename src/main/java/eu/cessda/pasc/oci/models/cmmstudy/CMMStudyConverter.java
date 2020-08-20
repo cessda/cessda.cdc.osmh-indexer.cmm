@@ -46,16 +46,14 @@ public class CMMStudyConverter {
 
   // Serialize/deserialize helpers
   public CMMStudyConverter() {
-    ObjectMapper objectMapper = new ObjectMapper();
-    reader = objectMapper.readerFor(CMMStudy.class);
-    writer = objectMapper.writerFor(CMMStudy.class);
+    this(new ObjectMapper());
   }
 
-  @Autowired
-  public CMMStudyConverter(ObjectMapper objectMapper) {
-    reader = objectMapper.readerFor(CMMStudy.class);
-    writer = objectMapper.writerFor(CMMStudy.class);
-  }
+    @Autowired
+    private CMMStudyConverter(ObjectMapper objectMapper) {
+        reader = objectMapper.readerFor(CMMStudy.class);
+        writer = objectMapper.writerFor(CMMStudy.class);
+    }
 
   /**
    * Convert a JSON stream to a {@link CMMStudy} POJO.

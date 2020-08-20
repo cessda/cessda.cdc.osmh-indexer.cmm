@@ -18,7 +18,7 @@ package eu.cessda.pasc.oci;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.elasticsearch.IngestService;
 import eu.cessda.pasc.oci.harvester.HarvesterConsumerService;
-import eu.cessda.pasc.oci.harvester.LanguageDocumentExtractor;
+import eu.cessda.pasc.oci.harvester.LanguageExtractor;
 import eu.cessda.pasc.oci.metrics.Metrics;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
@@ -49,14 +49,14 @@ public class HarvesterRunner {
     private final AppConfigurationProperties configurationProperties;
     private final HarvesterConsumerService localHarvester;
     private final IngestService ingestService;
-    private final LanguageDocumentExtractor extractor;
+    private final LanguageExtractor extractor;
     private final Metrics metrics;
     private final HarvesterConsumerService remoteHarvester;
 
     private final AtomicBoolean indexerRunning = new AtomicBoolean(false);
 
     public HarvesterRunner(AppConfigurationProperties configurationProperties, HarvesterConsumerService remoteHarvesterConsumerService, HarvesterConsumerService localHarvesterConsumerService,
-                           IngestService ingestService, LanguageDocumentExtractor extractor, Metrics metrics) {
+                           IngestService ingestService, LanguageExtractor extractor, Metrics metrics) {
         this.configurationProperties = configurationProperties;
         this.localHarvester = localHarvesterConsumerService;
         this.ingestService = ingestService;

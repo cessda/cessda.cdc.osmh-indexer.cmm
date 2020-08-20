@@ -28,10 +28,6 @@ osmhConsumer:
       - Variable
       - Question
       - CMM
-    harvesters:
-      OAI-PMH:
-        url: 'http://localhost:9091'
-        version: 'v0'
     repos:
       - url: https://data2.aussda.at/oai/
         preferredMetadataParam: oai_ddi

@@ -15,8 +15,6 @@
  */
 package eu.cessda.pasc.oci.mock.data;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.cessda.pasc.oci.configurations.UtilitiesConfiguration;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
@@ -35,172 +33,172 @@ import java.util.Optional;
  */
 public final class RecordTestData {
 
-  public static final String LIST_RECORDER_HEADERS_BODY_EXAMPLE = "" +
-          "[\n" +
-          "  {\n" +
-          "    \"lastModified\": \"2018-02-21T07:48:38Z\",\n" +
-          "    \"type\": \"Study\",\n" +
-          "    \"recordType\": \"RecordHeader\",\n" +
-          "    \"identifier\": \"997\"\n" +
-          "  },\n" +
-          "  {\n" +
-      "    \"lastModified\": \"2018-02-19\",\n" +
-      "    \"type\": \"Study\",\n" +
-      "    \"recordType\": \"RecordHeader\",\n" +
-      "    \"identifier\": \"998\"\n" +
-      "  }\n" +
-      "]";
+    public static final String LIST_RECORDER_HEADERS_BODY_EXAMPLE = "" +
+        "[\n" +
+        "  {\n" +
+        "    \"lastModified\": \"2018-02-21T07:48:38Z\",\n" +
+        "    \"type\": \"Study\",\n" +
+        "    \"recordType\": \"RecordHeader\",\n" +
+        "    \"identifier\": \"997\"\n" +
+        "  },\n" +
+        "  {\n" +
+        "    \"lastModified\": \"2018-02-19\",\n" +
+        "    \"type\": \"Study\",\n" +
+        "    \"recordType\": \"RecordHeader\",\n" +
+        "    \"identifier\": \"998\"\n" +
+        "  }\n" +
+        "]";
 
-  public static final String LIST_RECORDER_HEADERS_BODY_EXAMPLE_WITH_INCREMENT = "" +
-      "[\n" +
-      "  {\n" +
-      "    \"lastModified\": \"2018-02-21T07:48:38Z\",\n" +
-      "    \"type\": \"Study\",\n" +
-      "    \"recordType\": \"RecordHeader\",\n" +
-      "    \"identifier\": \"997\"\n" +
-      "  },\n" +
-      "  {\n" +
-      "    \"lastModified\": \"2018-03-22T07:48:38Z\",\n" +
-      "    \"type\": \"Study\",\n" +
-      "    \"recordType\": \"RecordHeader\",\n" +
-      "    \"identifier\": \"999\"\n" +
-      "  },\n" +
-      "  {\n" +
-      "    \"lastModified\": \"2018-02-23\",\n" +
-      "    \"type\": \"Study\",\n" +
-      "    \"recordType\": \"RecordHeader\",\n" +
-      "    \"identifier\": \"1000\"\n" +
-      "  }\n" +
-      "]";
+    public static final String LIST_RECORDER_HEADERS_BODY_EXAMPLE_WITH_INCREMENT = "" +
+        "[\n" +
+        "  {\n" +
+        "    \"lastModified\": \"2018-02-21T07:48:38Z\",\n" +
+        "    \"type\": \"Study\",\n" +
+        "    \"recordType\": \"RecordHeader\",\n" +
+        "    \"identifier\": \"997\"\n" +
+        "  },\n" +
+        "  {\n" +
+        "    \"lastModified\": \"2018-03-22T07:48:38Z\",\n" +
+        "    \"type\": \"Study\",\n" +
+        "    \"recordType\": \"RecordHeader\",\n" +
+        "    \"identifier\": \"999\"\n" +
+        "  },\n" +
+        "  {\n" +
+        "    \"lastModified\": \"2018-02-23\",\n" +
+        "    \"type\": \"Study\",\n" +
+        "    \"recordType\": \"RecordHeader\",\n" +
+        "    \"identifier\": \"1000\"\n" +
+        "  }\n" +
+        "]";
 
-  public static final String LIST_RECORDER_HEADERS_X6 = "" +
-      "[\n" +
-      "  {\n" +
-      "    \"lastModified\": \"2018-02-22T07:48:38Z\",\n" +
-      "    \"type\": \"Study\",\n" +
-      "    \"recordType\": \"RecordHeader\",\n" +
-      "    \"identifier\": \"997\"\n" +
-      "  },\n" +
-      "  {\n" +
-      "    \"lastModified\": \"2018-02-01T07:48:38Z\",\n" +
-      "    \"type\": \"Study\",\n" +
-      "    \"recordType\": \"RecordHeader\",\n" +
-      "    \"identifier\": \"999\"\n" +
-      "  },\n" +
-      "  {\n" +
-      "    \"lastModified\": \"2018-02-22T07:48:38Z\",\n" +
-      "    \"type\": \"Study\",\n" +
-      "    \"recordType\": \"RecordHeader\",\n" +
-      "    \"identifier\": \"998\"\n" +
-      "  },\n" +
-      "  {\n" +
-      "    \"lastModified\": \"2018-01-05T07:48:38Z\",\n" +
-      "    \"type\": \"Study\",\n" +
-      "    \"recordType\": \"RecordHeader\",\n" +
-      "    \"identifier\": \"1000\"\n" +
-      "  },\n" +
-      "  {\n" +
-      "    \"lastModified\": \"2018-01-15T07:48:38Z\",\n" +
-      "    \"type\": \"Study\",\n" +
-      "    \"recordType\": \"RecordHeader\",\n" +
-      "    \"identifier\": \"1001\"\n" +
-      "  },\n" +
-      "  {\n" +
-      "    \"lastModified\": \"2016-02-22T07:48:38Z\",\n" +
-      "    \"type\": \"Study\",\n" +
-      "    \"recordType\": \"RecordHeader\",\n" +
-      "    \"identifier\": \"1002\"\n" +
-      "  }\n" +
-      "]";
+    public static final String LIST_RECORDER_HEADERS_X6 = "" +
+        "[\n" +
+        "  {\n" +
+        "    \"lastModified\": \"2018-02-22T07:48:38Z\",\n" +
+        "    \"type\": \"Study\",\n" +
+        "    \"recordType\": \"RecordHeader\",\n" +
+        "    \"identifier\": \"997\"\n" +
+        "  },\n" +
+        "  {\n" +
+        "    \"lastModified\": \"2018-02-01T07:48:38Z\",\n" +
+        "    \"type\": \"Study\",\n" +
+        "    \"recordType\": \"RecordHeader\",\n" +
+        "    \"identifier\": \"999\"\n" +
+        "  },\n" +
+        "  {\n" +
+        "    \"lastModified\": \"2018-02-22T07:48:38Z\",\n" +
+        "    \"type\": \"Study\",\n" +
+        "    \"recordType\": \"RecordHeader\",\n" +
+        "    \"identifier\": \"998\"\n" +
+        "  },\n" +
+        "  {\n" +
+        "    \"lastModified\": \"2018-01-05T07:48:38Z\",\n" +
+        "    \"type\": \"Study\",\n" +
+        "    \"recordType\": \"RecordHeader\",\n" +
+        "    \"identifier\": \"1000\"\n" +
+        "  },\n" +
+        "  {\n" +
+        "    \"lastModified\": \"2018-01-15T07:48:38Z\",\n" +
+        "    \"type\": \"Study\",\n" +
+        "    \"recordType\": \"RecordHeader\",\n" +
+        "    \"identifier\": \"1001\"\n" +
+        "  },\n" +
+        "  {\n" +
+        "    \"lastModified\": \"2016-02-22T07:48:38Z\",\n" +
+        "    \"type\": \"Study\",\n" +
+        "    \"recordType\": \"RecordHeader\",\n" +
+        "    \"identifier\": \"1002\"\n" +
+        "  }\n" +
+        "]";
 
-  public static final String LIST_RECORDER_HEADERS_WITH_INVALID_DATETIME = "" +
-      "[\n" +
-      "  {\n" +
-      "    \"lastModified\": \"2018-02-22\",\n" +
-      "    \"type\": \"Study\",\n" +
-      "    \"recordType\": \"RecordHeader\",\n" +
-      "    \"identifier\": \"997\"\n" +
-      "  },\n" +
-      "  {\n" +
-      "    \"lastModified\": \"2018-02-01T07:48:38Z\",\n" +
-      "    \"type\": \"Study\",\n" +
-      "    \"recordType\": \"RecordHeader\",\n" +
-      "    \"identifier\": \"999\"\n" +
-      "  },\n" +
-      "  {\n" +
-      "    \"lastModified\": \"2018-00-00\",\n" +
-      "    \"type\": \"Study\",\n" +
-      "    \"recordType\": \"RecordHeader\",\n" +
-      "    \"identifier\": \"998\"\n" +
-      "  }\n" +
-      "]";
+    public static final String LIST_RECORDER_HEADERS_WITH_INVALID_DATETIME = "" +
+        "[\n" +
+        "  {\n" +
+        "    \"lastModified\": \"2018-02-22\",\n" +
+        "    \"type\": \"Study\",\n" +
+        "    \"recordType\": \"RecordHeader\",\n" +
+        "    \"identifier\": \"997\"\n" +
+        "  },\n" +
+        "  {\n" +
+        "    \"lastModified\": \"2018-02-01T07:48:38Z\",\n" +
+        "    \"type\": \"Study\",\n" +
+        "    \"recordType\": \"RecordHeader\",\n" +
+        "    \"identifier\": \"999\"\n" +
+        "  },\n" +
+        "  {\n" +
+        "    \"lastModified\": \"2018-00-00\",\n" +
+        "    \"type\": \"Study\",\n" +
+        "    \"recordType\": \"RecordHeader\",\n" +
+        "    \"identifier\": \"998\"\n" +
+        "  }\n" +
+        "]";
 
 
-  public static List<CMMStudy> getASingleSyntheticCMMStudyAsList() {
-    List<CMMStudy> cmmStudies = new ArrayList<>();
-    try {
-      cmmStudies.add(getSyntheticCmmStudy());
-    } catch (IOException e) {
-      throw new AssertionError("Unable to parse Study string to CMMStudy Object", e);
+    public static List<CMMStudy> getASingleSyntheticCMMStudyAsList() {
+        List<CMMStudy> cmmStudies = new ArrayList<>(1);
+        try {
+            cmmStudies.add(getSyntheticCmmStudy());
+        } catch (IOException e) {
+            throw new AssertionError("Unable to parse Study string to CMMStudy Object", e);
+        }
+        return cmmStudies;
     }
-    return cmmStudies;
-  }
 
 
-  public static List<CMMStudy> getSyntheticCMMStudyAndADeletedRecordAsList() {
-    List<CMMStudy> cmmStudies = new ArrayList<>();
-    try {
-      cmmStudies.add(getSyntheticCmmStudy());
-      cmmStudies.add(getDeletedCmmStudy());
-    } catch (IOException e) {
-      throw new AssertionError("Unable to parse Study string to CMMStudy Object", e);
+    public static List<CMMStudy> getSyntheticCMMStudyAndADeletedRecordAsList() {
+        List<CMMStudy> cmmStudies = new ArrayList<>(2);
+        try {
+            cmmStudies.add(getSyntheticCmmStudy());
+            cmmStudies.add(getDeletedCmmStudy());
+        } catch (IOException e) {
+            throw new AssertionError("Unable to parse Study string to CMMStudy Object", e);
+        }
+        return cmmStudies;
     }
-    return cmmStudies;
-  }
 
-  public static List<CMMStudyOfLanguage> getCmmStudyOfLanguageCodeEnX1() throws IOException {
-      String syntheticCMMStudyOfLanguageEn = getSyntheticCMMStudyOfLanguageEn();
-      CMMStudyOfLanguage cmmStudyOfLanguage = new CMMStudyOfLanguageConverter(new ObjectMapper()).fromJsonString(syntheticCMMStudyOfLanguageEn);
-      return Collections.singletonList(cmmStudyOfLanguage);
-  }
+    public static List<CMMStudyOfLanguage> getCmmStudyOfLanguageCodeEnX1() throws IOException {
+        String syntheticCMMStudyOfLanguageEn = getSyntheticCMMStudyOfLanguageEn();
+        var cmmStudyOfLanguage = new CMMStudyOfLanguageConverter().fromJsonString(syntheticCMMStudyOfLanguageEn);
+        return Collections.singletonList(cmmStudyOfLanguage);
+    }
 
-  public static List<CMMStudyOfLanguage> getCmmStudyOfLanguageCodeEnX3() throws IOException {
-      var studyOfLanguages = new ArrayList<CMMStudyOfLanguage>();
-      String syntheticCMMStudyOfLanguageEn = getSyntheticCMMStudyOfLanguageEn();
-      CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter = new CMMStudyOfLanguageConverter(new ObjectMapper());
-      studyOfLanguages.add(cmmStudyOfLanguageConverter.fromJsonString(syntheticCMMStudyOfLanguageEn));
+    public static List<CMMStudyOfLanguage> getCmmStudyOfLanguageCodeEnX3() throws IOException {
+        var studyOfLanguages = new ArrayList<CMMStudyOfLanguage>(3);
+        String syntheticCMMStudyOfLanguageEn = getSyntheticCMMStudyOfLanguageEn();
+        var cmmStudyOfLanguageConverter = new CMMStudyOfLanguageConverter();
+        studyOfLanguages.add(cmmStudyOfLanguageConverter.fromJsonString(syntheticCMMStudyOfLanguageEn));
 
-      CMMStudyOfLanguage cmmStudyOfLanguage2 = cmmStudyOfLanguageConverter.fromJsonString(syntheticCMMStudyOfLanguageEn);
-      cmmStudyOfLanguage2.setId("UK-Data-Service__999");
-      cmmStudyOfLanguage2.setLastModified("2017-11-15T08:08:11Z");
-      studyOfLanguages.add(cmmStudyOfLanguage2);
+        CMMStudyOfLanguage cmmStudyOfLanguage2 = cmmStudyOfLanguageConverter.fromJsonString(syntheticCMMStudyOfLanguageEn)
+            .withId("UK-Data-Service__999")
+            .withLastModified("2017-11-15T08:08:11Z");
+        studyOfLanguages.add(cmmStudyOfLanguage2);
 
-      CMMStudyOfLanguage cmmStudyOfLanguage3 = cmmStudyOfLanguageConverter.fromJsonString(syntheticCMMStudyOfLanguageEn);
-      cmmStudyOfLanguage3.setId("UK-Data-Service__1000");
-    cmmStudyOfLanguage3.setLastModified("2017-04-05");
-    studyOfLanguages.add(cmmStudyOfLanguage3);
+        CMMStudyOfLanguage cmmStudyOfLanguage3 = cmmStudyOfLanguageConverter.fromJsonString(syntheticCMMStudyOfLanguageEn)
+            .withId("UK-Data-Service__1000")
+            .withLastModified("2017-04-05");
+        studyOfLanguages.add(cmmStudyOfLanguage3);
 
-    return studyOfLanguages;
-  }
+        return studyOfLanguages;
+    }
 
-  public static CMMStudy getSyntheticCmmStudy() throws IOException {
-    InputStream cmmStudyString = new FileHandler().getFileAsStream("synthetic_compliant_record.json");
-    return new CMMStudyConverter(new UtilitiesConfiguration(null).objectMapper()).fromJsonStream(cmmStudyString);
-  }
+    public static CMMStudy getSyntheticCmmStudy() throws IOException {
+        InputStream cmmStudyString = new FileHandler().getFileAsStream("synthetic_compliant_record.json");
+        return new CMMStudyConverter().fromJsonStream(cmmStudyString);
+    }
 
-  private static CMMStudy getDeletedCmmStudy() throws IOException {
-    InputStream cmmStudyString = new FileHandler().getFileAsStream("record_ukds_1031_deleted.json");
-    return new CMMStudyConverter(new UtilitiesConfiguration(null).objectMapper()).fromJsonStream(cmmStudyString);
-  }
+    private static CMMStudy getDeletedCmmStudy() throws IOException {
+        InputStream cmmStudyString = new FileHandler().getFileAsStream("record_ukds_1031_deleted.json");
+        return new CMMStudyConverter().fromJsonStream(cmmStudyString);
+    }
 
-  public static Optional<CMMStudy> getSyntheticCmmStudy(String identifier) throws IOException {
-    var cmmStudy = getSyntheticCmmStudy();
-    cmmStudy.setStudyNumber(identifier);
-    return Optional.of(cmmStudy);
-  }
+    public static Optional<CMMStudy> getSyntheticCmmStudy(String identifier) throws IOException {
+        var cmmStudy = getSyntheticCmmStudy();
+        cmmStudy.withStudyNumber(identifier);
+        return Optional.of(cmmStudy);
+    }
 
-  public static String getSyntheticCMMStudyOfLanguageEn() throws IOException {
-    FileHandler fileHandler = new FileHandler();
-    return fileHandler.getFileAsString("synthetic_complaint_record_en.json");
-  }
+    public static String getSyntheticCMMStudyOfLanguageEn() throws IOException {
+        FileHandler fileHandler = new FileHandler();
+        return fileHandler.getFileAsString("synthetic_complaint_record_en.json");
+    }
 }

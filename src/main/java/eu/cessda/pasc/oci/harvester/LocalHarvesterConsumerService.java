@@ -37,12 +37,12 @@ import static net.logstash.logback.argument.StructuredArguments.value;
 public class LocalHarvesterConsumerService extends AbstractHarvesterConsumerService {
 
     private final RecordHeaderParser recordHeaderParser;
-    private final GetRecordService getRecordService;
+    private final RecordXMLParser recordXMLParser;
 
     @Autowired
-    public LocalHarvesterConsumerService(RecordHeaderParser recordHeaderParser, GetRecordService getRecordService) {
+    public LocalHarvesterConsumerService(RecordHeaderParser recordHeaderParser, RecordXMLParser recordXMLParser) {
         this.recordHeaderParser = recordHeaderParser;
-        this.getRecordService = getRecordService;
+        this.recordXMLParser = recordXMLParser;
     }
 
     @Override
@@ -72,7 +72,7 @@ public class LocalHarvesterConsumerService extends AbstractHarvesterConsumerServ
     @Override
     public Optional<CMMStudy> getRecordFromRemote(Repo repo, RecordHeader recordHeader) {
         try {
-            return Optional.of(getRecordService.getRecord(repo, recordHeader.getIdentifier()));
+            return Optional.of(recordXMLParser.getRecord(repo, recordHeader.getIdentifier()));
         } catch (OaiPmhException e) {
             e.getOaiErrorMessage().ifPresentOrElse(
                 oaiErrorMessage -> log.warn(FAILED_TO_GET_STUDY_ID + ": {}",

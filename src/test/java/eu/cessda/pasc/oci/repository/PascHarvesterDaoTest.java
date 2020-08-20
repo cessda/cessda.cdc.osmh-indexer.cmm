@@ -16,12 +16,7 @@
 package eu.cessda.pasc.oci.repository;
 
 import com.pgssoft.httpclient.HttpClientMock;
-import eu.cessda.pasc.oci.AbstractSpringTestProfileContext;
-import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,20 +31,16 @@ import static org.assertj.core.api.Java6BDDAssertions.then;
  *
  * @author moses AT doraventures DOT com
  */
-@RunWith(SpringRunner.class)
-public class PascHarvesterDaoTest extends AbstractSpringTestProfileContext {
+public class PascHarvesterDaoTest {
 
-  @Autowired
-  private AppConfigurationProperties appConfigurationProperties;
+    private final HttpClientMock httpClient = new HttpClientMock();
 
-  private final HttpClientMock httpClient = new HttpClientMock();
+    @Test
+    public void shouldReturnSuccessfulHttpResponseListRecord() throws IOException {
 
-  @Test
-  public void shouldReturnSuccessfulHttpResponseListRecord() throws IOException {
-
-      // Given
-      String expectedUrl = "http://cdc-osmh-repo:9091/v0/ListRecordHeaders?" +
-              "Repository=https://oai.ukdataservice.ac.uk:8443/oai/provider";
+        // Given
+        String expectedUrl = "http://cdc-osmh-repo:9091/v0/ListRecordHeaders?" +
+            "Repository=https://oai.ukdataservice.ac.uk:8443/oai/provider";
 
       httpClient.onGet(expectedUrl).doReturnJSON(LIST_RECORDER_HEADERS_BODY_EXAMPLE, StandardCharsets.UTF_8);
 

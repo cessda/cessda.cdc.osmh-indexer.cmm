@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.cessda.pasc.oci.AbstractSpringTestProfileContext;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.exception.HTTPException;
+import eu.cessda.pasc.oci.mock.data.ReposTestData;
 import eu.cessda.pasc.oci.models.ErrorMessage;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
@@ -29,10 +30,7 @@ import eu.cessda.pasc.oci.parser.TimeUtility;
 import eu.cessda.pasc.oci.repository.DaoBase;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -54,16 +52,13 @@ import static org.mockito.Mockito.when;
 /**
  * @author moses AT doraventures DOT com
  */
-@RunWith(SpringRunner.class)
 public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfileContext {
 
     private final DaoBase daoBase = Mockito.mock(DaoBase.class);
     private final FileHandler fileHandler = new FileHandler();
-    @Autowired
-    AppConfigurationProperties appConfigurationProperties;
+    private final AppConfigurationProperties appConfigurationProperties = Mockito.mock(AppConfigurationProperties.class);
     private static final RecordHeader STUDY_NUMBER = RecordHeader.builder().identifier("4124325").build();
-    @Autowired
-    CMMStudyConverter cmmStudyConverter;
+    private final CMMStudyConverter cmmStudyConverter = new CMMStudyConverter();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
@@ -73,6 +68,7 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
 
     @Before
     public void setUp() {
+        Mockito.when(appConfigurationProperties.getEndpoints()).thenReturn(ReposTestData.getEndpoints());
         remoteHarvesterConsumerService = new RemoteHarvesterConsumerService(appConfigurationProperties, cmmStudyConverter, daoBase, objectMapper);
     }
 

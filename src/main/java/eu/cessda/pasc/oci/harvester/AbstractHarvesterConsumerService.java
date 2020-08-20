@@ -75,7 +75,7 @@ abstract class AbstractHarvesterConsumerService implements HarvesterConsumerServ
         return new ArrayList<>(unfilteredRecordHeaders);
     }
 
-    protected abstract Optional<CMMStudy> getRecordFromRemote(Repo repo,RecordHeader recordHeader);
+    protected abstract Optional<CMMStudy> getRecordFromRemote(Repo repo, RecordHeader recordHeader);
 
     /**
      * Creates an inactive {@link CMMStudy} using the details in the record header.
