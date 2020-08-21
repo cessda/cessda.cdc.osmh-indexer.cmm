@@ -16,7 +16,8 @@
 package eu.cessda.pasc.oci.models.cmmstudy;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import lombok.Builder;
+import lombok.Value;
 
 /**
  * Pid - Study Persistent Identifier pojo to hold
@@ -33,13 +34,10 @@ import lombok.*;
  * @author moses AT doraventures DOT com
  */
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode
-@ToString
+@Value
 public class Pid {
-  @JsonProperty("agency")
-  private String agency;
-  @JsonProperty("pid")
-  private String pid;
+    @JsonProperty("agency")
+    String agency;
+    @JsonProperty("pid")
+    String pid;
 }

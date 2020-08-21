@@ -18,7 +18,9 @@ package eu.cessda.pasc.oci.models.cmmstudy;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import lombok.Builder;
+import lombok.Value;
+import lombok.With;
 import org.springframework.data.annotation.Id;
 
 import java.util.List;
@@ -31,100 +33,92 @@ import java.util.Set;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@EqualsAndHashCode
-@ToString
+@Value
+@With
+@SuppressWarnings("ReferenceEquality")
 public class CMMStudyOfLanguage {
 
-  @Id
-  @Setter
-  private String id;
+    @Id
+    String id;
 
-  @JsonProperty("code")
-  private String code;
+    @JsonProperty("code")
+    String code;
 
-  @JsonProperty("creators")
-  private List<String> creators;
+    @JsonProperty("creators")
+    List<String> creators;
 
-  @JsonProperty("dataCollectionPeriodStartdate")
-  private String dataCollectionPeriodStartdate;
+    @JsonProperty("dataCollectionPeriodStartdate")
+    String dataCollectionPeriodStartdate;
 
-  @JsonProperty("dataCollectionPeriodEnddate")
-  private String dataCollectionPeriodEnddate;
+    @JsonProperty("dataCollectionPeriodEnddate")
+    String dataCollectionPeriodEnddate;
 
-  @JsonProperty("dataCollectionYear")
-  private int dataCollectionYear;
+    @JsonProperty("dataCollectionYear")
+    int dataCollectionYear;
 
-  @JsonProperty("dataCollectionFreeTexts")
-  private List<DataCollectionFreeText> dataCollectionFreeTexts;
+    @JsonProperty("dataCollectionFreeTexts")
+    List<DataCollectionFreeText> dataCollectionFreeTexts;
 
-  @JsonProperty("dataAccessFreeTexts")
-  private List<String> dataAccessFreeTexts;
+    @JsonProperty("dataAccessFreeTexts")
+    List<String> dataAccessFreeTexts;
 
-  @JsonProperty("publicationYear")
-  private String publicationYear;
+    @JsonProperty("publicationYear")
+    String publicationYear;
 
-  @JsonProperty("typeOfModeOfCollections")
-  private List<TermVocabAttributes> typeOfModeOfCollections;
+    @JsonProperty("typeOfModeOfCollections")
+    List<TermVocabAttributes> typeOfModeOfCollections;
 
-  @JsonProperty("keywords")
-  private List<TermVocabAttributes> keywords;
+    @JsonProperty("keywords")
+    List<TermVocabAttributes> keywords;
 
-  @JsonProperty("samplingProcedureFreeTexts")
-  private List<String> samplingProcedureFreeTexts;
+    @JsonProperty("samplingProcedureFreeTexts")
+    List<String> samplingProcedureFreeTexts;
 
-  @JsonProperty("classifications")
-  private List<TermVocabAttributes> classifications;
+    @JsonProperty("classifications")
+    List<TermVocabAttributes> classifications;
 
-  @JsonProperty("abstract")
-  private String abstractField;
+    @JsonProperty("abstract")
+    String abstractField;
 
-  @JsonProperty("titleStudy")
-  private String titleStudy;
+    @JsonProperty("titleStudy")
+    String titleStudy;
 
-  @JsonProperty("studyUrl")
-  private String studyUrl;
+    @JsonProperty("studyUrl")
+    String studyUrl;
 
-  @JsonProperty("studyNumber")
-  private String studyNumber;
+    @JsonProperty("studyNumber")
+    String studyNumber;
 
-  @JsonProperty("typeOfTimeMethods")
-  private List<TermVocabAttributes> typeOfTimeMethods;
+    @JsonProperty("typeOfTimeMethods")
+    List<TermVocabAttributes> typeOfTimeMethods;
 
-  @JsonProperty("fileLanguages")
-  private Set<String> fileLanguages;
+    @JsonProperty("fileLanguages")
+    Set<String> fileLanguages;
 
-  @JsonProperty("typeOfSamplingProcedures")
-  private List<VocabAttributes> typeOfSamplingProcedures;
+    @JsonProperty("typeOfSamplingProcedures")
+    List<VocabAttributes> typeOfSamplingProcedures;
 
-  @JsonProperty("publisher")
-  private Publisher publisher;
+    @JsonProperty("publisher")
+    Publisher publisher;
 
-  @JsonProperty("studyAreaCountries")
-  private List<Country> studyAreaCountries;
+    @JsonProperty("studyAreaCountries")
+    List<Country> studyAreaCountries;
 
-  @JsonProperty("unitTypes")
-  private List<TermVocabAttributes> unitTypes;
+    @JsonProperty("unitTypes")
+    List<TermVocabAttributes> unitTypes;
 
-  @JsonProperty("pidStudies")
-  private List<Pid> pidStudies;
+    @JsonProperty("pidStudies")
+    List<Pid> pidStudies;
 
-  @Setter
-  @JsonProperty("lastModified")
-  private String lastModified;
+    @JsonProperty("lastModified")
+    String lastModified;
 
-  @JsonProperty("isActive")
-  private boolean active;
+    @JsonProperty("isActive")
+    boolean active;
 
-  @JsonProperty("langAvailableIn")
-  private Set<String> langAvailableIn;
+    @JsonProperty("langAvailableIn")
+    Set<String> langAvailableIn;
 
-  @JsonProperty("studyXmlSourceUrl")
-  private String studyXmlSourceUrl;
-
-  public String getId() {
-    return id;
-  }
+    @JsonProperty("studyXmlSourceUrl")
+    String studyXmlSourceUrl;
 }

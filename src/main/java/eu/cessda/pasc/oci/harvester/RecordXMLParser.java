@@ -44,13 +44,13 @@ import java.net.URISyntaxException;
  */
 @Service
 @Slf4j
-class GetRecordService {
+class RecordXMLParser {
 
     private final CMMStudyMapper cmmStudyMapper;
     private final DaoBase daoBase;
 
     @Autowired
-    public GetRecordService(CMMStudyMapper cmmStudyMapper, DaoBase daoBase) {
+    public RecordXMLParser(CMMStudyMapper cmmStudyMapper, DaoBase daoBase) {
         this.daoBase = daoBase;
         this.cmmStudyMapper = cmmStudyMapper;
     }

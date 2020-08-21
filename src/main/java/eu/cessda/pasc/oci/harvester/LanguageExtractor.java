@@ -37,12 +37,12 @@ import java.util.stream.Collectors;
  */
 @Component
 @Slf4j
-public class LanguageDocumentExtractor {
+public class LanguageExtractor {
 
     private final AppConfigurationProperties appConfigurationProperties;
 
     @Autowired
-    public LanguageDocumentExtractor(AppConfigurationProperties appConfigurationProperties) {
+    public LanguageExtractor(AppConfigurationProperties appConfigurationProperties) {
         this.appConfigurationProperties = appConfigurationProperties;
     }
 

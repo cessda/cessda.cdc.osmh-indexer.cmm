@@ -19,7 +19,6 @@ import eu.cessda.pasc.oci.LoggingConstants;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.elasticsearch.IngestService;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
-import eu.cessda.pasc.oci.models.cmmstudy.Publisher;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -32,11 +31,9 @@ import org.springframework.stereotype.Component;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -53,7 +50,6 @@ public class MicrometerMetrics implements Metrics {
     private static final String NUM_RECORDS_HARVESTED = "num.records.harvested";
     private static final String LIST_RECORD_LANGCODE = "list.record.langcode";
     private static final String LIST_RECORDS_ENDPOINT = "list.records.endpoint";
-    private static final String LIST_RECORDS_PUBLISHER = "list.records.publisher";
 
     // For logging
     private static final String UPDATING_METRIC = "Updating {} metric.";
@@ -62,17 +58,14 @@ public class MicrometerMetrics implements Metrics {
     private final AtomicLong totalRecords = new AtomicLong(0);
     private final ConcurrentHashMap<String, AtomicLong> recordsLanguagesMap = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Repo, AtomicLong> recordsEndpointMap = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<Publisher, AtomicLong> recordsPublisherMap = new ConcurrentHashMap<>();
 
     private final AppConfigurationProperties appConfigurationProperties;
     private final IngestService ingestService;
-    private final MeterRegistry meterRegistry;
 
     @Autowired
     public MicrometerMetrics(AppConfigurationProperties appConfigurationProperties, IngestService ingestService, MeterRegistry meterRegistry) {
         this.appConfigurationProperties = appConfigurationProperties;
         this.ingestService = ingestService;
-        this.meterRegistry = meterRegistry;
 
         // Total records metric
         Gauge.builder(NUM_RECORDS_HARVESTED, totalRecords::get)
@@ -196,51 +189,6 @@ public class MicrometerMetrics implements Metrics {
     }
 
     /**
-     * Updates the total records stored for each publisher.
-     *
-     * @param studies a collection of studies to extract publisher information from.
-     * @throws ElasticsearchException if Elasticsearch is unavailable.
-     * @deprecated - redundant - see {@link}
-     */
-    @Deprecated(forRemoval = true)
-    void updatePublisherRecordsMetric(Collection<CMMStudyOfLanguage> studies) {
-        log.debug(UPDATING_METRIC, LIST_RECORDS_PUBLISHER);
-        var hitCountPerPublisher = new HashMap<Publisher, AtomicInteger>();
-
-        for (CMMStudyOfLanguage study : studies) {
-            // Ignore studies that don't have a publisher set
-            if (study.getPublisher() != null) {
-                hitCountPerPublisher.computeIfAbsent(study.getPublisher(), p -> new AtomicInteger(0)).getAndIncrement();
-            }
-        }
-
-        // This registers the metrics for each publisher on first encounter
-        hitCountPerPublisher.forEach((publisherKey, counter) -> recordsPublisherMap.computeIfAbsent(publisherKey, publisher -> {
-                var builder = Gauge.builder(LIST_RECORDS_PUBLISHER, () -> getRecordCount(publisher));
-                builder.description("Amount of records stored per publisher");
-                builder.tag("publisher", publisher.getName());
-                builder.register(meterRegistry);
-                return new AtomicLong(0);
-            }).set(counter.get())
-        );
-    }
-
-    /**
-     * Gets the count of the amount of records currently stored in Elasticsearch.
-     * Setting this {@link AtomicLong} will update the Micrometer metric.
-     *
-     * @param publisher the publisher to get.
-     * @throws IllegalArgumentException if the publisher is not stored in the map.
-     */
-    AtomicLong getRecordCount(Publisher publisher) {
-        AtomicLong publisherRecord = recordsPublisherMap.get(publisher);
-        if (publisherRecord != null) {
-            return publisherRecord;
-        }
-        throw new IllegalArgumentException(String.format("Invalid publisher [%s]", publisher.getName()));
-    }
-
-    /**
      * {@inheritDoc}
      *
      * @throws ElasticsearchException if Elasticsearch is unavailable.
@@ -251,6 +199,5 @@ public class MicrometerMetrics implements Metrics {
         updateLanguageMetrics();
         var allStudies = ingestService.getAllStudies("*");
         updateEndpointsRecordsMetric(allStudies);
-        updatePublisherRecordsMetric(allStudies);
     }
 }

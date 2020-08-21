@@ -16,10 +16,12 @@
 package eu.cessda.pasc.oci.mock.data;
 
 import eu.cessda.pasc.oci.models.configurations.Endpoints;
+import eu.cessda.pasc.oci.models.configurations.Harvester;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.experimental.UtilityClass;
 
 import java.net.URI;
+import java.util.List;
 
 @UtilityClass
 public class ReposTestData
@@ -48,9 +50,49 @@ public class ReposTestData
         return repo;
     }
 
+    public static Repo getFSDRepo() {
+        var repo = new Repo();
+        repo.setUrl(URI.create("http://services.fsd.uta.fi/v0/oai"));
+        repo.setCode("FSD");
+        repo.setPreferredMetadataParam("oai_ddi25");
+        repo.setSetSpec("study_groups:energia");
+        repo.setHandler("OAI-PMH");
+        return repo;
+    }
+
+    public static Harvester getOaiPmhHarvester() {
+        var nesstarHarvester = new Harvester();
+        nesstarHarvester.setUrl(URI.create("http://localhost:9091"));
+        nesstarHarvester.setVersion("v0");
+        return nesstarHarvester;
+    }
+
+    public static Harvester getNesstarHarvester() {
+        var nesstarHarvester = new Harvester();
+        nesstarHarvester.setUrl(URI.create("http://localhost:9842"));
+        nesstarHarvester.setVersion("v0");
+        return nesstarHarvester;
+    }
+
+    public static Endpoints getSingleEndpoint() {
+        Endpoints endpoints = new Endpoints();
+        endpoints.getRepos().add(getUKDSRepo());
+        endpoints.getHarvesters().put("OAI-PMH", getOaiPmhHarvester());
+        endpoints.getHarvesters().put("NESSTAR", getNesstarHarvester());
+        return endpoints;
+    }
+
     public static Endpoints getEndpoints() {
         Endpoints endpoints = new Endpoints();
         endpoints.getRepos().add(getUKDSRepo());
+        endpoints.getRepos().add(getGesisEnRepo());
+        endpoints.getRepos().add(getFSDRepo());
+        endpoints.getHarvesters().put("OAI-PMH", getOaiPmhHarvester());
+        endpoints.getHarvesters().put("NESSTAR", getNesstarHarvester());
         return endpoints;
+    }
+
+    public static List<String> getListOfLanguages() {
+        return List.of("cs", "da", "de", "el", "en", "et", "fi", "fr", "hu", "it", "nl", "no", "pt", "sk", "sl", "sr", "sv");
     }
 }

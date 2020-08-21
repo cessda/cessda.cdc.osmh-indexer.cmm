@@ -78,8 +78,25 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
                 log.info("[{}] Retrieved [{}] record headers.", repo.getCode(), recordHeadersUnfiltered.size());
                 return filterRecords(recordHeadersUnfiltered, lastModifiedDate);
             }
+        }
+        catch (HTTPException e) {
+            try {
+                ErrorMessage errorMessage = errorMessageObjectReader.readValue(e.getExternalResponse().getBody());
+                log.error(LIST_RECORD_HEADERS_FAILED_WITH_MESSAGE,
+                    value(LoggingConstants.REPO_NAME, repo.getCode()),
+                    value(LoggingConstants.EXCEPTION_NAME, errorMessage.getException()),
+                    value(LoggingConstants.REASON, errorMessage.getMessage())
+                );
+            } catch (IOException jsonException) {
+                log.error(LIST_RECORD_HEADERS_FAILED + ": Response body: {}",
+                    value(LoggingConstants.REPO_NAME, repo.getCode()),
+                    e.toString(),
+                    value(LoggingConstants.REASON, e.getExternalResponse().getBody())
+                );
+                log.debug(jsonException.toString());
+            }
         } catch (IOException | IllegalArgumentException | URISyntaxException e) {
-            log.error("[{}] ListRecordHeaders failed: {}", value(LoggingConstants.REPO_NAME, repo.getCode()), e.toString());
+            log.error(LIST_RECORD_HEADERS_FAILED, value(LoggingConstants.REPO_NAME, repo.getCode()), e.toString());
         }
         return Collections.emptyList();
     }
@@ -97,9 +114,10 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
         } catch (HTTPException e) {
             try {
                 ErrorMessage errorMessage = errorMessageObjectReader.readValue(e.getExternalResponse().getBody());
-                log.warn(FAILED_TO_GET_STUDY_ID,
+                log.warn(FAILED_TO_GET_STUDY_ID_WITH_MESSAGE,
                     value(LoggingConstants.REPO_NAME, repo.getCode()),
                     value(LoggingConstants.STUDY_ID, recordHeader.getIdentifier()),
+                    value(LoggingConstants.EXCEPTION_NAME, errorMessage.getException()),
                     value(LoggingConstants.REASON, errorMessage.getMessage())
                 );
             } catch (IOException jsonException) {

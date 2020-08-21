@@ -16,13 +16,10 @@
 package eu.cessda.pasc.oci.parser;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
+import eu.cessda.pasc.oci.mock.data.ReposTestData;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.mockito.Mockito;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -35,21 +32,21 @@ import static org.assertj.core.api.BDDAssertions.then;
  *
  * @author moses AT doraventures DOT com
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@ActiveProfiles("test")
 public class OaiPmhHelpersTest {
 
 
-    @Autowired
-    private AppConfigurationProperties appConfigurationProperties;
+    private final AppConfigurationProperties appConfigurationProperties = Mockito.mock(AppConfigurationProperties.class);
+
+    public OaiPmhHelpersTest() {
+        Mockito.when(appConfigurationProperties.getEndpoints()).thenReturn(ReposTestData.getEndpoints());
+    }
 
     @Test
     public void ShouldAppendMetaDataPrefixForGivenFSD() throws URISyntaxException {
 
         // Given
         Repo fsdEndpoint = appConfigurationProperties.getEndpoints().getRepos()
-                .stream().filter(repo -> repo.getCode().equals("FSD")).findAny().orElseThrow();
+            .stream().filter(repo -> repo.getCode().equals("FSD")).findAny().orElseThrow();
         String expectedReqUrl = "http://services.fsd.uta.fi/v0/oai?verb=GetRecord&identifier=15454&metadataPrefix=oai_ddi25";
 
         // When

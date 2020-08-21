@@ -28,4 +28,5 @@ public class LoggingConstants {
     public static final String REPO_NAME = "repo_name";
     public static final String LANG_CODE = "lang_code";
     public static final String REASON = "rejection_reason";
+    public static final String EXCEPTION_NAME = "exception_name";
 }

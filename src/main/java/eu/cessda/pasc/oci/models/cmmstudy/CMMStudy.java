@@ -18,7 +18,10 @@ package eu.cessda.pasc.oci.models.cmmstudy;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Value;
+import lombok.With;
 
 import java.util.List;
 import java.util.Map;
@@ -50,96 +53,93 @@ import java.util.Set;
         "dataCollectionPeriodStartdate",
         "dataCollectionPeriodEnddate",
         "dataCollectionYear",
-        "dataCollectionFreeTexts",
-        "dataAccessFreeTexts",
-        "lastModified",
-        "studyUrl",
-        "isActive",
-        "langAvailableIn",
-        "studyXmlSourceUrl"
+    "dataCollectionFreeTexts",
+    "dataAccessFreeTexts",
+    "lastModified",
+    "studyUrl",
+    "isActive",
+    "langAvailableIn",
+    "studyXmlSourceUrl"
 })
 @AllArgsConstructor
 @Builder
-@Getter
-@NoArgsConstructor
-@ToString
+@Value
+@With
+@SuppressWarnings("ReferenceEquality")
 public class CMMStudy {
 
-  @JsonProperty("creators")
-  private Map<String, List<String>> creators;
+    @JsonProperty("creators")
+    Map<String, List<String>> creators;
 
-  @JsonProperty("dataCollectionPeriodStartdate")
-  private String dataCollectionPeriodStartdate;
+    @JsonProperty("dataCollectionPeriodStartdate")
+    String dataCollectionPeriodStartdate;
 
-  @JsonProperty("dataCollectionPeriodEnddate")
-  private String dataCollectionPeriodEnddate;
+    @JsonProperty("dataCollectionPeriodEnddate")
+    String dataCollectionPeriodEnddate;
 
-  @JsonProperty("dataCollectionYear")
-  private int dataCollectionYear;
+    @JsonProperty("dataCollectionYear")
+    int dataCollectionYear;
 
-  @JsonProperty("dataCollectionFreeTexts")
-  private Map<String, List<DataCollectionFreeText>> dataCollectionFreeTexts;
+    @JsonProperty("dataCollectionFreeTexts")
+    Map<String, List<DataCollectionFreeText>> dataCollectionFreeTexts;
 
-  @JsonProperty("dataAccessFreeTexts")
-  private Map<String, List<String>> dataAccessFreeTexts;
+    @JsonProperty("dataAccessFreeTexts")
+    Map<String, List<String>> dataAccessFreeTexts;
 
-  @JsonProperty("publicationYear")
-  private String publicationYear;
+    @JsonProperty("publicationYear")
+    String publicationYear;
 
-  @JsonProperty("typeOfModeOfCollections")
-  private Map<String, List<TermVocabAttributes>> typeOfModeOfCollections;
+    @JsonProperty("typeOfModeOfCollections")
+    Map<String, List<TermVocabAttributes>> typeOfModeOfCollections;
 
-  @JsonProperty("keywords")
-  private Map<String, List<TermVocabAttributes>> keywords;
+    @JsonProperty("keywords")
+    Map<String, List<TermVocabAttributes>> keywords;
 
-  @JsonProperty("samplingProcedureFreeTexts")
-  private Map<String, List<String>> samplingProcedureFreeTexts;
+    @JsonProperty("samplingProcedureFreeTexts")
+    Map<String, List<String>> samplingProcedureFreeTexts;
 
-  @JsonProperty("classifications")
-  private Map<String, List<TermVocabAttributes>> classifications;
+    @JsonProperty("classifications")
+    Map<String, List<TermVocabAttributes>> classifications;
 
-  @JsonProperty("abstract")
-  private Map<String, String> abstractField;
+    @JsonProperty("abstract")
+    Map<String, String> abstractField;
 
-  @JsonProperty("titleStudy")
-  private Map<String, String> titleStudy;
+    @JsonProperty("titleStudy")
+    Map<String, String> titleStudy;
 
-  @Setter
-  @JsonProperty("studyUrl")
-  private Map<String, String> studyUrl;
+    @JsonProperty("studyUrl")
+    Map<String, String> studyUrl;
 
-  @Setter
-  @JsonProperty("studyNumber")
-  private String studyNumber;
+    @JsonProperty("studyNumber")
+    String studyNumber;
 
-  @JsonProperty("typeOfTimeMethods")
-  private Map<String, List<TermVocabAttributes>> typeOfTimeMethods;
+    @JsonProperty("typeOfTimeMethods")
+    Map<String, List<TermVocabAttributes>> typeOfTimeMethods;
 
-  @JsonProperty("fileLanguages")
-  private Set<String> fileLanguages;
+    @JsonProperty("fileLanguages")
+    Set<String> fileLanguages;
 
-  @JsonProperty("typeOfSamplingProcedures")
-  private Map<String, List<VocabAttributes>> typeOfSamplingProcedures;
+    @JsonProperty("typeOfSamplingProcedures")
+    Map<String, List<VocabAttributes>> typeOfSamplingProcedures;
 
-  @JsonProperty("publisher")
-  private Map<String, Publisher> publisher;
+    @JsonProperty("publisher")
+    Map<String, Publisher> publisher;
 
-  @JsonProperty("studyAreaCountries")
-  private Map<String, List<Country>> studyAreaCountries;
+    @JsonProperty("studyAreaCountries")
+    Map<String, List<Country>> studyAreaCountries;
 
-  @JsonProperty("unitTypes")
-  private Map<String, List<TermVocabAttributes>> unitTypes;
+    @JsonProperty("unitTypes")
+    Map<String, List<TermVocabAttributes>> unitTypes;
 
-  @JsonProperty("pidStudies")
-  private Map<String, List<Pid>> pidStudies;
+    @JsonProperty("pidStudies")
+    Map<String, List<Pid>> pidStudies;
 
-  @JsonProperty("lastModified")
-  private String lastModified;
+    @JsonProperty("lastModified")
+    String lastModified;
 
-  @Setter
-  @JsonProperty("isActive")
-  private boolean active;
+    @JsonProperty("isActive")
+    boolean active;
 
-  @JsonProperty("studyXmlSourceUrl")
-  private String studyXmlSourceUrl;
+    @JsonProperty("studyXmlSourceUrl")
+    String studyXmlSourceUrl;
 }

@@ -19,6 +19,7 @@ import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.models.cmmstudy.*;
 import eu.cessda.pasc.oci.models.configurations.Repo;
+import eu.cessda.pasc.oci.models.oai.configuration.MetadataParsingDefaultLang;
 import eu.cessda.pasc.oci.models.oai.configuration.OaiPmh;
 import lombok.Builder;
 import lombok.Value;
@@ -52,6 +53,17 @@ public class CMMStudyMapper {
     private final OaiPmh oaiPmh;
     private final DocElementParser docElementParser;
     private final XPathFactory xFactory = XPathFactory.instance();
+
+    public CMMStudyMapper() {
+        oaiPmh = new OaiPmh();
+        var defaultLangSettings = new MetadataParsingDefaultLang();
+        defaultLangSettings.setActive(true);
+        defaultLangSettings.setLang("en");
+        oaiPmh.setMetadataParsingDefaultLang(defaultLangSettings);
+        oaiPmh.setConcatRepeatedElements(true);
+        oaiPmh.setConcatSeparator("+<br>");
+        docElementParser = new DocElementParser(oaiPmh);
+    }
 
     @Autowired
     public CMMStudyMapper(DocElementParser docElementParser, HandlerConfigurationProperties handlerConfigurationProperties) {

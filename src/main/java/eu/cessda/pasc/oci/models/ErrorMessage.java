@@ -15,6 +15,7 @@
  */
 package eu.cessda.pasc.oci.models;
 
+import lombok.NonNull;
 import lombok.Value;
 
 /**
@@ -22,5 +23,9 @@ import lombok.Value;
  */
 @Value
 public class ErrorMessage {
+    @NonNull
+    String exception;
+    @NonNull
     String message;
+    String externalResponse;
 }

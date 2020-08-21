@@ -36,12 +36,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.net.URI;
@@ -49,6 +44,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.api.BDDAssertions.then;
@@ -58,21 +54,19 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 /**
  * @author moses AT doraventures DOT com
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@ActiveProfiles("test")
 @Slf4j
-public class GetRecordServiceTest {
+public class RecordXMLParserTest {
 
     private final CMMStudyConverter cmmConverter = new CMMStudyConverter();
     private final DaoBase daoBase = Mockito.mock(DaoBase.class);
     private final Repo repo;
     private final String recordIdentifier;
     private final URI fullRecordUrl;
-    @Autowired
-    private CMMStudyMapper cmmStudyMapper;
+    private final CMMStudyMapper cmmStudyMapper = new CMMStudyMapper();
 
-    public GetRecordServiceTest() {
+    public RecordXMLParserTest() {
+        // Needed because TimeUtility only works properly in UTC timezones
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         repo = ReposTestData.getUKDSRepo();
         recordIdentifier = "http://my-example_url:80/obj/fStudy/ch.sidos.ddi.468.7773";
         fullRecordUrl = URI.create(repo.getUrl() + "?verb=GetRecord&identifier=" + URLEncoder.encode(recordIdentifier, StandardCharsets.UTF_8) + "&metadataPrefix=ddi");
@@ -87,7 +81,7 @@ public class GetRecordServiceTest {
         );
 
         // When
-        CMMStudy result = new GetRecordService(cmmStudyMapper, daoBase).getRecord(repo, recordIdentifier);
+        CMMStudy result = new RecordXMLParser(cmmStudyMapper, daoBase).getRecord(repo, recordIdentifier);
 
         then(result).isNotNull();
         validateCMMStudyResultAgainstSchema(result);
@@ -104,7 +98,7 @@ public class GetRecordServiceTest {
         );
 
         // When
-        CMMStudy result = new GetRecordService(cmmStudyMapper, daoBase).getRecord(repo, recordIdentifier);
+        CMMStudy result = new RecordXMLParser(cmmStudyMapper, daoBase).getRecord(repo, recordIdentifier);
 
         then(result).isNotNull();
 
@@ -128,7 +122,7 @@ public class GetRecordServiceTest {
         );
 
         // When
-        CMMStudy record = new GetRecordService(cmmStudyMapper, daoBase).getRecord(repo, recordIdentifier);
+        CMMStudy record = new RecordXMLParser(cmmStudyMapper, daoBase).getRecord(repo, recordIdentifier);
 
         // Then
         then(record).isNotNull();
@@ -145,7 +139,7 @@ public class GetRecordServiceTest {
         );
 
         // When
-        CMMStudy record = new GetRecordService(cmmStudyMapper, daoBase).getRecord(repo, recordIdentifier);
+        CMMStudy record = new RecordXMLParser(cmmStudyMapper, daoBase).getRecord(repo, recordIdentifier);
         then(record).isNotNull();
         validateCMMStudyResultAgainstSchema(record);
         final ObjectMapper mapper = new ObjectMapper();
@@ -167,7 +161,7 @@ public class GetRecordServiceTest {
         );
 
         // When
-        CMMStudy record = new GetRecordService(cmmStudyMapper, daoBase).getRecord(repo, recordIdentifier);
+        CMMStudy record = new RecordXMLParser(cmmStudyMapper, daoBase).getRecord(repo, recordIdentifier);
         String actualCmmStudyJsonString = cmmConverter.toJsonString(record);
 
         // then
@@ -188,7 +182,7 @@ public class GetRecordServiceTest {
         );
 
         // When
-        CMMStudy record = new GetRecordService(cmmStudyMapper, daoBase).getRecord(repo, recordIdentifier);
+        CMMStudy record = new RecordXMLParser(cmmStudyMapper, daoBase).getRecord(repo, recordIdentifier);
 
         then(record).isNotNull();
         then(record.getAbstractField().size()).isEqualTo(3);
@@ -210,7 +204,7 @@ public class GetRecordServiceTest {
         );
 
         // When
-        CMMStudy record = new GetRecordService(cmmStudyMapper, daoBase).getRecord(repo, recordIdentifier);
+        CMMStudy record = new RecordXMLParser(cmmStudyMapper, daoBase).getRecord(repo, recordIdentifier);
 
         then(record).isNotNull();
         then(record.getTitleStudy().size()).isEqualTo(3);
@@ -227,7 +221,7 @@ public class GetRecordServiceTest {
         );
 
         // When
-        CMMStudy record = new GetRecordService(cmmStudyMapper, daoBase).getRecord(repo, recordIdentifier);
+        CMMStudy record = new RecordXMLParser(cmmStudyMapper, daoBase).getRecord(repo, recordIdentifier);
 
         // Then
         then(record).isNotNull();
@@ -243,7 +237,7 @@ public class GetRecordServiceTest {
         );
 
         // When
-        new GetRecordService(cmmStudyMapper, daoBase).getRecord(repo, recordIdentifier);
+        new RecordXMLParser(cmmStudyMapper, daoBase).getRecord(repo, recordIdentifier);
 
         // Then an exception is thrown.
     }
@@ -257,7 +251,7 @@ public class GetRecordServiceTest {
         );
 
         // When
-        CMMStudy result = new GetRecordService(cmmStudyMapper, daoBase).getRecord(repo, recordIdentifier);
+        CMMStudy result = new RecordXMLParser(cmmStudyMapper, daoBase).getRecord(repo, recordIdentifier);
 
         then(result).isNotNull();
         validateCMMStudyResultAgainstSchema(result);
@@ -343,7 +337,7 @@ public class GetRecordServiceTest {
         );
 
         // When
-        CMMStudy result = new GetRecordService(cmmStudyMapper, daoBase).getRecord(repository, recordIdentifier);
+        CMMStudy result = new RecordXMLParser(cmmStudyMapper, daoBase).getRecord(repository, recordIdentifier);
 
         then(result).isNotNull();
         validateCMMStudyResultAgainstSchema(result);

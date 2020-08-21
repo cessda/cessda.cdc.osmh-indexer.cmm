@@ -16,7 +16,8 @@
 package eu.cessda.pasc.oci.models.cmmstudy;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import lombok.Builder;
+import lombok.Value;
 
 /**
  * Country pojo to hold
@@ -26,14 +27,10 @@ import lombok.*;
  * @author moses AT doraventures DOT com
  */
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@EqualsAndHashCode
-@ToString
+@Value
 public class Country {
-  @JsonProperty("abbr")
-  private String iso2LetterCode;
-  @JsonProperty("country")
-  private String countryName;
+    @JsonProperty("abbr")
+    String iso2LetterCode;
+    @JsonProperty("country")
+    String countryName;
 }

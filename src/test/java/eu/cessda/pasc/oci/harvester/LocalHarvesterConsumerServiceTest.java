@@ -37,7 +37,7 @@ public class LocalHarvesterConsumerServiceTest {
     private static final Repo UKDS_REPO = getUKDSRepo();
     private static final RecordHeader STUDY_NUMBER = RecordHeader.builder().identifier("oai:ukds/5436").build();
     private final RecordHeaderParser recordHeaderParser = Mockito.mock(RecordHeaderParser.class);
-    private final GetRecordService getRecordService = Mockito.mock(GetRecordService.class);
+    private final RecordXMLParser recordXMLParser = Mockito.mock(RecordXMLParser.class);
     /**
      * Class to test
      */
@@ -45,7 +45,7 @@ public class LocalHarvesterConsumerServiceTest {
 
     @Before
     public void setUp() {
-        remoteHarvesterConsumerService = new LocalHarvesterConsumerService(recordHeaderParser, getRecordService);
+        remoteHarvesterConsumerService = new LocalHarvesterConsumerService(recordHeaderParser, recordXMLParser);
     }
 
     @Test
@@ -81,7 +81,7 @@ public class LocalHarvesterConsumerServiceTest {
     @Test
     public void getRecordShouldLogOaiErrorCodeAndMessageWhenAnOaiExceptionIsThrown() throws HarvesterException {
         // When
-        Mockito.when(getRecordService.getRecord(UKDS_REPO, STUDY_NUMBER.getIdentifier())).thenThrow(new OaiPmhException(OaiPmhException.Code.badArgument, "Invalid argument"));
+        Mockito.when(recordXMLParser.getRecord(UKDS_REPO, STUDY_NUMBER.getIdentifier())).thenThrow(new OaiPmhException(OaiPmhException.Code.badArgument, "Invalid argument"));
 
         // Then
         var record = remoteHarvesterConsumerService.getRecord(UKDS_REPO, STUDY_NUMBER);
@@ -91,7 +91,7 @@ public class LocalHarvesterConsumerServiceTest {
     @Test
     public void getRecordShouldLogOaiErrorCodeWhenAnOaiExceptionIsThrown() throws HarvesterException {
         // When
-        Mockito.when(getRecordService.getRecord(UKDS_REPO, STUDY_NUMBER.getIdentifier())).thenThrow(new OaiPmhException(OaiPmhException.Code.badArgument));
+        Mockito.when(recordXMLParser.getRecord(UKDS_REPO, STUDY_NUMBER.getIdentifier())).thenThrow(new OaiPmhException(OaiPmhException.Code.badArgument));
 
         // Then
         var record = remoteHarvesterConsumerService.getRecord(UKDS_REPO, STUDY_NUMBER);
@@ -101,7 +101,7 @@ public class LocalHarvesterConsumerServiceTest {
     @Test
     public void getRecordShouldLogWhenACustomHandlerExceptionIsThrown() throws HarvesterException {
         // When
-        Mockito.when(getRecordService.getRecord(UKDS_REPO, STUDY_NUMBER.getIdentifier())).thenThrow(HarvesterException.class);
+        Mockito.when(recordXMLParser.getRecord(UKDS_REPO, STUDY_NUMBER.getIdentifier())).thenThrow(HarvesterException.class);
 
         // Then
         var record = remoteHarvesterConsumerService.getRecord(UKDS_REPO, STUDY_NUMBER);

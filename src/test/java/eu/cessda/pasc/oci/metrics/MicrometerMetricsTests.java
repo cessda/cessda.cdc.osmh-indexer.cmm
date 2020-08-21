@@ -19,7 +19,6 @@ import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.elasticsearch.IngestService;
 import eu.cessda.pasc.oci.mock.data.RecordTestData;
 import eu.cessda.pasc.oci.mock.data.ReposTestData;
-import eu.cessda.pasc.oci.models.cmmstudy.Publisher;
 import eu.cessda.pasc.oci.models.configurations.Endpoints;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -184,30 +183,6 @@ public class MicrometerMetricsTests {
         // Then
         micrometerMetrics.updateEndpointsRecordsMetric(testSet);
         micrometerMetrics.getRecordCount(ReposTestData.getUKDSRepo());
-    }
-
-    @Test
-    public void shouldContainCorrectAmountOfRecordsForEachPublisher() throws IOException {
-        IngestService ingestService = Mockito.mock(IngestService.class);
-
-        // When
-        var testSet = new HashSet<>(RecordTestData.getCmmStudyOfLanguageCodeEnX3());
-        var micrometerMetrics = new MicrometerMetrics(appConfigurationProperties, ingestService, meterRegistry);
-
-        // Then
-        micrometerMetrics.updatePublisherRecordsMetric(testSet);
-
-        Publisher publisher = testSet.iterator().next().getPublisher();
-        Assert.assertEquals(3, micrometerMetrics.getRecordCount(publisher).get());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldThrowOnInvalidPublisher() {
-        IngestService ingestService = Mockito.mock(IngestService.class);
-        var micrometerMetrics = new MicrometerMetrics(appConfigurationProperties, ingestService, meterRegistry);
-
-        // Then
-        micrometerMetrics.getRecordCount(new Publisher());
     }
 
     @Test
