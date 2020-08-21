@@ -37,6 +37,9 @@ import java.util.stream.Collectors;
 abstract class AbstractHarvesterConsumerService implements HarvesterConsumerService {
 
     protected static final String FAILED_TO_GET_STUDY_ID = "[{}] Failed to get StudyId [{}]: {}";
+    protected static final String LIST_RECORD_HEADERS_FAILED = "[{}] ListRecordHeaders failed: {}";
+    protected static final String LIST_RECORD_HEADERS_FAILED_WITH_MESSAGE = LIST_RECORD_HEADERS_FAILED + ": {}";
+    protected static final String FAILED_TO_GET_STUDY_ID_WITH_MESSAGE = FAILED_TO_GET_STUDY_ID + ": {}";
 
     @Override
     public Optional<CMMStudy> getRecord(Repo repo, RecordHeader recordHeader) {

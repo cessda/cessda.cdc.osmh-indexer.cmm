@@ -177,7 +177,7 @@ public class HarvesterRunner {
 
     private Map<String, List<CMMStudyOfLanguage>> getCmmStudiesOfEachLangIsoCodeMap(Repo repo, LocalDateTime lastModifiedDateTime) {
 
-        HarvesterConsumerService harvester;
+        final HarvesterConsumerService harvester;
 
         // OAI-PMH repositories can be handled by the internal harvester, all other types should be delegated to remote handlers
         if (repo.getHandler().equalsIgnoreCase("OAI-PMH")) {
@@ -196,11 +196,10 @@ public class HarvesterRunner {
             .map(Optional::get)
             .collect(Collectors.toList());
 
-        log.info("[{}] Retrieved [{}] studies from [{}] header entries. [{}] studies couldn't be retrieved.",
+        log.info("[{}] Retrieved [{}] studies from [{}] header entries.",
                 value(LoggingConstants.REPO_NAME, repo.getCode()),
                 value("present_cmm_record", presentCMMStudies.size()),
-                value("total_cmm_record", recordHeaders.size()),
-                value("cmm_records_rejected", recordHeaders.size() - presentCMMStudies.size()));
+                value("total_cmm_record", recordHeaders.size()));
 
         return extractor.mapLanguageDoc(presentCMMStudies, repo);
     }

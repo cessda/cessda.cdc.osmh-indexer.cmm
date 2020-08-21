@@ -22,6 +22,7 @@ import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,29 +54,34 @@ public class LocalHarvesterConsumerService extends AbstractHarvesterConsumerServ
         } catch (OaiPmhException e) {
             // Check if there was a message attached to the OAI error response
             e.getOaiErrorMessage().ifPresentOrElse(
-                oaiErrorMessage -> log.error("[{}] ListRecordHeaders failed. {}: {}",
+                oaiErrorMessage -> log.error(LIST_RECORD_HEADERS_FAILED_WITH_MESSAGE,
                     repo.getCode(),
                     value(LoggingConstants.OAI_ERROR_CODE, e.getCode()),
                     value(LoggingConstants.OAI_ERROR_MESSAGE, oaiErrorMessage)
                 ),
-                () -> log.error("[{}] ListRecordHeaders failed. {}.",
+                () -> log.error(LIST_RECORD_HEADERS_FAILED,
                     repo.getCode(),
                     value(LoggingConstants.OAI_ERROR_CODE, e.getCode())
                 )
             );
         } catch (HarvesterException e) {
-            log.error("[{}] ListRecordHeaders failed:", value(LoggingConstants.REPO_NAME, repo.getCode()), e);
+            log.error(LIST_RECORD_HEADERS_FAILED_WITH_MESSAGE,
+                value(LoggingConstants.REPO_NAME, repo.getCode()),
+                value(LoggingConstants.EXCEPTION_NAME, e.getClass().getName()),
+                value(LoggingConstants.REASON, e.getMessage())
+            );
         }
         return Collections.emptyList();
     }
 
     @Override
+    @SuppressWarnings("try")
     public Optional<CMMStudy> getRecordFromRemote(Repo repo, RecordHeader recordHeader) {
-        try {
+        try (var identifierClosable = MDC.putCloseable(LoggingConstants.STUDY_ID, recordHeader.getIdentifier())) {
             return Optional.of(recordXMLParser.getRecord(repo, recordHeader.getIdentifier()));
         } catch (OaiPmhException e) {
             e.getOaiErrorMessage().ifPresentOrElse(
-                oaiErrorMessage -> log.warn(FAILED_TO_GET_STUDY_ID + ": {}",
+                oaiErrorMessage -> log.warn(FAILED_TO_GET_STUDY_ID_WITH_MESSAGE,
                     repo.getCode(),
                     value(LoggingConstants.STUDY_ID, recordHeader.getIdentifier()),
                     value(LoggingConstants.OAI_ERROR_CODE, e.getCode()),

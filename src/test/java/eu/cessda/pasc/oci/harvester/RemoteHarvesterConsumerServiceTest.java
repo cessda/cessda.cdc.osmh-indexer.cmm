@@ -158,7 +158,7 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
         when(repoMock.getUrl()).thenReturn(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
         when(repoMock.getHandler()).thenReturn("NESSTAR");
 
-        var jsonMessage = objectMapper.writeValueAsString(new ErrorMessage("Mocked server error!"));
+        var jsonMessage = objectMapper.writeValueAsString(new ErrorMessage("eu.cessda.Exception", "Mocked server error!", null));
 
         when(daoBase.getInputStream(any(URI.class))).thenThrow(new HTTPException(500, jsonMessage));
 

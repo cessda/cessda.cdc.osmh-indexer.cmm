@@ -39,7 +39,7 @@ public class TimeUtility {
     };
 
     /**
-     * Attempts to pass date string using multiple expected date formats into a LocalDateTime.
+     * Attempts to parse the date string into a LocalDateTime using multiple expected date formats.
      *
      * @param dateString to parse as a {@link LocalDateTime}.
      * @return the {@link Optional} of {@link LocalDateTime}, or an {@link Optional#empty()} if the date failed to parse.

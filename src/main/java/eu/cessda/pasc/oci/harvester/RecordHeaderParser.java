@@ -27,7 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -73,38 +72,14 @@ class RecordHeaderParser {
         // We exit if the response has an <error> element
         ListIdentifiersResponseValidator.validateResponse(recordHeadersDocument);
 
-        log.info("[{}] Parsing record headers.", repo.getCode());
-        List<RecordHeader> recordHeaders = retrieveRecordHeaders(recordHeadersDocument, repo.getUrl());
+        log.debug("[{}] Parsing record headers.", repo.getCode());
+        var recordHeaders = retrieveRecordHeaders(recordHeadersDocument, repo.getUrl());
         log.debug("[{}] ParseRecordHeaders ended:  No more resumption tokens to process.", repo.getCode());
 
-        int expectedRecordHeadersCount = getRecordHeadersCount(recordHeadersDocument);
-        if (expectedRecordHeadersCount != -1) {
-            log.info("[{}] Retrieved [{}] of [{}] expected record headers.",
-                repo.getCode(), recordHeaders.size(), expectedRecordHeadersCount
-            );
-        } else {
-            log.info("[{}] Retrieved [{}] record headers.", repo.getCode(), recordHeaders.size());
-        }
         return recordHeaders;
     }
 
-    private int getRecordHeadersCount(Document doc) {
-
-        NodeList resumptionToken = doc.getElementsByTagName(OaiPmhConstants.RESUMPTION_TOKEN_ELEMENT);
-        if (resumptionToken.getLength() > 0) {
-            Node item = resumptionToken.item(0);
-            NamedNodeMap attributes = item.getAttributes();
-            for (int attributeIndex = 0; attributeIndex < attributes.getLength(); attributeIndex++) {
-                if (attributes.item(attributeIndex).getNodeName().equalsIgnoreCase(OaiPmhConstants.COMPLETE_LIST_SIZE_ATTR)) {
-                    return Integer.parseInt(attributes.item(attributeIndex).getTextContent());
-                }
-            }
-        }
-        // Should not reach here for valid oai-pmh xml responses
-        return -1;
-    }
-
-    private List<RecordHeader> retrieveRecordHeaders(Document document, URI baseRepoUrl) throws XMLParseException {
+    private ArrayList<RecordHeader> retrieveRecordHeaders(Document document, URI baseRepoUrl) throws XMLParseException {
 
         Optional<String> resumptionToken;
         var recordHeaders = new ArrayList<RecordHeader>();
@@ -147,7 +122,7 @@ class RecordHeaderParser {
         if (resumptionToken.getLength() > 0) {
             Node item = resumptionToken.item(0);
             if (!item.getTextContent().trim().isEmpty()) {
-                return Optional.ofNullable(item.getTextContent());
+                return Optional.of(item.getTextContent());
             }
         }
         log.debug("Resumption token empty.");
