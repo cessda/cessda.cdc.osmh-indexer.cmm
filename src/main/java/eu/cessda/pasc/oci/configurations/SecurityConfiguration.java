@@ -39,6 +39,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .anyRequest().permitAll() // Enable access to REST APIs without authentication
                 .and().formLogin() // Enable form based login
                 .and().httpBasic() // Enable basic authentication
-                .and().csrf().ignoringAntMatchers("/actuator**"); // https://codecentric.github.io/spring-boot-admin/2.1.5/#_csrf_on_actuator_endpoints
+                .and().csrf().ignoringAntMatchers("/actuator/**"); // https://codecentric.github.io/spring-boot-admin/2.1.5/#_csrf_on_actuator_endpoints
     }
 }
