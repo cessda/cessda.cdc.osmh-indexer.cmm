@@ -15,7 +15,7 @@
  */
 package eu.cessda.pasc.oci.parser;
 
-import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
+import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.models.cmmstudy.TermVocabAttributes;
 import eu.cessda.pasc.oci.models.oai.configuration.OaiPmh;
@@ -54,8 +54,8 @@ class DocElementParser {
     }
 
     @Autowired
-    private DocElementParser(HandlerConfigurationProperties handlerConfigurationProperties) {
-        this.oaiPmh = handlerConfigurationProperties.getOaiPmh();
+    private DocElementParser(AppConfigurationProperties appConfigurationProperties) {
+        this.oaiPmh = appConfigurationProperties.getOaiPmh();
     }
 
     static TermVocabAttributes parseTermVocabAttrAndValues(Element parentElement, Element concept, boolean hasControlledValue) {

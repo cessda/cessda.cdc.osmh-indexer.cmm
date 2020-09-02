@@ -18,7 +18,7 @@ package eu.cessda.pasc.oci.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
+import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedOperation;
@@ -35,17 +35,17 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class StatusService {
 
-  private final HandlerConfigurationProperties handlerConfigurationProperties;
+  private final AppConfigurationProperties appConfigurationProperties;
   private final ObjectWriter prettyPrinter;
 
   @Autowired
-  public StatusService(HandlerConfigurationProperties handlerConfigurationProperties, ObjectMapper objectMapper) {
-    this.handlerConfigurationProperties = handlerConfigurationProperties;
+  public StatusService(AppConfigurationProperties appConfigurationProperties, ObjectMapper objectMapper) {
+    this.appConfigurationProperties = appConfigurationProperties;
     this.prettyPrinter = objectMapper.writerWithDefaultPrettyPrinter();
   }
 
   @ManagedOperation(description = "Prints out the CDC Handler OAI-PMH DDI 2.5 Configuration")
   public String printPaSCHandlerOaiPmhConfig() throws JsonProcessingException {
-    return "Config for DDI 2.5: [" + prettyPrinter.writeValueAsString(handlerConfigurationProperties.getOaiPmh()) + "]";
+    return "Config for DDI 2.5: [" + prettyPrinter.writeValueAsString(appConfigurationProperties.getOaiPmh()) + "]";
   }
 }

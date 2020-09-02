@@ -18,14 +18,9 @@ package eu.cessda.pasc.oci.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
+import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InOrder;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.mockito.BDDMockito.given;
@@ -34,13 +29,9 @@ import static org.mockito.Mockito.*;
 /**
  * @author moses AT doraventures DOT com
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@ActiveProfiles("test")
 public class StatusServiceTest {
 
-  @Autowired
-  private HandlerConfigurationProperties handlerConfigurationProperties;
+  private final AppConfigurationProperties appConfigurationProperties = new AppConfigurationProperties();
 
   @Test
   public void shouldPrintOutConfiguration() throws JsonProcessingException {
@@ -50,7 +41,7 @@ public class StatusServiceTest {
     ObjectMapper objectMapper = mock(ObjectMapper.class);
     given(objectMapper.writerWithDefaultPrettyPrinter()).willReturn(prettyWriter);
     given(prettyWriter.writeValueAsString(any())).willReturn("{\"test\":\"value\"}");
-    StatusService statusService = new StatusService(handlerConfigurationProperties, objectMapper);
+    StatusService statusService = new StatusService(appConfigurationProperties, objectMapper);
 
     // when
     String outPut = statusService.printPaSCHandlerOaiPmhConfig();
