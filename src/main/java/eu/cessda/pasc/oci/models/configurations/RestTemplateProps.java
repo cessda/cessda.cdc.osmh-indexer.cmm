@@ -26,7 +26,6 @@ import lombok.Data;
 public class RestTemplateProps {
 
     private int connTimeout;
-    private int connRequestTimeout;
     private int readTimeout;
     private boolean verifySSL;
 }

@@ -17,6 +17,7 @@ package eu.cessda.pasc.oci.configurations;
 
 import eu.cessda.pasc.oci.models.configurations.Endpoints;
 import eu.cessda.pasc.oci.models.configurations.RestTemplateProps;
+import eu.cessda.pasc.oci.models.oai.configuration.OaiPmh;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -40,6 +41,7 @@ public class AppConfigurationProperties {
   private Endpoints endpoints = new Endpoints();
   private RestTemplateProps restTemplateProps = new RestTemplateProps();
   private final List<String> languages = new ArrayList<>();
+  private final OaiPmh oaiPmh = new OaiPmh();
 
   public AppConfigurationProperties() {
     TimeZone.setDefault(TimeZone.getTimeZone("UTC"));

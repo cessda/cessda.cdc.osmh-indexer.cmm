@@ -75,8 +75,6 @@ osmhConsumer:
       NESSTAR:
         url: 'http://localhost:9842'
         version: 'v0'
-    supportedRecordTypes:
-      - CMMStudy
     # Use 'code descriptive term' taken from CDC Publisher Names CV
     repos:
       - url: https://www.adp.fdv.uni-lj.si/v0/oai
@@ -184,25 +182,12 @@ osmhConsumer:
     connTimeout: 10000 # increased from 5 seconds to 10 seconds to deal with slower Nesstar repos
     connRequestTimeout: 5000 # 5 seconds
     readTimeout: 180000 # increased from 120 seconds to 180 seconds to deal with slower Nesstar repos
-    verifySSL: true
-osmhhandler:
-  baseEndpoint: '/'
   oaiPmh:
-    supportedApiVersions:
-      - v0
-    supportedRecordTypes:
-      - CMMStudy
     metadataParsingDefaultLang:
       active: true
       lang: 'en'
     concatRepeatedElements: true
     concatSeparator: "+<br>"
-    publicationYearDefault: 1970
-  restTemplateProps:
-    connTimeout: 10000 # increased from 5 seconds to 10 seconds to deal with slower Nesstar repos
-    connRequestTimeout: 5000 # 5 seconds
-    readTimeout: 180000 # increased from 120 seconds to 180 seconds to deal with slower Nesstar repos
-    verifySSL: true
 ---
 # For debugging
 spring:

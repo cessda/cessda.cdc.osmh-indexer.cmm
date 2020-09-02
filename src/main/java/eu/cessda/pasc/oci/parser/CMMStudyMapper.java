@@ -15,7 +15,7 @@
  */
 package eu.cessda.pasc.oci.parser;
 
-import eu.cessda.pasc.oci.configurations.HandlerConfigurationProperties;
+import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.models.cmmstudy.*;
 import eu.cessda.pasc.oci.models.configurations.Repo;
@@ -66,9 +66,9 @@ public class CMMStudyMapper {
     }
 
     @Autowired
-    public CMMStudyMapper(DocElementParser docElementParser, HandlerConfigurationProperties handlerConfigurationProperties) {
+    public CMMStudyMapper(DocElementParser docElementParser, AppConfigurationProperties appConfigurationProperties) {
         this.docElementParser = docElementParser;
-        this.oaiPmh = handlerConfigurationProperties.getOaiPmh();
+        this.oaiPmh = appConfigurationProperties.getOaiPmh();
     }
 
     /**
