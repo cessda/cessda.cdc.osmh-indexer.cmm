@@ -36,9 +36,9 @@ The following tools are expected to be installed before compiling
 
 ### Sonar it
 
-Static code quality with verification with SonarQube
+To perform SonarQube analysis locally, run SonarQube and then execute
 
-    mvn sonar:sonar -Dsonar.host.url=http://localhost:9000
+    mvn sonar:sonar
 
 ### Build it
 
@@ -48,11 +48,11 @@ Static code quality with verification with SonarQube
 
     mvn spring-boot:run
 
-### Run it — with profile
+### Run it — with a specified profile
 
-    java -jar -Dspring.profiles.active=dev target/pasc-oci*.jar
-    java -jar -Dspring.profiles.active=uat target/pasc-oci*.jar
-    java -jar -Dspring.profiles.active=prod target/pasc-oci*.jar
+To run the OSMH consumer with a custom profile, use the following command line:
+
+    java -jar target/pasc-oci*.jar --spring.profiles.active=${profile_name}
 
 If no profile is specified, the default profile will be used. The default profile is configured to use a local Elasticsearch instance, as well as a local NESSTAR repository handler.
 
@@ -73,11 +73,9 @@ The application loads configuration in this order
 * application-[dev,local,prod].yml
     * dev, local and prod refer to Spring profiles
         * A Spring profile can be specified by the command line `--spring.profiles.active` or the environment variable `SPRING_PROFILES_ACTIVE`
-    * See <https://docs.spring.io/spring-boot/docs/1.5.x/reference/html/boot-features-profiles.html> for more details
+    * See <https://docs.spring.io/spring-boot/docs/2.0.x/reference/html/boot-features-profiles.html> for more details
 * application.yml
 * CLI parameters e.g. `--logging.level.=DEBUG` sets logging level for all classes
-
-Note that usernames (`${SECURITY_USER_NAME}` and `${SPRING_BOOT_ADMIN_USERNAME}`) and passwords (`${SECURITY_USER_PASSWORD}` and `${SPRING_BOOT_ADMIN_PASSWORD}`) are defined externally, and consumed by the indexer at runtime.
 
 ### At Runtime
 
@@ -85,32 +83,77 @@ If the application is registered at a [Spring Boot Admin server](https://github.
 
 **Changes made at runtime will be effective after a context reload but are lost after an application restart unless persisted in** `application.yml`
 
-## Timer Properties
+## Configuring the indexer
 
-Harvesting Schedule timers:
+The OSMH harvester has many settings that change the behaviour of the harvest. These settings are defined under the `osmhConsumer` and `osmhhandler` keys in `application.yml`.
+
+### Timer Properties
+
+Harvesting Schedule timers are specified under `osmhConsumer.delay` and `osmhConsumer.daily`:
 
 ```yaml
 osmhConsumer:
   delay:
     # Auto Starts after delay of 60 seconds at startup
     initial: '60000'
+  daily:
+    # Perform a daily harvest run at 00:01am.
+    run: '0 01 00 * * *'
+    # Then perform a full run every Sunday at 09:00
+    sunday.run: '0 00 09 * * SUN'
 ```
+
+Timer schedules are defined using Spring's cron notation.
 
 The timer schedule for GCP use is defined in [CDC deployment repository's template-deployment.yaml](https://bitbucket.org/cessda/cessda.cdc.deploy/src/master/osmh-indexer/infrastructure/k8s/template-deployment.yaml), but if you are deploying the software elsewhere, then the timer settings in [application.yml](/src/main/resources/application.yml) are relevant. The profiles are defined in [application.yml](/src/main/resources/application.yml) and selected in [Dockerfile](Dockerfile).
 
 Take care with the daily/Sunday timer settings, otherwise all running instances may attempt to re-harvest the same endpoints at the same time.
 
-## Declaring a repository
+
+### Language settings
+
+The languages that the OSMH indexer will attempt to harvest are specified under `osmhConsumer.languages`. These languages will be parsed and indexed into Elasticsearch.
+
+```yaml
+osmhConsumer:
+  languages: ['cs', 'da', 'de', 'el', 'en', 'et', 'fi', 'fr', 'hu', 'it', 'nl', 'no', 'pt', 'sk', 'sl', 'sr', 'sv']
+```
+
+Custom mappings and settings can be defined in [src/main/resources/elasticsearch](src/main/resources/elasticsearch). The indexer will attempt to load language specific settings and mappings if present, falling back to a language neutral variant if a language specific variant is not found.
+
+### Configuring repository handlers
+
+The harvester supports OAI-PMH compliant repositories returning DDI 2.5 metadata internally. Other repositories with different metadata formats are supported by external repository handlers, for example NESSTAR repositories.
+
+```yaml
+osmhConsumer:
+  endpoints:
+    harvesters:
+      NESSTAR:
+        url: 'http://localhost:9842'
+        version: 'v0'
+      # This is an example entry
+      NEXT-GEN:
+        url: 'http://localhost:9844'
+        version: 'v0'
+```
+
+Repository handlers are defined as a map, with the key being the name of the handler.
+
+### Declaring a repository
 
 Repositories are declared in [application.yml](/src/main/resources/application.yml) and are specified under the key `osmhConsumer.endpoints.repos`.
 
 ```yaml
-- url: http://194.117.18.18:6003/v0/oai
-  code: APIS
-  name: 'Portuguese Archive of Social Information (APIS)'
-  handler: 'OAI-PMH'
-  preferredMetadataParam: oai_ddi25
-  defaultLanguage: pt
+osmhConsumer:
+  endpoints:
+    repos:
+      - url: http://194.117.18.18:6003/v0/oai
+        code: APIS
+        name: 'Portuguese Archive of Social Information (APIS)'
+        handler: 'OAI-PMH'
+        preferredMetadataParam: oai_ddi25
+        defaultLanguage: pt
 ```
 
 The URL is the OAI-PMH endpoint.
@@ -123,7 +166,21 @@ The handler defines how the repository will be parsed. Current options are OAI-P
 
 The preferred metadata parameter sets the `metadataPrefix` parameter on OAI-PMH requests.
 
-The default language is used to set a language on a metadata record which doesn't have a language specified in the record itself. This is an optional field.
+The default language is used to set a language on a metadata record which doesn't have a language specified in the record itself. This is an optional field and defaults to `en` if not set.
+
+### Setting HTTP timeouts
+
+```yaml
+osmhConsumer:
+  restTemplateProps:
+    connTimeout: 10000 # increased from 5 seconds to 10 seconds to deal with slower Nesstar repos
+    connRequestTimeout: 5000 # 5 seconds
+    readTimeout: 180000 # increased from 120 seconds to 180 seconds to deal with slower Nesstar repos
+```
+
+`connTimeout` defines how long the OSMH harvester should wait for a response from an endpoint.
+
+`readTimout` defines how long the server has to completely deliver the response.
 
 ## Built With
 
