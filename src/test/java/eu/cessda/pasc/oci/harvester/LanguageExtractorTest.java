@@ -15,7 +15,6 @@
  */
 package eu.cessda.pasc.oci.harvester;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.mock.data.RecordTestData;
 import eu.cessda.pasc.oci.mock.data.ReposTestData;
@@ -113,7 +112,7 @@ public class LanguageExtractorTest {
     }
 
     @Test
-    public void shouldReturnExtractedDocInThereRespectiveLangDocuments() throws JsonProcessingException {
+    public void shouldReturnExtractedDocInThereRespectiveLangDocuments() {
 
         // Given
         List<CMMStudy> studies = getASingleSyntheticCMMStudyAsList();
@@ -133,13 +132,10 @@ public class LanguageExtractorTest {
         //then(languageDocMap.get("se")).hasSize(0);
         //then(languageDocMap.get("sk")).hasSize(0);
 
-        List<CMMStudyOfLanguage> enStudy = languageDocMap.get("en");
-        String enCMMStudyJsonStringOpt = cmmStudyOfLanguageConverter.toJsonString(enStudy.get(0));
-        System.out.println(enCMMStudyJsonStringOpt);
     }
 
     @Test
-    public void shouldReturnExtractedDocInTheirRespectiveLangDocumentsIncludingDeletedRecordsMarkedAsInActive() throws JsonProcessingException {
+    public void shouldReturnExtractedDocInTheirRespectiveLangDocumentsIncludingDeletedRecordsMarkedAsInActive() {
 
         // Given
         List<CMMStudy> studies = getSyntheticCMMStudyAndADeletedRecordAsList();
@@ -155,12 +151,6 @@ public class LanguageExtractorTest {
         then(languageDocMap.get("fi")).hasSize(2); // a deleted record and an active record that is valid
         //then(languageDocMap.get("sv")).hasSize(1); // a deleted record and an active record that is not valid for lang
 
-        List<CMMStudyOfLanguage> enStudy = languageDocMap.get("en");
-        log.info("Printing Records");
-        for (CMMStudyOfLanguage cmmStudyOfLanguage : enStudy) {
-            String enCMMStudyJsonStringOpt = cmmStudyOfLanguageConverter.toJsonString(cmmStudyOfLanguage);
-            log.info(enCMMStudyJsonStringOpt);
-        }
     }
 
     @Test

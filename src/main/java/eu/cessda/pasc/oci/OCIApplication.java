@@ -23,11 +23,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.EnableMBeanExport;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.jmx.support.RegistrationPolicy;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-@EnableMBeanExport(registration = RegistrationPolicy.REPLACE_EXISTING)
+@EnableAsync
+@EnableMBeanExport
 @EnableScheduling
 @Slf4j
 public class OCIApplication {

@@ -22,6 +22,7 @@ import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -61,6 +62,7 @@ public class ConsumerScheduler {
   /**
    * Auto Starts after delay of given time at startup.
    */
+  @Async
   @ManagedOperation(description = "Manual trigger to do a full harvest and ingest run")
   @Scheduled(initialDelayString = "${osmhConsumer.delay.initial}", fixedDelayString = "${osmhConsumer.delay.fixed}")
   @SuppressWarnings("try")
@@ -75,6 +77,7 @@ public class ConsumerScheduler {
   /**
    * Daily Harvest and Ingestion run.
    */
+  @Async
   @ManagedOperation(description = "Manual trigger to do an incremental harvest and ingest")
   @Scheduled(cron = "${osmhConsumer.daily.run}")
   @SuppressWarnings("try")

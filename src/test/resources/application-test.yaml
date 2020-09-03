@@ -49,3 +49,4 @@ osmhConsumer:
 elasticsearch:
   # Because tests clear Elasticsearch after completion make sure that we don't run against live clusters
   clustername: test
+  port: 9350

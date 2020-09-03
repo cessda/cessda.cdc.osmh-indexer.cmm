@@ -42,11 +42,6 @@ spring:
               # Send the username and password for authentication to Spring Boot Admin
               name: ${spring.security.user.name}
               password: ${spring.security.user.password}
-      routes:
-        endpoints: env,metrics,log,trace,dump,jolokia,info,configprops,trace,logfile,refresh,flyway,liquibase,heapdump
-      auto-deregistration: true
-      auto-registration: true
-      period: 30000
   security:
     user:
       name: user
