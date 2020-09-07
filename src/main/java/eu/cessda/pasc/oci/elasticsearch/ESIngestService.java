@@ -31,6 +31,7 @@ import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.ElasticsearchException;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.query.DeleteQuery;
 import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +39,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -73,16 +75,15 @@ public class ESIngestService implements IngestService {
     }
 
     @Override
-    public boolean bulkIndex(List<CMMStudyOfLanguage> languageCMMStudiesMap, String languageIsoCode) {
+    public boolean bulkIndex(Collection<CMMStudyOfLanguage> languageCMMStudiesMap, String languageIsoCode) {
         String indexName = String.format(INDEX_NAME_TEMPLATE, languageIsoCode);
-        boolean isSuccessful = true;
 
         if (prepareIndex(indexName)) {
-            List<IndexQuery> queries = new ArrayList<>(Integer.min(languageCMMStudiesMap.size(), INDEX_COMMIT_SIZE));
+            var queries = new ArrayList<IndexQuery>(Integer.min(languageCMMStudiesMap.size(), INDEX_COMMIT_SIZE));
             log.debug("[{}] Indexing...", indexName);
             int counter = 0;
             for (CMMStudyOfLanguage cmmStudyOfLanguage : languageCMMStudiesMap) {
-                IndexQuery indexQuery = getIndexQuery(indexName, cmmStudyOfLanguage);
+                var indexQuery = getIndexQuery(indexName, cmmStudyOfLanguage);
                 queries.add(indexQuery);
                 counter++;
                 if (queries.size() == INDEX_COMMIT_SIZE) {
@@ -95,12 +96,29 @@ public class ESIngestService implements IngestService {
                 log.debug("[{}] Current bulkIndex counter [{}].", indexName, counter);
                 executeBulk(queries);
             }
-            esTemplate.refresh(indexName);
             log.debug("[{}] BulkIndex completed.", languageIsoCode);
-        } else {
-            isSuccessful = false;
+            return true;
         }
-        return isSuccessful;
+
+        return false;
+    }
+
+    @Override
+    public void bulkDelete(Collection<CMMStudyOfLanguage> cmmStudiesToDelete, String languageIsoCode) {
+
+        var deleteQuery = new DeleteQuery();
+
+        // Set the index
+        String indexName = String.format(INDEX_NAME_TEMPLATE, languageIsoCode);
+        deleteQuery.setIndex(indexName);
+
+        // Extract the ids from the studies, and add them to the delete query
+        var studyIds = cmmStudiesToDelete.stream().map(CMMStudyOfLanguage::getId).toArray(String[]::new);
+        deleteQuery.setType(INDEX_TYPE);
+        deleteQuery.setQuery(QueryBuilders.idsQuery().addIds(studyIds));
+
+        // Perform the deletion
+        esTemplate.delete(deleteQuery);
     }
 
     @Override
