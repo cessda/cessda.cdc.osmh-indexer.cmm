@@ -32,10 +32,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -122,9 +119,23 @@ public class HarvesterRunner {
      */
     private void executeBulk(Repo repo, String langIsoCode, List<CMMStudyOfLanguage> cmmStudies) {
         if (!cmmStudies.isEmpty()) {
-            var studiesUpdated = getUpdatedStudies(cmmStudies, langIsoCode);
             log.info("[{}({})] Indexing...", repo.getCode(), langIsoCode);
-            if (ingestService.bulkIndex(cmmStudies, langIsoCode)) {
+            var studiesUpdated = getUpdatedStudies(cmmStudies, langIsoCode);
+
+            // Split the studies into studies to index and studies to delete
+            var studiesToIndex = new ArrayList<CMMStudyOfLanguage>();
+            var studiesToDelete = new ArrayList<CMMStudyOfLanguage>();
+            for (var study : cmmStudies) {
+                if (study.isActive()) {
+                    studiesToIndex.add(study);
+                } else {
+                    studiesToDelete.add(study);
+                }
+            }
+
+            // Perform indexing and deletions
+            if (ingestService.bulkIndex(studiesToIndex, langIsoCode)) {
+                ingestService.bulkDelete(studiesToDelete, langIsoCode);
                 log.info("[{}({})] Indexing succeeded: [{}] studies created, [{}] studies deleted, [{}] studies updated.",
                         repo.getCode(),
                         langIsoCode,
@@ -154,20 +165,15 @@ public class HarvesterRunner {
             var esStudyOptional = ingestService.getStudy(remoteStudy.getId(), language);
 
             // If empty then the study didn't exist in Elasticsearch, and will be created
-            if (esStudyOptional.isEmpty()) {
-                if (remoteStudy.isActive()) {
-                    studiesCreated.getAndIncrement();
-                }
-            } else {
-                if (!remoteStudy.equals(esStudyOptional.get())) {
-                    // If not equal
-                    if (remoteStudy.isActive()) {
-                        // The study has been deleted
-                        studiesUpdated.getAndIncrement();
-                    } else {
-                        // The study has been updated
-                        studiesDeleted.getAndIncrement();
-                    }
+            if (esStudyOptional.isEmpty() && remoteStudy.isActive()) {
+                studiesCreated.getAndIncrement();
+            } else if (esStudyOptional.isPresent()) {
+                if (!remoteStudy.isActive()) {
+                    // The study has been deleted
+                    studiesDeleted.getAndIncrement();
+                } else if (!remoteStudy.equals(esStudyOptional.get())) { // If not equal
+                    // The study has been updated
+                    studiesUpdated.getAndIncrement();
                 }
             }
         });
