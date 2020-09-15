@@ -23,6 +23,7 @@ import org.junit.runners.Parameterized;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.TimeZone;
 
 /**
  * Parameterised test for various date possibilities
@@ -36,8 +37,9 @@ public class TimeUtilDateExtractionParameterisedTest {
   private final int fExpected;
 
   public TimeUtilDateExtractionParameterisedTest(String fInput, int fExpected) {
-    this.fInput = fInput;
-    this.fExpected = fExpected;
+      TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+      this.fInput = fInput;
+      this.fExpected = fExpected;
   }
 
   // variable labels from junit v4.12

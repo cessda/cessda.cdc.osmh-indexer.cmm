@@ -27,6 +27,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -67,46 +68,56 @@ public class ConsumerScheduler {
   @Scheduled(initialDelayString = "${osmhConsumer.delay.initial}", fixedDelayString = "${osmhConsumer.delay.fixed}")
   @SuppressWarnings("try")
   public void fullHarvestAndIngestionAllConfiguredSPsReposRecords() {
-    try (var jobKeyClosable = MDC.putCloseable(ConsumerScheduler.DEFAULT_CDC_JOB_KEY, getJobId())) {
-      final var startTime = logStartStatus(FULL_RUN);
-      harvesterRunner.executeHarvestAndIngest(null);
-      logEndStatus(startTime, FULL_RUN);
+      try (var jobType = MDC.putCloseable("job_type", FULL_RUN)) {
+          runHarvest(FULL_RUN);
+      }
+  }
+
+    /**
+     * Daily Harvest and Ingestion run.
+     */
+    @Async
+    @ManagedOperation(description = "Manual trigger to do an incremental harvest and ingest")
+    @Scheduled(cron = "${osmhConsumer.daily.run}")
+    @SuppressWarnings("try")
+    public void dailyIncrementalHarvestAndIngestionAllConfiguredSPsReposRecords() {
+        try (var jobType = MDC.putCloseable("job_type", DAILY_INCREMENTAL_RUN)) {
+            runHarvest(DAILY_INCREMENTAL_RUN);
+        }
     }
-  }
 
-  /**
-   * Daily Harvest and Ingestion run.
-   */
-  @Async
-  @ManagedOperation(description = "Manual trigger to do an incremental harvest and ingest")
-  @Scheduled(cron = "${osmhConsumer.daily.run}")
-  @SuppressWarnings("try")
-  public void dailyIncrementalHarvestAndIngestionAllConfiguredSPsReposRecords() {
-    try (var jobKeyClosable = MDC.putCloseable(ConsumerScheduler.DEFAULT_CDC_JOB_KEY, getJobId())) {
-      final var startTime = logStartStatus(DAILY_INCREMENTAL_RUN);
-      harvesterRunner.executeHarvestAndIngest(esIndexerService.getMostRecentLastModified().orElse(null));
-      logEndStatus(startTime, DAILY_INCREMENTAL_RUN);
+    private void runHarvest(String jobType) {
+        try (var jobKeyClosable = MDC.putCloseable(ConsumerScheduler.DEFAULT_CDC_JOB_KEY, getJobId())) {
+            final var startTime = logStartStatus(jobType);
+
+            LocalDateTime mostRecentLastModified = null;
+            if (jobType.equals(DAILY_INCREMENTAL_RUN)) {
+                mostRecentLastModified = esIndexerService.getMostRecentLastModified().orElse(null);
+            }
+
+            harvesterRunner.executeHarvestAndIngest(mostRecentLastModified);
+            logEndStatus(startTime, jobType);
+        }
     }
-  }
 
-  /**
-   * Weekly run.
-   */
-  @Scheduled(cron = "${osmhConsumer.daily.sunday.run}")
-  public void weeklyFullHarvestAndIngestionAllConfiguredSPsReposRecords() {
-    log.info("Once a Week Full Run. Triggered by cron - STARTED");
-    fullHarvestAndIngestionAllConfiguredSPsReposRecords();
-    log.info("Once a Week Full Run. Triggered by cron - ENDED");
-  }
+    /**
+     * Weekly run.
+     */
+    @Scheduled(cron = "${osmhConsumer.daily.sunday.run}")
+    public void weeklyFullHarvestAndIngestionAllConfiguredSPsReposRecords() {
+        log.info("Once a Week Full Run. Triggered by cron - STARTED");
+        fullHarvestAndIngestionAllConfiguredSPsReposRecords();
+        log.info("Once a Week Full Run. Triggered by cron - ENDED");
+    }
 
-  /**
-   * Gets the correlation id of this run
-   *
-   * @return the correlation id
-   */
-  private String getJobId() {
-    return DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.now(ZoneId.systemDefault()));
-  }
+    /**
+     * Gets the correlation id of this run
+     *
+     * @return the correlation id
+     */
+    private String getJobId() {
+        return DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.now(ZoneId.systemDefault()));
+    }
 
   private OffsetDateTime logStartStatus(final String runDescription) {
     final OffsetDateTime startTime = OffsetDateTime.now(ZoneId.systemDefault());

@@ -36,8 +36,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static net.logstash.logback.argument.StructuredArguments.value;
@@ -79,9 +83,10 @@ public class HarvesterRunner {
                 List<Repo> repos = configurationProperties.getEndpoints().getRepos();
 
                 // Store the MDC so that it can be used in the running thread
-                Map<String, String> contextMap = MDC.getCopyOfContextMap();
-                repos.parallelStream().forEach(repo -> {
-                    MDC.setContextMap(contextMap);
+                var contextMap = new AtomicReference<>(MDC.getCopyOfContextMap());
+                var executor = Executors.newFixedThreadPool(repos.size());
+                var futures = repos.stream().map(repo -> CompletableFuture.runAsync(() -> {
+                    MDC.setContextMap(contextMap.get());
 
                     // Set the MDC so that the record name is attached to all downstream logs
                     try (var repoNameClosable = MDC.putCloseable(LoggingConstants.REPO_NAME, repo.getCode())) {
@@ -96,13 +101,29 @@ public class HarvesterRunner {
 
                     // Reset the MDC
                     MDC.clear();
+                }, executor)).collect(Collectors.toList());
+
+                futures.forEach(f -> {
+                    try {
+                        f.get();
+                    } catch (InterruptedException e) {
+                        executor.shutdownNow();
+                        Thread.currentThread().interrupt();
+                    } catch (ExecutionException e) {
+                        if (e.getCause() instanceof ElasticsearchException) {
+                            log.error("Error communicating to Elasticsearch!: {}", e.getCause().toString());
+                        } else {
+                            log.error("Unexpected error occurred when harvesting!", e.getCause());
+                        }
+                    }
                 });
-                MDC.setContextMap(contextMap);
+
+                executor.shutdown();
+                MDC.setContextMap(contextMap.get());
+
                 log.info("Harvest finished. Summary of the current state:");
                 log.info("Total number of records: {}", value("total_cmm_studies", ingestService.getTotalHitCount("*")));
                 metrics.updateMetrics();
-            } catch (ElasticsearchException e) {
-                log.error("Harvest failed!: {}", e.toString());
             } finally {
                 // Ensure that the running state is always set to false even if an exception is thrown
                 indexerRunning.set(false);
