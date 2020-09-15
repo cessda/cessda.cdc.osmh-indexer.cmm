@@ -19,6 +19,7 @@ import eu.cessda.pasc.oci.models.cmmstudy.*;
 import lombok.experimental.UtilityClass;
 import org.jdom2.Element;
 
+import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -45,10 +46,15 @@ class ParsingStrategies {
 
   static Function<Element, Optional<Country>> countryStrategyFunction() {
     return element -> {
-      Country country = Country.builder()
-          .iso2LetterCode(getAttributeValue(element, ABBR_ATTR).orElse(COUNTRY_NOT_AVAIL))
-          .countryName(cleanCharacterReturns(element.getText()))
-              .build();
+        // Create an optional that is only present if the country code is correct
+        var optionalCountryCode = getAttributeValue(element, ABBR_ATTR)
+            .filter(code -> Locale.getISOCountries(Locale.IsoCountryCode.PART1_ALPHA2).contains(code));
+
+        Country country = Country.builder()
+          .iso2LetterCode(optionalCountryCode.orElse(COUNTRY_NOT_AVAIL))
+          .countryName(optionalCountryCode.map(code -> new Locale("", code).getDisplayCountry(Locale.ENGLISH)).orElse(""))
+          .build();
+
       return Optional.of(country);
     };
   }
@@ -71,9 +77,9 @@ class ParsingStrategies {
   }
 
   static Function<Element, Optional<String>> creatorStrategyFunction() {
-    return element -> Optional.of(
-            getAttributeValue(element, CREATOR_AFFILIATION_ATTR).map(
-                    valueString -> (element.getText() + " (" + valueString + ")")).orElseGet(element::getText)
+    return element -> Optional.of(getAttributeValue(element, CREATOR_AFFILIATION_ATTR)
+        .map(valueString -> (element.getText() + " (" + valueString + ")"))
+        .orElseGet(element::getText)
     );
   }
 
