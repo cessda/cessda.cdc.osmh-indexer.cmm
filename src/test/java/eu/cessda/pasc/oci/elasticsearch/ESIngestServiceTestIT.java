@@ -24,9 +24,8 @@ import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
 import eu.cessda.pasc.oci.parser.FileHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
-import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.sort.SortOrder;
 import org.json.JSONException;
 import org.junit.After;
@@ -45,13 +44,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static eu.cessda.pasc.oci.mock.data.RecordTestData.*;
 import static org.assertj.core.api.Java6BDDAssertions.then;
+import static org.junit.Assert.assertFalse;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 
@@ -106,13 +104,12 @@ public class ESIngestServiceTestIT {
 
         // Then
         then(isSuccessful).isTrue();
-        Client client = this.elasticsearchTemplate.getClient();
-        SearchResponse response = client.prepareSearch(INDEX_NAME)
-                .setTypes(INDEX_TYPE)
-                .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-                .setQuery(QueryBuilders.idsQuery().addIds(expected))
-                .execute()
-                .actionGet();
+        this.elasticsearchTemplate.refresh(INDEX_NAME);
+        SearchResponse response = elasticsearchTemplate.getClient().prepareSearch(INDEX_NAME)
+            .setTypes(INDEX_TYPE)
+            .setQuery(QueryBuilders.idsQuery().addIds(expected))
+            .execute()
+            .actionGet();
 
         // Should return the same ID
         then(response.getHits().getAt(0).getId()).isEqualTo(expected);
@@ -122,83 +119,83 @@ public class ESIngestServiceTestIT {
         assertEquals(expectedTree.toString(), actualTree.toString(), true);
     }
 
-  @Test
-  public void shouldRetrieveTheMostRecentLastModifiedDate() throws IOException {
+    @Test
+    public void shouldRetrieveTheMostRecentLastModifiedDate() throws IOException {
 
-      // Given
-      List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
-      CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter = new CMMStudyOfLanguageConverter();
-      ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp, cmmStudyOfLanguageConverter);
-      boolean isSuccessful = ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
-      then(isSuccessful).isTrue();
-      Client client = this.elasticsearchTemplate.getClient();
-      SearchResponse response = client.prepareSearch(INDEX_NAME)
-              .setTypes(INDEX_TYPE)
-              .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-              .setQuery(QueryBuilders.matchAllQuery())
-              .addSort("lastModified", SortOrder.DESC)
-              .execute()
-              .actionGet();
+        // Given
+        List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
+        CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter = new CMMStudyOfLanguageConverter();
+        ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp, cmmStudyOfLanguageConverter);
+        boolean isSuccessful = ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
 
-      // And state is as expected
-      then(response.getHits().getTotalHits()).isEqualTo(3);
-      then(response.getHits().getAt(0).getId()).isEqualTo("UK-Data-Service__2305");
-      then(response.getHits().getAt(1).getId()).isEqualTo("UK-Data-Service__999");
-      then(response.getHits().getAt(2).getId()).isEqualTo("UK-Data-Service__1000");
+        then(isSuccessful).isTrue();
+        this.elasticsearchTemplate.refresh(INDEX_NAME);
+        SearchResponse response = elasticsearchTemplate.getClient().prepareSearch(INDEX_NAME)
+            .setTypes(INDEX_TYPE)
+            .setQuery(QueryBuilders.matchAllQuery())
+            .addSort("lastModified", SortOrder.DESC)
+            .execute()
+            .actionGet();
 
-      // When
-      Optional<LocalDateTime> mostRecentLastModified = ingestService.getMostRecentLastModified();
+        // And state is as expected
+        then(response.getHits().getTotalHits()).isEqualTo(3);
+        then(response.getHits().getAt(0).getId()).isEqualTo("UK-Data-Service__2305");
+        then(response.getHits().getAt(1).getId()).isEqualTo("UK-Data-Service__999");
+        then(response.getHits().getAt(2).getId()).isEqualTo("UK-Data-Service__1000");
 
-      // Then
-      then(mostRecentLastModified.orElse(null)).isEqualByComparingTo(LocalDateTime.parse("2017-11-17T00:00:00"));
-  }
+        // When
+        Optional<LocalDateTime> mostRecentLastModified = ingestService.getMostRecentLastModified();
 
-  @Test
-  public void shouldReturnFalseOnIndexCreationFailure() throws IOException {
+        // Then
+        then(mostRecentLastModified.orElse(null)).isEqualByComparingTo(LocalDateTime.parse("2017-11-17T00:00:00"));
+    }
 
-    //Setup
-    ElasticsearchTemplate elasticsearchTemplate = Mockito.mock(ElasticsearchTemplate.class);
-    ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp, null);
-    List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
+    @Test
+    public void shouldReturnFalseOnIndexCreationFailure() throws IOException {
 
-    // When
-    Mockito.when(elasticsearchTemplate.createIndex(Mockito.anyString(), Mockito.any())).thenReturn(false);
+        //Setup
+        ElasticsearchTemplate elasticsearchTemplate = Mockito.mock(ElasticsearchTemplate.class);
+        ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp, null);
+        List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
 
-    boolean isSuccessful = ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
-    Assert.assertFalse(isSuccessful);
-  }
+        // When
+        Mockito.when(elasticsearchTemplate.createIndex(Mockito.anyString(), Mockito.any())).thenReturn(false);
 
-  @Test
-  public void shouldReturnFalseOnPutMappingFailure() throws IOException {
+        boolean isSuccessful = ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
+        Assert.assertFalse(isSuccessful);
+    }
 
-    //Setup
-    ElasticsearchTemplate elasticsearchTemplate = Mockito.mock(ElasticsearchTemplate.class);
-    ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp, null);
-    List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
+    @Test
+    public void shouldReturnFalseOnPutMappingFailure() throws IOException {
 
-    // When
-    Mockito.when(elasticsearchTemplate.createIndex(Mockito.anyString(), Mockito.any())).thenReturn(true);
-    Mockito.when(elasticsearchTemplate.putMapping(Mockito.anyString(), Mockito.anyString(), Mockito.any())).thenReturn(false);
+        //Setup
+        ElasticsearchTemplate elasticsearchTemplate = Mockito.mock(ElasticsearchTemplate.class);
+        ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp, null);
+        List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
 
-    Assert.assertFalse(ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE));
-  }
+        // When
+        Mockito.when(elasticsearchTemplate.createIndex(Mockito.anyString(), Mockito.any())).thenReturn(true);
+        Mockito.when(elasticsearchTemplate.putMapping(Mockito.anyString(), Mockito.anyString(), Mockito.any())).thenReturn(false);
 
-  @Test
-  public void shouldCreateAnIndexWithNoSettingsWhenIOExceptionIsThrown() throws IOException {
+        Assert.assertFalse(ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE));
+    }
 
-    //Setup
-    FileHandler fileHandlerMock = Mockito.mock(FileHandler.class);
-    ElasticsearchTemplate elasticsearchTemplate = Mockito.mock(ElasticsearchTemplate.class);
-    ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandlerMock, esConfigProp, null);
-      List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
+    @Test
+    public void shouldCreateAnIndexWithNoSettingsWhenIOExceptionIsThrown() throws IOException {
 
-      // When
-      Mockito.when(fileHandlerMock.getFileAsString(Mockito.anyString())).thenThrow(new IOException());
-      Mockito.when(elasticsearchTemplate.createIndex(Mockito.anyString())).thenReturn(true);
+        //Setup
+        FileHandler fileHandlerMock = Mockito.mock(FileHandler.class);
+        ElasticsearchTemplate elasticsearchTemplate = Mockito.mock(ElasticsearchTemplate.class);
+        ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandlerMock, esConfigProp, null);
+        List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
 
-      Assert.assertTrue(ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE));
-      Mockito.verify(elasticsearchTemplate).createIndex(Mockito.anyString());
-  }
+        // When
+        Mockito.when(fileHandlerMock.getFileAsString(Mockito.anyString())).thenThrow(new IOException());
+        Mockito.when(elasticsearchTemplate.createIndex(Mockito.anyString())).thenReturn(true);
+
+        Assert.assertTrue(ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE));
+        Mockito.verify(elasticsearchTemplate).createIndex(Mockito.anyString());
+    }
 
     @Test
     public void shouldReturnAnIteratorOverAllStudiesInTheSpecifiedIndices() throws IOException {
@@ -211,6 +208,7 @@ public class ESIngestServiceTestIT {
         // Given
         boolean isSuccessful = ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
         then(isSuccessful).isTrue();
+        elasticsearchTemplate.refresh(INDEX_NAME);
 
         // Then
         var hitCountPerRepository = ingestService.getAllStudies("*");
@@ -231,6 +229,7 @@ public class ESIngestServiceTestIT {
         Mockito.when(objectReader.readValue(Mockito.any(InputStream.class))).thenThrow(new IOException());
         boolean isSuccessful = ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
         then(isSuccessful).isTrue();
+        elasticsearchTemplate.refresh(INDEX_NAME);
 
         // Then
         var hitCountPerRepository = ingestService.getAllStudies("*");
@@ -254,42 +253,42 @@ public class ESIngestServiceTestIT {
         var study = ingestService.getStudy(expectedStudy.getId(), LANGUAGE_ISO_CODE);
 
         Assert.assertEquals(expectedStudy, study.orElseThrow());
-  }
+    }
 
-  @Test
-  public void shouldReturnEmptyOptionalOnInvalidIndex() {
+    @Test
+    public void shouldReturnEmptyOptionalOnInvalidIndex() {
 
-    // Setup
-      ElasticsearchTemplate elasticsearchTemplate = new ElasticsearchTemplate(this.elasticsearchTemplate.getClient());
-      CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter = new CMMStudyOfLanguageConverter();
-      ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp, cmmStudyOfLanguageConverter);
+        // Setup
+        ElasticsearchTemplate elasticsearchTemplate = new ElasticsearchTemplate(this.elasticsearchTemplate.getClient());
+        CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter = new CMMStudyOfLanguageConverter();
+        ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp, cmmStudyOfLanguageConverter);
 
-    // Then
-    var study = ingestService.getStudy(UUID.randomUUID().toString(), "moon");
+        // Then
+        var study = ingestService.getStudy(UUID.randomUUID().toString(), "moon");
 
-    Assert.assertEquals(Optional.empty(), study);
-  }
+        Assert.assertEquals(Optional.empty(), study);
+    }
 
-  @Test
-  public void shouldReturnEmptyOptionalOnIOException() throws IOException {
-      // Setup
-      List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
-      ObjectReader objectReader = Mockito.mock(ObjectReader.class);
-      CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter = Mockito.mock(CMMStudyOfLanguageConverter.class);
-      ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp, cmmStudyOfLanguageConverter);
+    @Test
+    public void shouldReturnEmptyOptionalOnIOException() throws IOException {
+        // Setup
+        List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
+        ObjectReader objectReader = Mockito.mock(ObjectReader.class);
+        CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter = Mockito.mock(CMMStudyOfLanguageConverter.class);
+        ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp, cmmStudyOfLanguageConverter);
 
-      // Given
-      Mockito.when(cmmStudyOfLanguageConverter.getReader()).thenReturn(objectReader);
-      Mockito.when(objectReader.readValue(Mockito.any(byte[].class))).thenThrow(new IOException());
-      boolean isSuccessful = ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
-      then(isSuccessful).isTrue();
-      var expectedStudy = studyOfLanguages.get(0);
+        // Given
+        Mockito.when(cmmStudyOfLanguageConverter.getReader()).thenReturn(objectReader);
+        Mockito.when(objectReader.readValue(Mockito.any(byte[].class))).thenThrow(new IOException());
+        boolean isSuccessful = ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
+        then(isSuccessful).isTrue();
+        var expectedStudy = studyOfLanguages.get(0);
 
-      // Then
-      var study = ingestService.getStudy(expectedStudy.getId(), LANGUAGE_ISO_CODE);
+        // Then
+        var study = ingestService.getStudy(expectedStudy.getId(), LANGUAGE_ISO_CODE);
 
-      Assert.assertEquals(Optional.empty(), study);
-  }
+        Assert.assertEquals(Optional.empty(), study);
+    }
 
     @Test
     public void shouldLogFailedIndexOperations() throws IOException {
@@ -307,5 +306,34 @@ public class ESIngestServiceTestIT {
         // Then - indexing should report true as Elasticsearch was accessible
         boolean indexingResult = ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
         Assert.assertTrue(indexingResult);
+    }
+
+    @Test
+    public void shouldDeleteGivenStudies() throws IOException {
+        // Setup
+        List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
+        CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter = new CMMStudyOfLanguageConverter();
+        ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, fileHandler, esConfigProp, cmmStudyOfLanguageConverter);
+        boolean isSuccessful = ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
+        then(isSuccessful).isTrue();
+        elasticsearchTemplate.refresh(INDEX_NAME);
+
+        // Given
+        var studyToDelete = Collections.singletonList(studyOfLanguages.get(0));
+        ingestService.bulkDelete(studyToDelete, LANGUAGE_ISO_CODE);
+
+        // Then - the study should not be present, but other studies should be
+        elasticsearchTemplate.refresh(INDEX_NAME);
+        assertFalse(elasticsearchTemplate.getClient().prepareGet(INDEX_NAME, INDEX_TYPE, studyToDelete.get(0).getId()).get().isExists());
+
+        SearchResponse response = elasticsearchTemplate.getClient().prepareSearch(INDEX_NAME)
+            .setTypes(INDEX_TYPE)
+            .setQuery(QueryBuilders.matchAllQuery())
+            .addSort("lastModified", SortOrder.DESC)
+            .get();
+
+        then(response.getHits().getTotalHits()).isEqualTo(2); // Should be two studies
+        then(Arrays.stream(response.getHits().getHits()).map(SearchHit::getId).toArray()) // Should not contain the deleted study
+            .containsExactlyInAnyOrder(studyOfLanguages.get(1).getId(), studyOfLanguages.get(2).getId());
     }
 }
