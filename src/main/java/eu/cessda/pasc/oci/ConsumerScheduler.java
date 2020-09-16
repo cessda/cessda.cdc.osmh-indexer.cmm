@@ -44,32 +44,34 @@ import static net.logstash.logback.argument.StructuredArguments.value;
 @Slf4j
 public class ConsumerScheduler {
 
-  private static final String FULL_RUN = "Full Run";
-  private static final String DAILY_INCREMENTAL_RUN = "Daily Incremental Run";
-  private static final String DEFAULT_CDC_JOB_KEY = "indexer_job_id";
+    private static final String FULL_RUN = "Full Run";
+    private static final String DAILY_INCREMENTAL_RUN = "Daily Incremental Run";
 
-  private final DebuggingJMXBean debuggingJMXBean;
-  private final IngestService esIndexerService;
-  private final HarvesterRunner harvesterRunner;
+    // Logging fields
+    private static final String INDEXER_JOB_ID = "indexer_job_id";
+    private static final String RUN_TYPE = "run_type";
 
-  @Autowired
-  public ConsumerScheduler(final DebuggingJMXBean debuggingJMXBean, final IngestService esIndexerService,
-      final HarvesterRunner harvesterRunner) {
-    this.debuggingJMXBean = debuggingJMXBean;
-    this.esIndexerService = esIndexerService;
-    this.harvesterRunner = harvesterRunner;
-  }
+    private final DebuggingJMXBean debuggingJMXBean;
+    private final IngestService esIndexerService;
+    private final HarvesterRunner harvesterRunner;
 
-  /**
-   * Auto Starts after delay of given time at startup.
-   */
-  @Async
-  @ManagedOperation(description = "Manual trigger to do a full harvest and ingest run")
-  @Scheduled(initialDelayString = "${osmhConsumer.delay.initial}", fixedDelayString = "${osmhConsumer.delay.fixed}")
-  @SuppressWarnings("try")
-  public void fullHarvestAndIngestionAllConfiguredSPsReposRecords() {
-      try (var jobType = MDC.putCloseable("job_type", FULL_RUN)) {
-          runHarvest(FULL_RUN);
+    @Autowired
+    public ConsumerScheduler(DebuggingJMXBean debuggingJMXBean, IngestService esIndexerService, HarvesterRunner harvesterRunner) {
+        this.debuggingJMXBean = debuggingJMXBean;
+        this.esIndexerService = esIndexerService;
+        this.harvesterRunner = harvesterRunner;
+    }
+
+    /**
+     * Auto Starts after delay of given time at startup.
+     */
+    @Async
+    @ManagedOperation(description = "Manual trigger to do a full harvest and ingest run")
+    @Scheduled(initialDelayString = "${osmhConsumer.delay.initial}", fixedDelayString = "${osmhConsumer.delay.fixed}")
+    @SuppressWarnings("try")
+    public void fullHarvestAndIngestionAllConfiguredSPsReposRecords() {
+        try (var jobKeyClosable = MDC.putCloseable(RUN_TYPE, FULL_RUN)) {
+            run(FULL_RUN, null);
       }
   }
 
@@ -81,22 +83,23 @@ public class ConsumerScheduler {
     @Scheduled(cron = "${osmhConsumer.daily.run}")
     @SuppressWarnings("try")
     public void dailyIncrementalHarvestAndIngestionAllConfiguredSPsReposRecords() {
-        try (var jobType = MDC.putCloseable("job_type", DAILY_INCREMENTAL_RUN)) {
-            runHarvest(DAILY_INCREMENTAL_RUN);
+        try (var jobKeyClosable = MDC.putCloseable(RUN_TYPE, DAILY_INCREMENTAL_RUN)) {
+            run(DAILY_INCREMENTAL_RUN, esIndexerService.getMostRecentLastModified().orElse(null));
         }
     }
 
-    private void runHarvest(String jobType) {
-        try (var jobKeyClosable = MDC.putCloseable(ConsumerScheduler.DEFAULT_CDC_JOB_KEY, getJobId())) {
-            final var startTime = logStartStatus(jobType);
-
-            LocalDateTime mostRecentLastModified = null;
-            if (jobType.equals(DAILY_INCREMENTAL_RUN)) {
-                mostRecentLastModified = esIndexerService.getMostRecentLastModified().orElse(null);
-            }
-
-            harvesterRunner.executeHarvestAndIngest(mostRecentLastModified);
-            logEndStatus(startTime, jobType);
+    /**
+     * Runs the harvest.
+     *
+     * @param runType     the run type, used for logging
+     * @param harvestFrom the LocalDateTime to harvest from, where null is a full harvest
+     */
+    @SuppressWarnings("try")
+    private void run(String runType, LocalDateTime harvestFrom) {
+        try (var jobKeyClosable = MDC.putCloseable(INDEXER_JOB_ID, getJobId())) {
+            final var startTime = logStartStatus(runType);
+            harvesterRunner.executeHarvestAndIngest(harvestFrom);
+            logEndStatus(startTime, runType);
         }
     }
 
@@ -119,20 +122,26 @@ public class ConsumerScheduler {
         return DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.now(ZoneId.systemDefault()));
     }
 
-  private OffsetDateTime logStartStatus(final String runDescription) {
-    final OffsetDateTime startTime = OffsetDateTime.now(ZoneId.systemDefault());
-    log.info("[{}] Consume and Ingest All SPs Repos: \nStarted at [{}]\nCurrent state before run:\n{}\n{}",
-        runDescription, startTime, debuggingJMXBean.printCurrentlyConfiguredRepoEndpoints(),
-        debuggingJMXBean.printElasticSearchInfo());
-    return startTime;
-  }
+    private OffsetDateTime logStartStatus(final String runDescription) {
+        final OffsetDateTime startTime = OffsetDateTime.now(ZoneId.systemDefault());
+        log.info("[{}] Consume and Ingest All SPs Repos: \n" +
+                "Started at [{}]\n" +
+                "Current state before run:\n" +
+                "{}\n" +
+                "{}",
+            runDescription, startTime, debuggingJMXBean.printCurrentlyConfiguredRepoEndpoints(),
+            debuggingJMXBean.printElasticSearchInfo());
+        return startTime;
+    }
 
-  private void logEndStatus(final OffsetDateTime startTime, final String runDescription) {
-      final var endTime = OffsetDateTime.now(ZoneId.systemDefault());
-      log.info("[{}] Consume and Ingest All SPs Repos:\nEnded at: [{}]\nDuration: [{}] seconds",
-          runDescription,
-          endTime,
-          value("job_duration", Duration.between(startTime, endTime).getSeconds())
-      );
-  }
+    private void logEndStatus(final OffsetDateTime startTime, final String runDescription) {
+        final var endTime = OffsetDateTime.now(ZoneId.systemDefault());
+        log.info("[{}] Consume and Ingest All SPs Repos:\n" +
+                "Ended at: [{}]\n" +
+                "Duration: [{}] seconds",
+            runDescription,
+            endTime,
+            value("job_duration", Duration.between(startTime, endTime).getSeconds())
+        );
+    }
 }
