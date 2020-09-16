@@ -72,8 +72,8 @@ public class ConsumerScheduler {
     public void fullHarvestAndIngestionAllConfiguredSPsReposRecords() {
         try (var jobKeyClosable = MDC.putCloseable(RUN_TYPE, FULL_RUN)) {
             run(FULL_RUN, null);
-      }
-  }
+        }
+    }
 
     /**
      * Daily Harvest and Ingestion run.
