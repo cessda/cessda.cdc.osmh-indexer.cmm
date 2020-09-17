@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.repository;
+package eu.cessda.pasc.oci.http;
 
 import com.pgssoft.httpclient.HttpClientMock;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class PascHarvesterDaoTest {
       httpClient.onGet(expectedUrl).doReturnJSON(LIST_RECORDER_HEADERS_BODY_EXAMPLE, StandardCharsets.UTF_8);
 
       // When
-      DaoBaseImpl daoBase = new DaoBaseImpl(httpClient);
+        HttpClientImpl daoBase = new HttpClientImpl(httpClient);
       try (InputStream recordHeaders = daoBase.getInputStream(expectedUrl)) {
           then(new String(recordHeaders.readAllBytes(), StandardCharsets.UTF_8)).isEqualTo(LIST_RECORDER_HEADERS_BODY_EXAMPLE);
           httpClient.verify().get().called(1);
@@ -62,7 +62,7 @@ public class PascHarvesterDaoTest {
       httpClient.onGet(expectedUrl).doReturnJSON(expectedUrl, StandardCharsets.UTF_8);
 
       // When
-      DaoBaseImpl daoBase = new DaoBaseImpl(httpClient);
+      HttpClientImpl daoBase = new HttpClientImpl(httpClient);
       try (InputStream recordHeaders = daoBase.getInputStream(expectedUrl)) {
           then(new String(recordHeaders.readAllBytes(), StandardCharsets.UTF_8)).isEqualTo(expectedUrl);
           httpClient.verify().get().called(1);

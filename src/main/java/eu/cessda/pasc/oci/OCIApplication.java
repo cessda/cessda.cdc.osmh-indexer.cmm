@@ -26,6 +26,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import java.util.TimeZone;
+
 @SpringBootApplication
 @EnableAsync
 @EnableMBeanExport
@@ -33,16 +35,19 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Slf4j
 public class OCIApplication {
 
-	private final Metrics metrics;
+    private final Metrics metrics;
 
 	public OCIApplication(Metrics metrics) {
-
 		this.metrics = metrics;
 	}
 
 	public static void main(String[] args) {
-		SpringApplication.run(OCIApplication.class, args);
-	}
+        // Set settings needed for the application to work properly
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+
+        // Start the application
+        SpringApplication.run(OCIApplication.class, args);
+    }
 
 	@EventListener
 	public void startupMetrics(ContextRefreshedEvent contextRefreshedEvent) {

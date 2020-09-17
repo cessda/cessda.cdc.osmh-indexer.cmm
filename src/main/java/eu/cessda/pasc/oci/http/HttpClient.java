@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.repository;
+package eu.cessda.pasc.oci.http;
 
 import eu.cessda.pasc.oci.exception.HTTPException;
 
@@ -24,14 +24,14 @@ import java.net.URI;
 /**
  * Interface for HTTP client methods.
  */
-public interface DaoBase {
+public interface HttpClient {
     /**
      * Performs a HTTP Get request to the specified URL.
      *
      * @return An {@link InputStream} of the response body.
      * @throws HTTPException if the server returns a failure code.
-     *                                 The status code and the body of the response will be attached to the exception.
-     * @throws IOException             if an IO Error occurs.
+     *                       The status code and the body of the response will be attached to the exception.
+     * @throws IOException   if an IO Error occurs.
      */
     InputStream getInputStream(URI uri) throws IOException;
 }

@@ -17,12 +17,12 @@ package eu.cessda.pasc.oci.harvester;
 
 import eu.cessda.pasc.oci.exception.HarvesterException;
 import eu.cessda.pasc.oci.exception.XMLParseException;
+import eu.cessda.pasc.oci.http.HttpClient;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.parser.ListIdentifiersResponseValidator;
 import eu.cessda.pasc.oci.parser.OaiPmhConstants;
 import eu.cessda.pasc.oci.parser.OaiPmhHelpers;
-import eu.cessda.pasc.oci.repository.DaoBase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -55,12 +55,12 @@ class RecordHeaderParser {
     private static final String RECORD_HEADER = "RecordHeader";
     private static final String STUDY = "Study";
 
-    private final DaoBase daoBase;
+    private final HttpClient httpClient;
     private final DocumentBuilderFactory builderFactory;
 
     @Autowired
-    public RecordHeaderParser(DaoBase daoBase, DocumentBuilderFactory builderFactory) {
-        this.daoBase = daoBase;
+    public RecordHeaderParser(HttpClient httpClient, DocumentBuilderFactory builderFactory) {
+        this.httpClient = httpClient;
         this.builderFactory = builderFactory;
     }
 
@@ -101,7 +101,7 @@ class RecordHeaderParser {
     }
 
     private Document getRecordHeadersDocument(URI repoUrl) throws XMLParseException {
-        try (InputStream documentInputStream = daoBase.getInputStream(repoUrl)) {
+        try (InputStream documentInputStream = httpClient.getInputStream(repoUrl)) {
             return builderFactory.newDocumentBuilder().parse(documentInputStream);
         } catch (IOException | SAXException | ParserConfigurationException e) {
             throw new XMLParseException(repoUrl, e);
