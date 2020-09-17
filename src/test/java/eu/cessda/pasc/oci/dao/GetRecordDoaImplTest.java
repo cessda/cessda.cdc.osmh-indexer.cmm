@@ -17,7 +17,7 @@ package eu.cessda.pasc.oci.dao;
 
 import com.pgssoft.httpclient.HttpClientMock;
 import eu.cessda.pasc.oci.exception.HTTPException;
-import eu.cessda.pasc.oci.repository.DaoBaseImpl;
+import eu.cessda.pasc.oci.http.HttpClientImpl;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -46,7 +46,7 @@ public class GetRecordDoaImplTest {
         httpClient.onGet(expectedUrl).doReturnXML(expectedUrl, StandardCharsets.UTF_8);
 
         // When
-        var recordDoa = new DaoBaseImpl(httpClient);
+        var recordDoa = new HttpClientImpl(httpClient);
         try (InputStream responseXMLRecord = recordDoa.getInputStream(URI.create(expectedUrl))) {
             then(new String(responseXMLRecord.readAllBytes(), StandardCharsets.UTF_8)).isEqualTo(expectedUrl);
         }
@@ -62,7 +62,7 @@ public class GetRecordDoaImplTest {
         httpClient.onGet(expectedFullGetRecordUrl).doReturn(500, expectedFullGetRecordUrl);
 
         // When
-        var recordDoa = new DaoBaseImpl(httpClient);
+        var recordDoa = new HttpClientImpl(httpClient);
         recordDoa.getInputStream(URI.create(expectedFullGetRecordUrl));
     }
 }

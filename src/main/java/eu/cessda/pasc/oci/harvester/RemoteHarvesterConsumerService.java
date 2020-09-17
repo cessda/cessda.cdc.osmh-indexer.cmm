@@ -21,13 +21,13 @@ import eu.cessda.pasc.oci.LoggingConstants;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.exception.HTTPException;
 import eu.cessda.pasc.oci.exception.HandlerNotFoundException;
+import eu.cessda.pasc.oci.http.HttpClient;
 import eu.cessda.pasc.oci.models.ErrorMessage;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.configurations.Harvester;
 import eu.cessda.pasc.oci.models.configurations.Repo;
-import eu.cessda.pasc.oci.repository.DaoBase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -54,15 +54,15 @@ import static net.logstash.logback.argument.StructuredArguments.value;
 @Slf4j
 public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerService {
 
-    private final DaoBase daoBase;
+    private final HttpClient httpClient;
     private final ObjectReader recordHeaderObjectReader;
     private final CMMStudyConverter cmmStudyConverter;
     private final AppConfigurationProperties appConfigurationProperties;
     private final ObjectReader errorMessageObjectReader;
 
     @Autowired
-    public RemoteHarvesterConsumerService(AppConfigurationProperties appConfigurationProperties, CMMStudyConverter cmmStudyConverter, DaoBase daoBase, ObjectMapper mapper) {
-        this.daoBase = daoBase;
+    public RemoteHarvesterConsumerService(AppConfigurationProperties appConfigurationProperties, CMMStudyConverter cmmStudyConverter, HttpClient httpClient, ObjectMapper mapper) {
+        this.httpClient = httpClient;
         this.cmmStudyConverter = cmmStudyConverter;
         this.appConfigurationProperties = appConfigurationProperties;
         this.recordHeaderObjectReader = mapper.readerFor(mapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class));
@@ -73,7 +73,7 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
     public List<RecordHeader> listRecordHeaders(Repo repo, LocalDateTime lastModifiedDate) {
         try {
             URI finalUrl = constructListRecordUrl(repo);
-            try (InputStream recordHeadersJsonStream = daoBase.getInputStream(finalUrl)) {
+            try (InputStream recordHeadersJsonStream = httpClient.getInputStream(finalUrl)) {
                 List<RecordHeader> recordHeadersUnfiltered = recordHeaderObjectReader.readValue(recordHeadersJsonStream);
                 log.info("[{}] Retrieved [{}] record headers.", repo.getCode(), recordHeadersUnfiltered.size());
                 return filterRecords(recordHeadersUnfiltered, lastModifiedDate);
@@ -108,7 +108,7 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
 
         try {
             URI finalUrl = constructGetRecordUrl(repo, recordHeader.getIdentifier());
-            try (InputStream recordJsonStream = daoBase.getInputStream(finalUrl)) {
+            try (InputStream recordJsonStream = httpClient.getInputStream(finalUrl)) {
                 return Optional.of(cmmStudyConverter.fromJsonStream(recordJsonStream));
             }
         } catch (HTTPException e) {

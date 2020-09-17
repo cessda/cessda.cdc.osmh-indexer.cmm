@@ -16,7 +16,7 @@
 package eu.cessda.pasc.oci.dao;
 
 import com.pgssoft.httpclient.HttpClientMock;
-import eu.cessda.pasc.oci.repository.DaoBaseImpl;
+import eu.cessda.pasc.oci.http.HttpClientImpl;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -42,7 +42,7 @@ public class ListRecordHeadersDaoImplTest {
         httpClient.onGet(fullListRecordHeadersUrl).doReturn(fullListRecordHeadersUrl, StandardCharsets.UTF_8);
 
         // When
-        var listRecordHeadersDao = new DaoBaseImpl(httpClient);
+        var listRecordHeadersDao = new HttpClientImpl(httpClient);
         try (InputStream inputStream = listRecordHeadersDao.getInputStream(URI.create(fullListRecordHeadersUrl))) {
             String recordHeadersXML = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
             System.out.println("Actual: " + recordHeadersXML);
@@ -62,7 +62,7 @@ public class ListRecordHeadersDaoImplTest {
         httpClient.onGet(fullListRecordHeadersUrl).doReturn(fullListRecordHeadersUrl, StandardCharsets.UTF_8);
 
         // When
-        var listRecordHeadersDao = new DaoBaseImpl(httpClient);
+        var listRecordHeadersDao = new HttpClientImpl(httpClient);
         try (InputStream inputStream = listRecordHeadersDao.getInputStream(URI.create(fullListRecordHeadersUrl))) {
             String recordHeadersXML = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 

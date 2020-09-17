@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.repository;
+package eu.cessda.pasc.oci.http;
 
 import com.pgssoft.httpclient.HttpClientMock;
 import com.pgssoft.httpclient.MockedServerResponse;
@@ -36,7 +36,7 @@ import static org.assertj.core.api.Java6BDDAssertions.then;
  *
  * @author moses AT doraventures DOT com
  */
-public class DaoBaseTest {
+public class HttpClientTest {
 
     private final HttpClientMock httpClient = new HttpClientMock();
 
@@ -55,7 +55,7 @@ public class DaoBaseTest {
         httpClient.onGet(expectedUrl).doReturnJSON(LIST_RECORDER_HEADERS_BODY_EXAMPLE, StandardCharsets.UTF_8);
 
         // When
-        DaoBaseImpl daoBase = new DaoBaseImpl(httpClient);
+        HttpClientImpl daoBase = new HttpClientImpl(httpClient);
         try (InputStream recordHeaders = daoBase.getInputStream(expectedUrl)) {
             then(new String(recordHeaders.readAllBytes(), StandardCharsets.UTF_8)).isEqualTo(LIST_RECORDER_HEADERS_BODY_EXAMPLE);
             httpClient.verify().get().called(1);
@@ -73,7 +73,7 @@ public class DaoBaseTest {
         httpClient.onGet(expectedUrl).doReturn(expectedStatusCode, "The exception wasn't thrown.");
 
         // When
-        DaoBaseImpl daoBase = new DaoBaseImpl(httpClient);
+        HttpClientImpl daoBase = new HttpClientImpl(httpClient);
         try (InputStream inputStream = daoBase.getInputStream(expectedUrl)) {
             Assert.fail(new String(inputStream.readAllBytes(), Charset.defaultCharset()));
         } catch (HTTPException e) {
@@ -85,10 +85,10 @@ public class DaoBaseTest {
     public void shouldThrowIllegalStateExceptionOnInterruption() throws IOException {
 
         // Given
-        httpClient.onGet().doAction(DaoBaseTest::throwInterruptedException);
+        httpClient.onGet().doAction(HttpClientTest::throwInterruptedException);
 
         // When
-        DaoBaseImpl daoBase = new DaoBaseImpl(httpClient);
+        HttpClientImpl daoBase = new HttpClientImpl(httpClient);
         try (InputStream empty = daoBase.getInputStream("http://error.endpoint/")) {
             Assert.assertEquals(-1, empty.read());
         }
@@ -101,7 +101,7 @@ public class DaoBaseTest {
         httpClient.onGet().doThrowException(new IOException("Mocked!"));
 
         // When
-        DaoBaseImpl daoBase = new DaoBaseImpl(httpClient);
+        HttpClientImpl daoBase = new HttpClientImpl(httpClient);
         try (InputStream inputStream = daoBase.getInputStream("http://error.endpoint/")) {
             Assert.fail(new String(inputStream.readAllBytes(), Charset.defaultCharset()));
         }

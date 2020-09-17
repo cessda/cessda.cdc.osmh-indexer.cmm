@@ -24,13 +24,13 @@ import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import eu.cessda.pasc.oci.exception.HarvesterException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
+import eu.cessda.pasc.oci.http.HttpClient;
 import eu.cessda.pasc.oci.mock.data.CMMStudyTestData;
 import eu.cessda.pasc.oci.mock.data.ReposTestData;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.parser.CMMStudyMapper;
-import eu.cessda.pasc.oci.repository.DaoBase;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -58,7 +58,7 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 public class RecordXMLParserTest {
 
     private final CMMStudyConverter cmmConverter = new CMMStudyConverter();
-    private final DaoBase daoBase = Mockito.mock(DaoBase.class);
+    private final HttpClient httpClient = Mockito.mock(HttpClient.class);
     private final Repo repo;
     private final String recordIdentifier;
     private final URI fullRecordUrl;
@@ -76,12 +76,12 @@ public class RecordXMLParserTest {
     public void shouldReturnValidCMMStudyRecordFromAFullyComplaintCmmDdiRecord() throws IOException, ProcessingException, JSONException, HarvesterException {
 
         // Given
-        given(daoBase.getInputStream(fullRecordUrl)).willReturn(
+        given(httpClient.getInputStream(fullRecordUrl)).willReturn(
             CMMStudyTestData.getContentAsStream("xml/synthetic_compliant_cmm.xml")
         );
 
         // When
-        CMMStudy result = new RecordXMLParser(cmmStudyMapper, daoBase).getRecord(repo, recordIdentifier);
+        CMMStudy result = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordIdentifier);
 
         then(result).isNotNull();
         validateCMMStudyResultAgainstSchema(result);
@@ -93,12 +93,12 @@ public class RecordXMLParserTest {
     public void shouldHarvestedContentForLanguageSpecificDimensionFromElementWithCorrectXmlLangAttribute() throws IOException, HarvesterException {
 
         // Given
-        given(daoBase.getInputStream(fullRecordUrl)).willReturn(
+        given(httpClient.getInputStream(fullRecordUrl)).willReturn(
             CMMStudyTestData.getContentAsStream("xml/oai-fsd_uta_fi-FSD3187.xml")
         );
 
         // When
-        CMMStudy result = new RecordXMLParser(cmmStudyMapper, daoBase).getRecord(repo, recordIdentifier);
+        CMMStudy result = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordIdentifier);
 
         then(result).isNotNull();
 
@@ -117,12 +117,12 @@ public class RecordXMLParserTest {
     public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord() throws IOException, ProcessingException, JSONException, HarvesterException {
 
         // Given
-        given(daoBase.getInputStream(fullRecordUrl)).willReturn(
+        given(httpClient.getInputStream(fullRecordUrl)).willReturn(
             CMMStudyTestData.getContentAsStream("xml/ddi_record_1683.xml")
         );
 
         // When
-        CMMStudy record = new RecordXMLParser(cmmStudyMapper, daoBase).getRecord(repo, recordIdentifier);
+        CMMStudy record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordIdentifier);
 
         // Then
         then(record).isNotNull();
@@ -134,12 +134,12 @@ public class RecordXMLParserTest {
     public void shouldOnlyExtractSingleDateAsStartDateForRecordsWithASingleDateAttr() throws IOException, ProcessingException, JSONException, HarvesterException {
 
         // Given
-        given(daoBase.getInputStream(fullRecordUrl)).willReturn(
+        given(httpClient.getInputStream(fullRecordUrl)).willReturn(
             CMMStudyTestData.getContentAsStream("xml/ddi_record_1683.xml")
         );
 
         // When
-        CMMStudy record = new RecordXMLParser(cmmStudyMapper, daoBase).getRecord(repo, recordIdentifier);
+        CMMStudy record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordIdentifier);
         then(record).isNotNull();
         validateCMMStudyResultAgainstSchema(record);
         final ObjectMapper mapper = new ObjectMapper();
@@ -156,12 +156,12 @@ public class RecordXMLParserTest {
 
         // Given
         String expectedCmmStudyJsonString = CMMStudyTestData.getContent("json/ddi_record_1683_with_codebookXmlLag.json");
-        given(daoBase.getInputStream(fullRecordUrl)).willReturn(
+        given(httpClient.getInputStream(fullRecordUrl)).willReturn(
             CMMStudyTestData.getContentAsStream("xml/ddi_record_1683_with_codebookXmlLag.xml")
         );
 
         // When
-        CMMStudy record = new RecordXMLParser(cmmStudyMapper, daoBase).getRecord(repo, recordIdentifier);
+        CMMStudy record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordIdentifier);
         String actualCmmStudyJsonString = cmmConverter.toJsonString(record);
 
         // then
@@ -177,12 +177,12 @@ public class RecordXMLParserTest {
         expectedAbstract.put("fi", "Haastattelu+<br>Jyväskylä");
         expectedAbstract.put("en", "1. The data+<br>2. The datafiles");
 
-        given(daoBase.getInputStream(fullRecordUrl)).willReturn(
+        given(httpClient.getInputStream(fullRecordUrl)).willReturn(
             CMMStudyTestData.getContentAsStream("xml/ddi_record_2305_fsd_repeat_abstract.xml")
         );
 
         // When
-        CMMStudy record = new RecordXMLParser(cmmStudyMapper, daoBase).getRecord(repo, recordIdentifier);
+        CMMStudy record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordIdentifier);
 
         then(record).isNotNull();
         then(record.getAbstractField().size()).isEqualTo(3);
@@ -199,12 +199,12 @@ public class RecordXMLParserTest {
         expectedTitle.put("no", "2 - Et Machinery of Government, 1976-1977");
         expectedTitle.put("yy", "Enquête sociale européenne");
 
-        given(daoBase.getInputStream(fullRecordUrl)).willReturn(
+        given(httpClient.getInputStream(fullRecordUrl)).willReturn(
             CMMStudyTestData.getContentAsStream("xml/ddi_record_1683.xml")
         );
 
         // When
-        CMMStudy record = new RecordXMLParser(cmmStudyMapper, daoBase).getRecord(repo, recordIdentifier);
+        CMMStudy record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordIdentifier);
 
         then(record).isNotNull();
         then(record.getTitleStudy().size()).isEqualTo(3);
@@ -216,12 +216,12 @@ public class RecordXMLParserTest {
     public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord_MarkedAsNotActive() throws IOException, HarvesterException {
 
         // Given
-        given(daoBase.getInputStream(fullRecordUrl)).willReturn(
+        given(httpClient.getInputStream(fullRecordUrl)).willReturn(
             CMMStudyTestData.getContentAsStream("xml/ddi_record_1031_deleted.xml")
         );
 
         // When
-        CMMStudy record = new RecordXMLParser(cmmStudyMapper, daoBase).getRecord(repo, recordIdentifier);
+        CMMStudy record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordIdentifier);
 
         // Then
         then(record).isNotNull();
@@ -232,12 +232,12 @@ public class RecordXMLParserTest {
     public void shouldThrowExceptionForRecordWithErrorElement() throws IOException, HarvesterException {
 
         // Given
-        given(daoBase.getInputStream(fullRecordUrl)).willReturn(
+        given(httpClient.getInputStream(fullRecordUrl)).willReturn(
             CMMStudyTestData.getContentAsStream("xml/ddi_record_WithError.xml")
         );
 
         // When
-        new RecordXMLParser(cmmStudyMapper, daoBase).getRecord(repo, recordIdentifier);
+        new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordIdentifier);
 
         // Then an exception is thrown.
     }
@@ -246,12 +246,12 @@ public class RecordXMLParserTest {
     public void shouldExtractAllRequiredCMMFieldsForAGivenAUKDSRecord() throws IOException, ProcessingException, JSONException, HarvesterException {
 
         // Given
-        given(daoBase.getInputStream(fullRecordUrl)).willReturn(
+        given(httpClient.getInputStream(fullRecordUrl)).willReturn(
             CMMStudyTestData.getContentAsStream("xml/ddi_record_ukds_example.xml")
         );
 
         // When
-        CMMStudy result = new RecordXMLParser(cmmStudyMapper, daoBase).getRecord(repo, recordIdentifier);
+        CMMStudy result = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordIdentifier);
 
         then(result).isNotNull();
         validateCMMStudyResultAgainstSchema(result);
@@ -332,12 +332,12 @@ public class RecordXMLParserTest {
         var repository = ReposTestData.getUKDSLanguageOverrideRepository();
 
         // Given
-        given(daoBase.getInputStream(fullRecordUrl)).willReturn(
+        given(httpClient.getInputStream(fullRecordUrl)).willReturn(
             CMMStudyTestData.getContentAsStream("xml/ddi_record_ukds_example.xml")
         );
 
         // When
-        CMMStudy result = new RecordXMLParser(cmmStudyMapper, daoBase).getRecord(repository, recordIdentifier);
+        CMMStudy result = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repository, recordIdentifier);
 
         then(result).isNotNull();
         validateCMMStudyResultAgainstSchema(result);

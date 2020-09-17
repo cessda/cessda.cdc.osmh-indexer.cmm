@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.repository;
+package eu.cessda.pasc.oci.http;
 
 import eu.cessda.pasc.oci.exception.HTTPException;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
@@ -36,11 +35,11 @@ import java.time.Instant;
  */
 @Slf4j
 @Service
-public class DaoBaseImpl implements DaoBase {
+public class HttpClientImpl implements HttpClient {
 
-    private final HttpClient httpClient;
+    private final java.net.http.HttpClient httpClient;
 
-    public DaoBaseImpl(HttpClient httpClient) {
+    public HttpClientImpl(java.net.http.HttpClient httpClient) {
         this.httpClient = httpClient;
     }
 
