@@ -99,7 +99,7 @@ public class CMMStudyMapper {
 
     public String parseDefaultLanguage(Document document, Repo repository) {
         XPathExpression<Attribute> attributeExpression = xFactory
-            .compile(RECORD_DEFAULT_LANGUAGE, Filters.attribute(), null, OAI_AND_DDI_NS);
+            .compile(RECORD_DEFAULT_LANGUAGE_XPATH, Filters.attribute(), null, OAI_AND_DDI_NS);
         Optional<Attribute> codeBookLang = Optional.ofNullable(attributeExpression.evaluateFirst(document));
         if (codeBookLang.isPresent() && !codeBookLang.get().getValue().trim().isEmpty()) {
             return codeBookLang.get().getValue().trim();
@@ -310,17 +310,17 @@ public class CMMStudyMapper {
     /**
      * Parses Sampling Procedure(s) from:
      * <p>
-     * Xpath = {@value OaiPmhConstants#SAMPLING_XPATH }
+     * Xpath = {@value OaiPmhConstants#TYPE_OF_SAMPLING_XPATH }
      */
     public Map<String, List<String>> parseSamplingProcedureFreeTexts(Document doc, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, doc, SAMPLING_XPATH, nullableElementValueStrategyFunction());
+            defaultLangIsoCode, doc, TYPE_OF_SAMPLING_XPATH, nullableElementValueStrategyFunction());
     }
 
     /**
      * Parses Sampling Procedure(s) from:
      * <p>
-     * Xpath = {@value OaiPmhConstants#SAMPLING_XPATH }
+     * Xpath = {@value OaiPmhConstants#TYPE_OF_SAMPLING_XPATH }
      */
     public Map<String, List<String>> parseDataAccessFreeText(Document doc, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(

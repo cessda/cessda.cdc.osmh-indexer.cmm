@@ -87,7 +87,7 @@ public class LanguageExtractor {
      */
     boolean isValidCMMStudyForLang(@NonNull CMMStudy cmmStudy, @NonNull String languageIsoCode) {
 
-        // Inactive = deleted record no need to validate against CMM below. Index as is. Filtered in Frontend.
+        // Inactive = deleted record, no need to validate against CMM below. This will be deleted in the index.
         if (!cmmStudy.isActive()) {
             return true;
         }
