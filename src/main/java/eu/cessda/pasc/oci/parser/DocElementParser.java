@@ -17,7 +17,6 @@ package eu.cessda.pasc.oci.parser;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
-import eu.cessda.pasc.oci.models.cmmstudy.TermVocabAttributes;
 import eu.cessda.pasc.oci.models.oai.configuration.OaiPmh;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
@@ -33,7 +32,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static eu.cessda.pasc.oci.parser.HTMLFilter.cleanCharacterReturns;
 import static eu.cessda.pasc.oci.parser.OaiPmhConstants.*;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -58,22 +56,13 @@ class DocElementParser {
         this.oaiPmh = appConfigurationProperties.getOaiPmh();
     }
 
-    static TermVocabAttributes parseTermVocabAttrAndValues(Element parentElement, Element concept, boolean hasControlledValue) {
-        TermVocabAttributes.TermVocabAttributesBuilder builder = TermVocabAttributes.builder();
-        builder.term(cleanCharacterReturns(parentElement.getText()));
-
-        if (hasControlledValue) {
-            builder.vocab(getAttributeValue(concept, VOCAB_ATTR).orElse(""))
-                .vocabUri(getAttributeValue(concept, VOCAB_URI_ATTR).orElse(""))
-                .id(concept.getText());
-        } else {
-            builder.vocab(getAttributeValue(parentElement, VOCAB_ATTR).orElse(""))
-                .vocabUri(getAttributeValue(parentElement, VOCAB_URI_ATTR).orElse(""))
-                .id(getAttributeValue(parentElement, ID_ATTR).orElse(""));
-        }
-        return builder.build();
-    }
-
+    /**
+     * Returns the text content of the given attribute.
+     * If the attribute does not exist, an empty {@link Optional} will be returned.
+     *
+     * @param element the element to parse.
+     * @param idAttr  the attribute to return the text content of.
+     */
     static Optional<String> getAttributeValue(Element element, String idAttr) {
         return ofNullable(element.getAttributeValue(idAttr));
     }
@@ -104,7 +93,7 @@ class DocElementParser {
      */
     List<Element> getElements(Document document, String xPathToElement) {
         XPathExpression<Element> expression = xFactory.compile(xPathToElement, Filters.element(), null, OAI_AND_DDI_NS);
-        return expression.evaluate(document).stream().filter(Objects::nonNull).collect(toList());
+        return expression.evaluate(document);
     }
 
     /**
