@@ -28,7 +28,6 @@ import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.filter.Filters;
-import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -75,14 +74,12 @@ public class CMMStudyMapper {
     /**
      * Extracts the Study Number from the header element
      * <p>
-     * Original specified path cant be relied on (/codeBook/stdyDscr/citation/titlStmt/IDNo)
+     * Original specified path can't be relied on (/codeBook/stdyDscr/citation/titlStmt/IDNo)
      * <ul>
      * <li>It may have multiple identifiers for different agency.</li>
-     * <li>Where as The header will by default specify the unique code identifier
-     * for the repo(agency) we are querying
-     * </li>
-     * <p>
+     * <li>Where as The header will by default specify the unique code identifier for the repo(agency) we are querying</li>
      * </ul>
+     * <p>
      * Actual path used: /record/header/identifier
      *
      * @param document the document to parse
@@ -98,12 +95,22 @@ public class CMMStudyMapper {
         return new HeaderElement(studyNumber.orElse(null), lastModified.orElse(null), recordStatus);
     }
 
+    /**
+     * Attempts to parse the default language from the given document.
+     * <p>
+     * This method will first attempt to find the language attribute at {@value OaiPmhConstants#RECORD_DEFAULT_LANGUAGE_XPATH}.
+     * If this attribute doesn't exist, the default language of the repository will be used if set.
+     * Otherwise, the global default language will be used.
+     *
+     * @param document   the OAI-PMH document to parse.
+     * @param repository the repository used to set the default language.
+     * @return the default language of the document.
+     */
     public String parseDefaultLanguage(Document document, Repo repository) {
-        XPathExpression<Attribute> attributeExpression = xFactory
-            .compile(RECORD_DEFAULT_LANGUAGE_XPATH, Filters.attribute(), null, OAI_AND_DDI_NS);
-        Optional<Attribute> codeBookLang = Optional.ofNullable(attributeExpression.evaluateFirst(document));
-        if (codeBookLang.isPresent() && !codeBookLang.get().getValue().trim().isEmpty()) {
-            return codeBookLang.get().getValue().trim();
+        var attributeExpression = xFactory.compile(RECORD_DEFAULT_LANGUAGE_XPATH, Filters.attribute(), null, OAI_AND_DDI_NS);
+        var codeBookLang = attributeExpression.evaluateFirst(document);
+        if (codeBookLang != null && !codeBookLang.getValue().trim().isEmpty()) {
+            return codeBookLang.getValue().trim();
             // #192 - Per repository override of the default language
         } else if (repository.getDefaultLanguage() != null) {
             return repository.getDefaultLanguage();

@@ -27,7 +27,7 @@ import static eu.cessda.pasc.oci.parser.OaiPmhConstants.*;
 import static java.util.Optional.ofNullable;
 
 /**
- * Placeholder for various strategies to use to extract metadata for each field type
+ * Placeholder for various strategies to use to extract metadata for each field type.
  *
  * @author moses AT doraventures DOT com
  */
@@ -88,6 +88,14 @@ class ParsingStrategies {
         return value.isEmpty() ? Optional.empty() : Optional.of(value);
     }
 
+    /**
+     * Returns an {@link Optional} representing the text of the element, as well as the affiliation if present.
+     * <p>
+     * If the {@value OaiPmhConstants#CREATOR_AFFILIATION_ATTR} attribute is present, then the string is constructed
+     * as "element text (attribute value)". Otherwise only the element text is returned.
+     *
+     * @param element the {@link Element} to parse.
+     */
     static Optional<String> creatorStrategy(Element element) {
         return Optional.of(getAttributeValue(element, CREATOR_AFFILIATION_ATTR)
             .map(valueString -> (element.getText() + " (" + valueString + ")"))
@@ -155,6 +163,16 @@ class ParsingStrategies {
         });
     }
 
+    /**
+     * Constructs a {@link DataCollectionFreeText} using the given element.
+     * <p>
+     * The free text field is derived from the element text, and the event is derived from the
+     * {@value OaiPmhConstants#EVENT_ATTR} attribute. If the attribute is missing or otherwise
+     * unset the event will be set to {@value DATE_NOT_AVAIL}.
+     *
+     * @param element the {@link Element} to parse.
+     * @return a {@link DataCollectionFreeText}.
+     */
     static Optional<DataCollectionFreeText> dataCollFreeTextStrategy(Element element) {
         Optional<String> dateAttrValue = getAttributeValue(element, DATE_ATTR);
 

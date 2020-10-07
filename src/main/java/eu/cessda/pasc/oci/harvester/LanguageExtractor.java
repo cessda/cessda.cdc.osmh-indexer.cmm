@@ -97,8 +97,7 @@ public class LanguageExtractor {
 
     private CMMStudyOfLanguage getCmmStudyOfLanguage(CMMStudy cmmStudy, String lang, Repo repository) {
 
-        String formatMsg = "Extracting CMMStudyOfLang from CMMStudyNumber [{}] for lang [{}]";
-        log.trace(formatMsg, cmmStudy.getStudyNumber(), lang);
+        log.trace("[{}] Extracting CMMStudyOfLanguage from [{}], language [{}]", repository.getCode(), cmmStudy.getStudyNumber(), lang);
 
         CMMStudyOfLanguage.CMMStudyOfLanguageBuilder builder = CMMStudyOfLanguage.builder();
 

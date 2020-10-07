@@ -101,12 +101,11 @@ class DocElementParser {
      *
      * @param document       the document to parse
      * @param xPathToElement the xPath
-     * @return nonNull list of {@link Element}
+     * @return a list of {@link Element}s
      */
     private List<Element> getElementsWithDateAttr(Document document, String xPathToElement) {
         XPathExpression<Element> expression = xFactory.compile(xPathToElement, Filters.element(), null, OAI_AND_DDI_NS);
         return expression.evaluate(document).stream()
-            .filter(Objects::nonNull)
             .filter(element -> getAttributeValue(element, DATE_ATTR).isPresent()) //PUG requirement: we only care about those with @date CV
             .collect(toList());
     }
@@ -191,7 +190,7 @@ class DocElementParser {
         Map<String, String> titlesMap = new HashMap<>();
         for (Element element : elements) {
             String elementText = textExtractionStrategy.apply(element);
-            Attribute langAttribute = element.getAttribute(LANG_ATTR, Namespace.XML_NAMESPACE);
+            var langAttribute = element.getAttribute(LANG_ATTR, Namespace.XML_NAMESPACE);
             if (null == langAttribute || langAttribute.getValue().isEmpty()) {
                 mapToADefaultingLang(isConcatenating, langCode, titlesMap, element, elementText);
             } else if (isConcatenating) {
