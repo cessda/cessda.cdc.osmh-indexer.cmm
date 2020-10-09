@@ -24,7 +24,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import static eu.cessda.pasc.oci.mock.data.RecordTestData.LIST_RECORDER_HEADERS_BODY_EXAMPLE;
@@ -75,7 +74,7 @@ public class HttpClientTest {
         // When
         HttpClientImpl daoBase = new HttpClientImpl(httpClient);
         try (InputStream inputStream = daoBase.getInputStream(expectedUrl)) {
-            Assert.fail(new String(inputStream.readAllBytes(), Charset.defaultCharset()));
+            Assert.fail(new String(inputStream.readAllBytes(), StandardCharsets.UTF_8));
         } catch (HTTPException e) {
             Assert.assertEquals(expectedStatusCode, e.getExternalResponse().getStatusCode());
         }
@@ -103,7 +102,7 @@ public class HttpClientTest {
         // When
         HttpClientImpl daoBase = new HttpClientImpl(httpClient);
         try (InputStream inputStream = daoBase.getInputStream("http://error.endpoint/")) {
-            Assert.fail(new String(inputStream.readAllBytes(), Charset.defaultCharset()));
+            Assert.fail(new String(inputStream.readAllBytes(), StandardCharsets.UTF_8));
         }
     }
 }
