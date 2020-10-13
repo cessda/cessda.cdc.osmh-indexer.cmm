@@ -25,7 +25,6 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TimeZone;
 
 /**
  * Loads Default Configurations from application*.yml
@@ -43,7 +42,4 @@ public class AppConfigurationProperties {
   private final List<String> languages = new ArrayList<>();
   private final OaiPmh oaiPmh = new OaiPmh();
 
-  public AppConfigurationProperties() {
-    TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-  }
 }

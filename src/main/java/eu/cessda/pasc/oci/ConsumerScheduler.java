@@ -27,6 +27,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -43,85 +44,104 @@ import static net.logstash.logback.argument.StructuredArguments.value;
 @Slf4j
 public class ConsumerScheduler {
 
-  private static final String FULL_RUN = "Full Run";
-  private static final String DAILY_INCREMENTAL_RUN = "Daily Incremental Run";
-  private static final String DEFAULT_CDC_JOB_KEY = "indexer_job_id";
+    private static final String FULL_RUN = "Full Run";
+    private static final String DAILY_INCREMENTAL_RUN = "Daily Incremental Run";
 
-  private final DebuggingJMXBean debuggingJMXBean;
-  private final IngestService esIndexerService;
-  private final HarvesterRunner harvesterRunner;
+    // Logging fields
+    private static final String INDEXER_JOB_ID = "indexer_job_id";
+    private static final String RUN_TYPE = "run_type";
 
-  @Autowired
-  public ConsumerScheduler(final DebuggingJMXBean debuggingJMXBean, final IngestService esIndexerService,
-      final HarvesterRunner harvesterRunner) {
-    this.debuggingJMXBean = debuggingJMXBean;
-    this.esIndexerService = esIndexerService;
-    this.harvesterRunner = harvesterRunner;
-  }
+    private final DebuggingJMXBean debuggingJMXBean;
+    private final IngestService esIndexerService;
+    private final HarvesterRunner harvesterRunner;
 
-  /**
-   * Auto Starts after delay of given time at startup.
-   */
-  @Async
-  @ManagedOperation(description = "Manual trigger to do a full harvest and ingest run")
-  @Scheduled(initialDelayString = "${osmhConsumer.delay.initial}", fixedDelayString = "${osmhConsumer.delay.fixed}")
-  @SuppressWarnings("try")
-  public void fullHarvestAndIngestionAllConfiguredSPsReposRecords() {
-    try (var jobKeyClosable = MDC.putCloseable(ConsumerScheduler.DEFAULT_CDC_JOB_KEY, getJobId())) {
-      final var startTime = logStartStatus(FULL_RUN);
-      harvesterRunner.executeHarvestAndIngest(null);
-      logEndStatus(startTime, FULL_RUN);
+    @Autowired
+    public ConsumerScheduler(DebuggingJMXBean debuggingJMXBean, IngestService esIndexerService, HarvesterRunner harvesterRunner) {
+        this.debuggingJMXBean = debuggingJMXBean;
+        this.esIndexerService = esIndexerService;
+        this.harvesterRunner = harvesterRunner;
     }
-  }
 
-  /**
-   * Daily Harvest and Ingestion run.
-   */
-  @Async
-  @ManagedOperation(description = "Manual trigger to do an incremental harvest and ingest")
-  @Scheduled(cron = "${osmhConsumer.daily.run}")
-  @SuppressWarnings("try")
-  public void dailyIncrementalHarvestAndIngestionAllConfiguredSPsReposRecords() {
-    try (var jobKeyClosable = MDC.putCloseable(ConsumerScheduler.DEFAULT_CDC_JOB_KEY, getJobId())) {
-      final var startTime = logStartStatus(DAILY_INCREMENTAL_RUN);
-      harvesterRunner.executeHarvestAndIngest(esIndexerService.getMostRecentLastModified().orElse(null));
-      logEndStatus(startTime, DAILY_INCREMENTAL_RUN);
+    /**
+     * Auto Starts after delay of given time at startup.
+     */
+    @Async
+    @ManagedOperation(description = "Manual trigger to do a full harvest and ingest run")
+    @Scheduled(initialDelayString = "${osmhConsumer.delay.initial}", fixedDelayString = "${osmhConsumer.delay.fixed}")
+    @SuppressWarnings("try")
+    public void fullHarvestAndIngestionAllConfiguredSPsReposRecords() {
+        try (var jobKeyClosable = MDC.putCloseable(RUN_TYPE, FULL_RUN)) {
+            run(FULL_RUN, null);
+        }
     }
-  }
 
-  /**
-   * Weekly run.
-   */
-  @Scheduled(cron = "${osmhConsumer.daily.sunday.run}")
-  public void weeklyFullHarvestAndIngestionAllConfiguredSPsReposRecords() {
-    log.info("Once a Week Full Run. Triggered by cron - STARTED");
-    fullHarvestAndIngestionAllConfiguredSPsReposRecords();
-    log.info("Once a Week Full Run. Triggered by cron - ENDED");
-  }
+    /**
+     * Daily Harvest and Ingestion run.
+     */
+    @Async
+    @ManagedOperation(description = "Manual trigger to do an incremental harvest and ingest")
+    @Scheduled(cron = "${osmhConsumer.daily.run}")
+    @SuppressWarnings("try")
+    public void dailyIncrementalHarvestAndIngestionAllConfiguredSPsReposRecords() {
+        try (var jobKeyClosable = MDC.putCloseable(RUN_TYPE, DAILY_INCREMENTAL_RUN)) {
+            run(DAILY_INCREMENTAL_RUN, esIndexerService.getMostRecentLastModified().orElse(null));
+        }
+    }
 
-  /**
-   * Gets the correlation id of this run
-   *
-   * @return the correlation id
-   */
-  private String getJobId() {
-    return DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.now(ZoneId.systemDefault()));
-  }
+    /**
+     * Runs the harvest.
+     *
+     * @param runType     the run type, used for logging
+     * @param harvestFrom the LocalDateTime to harvest from, where null is a full harvest
+     */
+    @SuppressWarnings("try")
+    private void run(String runType, LocalDateTime harvestFrom) {
+        try (var jobKeyClosable = MDC.putCloseable(INDEXER_JOB_ID, getJobId())) {
+            final var startTime = logStartStatus(runType);
+            harvesterRunner.executeHarvestAndIngest(harvestFrom);
+            logEndStatus(startTime, runType);
+        }
+    }
 
-  private OffsetDateTime logStartStatus(final String runDescription) {
-    final OffsetDateTime startTime = OffsetDateTime.now(ZoneId.systemDefault());
-    log.info("[{}] Consume and Ingest All SPs Repos: \nStarted at [{}]\nCurrent state before run:\n{}\n{}",
-        runDescription, startTime, debuggingJMXBean.printCurrentlyConfiguredRepoEndpoints(),
-        debuggingJMXBean.printElasticSearchInfo());
-    return startTime;
-  }
+    /**
+     * Weekly run.
+     */
+    @Scheduled(cron = "${osmhConsumer.daily.sunday.run}")
+    public void weeklyFullHarvestAndIngestionAllConfiguredSPsReposRecords() {
+        log.info("Once a Week Full Run. Triggered by cron - STARTED");
+        fullHarvestAndIngestionAllConfiguredSPsReposRecords();
+        log.info("Once a Week Full Run. Triggered by cron - ENDED");
+    }
 
-  private void logEndStatus(final OffsetDateTime startTime, final String runDescription) {
-      final var endTime = OffsetDateTime.now(ZoneId.systemDefault());
-      log.info("[{}] Consume and Ingest All SPs Repos:\nEnded at: [{}]\nDuration: [{}] seconds",
-          runDescription,
-          endTime,
-          value("job_duration", Duration.between(startTime, endTime).getSeconds())
-      );
-  }
+    /**
+     * Gets the correlation id of this run
+     *
+     * @return the correlation id
+     */
+    private String getJobId() {
+        return DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.now(ZoneId.systemDefault()));
+    }
+
+    private OffsetDateTime logStartStatus(final String runDescription) {
+        final OffsetDateTime startTime = OffsetDateTime.now(ZoneId.systemDefault());
+        log.info("[{}] Consume and Ingest All SPs Repos: \n" +
+                "Started at [{}]\n" +
+                "Current state before run:\n" +
+                "{}\n" +
+                "{}",
+            runDescription, startTime, debuggingJMXBean.printCurrentlyConfiguredRepoEndpoints(),
+            debuggingJMXBean.printElasticSearchInfo());
+        return startTime;
+    }
+
+    private void logEndStatus(final OffsetDateTime startTime, final String runDescription) {
+        final var endTime = OffsetDateTime.now(ZoneId.systemDefault());
+        log.info("[{}] Consume and Ingest All SPs Repos:\n" +
+                "Ended at: [{}]\n" +
+                "Duration: [{}] seconds",
+            runDescription,
+            endTime,
+            value("job_duration", Duration.between(startTime, endTime).getSeconds())
+        );
+    }
 }

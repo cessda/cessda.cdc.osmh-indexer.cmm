@@ -87,7 +87,7 @@ public class LanguageExtractor {
      */
     boolean isValidCMMStudyForLang(@NonNull CMMStudy cmmStudy, @NonNull String languageIsoCode) {
 
-        // Inactive = deleted record no need to validate against CMM below. Index as is. Filtered in Frontend.
+        // Inactive = deleted record, no need to validate against CMM below. This will be deleted in the index.
         if (!cmmStudy.isActive()) {
             return true;
         }
@@ -97,8 +97,7 @@ public class LanguageExtractor {
 
     private CMMStudyOfLanguage getCmmStudyOfLanguage(CMMStudy cmmStudy, String lang, Repo repository) {
 
-        String formatMsg = "Extracting CMMStudyOfLang from CMMStudyNumber [{}] for lang [{}]";
-        log.trace(formatMsg, cmmStudy.getStudyNumber(), lang);
+        log.trace("[{}] Extracting CMMStudyOfLanguage from [{}], language [{}]", repository.getCode(), cmmStudy.getStudyNumber(), lang);
 
         CMMStudyOfLanguage.CMMStudyOfLanguageBuilder builder = CMMStudyOfLanguage.builder();
 
@@ -138,7 +137,12 @@ public class LanguageExtractor {
         Optional.ofNullable(cmmStudy.getTitleStudy()).ifPresent(map -> builder.titleStudy(map.get(lang)));
         Optional.ofNullable(cmmStudy.getDataCollectionFreeTexts()).ifPresent(map -> builder.dataCollectionFreeTexts(map.get(lang)));
         Optional.ofNullable(cmmStudy.getDataAccessFreeTexts()).ifPresent(map -> builder.dataAccessFreeTexts(map.get(lang)));
-        Optional.ofNullable(cmmStudy.getStudyUrl()).ifPresent(map -> builder.studyUrl(map.get(lang)));
+
+        // #142 - Use any language to set the study url field
+        Optional.ofNullable(cmmStudy.getStudyUrl()).flatMap(map -> map.entrySet().stream().findAny()).map(Map.Entry::getValue).ifPresent(builder::studyUrl);
+
+        // Override with the language specific variant
+        Optional.ofNullable(cmmStudy.getStudyUrl()).flatMap(map -> Optional.ofNullable(map.get(lang))).ifPresent(builder::studyUrl);
 
         return builder.build();
     }

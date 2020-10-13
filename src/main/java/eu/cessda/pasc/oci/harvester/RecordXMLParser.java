@@ -18,11 +18,11 @@ package eu.cessda.pasc.oci.harvester;
 import eu.cessda.pasc.oci.exception.HarvesterException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.exception.XMLParseException;
+import eu.cessda.pasc.oci.http.HttpClient;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.parser.CMMStudyMapper;
 import eu.cessda.pasc.oci.parser.OaiPmhHelpers;
-import eu.cessda.pasc.oci.repository.DaoBase;
 import lombok.extern.slf4j.Slf4j;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
@@ -47,11 +47,11 @@ import java.net.URISyntaxException;
 class RecordXMLParser {
 
     private final CMMStudyMapper cmmStudyMapper;
-    private final DaoBase daoBase;
+    private final HttpClient httpClient;
 
     @Autowired
-    public RecordXMLParser(CMMStudyMapper cmmStudyMapper, DaoBase daoBase) {
-        this.daoBase = daoBase;
+    public RecordXMLParser(CMMStudyMapper cmmStudyMapper, HttpClient httpClient) {
+        this.httpClient = httpClient;
         this.cmmStudyMapper = cmmStudyMapper;
     }
 
@@ -60,7 +60,7 @@ class RecordXMLParser {
         URI fullUrl = null;
         try {
             fullUrl = OaiPmhHelpers.buildGetStudyFullUrl(repo, studyIdentifier);
-            try (InputStream recordXML = daoBase.getInputStream(fullUrl)) {
+            try (InputStream recordXML = httpClient.getInputStream(fullUrl)) {
                 return mapDDIRecordToCMMStudy(recordXML, fullUrl, repo);
             }
         } catch (JDOMException | IOException e) {

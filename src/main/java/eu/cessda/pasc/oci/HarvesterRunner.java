@@ -32,10 +32,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -44,6 +44,7 @@ import static net.logstash.logback.argument.StructuredArguments.value;
 
 @Component
 @Slf4j
+@SuppressWarnings("unused")
 public class HarvesterRunner {
 
     private final AppConfigurationProperties configurationProperties;
@@ -69,46 +70,72 @@ public class HarvesterRunner {
     /**
      * Starts the harvest.
      *
-     * @param lastModifiedDateTime the DateTime to incrementally harvest from, set to null to perform a full harvest.
+     * @param lastModifiedDateTime the {@link LocalDateTime} to incrementally harvest from, set to {@code null} to perform a full harvest.
      * @throws IllegalStateException if a harvest is already running.
      */
-    @SuppressWarnings("try")
     public void executeHarvestAndIngest(LocalDateTime lastModifiedDateTime) {
         if (!indexerRunning.getAndSet(true)) {
             try {
                 List<Repo> repos = configurationProperties.getEndpoints().getRepos();
 
                 // Store the MDC so that it can be used in the running thread
-                Map<String, String> contextMap = MDC.getCopyOfContextMap();
-                repos.parallelStream().forEach(repo -> {
-                    MDC.setContextMap(contextMap);
+                var contextMap = MDC.getCopyOfContextMap();
+                var executor = Executors.newFixedThreadPool(repos.size());
+                var futures = repos.stream()
+                    .map(repo -> CompletableFuture.runAsync(() -> harvestRepository(repo, lastModifiedDateTime, contextMap), executor))
+                    .collect(Collectors.toList());
 
-                    // Set the MDC so that the record name is attached to all downstream logs
-                    try (var repoNameClosable = MDC.putCloseable(LoggingConstants.REPO_NAME, repo.getCode())) {
-                        log.info("Processing Repo [{}]", repo);
-                        Map<String, List<CMMStudyOfLanguage>> langStudies = getCmmStudiesOfEachLangIsoCodeMap(repo, lastModifiedDateTime);
-                        langStudies.forEach((langIsoCode, cmmStudies) -> {
-                            try (var langClosable = MDC.putCloseable(LoggingConstants.LANG_CODE, langIsoCode)) {
-                                executeBulk(repo, langIsoCode, cmmStudies);
-                            }
-                        });
+                for (var f : futures) {
+                    try {
+                        f.get();
+                    } catch (InterruptedException e) {
+                        executor.shutdownNow();
+                        Thread.currentThread().interrupt();
+                    } catch (ExecutionException e) {
+                        log.error("Unexpected error occurred when harvesting!", e.getCause());
                     }
+                }
 
-                    // Reset the MDC
-                    MDC.clear();
-                });
+                executor.shutdown();
                 MDC.setContextMap(contextMap);
+
                 log.info("Harvest finished. Summary of the current state:");
                 log.info("Total number of records: {}", value("total_cmm_studies", ingestService.getTotalHitCount("*")));
                 metrics.updateMetrics();
-            } catch (ElasticsearchException e) {
-                log.error("Harvest failed!: {}", e.toString());
             } finally {
                 // Ensure that the running state is always set to false even if an exception is thrown
                 indexerRunning.set(false);
             }
         } else {
             throw new IllegalStateException("Indexer is already running");
+        }
+    }
+
+    /**
+     * Harvest an individual repository.
+     *
+     * @param repo                 the repository to harvest.
+     * @param lastModifiedDateTime the {@link LocalDateTime} to incrementally harvest from, can be {@code null}.
+     * @param contextMap           the logging context map.
+     */
+    @SuppressWarnings("try")
+    private void harvestRepository(Repo repo, LocalDateTime lastModifiedDateTime, Map<String, String> contextMap) {
+        MDC.setContextMap(contextMap);
+
+        // Set the MDC so that the record name is attached to all downstream logs
+        try (var repoNameClosable = MDC.putCloseable(LoggingConstants.REPO_NAME, repo.getCode())) {
+            log.info("Processing Repo [{}]", repo);
+            var langStudies = getCmmStudiesOfEachLangIsoCodeMap(repo, lastModifiedDateTime);
+            for (var entry : langStudies.entrySet()) {
+                try (var langClosable = MDC.putCloseable(LoggingConstants.LANG_CODE, entry.getKey())) {
+                    executeBulk(repo, entry.getKey(), entry.getValue());
+                } catch (ElasticsearchException e) {
+                    log.error("[{}({})] Error communicating with Elasticsearch!: {}", repo.getCode(), entry.getKey(), e.toString());
+                }
+            }
+        } finally {
+            // Reset the MDC
+            MDC.clear();
         }
     }
 
@@ -122,9 +149,23 @@ public class HarvesterRunner {
      */
     private void executeBulk(Repo repo, String langIsoCode, List<CMMStudyOfLanguage> cmmStudies) {
         if (!cmmStudies.isEmpty()) {
-            var studiesUpdated = getUpdatedStudies(cmmStudies, langIsoCode);
             log.info("[{}({})] Indexing...", repo.getCode(), langIsoCode);
-            if (ingestService.bulkIndex(cmmStudies, langIsoCode)) {
+            var studiesUpdated = getUpdatedStudies(cmmStudies, langIsoCode);
+
+            // Split the studies into studies to index and studies to delete
+            var studiesToIndex = new ArrayList<CMMStudyOfLanguage>();
+            var studiesToDelete = new ArrayList<CMMStudyOfLanguage>();
+            for (var study : cmmStudies) {
+                if (study.isActive()) {
+                    studiesToIndex.add(study);
+                } else {
+                    studiesToDelete.add(study);
+                }
+            }
+
+            // Perform indexing and deletions
+            if (ingestService.bulkIndex(studiesToIndex, langIsoCode)) {
+                ingestService.bulkDelete(studiesToDelete, langIsoCode);
                 log.info("[{}({})] Indexing succeeded: [{}] studies created, [{}] studies deleted, [{}] studies updated.",
                         repo.getCode(),
                         langIsoCode,
@@ -150,27 +191,22 @@ public class HarvesterRunner {
         var studiesDeleted = new AtomicInteger(0);
         var studiesUpdated = new AtomicInteger(0);
 
-        cmmStudies.parallelStream().forEach(remoteStudy -> {
-            var esStudyOptional = ingestService.getStudy(remoteStudy.getId(), language);
-
-            // If empty then the study didn't exist in Elasticsearch, and will be created
-            if (esStudyOptional.isEmpty()) {
+        cmmStudies.parallelStream().forEach(remoteStudy -> ingestService.getStudy(remoteStudy.getId(), language)
+            .ifPresentOrElse(study -> {
+                if (!remoteStudy.isActive()) {
+                    // The study has been deleted
+                    studiesDeleted.getAndIncrement();
+                } else if (!remoteStudy.equals(study)) {
+                    // The study has been updated
+                    studiesUpdated.getAndIncrement();
+                }
+            }, () -> {
                 if (remoteStudy.isActive()) {
+                    // If empty then the study didn't exist in Elasticsearch, and will be created
                     studiesCreated.getAndIncrement();
                 }
-            } else {
-                if (!remoteStudy.equals(esStudyOptional.get())) {
-                    // If not equal
-                    if (remoteStudy.isActive()) {
-                        // The study has been deleted
-                        studiesUpdated.getAndIncrement();
-                    } else {
-                        // The study has been updated
-                        studiesDeleted.getAndIncrement();
-                    }
-                }
-            }
-        });
+            })
+        );
 
         return new UpdatedStudies(studiesCreated.get(), studiesDeleted.get(), studiesUpdated.get());
     }

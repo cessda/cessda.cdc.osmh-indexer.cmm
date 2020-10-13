@@ -16,13 +16,14 @@
 package eu.cessda.pasc.oci.harvester;
 
 import eu.cessda.pasc.oci.exception.HarvesterException;
+import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.exception.XMLParseException;
+import eu.cessda.pasc.oci.http.HttpClient;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.parser.ListIdentifiersResponseValidator;
 import eu.cessda.pasc.oci.parser.OaiPmhConstants;
 import eu.cessda.pasc.oci.parser.OaiPmhHelpers;
-import eu.cessda.pasc.oci.repository.DaoBase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,9 +35,9 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -55,53 +56,60 @@ class RecordHeaderParser {
     private static final String RECORD_HEADER = "RecordHeader";
     private static final String STUDY = "Study";
 
-    private final DaoBase daoBase;
+    private final HttpClient httpClient;
     private final DocumentBuilderFactory builderFactory;
 
     @Autowired
-    public RecordHeaderParser(DaoBase daoBase, DocumentBuilderFactory builderFactory) {
-        this.daoBase = daoBase;
+    public RecordHeaderParser(HttpClient httpClient, DocumentBuilderFactory builderFactory) {
+        this.httpClient = httpClient;
         this.builderFactory = builderFactory;
     }
 
+    /**
+     * Gets a list of record headers from the specified repository. The returned list is immutable.
+     * <p>
+     * This method uses the {@code ListIdentifiers} verb.
+     *
+     * @param repo the repository to retrieve records from
+     * @return a list of record headers
+     * @throws OaiPmhException    if the repository returns an OAI-PMH error
+     * @throws XMLParseException  if the XML cannot be parsed, or if an IO error occurs
+     * @throws HarvesterException if the OAI-PMH repository returns a XML document with no {@code <oai>} element
+     */
     List<RecordHeader> getRecordHeaders(Repo repo) throws HarvesterException {
 
+        log.debug("[{}] Parsing record headers.", repo.getCode());
+
         URI fullListRecordUrlPath = OaiPmhHelpers.appendListRecordParams(repo);
-        Document recordHeadersDocument = getRecordHeadersDocument(fullListRecordUrlPath);
+        var recordHeadersDocument = getRecordHeadersDocument(fullListRecordUrlPath);
 
         // We exit if the response has an <error> element
         ListIdentifiersResponseValidator.validateResponse(recordHeadersDocument);
-
-        log.debug("[{}] Parsing record headers.", repo.getCode());
-        var recordHeaders = retrieveRecordHeaders(recordHeadersDocument, repo.getUrl());
-        log.debug("[{}] ParseRecordHeaders ended:  No more resumption tokens to process.", repo.getCode());
-
-        return recordHeaders;
-    }
-
-    private ArrayList<RecordHeader> retrieveRecordHeaders(Document document, URI baseRepoUrl) throws XMLParseException {
 
         Optional<String> resumptionToken;
         var recordHeaders = new ArrayList<RecordHeader>();
 
         do {
             // Parse and add all found record headers
-            recordHeaders.addAll(parseRecordHeadersFromDoc(document));
+            recordHeaders.addAll(parseRecordHeadersFromDoc(recordHeadersDocument));
 
             // Check and loop when there is a resumptionToken
-            resumptionToken = parseResumptionToken(document);
+            resumptionToken = parseResumptionToken(recordHeadersDocument);
             if (resumptionToken.isPresent()) {
-                URI repoUrlWithResumptionToken = OaiPmhHelpers.appendListRecordResumptionToken(baseRepoUrl, resumptionToken.get());
+                URI repoUrlWithResumptionToken = OaiPmhHelpers.appendListRecordResumptionToken(repo.getUrl(), resumptionToken.get());
                 log.trace("Looping for [{}].", repoUrlWithResumptionToken);
-                document = getRecordHeadersDocument(repoUrlWithResumptionToken);
+                recordHeadersDocument = getRecordHeadersDocument(repoUrlWithResumptionToken);
             }
 
         } while (resumptionToken.isPresent());
-        return recordHeaders;
+
+        log.debug("[{}] ParseRecordHeaders ended:  No more resumption tokens to process.", repo.getCode());
+
+        return Collections.unmodifiableList(recordHeaders);
     }
 
     private Document getRecordHeadersDocument(URI repoUrl) throws XMLParseException {
-        try (InputStream documentInputStream = daoBase.getInputStream(repoUrl)) {
+        try (var documentInputStream = httpClient.getInputStream(repoUrl)) {
             return builderFactory.newDocumentBuilder().parse(documentInputStream);
         } catch (IOException | SAXException | ParserConfigurationException e) {
             throw new XMLParseException(repoUrl, e);
@@ -140,10 +148,8 @@ class RecordHeaderParser {
         }
 
         var headerElements = headerNode.getChildNodes();
-        int headerElementsLength = headerElements.getLength();
-        for (int headerElementIndex = 0; headerElementIndex < headerElementsLength; headerElementIndex++) {
-            Node headerElement = headerElements.item(headerElementIndex);
-            String currentHeaderElementValue;
+        IntStream.range(0, headerElements.getLength()).mapToObj(headerElements::item).forEach(headerElement -> {
+            final String currentHeaderElementValue;
             switch (headerElement.getNodeName()) {
                 case OaiPmhConstants.IDENTIFIER_ELEMENT:
                     currentHeaderElementValue = headerElement.getTextContent();
@@ -165,7 +171,7 @@ class RecordHeaderParser {
                     // nothing to do
                     break;
             }
-        }
+        });
         return recordHeaderBuilder.build();
     }
 }

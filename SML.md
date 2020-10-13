@@ -7,7 +7,7 @@ Which means *"Software is usable; the software can be used by most users althoug
 
 | Attribute  | Description  | Score  |
 |:----------|:----------|:----------|
-| CA1.1 | End­ user Documentation | 0 |
+| CA1.1 | End user Documentation | 0 |
 | CA1.2 | Operational documentation | 2 |
 | CA1.3 | Development Documentation | 1 |
 | CA2 | Intellectual Property | 2 |

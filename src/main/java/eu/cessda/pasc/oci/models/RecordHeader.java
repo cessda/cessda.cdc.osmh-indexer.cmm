@@ -22,7 +22,10 @@ import com.google.common.base.CharMatcher;
 import lombok.*;
 
 /**
+ * Represents an OAI-PMH header.
+ *
  * @author moses AT doraventures DOT com
+ * @see <a href=http://www.openarchives.org/OAI/openarchivesprotocol.html#Record>http://www.openarchives.org/OAI/openarchivesprotocol.html#Record</a>
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({

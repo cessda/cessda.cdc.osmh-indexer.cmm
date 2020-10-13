@@ -36,16 +36,15 @@ public class OaiPmhConstants {
     static final String LAST_MODIFIED_DATE_XPATH = "//oai:header/oai:datestamp[1]";
     static final String ERROR_PATH = "//oai:error";
 
-    // Codebook Paths
-    static final String RECORD_DEFAULT_LANGUAGE = "//ddi:codeBook/@xml:lang";
+    // Elements
     public static final String IDENTIFIER_ELEMENT = "identifier";
     public static final String DATESTAMP_ELEMENT = "datestamp";
     public static final String SET_SPEC_ELEMENT = "setSpec";
     public static final String HEADER_ELEMENT = "header";
     public static final String RESUMPTION_TOKEN_ELEMENT = "resumptionToken";
-    public static final String COMPLETE_LIST_SIZE_ATTR = "completeListSize";
-    public static final String STATUS_ATTR = "status";
     public static final String DELETED = "deleted";
+
+    // Codebook Paths
     static final String ABSTRACT_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:abstract";
     static final String TITLE_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:titl";
     static final String PAR_TITLE_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:parTitl";
@@ -66,11 +65,12 @@ public class OaiPmhConstants {
     static final String FILE_TXT_LANGUAGES_XPATH = "//ddi:codeBook/ddi:fileDscr/ddi:fileTxt/@xml:lang";
     static final String FILENAME_LANGUAGES_XPATH = "//ddi:codeBook/ddi:fileDscr/ddi:fileTxt/ddi:fileName/@xml:lang";
     static final String TYPE_OF_SAMPLING_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:sampProc";
-    static final String SAMPLING_XPATH = TYPE_OF_SAMPLING_XPATH;
     static final String TYPE_OF_MODE_OF_COLLECTION_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:collMode";
-    // Elements
-    static final String LANG_ATTR = "lang";
+    static final String RECORD_DEFAULT_LANGUAGE_XPATH = "//ddi:codeBook/@xml:lang";
+
     // Attributes
+    public static final String STATUS_ATTR = "status";
+    static final String LANG_ATTR = "lang";
     static final String DATE_ATTR = "date";
     static final String END_ATTR = "end";
     static final String START_ATTR = "start";
@@ -87,6 +87,7 @@ public class OaiPmhConstants {
     static final String URI_ATTR = "URI";
     static final String OAI_PMH = "OAI-PMH";
     static final String ERROR = "error";
+
     // URL Paths tokens
     static final String VERB_PARAM_KEY = "verb";
     static final String METADATA_PREFIX_PARAM_KEY = "metadataPrefix";
