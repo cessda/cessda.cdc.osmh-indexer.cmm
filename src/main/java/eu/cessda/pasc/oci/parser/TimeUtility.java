@@ -30,12 +30,15 @@ import java.util.Optional;
 public class TimeUtility {
 
     private static final String[] EXPECTED_DATE_FORMATS = new String[]{
-            "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
-            "yyyy-MM-dd'T'HH:mm:ss'Z'",
-            "yyyy-dd-MM HH:mm:ss.SSS",
-            "yyyy-MM-dd",
-            "yyyy-MM-dd'T'HH:mm:ssZ",
-            "yyyy-MM", "yyyy"
+        "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
+        "yyyy-MM-dd'T'HH:mm:ss'Z'",
+        "yyyy-MM-dd'T'HH:mm:ss",
+        "yyyy-MM-dd'T'HH:mm'Z'",
+        "yyyy-MM-dd'T'HH:mm",
+        "yyyy-dd-MM HH:mm:ss.SSS",
+        "yyyy-MM-dd",
+        "yyyy-MM-dd'T'HH:mm:ssZ",
+        "yyyy-MM", "yyyy"
     };
 
     /**

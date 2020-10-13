@@ -57,7 +57,7 @@
       }
     ]
   },
-  "dataCollectionPeriodStartdate": "2010-09-20",
+  "dataCollectionPeriodStartdate": "2010-09-20T00:00",
   "dataCollectionYear": 2010,
   "typeOfTimeMethods": {
     "de": [
@@ -317,7 +317,7 @@
       }
     ]
   },
-  "dataCollectionPeriodEnddate": "2018-10-21T00:00:00Z",
+  "dataCollectionPeriodEnddate": "2018-10-21T00:00",
   "publisher": {
     "se": {
       "publisher": "Samhällsdatablad",

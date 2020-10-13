@@ -28,6 +28,7 @@ import org.jdom2.xpath.XPathFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -217,7 +218,12 @@ class DocElementParser {
         List<Element> elements = getElementsWithDateAttr(document, elementXpath);
         return elements.stream()
             .filter(element -> Objects.nonNull(element.getAttributeValue(EVENT_ATTR)))
-            .collect(Collectors.toMap(element -> element.getAttributeValue(EVENT_ATTR), element -> element.getAttributeValue(DATE_ATTR), (a, b) -> a));
+            .collect(Collectors.toMap(
+                element -> element.getAttributeValue(EVENT_ATTR),
+                element -> TimeUtility.getLocalDateTime(element.getAttributeValue(DATE_ATTR))
+                    .map(LocalDateTime::toString).orElse(element.getAttributeValue(DATE_ATTR)),
+                (a, b) -> a // If duplicates are present, keep the first encountered
+            ));
     }
 
     /**

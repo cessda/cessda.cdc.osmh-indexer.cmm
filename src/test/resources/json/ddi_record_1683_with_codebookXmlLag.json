@@ -186,7 +186,7 @@
       }
     ]
   },
-  "dataCollectionPeriodStartdate": "1976-01-01T00:00:00Z",
+  "dataCollectionPeriodStartdate": "1976-01-01T00:00",
   "dataCollectionFreeTexts": {},
   "dataAccessFreeTexts": {
     "zz": [

@@ -148,7 +148,7 @@ public class RecordXMLParserTest {
         String jsonString = cmmConverter.toJsonString(record);
         final JsonNode actualTree = mapper.readTree(jsonString);
 
-        then(actualTree.get("dataCollectionPeriodStartdate").asText()).isEqualTo("1976-01-01T00:00:00Z");
+        then(actualTree.get("dataCollectionPeriodStartdate").asText()).isEqualTo("1976-01-01T00:00");
         then(actualTree.get("dataCollectionPeriodEnddate")).isNull();
         then(actualTree.get("dataCollectionYear").asInt()).isEqualTo(1976);
     }
@@ -288,10 +288,10 @@ public class RecordXMLParserTest {
 
         // This following could be compared with one single Uber Json compare, but probably best this way to easily know
         // which field test assertion line below that fails.
-        then(expectedTree.get("publicationYear").toString()).isEqualTo(actualTree.get("publicationYear").toString());
-        then(expectedTree.get("dataCollectionPeriodStartdate").toString()).isEqualTo(actualTree.get("dataCollectionPeriodStartdate").toString());
-        then(expectedTree.get("dataCollectionPeriodEnddate").toString()).isEqualTo(actualTree.get("dataCollectionPeriodEnddate").toString());
-        then(expectedTree.get("dataCollectionYear").asInt()).isEqualTo(actualTree.get("dataCollectionYear").asInt());
+        then(actualTree.get("publicationYear").toString()).isEqualTo(expectedTree.get("publicationYear").toString());
+        then(actualTree.get("dataCollectionPeriodStartdate").toString()).isEqualTo(expectedTree.get("dataCollectionPeriodStartdate").toString());
+        then(actualTree.get("dataCollectionPeriodEnddate").toString()).isEqualTo(expectedTree.get("dataCollectionPeriodEnddate").toString());
+        then(actualTree.get("dataCollectionYear").asInt()).isEqualTo(expectedTree.get("dataCollectionYear").asInt());
         assertEquals(expectedTree.get("abstract").toString(), actualTree.get("abstract").toString(), true);
         assertEquals(expectedTree.get("classifications").toString(), actualTree.get("classifications").toString(), true);
         assertEquals(expectedTree.get("keywords").toString(), actualTree.get("keywords").toString(), true);
