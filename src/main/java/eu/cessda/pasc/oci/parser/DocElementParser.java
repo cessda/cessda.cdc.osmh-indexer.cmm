@@ -17,7 +17,6 @@ package eu.cessda.pasc.oci.parser;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
-import eu.cessda.pasc.oci.models.cmmstudy.TermVocabAttributes;
 import eu.cessda.pasc.oci.models.oai.configuration.OaiPmh;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
@@ -33,7 +32,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static eu.cessda.pasc.oci.parser.HTMLFilter.cleanCharacterReturns;
 import static eu.cessda.pasc.oci.parser.OaiPmhConstants.*;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -58,22 +56,13 @@ class DocElementParser {
         this.oaiPmh = appConfigurationProperties.getOaiPmh();
     }
 
-    static TermVocabAttributes parseTermVocabAttrAndValues(Element parentElement, Element concept, boolean hasControlledValue) {
-        TermVocabAttributes.TermVocabAttributesBuilder builder = TermVocabAttributes.builder();
-        builder.term(cleanCharacterReturns(parentElement.getText()));
-
-        if (hasControlledValue) {
-            builder.vocab(getAttributeValue(concept, VOCAB_ATTR).orElse(""))
-                .vocabUri(getAttributeValue(concept, VOCAB_URI_ATTR).orElse(""))
-                .id(concept.getText());
-        } else {
-            builder.vocab(getAttributeValue(parentElement, VOCAB_ATTR).orElse(""))
-                .vocabUri(getAttributeValue(parentElement, VOCAB_URI_ATTR).orElse(""))
-                .id(getAttributeValue(parentElement, ID_ATTR).orElse(""));
-        }
-        return builder.build();
-    }
-
+    /**
+     * Returns the text content of the given attribute.
+     * If the attribute does not exist, an empty {@link Optional} will be returned.
+     *
+     * @param element the element to parse.
+     * @param idAttr  the attribute to return the text content of.
+     */
     static Optional<String> getAttributeValue(Element element, String idAttr) {
         return ofNullable(element.getAttributeValue(idAttr));
     }
@@ -104,7 +93,7 @@ class DocElementParser {
      */
     List<Element> getElements(Document document, String xPathToElement) {
         XPathExpression<Element> expression = xFactory.compile(xPathToElement, Filters.element(), null, OAI_AND_DDI_NS);
-        return expression.evaluate(document).stream().filter(Objects::nonNull).collect(toList());
+        return expression.evaluate(document);
     }
 
     /**
@@ -112,22 +101,32 @@ class DocElementParser {
      *
      * @param document       the document to parse
      * @param xPathToElement the xPath
-     * @return nonNull list of {@link Element}
+     * @return a list of {@link Element}s
      */
     private List<Element> getElementsWithDateAttr(Document document, String xPathToElement) {
         XPathExpression<Element> expression = xFactory.compile(xPathToElement, Filters.element(), null, OAI_AND_DDI_NS);
         return expression.evaluate(document).stream()
-            .filter(Objects::nonNull)
             .filter(element -> getAttributeValue(element, DATE_ATTR).isPresent()) //PUG requirement: we only care about those with @date CV
             .collect(toList());
     }
 
-    <T> Map<String, List<T>> extractMetadataObjectListForEachLang(
-        String defaultLangIsoCode, Document document, String xPath,
-        Function<Element, Optional<T>> parserStrategy) {
+    /**
+     * Extracts metadata from the given {@link Document}, using the given parser strategy {@link Function}.
+     * <p>
+     * This method performs per-language extraction using the semantics of {@link DocElementParser#parseLanguageCode(String, Element)},
+     * and returns all elements that are present.
+     *
+     * @param defaultLangIsoCode the language to fall back to if the elements do not have a {@value OaiPmhConstants#LANG_ATTR} attribute.
+     * @param document           the {@link Document} to parse.
+     * @param xPath              the XPath to search.
+     * @param parserStrategy     the strategy to apply to each element.
+     * @param <T>                the type returned by the parser strategy.
+     * @return a {@link Map} with the key set to the language, and the value a {@link List} of {@link T}.
+     */
+    <T> Map<String, List<T>> extractMetadataObjectListForEachLang(String defaultLangIsoCode, Document document, String xPath, Function<Element, Optional<T>> parserStrategy) {
 
-        Map<String, List<T>> mapOfMetadataToLanguageCode = new HashMap<>();
-        List<Element> elements = getElements(document, xPath);
+        var mapOfMetadataToLanguageCode = new HashMap<String, List<T>>();
+        var elements = getElements(document, xPath);
         for (Element element : elements) {
             parserStrategy.apply(element).ifPresent(parsedMetadataPojoValue ->
                 parseLanguageCode(defaultLangIsoCode, element).ifPresent(code ->
@@ -137,18 +136,25 @@ class DocElementParser {
         return mapOfMetadataToLanguageCode;
     }
 
+    /**
+     * Extracts metadata from the given {@link Document}, using the given parser strategy {@link Function}.
+     * <p>
+     * This method performs per-language extraction using the semantics of {@link DocElementParser#parseLanguageCode(String, Element)}.
+     * If multiple values with the same language key are encountered, the last encountered is returned.
+     *
+     * @param defaultLangIsoCode the language to fall back to if the elements do not have a {@value OaiPmhConstants#LANG_ATTR} attribute.
+     * @param document           the {@link Document} to parse.
+     * @param xPath              the XPath to search.
+     * @param parserStrategy     the strategy to apply to each element.
+     * @param <T>                the type returned by the parser strategy.
+     * @return a {@link Map} with the key set to the language.
+     */
     <T> Map<String, T> extractMetadataObjectForEachLang(String defaultLangIsoCode, Document document, String xPath, Function<Element, T> parserStrategy) {
-
-        Map<String, T> mapOfMetadataToLanguageCode = new HashMap<>();
-        List<Element> elements = getElements(document, xPath);
-        for (Element element : elements) {
-            T parsedMetadataPojo = parserStrategy.apply(element);
-
-            //Overrides duplicates, last wins.
-            parseLanguageCode(defaultLangIsoCode, element).ifPresent(languageIsoCode -> mapOfMetadataToLanguageCode.put(languageIsoCode, parsedMetadataPojo));
-        }
-
-        return mapOfMetadataToLanguageCode;
+        var elements = getElements(document, xPath);
+        return elements.stream().map(element -> parseLanguageCode(defaultLangIsoCode, element).map(lang -> Map.entry(lang, parserStrategy.apply(element))))
+            .filter(Optional::isPresent).map(Optional::get)
+            // If multiple values with the same key are returned, the last value wins
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> b));
     }
 
     private Optional<String> parseLanguageCode(String defaultLangIsoCode, Element element) {
@@ -169,27 +175,58 @@ class DocElementParser {
         return Optional.empty();
     }
 
+    /**
+     * Gets the first {@link Element} that satisfies the XPath expression. If no elements are found, an empty {@link Optional} is returned
+     *
+     * @param document       the {@link Document} to parse.
+     * @param xPathToElement the XPath.
+     * @return The first {@link Element}, or an empty {@link Optional} if no elements were found.
+     */
     Optional<Element> getFirstElement(Document document, String xPathToElement) {
         XPathExpression<Element> expression = xFactory.compile(xPathToElement, Filters.element(), null, OAI_AND_DDI_NS);
         return ofNullable(expression.evaluateFirst(document));
     }
 
+    /**
+     * Gets the first {@link Attribute} that satisfies the XPath expression. If no attributes are found, an empty {@link Optional} is returned
+     *
+     * @param document       the {@link Document} to parse.
+     * @param xPathToElement the XPath.
+     * @return The first {@link Attribute}, or an empty {@link Optional} if no attributes were found.
+     */
     Optional<Attribute> getFirstAttribute(Document document, String xPathToElement) {
         XPathExpression<Attribute> expression = xFactory.compile(xPathToElement, Filters.attribute(), null, OAI_AND_DDI_NS);
         return ofNullable(expression.evaluateFirst(document));
     }
 
+    /**
+     * Gets the date attribute from elements that have an {@value OaiPmhConstants#EVENT_ATTR} attribute.
+     * <p>
+     * If the same {@value OaiPmhConstants#EVENT_ATTR} type is defined for multiple languages the filter will only keep the first encountered.
+     * <ul>
+     *     <li>{@code <collDate xml:lang="en" date="2009-03-19" event="start"/> }</li>
+     *     <li><strike>{@code <collDate xml:lang="fi" date="2009-03-19" event="start"/> }</strike></li>
+     * </ul>
+     * Currently there is no requirement to extract dates of event per language.
+     *
+     * @param document     the {@link Document} to parse.
+     * @param elementXpath the XPath to search.
+     * @return a {@link Map} with the keys set to the {@value OaiPmhConstants#EVENT_ATTR} and the values set to the date values.
+     */
     Map<String, String> getDateElementAttributesValueMap(Document document, String elementXpath) {
         List<Element> elements = getElementsWithDateAttr(document, elementXpath);
         return elements.stream()
-            // If the same "event" type is defined for multiple languages the following filter will only allow the first.
-            // eg: <collDate xml:lang="en" date="2009-03-19" event="start"/>
-            //     <collDate xml:lang="fi" date="2009-03-19" event="start"/>
-            // Currently there is no requirement to extract dates of event per language.
             .filter(element -> Objects.nonNull(element.getAttributeValue(EVENT_ATTR)))
             .collect(Collectors.toMap(element -> element.getAttributeValue(EVENT_ATTR), element -> element.getAttributeValue(DATE_ATTR), (a, b) -> a));
     }
 
+    /**
+     * Gets a list of {@link Attribute}s that satisfies the XPath expression.
+     *
+     * @param document       the {@link Document} to parse.
+     * @param xPathToElement the XPath to search.
+     * @return a list of {@link Attribute}s.
+     */
     private List<Attribute> getAttributes(Document document, String xPathToElement) {
         XPathExpression<Attribute> expression = xFactory.compile(xPathToElement, Filters.attribute(), null, DDI_NS);
         return expression.evaluate(document);
@@ -205,10 +242,10 @@ class DocElementParser {
     Map<String, String> getLanguageKeyValuePairs(List<Element> elements, boolean isConcatenating, String langCode,
                                                  Function<Element, String> textExtractionStrategy) {
 
-        Map<String, String> titlesMap = new HashMap<>();
+        var titlesMap = new HashMap<String, String>();
         for (Element element : elements) {
             String elementText = textExtractionStrategy.apply(element);
-            Attribute langAttribute = element.getAttribute(LANG_ATTR, Namespace.XML_NAMESPACE);
+            var langAttribute = element.getAttribute(LANG_ATTR, Namespace.XML_NAMESPACE);
             if (null == langAttribute || langAttribute.getValue().isEmpty()) {
                 mapToADefaultingLang(isConcatenating, langCode, titlesMap, element, elementText);
             } else if (isConcatenating) {

@@ -28,7 +28,6 @@ import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.filter.Filters;
-import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -38,7 +37,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static eu.cessda.pasc.oci.parser.OaiPmhConstants.*;
-import static eu.cessda.pasc.oci.parser.ParsingStrategies.*;
+import static eu.cessda.pasc.oci.parser.ParsingStrategies.samplingTermVocabAttributeStrategy;
+import static eu.cessda.pasc.oci.parser.ParsingStrategies.termVocabAttributeStrategy;
 import static eu.cessda.pasc.oci.parser.TimeUtility.parseYearFromDateString;
 
 /**
@@ -74,14 +74,12 @@ public class CMMStudyMapper {
     /**
      * Extracts the Study Number from the header element
      * <p>
-     * Original specified path cant be relied on (/codeBook/stdyDscr/citation/titlStmt/IDNo)
+     * Original specified path can't be relied on (/codeBook/stdyDscr/citation/titlStmt/IDNo)
      * <ul>
      * <li>It may have multiple identifiers for different agency.</li>
-     * <li>Where as The header will by default specify the unique code identifier
-     * for the repo(agency) we are querying
-     * </li>
-     * <p>
+     * <li>Where as The header will by default specify the unique code identifier for the repo(agency) we are querying</li>
      * </ul>
+     * <p>
      * Actual path used: /record/header/identifier
      *
      * @param document the document to parse
@@ -97,12 +95,22 @@ public class CMMStudyMapper {
         return new HeaderElement(studyNumber.orElse(null), lastModified.orElse(null), recordStatus);
     }
 
+    /**
+     * Attempts to parse the default language from the given document.
+     * <p>
+     * This method will first attempt to find the language attribute at {@value OaiPmhConstants#RECORD_DEFAULT_LANGUAGE_XPATH}.
+     * If this attribute doesn't exist, the default language of the repository will be used if set.
+     * Otherwise, the global default language will be used.
+     *
+     * @param document   the OAI-PMH document to parse.
+     * @param repository the repository used to set the default language.
+     * @return the default language of the document.
+     */
     public String parseDefaultLanguage(Document document, Repo repository) {
-        XPathExpression<Attribute> attributeExpression = xFactory
-            .compile(RECORD_DEFAULT_LANGUAGE, Filters.attribute(), null, OAI_AND_DDI_NS);
-        Optional<Attribute> codeBookLang = Optional.ofNullable(attributeExpression.evaluateFirst(document));
-        if (codeBookLang.isPresent() && !codeBookLang.get().getValue().trim().isEmpty()) {
-            return codeBookLang.get().getValue().trim();
+        var attributeExpression = xFactory.compile(RECORD_DEFAULT_LANGUAGE_XPATH, Filters.attribute(), null, OAI_AND_DDI_NS);
+        var codeBookLang = attributeExpression.evaluateFirst(document);
+        if (codeBookLang != null && !codeBookLang.getValue().trim().isEmpty()) {
+            return codeBookLang.getValue().trim();
             // #192 - Per repository override of the default language
         } else if (repository.getDefaultLanguage() != null) {
             return repository.getDefaultLanguage();
@@ -117,7 +125,7 @@ public class CMMStudyMapper {
      */
     public Map<String, List<Pid>> parsePidStudies(Document document, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, document, PID_STUDY_XPATH, pidStrategyFunction());
+            defaultLangIsoCode, document, PID_STUDY_XPATH, ParsingStrategies::pidStrategy);
     }
 
     /**
@@ -167,7 +175,7 @@ public class CMMStudyMapper {
      */
     public Map<String, List<String>> parseCreator(Document doc, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, doc, CREATORS_XPATH, creatorStrategyFunction());
+            defaultLangIsoCode, doc, CREATORS_XPATH, ParsingStrategies::creatorStrategy);
     }
 
     /**
@@ -178,7 +186,7 @@ public class CMMStudyMapper {
     public Map<String, List<TermVocabAttributes>> parseClassifications(Document doc, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
             defaultLangIsoCode, doc, CLASSIFICATIONS_XPATH,
-            termVocabAttributeStrategyFunction(false));
+            element -> termVocabAttributeStrategy(element, false));
     }
 
     /**
@@ -188,7 +196,8 @@ public class CMMStudyMapper {
      */
     public Map<String, List<TermVocabAttributes>> parseKeywords(Document doc, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, doc, KEYWORDS_XPATH, termVocabAttributeStrategyFunction(false));
+            defaultLangIsoCode, doc, KEYWORDS_XPATH,
+            element -> termVocabAttributeStrategy(element, false));
     }
 
     /**
@@ -200,7 +209,7 @@ public class CMMStudyMapper {
 
         return docElementParser.extractMetadataObjectListForEachLang(
             defaultLangIsoCode, doc, TYPE_OF_TIME_METHOD_XPATH,
-            termVocabAttributeStrategyFunction(true));
+            element -> termVocabAttributeStrategy(element, true));
     }
 
     /**
@@ -211,7 +220,7 @@ public class CMMStudyMapper {
     public Map<String, List<TermVocabAttributes>> parseTypeOfModeOfCollection(Document doc, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
             defaultLangIsoCode, doc, TYPE_OF_MODE_OF_COLLECTION_XPATH,
-            termVocabAttributeStrategyFunction(true));
+            element -> termVocabAttributeStrategy(element, true));
     }
 
     /**
@@ -221,7 +230,8 @@ public class CMMStudyMapper {
      */
     public Map<String, List<TermVocabAttributes>> parseUnitTypes(Document document, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, document, UNIT_TYPE_XPATH, termVocabAttributeStrategyFunction(true));
+            defaultLangIsoCode, document, UNIT_TYPE_XPATH,
+            element -> termVocabAttributeStrategy(element, true));
     }
 
     /**
@@ -231,7 +241,7 @@ public class CMMStudyMapper {
      */
     public Map<String, List<VocabAttributes>> parseTypeOfSamplingProcedure(Document doc, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(defaultLangIsoCode, doc, TYPE_OF_SAMPLING_XPATH,
-            samplingTermVocabAttributeStrategyFunction(true));
+            element -> samplingTermVocabAttributeStrategy(element, true));
     }
 
     /**
@@ -241,7 +251,7 @@ public class CMMStudyMapper {
      */
     public Map<String, List<Country>> parseStudyAreaCountries(Document document, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, document, STUDY_AREA_COUNTRIES_XPATH, countryStrategyFunction());
+            defaultLangIsoCode, document, STUDY_AREA_COUNTRIES_XPATH, ParsingStrategies::countryStrategy);
     }
 
     /**
@@ -252,9 +262,9 @@ public class CMMStudyMapper {
      */
     public Map<String, Publisher> parsePublisher(Document document, String defaultLang) {
         Map<String, Publisher> producerPathMap = docElementParser.extractMetadataObjectForEachLang(defaultLang, document,
-            PUBLISHER_XPATH, publisherStrategyFunction());
+            PUBLISHER_XPATH, ParsingStrategies::publisherStrategy);
         Map<String, Publisher> distrPathMap = docElementParser.extractMetadataObjectForEachLang(defaultLang, document,
-            DISTRIBUTOR_XPATH, publisherStrategyFunction());
+            DISTRIBUTOR_XPATH, ParsingStrategies::publisherStrategy);
 
         Map<String, Publisher> mergedStudyUrls = new HashMap<>(producerPathMap);
         distrPathMap.forEach((k, v) -> mergedStudyUrls.merge(k, v, (docDscrValue, stdyDscrValue) -> docDscrValue));
@@ -296,8 +306,8 @@ public class CMMStudyMapper {
 
         var docDscrElement = docElementParser.getElements(document, STUDY_URL_DOC_DSCR_XPATH);
         var stdyDscrElements = docElementParser.getElements(document, STUDY_URL_STDY_DSCR_XPATH);
-        var urlFromDocDscr = docElementParser.getLanguageKeyValuePairs(docDscrElement, false, langCode, uriStrategyFunction());
-        var urlFromStdyDscr = docElementParser.getLanguageKeyValuePairs(stdyDscrElements, false, langCode, uriStrategyFunction());
+        var urlFromDocDscr = docElementParser.getLanguageKeyValuePairs(docDscrElement, false, langCode, ParsingStrategies::uriStrategy);
+        var urlFromStdyDscr = docElementParser.getLanguageKeyValuePairs(stdyDscrElements, false, langCode, ParsingStrategies::uriStrategy);
 
         var mergedStudyUrls = new HashMap<>(urlFromDocDscr);
 
@@ -310,21 +320,21 @@ public class CMMStudyMapper {
     /**
      * Parses Sampling Procedure(s) from:
      * <p>
-     * Xpath = {@value OaiPmhConstants#SAMPLING_XPATH }
+     * Xpath = {@value OaiPmhConstants#TYPE_OF_SAMPLING_XPATH }
      */
     public Map<String, List<String>> parseSamplingProcedureFreeTexts(Document doc, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, doc, SAMPLING_XPATH, nullableElementValueStrategyFunction());
+            defaultLangIsoCode, doc, TYPE_OF_SAMPLING_XPATH, ParsingStrategies::nullableElementValueStrategy);
     }
 
     /**
      * Parses Sampling Procedure(s) from:
      * <p>
-     * Xpath = {@value OaiPmhConstants#SAMPLING_XPATH }
+     * Xpath = {@value OaiPmhConstants#TYPE_OF_SAMPLING_XPATH }
      */
     public Map<String, List<String>> parseDataAccessFreeText(Document doc, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, doc, DATA_RESTRCTN_XPATH, nullableElementValueStrategyFunction());
+            defaultLangIsoCode, doc, DATA_RESTRCTN_XPATH, ParsingStrategies::nullableElementValueStrategy);
     }
 
     /**
@@ -334,7 +344,7 @@ public class CMMStudyMapper {
      */
     public Map<String, List<DataCollectionFreeText>> parseDataCollectionFreeTexts(Document document, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, document, DATA_COLLECTION_PERIODS_PATH, dataCollFreeTextStrategyFunction());
+            defaultLangIsoCode, document, DATA_COLLECTION_PERIODS_PATH, ParsingStrategies::dataCollFreeTextStrategy);
     }
 
     /**

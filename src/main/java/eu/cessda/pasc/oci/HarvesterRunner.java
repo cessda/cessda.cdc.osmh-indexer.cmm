@@ -100,7 +100,7 @@ public class HarvesterRunner {
                     MDC.clear();
                 }, executor)).collect(Collectors.toList());
 
-                futures.forEach(f -> {
+                for (var f : futures) {
                     try {
                         f.get();
                     } catch (InterruptedException e) {
@@ -108,12 +108,12 @@ public class HarvesterRunner {
                         Thread.currentThread().interrupt();
                     } catch (ExecutionException e) {
                         if (e.getCause() instanceof ElasticsearchException) {
-                            log.error("Error communicating to Elasticsearch!: {}", e.getCause().toString());
+                            log.error("Error communicating with Elasticsearch!: {}", e.getCause().toString());
                         } else {
                             log.error("Unexpected error occurred when harvesting!", e.getCause());
                         }
                     }
-                });
+                }
 
                 executor.shutdown();
                 MDC.setContextMap(contextMap.get());
@@ -182,22 +182,22 @@ public class HarvesterRunner {
         var studiesDeleted = new AtomicInteger(0);
         var studiesUpdated = new AtomicInteger(0);
 
-        cmmStudies.parallelStream().forEach(remoteStudy -> {
-            var esStudyOptional = ingestService.getStudy(remoteStudy.getId(), language);
-
-            // If empty then the study didn't exist in Elasticsearch, and will be created
-            if (esStudyOptional.isEmpty() && remoteStudy.isActive()) {
-                studiesCreated.getAndIncrement();
-            } else if (esStudyOptional.isPresent()) {
+        cmmStudies.parallelStream().forEach(remoteStudy -> ingestService.getStudy(remoteStudy.getId(), language)
+            .ifPresentOrElse(study -> {
                 if (!remoteStudy.isActive()) {
                     // The study has been deleted
                     studiesDeleted.getAndIncrement();
-                } else if (!remoteStudy.equals(esStudyOptional.get())) { // If not equal
+                } else if (!remoteStudy.equals(study)) {
                     // The study has been updated
                     studiesUpdated.getAndIncrement();
                 }
-            }
-        });
+            }, () -> {
+                if (remoteStudy.isActive()) {
+                    // If empty then the study didn't exist in Elasticsearch, and will be created
+                    studiesCreated.getAndIncrement();
+                }
+            })
+        );
 
         return new UpdatedStudies(studiesCreated.get(), studiesDeleted.get(), studiesUpdated.get());
     }
