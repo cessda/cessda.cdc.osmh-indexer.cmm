@@ -41,6 +41,8 @@ import static org.mockito.Mockito.*;
 
 
 /**
+ * Tests related to {@link ConsumerScheduler}
+ *
  * @author moses AT doraventures DOT com
  */
 public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {

@@ -52,6 +52,8 @@ import static org.mockito.BDDMockito.given;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 /**
+ * Tests related to {@link RecordXMLParser}
+ *
  * @author moses AT doraventures DOT com
  */
 @Slf4j

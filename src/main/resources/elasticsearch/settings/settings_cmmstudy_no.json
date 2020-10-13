@@ -37,6 +37,15 @@
         "type": "stop",
         "stopwords": "_norwegian_"
       }
+    },
+    "normalizer": {
+      "case_insensitive_normalizer": {
+        "type": "custom",
+        "char_filter": [],
+        "filter": [
+          "lowercase"
+        ]
+      }
     }
   }
 }

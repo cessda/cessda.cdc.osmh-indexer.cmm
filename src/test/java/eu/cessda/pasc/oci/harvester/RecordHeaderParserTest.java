@@ -40,6 +40,8 @@ import static org.mockito.BDDMockito.given;
 
 
 /**
+ * Tests related to {@link RecordHeaderParser}
+ *
  * @author moses AT doraventures DOT com
  */
 public class RecordHeaderParserTest {

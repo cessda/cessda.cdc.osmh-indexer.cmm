@@ -32,7 +32,6 @@ import org.springframework.stereotype.Component;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -174,17 +173,15 @@ public class MicrometerMetrics implements Metrics {
             .collect(Collectors.groupingBy(URI::getHost, Collectors.counting()));
 
         for (Map.Entry<String, Long> hostEntry : hostEntryMap.entrySet()) {
-            try {
-                var repoAtomicLongEntry = recordsEndpointMap.entrySet().stream()
-                    .filter(repoEntry -> repoEntry.getKey().getUrl().getHost().equalsIgnoreCase(hostEntry.getKey()))
-                    .findAny().orElseThrow();
-                repoAtomicLongEntry.getValue().set(hostEntry.getValue());
-                log.info("[{}] Current records: [{}]",
-                    StructuredArguments.value(LoggingConstants.REPO_NAME, repoAtomicLongEntry.getKey().getCode()),
-                    StructuredArguments.value("repo_record_count", hostEntry.getValue()));
-            } catch (NoSuchElementException e) {
-                log.warn("Repository [{}] not configured.", hostEntry.getKey());
-            }
+            recordsEndpointMap.entrySet().stream()
+                .filter(repoEntry -> repoEntry.getKey().getUrl().getHost().equalsIgnoreCase(hostEntry.getKey()))
+                .findAny().ifPresentOrElse(repoAtomicLongEntry -> {
+                    repoAtomicLongEntry.getValue().set(hostEntry.getValue());
+                    log.info("[{}] Current records: [{}]",
+                        StructuredArguments.value(LoggingConstants.REPO_NAME, repoAtomicLongEntry.getKey().getCode()),
+                        StructuredArguments.value("repo_record_count", hostEntry.getValue()));
+                }, () -> log.warn("Repository [{}] not configured.", hostEntry.getKey())
+            );
         }
     }
 
