@@ -18,6 +18,7 @@ package eu.cessda.pasc.oci.harvester;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
+import eu.cessda.pasc.oci.models.cmmstudy.Country;
 import eu.cessda.pasc.oci.models.cmmstudy.Publisher;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.NonNull;
@@ -127,7 +128,14 @@ public class LanguageExtractor {
         Optional.ofNullable(cmmStudy.getKeywords()).ifPresent(map -> builder.keywords(map.get(lang)));
         Optional.ofNullable(cmmStudy.getClassifications()).ifPresent(map -> builder.classifications(map.get(lang)));
         Optional.ofNullable(cmmStudy.getTypeOfTimeMethods()).ifPresent(map -> builder.typeOfTimeMethods(map.get(lang)));
-        Optional.ofNullable(cmmStudy.getStudyAreaCountries()).ifPresent(map -> builder.studyAreaCountries(map.get(lang)));
+        var countries = Optional.ofNullable(cmmStudy.getStudyAreaCountries())
+            .map(map -> map.get(lang)).stream().flatMap(Collection::stream)
+            .filter(country -> Locale.getISOCountries(Locale.IsoCountryCode.PART1_ALPHA2).contains(country.getIso2LetterCode()))
+            .map(country -> Country.builder().iso2LetterCode(country.getIso2LetterCode())
+                .countryName(new Locale("", country.getIso2LetterCode()).getDisplayCountry(Locale.ENGLISH))
+                .build())
+            .collect(Collectors.toList());
+        builder.studyAreaCountries(countries);
         Optional.ofNullable(cmmStudy.getUnitTypes()).ifPresent(map -> builder.unitTypes(map.get(lang)));
         Optional.ofNullable(cmmStudy.getPidStudies()).ifPresent(map -> builder.pidStudies(map.get(lang)));
         Optional.ofNullable(cmmStudy.getCreators()).ifPresent(map -> builder.creators(map.get(lang)));
