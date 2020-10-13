@@ -29,6 +29,8 @@ import java.util.List;
 import static eu.cessda.pasc.oci.mock.data.ReposTestData.getUKDSRepo;
 
 /**
+ * Tests related to {@link LocalHarvesterConsumerService}
+ *
  * @author moses AT doraventures DOT com
  */
 public class LocalHarvesterConsumerServiceTest {

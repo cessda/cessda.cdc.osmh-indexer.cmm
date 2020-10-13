@@ -38,13 +38,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static net.logstash.logback.argument.StructuredArguments.value;
 
 @Component
 @Slf4j
+@SuppressWarnings("unused")
 public class HarvesterRunner {
 
     private final AppConfigurationProperties configurationProperties;
@@ -70,35 +70,20 @@ public class HarvesterRunner {
     /**
      * Starts the harvest.
      *
-     * @param lastModifiedDateTime the DateTime to incrementally harvest from, set to null to perform a full harvest.
+     * @param lastModifiedDateTime the {@link LocalDateTime} to incrementally harvest from, set to {@code null} to perform a full harvest.
      * @throws IllegalStateException if a harvest is already running.
      */
-    @SuppressWarnings("try")
     public void executeHarvestAndIngest(LocalDateTime lastModifiedDateTime) {
         if (!indexerRunning.getAndSet(true)) {
             try {
                 List<Repo> repos = configurationProperties.getEndpoints().getRepos();
 
                 // Store the MDC so that it can be used in the running thread
-                var contextMap = new AtomicReference<>(MDC.getCopyOfContextMap());
+                var contextMap = MDC.getCopyOfContextMap();
                 var executor = Executors.newFixedThreadPool(repos.size());
-                var futures = repos.stream().map(repo -> CompletableFuture.runAsync(() -> {
-                    MDC.setContextMap(contextMap.get());
-
-                    // Set the MDC so that the record name is attached to all downstream logs
-                    try (var repoNameClosable = MDC.putCloseable(LoggingConstants.REPO_NAME, repo.getCode())) {
-                        log.info("Processing Repo [{}]", repo);
-                        Map<String, List<CMMStudyOfLanguage>> langStudies = getCmmStudiesOfEachLangIsoCodeMap(repo, lastModifiedDateTime);
-                        langStudies.forEach((langIsoCode, cmmStudies) -> {
-                            try (var langClosable = MDC.putCloseable(LoggingConstants.LANG_CODE, langIsoCode)) {
-                                executeBulk(repo, langIsoCode, cmmStudies);
-                            }
-                        });
-                    }
-
-                    // Reset the MDC
-                    MDC.clear();
-                }, executor)).collect(Collectors.toList());
+                var futures = repos.stream()
+                    .map(repo -> CompletableFuture.runAsync(() -> harvestRepository(repo, lastModifiedDateTime, contextMap), executor))
+                    .collect(Collectors.toList());
 
                 for (var f : futures) {
                     try {
@@ -107,16 +92,12 @@ public class HarvesterRunner {
                         executor.shutdownNow();
                         Thread.currentThread().interrupt();
                     } catch (ExecutionException e) {
-                        if (e.getCause() instanceof ElasticsearchException) {
-                            log.error("Error communicating with Elasticsearch!: {}", e.getCause().toString());
-                        } else {
-                            log.error("Unexpected error occurred when harvesting!", e.getCause());
-                        }
+                        log.error("Unexpected error occurred when harvesting!", e.getCause());
                     }
                 }
 
                 executor.shutdown();
-                MDC.setContextMap(contextMap.get());
+                MDC.setContextMap(contextMap);
 
                 log.info("Harvest finished. Summary of the current state:");
                 log.info("Total number of records: {}", value("total_cmm_studies", ingestService.getTotalHitCount("*")));
@@ -127,6 +108,34 @@ public class HarvesterRunner {
             }
         } else {
             throw new IllegalStateException("Indexer is already running");
+        }
+    }
+
+    /**
+     * Harvest an individual repository.
+     *
+     * @param repo                 the repository to harvest.
+     * @param lastModifiedDateTime the {@link LocalDateTime} to incrementally harvest from, can be {@code null}.
+     * @param contextMap           the logging context map.
+     */
+    @SuppressWarnings("try")
+    private void harvestRepository(Repo repo, LocalDateTime lastModifiedDateTime, Map<String, String> contextMap) {
+        MDC.setContextMap(contextMap);
+
+        // Set the MDC so that the record name is attached to all downstream logs
+        try (var repoNameClosable = MDC.putCloseable(LoggingConstants.REPO_NAME, repo.getCode())) {
+            log.info("Processing Repo [{}]", repo);
+            var langStudies = getCmmStudiesOfEachLangIsoCodeMap(repo, lastModifiedDateTime);
+            for (var entry : langStudies.entrySet()) {
+                try (var langClosable = MDC.putCloseable(LoggingConstants.LANG_CODE, entry.getKey())) {
+                    executeBulk(repo, entry.getKey(), entry.getValue());
+                } catch (ElasticsearchException e) {
+                    log.error("[{}({})] Error communicating with Elasticsearch!: {}", repo.getCode(), entry.getKey(), e.toString());
+                }
+            }
+        } finally {
+            // Reset the MDC
+            MDC.clear();
         }
     }
 

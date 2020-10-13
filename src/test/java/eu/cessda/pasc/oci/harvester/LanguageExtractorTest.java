@@ -36,6 +36,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Java6BDDAssertions.then;
 
 /**
+ * Tests related to {@link LanguageExtractor}
+ *
  * @author moses AT doraventures DOT com
  */
 @Slf4j

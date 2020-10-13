@@ -35,6 +35,15 @@
         "type": "stop",
         "stopwords": "_portuguese_"
       }
+    },
+    "normalizer": {
+      "case_insensitive_normalizer": {
+        "type": "custom",
+        "char_filter": [],
+        "filter": [
+          "lowercase"
+        ]
+      }
     }
   }
 }

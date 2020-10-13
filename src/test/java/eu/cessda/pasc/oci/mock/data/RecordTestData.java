@@ -29,69 +29,71 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * Test data used by multiple tests.
+ *
  * @author moses AT doraventures DOT com
  */
 public final class RecordTestData {
 
-    public static final String LIST_RECORDER_HEADERS_BODY_EXAMPLE = "" +
+    public static final String LIST_RECORDER_HEADERS_BODY_EXAMPLE =
         "[\n" +
-        "  {\n" +
-        "    \"lastModified\": \"2018-02-21T07:48:38Z\",\n" +
-        "    \"type\": \"Study\",\n" +
-        "    \"recordType\": \"RecordHeader\",\n" +
-        "    \"identifier\": \"997\"\n" +
-        "  },\n" +
-        "  {\n" +
-        "    \"lastModified\": \"2018-02-19\",\n" +
-        "    \"type\": \"Study\",\n" +
-        "    \"recordType\": \"RecordHeader\",\n" +
-        "    \"identifier\": \"998\"\n" +
-        "  }\n" +
-        "]";
+            "  {\n" +
+            "    \"lastModified\": \"2018-02-21T07:48:38Z\",\n" +
+            "    \"type\": \"Study\",\n" +
+            "    \"recordType\": \"RecordHeader\",\n" +
+            "    \"identifier\": \"997\"\n" +
+            "  },\n" +
+            "  {\n" +
+            "    \"lastModified\": \"2018-02-19\",\n" +
+            "    \"type\": \"Study\",\n" +
+            "    \"recordType\": \"RecordHeader\",\n" +
+            "    \"identifier\": \"998\"\n" +
+            "  }\n" +
+            "]";
 
-    public static final String LIST_RECORDER_HEADERS_BODY_EXAMPLE_WITH_INCREMENT = "" +
+    public static final String LIST_RECORDER_HEADERS_BODY_EXAMPLE_WITH_INCREMENT =
         "[\n" +
-        "  {\n" +
-        "    \"lastModified\": \"2018-02-21T07:48:38Z\",\n" +
-        "    \"type\": \"Study\",\n" +
-        "    \"recordType\": \"RecordHeader\",\n" +
-        "    \"identifier\": \"997\"\n" +
-        "  },\n" +
-        "  {\n" +
-        "    \"lastModified\": \"2018-03-22T07:48:38Z\",\n" +
-        "    \"type\": \"Study\",\n" +
-        "    \"recordType\": \"RecordHeader\",\n" +
-        "    \"identifier\": \"999\"\n" +
-        "  },\n" +
-        "  {\n" +
-        "    \"lastModified\": \"2018-02-23\",\n" +
-        "    \"type\": \"Study\",\n" +
-        "    \"recordType\": \"RecordHeader\",\n" +
-        "    \"identifier\": \"1000\"\n" +
-        "  }\n" +
-        "]";
+            "  {\n" +
+            "    \"lastModified\": \"2018-02-21T07:48:38Z\",\n" +
+            "    \"type\": \"Study\",\n" +
+            "    \"recordType\": \"RecordHeader\",\n" +
+            "    \"identifier\": \"997\"\n" +
+            "  },\n" +
+            "  {\n" +
+            "    \"lastModified\": \"2018-03-22T07:48:38Z\",\n" +
+            "    \"type\": \"Study\",\n" +
+            "    \"recordType\": \"RecordHeader\",\n" +
+            "    \"identifier\": \"999\"\n" +
+            "  },\n" +
+            "  {\n" +
+            "    \"lastModified\": \"2018-02-23\",\n" +
+            "    \"type\": \"Study\",\n" +
+            "    \"recordType\": \"RecordHeader\",\n" +
+            "    \"identifier\": \"1000\"\n" +
+            "  }\n" +
+            "]";
 
-    public static final String LIST_RECORDER_HEADERS_X6 = "" +
+    public static final String LIST_RECORDER_HEADERS_X6 =
         "[\n" +
-        "  {\n" +
-        "    \"lastModified\": \"2018-02-22T07:48:38Z\",\n" +
-        "    \"type\": \"Study\",\n" +
-        "    \"recordType\": \"RecordHeader\",\n" +
-        "    \"identifier\": \"997\"\n" +
-        "  },\n" +
-        "  {\n" +
-        "    \"lastModified\": \"2018-02-01T07:48:38Z\",\n" +
-        "    \"type\": \"Study\",\n" +
-        "    \"recordType\": \"RecordHeader\",\n" +
-        "    \"identifier\": \"999\"\n" +
-        "  },\n" +
-        "  {\n" +
-        "    \"lastModified\": \"2018-02-22T07:48:38Z\",\n" +
-        "    \"type\": \"Study\",\n" +
-        "    \"recordType\": \"RecordHeader\",\n" +
-        "    \"identifier\": \"998\"\n" +
-        "  },\n" +
-        "  {\n" +
+            "  {\n" +
+            "    \"lastModified\": \"2018-02-22T07:48:38Z\",\n" +
+            "    \"type\": \"Study\",\n" +
+            "    \"recordType\": \"RecordHeader\",\n" +
+            "    \"identifier\": \"997\"\n" +
+            "  },\n" +
+            "  {\n" +
+            "    \"lastModified\": \"2018-02-01T07:48:38Z\",\n" +
+            "    \"type\": \"Study\",\n" +
+            "    \"recordType\": \"RecordHeader\",\n" +
+            "    \"identifier\": \"999\"\n" +
+            "  },\n" +
+            "  {\n" +
+            "    \"lastModified\": \"2018-02-22T07:48:38Z\",\n" +
+            "    \"type\": \"Study\",\n" +
+            "    \"recordType\": \"RecordHeader\",\n" +
+            "    \"identifier\": \"998\"\n" +
+            "  },\n" +
+            "  {\n" +
         "    \"lastModified\": \"2018-01-05T07:48:38Z\",\n" +
         "    \"type\": \"Study\",\n" +
         "    \"recordType\": \"RecordHeader\",\n" +
@@ -111,27 +113,27 @@ public final class RecordTestData {
         "  }\n" +
         "]";
 
-    public static final String LIST_RECORDER_HEADERS_WITH_INVALID_DATETIME = "" +
+    public static final String LIST_RECORDER_HEADERS_WITH_INVALID_DATETIME =
         "[\n" +
-        "  {\n" +
-        "    \"lastModified\": \"2018-02-22\",\n" +
-        "    \"type\": \"Study\",\n" +
-        "    \"recordType\": \"RecordHeader\",\n" +
-        "    \"identifier\": \"997\"\n" +
-        "  },\n" +
-        "  {\n" +
-        "    \"lastModified\": \"2018-02-01T07:48:38Z\",\n" +
-        "    \"type\": \"Study\",\n" +
-        "    \"recordType\": \"RecordHeader\",\n" +
-        "    \"identifier\": \"999\"\n" +
-        "  },\n" +
-        "  {\n" +
-        "    \"lastModified\": \"2018-00-00\",\n" +
-        "    \"type\": \"Study\",\n" +
-        "    \"recordType\": \"RecordHeader\",\n" +
-        "    \"identifier\": \"998\"\n" +
-        "  }\n" +
-        "]";
+            "  {\n" +
+            "    \"lastModified\": \"2018-02-22\",\n" +
+            "    \"type\": \"Study\",\n" +
+            "    \"recordType\": \"RecordHeader\",\n" +
+            "    \"identifier\": \"997\"\n" +
+            "  },\n" +
+            "  {\n" +
+            "    \"lastModified\": \"2018-02-01T07:48:38Z\",\n" +
+            "    \"type\": \"Study\",\n" +
+            "    \"recordType\": \"RecordHeader\",\n" +
+            "    \"identifier\": \"999\"\n" +
+            "  },\n" +
+            "  {\n" +
+            "    \"lastModified\": \"2018-00-00\",\n" +
+            "    \"type\": \"Study\",\n" +
+            "    \"recordType\": \"RecordHeader\",\n" +
+            "    \"identifier\": \"998\"\n" +
+            "  }\n" +
+            "]";
 
 
     public static List<CMMStudy> getASingleSyntheticCMMStudyAsList() {
