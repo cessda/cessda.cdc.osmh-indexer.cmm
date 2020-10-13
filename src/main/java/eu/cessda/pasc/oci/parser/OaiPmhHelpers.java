@@ -37,36 +37,32 @@ import static eu.cessda.pasc.oci.parser.OaiPmhConstants.*;
 @UtilityClass
 public class OaiPmhHelpers {
 
-  private static final String LIST_RECORD_HEADERS_URL_TEMPLATE = "%s?%s=%s&%s=%s";
-  private static final String LIST_RECORD_HEADERS_PER_SET_URL_TEMPLATE = "%s?%s=%s&%s=%s&%s=%s";
-  private static final String GET_RECORD_URL_TEMPLATE = "%s?%s=%s&%s=%s&%s=%s";
-
-  public static URI buildGetStudyFullUrl(@NonNull Repo repo, @NonNull String studyIdentifier) throws URISyntaxException {
-    return new URI(String.format(
-            GET_RECORD_URL_TEMPLATE, repo.getUrl(),
+    public static URI buildGetStudyFullUrl(@NonNull Repo repo, @NonNull String studyIdentifier) throws URISyntaxException {
+        return new URI(String.format(
+            "%s?%s=%s&%s=%s&%s=%s", repo.getUrl(),
             VERB_PARAM_KEY, GET_RECORD_VALUE, // verb=GetRecord
             IDENTIFIER_PARAM_KEY, URLEncoder.encode(studyIdentifier, StandardCharsets.UTF_8), //&identifier=1683
             METADATA_PREFIX_PARAM_KEY, URLEncoder.encode(repo.getPreferredMetadataParam(), StandardCharsets.UTF_8) //&metadataPrefix=ddi
-    ));
-  }
-
-  public static URI appendListRecordParams(@NonNull Repo repoConfig) {
-    if (StringUtils.isBlank(repoConfig.getSetSpec())) {
-      return URI.create(String.format(LIST_RECORD_HEADERS_URL_TEMPLATE, repoConfig.getUrl(),
-              VERB_PARAM_KEY, LIST_IDENTIFIERS_VALUE, // verb=ListIdentifier
-              METADATA_PREFIX_PARAM_KEY, repoConfig.getPreferredMetadataParam())); //&metadataPrefix=ddi
-    } else {
-      return URI.create(String.format(LIST_RECORD_HEADERS_PER_SET_URL_TEMPLATE, repoConfig.getUrl(),
-              VERB_PARAM_KEY, LIST_IDENTIFIERS_VALUE, // verb=ListIdentifier
-              METADATA_PREFIX_PARAM_KEY, repoConfig.getPreferredMetadataParam(), //&metadataPrefix=ddi
-              SET_SPEC_PARAM_KEY, repoConfig.getSetSpec())); //&set=my:set
+        ));
     }
-  }
 
-  public static URI appendListRecordResumptionToken(@NonNull URI baseRepoUrl, @NonNull String resumptionToken) {
-    return URI.create(String.format(LIST_RECORD_HEADERS_URL_TEMPLATE, baseRepoUrl,
+    public static URI appendListRecordParams(@NonNull Repo repoConfig) {
+        if (StringUtils.isBlank(repoConfig.getSetSpec())) {
+            return URI.create(String.format("%s?%s=%s&%s=%s", repoConfig.getUrl(),
+                VERB_PARAM_KEY, LIST_IDENTIFIERS_VALUE, // verb=ListIdentifier
+                METADATA_PREFIX_PARAM_KEY, repoConfig.getPreferredMetadataParam())); //&metadataPrefix=ddi
+        } else {
+            return URI.create(String.format("%s?%s=%s&%s=%s&%s=%s", repoConfig.getUrl(),
+                VERB_PARAM_KEY, LIST_IDENTIFIERS_VALUE, // verb=ListIdentifier
+                METADATA_PREFIX_PARAM_KEY, repoConfig.getPreferredMetadataParam(), //&metadataPrefix=ddi
+                SET_SPEC_PARAM_KEY, repoConfig.getSetSpec())); //&set=my:set
+        }
+    }
+
+    public static URI appendListRecordResumptionToken(@NonNull URI baseRepoUrl, @NonNull String resumptionToken) {
+        return URI.create(String.format("%s?%s=%s&%s=%s", baseRepoUrl,
             VERB_PARAM_KEY, LIST_IDENTIFIERS_VALUE, // verb=ListIdentifier
             RESUMPTION_TOKEN_KEY, URLEncoder.encode(resumptionToken, StandardCharsets.UTF_8)) // &resumptionToken=0001/500....
-    );
-  }
+        );
+    }
 }

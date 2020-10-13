@@ -45,6 +45,7 @@ public class TimeUtility {
      * @return the {@link Optional} of {@link LocalDateTime}, or an {@link Optional#empty()} if the date failed to parse.
      * @throws IllegalArgumentException if the string is {@code null}
      */
+    @SuppressWarnings("JdkObsolete")
     public static Optional<LocalDateTime> getLocalDateTime(String dateString) {
         try {
             Date date = DateUtils.parseDate(dateString, EXPECTED_DATE_FORMATS);
