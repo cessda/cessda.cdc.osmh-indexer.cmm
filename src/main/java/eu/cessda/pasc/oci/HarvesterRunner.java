@@ -73,7 +73,6 @@ public class HarvesterRunner {
      * @param lastModifiedDateTime the {@link LocalDateTime} to incrementally harvest from, set to {@code null} to perform a full harvest.
      * @throws IllegalStateException if a harvest is already running.
      */
-    @SuppressWarnings("try")
     public void executeHarvestAndIngest(LocalDateTime lastModifiedDateTime) {
         if (!indexerRunning.getAndSet(true)) {
             try {
@@ -119,6 +118,7 @@ public class HarvesterRunner {
      * @param lastModifiedDateTime the {@link LocalDateTime} to incrementally harvest from, can be {@code null}.
      * @param contextMap           the logging context map.
      */
+    @SuppressWarnings("try")
     private void harvestRepository(Repo repo, LocalDateTime lastModifiedDateTime, Map<String, String> contextMap) {
         MDC.setContextMap(contextMap);
 
