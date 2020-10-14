@@ -76,9 +76,8 @@ class DocElementParser {
         String currentElementContent = element.getText();
 
         if (titlesMap.containsKey(xmlLang)) {
-            String previousElementContent = titlesMap.get(xmlLang);
-            String concatenatedContent = previousElementContent + separator + currentElementContent;
-            titlesMap.put(xmlLang, concatenatedContent); // keep concatenating
+            String elementContent = titlesMap.get(xmlLang) + separator + currentElementContent;
+            titlesMap.put(xmlLang, elementContent); // keep concatenating
         } else {
             titlesMap.put(xmlLang, currentElementContent); // set first
         }
@@ -125,15 +124,12 @@ class DocElementParser {
      */
     <T> Map<String, List<T>> extractMetadataObjectListForEachLang(String defaultLangIsoCode, Document document, String xPath, Function<Element, Optional<T>> parserStrategy) {
 
-        var mapOfMetadataToLanguageCode = new HashMap<String, List<T>>();
         var elements = getElements(document, xPath);
-        for (Element element : elements) {
-            parserStrategy.apply(element).ifPresent(parsedMetadataPojoValue ->
-                parseLanguageCode(defaultLangIsoCode, element).ifPresent(code ->
-                    mapOfMetadataToLanguageCode.computeIfAbsent(code, k -> new ArrayList<>()).add(parsedMetadataPojoValue)));
-        }
-
-        return mapOfMetadataToLanguageCode;
+        return elements.stream().map(element -> parserStrategy.apply(element)
+            .flatMap(parsedMetadataPojoValue -> parseLanguageCode(defaultLangIsoCode, element)
+                .map(lang -> Map.entry(lang, parsedMetadataPojoValue))))
+            .filter(Optional::isPresent).map(Optional::get)
+            .collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
     }
 
     /**
