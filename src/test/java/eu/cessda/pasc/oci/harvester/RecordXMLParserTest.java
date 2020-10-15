@@ -324,7 +324,7 @@ public class RecordXMLParserTest {
         assertEquals(expectedTree.get("abstract").toString(), actualTree.get("abstract").toString(), true);
         assertEquals(expectedTree.get("titleStudy").toString(), actualTree.get("titleStudy").toString(), true);
         assertEquals(expectedTree.get("studyUrl").toString(), actualTree.get("studyUrl").toString(), true);
-        then(expectedTree.get("studyNumber").toString()).isEqualTo(actualTree.get("studyNumber").toString());
+        then(actualTree.get("studyNumber").toString()).isEqualTo(expectedTree.get("studyNumber").toString());
         assertEquals(expectedTree.get("publisher").toString(), actualTree.get("publisher").toString(), true);
     }
 
