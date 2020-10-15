@@ -69,22 +69,6 @@ class DocElementParser {
     }
 
     /**
-     * Temp request from PUG to concatenate repeated elements.
-     * <p>
-     */
-    private static void concatRepeatedElements(String separator, Map<String, String> titlesMap, Element element, String xmlLang) {
-
-        String currentElementContent = element.getText();
-
-        if (titlesMap.containsKey(xmlLang)) {
-            String elementContent = titlesMap.get(xmlLang) + separator + currentElementContent;
-            titlesMap.put(xmlLang, elementContent); // keep concatenating
-        } else {
-            titlesMap.put(xmlLang, currentElementContent); // set first
-        }
-    }
-
-    /**
      * Extracts elements from doc
      *
      * @param document       the document to parse
@@ -163,10 +147,11 @@ class DocElementParser {
                 langAttr = concept.getAttribute(LANG_ATTR, Namespace.XML_NAMESPACE);
             }
         }
+
         if (langAttr != null && !langAttr.getValue().isEmpty()) {
-            return ofNullable(langAttr.getValue());
+            return Optional.of(langAttr.getValue());
         } else if (oaiPmh.getMetadataParsingDefaultLang().isActive()) {
-            return ofNullable(defaultLangIsoCode);
+            return Optional.of(defaultLangIsoCode);
         }
 
         return Optional.empty();
@@ -235,40 +220,43 @@ class DocElementParser {
     }
 
     /**
-     * Parses value of given Element for every given xml@lang attributed.
+     * Parses value of given {@link Element} for every given xml@lang attributed.
      * <p>
      * If no lang is found attempts to default to a configured xml@lang.
      * <p>
      * If configuration is set to not default to a given lang, effect is this element is not extracted.
+     *
+     * @param elements               a list of {@link Element}s to parse.
+     * @param isConcatenating        if true, concatenate multiple {@link Element}s of the same language
+     * @param langCode               the default language to use if an element does not have a {@value OaiPmhConstants#LANG_ATTR} attribute.
+     * @param textExtractionStrategy the text extraction strategy to apply.
      */
     Map<String, String> getLanguageKeyValuePairs(List<Element> elements, boolean isConcatenating, String langCode,
                                                  Function<Element, String> textExtractionStrategy) {
 
         var titlesMap = new HashMap<String, String>();
         for (Element element : elements) {
-            String elementText = textExtractionStrategy.apply(element);
+
             var langAttribute = element.getAttribute(LANG_ATTR, Namespace.XML_NAMESPACE);
-            if (null == langAttribute || langAttribute.getValue().isEmpty()) {
-                mapToADefaultingLang(isConcatenating, langCode, titlesMap, element, elementText);
-            } else if (isConcatenating) {
-                concatRepeatedElements(oaiPmh.getConcatSeparator(), titlesMap, element, langAttribute.getValue());
+
+            if (langAttribute != null && !langAttribute.getValue().isEmpty()) {
+                putElementInMap(titlesMap, langAttribute.getValue(), textExtractionStrategy.apply(element), isConcatenating);
             } else {
-                titlesMap.put(langAttribute.getValue(), elementText);
+                // If defaulting lang is not configured skip, the language is not known
+                if (oaiPmh.getMetadataParsingDefaultLang().isActive()) {
+                    putElementInMap(titlesMap, langCode, textExtractionStrategy.apply(element), isConcatenating);
+                }
             }
         }
         return titlesMap;
     }
 
-    private void mapToADefaultingLang(boolean isConcatenating, String defaultingLang,
-                                      Map<String, String> titlesMap, Element element, String elementText) {
-        boolean isDefaultingLang = oaiPmh.getMetadataParsingDefaultLang().isActive();
-        if (isDefaultingLang) { // If defaulting lang is not configured we skip. We do not know the lang
-            if (isConcatenating && oaiPmh.isConcatRepeatedElements()) {
-                concatRepeatedElements(oaiPmh.getConcatSeparator(), titlesMap, element, defaultingLang);
-            } else {
-                titlesMap.put(defaultingLang, elementText); // Else keep overriding
-            }
+    private void putElementInMap(Map<String, String> titlesMap, String langCode, String elementText, boolean isConcatenating) {
+        // Concatenate if configured
+        if (isConcatenating && oaiPmh.isConcatRepeatedElements() && titlesMap.containsKey(langCode)) {
+            elementText = titlesMap.get(langCode) + oaiPmh.getConcatSeparator() + elementText;
         }
+        titlesMap.put(langCode, elementText);
     }
 
     /**
