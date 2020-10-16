@@ -37,7 +37,6 @@ class ParsingStrategies {
     // Metadata handling
     private static final String EMPTY_EL = "empty";
     private static final String DATE_NOT_AVAIL = "Date not specified";
-    private static final String AGENCY_NOT_AVAIL = "Agency not specified";
     private static final String COUNTRY_NOT_AVAIL = "Country not specified";
     private static final String PUBLISHER_NOT_AVAIL = "Publisher not specified";
 
@@ -63,18 +62,15 @@ class ParsingStrategies {
      * Constructs a {@link Pid} using the given element.
      * <p>
      * The pid is derived from the element's text, and the abbreviation is derived from the
-     * {@value OaiPmhConstants#AGENCY_ATTR} attribute. If the attribute is missing or otherwise
-     * unset the abbreviation will be set to {@value AGENCY_NOT_AVAIL}.
+     * {@value OaiPmhConstants#AGENCY_ATTR} attribute.
      *
      * @param element the {@link Element} to parse.
      * @return an Optional {@link Pid}.
      */
     static Optional<Pid> pidStrategy(Element element) {
-        Pid agency = Pid.builder()
-            .agency(getAttributeValue(element, AGENCY_ATTR).orElse(AGENCY_NOT_AVAIL))
-            .pid(element.getText())
-            .build();
-        return Optional.of(agency);
+        var agencyBuilder = Pid.builder().pid(element.getText());
+        getAttributeValue(element, AGENCY_ATTR).ifPresent(agencyBuilder::agency);
+        return Optional.of(agencyBuilder.build());
     }
 
     /**
