@@ -160,7 +160,7 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
 
         var jsonMessage = objectMapper.writeValueAsString(new ErrorMessage("eu.cessda.Exception", "Mocked server error!", null));
 
-        when(httpClient.getInputStream(any(URI.class))).thenThrow(new HTTPException(500, jsonMessage));
+        when(httpClient.getInputStream(any(URI.class))).thenThrow(new HTTPException(500, jsonMessage.getBytes(StandardCharsets.UTF_8)));
 
         Optional<CMMStudy> actualRecord = remoteHarvesterConsumerService.getRecord(repoMock, STUDY_NUMBER);
 
@@ -175,7 +175,7 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
         when(repoMock.getUrl()).thenReturn(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
         when(repoMock.getHandler()).thenReturn("NESSTAR");
 
-        when(httpClient.getInputStream(any(URI.class))).thenThrow(new HTTPException(500, "Not a JSON string"));
+        when(httpClient.getInputStream(any(URI.class))).thenThrow(new HTTPException(500, "Not a JSON string".getBytes(StandardCharsets.UTF_8)));
 
         Optional<CMMStudy> actualRecord = remoteHarvesterConsumerService.getRecord(repoMock, STUDY_NUMBER);
 

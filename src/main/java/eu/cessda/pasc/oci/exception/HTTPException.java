@@ -15,11 +15,14 @@
  */
 package eu.cessda.pasc.oci.exception;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Exception for HTTP level failures that prevent a request from completing.
@@ -30,37 +33,51 @@ import java.io.Serializable;
  */
 public class HTTPException extends IOException {
 
-  private static final long serialVersionUID = 928798312826959273L;
+    private static final long serialVersionUID = 928798312826959273L;
 
-  private final ExternalResponse externalResponse;
+    private final ExternalResponse externalResponse;
 
-  /**
-   * Constructs an ExternalSystemException with the specified status code and external response body.
-   *
-   * @param statusCode           the status code of the external response that caused this exception
-   * @param externalResponseBody the body of the external response that caused this exception
-   */
-  public HTTPException(int statusCode, @NonNull String externalResponseBody) {
-    super(String.format("Server returned %d", statusCode));
-    externalResponse = new ExternalResponse(externalResponseBody, statusCode);
-  }
+    /**
+     * Constructs an ExternalSystemException with the specified status code and external response body.
+     *
+     * @param statusCode           the status code of the external response that caused this exception
+     * @param externalResponseBody the body of the external response that caused this exception
+     */
+    public HTTPException(int statusCode, byte[] externalResponseBody) {
+        super(String.format("Server returned %d", statusCode));
+        externalResponse = new ExternalResponse(externalResponseBody, statusCode);
+    }
 
-  /**
-   * Gets the external response that caused this exception.
-   */
-  @NonNull
-  public ExternalResponse getExternalResponse() {
-    return externalResponse;
-  }
-
-  /**
-   * An immutable object describing the status code and the body of the external response.
-   */
-  @Value
-  public static class ExternalResponse implements Serializable {
-    private static final long serialVersionUID = -7110617275735794989L;
+    /**
+     * Gets the external response that caused this exception.
+     */
     @NonNull
-    String body;
-    int statusCode;
-  }
+    public ExternalResponse getExternalResponse() {
+        return externalResponse;
+    }
+
+    /**
+     * An immutable object describing the status code and the body of the external response.
+     */
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @Value
+    public static class ExternalResponse implements Serializable {
+        private static final long serialVersionUID = -7110617275735794989L;
+
+        /**
+         * The body of the response.
+         */
+        @NonNull byte[] body;
+        /**
+         * The status code of the response.
+         */
+        int statusCode;
+
+        /**
+         * The body of the response as a {@link StandardCharsets#UTF_8} string.
+         */
+        public String getBodyAsString() {
+            return new String(body, StandardCharsets.UTF_8);
+        }
+    }
 }

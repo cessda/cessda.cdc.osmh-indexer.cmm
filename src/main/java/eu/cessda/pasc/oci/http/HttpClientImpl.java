@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 
@@ -49,7 +48,7 @@ public class HttpClientImpl implements HttpClient {
 
     @Override
     public InputStream getInputStream(URI uri) throws IOException {
-        HttpRequest httpRequest = HttpRequest.newBuilder(uri).build();
+        var httpRequest = HttpRequest.newBuilder(uri).build();
         try {
             log.debug("Sending request to url [{}].", uri);
 
@@ -58,12 +57,14 @@ public class HttpClientImpl implements HttpClient {
                 start = Instant.now();
             }
 
-            HttpResponse<InputStream> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofInputStream());
+            var httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofInputStream());
 
             if (log.isTraceEnabled()) {
-                Instant end = Instant.now();
                 assert start != null;
-                log.debug("Got response code of [{}], getting headers took [{}] ms", httpResponse.statusCode(), Duration.between(start, end).toMillis());
+                log.debug("Got response code of [{}], getting headers took [{}] ms",
+                    httpResponse.statusCode(),
+                    Duration.between(start, Instant.now()).toMillis()
+                );
             }
 
             // Check the returned HTTP status code, throw an exception if not a success code
@@ -75,8 +76,8 @@ public class HttpClientImpl implements HttpClient {
             // The HTTP request wasn't successful, attempt to read the body
             try (InputStream body = httpResponse.body()) {
                 throw new HTTPException(
-                        httpResponse.statusCode(),
-                        new String(body.readAllBytes(), StandardCharsets.UTF_8)
+                    httpResponse.statusCode(),
+                    body.readAllBytes()
                 );
             }
         } catch (InterruptedException e) {

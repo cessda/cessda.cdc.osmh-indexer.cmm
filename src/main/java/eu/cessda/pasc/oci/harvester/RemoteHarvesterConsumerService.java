@@ -91,7 +91,7 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
                 log.error(LIST_RECORD_HEADERS_FAILED + ": Response body: {}",
                     value(LoggingConstants.REPO_NAME, repo.getCode()),
                     e.toString(),
-                    value(LoggingConstants.REASON, e.getExternalResponse().getBody())
+                    value(LoggingConstants.REASON, e.getExternalResponse().getBodyAsString())
                 );
                 log.debug(jsonException.toString());
             }
@@ -125,7 +125,7 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
                     value(LoggingConstants.REPO_NAME, repo.getCode()),
                     value(LoggingConstants.STUDY_ID, recordHeader.getIdentifier()),
                     e.toString(),
-                    value(LoggingConstants.REASON, e.getExternalResponse().getBody())
+                    value(LoggingConstants.REASON, e.getExternalResponse().getBodyAsString())
                 );
                 log.debug(jsonException.toString());
             }
@@ -140,14 +140,14 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
     }
 
     private URI constructListRecordUrl(Repo repo) throws URISyntaxException {
-        Harvester harvester = appConfigurationProperties.getEndpoints().getHarvesters().get(repo.getHandler().toUpperCase());
+        var harvester = appConfigurationProperties.getEndpoints().getHarvesters().get(repo.getHandler().toUpperCase());
         if (harvester != null) {
             String finalUrlString = String.format("%s/%s/ListRecordHeaders?Repository=%s",
                 harvester.getUrl(),
                 harvester.getVersion(),
                 URLEncoder.encode(repo.getUrl().toString(), StandardCharsets.UTF_8)
             );
-            URI finalUrl = new URI(finalUrlString);
+            var finalUrl = new URI(finalUrlString);
             log.trace("[{}] Final ListHeaders Handler url [{}] constructed.", repo.getName(), finalUrlString);
             return finalUrl;
         } else {
