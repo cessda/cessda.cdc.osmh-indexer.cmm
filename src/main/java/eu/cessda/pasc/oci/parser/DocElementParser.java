@@ -68,23 +68,6 @@ class DocElementParser {
     }
 
     /**
-     * Temp request from PUG to concatenate repeated elements.
-     * <p>
-     */
-    private static void concatRepeatedElements(String separator, Map<String, String> titlesMap, Element element, String xmlLang) {
-
-        String currentElementContent = element.getText();
-
-        if (titlesMap.containsKey(xmlLang)) {
-            String previousElementContent = titlesMap.get(xmlLang);
-            String concatenatedContent = previousElementContent + separator + currentElementContent;
-            titlesMap.put(xmlLang, concatenatedContent); // keep concatenating
-        } else {
-            titlesMap.put(xmlLang, currentElementContent); // set first
-        }
-    }
-
-    /**
      * Extracts elements from doc
      *
      * @param document       the document to parse
@@ -113,7 +96,7 @@ class DocElementParser {
     /**
      * Extracts metadata from the given {@link Document}, using the given parser strategy {@link Function}.
      * <p>
-     * This method performs per-language extraction using the semantics of {@link DocElementParser#parseLanguageCode(String, Element)},
+     * This method performs per-language extraction using the semantics of {@link DocElementParser#parseLanguageCode(Element, String)},
      * and returns all elements that are present.
      *
      * @param defaultLangIsoCode the language to fall back to if the elements do not have a {@value OaiPmhConstants#LANG_ATTR} attribute.
@@ -125,21 +108,18 @@ class DocElementParser {
      */
     <T> Map<String, List<T>> extractMetadataObjectListForEachLang(String defaultLangIsoCode, Document document, String xPath, Function<Element, Optional<T>> parserStrategy) {
 
-        var mapOfMetadataToLanguageCode = new HashMap<String, List<T>>();
         var elements = getElements(document, xPath);
-        for (Element element : elements) {
-            parserStrategy.apply(element).ifPresent(parsedMetadataPojoValue ->
-                parseLanguageCode(defaultLangIsoCode, element).ifPresent(code ->
-                    mapOfMetadataToLanguageCode.computeIfAbsent(code, k -> new ArrayList<>()).add(parsedMetadataPojoValue)));
-        }
-
-        return mapOfMetadataToLanguageCode;
+        return elements.stream().map(element -> parserStrategy.apply(element)
+            .flatMap(parsedMetadataPojoValue -> parseLanguageCode(element, defaultLangIsoCode)
+                .map(lang -> Map.entry(lang, parsedMetadataPojoValue))))
+            .filter(Optional::isPresent).map(Optional::get)
+            .collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
     }
 
     /**
      * Extracts metadata from the given {@link Document}, using the given parser strategy {@link Function}.
      * <p>
-     * This method performs per-language extraction using the semantics of {@link DocElementParser#parseLanguageCode(String, Element)}.
+     * This method performs per-language extraction using the semantics of {@link DocElementParser#parseLanguageCode(Element, String)}.
      * If multiple values with the same language key are encountered, the last encountered is returned.
      *
      * @param defaultLangIsoCode the language to fall back to if the elements do not have a {@value OaiPmhConstants#LANG_ATTR} attribute.
@@ -151,13 +131,13 @@ class DocElementParser {
      */
     <T> Map<String, T> extractMetadataObjectForEachLang(String defaultLangIsoCode, Document document, String xPath, Function<Element, T> parserStrategy) {
         var elements = getElements(document, xPath);
-        return elements.stream().map(element -> parseLanguageCode(defaultLangIsoCode, element).map(lang -> Map.entry(lang, parserStrategy.apply(element))))
+        return elements.stream().map(element -> parseLanguageCode(element, defaultLangIsoCode).map(lang -> Map.entry(lang, parserStrategy.apply(element))))
             .filter(Optional::isPresent).map(Optional::get)
             // If multiple values with the same key are returned, the last value wins
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> b));
     }
 
-    private Optional<String> parseLanguageCode(String defaultLangIsoCode, Element element) {
+    private Optional<String> parseLanguageCode(Element element, String defaultLangIsoCode) {
 
         Attribute langAttr = element.getAttribute(LANG_ATTR, Namespace.XML_NAMESPACE);
         if (langAttr == null) {
@@ -166,10 +146,11 @@ class DocElementParser {
                 langAttr = concept.getAttribute(LANG_ATTR, Namespace.XML_NAMESPACE);
             }
         }
+
         if (langAttr != null && !langAttr.getValue().isEmpty()) {
-            return ofNullable(langAttr.getValue());
+            return Optional.of(langAttr.getValue());
         } else if (oaiPmh.getMetadataParsingDefaultLang().isActive()) {
-            return ofNullable(defaultLangIsoCode);
+            return Optional.of(defaultLangIsoCode);
         }
 
         return Optional.empty();
@@ -233,40 +214,43 @@ class DocElementParser {
     }
 
     /**
-     * Parses value of given Element for every given xml@lang attributed.
+     * Parses value of given {@link Element} for every given xml@lang attributed.
      * <p>
      * If no lang is found attempts to default to a configured xml@lang.
      * <p>
      * If configuration is set to not default to a given lang, effect is this element is not extracted.
+     *
+     * @param elements               a list of {@link Element}s to parse.
+     * @param isConcatenating        if true, concatenate multiple {@link Element}s of the same language
+     * @param langCode               the default language to use if an element does not have a {@value OaiPmhConstants#LANG_ATTR} attribute.
+     * @param textExtractionStrategy the text extraction strategy to apply.
      */
     Map<String, String> getLanguageKeyValuePairs(List<Element> elements, boolean isConcatenating, String langCode,
                                                  Function<Element, String> textExtractionStrategy) {
 
         var titlesMap = new HashMap<String, String>();
         for (Element element : elements) {
-            String elementText = textExtractionStrategy.apply(element);
+
             var langAttribute = element.getAttribute(LANG_ATTR, Namespace.XML_NAMESPACE);
-            if (null == langAttribute || langAttribute.getValue().isEmpty()) {
-                mapToADefaultingLang(isConcatenating, langCode, titlesMap, element, elementText);
-            } else if (isConcatenating) {
-                concatRepeatedElements(oaiPmh.getConcatSeparator(), titlesMap, element, langAttribute.getValue());
+
+            if (langAttribute != null && !langAttribute.getValue().isEmpty()) {
+                putElementInMap(titlesMap, langAttribute.getValue(), textExtractionStrategy.apply(element), isConcatenating);
             } else {
-                titlesMap.put(langAttribute.getValue(), elementText);
+                // If defaulting lang is not configured skip, the language is not known
+                if (oaiPmh.getMetadataParsingDefaultLang().isActive()) {
+                    putElementInMap(titlesMap, langCode, textExtractionStrategy.apply(element), isConcatenating);
+                }
             }
         }
         return titlesMap;
     }
 
-    private void mapToADefaultingLang(boolean isConcatenating, String defaultingLang,
-                                      Map<String, String> titlesMap, Element element, String elementText) {
-        boolean isDefaultingLang = oaiPmh.getMetadataParsingDefaultLang().isActive();
-        if (isDefaultingLang) { // If defaulting lang is not configured we skip. We do not know the lang
-            if (isConcatenating && oaiPmh.isConcatRepeatedElements()) {
-                concatRepeatedElements(oaiPmh.getConcatSeparator(), titlesMap, element, defaultingLang);
-            } else {
-                titlesMap.put(defaultingLang, elementText); // Else keep overriding
-            }
+    private void putElementInMap(Map<String, String> titlesMap, String langCode, String elementText, boolean isConcatenating) {
+        // Concatenate if configured
+        if (isConcatenating && oaiPmh.isConcatRepeatedElements() && titlesMap.containsKey(langCode)) {
+            elementText = titlesMap.get(langCode) + oaiPmh.getConcatSeparator() + elementText;
         }
+        titlesMap.put(langCode, elementText);
     }
 
     /**
