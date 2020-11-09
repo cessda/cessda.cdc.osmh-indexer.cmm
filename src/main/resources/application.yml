@@ -182,7 +182,7 @@ osmhConsumer:
       active: true
       lang: 'en'
     concatRepeatedElements: true
-    concatSeparator: "+<br>"
+    concatSeparator: "<br>"
 ---
 # For debugging
 spring:
