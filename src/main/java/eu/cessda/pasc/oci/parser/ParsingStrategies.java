@@ -37,25 +37,23 @@ class ParsingStrategies {
     // Metadata handling
     private static final String EMPTY_EL = "empty";
     private static final String DATE_NOT_AVAIL = "Date not specified";
-    private static final String COUNTRY_NOT_AVAIL = "Country not specified";
     private static final String PUBLISHER_NOT_AVAIL = "Publisher not specified";
 
     /**
      * Constructs a {@link Country} using the given element.
      * <p>
-     * The country name is derived from the element's text, and the ISO code is derived from the
-     * {@value OaiPmhConstants#ABBR_ATTR} attribute. If the attribute is missing or otherwise
-     * unset the ISO code will be set to {@value COUNTRY_NOT_AVAIL}.
+     * The ISO code is derived from the{@value OaiPmhConstants#ABBR_ATTR} attribute.
      *
      * @param element the {@link Element} to parse.
      * @return an Optional {@link Country}.
      */
     static Optional<Country> countryStrategy(Element element) {
-        Country country = Country.builder()
-            .iso2LetterCode(getAttributeValue(element, ABBR_ATTR).orElse(COUNTRY_NOT_AVAIL))
-            .countryName(cleanCharacterReturns(element.getText()))
-            .build();
-        return Optional.of(country);
+        return getAttributeValue(element, ABBR_ATTR)
+            .map(code -> Country.builder()
+                .iso2LetterCode(code)
+                .countryName(cleanCharacterReturns(element.getText()))
+                .build()
+            );
     }
 
     /**
