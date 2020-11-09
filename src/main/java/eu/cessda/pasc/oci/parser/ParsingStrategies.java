@@ -37,7 +37,6 @@ class ParsingStrategies {
     // Metadata handling
     private static final String EMPTY_EL = "empty";
     private static final String DATE_NOT_AVAIL = "Date not specified";
-    private static final String AGENCY_NOT_AVAIL = "Agency not specified";
     private static final String PUBLISHER_NOT_AVAIL = "Publisher not specified";
 
     /**

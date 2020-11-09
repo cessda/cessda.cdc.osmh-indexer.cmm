@@ -15,6 +15,7 @@
  */
 package eu.cessda.pasc.oci.harvester;
 
+import com.neovisionaries.i18n.CountryCode;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
@@ -130,9 +131,10 @@ public class LanguageExtractor {
         Optional.ofNullable(cmmStudy.getTypeOfTimeMethods()).ifPresent(map -> builder.typeOfTimeMethods(map.get(lang)));
         var countries = Optional.ofNullable(cmmStudy.getStudyAreaCountries())
             .map(map -> map.get(lang)).stream().flatMap(Collection::stream)
-            .filter(country -> Locale.getISOCountries(Locale.IsoCountryCode.PART1_ALPHA2).contains(country.getIso2LetterCode()))
-            .map(country -> Country.builder().iso2LetterCode(country.getIso2LetterCode())
-                .countryName(new Locale("", country.getIso2LetterCode()).getDisplayCountry(Locale.ENGLISH))
+            .map(country -> CountryCode.getByCode(country.getIso2LetterCode())).filter(Objects::nonNull)
+            .map(countryCode -> Country.builder()
+                .countryName(countryCode.getName())
+                .iso2LetterCode(countryCode.getAlpha2())
                 .build())
             .collect(Collectors.toList());
         builder.studyAreaCountries(countries);
