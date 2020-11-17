@@ -170,10 +170,8 @@ class ParsingStrategies {
      * @return a {@link DataCollectionFreeText}.
      */
     static Optional<DataCollectionFreeText> dataCollFreeTextStrategy(Element element) {
-        Optional<String> dateAttrValue = getAttributeValue(element, DATE_ATTR);
-
-        // PUG requirement:  Only extract if there is no @date in <collDate>
-        if (dateAttrValue.isEmpty()) {
+        // #243: Extract in all cases - previously if the @date attribute was present extraction was skipped
+        if (!element.getText().isEmpty()) {
             return Optional.of(DataCollectionFreeText.builder()
                 .event(getAttributeValue(element, EVENT_ATTR).orElse(DATE_NOT_AVAIL))
                 .dataCollectionFreeText(element.getText())

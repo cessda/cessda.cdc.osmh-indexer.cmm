@@ -176,6 +176,10 @@
   "dataCollectionFreeTexts": {
     "en": [
       {
+        "dataCollectionFreeText": "End of October",
+        "event": "end"
+      },
+      {
         "dataCollectionFreeText": "Spring 2018",
         "event": "start"
       },
