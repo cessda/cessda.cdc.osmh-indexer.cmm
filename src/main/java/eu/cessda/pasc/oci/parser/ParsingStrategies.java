@@ -36,7 +36,6 @@ class ParsingStrategies {
 
     // Metadata handling
     private static final String EMPTY_EL = "empty";
-    private static final String DATE_NOT_AVAIL = "Date not specified";
     private static final String PUBLISHER_NOT_AVAIL = "Publisher not specified";
 
     /**
@@ -161,21 +160,18 @@ class ParsingStrategies {
      * Constructs a {@link DataCollectionFreeText} using the given element.
      * <p>
      * The free text field is derived from the element text, and the event is derived from the
-     * {@value OaiPmhConstants#EVENT_ATTR} attribute. If the attribute is missing or otherwise
-     * unset the event will be set to {@value DATE_NOT_AVAIL}.
+     * {@value OaiPmhConstants#EVENT_ATTR} attribute.
      *
      * @param element the {@link Element} to parse.
      * @return a {@link DataCollectionFreeText}.
      */
     static Optional<DataCollectionFreeText> dataCollFreeTextStrategy(Element element) {
-        Optional<String> dateAttrValue = getAttributeValue(element, DATE_ATTR);
-
-        // PUG requirement:  Only extract if there is no @date in <collDate>
-        if (dateAttrValue.isEmpty()) {
-            return Optional.of(DataCollectionFreeText.builder()
-                .event(getAttributeValue(element, EVENT_ATTR).orElse(DATE_NOT_AVAIL))
-                .dataCollectionFreeText(element.getText())
-                .build());
+        // #243: Extract in all cases - previously if the @date attribute was present extraction was skipped
+        if (!element.getText().isEmpty()) {
+            var builder = DataCollectionFreeText.builder()
+                .dataCollectionFreeText(element.getText());
+            getAttributeValue(element, EVENT_ATTR).ifPresent(builder::event);
+            return Optional.of(builder.build());
         }
 
         return Optional.empty();

@@ -309,6 +309,7 @@ public class CMMStudyMapper {
         var urlFromDocDscr = docElementParser.getLanguageKeyValuePairs(docDscrElement, false, langCode, ParsingStrategies::uriStrategy);
         var urlFromStdyDscr = docElementParser.getLanguageKeyValuePairs(stdyDscrElements, false, langCode, ParsingStrategies::uriStrategy);
 
+        // The map returned is not guaranteed to be mutable
         var mergedStudyUrls = new HashMap<>(urlFromDocDscr);
 
         // If absent, use the URL from mergedStudyUrls
