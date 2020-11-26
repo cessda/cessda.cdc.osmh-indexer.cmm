@@ -105,7 +105,7 @@ osmhConsumer:
       #        name: 'FORS - Swiss Centre of Expertise in the Social Sciences'
       #        handler: 'OAI-PMH'
       #        preferredMetadataParam: oai_ddi25
-      - url: http://services.fsd.uta.fi/v0/oai
+      - url: http://services.fsd.tuni.fi/v0/oai
         code: FSD
         name: 'Finnish Social Science Data Archive (FSD)'
         handler: 'OAI-PMH'
