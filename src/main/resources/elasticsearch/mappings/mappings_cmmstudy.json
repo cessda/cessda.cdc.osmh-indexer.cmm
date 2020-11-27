@@ -125,6 +125,10 @@
             "ignore_above": 256
           },
           "country": {
+            "type": "text",
+            "index": false
+          },
+          "searchField": {
             "type": "keyword",
             "ignore_above": 256
           }

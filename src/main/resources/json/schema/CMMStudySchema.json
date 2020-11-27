@@ -142,6 +142,9 @@
                 },
                 "country": {
                   "type": "string"
+                },
+                "searchField": {
+                  "type": "string"
                 }
               },
               "additionalProperties": false
