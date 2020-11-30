@@ -130,6 +130,7 @@ public class LanguageExtractor {
         Optional.ofNullable(cmmStudy.getTypeOfTimeMethods()).ifPresent(map -> builder.typeOfTimeMethods(map.get(lang)));
         var countries = Optional.ofNullable(cmmStudy.getStudyAreaCountries())
             .map(map -> map.get(lang)).stream().flatMap(Collection::stream)
+            // If the ISO code is not valid, then the optional will be empty
             .map(country -> Optional.ofNullable(CountryCode.getByCode(country.getIsoCode()))
                 .map(CountryCode::getName)
                 .map(country::withSearchField)
