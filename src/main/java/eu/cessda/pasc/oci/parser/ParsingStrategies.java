@@ -47,12 +47,10 @@ class ParsingStrategies {
      * @return an Optional {@link Country}.
      */
     static Optional<Country> countryStrategy(Element element) {
-        return getAttributeValue(element, ABBR_ATTR)
-            .map(code -> Country.builder()
-                .iso2LetterCode(code)
-                .countryName(cleanCharacterReturns(element.getText()))
-                .build()
-            );
+        var builder = Country.builder();
+        builder.elementText(cleanCharacterReturns(element.getText()));
+        getAttributeValue(element, ABBR_ATTR).ifPresent(builder::isoCode);
+        return Optional.of(builder.build());
     }
 
     /**

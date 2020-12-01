@@ -19,7 +19,6 @@ import com.neovisionaries.i18n.CountryCode;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
-import eu.cessda.pasc.oci.models.cmmstudy.Country;
 import eu.cessda.pasc.oci.models.cmmstudy.Publisher;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.NonNull;
@@ -131,12 +130,12 @@ public class LanguageExtractor {
         Optional.ofNullable(cmmStudy.getTypeOfTimeMethods()).ifPresent(map -> builder.typeOfTimeMethods(map.get(lang)));
         var countries = Optional.ofNullable(cmmStudy.getStudyAreaCountries())
             .map(map -> map.get(lang)).stream().flatMap(Collection::stream)
-            .map(country -> CountryCode.getByCode(country.getIso2LetterCode())).filter(Objects::nonNull)
-            .map(countryCode -> Country.builder()
-                .countryName(countryCode.getName())
-                .iso2LetterCode(countryCode.getAlpha2())
-                .build())
-            .collect(Collectors.toList());
+            // If the ISO code is not valid, then the optional will be empty
+            .map(country -> Optional.ofNullable(CountryCode.getByCode(country.getIsoCode()))
+                .map(CountryCode::getName)
+                .map(country::withSearchField)
+                .orElse(country)
+            ).collect(Collectors.toList());
         builder.studyAreaCountries(countries);
         Optional.ofNullable(cmmStudy.getUnitTypes()).ifPresent(map -> builder.unitTypes(map.get(lang)));
         Optional.ofNullable(cmmStudy.getPidStudies()).ifPresent(map -> builder.pidStudies(map.get(lang)));
