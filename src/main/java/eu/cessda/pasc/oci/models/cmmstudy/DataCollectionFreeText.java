@@ -33,7 +33,7 @@ import lombok.Value;
 public class DataCollectionFreeText {
 
     @JsonProperty("dataCollectionFreeText")
-    String dataCollectionFreeText;
+    String elementText;
     @JsonProperty("event")
     String event;
 }

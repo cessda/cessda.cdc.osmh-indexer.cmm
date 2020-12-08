@@ -63,7 +63,7 @@ class ParsingStrategies {
      * @return an Optional {@link Pid}.
      */
     static Optional<Pid> pidStrategy(Element element) {
-        var agencyBuilder = Pid.builder().pid(element.getText());
+        var agencyBuilder = Pid.builder().elementText(element.getText());
         getAttributeValue(element, AGENCY_ATTR).ifPresent(agencyBuilder::agency);
         return Optional.of(agencyBuilder.build());
     }
@@ -167,7 +167,7 @@ class ParsingStrategies {
         // #243: Extract in all cases - previously if the @date attribute was present extraction was skipped
         if (!element.getText().isEmpty()) {
             var builder = DataCollectionFreeText.builder()
-                .dataCollectionFreeText(element.getText());
+                .elementText(element.getText());
             getAttributeValue(element, EVENT_ATTR).ifPresent(builder::event);
             return Optional.of(builder.build());
         }

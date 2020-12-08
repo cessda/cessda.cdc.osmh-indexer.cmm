@@ -41,5 +41,5 @@ public class Pid {
     @JsonProperty("agency")
     String agency;
     @JsonProperty("pid")
-    String pid;
+    String elementText;
 }
