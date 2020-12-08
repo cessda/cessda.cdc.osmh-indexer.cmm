@@ -10,7 +10,6 @@
         "analyzer": "pasc_index_autocomplete_analyzer",
         "search_analyzer": "pasc_standard_analyzer",
         "term_vector": "with_positions_offsets",
-        "boost": 3.5,
         "fields": {
           "raw": {
             "type": "keyword",
@@ -21,8 +20,7 @@
       "abstract": {
         "type": "text",
         "analyzer": "pasc_standard_analyzer",
-        "term_vector": "with_positions_offsets",
-        "boost": 2
+        "term_vector": "with_positions_offsets"
       },
       "code": {
         "type": "keyword",
@@ -31,8 +29,7 @@
       "creators": {
         "type": "text",
         "analyzer": "pasc_standard_analyzer",
-        "term_vector": "with_positions_offsets",
-        "boost": 2
+        "term_vector": "with_positions_offsets"
       },
       "dataAccessFreeTexts": {
         "type": "text",
@@ -97,14 +94,16 @@
       "publicationYear": {
         "type": "date",
         "format": "strict_date_optional_time||epoch_millis||year",
-        "ignore_malformed": true
+        "ignore_malformed": true,
+        "index": false
       },
       "publisher": {
         "type": "nested",
         "properties": {
           "abbr": {
             "type": "keyword",
-            "ignore_above": 256
+            "ignore_above": 256,
+            "index": false
           },
           "publisher": {
             "type": "keyword",
@@ -144,7 +143,8 @@
       },
       "studyXmlSourceUrl": {
         "type": "keyword",
-        "ignore_above": 512
+        "ignore_above": 512,
+        "index": false
       },
       "keywords": {
         "type": "nested",
@@ -152,8 +152,7 @@
           "id": {
             "type": "keyword",
             "index": "no",
-            "ignore_above": 256,
-            "boost": 1.5
+            "ignore_above": 256
           },
           "term": {
             "type": "text",
