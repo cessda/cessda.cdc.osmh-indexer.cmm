@@ -124,8 +124,7 @@
             "ignore_above": 256
           },
           "country": {
-            "type": "text",
-            "ignore_above": 256
+            "type": "text"
           },
           "searchField": {
             "type": "keyword",
