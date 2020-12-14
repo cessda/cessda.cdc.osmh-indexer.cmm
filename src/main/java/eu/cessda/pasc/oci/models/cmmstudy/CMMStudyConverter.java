@@ -41,13 +41,13 @@ import java.io.InputStream;
 @Service
 public class CMMStudyConverter {
 
-  private final ObjectReader reader;
-  private final ObjectWriter writer;
+    private final ObjectReader reader;
+    private final ObjectWriter writer;
 
-  // Serialize/deserialize helpers
-  public CMMStudyConverter() {
-    this(new ObjectMapper());
-  }
+    // Serialize/deserialize helpers
+    public CMMStudyConverter() {
+        this(new ObjectMapper());
+    }
 
     @Autowired
     private CMMStudyConverter(ObjectMapper objectMapper) {
@@ -55,23 +55,23 @@ public class CMMStudyConverter {
         writer = objectMapper.writerFor(CMMStudy.class);
     }
 
-  /**
-   * Convert a JSON stream to a {@link CMMStudy} POJO.
-   *
-   * @param json the {@link InputStream} to parse.
-   * @throws IOException if an IO error occurs when parsing the stream.
-   */
-  public CMMStudy fromJsonStream(InputStream json) throws IOException {
-    return reader.readValue(json);
-  }
+    /**
+     * Convert a JSON stream to a {@link CMMStudy} POJO.
+     *
+     * @param json the {@link InputStream} to parse.
+     * @throws IOException if an IO error occurs when parsing the stream.
+     */
+    public CMMStudy fromJsonStream(InputStream json) throws IOException {
+        return reader.readValue(json);
+    }
 
-  /**
-   * Convert a {@link CMMStudy} to a JSON string.
-   *
-   * @param cmmStudy the {@link CMMStudy} to convert.
-   * @throws JsonProcessingException when an error occurs creating the JSON representation.
-   */
-  public String toJsonString(CMMStudy cmmStudy) throws JsonProcessingException {
-    return writer.writeValueAsString(cmmStudy);
-  }
+    /**
+     * Convert a {@link CMMStudy} to a JSON string.
+     *
+     * @param cmmStudy the {@link CMMStudy} to convert.
+     * @throws JsonProcessingException when an error occurs creating the JSON representation.
+     */
+    public String toJsonString(CMMStudy cmmStudy) throws JsonProcessingException {
+        return writer.writeValueAsString(cmmStudy);
+    }
 }

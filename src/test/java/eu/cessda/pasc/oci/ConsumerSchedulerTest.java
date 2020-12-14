@@ -16,7 +16,6 @@
 package eu.cessda.pasc.oci;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.CollectionType;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.elasticsearch.IngestService;
 import eu.cessda.pasc.oci.harvester.HarvesterConsumerService;
@@ -31,9 +30,9 @@ import org.mockito.Mockito;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static eu.cessda.pasc.oci.mock.data.RecordTestData.*;
 import static eu.cessda.pasc.oci.mock.data.ReposTestData.getSingleEndpoint;
@@ -47,7 +46,6 @@ import static org.mockito.Mockito.*;
  */
 public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     // mock for debug logging
-    private final DebuggingJMXBean debuggingJMXBean = mock(DebuggingJMXBean.class);
     private final AppConfigurationProperties appConfigurationProperties = mock(AppConfigurationProperties.class);
     private final IngestService esIndexer = mock(IngestService.class);
     private final LanguageExtractor extractor = new LanguageExtractor(appConfigurationProperties);
@@ -55,26 +53,26 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     private final MicrometerMetrics micrometerMetrics = mock(MicrometerMetrics.class);
 
     public ConsumerSchedulerTest() {
-
-        when(debuggingJMXBean.printCurrentlyConfiguredRepoEndpoints()).thenReturn("printed repo info");
-        when(debuggingJMXBean.printElasticSearchInfo()).thenReturn("printed ES Info");
-
         // mock for configuration of our repos
         when(appConfigurationProperties.getEndpoints()).thenReturn(getSingleEndpoint());
         when(appConfigurationProperties.getLanguages()).thenReturn(Arrays.asList("cs", "da", "de", "el", "en", "et", "fi", "fr", "hu", "it", "nl", "no", "pt", "sk", "sl", "sr", "sv"));
     }
 
+    private DebuggingJMXBean mockDebuggingJMXBean() {
+        var debuggingJMXBean = mock(DebuggingJMXBean.class);
+
+        when(debuggingJMXBean.printCurrentlyConfiguredRepoEndpoints()).thenReturn("printed repo info");
+        when(debuggingJMXBean.printElasticSearchInfo()).thenReturn("printed ES Info");
+
+        return debuggingJMXBean;
+    }
+
     @Test
     public void shouldHarvestAndIngestAllMetadata() throws IOException {
         // mock for our record headers
-        var harvesterConsumerService = mock(HarvesterConsumerService.class);
-        CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class);
-        var recordHeaderMap = objectMapper.<List<RecordHeader>>readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE, collectionType)
-            .stream().collect(Collectors.toMap(RecordHeader::getIdentifier, recordHeader -> recordHeader));
-        when(harvesterConsumerService.listRecordHeaders(any(Repo.class), any())).thenReturn(objectMapper.readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE, collectionType));
-        // mock record requests from each header
-        when(harvesterConsumerService.getRecord(any(Repo.class), eq(recordHeaderMap.get("998")))).thenReturn(getSyntheticCmmStudy("998"));
-        when(harvesterConsumerService.getRecord(any(Repo.class), eq(recordHeaderMap.get("997")))).thenReturn(getSyntheticCmmStudy("997"));
+        var harvesterConsumerService = mockRecordRequests();
+        var debuggingJMXBean = mockDebuggingJMXBean();
+
         // mock for ES bulking
         when(esIndexer.bulkIndex(anyList(), anyString())).thenReturn(true);
         when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
@@ -86,21 +84,16 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
         // When
         scheduler.fullHarvestAndIngestionAllConfiguredSPsReposRecords();
 
-        thenVerifyFullRun(harvesterConsumerService);
+        thenVerifyFullRun(harvesterConsumerService, debuggingJMXBean);
     }
 
     @Test
     public void shouldHarvestAndIngestAllMetadataForWeeklyRun() throws IOException {
 
         // mock for our record headers
-        var harvesterConsumerService = mock(HarvesterConsumerService.class);
-        CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class);
-        var recordHeaderMap = objectMapper.<List<RecordHeader>>readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE, collectionType)
-            .stream().collect(Collectors.toMap(RecordHeader::getIdentifier, recordHeader -> recordHeader));
-        when(harvesterConsumerService.listRecordHeaders(any(Repo.class), any())).thenReturn(objectMapper.readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE, collectionType));
-        // mock record requests from each header
-        when(harvesterConsumerService.getRecord(any(Repo.class), eq(recordHeaderMap.get("998")))).thenReturn(getSyntheticCmmStudy("998"));
-        when(harvesterConsumerService.getRecord(any(Repo.class), eq(recordHeaderMap.get("997")))).thenReturn(getSyntheticCmmStudy("997"));
+        var harvesterConsumerService = mockRecordRequests();
+        var debuggingJMXBean = mockDebuggingJMXBean();
+
         // mock for ES bulking
         when(esIndexer.bulkIndex(anyList(), anyString())).thenReturn(true);
         when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
@@ -113,10 +106,31 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
         // When
         scheduler.weeklyFullHarvestAndIngestionAllConfiguredSPsReposRecords();
 
-        thenVerifyFullRun(harvesterConsumerService);
+        thenVerifyFullRun(harvesterConsumerService, debuggingJMXBean);
     }
 
-    private void thenVerifyFullRun(HarvesterConsumerService harvesterConsumerService) {
+    /**
+     * Creates a mocked {@link HarvesterConsumerService} that responds to header and record requests.
+     */
+    private HarvesterConsumerService mockRecordRequests() throws IOException {
+        var harvesterConsumerService = mock(HarvesterConsumerService.class);
+        var collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class);
+        var recordHeaders = objectMapper.<List<RecordHeader>>readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE, collectionType);
+
+        // Mock requests for the repository headers
+        when(harvesterConsumerService.listRecordHeaders(any(Repo.class), any()))
+            .thenReturn(recordHeaders);
+
+        // mock record requests from each header
+        for (var recordHeader : recordHeaders) {
+            when(harvesterConsumerService.getRecord(any(Repo.class), eq(recordHeader)))
+                .thenReturn(Optional.of(getSyntheticCmmStudy(recordHeader.getIdentifier())));
+        }
+
+        return harvesterConsumerService;
+    }
+
+    private void thenVerifyFullRun(HarvesterConsumerService harvesterConsumerService, DebuggingJMXBean debuggingJMXBean) {
         verify(debuggingJMXBean, times(1)).printElasticSearchInfo();
         verify(debuggingJMXBean, times(1)).printCurrentlyConfiguredRepoEndpoints();
         verifyNoMoreInteractions(debuggingJMXBean);
@@ -143,21 +157,23 @@ public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
     @Test
     public void shouldDoIncrementalHarvestAndIngestionOfNewerRecordsOnly() throws IOException {
         // MOCKS ---------------------------------------------------------------------------------------------------------
+        var debuggingJMXBean = mockDebuggingJMXBean();
         // mock for our record headers
         var harvesterConsumerService = mock(HarvesterConsumerService.class);
-        CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class);
-        List<RecordHeader> recordHeaderList = objectMapper.readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE, collectionType);
-        var recordHeaderMap = recordHeaderList.stream().collect(Collectors.toMap(RecordHeader::getIdentifier, recordHeader -> recordHeader));
-        List<RecordHeader> recordHeaderListIncrement = objectMapper.readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE_WITH_INCREMENT, collectionType);
+        var collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class);
+        var recordHeaderList = objectMapper.<List<RecordHeader>>readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE, collectionType);
+        var recordHeaderListIncrement = objectMapper.<List<RecordHeader>>readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE_WITH_INCREMENT, collectionType);
         when(harvesterConsumerService.listRecordHeaders(any(Repo.class), any()))
             .thenReturn(recordHeaderList) // First call
             .thenReturn(recordHeaderListIncrement); // Second call / Incremental run
 
-        // mock record requests from each header
-        when(harvesterConsumerService.getRecord(any(Repo.class), eq(recordHeaderMap.get("998")))).thenReturn(getSyntheticCmmStudy("998"));
-        when(harvesterConsumerService.getRecord(any(Repo.class), eq(recordHeaderMap.get("997")))).thenReturn(getSyntheticCmmStudy("997"));
-        when(harvesterConsumerService.getRecord(any(Repo.class), eq(recordHeaderMap.get("999")))).thenReturn(getSyntheticCmmStudy("999"));
-        when(harvesterConsumerService.getRecord(any(Repo.class), eq(recordHeaderMap.get("1000")))).thenReturn(getSyntheticCmmStudy("1000"));
+        // mock record requests from each header, a set is used so that each header is only registered once
+        var allRecordHeaders = new HashSet<>(recordHeaderList);
+        allRecordHeaders.addAll(recordHeaderListIncrement);
+        for (var recordHeader : allRecordHeaders) {
+            when(harvesterConsumerService.getRecord(any(Repo.class), eq(recordHeader)))
+                .thenReturn(Optional.of(getSyntheticCmmStudy(recordHeader.getIdentifier())));
+        }
 
         // mock for ES methods
         when(esIndexer.bulkIndex(anyList(), anyString())).thenReturn(true);
