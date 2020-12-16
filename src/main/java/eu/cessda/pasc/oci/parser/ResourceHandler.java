@@ -15,7 +15,7 @@
  */
 package eu.cessda.pasc.oci.parser;
 
-import org.springframework.stereotype.Component;
+import lombok.experimental.UtilityClass;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -27,8 +27,8 @@ import java.nio.charset.StandardCharsets;
  *
  * @author moses AT doraventures DOT com
  */
-@Component
-public class FileHandler {
+@UtilityClass
+public class ResourceHandler {
     /**
      * Load the specified resource and return it as an {@link InputStream}.
      *
@@ -37,8 +37,8 @@ public class FileHandler {
      *                               the resource is in a package that is not opened unconditionally,
      *                               or access to the resource is denied by the security manager.
      */
-    public InputStream getFileAsStream(String fileName) throws FileNotFoundException {
-        InputStream resource = getClass().getClassLoader().getResourceAsStream(fileName);
+    public static InputStream getResourceAsStream(String fileName) throws FileNotFoundException {
+        var resource = ResourceHandler.class.getClassLoader().getResourceAsStream(fileName);
         if (resource == null) {
             throw new FileNotFoundException(fileName + " could not be found");
         }
@@ -53,9 +53,11 @@ public class FileHandler {
      * @throws FileNotFoundException if the resource could not be found,
      *                               the resource is in a package that is not opened unconditionally,
      *                               or access to the resource is denied by the security manager.
+     * @throws IOException           if an IO Error occurs
      */
-    public String getFileAsString(String fileName) throws IOException {
-        InputStream resource = getFileAsStream(fileName);
-        return new String(resource.readAllBytes(), StandardCharsets.UTF_8);
+    public static String getResourceAsString(String fileName) throws IOException {
+        try (var resource = getResourceAsStream(fileName)) {
+            return new String(resource.readAllBytes(), StandardCharsets.UTF_8);
+        }
     }
 }

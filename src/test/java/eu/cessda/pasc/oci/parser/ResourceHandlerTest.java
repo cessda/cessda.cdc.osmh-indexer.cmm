@@ -13,31 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.mock.data;
+package eu.cessda.pasc.oci.parser;
 
-
-import eu.cessda.pasc.oci.parser.FileHandler;
-import lombok.experimental.UtilityClass;
+import org.junit.Test;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 /**
- * mock data for Record headers.
- *
  * @author moses AT doraventures DOT com
  */
-@UtilityClass
-public class CMMStudyTestData {
+public class ResourceHandlerTest {
 
-  public static String getContent(String filePath) throws IOException {
-    FileHandler fileHandler = new FileHandler();
-      return fileHandler.getFileAsString(filePath);
-  }
+    @Test
+    public void shouldReturnContentToAValidFilePath() throws IOException {
+        String recordUkds998 = ResourceHandler.getResourceAsString("record_ukds_998.json");
+        assertThat(recordUkds998).isNotEmpty();
+    }
 
-  public static InputStream getContentAsStream(String filePath) throws FileNotFoundException {
-    FileHandler fileHandler = new FileHandler();
-    return fileHandler.getFileAsStream(filePath);
-  }
+    @Test(expected = FileNotFoundException.class)
+    public void shouldThrowFileNotFoundExceptionForAnInvalidValidFilePath() throws IOException {
+        ResourceHandler.getResourceAsString("does_not_exist.json");
+    }
 }

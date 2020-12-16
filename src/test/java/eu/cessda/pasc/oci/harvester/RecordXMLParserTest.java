@@ -25,12 +25,12 @@ import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import eu.cessda.pasc.oci.exception.HarvesterException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.http.HttpClient;
-import eu.cessda.pasc.oci.mock.data.CMMStudyTestData;
 import eu.cessda.pasc.oci.mock.data.ReposTestData;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.parser.CMMStudyMapper;
+import eu.cessda.pasc.oci.parser.ResourceHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -79,7 +79,7 @@ public class RecordXMLParserTest {
 
         // Given
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            CMMStudyTestData.getContentAsStream("xml/synthetic_compliant_cmm.xml")
+            ResourceHandler.getResourceAsStream("xml/synthetic_compliant_cmm.xml")
         );
 
         // When
@@ -96,7 +96,7 @@ public class RecordXMLParserTest {
 
         // Given
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            CMMStudyTestData.getContentAsStream("xml/oai-fsd_uta_fi-FSD3187.xml")
+            ResourceHandler.getResourceAsStream("xml/oai-fsd_uta_fi-FSD3187.xml")
         );
 
         // When
@@ -120,7 +120,7 @@ public class RecordXMLParserTest {
 
         // Given
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            CMMStudyTestData.getContentAsStream("xml/ddi_record_1683.xml")
+            ResourceHandler.getResourceAsStream("xml/ddi_record_1683.xml")
         );
 
         // When
@@ -137,7 +137,7 @@ public class RecordXMLParserTest {
 
         // Given
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            CMMStudyTestData.getContentAsStream("xml/ddi_record_1683.xml")
+            ResourceHandler.getResourceAsStream("xml/ddi_record_1683.xml")
         );
 
         // When
@@ -157,9 +157,9 @@ public class RecordXMLParserTest {
     public void shouldExtractDefaultLanguageFromCodebookXMLLagIfPresent() throws IOException, JSONException, HarvesterException {
 
         // Given
-        String expectedCmmStudyJsonString = CMMStudyTestData.getContent("json/ddi_record_1683_with_codebookXmlLag.json");
+        String expectedCmmStudyJsonString = ResourceHandler.getResourceAsString("json/ddi_record_1683_with_codebookXmlLag.json");
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            CMMStudyTestData.getContentAsStream("xml/ddi_record_1683_with_codebookXmlLag.xml")
+            ResourceHandler.getResourceAsStream("xml/ddi_record_1683_with_codebookXmlLag.xml")
         );
 
         // When
@@ -180,7 +180,7 @@ public class RecordXMLParserTest {
         expectedAbstract.put("en", "1. The data+<br>2. The datafiles");
 
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            CMMStudyTestData.getContentAsStream("xml/ddi_record_2305_fsd_repeat_abstract.xml")
+            ResourceHandler.getResourceAsStream("xml/ddi_record_2305_fsd_repeat_abstract.xml")
         );
 
         // When
@@ -202,7 +202,7 @@ public class RecordXMLParserTest {
         expectedTitle.put("yy", "Enquête sociale européenne");
 
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            CMMStudyTestData.getContentAsStream("xml/ddi_record_1683.xml")
+            ResourceHandler.getResourceAsStream("xml/ddi_record_1683.xml")
         );
 
         // When
@@ -219,7 +219,7 @@ public class RecordXMLParserTest {
 
         // Given
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            CMMStudyTestData.getContentAsStream("xml/ddi_record_1031_deleted.xml")
+            ResourceHandler.getResourceAsStream("xml/ddi_record_1031_deleted.xml")
         );
 
         // When
@@ -235,7 +235,7 @@ public class RecordXMLParserTest {
 
         // Given
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            CMMStudyTestData.getContentAsStream("xml/ddi_record_WithError.xml")
+            ResourceHandler.getResourceAsStream("xml/ddi_record_WithError.xml")
         );
 
         // When
@@ -249,7 +249,7 @@ public class RecordXMLParserTest {
 
         // Given
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            CMMStudyTestData.getContentAsStream("xml/ddi_record_ukds_example.xml")
+            ResourceHandler.getResourceAsStream("xml/ddi_record_ukds_example.xml")
         );
 
         // When
@@ -282,7 +282,7 @@ public class RecordXMLParserTest {
 
         final ObjectMapper mapper = new ObjectMapper();
         String jsonString = cmmConverter.toJsonString(record);
-        String expectedJson = CMMStudyTestData.getContent("json/synthetic_compliant_record.json");
+        String expectedJson = ResourceHandler.getResourceAsString("json/synthetic_compliant_record.json");
         final JsonNode actualTree = mapper.readTree(jsonString);
         final JsonNode expectedTree = mapper.readTree(expectedJson);
 
@@ -316,7 +316,7 @@ public class RecordXMLParserTest {
 
         final ObjectMapper mapper = new ObjectMapper();
         String jsonString = cmmConverter.toJsonString(record);
-        String expectedJson = CMMStudyTestData.getContent("json/ddi_record_ukds_example_extracted.json");
+        String expectedJson = ResourceHandler.getResourceAsString("json/ddi_record_ukds_example_extracted.json");
         final JsonNode actualTree = mapper.readTree(jsonString);
         final JsonNode expectedTree = mapper.readTree(expectedJson);
 
@@ -335,7 +335,7 @@ public class RecordXMLParserTest {
 
         // Given
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            CMMStudyTestData.getContentAsStream("xml/ddi_record_ukds_example.xml")
+            ResourceHandler.getResourceAsStream("xml/ddi_record_ukds_example.xml")
         );
 
         // When

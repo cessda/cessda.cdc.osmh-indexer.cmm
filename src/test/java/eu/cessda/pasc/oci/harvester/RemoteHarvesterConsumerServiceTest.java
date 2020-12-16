@@ -26,7 +26,7 @@ import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.configurations.Repo;
-import eu.cessda.pasc.oci.parser.FileHandler;
+import eu.cessda.pasc.oci.parser.ResourceHandler;
 import eu.cessda.pasc.oci.parser.TimeUtility;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,7 +55,6 @@ import static org.mockito.Mockito.when;
 public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfileContext {
 
     private final HttpClient httpClient = Mockito.mock(HttpClient.class);
-    private final FileHandler fileHandler = new FileHandler();
     private final AppConfigurationProperties appConfigurationProperties = Mockito.mock(AppConfigurationProperties.class);
     private static final RecordHeader STUDY_NUMBER = RecordHeader.builder().identifier("4124325").build();
     private final CMMStudyConverter cmmStudyConverter = new CMMStudyConverter();
@@ -200,7 +199,7 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
 
     @Test
     public void shouldReturnASuccessfulResponseGetRecord() throws IOException {
-        String recordUkds998 = fileHandler.getFileAsString("record_ukds_998.json");
+        String recordUkds998 = ResourceHandler.getResourceAsString("record_ukds_998.json");
         var recordID = RecordHeader.builder().identifier("998").build();
         URI expectedUrl = URI.create("http://localhost:9091/v0/GetRecord/CMMStudy/998?Repository=" +
             URLEncoder.encode("https://oai.ukdataservice.ac.uk:8443/oai/provider", StandardCharsets.UTF_8));
@@ -224,7 +223,7 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
 
     @Test
     public void shouldReturnDeletedRecordMarkedAsInactive() throws IOException {
-        String recordUkds1031 = fileHandler.getFileAsString("record_ukds_1031_deleted.json");
+        String recordUkds1031 = ResourceHandler.getResourceAsString("record_ukds_1031_deleted.json");
         var recordID = RecordHeader.builder().identifier("1031").build();
         URI expectedUrl = URI.create("http://localhost:9091/v0/GetRecord/CMMStudy/1031?Repository=" +
             URLEncoder.encode("https://oai.ukdataservice.ac.uk:8443/oai/provider", StandardCharsets.UTF_8));
@@ -250,11 +249,14 @@ public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfil
 
     @Test
     public void shouldAddLanguageOverrideIfPresent() throws IOException {
-        String recordUkds998 = fileHandler.getFileAsString("record_ukds_998.json");
+        String recordUkds998 = ResourceHandler.getResourceAsString("record_ukds_998.json");
         var recordID = RecordHeader.builder().identifier("998").build();
-        URI expectedUrl = URI.create("http://localhost:9091/v0/GetRecord/CMMStudy/" + recordID.getIdentifier() + "?Repository=" +
+        URI expectedUrl = URI.create("http://localhost:9091/v0/GetRecord/CMMStudy/" +
+            recordID.getIdentifier() +
+            "?Repository=" +
             URLEncoder.encode("https://oai.ukdataservice.ac.uk:8443/oai/provider", StandardCharsets.UTF_8) +
-            "&defaultLanguage=zz");
+            "&defaultLanguage=zz"
+        );
 
         when(httpClient.getInputStream(expectedUrl)).thenReturn(
             new ByteArrayInputStream(recordUkds998.getBytes(StandardCharsets.UTF_8))

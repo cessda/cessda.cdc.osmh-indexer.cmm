@@ -18,7 +18,7 @@ package eu.cessda.pasc.oci.elasticsearch;
 import eu.cessda.pasc.oci.configurations.ESConfigurationProperties;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
-import eu.cessda.pasc.oci.parser.FileHandler;
+import eu.cessda.pasc.oci.parser.ResourceHandler;
 import eu.cessda.pasc.oci.parser.TimeUtility;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -26,7 +26,6 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.IndexNotFoundException;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.ElasticsearchException;
@@ -35,7 +34,6 @@ import org.springframework.data.elasticsearch.core.query.DeleteQuery;
 import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.stereotype.Service;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -62,14 +60,12 @@ public class ESIngestService implements IngestService {
     private static final int INDEX_COMMIT_SIZE = 500;
 
     private final ElasticsearchTemplate esTemplate;
-    private final FileHandler fileHandler;
     private final ESConfigurationProperties esConfig;
     private final CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter;
 
     @Autowired
-    public ESIngestService(ElasticsearchTemplate esTemplate, FileHandler fileHandler, ESConfigurationProperties esConfig, CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter) {
+    public ESIngestService(ElasticsearchTemplate esTemplate, ESConfigurationProperties esConfig, CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter) {
         this.esTemplate = esTemplate;
-        this.fileHandler = fileHandler;
         this.esConfig = esConfig;
         this.cmmStudyOfLanguageConverter = cmmStudyOfLanguageConverter;
     }
@@ -78,10 +74,14 @@ public class ESIngestService implements IngestService {
     public boolean bulkIndex(Collection<CMMStudyOfLanguage> languageCMMStudiesMap, String languageIsoCode) {
         String indexName = String.format(INDEX_NAME_TEMPLATE, languageIsoCode);
 
-        if (prepareIndex(indexName)) {
+        if (createIndex(indexName)) {
+
+            // Allocate all space needed upfront, this avoids unnecessary resizes
             var queries = new ArrayList<IndexQuery>(Integer.min(languageCMMStudiesMap.size(), INDEX_COMMIT_SIZE));
+
             log.debug("[{}] Indexing...", indexName);
             int counter = 0;
+
             for (CMMStudyOfLanguage cmmStudyOfLanguage : languageCMMStudiesMap) {
                 var indexQuery = getIndexQuery(indexName, cmmStudyOfLanguage);
                 queries.add(indexQuery);
@@ -92,10 +92,12 @@ public class ESIngestService implements IngestService {
                     log.debug("[{}] Current bulkIndex counter [{}].", indexName, counter);
                 }
             }
+
             if (!queries.isEmpty()) {
                 log.debug("[{}] Current bulkIndex counter [{}].", indexName, counter);
                 executeBulk(queries);
             }
+
             log.debug("[{}] BulkIndex completed.", languageIsoCode);
             return true;
         }
@@ -123,9 +125,9 @@ public class ESIngestService implements IngestService {
 
     @Override
     public long getTotalHitCount(String language) {
-        SearchRequestBuilder matchAllSearchRequest = getMatchAllSearchRequest(language).setSize(0);
-        SearchResponse response = matchAllSearchRequest.get();
-        SearchHits hits = response.getHits();
+        var matchAllSearchRequest = getMatchAllSearchRequest(language).setSize(0);
+        var response = matchAllSearchRequest.get();
+        var hits = response.getHits();
         return hits.getTotalHits();
     }
 
@@ -162,7 +164,7 @@ public class ESIngestService implements IngestService {
     }
 
     /**
-     * Gets a match all search request for the language specified.
+     * Gets a match all {@link SearchRequestBuilder} for the language specified.
      *
      * @param language the language to get results for.
      */
@@ -189,7 +191,7 @@ public class ESIngestService implements IngestService {
                 return localDateTimeOpt.map(localDateTime -> localDateTime.withHour(0).withMinute(0).withSecond(0).withNano(0));
             }
         } catch (IOException e) {
-            log.warn("Couldn't decode {} into an instance of {}: {}", hits[0].getId(), CMMStudyOfLanguage.class.getName(), e.toString());
+            log.error("Couldn't decode {} into an instance of {}: {}", hits[0].getId(), CMMStudyOfLanguage.class.getName(), e.toString());
         }
         return Optional.empty();
     }
@@ -203,69 +205,55 @@ public class ESIngestService implements IngestService {
         return indexQuery;
     }
 
-    private boolean prepareIndex(String indexName) {
+    /**
+     * Creates an index with the given name. If the index already exists, then no operation is performed.
+     *
+     * @param indexName the name of the index to create
+     * @return {@code true} if the index was created or if the index already existed,
+     * {@code false} if an error occurred during index creation
+     */
+    private boolean createIndex(String indexName) {
+
         if (esTemplate.indexExists(indexName)) {
             log.debug("[{}] index name already exists, Skipping creation.", indexName);
             return true;
         }
-        log.info("[{}] index name does not exist and will be created", indexName);
-        return createIndex(indexName);
-    }
 
-    private boolean createIndex(String indexName) {
+        log.debug("[{}] index name does not exist and will be created", indexName);
+
         try {
 
-            String settingsTemplate = getIndexSettings(indexName);
-            String mappings = getIndexMappings(indexName);
-            String settings = String.format(settingsTemplate, esConfig.getNumberOfShards(), esConfig.getNumberOfReplicas());
+            // Load language specific settings
+            var settingsTemplate = ResourceHandler.getResourceAsString(String.format("elasticsearch/settings/settings_%s.json", indexName));
+            var settings = String.format(settingsTemplate, esConfig.getNumberOfShards(), esConfig.getNumberOfReplicas());
 
-            if (!settings.isEmpty() && !mappings.isEmpty()) {
-                log.debug("[{}] custom index creation with content \n{}", indexName, settings);
+            // Load mappings
+            var mappings = ResourceHandler.getResourceAsString(String.format("elasticsearch/mappings/mappings_%s.json", INDEX_TYPE));
 
-                if (!esTemplate.createIndex(indexName, settings)) {
-                    log.error("[{}] custom index failed creation!", indexName);
-                    return false;
-                } else {
-                    log.debug("[{}] index mapping PUT request with content \n{}", indexName, mappings);
+            log.trace("[{}] custom index creation: Settings: \n{}\nMappings:\n{}", indexName, settings, mappings);
 
-                    if (esTemplate.putMapping(indexName, INDEX_TYPE, mappings)) {
-                        log.info("[{}] custom index created successfully.", indexName);
-                        return true;
-                    } else {
-                        log.error("[{}] index mapping PUT request for type [{}] was unsuccessful.", indexName, INDEX_TYPE);
-                        esTemplate.deleteIndex(indexName);
-                        return false;
-                    }
-                }
+            // Create the index and set the mappings
+            if (esTemplate.createIndex(indexName, settings) && esTemplate.putMapping(indexName, INDEX_TYPE, mappings)) {
+                log.info("[{}] Index created.", indexName);
+                return true;
             } else {
-                log.warn("[{}] index creation Settings & Mappings must be define for a custom index.", indexName);
+                log.error("[{}] Index creation failed!", indexName);
+                esTemplate.deleteIndex(indexName);
+                return false;
             }
+
         } catch (IOException e) {
-            log.warn("[{}] Couldn't load settings for Elasticsearch: {}", indexName, e.toString());
+            log.error("[{}] Couldn't load settings for Elasticsearch: {}", indexName, e.toString());
         }
-        log.warn("[{}] index creation with no custom settings or mappings.", indexName);
-        return (esTemplate.createIndex(indexName));
+
+        return false;
     }
 
-    private String getIndexSettings(String indexName) throws IOException {
-        return getJson(indexName, "elasticsearch/settings/settings_%s.json");
-    }
-
-    private String getIndexMappings(String indexName) throws IOException {
-        return getJson(indexName, "elasticsearch/mappings/mappings_%s.json");
-    }
-
-    private String getJson(String indexName, String template) throws IOException {
-        String json;
-        try {
-            json = fileHandler.getFileAsString(String.format(template, indexName));
-        } catch (FileNotFoundException e) {
-            log.debug("[{}] Language specific JSON {} not found, falling back to {}", indexName, String.format(template, indexName), String.format(template, INDEX_TYPE));
-            json = fileHandler.getFileAsString(String.format(template, INDEX_TYPE));
-        }
-        return json;
-    }
-
+    /**
+     * Index the given list of {@link IndexQuery}s into Elasticsearch.
+     *
+     * @param queries the queries to index
+     */
     private void executeBulk(List<IndexQuery> queries) {
         try {
             esTemplate.bulkIndex(queries);

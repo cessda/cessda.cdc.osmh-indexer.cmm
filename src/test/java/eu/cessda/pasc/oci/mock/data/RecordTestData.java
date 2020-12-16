@@ -19,7 +19,7 @@ import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
-import eu.cessda.pasc.oci.parser.FileHandler;
+import eu.cessda.pasc.oci.parser.ResourceHandler;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -135,8 +135,6 @@ public final class RecordTestData {
 
     private static final CMMStudyConverter cmmStudyConverter = new CMMStudyConverter();
     private static final CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter = new CMMStudyOfLanguageConverter();
-    private static final FileHandler fileHandler = new FileHandler();
-
 
     public static List<CMMStudy> getASingleSyntheticCMMStudyAsList() {
         List<CMMStudy> cmmStudies = new ArrayList<>(1);
@@ -184,12 +182,12 @@ public final class RecordTestData {
     }
 
     public static CMMStudy getSyntheticCmmStudy() throws IOException {
-        var cmmStudyStream = fileHandler.getFileAsStream("synthetic_compliant_record.json");
+        var cmmStudyStream = ResourceHandler.getResourceAsStream("synthetic_compliant_record.json");
         return cmmStudyConverter.fromJsonStream(cmmStudyStream);
     }
 
     private static CMMStudy getDeletedCmmStudy() throws IOException {
-        var cmmStudyStream = fileHandler.getFileAsStream("record_ukds_1031_deleted.json");
+        var cmmStudyStream = ResourceHandler.getResourceAsStream("record_ukds_1031_deleted.json");
         return cmmStudyConverter.fromJsonStream(cmmStudyStream);
     }
 
@@ -199,6 +197,6 @@ public final class RecordTestData {
     }
 
     public static String getSyntheticCMMStudyOfLanguageEn() throws IOException {
-        return fileHandler.getFileAsString("synthetic_complaint_record_en.json");
+        return ResourceHandler.getResourceAsString("synthetic_complaint_record_en.json");
     }
 }
