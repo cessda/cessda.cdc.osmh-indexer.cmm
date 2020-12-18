@@ -18,8 +18,8 @@ package eu.cessda.pasc.oci.models;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.google.common.base.CharMatcher;
-import lombok.*;
+import lombok.Builder;
+import lombok.Value;
 
 /**
  * Represents an OAI-PMH header.
@@ -36,28 +36,20 @@ import lombok.*;
     "deleted"
 })
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@EqualsAndHashCode
-@ToString
+@Value
 public class RecordHeader {
 
     @JsonProperty("lastModified")
-    private String lastModified;
+    String lastModified;
     @JsonProperty("type")
-    private String type;
+    String type;
     @JsonProperty("recordType")
-    private String recordType;
+    String recordType;
     @JsonProperty("identifier")
-    private String identifier;
+    String identifier;
     /**
      * Deletion status on the remote repository
      */
     @JsonProperty("deleted")
-    private boolean deleted;
-
-    public void setIdentifier(String identifier) {
-        this.identifier = CharMatcher.breakingWhitespace().removeFrom(identifier);
-    }
+    boolean deleted;
 }

@@ -44,13 +44,14 @@ import static org.mockito.Mockito.*;
  *
  * @author moses AT doraventures DOT com
  */
-public class ConsumerSchedulerTest extends AbstractSpringTestProfileContext {
+public class ConsumerSchedulerTest {
     // mock for debug logging
     private final AppConfigurationProperties appConfigurationProperties = mock(AppConfigurationProperties.class);
     private final IngestService esIndexer = mock(IngestService.class);
     private final LanguageExtractor extractor = new LanguageExtractor(appConfigurationProperties);
-    private final ObjectMapper objectMapper = new ObjectMapper();
     private final MicrometerMetrics micrometerMetrics = mock(MicrometerMetrics.class);
+
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public ConsumerSchedulerTest() {
         // mock for configuration of our repos

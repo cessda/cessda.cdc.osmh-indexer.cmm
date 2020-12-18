@@ -16,7 +16,6 @@
 package eu.cessda.pasc.oci.harvester;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.cessda.pasc.oci.AbstractSpringTestProfileContext;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.exception.HTTPException;
 import eu.cessda.pasc.oci.http.HttpClient;
@@ -52,13 +51,15 @@ import static org.mockito.Mockito.when;
 /**
  * @author moses AT doraventures DOT com
  */
-public class RemoteHarvesterConsumerServiceTest extends AbstractSpringTestProfileContext {
+public class RemoteHarvesterConsumerServiceTest {
 
     private final HttpClient httpClient = Mockito.mock(HttpClient.class);
     private final AppConfigurationProperties appConfigurationProperties = Mockito.mock(AppConfigurationProperties.class);
+
+    private static final CMMStudyConverter cmmStudyConverter = new CMMStudyConverter();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
     private static final RecordHeader STUDY_NUMBER = RecordHeader.builder().identifier("4124325").build();
-    private final CMMStudyConverter cmmStudyConverter = new CMMStudyConverter();
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * Class to test

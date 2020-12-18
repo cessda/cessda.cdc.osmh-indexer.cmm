@@ -72,7 +72,7 @@ public class ESIngestService implements IngestService {
 
     @Override
     public boolean bulkIndex(Collection<CMMStudyOfLanguage> languageCMMStudiesMap, String languageIsoCode) {
-        String indexName = String.format(INDEX_NAME_TEMPLATE, languageIsoCode);
+        var indexName = String.format(INDEX_NAME_TEMPLATE, languageIsoCode);
 
         if (createIndex(indexName)) {
 
@@ -80,25 +80,24 @@ public class ESIngestService implements IngestService {
             var queries = new ArrayList<IndexQuery>(Integer.min(languageCMMStudiesMap.size(), INDEX_COMMIT_SIZE));
 
             log.debug("[{}] Indexing...", indexName);
-            int counter = 0;
 
             for (CMMStudyOfLanguage cmmStudyOfLanguage : languageCMMStudiesMap) {
-                var indexQuery = getIndexQuery(indexName, cmmStudyOfLanguage);
+                var indexQuery = getIndexQuery(cmmStudyOfLanguage, indexName);
                 queries.add(indexQuery);
-                counter++;
                 if (queries.size() == INDEX_COMMIT_SIZE) {
+                    log.trace("[{}] Bulk Indexing {} studies", indexName, INDEX_COMMIT_SIZE);
                     executeBulk(queries);
                     queries.clear();
-                    log.debug("[{}] Current bulkIndex counter [{}].", indexName, counter);
                 }
             }
 
+            // Commit all remaining studies
             if (!queries.isEmpty()) {
-                log.debug("[{}] Current bulkIndex counter [{}].", indexName, counter);
+                log.trace("[{}] Bulk Indexing {} studies", indexName, queries.size());
                 executeBulk(queries);
             }
 
-            log.debug("[{}] BulkIndex completed.", languageIsoCode);
+            log.debug("[{}] Indexing completed.", indexName);
             return true;
         }
 
@@ -111,7 +110,7 @@ public class ESIngestService implements IngestService {
         var deleteQuery = new DeleteQuery();
 
         // Set the index
-        String indexName = String.format(INDEX_NAME_TEMPLATE, languageIsoCode);
+        var indexName = String.format(INDEX_NAME_TEMPLATE, languageIsoCode);
         deleteQuery.setIndex(indexName);
 
         // Extract the ids from the studies, and add them to the delete query
@@ -196,7 +195,14 @@ public class ESIngestService implements IngestService {
         return Optional.empty();
     }
 
-    private IndexQuery getIndexQuery(String indexName, CMMStudyOfLanguage cmmStudyOfLanguage) {
+    /**
+     * Creates an {@link IndexQuery} for the given {@link CMMStudyOfLanguage} and sets the target index to
+     * the given index name.
+     *
+     * @param cmmStudyOfLanguage the study to index
+     * @param indexName          the index to save the study to
+     */
+    private IndexQuery getIndexQuery(CMMStudyOfLanguage cmmStudyOfLanguage, String indexName) {
         IndexQuery indexQuery = new IndexQuery();
         indexQuery.setId(cmmStudyOfLanguage.getId());
         indexQuery.setObject(cmmStudyOfLanguage);

@@ -47,10 +47,10 @@ public class ElasticsearchSet<T> extends AbstractSet<T> {
         this.objectReader = objectReader;
     }
 
-    @Override
-    public int size() {
-        return (int) searchRequestBuilder.get().getHits().getTotalHits();
-    }
+    /**
+     * Scroll timeout
+     */
+    private static final TimeValue timeout = new TimeValue(Duration.ofSeconds(60).toMillis());
 
     /**
      * {@inheritDoc}
@@ -62,12 +62,17 @@ public class ElasticsearchSet<T> extends AbstractSet<T> {
         return new ElasticsearchIterator();
     }
 
+    @Override
+    public int size() {
+        long totalHits = searchRequestBuilder.get().getHits().getTotalHits();
+        return totalHits < Integer.MAX_VALUE ? (int) totalHits : Integer.MAX_VALUE;
+    }
+
     /**
      * An iterator that iterates over an Elasticsearch scroll and decodes the resulting JSON
      */
     private class ElasticsearchIterator implements Iterator<T> {
 
-        private final TimeValue timeout = new TimeValue(Duration.ofSeconds(60).toMillis());
         private SearchResponse response = searchRequestBuilder.setSize(1000).setScroll(timeout).get();
         private int currentIndex = 0;
 
