@@ -38,47 +38,48 @@ import java.net.UnknownHostException;
  */
 @Configuration
 @Slf4j
-public class ElasticsearchConfiguration {
+public class ElasticsearchConfiguration implements AutoCloseable {
 
-  @Value("${elasticsearch.host}")
-  private String esHost;
+    @Value("${elasticsearch.host}")
+    private String esHost;
 
-  @Value("${elasticsearch.port}")
-  private int esPort;
+    @Value("${elasticsearch.port}")
+    private int esPort;
 
-  @Value("${elasticsearch.clustername}")
-  private String esClusterName;
+    @Value("${elasticsearch.clustername}")
+    private String esClusterName;
 
-  private TransportClient transportClient;
+    private TransportClient transportClient;
 
-  @Bean
-  public ObjectMapper objectMapper() {
-    return new ObjectMapper();
-  }
-
-  @SuppressWarnings({"resource", "IOResourceOpenedButNotSafelyClosed"})
-  @Bean
-  public Client client() throws UnknownHostException {
-    if (transportClient == null) {
-      log.debug("Creating Elasticsearch Client\nCluster name={}\nHostname={}", esClusterName, esHost);
-      Settings esSettings = Settings.builder().put("cluster.name", esClusterName).build();
-
-      // https://www.elastic.co/guide/en/elasticsearch/guide/current/_transport_client_versus_node_client.html
-      transportClient = new PreBuiltTransportClient(esSettings).addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(esHost), esPort));
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
     }
-    return transportClient;
-  }
 
-  @Bean
-  public ElasticsearchTemplate elasticsearchTemplate(Client client) {
-    return new ElasticsearchTemplate(client);
-  }
+    @SuppressWarnings({"resource", "IOResourceOpenedButNotSafelyClosed"})
+    @Bean
+    public Client client() throws UnknownHostException {
+        if (transportClient == null) {
+            log.debug("Creating Elasticsearch Client\nCluster name={}\nHostname={}", esClusterName, esHost);
+            Settings esSettings = Settings.builder().put("cluster.name", esClusterName).build();
 
-  @PreDestroy
-  public void closeElasticsearchClient() {
-    if (transportClient != null) {
-      transportClient.close();
-      transportClient = null;
+            // https://www.elastic.co/guide/en/elasticsearch/guide/current/_transport_client_versus_node_client.html
+            transportClient = new PreBuiltTransportClient(esSettings).addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(esHost), esPort));
+        }
+        return transportClient;
     }
-  }
+
+    @Bean
+    public ElasticsearchTemplate elasticsearchTemplate() throws UnknownHostException {
+        return new ElasticsearchTemplate(client());
+    }
+
+    @Override
+    @PreDestroy
+    public void close() {
+        if (transportClient != null) {
+            transportClient.close();
+            transportClient = null;
+        }
+    }
 }
