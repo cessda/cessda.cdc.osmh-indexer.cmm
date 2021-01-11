@@ -52,7 +52,6 @@ public class CMMStudyMapper {
 
     private final OaiPmh oaiPmh;
     private final DocElementParser docElementParser;
-    private final XPathFactory xFactory = XPathFactory.instance();
 
     public CMMStudyMapper() {
         oaiPmh = new OaiPmh();
@@ -107,15 +106,15 @@ public class CMMStudyMapper {
      * @return the default language of the document.
      */
     public String parseDefaultLanguage(Document document, Repo repository) {
-        var attributeExpression = xFactory.compile(RECORD_DEFAULT_LANGUAGE_XPATH, Filters.attribute(), null, OAI_AND_DDI_NS);
-        var codeBookLang = attributeExpression.evaluateFirst(document);
-        if (codeBookLang != null && !codeBookLang.getValue().trim().isEmpty()) {
-            return codeBookLang.getValue().trim();
+        var codeBookLang = docElementParser.getFirstAttribute(document, RECORD_DEFAULT_LANGUAGE_XPATH);
+        if (codeBookLang.isPresent() && !codeBookLang.get().getValue().trim().isEmpty()) {
+            return codeBookLang.get().getValue().trim();
             // #192 - Per repository override of the default language
         } else if (repository.getDefaultLanguage() != null) {
             return repository.getDefaultLanguage();
+        } else {
+            return oaiPmh.getMetadataParsingDefaultLang().getLang();
         }
-        return oaiPmh.getMetadataParsingDefaultLang().getLang();
     }
 
     /**
@@ -132,7 +131,7 @@ public class CMMStudyMapper {
      * Parse records status.
      */
     private boolean parseRecordStatus(Document document) {
-        Attribute status = xFactory.compile(RECORD_STATUS_XPATH, Filters.attribute(), null, OAI_NS).evaluateFirst(document);
+        Attribute status = XPathFactory.instance().compile(RECORD_STATUS_XPATH, Filters.attribute(), null, OAI_NS).evaluateFirst(document);
         return status == null || !status.getValue().equalsIgnoreCase("deleted");
     }
 
@@ -173,9 +172,9 @@ public class CMMStudyMapper {
      * <p>
      * Xpath = {@value OaiPmhConstants#CREATORS_XPATH }
      */
-    public Map<String, List<String>> parseCreator(Document doc, String defaultLangIsoCode) {
+    public Map<String, List<String>> parseCreator(Document document, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, doc, CREATORS_XPATH, ParsingStrategies::creatorStrategy);
+            defaultLangIsoCode, document, CREATORS_XPATH, ParsingStrategies::creatorStrategy);
     }
 
     /**
@@ -356,7 +355,7 @@ public class CMMStudyMapper {
      * For Data Collection start and end date plus the four digit Year value as Data Collection Year
      */
     public DataCollectionPeriod parseDataCollectionDates(Document doc) {
-        Map<String, String> dateAttrs = docElementParser.getDateElementAttributesValueMap(doc, DATA_COLLECTION_PERIODS_PATH);
+        var dateAttrs = docElementParser.getDateElementAttributesValueMap(doc, DATA_COLLECTION_PERIODS_PATH);
 
         var dataCollectionPeriodBuilder = DataCollectionPeriod.builder();
 
