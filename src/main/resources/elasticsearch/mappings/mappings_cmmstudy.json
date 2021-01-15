@@ -71,6 +71,10 @@
         "type": "keyword",
         "ignore_above": 256
       },
+      "langAvailableIn": {
+        "type": "keyword",
+        "ignore_above": 256
+      },
       "isActive": {
         "type": "boolean"
       },
