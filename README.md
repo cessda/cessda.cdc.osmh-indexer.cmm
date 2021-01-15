@@ -59,7 +59,7 @@ If no profile is specified, the default profile will be used. The default profil
 ## Notes
 
 * Makes use of TDD
-* For integrations test, loads up an embedded Elasticsearch server with tests against it
+* When running integration tests, a standalone Elasticsearch server is launched
 
 ## Deployment
 
@@ -103,9 +103,9 @@ osmhConsumer:
     sunday.run: '0 00 09 * * SUN'
 ```
 
-Timer schedules are defined using Spring's cron notation.
+Timer schedules are defined using [Spring's cron notation](https://docs.spring.io/spring-framework/docs/5.0.13.RELEASE/spring-framework-reference/integration.html#scheduling-annotation-support-scheduled).
 
-The timer schedule for GCP use is defined in [CDC deployment repository's template-deployment.yaml](https://bitbucket.org/cessda/cessda.cdc.deploy/src/master/osmh-indexer/infrastructure/k8s/template-deployment.yaml), but if you are deploying the software elsewhere, then the timer settings in [application.yml](/src/main/resources/application.yml) are relevant. The profiles are defined in [application.yml](/src/main/resources/application.yml) and selected in [Dockerfile](Dockerfile).
+The timer schedule for GCP use is defined in [CDC deployment repository's template-deployment.yaml](https://bitbucket.org/cessda/cessda.cdc.deploy/src/master/osmh-indexer/infrastructure/k8s/template-deployment.yaml), but if you are deploying the software elsewhere then the timer settings should be set in [application.yml](/src/main/resources/application.yml).
 
 Take care with the daily/Sunday timer settings, otherwise all running instances may attempt to re-harvest the same endpoints at the same time.
 
@@ -119,11 +119,11 @@ osmhConsumer:
   languages: ['cs', 'da', 'de', 'el', 'en', 'et', 'fi', 'fr', 'hu', 'it', 'nl', 'no', 'pt', 'sk', 'sl', 'sr', 'sv']
 ```
 
-Custom mappings and settings can be defined in [src/main/resources/elasticsearch](src/main/resources/elasticsearch). The indexer will attempt to load language specific settings and mappings if present, falling back to a language neutral variant if a language specific variant is not found.
+Custom mappings and settings can be defined in [src/main/resources/elasticsearch](src/main/resources/elasticsearch). Mappings are global for all defined languages, whereas settings are selected per language. If the required mappings and settings can't be loaded, the index will not be created and an error will be logged.
 
 ### Configuring repository handlers
 
-The harvester supports OAI-PMH compliant repositories returning DDI 2.5 metadata internally. Other repositories with different metadata formats are supported by external repository handlers, for example NESSTAR repositories.
+The harvester supports OAI-PMH compliant repositories returning DDI 2.5 metadata internally. Other repositories with different metadata formats, such as NESSTAR repositories, are supported by external repository handlers.
 
 ```yaml
 osmhConsumer:
@@ -160,27 +160,25 @@ The URL is the OAI-PMH endpoint.
 
 The code is the short name of the repository and acts as a unique identifier. This is a mandatory field.
 
-The name is the friendly name of the repository. This is an optional parameter and will be replaced with the code if it is not present.
+The name is the friendly name of the repository. This is an optional parameter and will be replaced with the code if the name is not present.
 
 The handler defines how the repository will be parsed. Current options are OAI-PMH, which parses repositories returning DDI 2.5, and NESSTAR, which parses DDI 1.2. Additional remote harvesters can be defined under the `osmhConsumer.endpoints.harvesters` key.
 
 The preferred metadata parameter sets the `metadataPrefix` parameter on OAI-PMH requests.
 
-The default language is used to set a language on a metadata record which doesn't have a language specified in the record itself. This is an optional field and defaults to `en` if not set.
+The default language is used to set a language on a metadata record that doesn't have a language specified in the record itself. This is an optional field and defaults to `osmhConsumer.oaiPmh.metadataParsingDefaultLang.lang` if not set. This setting is only considered if `osmhConsumer.oaiPmh.metadataParsingDefaultLang.active` is set to `true`.
 
 ### Setting HTTP timeouts
 
 ```yaml
 osmhConsumer:
-  restTemplateProps:
-    connTimeout: 10000 # increased from 5 seconds to 10 seconds to deal with slower Nesstar repos
-    connRequestTimeout: 5000 # 5 seconds
-    readTimeout: 180000 # increased from 120 seconds to 180 seconds to deal with slower Nesstar repos
+    restTemplateProps:
+        connTimeout: 10000 # defines how long the OSMH harvester should wait for a response from an endpoint
+        connRequestTimeout: 5000
+        readTimeout: 180000 # defines how long the server has to completely deliver the response
 ```
 
-`connTimeout` defines how long the OSMH harvester should wait for a response from an endpoint.
-
-`readTimout` defines how long the server has to completely deliver the response.
+The timeouts are specified in milliseconds.
 
 ## Built With
 
@@ -196,14 +194,10 @@ Please read [Contributing to CESSDA Open Source Software](https://bitbucket.org/
 
 * **Moses Mansaray <moses AT doraventures DOT com>** - *Initial work, first version release*
 
-You can find the list of all contributors [here](CONTRIBUTORS.md)
+You can find the list of all contributors [here](CONTRIBUTORS.md).
 
 ## License
 
-This project is licensed under the Apache 2 Licence - see the [LICENSE](LICENSE.txt) file for details
+This project is licensed under the Apache 2 Licence - see the [LICENSE](LICENSE.txt) file for details.
 
 ## Acknowledgments
-
-## Edge Case and Assumptions
-
-* Note the extra "/" workaround in the [application.yml](src/main/resources/application.yml) repository configuration for repositories that separate records with a different metadata prefix per language accessed with the same basic url.  This url in a way act as a key, so the extra "/" distinguishes the two for the specific metadataPrefix to be retrieved.  There must be a better way to handle this edge case.
