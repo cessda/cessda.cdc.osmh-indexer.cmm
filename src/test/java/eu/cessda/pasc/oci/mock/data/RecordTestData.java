@@ -15,11 +15,11 @@
  */
 package eu.cessda.pasc.oci.mock.data;
 
+import eu.cessda.pasc.oci.ResourceHandler;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
-import eu.cessda.pasc.oci.parser.ResourceHandler;
 
 import java.io.IOException;
 import java.util.ArrayList;

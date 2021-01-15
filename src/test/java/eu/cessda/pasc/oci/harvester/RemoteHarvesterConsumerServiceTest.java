@@ -16,6 +16,7 @@
 package eu.cessda.pasc.oci.harvester;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.cessda.pasc.oci.ResourceHandler;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.exception.HTTPException;
 import eu.cessda.pasc.oci.http.HttpClient;
@@ -25,7 +26,6 @@ import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.configurations.Repo;
-import eu.cessda.pasc.oci.parser.ResourceHandler;
 import eu.cessda.pasc.oci.parser.TimeUtility;
 import org.junit.Before;
 import org.junit.Test;

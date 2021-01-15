@@ -15,10 +15,10 @@
  */
 package eu.cessda.pasc.oci.elasticsearch;
 
+import eu.cessda.pasc.oci.ResourceHandler;
 import eu.cessda.pasc.oci.configurations.ESConfigurationProperties;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
-import eu.cessda.pasc.oci.parser.ResourceHandler;
 import eu.cessda.pasc.oci.parser.TimeUtility;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchRequestBuilder;

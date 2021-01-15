@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.parser;
+package eu.cessda.pasc.oci;
 
 import lombok.experimental.UtilityClass;
 
@@ -32,17 +32,22 @@ public class ResourceHandler {
     /**
      * Load the specified resource and return it as an {@link InputStream}.
      *
-     * @param fileName the resource to load
+     * @param fileName the resource to load.
      * @throws FileNotFoundException if the resource could not be found,
      *                               the resource is in a package that is not opened unconditionally,
      *                               or access to the resource is denied by the security manager.
+     * @throws IOException           if an IO error occurs.
      */
-    public static InputStream getResourceAsStream(String fileName) throws FileNotFoundException {
-        var resource = ResourceHandler.class.getClassLoader().getResourceAsStream(fileName);
+    public static InputStream getResourceAsStream(String fileName) throws IOException {
+
+        // Get the resource URL
+        var resource = ResourceHandler.class.getClassLoader().getResource(fileName);
+
         if (resource == null) {
             throw new FileNotFoundException(fileName + " could not be found");
         }
-        return resource;
+
+        return resource.openStream();
     }
 
     /**
@@ -53,7 +58,7 @@ public class ResourceHandler {
      * @throws FileNotFoundException if the resource could not be found,
      *                               the resource is in a package that is not opened unconditionally,
      *                               or access to the resource is denied by the security manager.
-     * @throws IOException           if an IO Error occurs
+     * @throws IOException           if an IO error occurs
      */
     public static String getResourceAsString(String fileName) throws IOException {
         try (var resource = getResourceAsStream(fileName)) {
