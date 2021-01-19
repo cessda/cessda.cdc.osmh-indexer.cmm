@@ -61,8 +61,8 @@ abstract class AbstractHarvesterConsumerService implements HarvesterConsumerServ
      */
     protected List<RecordHeader> filterRecords(Collection<RecordHeader> unfilteredRecordHeaders, LocalDateTime ingestedLastModifiedDate) {
         if (ingestedLastModifiedDate != null) {
-            List<RecordHeader> filteredHeaders = unfilteredRecordHeaders.stream()
-                .filter(recordHeader ->  isHeaderTimeGreater(recordHeader, ingestedLastModifiedDate))
+            var filteredHeaders = unfilteredRecordHeaders.stream()
+                .filter(recordHeader -> isHeaderTimeGreater(recordHeader, ingestedLastModifiedDate))
                 .collect(Collectors.toList());
 
             log.info("Returning [{}] filtered recordHeaders by date greater than [{}] | out of [{}] unfiltered.",
@@ -75,6 +75,9 @@ abstract class AbstractHarvesterConsumerService implements HarvesterConsumerServ
         }
 
         log.debug("Nothing filterable. No date specified.");
+        if (unfilteredRecordHeaders instanceof List) {
+            return (List<RecordHeader>) unfilteredRecordHeaders;
+        }
         return new ArrayList<>(unfilteredRecordHeaders);
     }
 
