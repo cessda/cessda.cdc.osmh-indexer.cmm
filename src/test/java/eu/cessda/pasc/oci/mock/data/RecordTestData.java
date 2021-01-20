@@ -33,6 +33,7 @@ import java.util.List;
  */
 public final class RecordTestData {
 
+    //language=JSON
     public static final String LIST_RECORDER_HEADERS_BODY_EXAMPLE =
         "[\n" +
             "  {\n" +
@@ -49,6 +50,7 @@ public final class RecordTestData {
             "  }\n" +
             "]";
 
+    //language=JSON
     public static final String LIST_RECORDER_HEADERS_BODY_EXAMPLE_WITH_INCREMENT =
         "[\n" +
             "  {\n" +
@@ -71,6 +73,7 @@ public final class RecordTestData {
             "  }\n" +
             "]";
 
+    //language=JSON
     public static final String LIST_RECORDER_HEADERS_X6 =
         "[\n" +
             "  {\n" +
@@ -92,25 +95,26 @@ public final class RecordTestData {
             "    \"identifier\": \"998\"\n" +
             "  },\n" +
             "  {\n" +
-        "    \"lastModified\": \"2018-01-05T07:48:38Z\",\n" +
-        "    \"type\": \"Study\",\n" +
-        "    \"recordType\": \"RecordHeader\",\n" +
-        "    \"identifier\": \"1000\"\n" +
-        "  },\n" +
-        "  {\n" +
-        "    \"lastModified\": \"2018-01-15T07:48:38Z\",\n" +
-        "    \"type\": \"Study\",\n" +
-        "    \"recordType\": \"RecordHeader\",\n" +
-        "    \"identifier\": \"1001\"\n" +
-        "  },\n" +
-        "  {\n" +
-        "    \"lastModified\": \"2016-02-22T07:48:38Z\",\n" +
-        "    \"type\": \"Study\",\n" +
-        "    \"recordType\": \"RecordHeader\",\n" +
-        "    \"identifier\": \"1002\"\n" +
-        "  }\n" +
-        "]";
+            "    \"lastModified\": \"2018-01-05T07:48:38Z\",\n" +
+            "    \"type\": \"Study\",\n" +
+            "    \"recordType\": \"RecordHeader\",\n" +
+            "    \"identifier\": \"1000\"\n" +
+            "  },\n" +
+            "  {\n" +
+            "    \"lastModified\": \"2018-01-15T07:48:38Z\",\n" +
+            "    \"type\": \"Study\",\n" +
+            "    \"recordType\": \"RecordHeader\",\n" +
+            "    \"identifier\": \"1001\"\n" +
+            "  },\n" +
+            "  {\n" +
+            "    \"lastModified\": \"2016-02-22T07:48:38Z\",\n" +
+            "    \"type\": \"Study\",\n" +
+            "    \"recordType\": \"RecordHeader\",\n" +
+            "    \"identifier\": \"1002\"\n" +
+            "  }\n" +
+            "]";
 
+    //language=JSON
     public static final String LIST_RECORDER_HEADERS_WITH_INVALID_DATETIME =
         "[\n" +
             "  {\n" +

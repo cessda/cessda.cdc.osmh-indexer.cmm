@@ -24,8 +24,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.Duration;
-import java.time.Instant;
 
 /**
  * Shareable Dao functions
@@ -49,23 +47,13 @@ public class HttpClientImpl implements HttpClient {
     @Override
     public InputStream getInputStream(URI uri) throws IOException {
         var httpRequest = HttpRequest.newBuilder(uri).build();
+
+        log.debug("Sending request to url [{}].", uri);
+
         try {
-            log.debug("Sending request to url [{}].", uri);
-
-            Instant start = null;
-            if (log.isTraceEnabled()) {
-                start = Instant.now();
-            }
-
             var httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofInputStream());
 
-            if (log.isTraceEnabled()) {
-                assert start != null;
-                log.debug("Got response code of [{}], getting headers took [{}] ms",
-                    httpResponse.statusCode(),
-                    Duration.between(start, Instant.now()).toMillis()
-                );
-            }
+            log.debug("Got response code of [{}]", httpResponse.statusCode());
 
             // Check the returned HTTP status code, throw an exception if not a success code
             // This includes redirects

@@ -50,7 +50,7 @@ public class OaiPmhConstants {
     static final String PAR_TITLE_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:parTitl";
     static final String STUDY_URL_DOC_DSCR_XPATH = "//ddi:codeBook/ddi:docDscr/ddi:citation/ddi:holdings";
     static final String STUDY_URL_STDY_DSCR_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:holdings";
-    static final String PID_STUDY_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo"; //use @agency instead?
+    static final String PID_STUDY_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo";
     static final String CREATORS_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty";
     static final String DATA_RESTRCTN_XPATH = "//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:restrctn";
     static final String DATA_COLLECTION_PERIODS_PATH = "//ddi:codeBook//ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate";
