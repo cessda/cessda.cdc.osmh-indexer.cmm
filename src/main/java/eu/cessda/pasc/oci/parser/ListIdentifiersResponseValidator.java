@@ -22,8 +22,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.util.Optional;
-
 @UtilityClass
 public class ListIdentifiersResponseValidator {
 
@@ -35,15 +33,14 @@ public class ListIdentifiersResponseValidator {
      * @throws HarvesterException if the given document has no OAI element.
      */
     public static void validateResponse(Document document) throws HarvesterException {
-        Optional<NodeList> oAINode = Optional.ofNullable(document.getElementsByTagName(OaiPmhConstants.OAI_PMH));
+        NodeList oAINode = document.getElementsByTagName(OaiPmhConstants.OAI_PMH);
 
-        if (oAINode.isEmpty()) {
+        if (oAINode.getLength() == 0) {
             throw new HarvesterException("Missing OAI element");
         }
 
-        NodeList nodeList = oAINode.get();
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            NodeList childNodes = nodeList.item(i).getChildNodes();
+        for (int i = 0; i < oAINode.getLength(); i++) {
+            NodeList childNodes = oAINode.item(i).getChildNodes();
             for (int childNodeIndex = 0; childNodeIndex < childNodes.getLength(); childNodeIndex++) {
                 Node item = childNodes.item(childNodeIndex);
                 if (OaiPmhConstants.ERROR.equals(item.getLocalName())) {

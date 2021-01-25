@@ -16,8 +16,10 @@
 package eu.cessda.pasc.oci.harvester;
 
 import eu.cessda.pasc.oci.configurations.UtilitiesConfiguration;
+import eu.cessda.pasc.oci.exception.HTTPException;
 import eu.cessda.pasc.oci.exception.HarvesterException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
+import eu.cessda.pasc.oci.exception.XMLParseException;
 import eu.cessda.pasc.oci.http.HttpClient;
 import eu.cessda.pasc.oci.mock.data.RecordHeadersMock;
 import eu.cessda.pasc.oci.mock.data.ReposTestData;
@@ -36,7 +38,9 @@ import java.util.List;
 
 import static eu.cessda.pasc.oci.parser.OaiPmhHelpers.appendListRecordResumptionToken;
 import static org.assertj.core.api.BDDAssertions.then;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doReturn;
 
 
 /**
@@ -74,16 +78,20 @@ public class RecordHeaderParserTest {
         then(recordHeaders).extracting("type").containsOnly("Study");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = XMLParseException.class)
     public void shouldThrowWhenRequestForHeaderFails() throws IOException, HarvesterException {
 
         // Given
         Repo ukdsEndpoint = ReposTestData.getUKDSRepo();
         String fullListRecordRepoUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=ListIdentifiers&metadataPrefix=ddi";
         String mockRecordHeadersXml = RecordHeadersMock.getListIdentifiersXMLResumptionTokenNotMockedForInvalid();
-        given(httpClient.getInputStream(URI.create(fullListRecordRepoUrl))).willReturn(
-            new ByteArrayInputStream(mockRecordHeadersXml.getBytes(StandardCharsets.UTF_8))
-        );
+
+        Mockito.when(httpClient.getInputStream(any(URI.class)))
+            .thenThrow(new HTTPException(404, new byte[]{}));
+
+        // Only stub the first request
+        doReturn(new ByteArrayInputStream(mockRecordHeadersXml.getBytes(StandardCharsets.UTF_8)))
+            .when(httpClient).getInputStream(URI.create(fullListRecordRepoUrl));
 
         // When
         recordHeaderParser.getRecordHeaders(ukdsEndpoint);
@@ -146,6 +154,23 @@ public class RecordHeaderParserTest {
         recordHeaderParser.getRecordHeaders(ukdsEndpoint);
     }
 
+    @Test(expected = OaiPmhException.class)
+    public void shouldThrowExceptionForRecordHeadersErrorWithNoMessage() throws IOException, HarvesterException {
+
+        // Given
+        Repo ukdsEndpoint = ReposTestData.getUKDSRepo();
+
+        String fullListRecordRepoUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=ListIdentifiers&metadataPrefix=ddi";
+
+        String mockRecordHeadersXml = RecordHeadersMock.getListIdentifiersXMLWithCannotDisseminateFormatError();
+        given(httpClient.getInputStream(URI.create(fullListRecordRepoUrl))).willReturn(
+            new ByteArrayInputStream(mockRecordHeadersXml.getBytes(StandardCharsets.UTF_8))
+        );
+
+        // When
+        recordHeaderParser.getRecordHeaders(ukdsEndpoint);
+    }
+
     @Test
     public void shouldReturnDeletedRecordHeaderWhenStudyIsDeleted() throws IOException, HarvesterException {
         // Given
@@ -161,5 +186,22 @@ public class RecordHeaderParserTest {
         // When
         List<RecordHeader> recordHeaders = recordHeaderParser.getRecordHeaders(ukdsEndpoint);
         Assert.assertTrue(recordHeaders.get(0).isDeleted());
+    }
+
+    @Test(expected = HarvesterException.class)
+    public void shouldThrowExceptionIfOAIElementIsMissing() throws HarvesterException, IOException {
+        // Given
+        Repo ukdsEndpoint = ReposTestData.getUKDSRepo();
+
+        String fullListRecordRepoUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=ListIdentifiers&metadataPrefix=ddi";
+
+        given(httpClient.getInputStream(URI.create(fullListRecordRepoUrl))).willReturn(
+            new ByteArrayInputStream(RecordHeadersMock.getEmptyXML().getBytes(StandardCharsets.UTF_8))
+        );
+
+        // When
+        recordHeaderParser.getRecordHeaders(ukdsEndpoint);
+
+        // An exception should be thrown
     }
 }

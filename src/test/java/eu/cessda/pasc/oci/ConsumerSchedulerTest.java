@@ -110,6 +110,28 @@ public class ConsumerSchedulerTest {
         thenVerifyFullRun(harvesterConsumerService, debuggingJMXBean);
     }
 
+    @Test
+    public void shouldLogErrorOnException() {
+
+        var debuggingJMXBean = mockDebuggingJMXBean();
+
+        // Throw a non-specific exception
+        var harvesterConsumerService = mock(HarvesterConsumerService.class);
+        when(harvesterConsumerService.listRecordHeaders(any(Repo.class), any()))
+            .thenThrow(RuntimeException.class);
+
+        // Given
+        var harvesterRunner = new HarvesterRunner(appConfigurationProperties, harvesterConsumerService, harvesterConsumerService, esIndexer, extractor, micrometerMetrics);
+        var scheduler = new ConsumerScheduler(debuggingJMXBean, esIndexer, harvesterRunner);
+
+        // When
+        scheduler.fullHarvestAndIngestionAllConfiguredSPsReposRecords();
+
+        // Verify that nothing else happened
+        verify(esIndexer, times(1)).getTotalHitCount("*");
+        verifyNoMoreInteractions(esIndexer);
+    }
+
     /**
      * Creates a mocked {@link HarvesterConsumerService} that responds to header and record requests.
      */

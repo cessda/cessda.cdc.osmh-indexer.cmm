@@ -48,4 +48,28 @@ public class AbstractHarvesterConsumerServiceTest {
         Assert.assertTrue(study.isPresent());
         Assert.assertFalse(study.get().isActive());
     }
+
+    @Test
+    public void shouldWarnOnNotParsableDate() {
+        var header = RecordHeader.builder().lastModified("Not a date").build();
+
+        // When
+        var records = abstractHarvesterConsumerService.filterRecords(Collections.singleton(header), LocalDateTime.now());
+
+        // Then the record should be filtered
+        Assert.assertTrue(records.isEmpty());
+    }
+
+    @Test
+    public void shouldNotFilterOnNullLastModifiedDate() {
+        // Construct an object to be used for identity purposes
+        var header = RecordHeader.builder().lastModified(LocalDateTime.now().toString()).build();
+
+        // When
+        var records = abstractHarvesterConsumerService.filterRecords(Collections.singleton(header), null);
+
+        // Then the same object should be returned
+        Assert.assertFalse(records.isEmpty());
+        Assert.assertTrue(records.contains(header));
+    }
 }

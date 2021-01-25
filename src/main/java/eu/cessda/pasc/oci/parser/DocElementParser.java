@@ -34,7 +34,6 @@ import java.util.stream.Collectors;
 
 import static eu.cessda.pasc.oci.parser.OaiPmhConstants.*;
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
 
 /**
  * Helper methods for extracting values from a {@link org.jdom2.Document }
@@ -45,7 +44,6 @@ import static java.util.stream.Collectors.toList;
 class DocElementParser {
 
     private final OaiPmh oaiPmh;
-    private final XPathFactory xFactory = XPathFactory.instance();
 
     DocElementParser(OaiPmh oaiPmh) {
         this.oaiPmh = oaiPmh;
@@ -75,22 +73,8 @@ class DocElementParser {
      * @return nonNull list of {@link Element}
      */
     List<Element> getElements(Document document, String xPathToElement) {
-        XPathExpression<Element> expression = xFactory.compile(xPathToElement, Filters.element(), null, OAI_AND_DDI_NS);
+        XPathExpression<Element> expression = XPathFactory.instance().compile(xPathToElement, Filters.element(), null, OAI_AND_DDI_NS);
         return expression.evaluate(document);
-    }
-
-    /**
-     * Extracts Date elements from doc that has @date
-     *
-     * @param document       the document to parse
-     * @param xPathToElement the xPath
-     * @return a list of {@link Element}s
-     */
-    private List<Element> getElementsWithDateAttr(Document document, String xPathToElement) {
-        XPathExpression<Element> expression = xFactory.compile(xPathToElement, Filters.element(), null, OAI_AND_DDI_NS);
-        return expression.evaluate(document).stream()
-            .filter(element -> getAttributeValue(element, DATE_ATTR).isPresent()) //PUG requirement: we only care about those with @date CV
-            .collect(toList());
     }
 
     /**
@@ -164,8 +148,8 @@ class DocElementParser {
      * @return The first {@link Element}, or an empty {@link Optional} if no elements were found.
      */
     Optional<Element> getFirstElement(Document document, String xPathToElement) {
-        XPathExpression<Element> expression = xFactory.compile(xPathToElement, Filters.element(), null, OAI_AND_DDI_NS);
-        return ofNullable(expression.evaluateFirst(document));
+        var elements = getElements(document, xPathToElement);
+        return elements.stream().findFirst();
     }
 
     /**
@@ -176,8 +160,8 @@ class DocElementParser {
      * @return The first {@link Attribute}, or an empty {@link Optional} if no attributes were found.
      */
     Optional<Attribute> getFirstAttribute(Document document, String xPathToElement) {
-        XPathExpression<Attribute> expression = xFactory.compile(xPathToElement, Filters.attribute(), null, OAI_AND_DDI_NS);
-        return ofNullable(expression.evaluateFirst(document));
+        var attributes = getAttributes(document, xPathToElement);
+        return attributes.stream().findFirst();
     }
 
     /**
@@ -195,8 +179,9 @@ class DocElementParser {
      * @return a {@link Map} with the keys set to the {@value OaiPmhConstants#EVENT_ATTR} and the values set to the date values.
      */
     Map<String, String> getDateElementAttributesValueMap(Document document, String elementXpath) {
-        List<Element> elements = getElementsWithDateAttr(document, elementXpath);
+        var elements = getElements(document, elementXpath);
         return elements.stream()
+            .filter(element -> getAttributeValue(element, DATE_ATTR).isPresent()) //PUG requirement: we only care about those with @date CV
             .filter(element -> Objects.nonNull(element.getAttributeValue(EVENT_ATTR)))
             .collect(Collectors.toMap(element -> element.getAttributeValue(EVENT_ATTR), element -> element.getAttributeValue(DATE_ATTR), (a, b) -> a));
     }
@@ -209,7 +194,7 @@ class DocElementParser {
      * @return a list of {@link Attribute}s.
      */
     private List<Attribute> getAttributes(Document document, String xPathToElement) {
-        XPathExpression<Attribute> expression = xFactory.compile(xPathToElement, Filters.attribute(), null, DDI_NS);
+        XPathExpression<Attribute> expression = XPathFactory.instance().compile(xPathToElement, Filters.attribute(), null, DDI_NS);
         return expression.evaluate(document);
     }
 

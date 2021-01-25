@@ -37,40 +37,35 @@ import java.time.Duration;
 @Slf4j
 public class UtilitiesConfiguration {
 
-  private final AppConfigurationProperties appConfigurationProperties;
+    private final AppConfigurationProperties appConfigurationProperties;
 
-  @Autowired
-  public UtilitiesConfiguration(AppConfigurationProperties appConfigurationProperties) {
-    this.appConfigurationProperties = appConfigurationProperties;
-  }
+    @Autowired
+    public UtilitiesConfiguration(AppConfigurationProperties appConfigurationProperties) {
+        this.appConfigurationProperties = appConfigurationProperties;
+    }
 
-  @Bean
-  public ObjectMapper objectMapper() {
-    return new ObjectMapper();
-  }
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
 
-  @Bean
-  public DocumentBuilderFactory documentBuilderFactory() throws ParserConfigurationException {
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-    factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-    factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-    factory.setNamespaceAware(true);
-    return factory;
-  }
+    @Bean
+    public DocumentBuilderFactory documentBuilderFactory() throws ParserConfigurationException {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        factory.setNamespaceAware(true);
+        return factory;
+    }
 
-  @Bean
-  public HttpClient httpClient() {
-    return Methanol.newBuilder()
+    @Bean
+    public HttpClient httpClient() {
+        return Methanol.newBuilder()
             .autoAcceptEncoding(true)
             .connectTimeout(Duration.ofMillis(appConfigurationProperties.getRestTemplateProps().getConnTimeout()))
             .requestTimeout(Duration.ofMillis(appConfigurationProperties.getRestTemplateProps().getReadTimeout()))
             .followRedirects(HttpClient.Redirect.NORMAL)
             .build();
-  }
-
-  @Bean
-  public org.jdom2.xpath.XPathFactory jdomXPathFactory() {
-    return org.jdom2.xpath.XPathFactory.instance();
-  }
+    }
 }

@@ -26,7 +26,6 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -66,14 +65,6 @@ public class DebuggingJMXBean {
             healths.getNumberOfDataNodes(),
             healths.getNumberOfNodes()
     );
-
-    if (log.isDebugEnabled()) {
-      log.debug("Elasticsearch Cluster Nodes Report:");
-      AtomicInteger counter = new AtomicInteger(1);
-      log.debug("Number of Nodes [{}], Index Details:", healths.getNumberOfNodes());
-      String msg = "Index [{}] [Current Index [{}] \t Status [{}] ]";
-      healths.getIndices().values().forEach(health -> log.debug(msg, counter.getAndIncrement(), health.getIndex(), health.getStatus()));
-    }
 
     return elasticsearchInfo;
   }
