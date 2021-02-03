@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Component responsible for extracting and mapping languages in which a given CMMStudy is available.
@@ -53,28 +54,34 @@ public class LanguageExtractor {
      * @param cmmStudies filtered list of present studies which generally holds fields for all languages.
      * @param repository the repository where the study originated.
      * @return map extracted documents for each language iso code.
-     * @throws NullPointerException if any of the parameters are {@code null}
      */
     public Map<String, List<CMMStudyOfLanguage>> mapLanguageDoc(@NonNull Collection<CMMStudy> cmmStudies, @NonNull Repo repository) {
 
         log.debug("[{}] Mapping [{}] CMMStudies to CMMStudyOfLanguage", repository.getCode(), cmmStudies.size());
-        var languageDocMap = new HashMap<String, List<CMMStudyOfLanguage>>(appConfigurationProperties.getLanguages().size());
 
-        for (String langCode : appConfigurationProperties.getLanguages()) {
-            log.trace("[{}] Extract CMMStudyOfLanguage for [{}] language code - STARTED", repository.getCode(), langCode);
-            var collectLanguageCmmStudy = cmmStudies.stream()
-                // Filter out if the study is not valid for the current language
-                .filter(cmmStudy -> isValidCMMStudyForLang(cmmStudy, langCode))
-                // Map the study to the language specific variant
-                .map(cmmStudy -> getCmmStudyOfLanguage(cmmStudy, langCode, repository))
-                .collect(Collectors.toList());
-            log.debug("[{}] langIsoCode [{}] has [{}] records that passed CMM minimum fields validation", repository.getCode(), langCode, collectLanguageCmmStudy.size());
-            if (!collectLanguageCmmStudy.isEmpty()) {
-                languageDocMap.put(langCode, collectLanguageCmmStudy);
-            }
-        }
 
-        return languageDocMap;
+        var collectLanguageCmmStudy = cmmStudies.stream()
+            // Map the study to the language specific variant
+            .flatMap(cmmStudy -> {
+                var validLanguages = appConfigurationProperties.getLanguages().stream()
+                    .filter(langCode -> isValidCMMStudyForLang(cmmStudy, langCode))
+                    .collect(Collectors.toList());
+
+                if (!validLanguages.isEmpty()) {
+                    var studyOfLanguages = new HashMap<String, CMMStudyOfLanguage>(validLanguages.size());
+                    for (var langCode : validLanguages) {
+                        studyOfLanguages.put(langCode, getCmmStudyOfLanguage(cmmStudy, langCode, validLanguages, repository));
+                    }
+                    return studyOfLanguages.entrySet().stream();
+                } else {
+                    log.debug("[{}] No valid languages for study [{}]", repository.getCode(), cmmStudy.getStudyNumber());
+                    return Stream.empty();
+                }
+            }).collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
+
+        log.debug("[{}] has [{}] records that passed CMM minimum fields validation", repository.getCode(), collectLanguageCmmStudy.entrySet().size());
+
+        return collectLanguageCmmStudy;
     }
 
     /**
@@ -86,7 +93,7 @@ public class LanguageExtractor {
      * @return true if Study is available in the specified language
      * @throws NullPointerException if any of the parameters are {@code null}
      */
-    boolean isValidCMMStudyForLang(@NonNull CMMStudy cmmStudy, @NonNull String languageIsoCode) {
+    boolean isValidCMMStudyForLang(CMMStudy cmmStudy, String languageIsoCode) {
 
         // Inactive = deleted record, no need to validate against CMM below. This will be deleted in the index.
         if (!cmmStudy.isActive()) {
@@ -96,9 +103,9 @@ public class LanguageExtractor {
         return hasMinimumCmmFields(cmmStudy, languageIsoCode);
     }
 
-    private CMMStudyOfLanguage getCmmStudyOfLanguage(CMMStudy cmmStudy, String lang, Repo repository) {
+    private CMMStudyOfLanguage getCmmStudyOfLanguage(CMMStudy cmmStudy, String lang, Collection<String> availableLanguages, Repo repository) {
 
-        log.trace("[{}] Extracting CMMStudyOfLanguage from [{}], language [{}]", repository.getCode(), cmmStudy.getStudyNumber(), lang);
+        log.trace("[{}] Extracting CMMStudyOfLanguage for study [{}], language [{}]", repository.getCode(), cmmStudy.getStudyNumber(), lang);
 
         CMMStudyOfLanguage.CMMStudyOfLanguageBuilder builder = CMMStudyOfLanguage.builder();
 
@@ -114,9 +121,7 @@ public class LanguageExtractor {
             .dataCollectionPeriodStartdate(cmmStudy.getDataCollectionPeriodStartdate())
             .dataCollectionPeriodEnddate(cmmStudy.getDataCollectionPeriodEnddate())
             .dataCollectionYear(cmmStudy.getDataCollectionYear())
-            .langAvailableIn(appConfigurationProperties.getLanguages().stream()
-                .filter(langCode -> hasMinimumCmmFields(cmmStudy, langCode))
-                .collect(Collectors.toSet()))
+            .langAvailableIn(Set.copyOf(availableLanguages))
             .studyXmlSourceUrl(cmmStudy.getStudyXmlSourceUrl());
 
         // #183: The CDC user group would like the publisher to be set based on the indexer's configuration
