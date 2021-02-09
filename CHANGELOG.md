@@ -14,7 +14,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 ## [2.3.0] - 2021-02-09
 
-OSMH Handler OAI-PMH - [10.5281/zenodo.4525896](https://zenodo.org/record/4525896)
+[10.5281/zenodo.4525896](https://zenodo.org/record/4525896)
 
 ### Additions
 
