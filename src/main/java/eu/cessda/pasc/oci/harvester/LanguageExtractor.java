@@ -21,14 +21,12 @@ import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.Publisher;
 import eu.cessda.pasc.oci.models.configurations.Repo;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Component responsible for extracting and mapping languages in which a given CMMStudy is available.
@@ -49,39 +47,26 @@ public class LanguageExtractor {
     }
 
     /**
-     * Extracts a custom document for each language IsoCode found in the config.
-     *
-     * @param cmmStudies filtered list of present studies which generally holds fields for all languages.
-     * @param repository the repository where the study originated.
-     * @return map extracted documents for each language iso code.
+     * Extracts the language specific variants of a given CMMStudy
+     * @param cmmStudy the study to extract
+     * @param repository the repository the study was harvested from
+     * @return an unmodifiable {@link Map} with extracted documents for each language ISO code
      */
-    public Map<String, List<CMMStudyOfLanguage>> mapLanguageDoc(@NonNull Collection<CMMStudy> cmmStudies, @NonNull Repo repository) {
+    public Map<String, CMMStudyOfLanguage> extractFromStudy(CMMStudy cmmStudy, Repo repository) {
+        var validLanguages = appConfigurationProperties.getLanguages().stream()
+            .filter(langCode -> isValidCMMStudyForLang(cmmStudy, langCode))
+            .collect(Collectors.toList());
 
-        log.debug("[{}] Mapping [{}] CMMStudies to CMMStudyOfLanguage", repository.getCode(), cmmStudies.size());
-
-
-        var collectLanguageCmmStudy = cmmStudies.stream()
-            // Map the study to the language specific variant
-            .flatMap(cmmStudy -> {
-                var validLanguages = appConfigurationProperties.getLanguages().stream()
-                    .filter(langCode -> isValidCMMStudyForLang(cmmStudy, langCode))
-                    .collect(Collectors.toList());
-
-                if (!validLanguages.isEmpty()) {
-                    var studyOfLanguages = new HashMap<String, CMMStudyOfLanguage>(validLanguages.size());
-                    for (var langCode : validLanguages) {
-                        studyOfLanguages.put(langCode, getCmmStudyOfLanguage(cmmStudy, langCode, validLanguages, repository));
-                    }
-                    return studyOfLanguages.entrySet().stream();
-                } else {
-                    log.debug("[{}] No valid languages for study [{}]", repository.getCode(), cmmStudy.getStudyNumber());
-                    return Stream.empty();
-                }
-            }).collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
-
-        log.debug("[{}] has [{}] records that passed CMM minimum fields validation", repository.getCode(), collectLanguageCmmStudy.entrySet().size());
-
-        return collectLanguageCmmStudy;
+        if (!validLanguages.isEmpty()) {
+            var studyOfLanguages = new TreeMap<String, CMMStudyOfLanguage>();
+            for (var langCode : validLanguages) {
+                studyOfLanguages.put(langCode, getCmmStudyOfLanguage(cmmStudy, langCode, validLanguages, repository));
+            }
+            return Collections.unmodifiableMap(studyOfLanguages);
+        } else {
+            log.debug("[{}] No valid languages for study [{}]", repository.getCode(), cmmStudy.getStudyNumber());
+            return Collections.emptyMap();
+        }
     }
 
     /**

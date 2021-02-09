@@ -20,8 +20,6 @@ import eu.cessda.pasc.oci.elasticsearch.IngestService;
 import eu.cessda.pasc.oci.harvester.HarvesterConsumerService;
 import eu.cessda.pasc.oci.harvester.LanguageExtractor;
 import eu.cessda.pasc.oci.metrics.Metrics;
-import eu.cessda.pasc.oci.models.RecordHeader;
-import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.Value;
@@ -32,7 +30,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -147,8 +148,8 @@ public class HarvesterRunner {
      * @param langIsoCode the language code.
      * @param cmmStudies  the studies to index.
      */
-    private void executeBulk(Repo repo, String langIsoCode, List<CMMStudyOfLanguage> cmmStudies) {
-        if (!cmmStudies.isEmpty()) {
+    private void executeBulk(Repo repo, String langIsoCode, Collection<CMMStudyOfLanguage> cmmStudies) {
+        if (indexerRunning.get() && !cmmStudies.isEmpty()) {
             log.info("[{}({})] Indexing...", repo.getCode(), langIsoCode);
             var studiesUpdated = getUpdatedStudies(cmmStudies, langIsoCode);
 
@@ -222,22 +223,28 @@ public class HarvesterRunner {
             harvester = remoteHarvester;
         }
 
-        List<RecordHeader> recordHeaders = harvester.listRecordHeaders(repo, lastModifiedDateTime);
+        var recordHeaders = harvester.listRecordHeaders(repo, lastModifiedDateTime);
 
-        List<CMMStudy> presentCMMStudies = recordHeaders.stream()
-            // If the harvest is cancelled, prevent the retrieval of any more records
-            .filter(recordHeader -> indexerRunning.get())
-            .map(recordHeader -> harvester.getRecord(repo, recordHeader))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .collect(Collectors.toList());
+        var studies = new AtomicInteger();
+
+        var collectLanguageCmmStudy = recordHeaders.stream()
+            .flatMap(recordHeader -> harvester.getRecord(repo, recordHeader).stream()) // Retrieve the record
+            .flatMap(cmmStudy -> {
+                // Extract language specific variants of the record
+                var extractedStudies = extractor.extractFromStudy(cmmStudy, repo);
+                if (!extractedStudies.isEmpty()) {
+                    studies.getAndIncrement();
+                }
+                return extractedStudies.entrySet().stream();
+            }).collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
 
         log.info("[{}] Retrieved [{}] studies from [{}] header entries.",
-                value(LoggingConstants.REPO_NAME, repo.getCode()),
-                value("present_cmm_record", presentCMMStudies.size()),
-                value("total_cmm_record", recordHeaders.size()));
+            value(LoggingConstants.REPO_NAME, repo.getCode()),
+            value("present_cmm_record", studies.get()),
+            value("total_cmm_record", recordHeaders.size())
+        );
 
-        return extractor.mapLanguageDoc(presentCMMStudies, repo);
+        return collectLanguageCmmStudy;
     }
 
     @Value

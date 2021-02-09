@@ -93,11 +93,11 @@ class DocElementParser {
     <T> Map<String, List<T>> extractMetadataObjectListForEachLang(String defaultLangIsoCode, Document document, String xPath, Function<Element, Optional<T>> parserStrategy) {
 
         var elements = getElements(document, xPath);
-        return elements.stream().map(element -> parserStrategy.apply(element)
-            .flatMap(parsedMetadataPojoValue -> parseLanguageCode(element, defaultLangIsoCode)
-                .map(lang -> Map.entry(lang, parsedMetadataPojoValue))))
-            .filter(Optional::isPresent).map(Optional::get)
-            .collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
+        return elements.stream().flatMap(element ->
+            parserStrategy.apply(element).flatMap(parsedMetadataPojoValue ->
+                parseLanguageCode(element, defaultLangIsoCode).map(lang -> Map.entry(lang, parsedMetadataPojoValue))
+            ).stream()
+        ).collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
     }
 
     /**
@@ -115,8 +115,7 @@ class DocElementParser {
      */
     <T> Map<String, T> extractMetadataObjectForEachLang(String defaultLangIsoCode, Document document, String xPath, Function<Element, T> parserStrategy) {
         var elements = getElements(document, xPath);
-        return elements.stream().map(element -> parseLanguageCode(element, defaultLangIsoCode).map(lang -> Map.entry(lang, parserStrategy.apply(element))))
-            .filter(Optional::isPresent).map(Optional::get)
+        return elements.stream().flatMap(element -> parseLanguageCode(element, defaultLangIsoCode).map(lang -> Map.entry(lang, parserStrategy.apply(element))).stream())
             // If multiple values with the same key are returned, the last value wins
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> b));
     }
