@@ -72,12 +72,12 @@ osmhConsumer:
         version: 'v0'
     # Use 'code descriptive term' taken from CDC Publisher Names CV
     repos:
-      - url: https://www.adp.fdv.uni-lj.si/v0/oai
-        code: ADP
-        name: 'Slovenian Social Science Data Archives (ADP)'
-        handler: 'OAI-PMH'
-        preferredMetadataParam: oai_ddi25
-        defaultLanguage: sl
+#      - url: https://www.adp.fdv.uni-lj.si/v0/oai
+#        code: ADP
+#        name: 'Slovenian Social Science Data Archives (ADP)'
+#        handler: 'OAI-PMH'
+#        preferredMetadataParam: oai_ddi25
+#        defaultLanguage: sl
       - url: http://194.117.18.18:6003/v0/oai
         code: APIS
         name: 'Portuguese Archive of Social Information (APIS)'
