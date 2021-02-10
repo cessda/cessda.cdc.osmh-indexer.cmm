@@ -1,5 +1,5 @@
 ---
-# Copyright CESSDA ERIC 2017-2019
+# Copyright CESSDA ERIC 2017-2021
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
 # use this file except in compliance with the License.
@@ -94,6 +94,13 @@ osmhConsumer:
         name: 'DANS-KNAW'
         handler: 'OAI-PMH'
         preferredMetadataParam: oai_ddi25_nl
+        defaultLanguage: nl
+      - url: https://easy.dans.knaw.nl/oai/
+        code: DANS
+        name: 'DANS-KNAW'
+        handler: 'OAI-PMH'
+        preferredMetadataParam: oai_ddi25_en
+        defaultLanguage: en
       - url: https://kuha.sa.dk/v0/oai
         code: DNA
         name: 'Danish National Archives (DNA)'
