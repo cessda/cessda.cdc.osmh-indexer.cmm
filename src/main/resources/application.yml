@@ -72,12 +72,12 @@ osmhConsumer:
         version: 'v0'
     # Use 'code descriptive term' taken from CDC Publisher Names CV
     repos:
-      - url: https://www.adp.fdv.uni-lj.si/v0/oai
-        code: ADP
-        name: 'Slovenian Social Science Data Archives (ADP)'
-        handler: 'OAI-PMH'
-        preferredMetadataParam: oai_ddi25
-        defaultLanguage: sl
+#      - url: https://www.adp.fdv.uni-lj.si/v0/oai
+#        code: ADP
+#        name: 'Slovenian Social Science Data Archives (ADP)'
+#        handler: 'OAI-PMH'
+#        preferredMetadataParam: oai_ddi25
+#        defaultLanguage: sl
       - url: http://194.117.18.18:6003/v0/oai
         code: APIS
         name: 'Portuguese Archive of Social Information (APIS)'
@@ -134,12 +134,12 @@ osmhConsumer:
         handler: 'OAI-PMH'
         setSpec: subject:social-sciences
         preferredMetadataParam: oai_ddi25
-      - url: https://dataverse.arch.be/oai
-        code: SODHA
-        name: 'Social Sciences and Digital Humanities Archive (SODHA)'
-        handler: 'OAI-PMH'
-        preferredMetadataParam: oai_ddi
-        defaultLanguage: fr
+#      - url: https://dataverse.arch.be/oai
+#        code: SODHA
+#        name: 'Social Sciences and Digital Humanities Archive (SODHA)'
+#        handler: 'OAI-PMH'
+#        preferredMetadataParam: oai_ddi
+#        defaultLanguage: fr
       - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
         code: UKDS
         name: 'UK Data Service'
@@ -161,11 +161,11 @@ osmhConsumer:
       #  name: 'TBC'
       #  handler: 'NESSTAR'
       #  defaultLanguage: fr
-      - url:  http://harvester.sodanet.gr:8080/oai/request
+      - url:  https://datacatalogue.sodanet.gr/oai
         code: SoDaNet
         name: 'SoDaNet - Greek Research Infrastructure for Social Science'
-        handler: 'NESSTAR'
-        setSpec: CESSDA
+        handler: 'OAI-PMH'
+      #  setSpec: CESSDA
         preferredMetadataParam: oai_ddi
         defaultLanguage: el
       - url:  http://nesstar.unidata.unimib.it/oai-pmh
