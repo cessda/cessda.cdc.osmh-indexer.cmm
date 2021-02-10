@@ -20,15 +20,13 @@ import eu.cessda.pasc.oci.mock.data.RecordTestData;
 import eu.cessda.pasc.oci.mock.data.ReposTestData;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
-import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static eu.cessda.pasc.oci.mock.data.RecordTestData.getASingleSyntheticCMMStudyAsList;
 import static eu.cessda.pasc.oci.mock.data.RecordTestData.getSyntheticCMMStudyAndADeletedRecordAsList;
@@ -40,11 +38,9 @@ import static org.assertj.core.api.Java6BDDAssertions.then;
  *
  * @author moses AT doraventures DOT com
  */
-@Slf4j
 public class LanguageExtractorTest {
 
     private final LanguageExtractor languageExtractor;
-    private final CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter = new CMMStudyOfLanguageConverter();
 
     public LanguageExtractorTest() {
         var appConfigurationProperties = Mockito.mock(AppConfigurationProperties.class);
@@ -67,19 +63,6 @@ public class LanguageExtractorTest {
 
         validCMMStudyForLang = languageExtractor.isValidCMMStudyForLang(cmmStudy, "fi");
         then(validCMMStudyForLang).isTrue();
-
-        //Synthetic doc does not exist, so language is skipped
-        //validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fr", idPrefix, cmmStudy);
-        //then(validCMMStudyForLang).isTrue();
-
-        //validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("nl", idPrefix, cmmStudy);
-        //then(validCMMStudyForLang).isTrue();
-
-        //validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("se", idPrefix, cmmStudy);
-        //then(validCMMStudyForLang).isFalse();
-
-        //validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("sk", idPrefix, cmmStudy);
-        //then(validCMMStudyForLang).isFalse();
     }
 
     @Test
@@ -98,29 +81,22 @@ public class LanguageExtractorTest {
 
         validCMMStudyForLang = languageExtractor.isValidCMMStudyForLang(syntheticCmmStudy, "fi");
         then(validCMMStudyForLang).isTrue();
-
-        //Synthetic doc does not exist, so language is skipped
-        //validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("fr", idPrefix, syntheticCmmStudy);
-        //then(validCMMStudyForLang).isTrue();
-
-        //validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("nl", idPrefix, syntheticCmmStudy);
-        //then(validCMMStudyForLang).isTrue();
-
-        //validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("se", idPrefix, syntheticCmmStudy);
-        //then(validCMMStudyForLang).isTrue();
-
-        //validCMMStudyForLang = languageDocumentExtractor.isValidCMMStudyForLang("sk", idPrefix, syntheticCmmStudy);
-        //then(validCMMStudyForLang).isTrue();
     }
 
     @Test
-    public void shouldReturnExtractedDocInThereRespectiveLangDocuments() {
+    public void shouldReturnExtractedDocInTheirRespectiveLangDocuments() {
 
         // Given
         List<CMMStudy> studies = getASingleSyntheticCMMStudyAsList();
 
         // When
-        Map<String, List<CMMStudyOfLanguage>> languageDocMap = languageExtractor.mapLanguageDoc(studies, ReposTestData.getUKDSRepo());
+        var languageDocMap = new HashMap<String, List<CMMStudyOfLanguage>>();
+        for (var study : studies) {
+            var result = languageExtractor.extractFromStudy(study, ReposTestData.getUKDSRepo());
+            for (var entry : result.entrySet()) {
+                languageDocMap.computeIfAbsent(entry.getKey(), k -> new ArrayList<>()).add(entry.getValue());
+            }
+        }
 
         then(languageDocMap).isNotNull();
         then(languageDocMap).hasSize(3);
@@ -128,11 +104,6 @@ public class LanguageExtractorTest {
         then(languageDocMap.get("de")).hasSize(1);
         then(languageDocMap.get("en")).hasSize(1);
         then(languageDocMap.get("fi")).hasSize(1);
-        //Synthetic doc does not exist, or does have a studyTitle or abstract, so language is skipped
-        //then(languageDocMap.get("fr")).hasSize(0);
-        //then(languageDocMap.get("nl")).hasSize(0);
-        //then(languageDocMap.get("se")).hasSize(0);
-        //then(languageDocMap.get("sk")).hasSize(0);
 
     }
 
@@ -143,7 +114,13 @@ public class LanguageExtractorTest {
         List<CMMStudy> studies = getSyntheticCMMStudyAndADeletedRecordAsList();
 
         // When
-        Map<String, List<CMMStudyOfLanguage>> languageDocMap = languageExtractor.mapLanguageDoc(studies, ReposTestData.getUKDSRepo());
+        var languageDocMap = new HashMap<String, List<CMMStudyOfLanguage>>();
+        for (var study : studies) {
+            var result = languageExtractor.extractFromStudy(study, ReposTestData.getUKDSRepo());
+            for (var entry : result.entrySet()) {
+                languageDocMap.computeIfAbsent(entry.getKey(), k -> new ArrayList<>()).add(entry.getValue());
+            }
+        }
 
         then(languageDocMap).isNotNull();
         then(languageDocMap).hasSize(17);
@@ -151,7 +128,6 @@ public class LanguageExtractorTest {
         then(languageDocMap.get("de")).hasSize(2); // a deleted record and an active record that is valid
         then(languageDocMap.get("en")).hasSize(2); // a deleted record and an active record that is valid
         then(languageDocMap.get("fi")).hasSize(2); // a deleted record and an active record that is valid
-        //then(languageDocMap.get("sv")).hasSize(1); // a deleted record and an active record that is not valid for lang
 
     }
 
@@ -162,10 +138,12 @@ public class LanguageExtractorTest {
         final CMMStudy cmmStudyWithNoAvailableLangSet = RecordTestData.getSyntheticCmmStudy();
 
         // When
-        var cmmStudyOfLanguage = languageExtractor.mapLanguageDoc(Collections.singleton(cmmStudyWithNoAvailableLangSet), ReposTestData.getUKDSRepo());
+        var cmmStudyOfLanguage = languageExtractor.extractFromStudy(cmmStudyWithNoAvailableLangSet, ReposTestData.getUKDSRepo());
 
         assertThat(cmmStudyOfLanguage.keySet()).containsExactlyInAnyOrder("en", "fi", "de");
-        cmmStudyOfLanguage.values().forEach(cmmStudyOfLanguages -> assertThat(cmmStudyOfLanguages.get(0).getLangAvailableIn()).containsExactlyInAnyOrder("en", "fi", "de"));
+        cmmStudyOfLanguage.values().forEach(cmmStudyOfLanguages ->
+            assertThat(cmmStudyOfLanguages.getLangAvailableIn()).containsExactlyInAnyOrder("en", "fi", "de")
+        );
     }
 
     @Test
@@ -175,7 +153,7 @@ public class LanguageExtractorTest {
         CMMStudy cmmStudyWithNoAvailableLangSet = RecordTestData.getSyntheticCmmStudy();
 
         // When
-        var cmmStudyOfLanguage = languageExtractor.mapLanguageDoc(Collections.singleton(cmmStudyWithNoAvailableLangSet.withStudyNumber(null)), ReposTestData.getUKDSRepo());
+        var cmmStudyOfLanguage = languageExtractor.extractFromStudy(cmmStudyWithNoAvailableLangSet.withStudyNumber(null), ReposTestData.getUKDSRepo());
 
         assertThat(cmmStudyOfLanguage).isEmpty();
     }
@@ -188,11 +166,13 @@ public class LanguageExtractorTest {
         cmmStudyWithNoAvailableLangSet.getTitleStudy().remove("en");
 
         // When
-        var cmmStudyOfLanguage = languageExtractor.mapLanguageDoc(Collections.singleton(cmmStudyWithNoAvailableLangSet), ReposTestData.getUKDSRepo());
+        var cmmStudyOfLanguage = languageExtractor.extractFromStudy(cmmStudyWithNoAvailableLangSet, ReposTestData.getUKDSRepo());
 
         assertThat(cmmStudyOfLanguage.keySet()).doesNotContain("en");
         assertThat(cmmStudyOfLanguage.keySet()).containsExactlyInAnyOrder("fi", "de");
-        cmmStudyOfLanguage.values().forEach(cmmStudyOfLanguages -> assertThat(cmmStudyOfLanguages.get(0).getLangAvailableIn()).containsExactlyInAnyOrder("fi", "de"));
+        cmmStudyOfLanguage.values().forEach(cmmStudyOfLanguages ->
+            assertThat(cmmStudyOfLanguages.getLangAvailableIn()).containsExactlyInAnyOrder("fi", "de")
+        );
     }
 
     @Test
@@ -203,11 +183,13 @@ public class LanguageExtractorTest {
         cmmStudyWithNoAvailableLangSet.getAbstractField().remove("fi");
 
         // When
-        var cmmStudyOfLanguage = languageExtractor.mapLanguageDoc(Collections.singleton(cmmStudyWithNoAvailableLangSet), ReposTestData.getUKDSRepo());
+        var cmmStudyOfLanguage = languageExtractor.extractFromStudy(cmmStudyWithNoAvailableLangSet, ReposTestData.getUKDSRepo());
 
         assertThat(cmmStudyOfLanguage.keySet()).doesNotContain("fi");
         assertThat(cmmStudyOfLanguage.keySet()).containsExactlyInAnyOrder("en", "de");
-        cmmStudyOfLanguage.values().forEach(cmmStudyOfLanguages -> assertThat(cmmStudyOfLanguages.get(0).getLangAvailableIn()).containsExactlyInAnyOrder("en", "de"));
+        cmmStudyOfLanguage.values().forEach(cmmStudyOfLanguages ->
+            assertThat(cmmStudyOfLanguages.getLangAvailableIn()).containsExactlyInAnyOrder("en", "de")
+        );
     }
 
     @Test
@@ -218,10 +200,12 @@ public class LanguageExtractorTest {
         cmmStudyWithNoAvailableLangSet.getPublisher().remove("de");
 
         // When
-        var cmmStudyOfLanguage = languageExtractor.mapLanguageDoc(Collections.singleton(cmmStudyWithNoAvailableLangSet), ReposTestData.getUKDSRepo());
+        var cmmStudyOfLanguage = languageExtractor.extractFromStudy(cmmStudyWithNoAvailableLangSet, ReposTestData.getUKDSRepo());
 
         assertThat(cmmStudyOfLanguage.keySet()).doesNotContain("de");
         assertThat(cmmStudyOfLanguage.keySet()).containsExactlyInAnyOrder("en", "fi");
-        cmmStudyOfLanguage.values().forEach(cmmStudyOfLanguages -> assertThat(cmmStudyOfLanguages.get(0).getLangAvailableIn()).containsExactlyInAnyOrder("en", "fi"));
+        cmmStudyOfLanguage.values().forEach(cmmStudyOfLanguages ->
+            assertThat(cmmStudyOfLanguages.getLangAvailableIn()).containsExactlyInAnyOrder("en", "fi")
+        );
     }
 }
