@@ -1,0 +1,7 @@
+{
+  "additionalBranchPrefix": "269-",
+  "commitMessagePrefix": "#269:",
+  "extends": [
+    "config:base"
+  ]
+}
