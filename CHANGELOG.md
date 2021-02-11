@@ -14,6 +14,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 ## [2.3.1] - 2021-02-11
 
+[10.5281/zenodo.4534741](https://zenodo.org/record/4534741)
+
 ### Additions
 
 - Add ADP to the list of harvested endpoints ([#201](https://bitbucket.org/cessda/cessda.cdc.version2/issues/201))
