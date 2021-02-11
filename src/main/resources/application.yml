@@ -168,11 +168,11 @@ osmhConsumer:
       #  name: 'TBC'
       #  handler: 'NESSTAR'
       #  defaultLanguage: fr
-      - url:  https://datacatalogue.sodanet.gr/oai
+      - url:  http://harvester.sodanet.gr:8080/oai/request
         code: SoDaNet
         name: 'SoDaNet - Greek Research Infrastructure for Social Science'
-        handler: 'OAI-PMH'
-      #  setSpec: CESSDA
+        handler: 'NESSTAR'
+        setSpec: CESSDA
         preferredMetadataParam: oai_ddi
         defaultLanguage: el
       - url:  http://nesstar.unidata.unimib.it/oai-pmh
