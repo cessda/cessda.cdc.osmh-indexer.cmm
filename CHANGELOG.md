@@ -12,6 +12,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 *- Fixed (for any bug fixes)*
 *- Security (in case of vulnerabilities)*
 
+## [2.3.1] - 2021-02-11
+
+### Additions
+
+- Add ADP to the list of harvested endpoints ([#201](https://bitbucket.org/cessda/cessda.cdc.version2/issues/201))
+
+### Changes
+
+- Included DANS twice with different metadata parameters to pick up English and Dutch study versions ([#280](https://bitbucket.org/cessda/cessda.cdc.version2/issues/280))
+- Improved the debug logging of studies dropped for having no languages with the minimum required fields ([#278](https://bitbucket.org/cessda/cessda.cdc.version2/issues/278))
+
 ## [2.3.0] - 2021-02-09
 
 [10.5281/zenodo.4525896](https://zenodo.org/record/4525896)
