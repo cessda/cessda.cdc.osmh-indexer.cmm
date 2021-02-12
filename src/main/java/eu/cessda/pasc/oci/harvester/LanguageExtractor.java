@@ -113,11 +113,11 @@ public class LanguageExtractor {
         builder.publisher(Publisher.builder().name(repository.getName()).abbreviation(repository.getCode()).build());
 
         // Language specific field extraction
-        Optional.ofNullable(cmmStudy.getTitleStudy()).ifPresent(map -> builder.titleStudy(map.get(lang)));
-        Optional.ofNullable(cmmStudy.getAbstractField()).ifPresent(map -> builder.abstractField(map.get(lang)));
-        Optional.ofNullable(cmmStudy.getKeywords()).ifPresent(map -> builder.keywords(map.get(lang)));
-        Optional.ofNullable(cmmStudy.getClassifications()).ifPresent(map -> builder.classifications(map.get(lang)));
-        Optional.ofNullable(cmmStudy.getTypeOfTimeMethods()).ifPresent(map -> builder.typeOfTimeMethods(map.get(lang)));
+        Optional.ofNullable(cmmStudy.getTitleStudy()).map(map -> map.get(lang)).ifPresent(builder::titleStudy);
+        Optional.ofNullable(cmmStudy.getAbstractField()).map(map -> map.get(lang)).ifPresent(builder::abstractField);
+        Optional.ofNullable(cmmStudy.getKeywords()).map(map -> map.get(lang)).ifPresent(builder::keywords);
+        Optional.ofNullable(cmmStudy.getClassifications()).map(map -> map.get(lang)).ifPresent(builder::classifications);
+        Optional.ofNullable(cmmStudy.getTypeOfTimeMethods()).map(map -> map.get(lang)).ifPresent(builder::typeOfTimeMethods);
         var countries = Optional.ofNullable(cmmStudy.getStudyAreaCountries())
             .map(map -> map.get(lang)).stream().flatMap(Collection::stream)
             // If the ISO code is not valid, then the optional will be empty
@@ -127,21 +127,21 @@ public class LanguageExtractor {
                 .orElse(country)
             ).collect(Collectors.toList());
         builder.studyAreaCountries(countries);
-        Optional.ofNullable(cmmStudy.getUnitTypes()).ifPresent(map -> builder.unitTypes(map.get(lang)));
-        Optional.ofNullable(cmmStudy.getPidStudies()).ifPresent(map -> builder.pidStudies(map.get(lang)));
-        Optional.ofNullable(cmmStudy.getCreators()).ifPresent(map -> builder.creators(map.get(lang)));
-        Optional.ofNullable(cmmStudy.getTypeOfSamplingProcedures()).ifPresent(map -> builder.typeOfSamplingProcedures(map.get(lang)));
-        Optional.ofNullable(cmmStudy.getSamplingProcedureFreeTexts()).ifPresent(map -> builder.samplingProcedureFreeTexts(map.get(lang)));
-        Optional.ofNullable(cmmStudy.getTypeOfModeOfCollections()).ifPresent(map -> builder.typeOfModeOfCollections(map.get(lang)));
-        Optional.ofNullable(cmmStudy.getTitleStudy()).ifPresent(map -> builder.titleStudy(map.get(lang)));
-        Optional.ofNullable(cmmStudy.getDataCollectionFreeTexts()).ifPresent(map -> builder.dataCollectionFreeTexts(map.get(lang)));
-        Optional.ofNullable(cmmStudy.getDataAccessFreeTexts()).ifPresent(map -> builder.dataAccessFreeTexts(map.get(lang)));
+        Optional.ofNullable(cmmStudy.getUnitTypes()).map(map -> map.get(lang)).ifPresent(builder::unitTypes);
+        Optional.ofNullable(cmmStudy.getPidStudies()).map(map -> map.get(lang)).ifPresent(builder::pidStudies);
+        Optional.ofNullable(cmmStudy.getCreators()).map(map -> map.get(lang)).ifPresent(builder::creators);
+        Optional.ofNullable(cmmStudy.getTypeOfSamplingProcedures()).map(map -> map.get(lang)).ifPresent(builder::typeOfSamplingProcedures);
+        Optional.ofNullable(cmmStudy.getSamplingProcedureFreeTexts()).map(map -> map.get(lang)).ifPresent(builder::samplingProcedureFreeTexts);
+        Optional.ofNullable(cmmStudy.getTypeOfModeOfCollections()).map(map -> map.get(lang)).ifPresent(builder::typeOfModeOfCollections);
+        Optional.ofNullable(cmmStudy.getTitleStudy()).map(map -> map.get(lang)).ifPresent(builder::titleStudy);
+        Optional.ofNullable(cmmStudy.getDataCollectionFreeTexts()).map(map -> map.get(lang)).ifPresent(builder::dataCollectionFreeTexts);
+        Optional.ofNullable(cmmStudy.getDataAccessFreeTexts()).map(map -> map.get(lang)).ifPresent(builder::dataAccessFreeTexts);
 
         // #142 - Use any language to set the study url field
-        Optional.ofNullable(cmmStudy.getStudyUrl()).flatMap(map -> map.entrySet().stream().findAny()).map(Map.Entry::getValue).ifPresent(builder::studyUrl);
+        Optional.ofNullable(cmmStudy.getStudyUrl()).flatMap(map -> map.values().stream().findAny()).ifPresent(builder::studyUrl);
 
         // Override with the language specific variant
-        Optional.ofNullable(cmmStudy.getStudyUrl()).flatMap(map -> Optional.ofNullable(map.get(lang))).ifPresent(builder::studyUrl);
+        Optional.ofNullable(cmmStudy.getStudyUrl()).map(map -> map.get(lang)).ifPresent(builder::studyUrl);
 
         return builder.build();
     }

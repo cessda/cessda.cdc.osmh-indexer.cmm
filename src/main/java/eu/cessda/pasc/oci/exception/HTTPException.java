@@ -38,7 +38,7 @@ public class HTTPException extends IOException {
     private final ExternalResponse externalResponse;
 
     /**
-     * Constructs an ExternalSystemException with the specified status code and external response body.
+     * Constructs a {@link HTTPException} with the specified status code and external response body.
      *
      * @param statusCode           the status code of the external response that caused this exception
      * @param externalResponseBody the body of the external response that caused this exception

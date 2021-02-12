@@ -55,6 +55,15 @@ class RecordXMLParser {
         this.cmmStudyMapper = cmmStudyMapper;
     }
 
+    /**
+     * Gets a record from a remote repository.
+     * @param repo the repository to retrieve the record from.
+     * @param studyIdentifier the study to retrieve.
+     * @return a {@link CMMStudy} representing the study.
+     * @throws OaiPmhException if the document contains an {@code <error>} element.
+     * @throws XMLParseException if an error occurred parsing the XML.
+     * @throws HarvesterException if the request URL could not be converted into a {@link URI}.
+     */
     public CMMStudy getRecord(Repo repo, String studyIdentifier) throws HarvesterException {
         log.debug("[{}] Querying for StudyID [{}]", repo.getCode(), studyIdentifier);
         URI fullUrl = null;
