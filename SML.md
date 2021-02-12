@@ -7,17 +7,17 @@ Which means *"Software is usable; the software can be used by most users althoug
 
 | Attribute  | Description  | Score  |
 |:----------|:----------|:----------|
-| CA1.1 | End user Documentation | 0 |
-| CA1.2 | Operational documentation | 2 |
+| CA1.1 | End user Documentation | N/A |
+| CA1.2 | Operational documentation | 3 |
 | CA1.3 | Development Documentation | 1 |
-| CA2 | Intellectual Property | 2 |
+| CA2 | Intellectual Property | 3 |
 | CA3 | Extensibility | 2 |
 | CA4 | Modularity | 3 |
 | CA5 | Packaging | 5 |
 | CA6 | Portability | 5 |
-| CA7 | Standards Compliance | 4 |
+| CA7 | Standards Compliance | 3 |
 | CA8 | Support | 2 |
 | CA9 | Verification and Testing | 5 |
-| CA10 | Security | 5 |
-| CA11 | Internationalisation and Localisation | 0 |
-| CA12 | Authentication and Authorisation | 0 |
+| CA10 | Security | 3 |
+| CA11 | Internationalisation and Localisation | N/A |
+| CA12 | Authentication and Authorisation | N/A |
