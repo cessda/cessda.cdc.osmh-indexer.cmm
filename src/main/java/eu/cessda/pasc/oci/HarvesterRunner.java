@@ -137,7 +137,10 @@ public class HarvesterRunner {
                     log.error("[{}({})] Error communicating with Elasticsearch!: {}", repo.getCode(), entry.getKey(), e.toString());
                 }
             }
-            log.info("[{}] Repo finished, took {} seconds", repo.getCode(), Duration.between(startTime, Instant.now()).getSeconds());
+            log.info("[{}] Repo finished, took {} seconds",
+                repo.getCode(),
+                value("repository_duration", Duration.between(startTime, Instant.now()).getSeconds())
+            );
         } finally {
             // Reset the MDC
             MDC.clear();
