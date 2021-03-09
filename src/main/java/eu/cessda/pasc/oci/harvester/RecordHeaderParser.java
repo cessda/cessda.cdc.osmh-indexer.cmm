@@ -83,7 +83,7 @@ class RecordHeaderParser {
         URI fullListRecordUrlPath = OaiPmhHelpers.appendListRecordParams(repo);
         var recordHeadersDocument = getRecordHeadersDocument(fullListRecordUrlPath);
 
-        // We exit if the response has an <error> element
+        // Exit if the response has an <error> element
         ListIdentifiersResponseValidator.validateResponse(recordHeadersDocument);
 
         Optional<String> resumptionToken;
@@ -144,7 +144,8 @@ class RecordHeaderParser {
 
         // Check if the record is deleted
         if (headerNode.hasAttributes()) {
-            recordHeaderBuilder.deleted(OaiPmhConstants.DELETED.equals(headerNode.getAttributes().getNamedItem(OaiPmhConstants.STATUS_ATTR).getNodeValue()));
+            String deletedAttribute = headerNode.getAttributes().getNamedItem(OaiPmhConstants.STATUS_ATTR).getNodeValue();
+            recordHeaderBuilder.deleted(OaiPmhConstants.DELETED.equals(deletedAttribute));
         }
 
         var headerElements = headerNode.getChildNodes();

@@ -29,6 +29,8 @@ import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -125,6 +127,7 @@ public class HarvesterRunner {
 
         // Set the MDC so that the record name is attached to all downstream logs
         try (var repoNameClosable = MDC.putCloseable(LoggingConstants.REPO_NAME, repo.getCode())) {
+            var startTime = Instant.now();
             log.info("Processing Repo [{}]", repo);
             var langStudies = getCmmStudiesOfEachLangIsoCodeMap(repo, lastModifiedDateTime);
             for (var entry : langStudies.entrySet()) {
@@ -134,6 +137,10 @@ public class HarvesterRunner {
                     log.error("[{}({})] Error communicating with Elasticsearch!: {}", repo.getCode(), entry.getKey(), e.toString());
                 }
             }
+            log.info("[{}] Repo finished, took {} seconds",
+                repo.getCode(),
+                value("repository_duration", Duration.between(startTime, Instant.now()).getSeconds())
+            );
         } finally {
             // Reset the MDC
             MDC.clear();
