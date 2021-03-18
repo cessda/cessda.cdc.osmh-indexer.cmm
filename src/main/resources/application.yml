@@ -117,7 +117,7 @@ osmhConsumer:
         name: 'Finnish Social Science Data Archive (FSD)'
         handler: 'OAI-PMH'
         preferredMetadataParam: oai_ddi25
-      - url: https://dbkapps.gesis.org/dbkoai3
+      - url: https://dbkapps.gesis.org/dbkoai
         code: GESIS
         name: 'GESIS - Leibniz Institute for the Social Sciences'
         handler: 'OAI-PMH'
