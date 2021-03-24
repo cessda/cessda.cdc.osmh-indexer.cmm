@@ -22,6 +22,7 @@ import eu.cessda.pasc.oci.http.HttpClient;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.parser.CMMStudyMapper;
+import eu.cessda.pasc.oci.parser.DateNotParsedException;
 import eu.cessda.pasc.oci.parser.OaiPmhHelpers;
 import lombok.extern.slf4j.Slf4j;
 import org.jdom2.Document;
@@ -112,10 +113,14 @@ class RecordXMLParser {
             builder.typeOfSamplingProcedures(cmmStudyMapper.parseTypeOfSamplingProcedure(document, defaultLangIsoCode));
             builder.samplingProcedureFreeTexts(cmmStudyMapper.parseSamplingProcedureFreeTexts(document, defaultLangIsoCode));
             builder.typeOfModeOfCollections(cmmStudyMapper.parseTypeOfModeOfCollection(document, defaultLangIsoCode));
-            var dataCollectionPeriod = cmmStudyMapper.parseDataCollectionDates(document);
-            dataCollectionPeriod.getStartDate().ifPresent(builder::dataCollectionPeriodStartdate);
-            dataCollectionPeriod.getEndDate().ifPresent(builder::dataCollectionPeriodEnddate);
-            builder.dataCollectionYear(dataCollectionPeriod.getDataCollectionYear());
+            try {
+                var dataCollectionPeriod = cmmStudyMapper.parseDataCollectionDates(document);
+                dataCollectionPeriod.getStartDate().ifPresent(builder::dataCollectionPeriodStartdate);
+                dataCollectionPeriod.getEndDate().ifPresent(builder::dataCollectionPeriodEnddate);
+                builder.dataCollectionYear(dataCollectionPeriod.getDataCollectionYear());
+            } catch (DateNotParsedException e) {
+                log.warn("[{}] Some dates in study {} couldn't be parsed: {}", repository.getCode(), headerElement.getStudyNumber().orElse(""), e.toString());
+            }
             builder.dataCollectionFreeTexts(cmmStudyMapper.parseDataCollectionFreeTexts(document, defaultLangIsoCode));
         }
         return builder.studyXmlSourceUrl(sourceUri.toString()).build();

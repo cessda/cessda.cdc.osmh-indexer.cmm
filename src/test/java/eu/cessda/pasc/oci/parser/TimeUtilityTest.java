@@ -17,8 +17,6 @@ package eu.cessda.pasc.oci.parser;
 
 import org.junit.Test;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.TimeZone;
 
 import static org.assertj.core.api.Assertions.fail;
@@ -35,41 +33,39 @@ public class TimeUtilityTest {
 
 
     @Test
-    public void shouldReturnExpectedDateValue() {
+    public void shouldReturnExpectedDateValue() throws DateNotParsedException {
 
         // Given
-        Optional<LocalDateTime> localDateTime = TimeUtility.getLocalDateTime("2018-03-20");
+        var localDateTime = TimeUtility.getLocalDateTime("2018-03-20");
 
         // When
-        if (localDateTime.isPresent()) {
-            then(localDateTime.get().toString()).isEqualToIgnoringCase("2018-03-20T00:00");
-        } else {
-            fail("Failed to parse Date String");
-        }
+        then(localDateTime.toString()).isEqualToIgnoringCase("2018-03-20T00:00");
     }
 
-  // String format yyyy-MM-dd'T'HH:mm:ssZ
-  @Test
-  public void shouldReturnExpectedDateValueForNesstarDateFormats() {
+    // String format yyyy-MM-dd'T'HH:mm:ssZ
+    @Test
+    public void shouldReturnExpectedDateValueForNesstarDateFormats() throws DateNotParsedException {
 
-    // Given
-    Optional<LocalDateTime> localDateTime = TimeUtility.getLocalDateTime("2015-05-04T22:55:30+0000");
+        // Given
+        var localDateTime = TimeUtility.getLocalDateTime("2015-05-04T22:55:30+0000");
 
-    // When
-    if (localDateTime.isPresent()) {
-      then(localDateTime.get().toString()).isEqualToIgnoringCase("2015-05-04T22:55:30");
-    } else {
-      fail("Failed to parse Date String");
+        // When
+        then(localDateTime.toString()).isEqualToIgnoringCase("2015-05-04T22:55:30");
     }
-  }
 
   @Test
   public void shouldReturnMissingForInvalidDateValue() {
 
-    // Given
-    Optional<LocalDateTime> localDateTime = TimeUtility.getLocalDateTime("invalid-date-string");
+      // Given
+      var invalid = "invalid-date-string";
 
-    // When
-    then(localDateTime.isPresent()).isFalse();
+      // Then
+      try {
+          TimeUtility.getLocalDateTime(invalid);
+          fail(DateNotParsedException.class.getName() + " is expected to throw");
+      } catch (DateNotParsedException e) {
+          then(e.getDateString()).isEqualTo(invalid);
+          then(e.getExpectedDateFormats()).isNotEmpty();
+      }
   }
 }

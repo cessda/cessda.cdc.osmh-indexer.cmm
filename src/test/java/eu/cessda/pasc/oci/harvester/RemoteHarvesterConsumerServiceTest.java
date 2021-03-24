@@ -26,6 +26,7 @@ import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.configurations.Repo;
+import eu.cessda.pasc.oci.parser.DateNotParsedException;
 import eu.cessda.pasc.oci.parser.TimeUtility;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +37,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -85,9 +85,9 @@ public class RemoteHarvesterConsumerServiceTest {
     }
 
     @Test
-    public void shouldReturnFilterRecordHeadersByLastModifiedDate() throws IOException {
+    public void shouldReturnFilterRecordHeadersByLastModifiedDate() throws IOException, DateNotParsedException {
         Repo repo = getUKDSRepo();
-        LocalDateTime lastModifiedDateCutOff = TimeUtility.getLocalDateTime("2018-02-01T07:48:38Z").get();
+        var lastModifiedDateCutOff = TimeUtility.getLocalDateTime("2018-02-01T07:48:38Z");
 
         when(httpClient.getInputStream(any(URI.class))).thenReturn(
             new ByteArrayInputStream(LIST_RECORDER_HEADERS_X6.getBytes(StandardCharsets.UTF_8))
@@ -95,16 +95,16 @@ public class RemoteHarvesterConsumerServiceTest {
         List<RecordHeader> recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(repo, lastModifiedDateCutOff);
 
         assertThat(recordHeaders).hasSize(2);
-        recordHeaders.forEach(recordHeader -> {
-            LocalDateTime currentLastModified = TimeUtility.getLocalDateTime(recordHeader.getLastModified()).orElse(null);
+        for (RecordHeader recordHeader : recordHeaders) {
+            var currentLastModified = TimeUtility.getLocalDateTime(recordHeader.getLastModified());
             then(currentLastModified).isGreaterThan(lastModifiedDateCutOff);
-        });
+        }
     }
 
     @Test
-    public void shouldFilterRecordHeadersByLastModifiedDateAndInvalidLastDateTimeStrings() throws IOException {
+    public void shouldFilterRecordHeadersByLastModifiedDateAndInvalidLastDateTimeStrings() throws IOException, DateNotParsedException {
         Repo repo = getUKDSRepo();
-        LocalDateTime lastModifiedCutOff = TimeUtility.getLocalDateTime("2018-02-10T07:48:38Z").orElse(null);
+        var lastModifiedCutOff = TimeUtility.getLocalDateTime("2018-02-10T07:48:38Z");
 
         when(httpClient.getInputStream(any(URI.class))).thenReturn(
             new ByteArrayInputStream(LIST_RECORDER_HEADERS_WITH_INVALID_DATETIME.getBytes(StandardCharsets.UTF_8))
@@ -112,10 +112,10 @@ public class RemoteHarvesterConsumerServiceTest {
         List<RecordHeader> recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(repo, lastModifiedCutOff);
 
         assertThat(recordHeaders).hasSize(1);
-        recordHeaders.forEach(recordHeader -> {
-            LocalDateTime currentLastModified = TimeUtility.getLocalDateTime(recordHeader.getLastModified()).orElse(null);
+        for (RecordHeader recordHeader : recordHeaders) {
+            var currentLastModified = TimeUtility.getLocalDateTime(recordHeader.getLastModified());
             then(currentLastModified).isGreaterThan(lastModifiedCutOff);
-        });
+        }
     }
 
     @Test
