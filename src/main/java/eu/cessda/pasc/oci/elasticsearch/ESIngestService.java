@@ -175,6 +175,7 @@ public class ESIngestService implements IngestService {
     }
 
     @Override
+    @SuppressWarnings("java:S1141")
     public Optional<LocalDateTime> getMostRecentLastModified() {
 
         SearchResponse response = getMatchAllSearchRequest("*")
@@ -190,7 +191,7 @@ public class ESIngestService implements IngestService {
                     var localDateTime = TimeUtility.getLocalDateTime(study.getLastModified());
                     return Optional.of(localDateTime.withHour(0).withMinute(0).withSecond(0).withNano(0));
                 } catch (DateNotParsedException e) {
-                    log.error("[{}] lastModified field is not a valid ISO date", study.getId());
+                    log.error("[{}] lastModified field is not a valid ISO date: {}", study.getId(), e.toString());
                 }
             }
         } catch (IOException e) {
