@@ -15,6 +15,8 @@
  */
 package eu.cessda.pasc.oci.parser;
 
+import eu.cessda.pasc.oci.DateNotParsedException;
+import eu.cessda.pasc.oci.TimeUtility;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -61,7 +63,8 @@ public class TimeUtilDateExtractionParameterisedTest {
     public void shouldExtractDataCollYearDateFunction() throws DateNotParsedException {
 
         // When
-        var actualYearDate = TimeUtility.parseYearFromDateString(fInput);
+	    var localDateTime = TimeUtility.getLocalDateTime(fInput);
+	    var actualYearDate = localDateTime.getYear();
 
         // Then
         then(actualYearDate).isEqualTo(fExpected);

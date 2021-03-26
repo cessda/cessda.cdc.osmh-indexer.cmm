@@ -13,26 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.harvester;
+package eu.cessda.pasc.oci.parser;
 
+import eu.cessda.pasc.oci.DateNotParsedException;
 import eu.cessda.pasc.oci.exception.HarvesterException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.exception.XMLParseException;
 import eu.cessda.pasc.oci.http.HttpClient;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.configurations.Repo;
-import eu.cessda.pasc.oci.parser.CMMStudyMapper;
-import eu.cessda.pasc.oci.parser.DateNotParsedException;
-import eu.cessda.pasc.oci.parser.OaiPmhHelpers;
 import lombok.extern.slf4j.Slf4j;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.xml.XMLConstants;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -45,7 +41,7 @@ import java.net.URISyntaxException;
  */
 @Service
 @Slf4j
-class RecordXMLParser {
+public class RecordXMLParser {
 
     private final CMMStudyMapper cmmStudyMapper;
     private final HttpClient httpClient;
@@ -83,7 +79,7 @@ class RecordXMLParser {
     private CMMStudy mapDDIRecordToCMMStudy(InputStream recordXML, URI sourceUri, Repo repository) throws JDOMException, IOException, OaiPmhException {
 
         CMMStudy.CMMStudyBuilder builder = CMMStudy.builder();
-        Document document = getSaxBuilder().build(recordXML);
+        Document document = OaiPmhHelpers.getSaxBuilder().build(recordXML);
 
         if (log.isTraceEnabled()) {
             log.trace("Record XML String [{}]", new XMLOutputter().outputString(document));
@@ -126,10 +122,4 @@ class RecordXMLParser {
         return builder.studyXmlSourceUrl(sourceUri.toString()).build();
     }
 
-    private SAXBuilder getSaxBuilder() {
-        SAXBuilder saxBuilder = new SAXBuilder();
-        saxBuilder.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-        saxBuilder.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-        return saxBuilder;
-    }
 }

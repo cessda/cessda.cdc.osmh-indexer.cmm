@@ -15,6 +15,8 @@
  */
 package eu.cessda.pasc.oci.parser;
 
+import eu.cessda.pasc.oci.DateNotParsedException;
+import eu.cessda.pasc.oci.TimeUtility;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.models.cmmstudy.*;
@@ -39,7 +41,6 @@ import java.util.stream.Stream;
 import static eu.cessda.pasc.oci.parser.OaiPmhConstants.*;
 import static eu.cessda.pasc.oci.parser.ParsingStrategies.samplingTermVocabAttributeStrategy;
 import static eu.cessda.pasc.oci.parser.ParsingStrategies.termVocabAttributeStrategy;
-import static eu.cessda.pasc.oci.parser.TimeUtility.parseYearFromDateString;
 
 /**
  * Responsible for Mapping oai-pmh fields to a CMMStudy
@@ -85,9 +86,9 @@ public class CMMStudyMapper {
      * @return true if record is active
      * @throws OaiPmhException if the document contains an {@code <error>} element
      */
-    public HeaderElement parseHeaderElement(Document document) throws OaiPmhException {
+    HeaderElement parseHeaderElement(Document document) throws OaiPmhException {
         // Validate the document doesn't contain an error element
-        docElementParser.validateResponse(document);
+        DocElementParser.validateResponse(document);
         Optional<String> studyNumber = parseStudyNumber(document);
         Optional<String> lastModified = parseLastModified(document);
         boolean recordStatus = parseRecordStatus(document);
@@ -105,8 +106,8 @@ public class CMMStudyMapper {
      * @param repository the repository used to set the default language.
      * @return the default language of the document.
      */
-    public String parseDefaultLanguage(Document document, Repo repository) {
-        var codeBookLang = docElementParser.getFirstAttribute(document, RECORD_DEFAULT_LANGUAGE_XPATH);
+    String parseDefaultLanguage(Document document, Repo repository) {
+        var codeBookLang = DocElementParser.getFirstAttribute(document, RECORD_DEFAULT_LANGUAGE_XPATH);
         if (codeBookLang.isPresent() && !codeBookLang.get().getValue().trim().isEmpty()) {
             return codeBookLang.get().getValue().trim();
             // #192 - Per repository override of the default language
@@ -122,7 +123,7 @@ public class CMMStudyMapper {
      * <p>
      * Xpath = {@value OaiPmhConstants#PID_STUDY_XPATH }
      */
-    public Map<String, List<Pid>> parsePidStudies(Document document, String defaultLangIsoCode) {
+    Map<String, List<Pid>> parsePidStudies(Document document, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
             defaultLangIsoCode, document, PID_STUDY_XPATH, ParsingStrategies::pidStrategy);
     }
@@ -139,14 +140,14 @@ public class CMMStudyMapper {
      * Parse last Modified.
      */
     private Optional<String> parseLastModified(Document document) {
-        return docElementParser.getFirstElement(document, LAST_MODIFIED_DATE_XPATH).map(Element::getText);
+        return DocElementParser.getFirstElement(document, LAST_MODIFIED_DATE_XPATH).map(Element::getText);
     }
 
     /**
      * Parse study number.
      */
     private Optional<String> parseStudyNumber(Document document) {
-        return docElementParser.getFirstElement(document, IDENTIFIER_XPATH).map(Element::getText);
+        return DocElementParser.getFirstElement(document, IDENTIFIER_XPATH).map(Element::getText);
     }
 
     /**
@@ -154,7 +155,7 @@ public class CMMStudyMapper {
      * <p>
      * Xpath = {@value OaiPmhConstants#ABSTRACT_XPATH }
      */
-    public Map<String, String> parseAbstract(Document document, String langCode) {
+    Map<String, String> parseAbstract(Document document, String langCode) {
         return parseLanguageContentOfElement(document, langCode, ABSTRACT_XPATH, true);
     }
 
@@ -163,8 +164,8 @@ public class CMMStudyMapper {
      * <p>
      * Xpath = {@value OaiPmhConstants#YEAR_OF_PUB_XPATH }
      */
-    public Optional<String> parseYrOfPublication(Document document) {
-        return docElementParser.getFirstAttribute(document, YEAR_OF_PUB_XPATH).map(Attribute::getValue);
+    Optional<String> parseYrOfPublication(Document document) {
+        return DocElementParser.getFirstAttribute(document, YEAR_OF_PUB_XPATH).map(Attribute::getValue);
     }
 
     /**
@@ -172,7 +173,7 @@ public class CMMStudyMapper {
      * <p>
      * Xpath = {@value OaiPmhConstants#CREATORS_XPATH }
      */
-    public Map<String, List<String>> parseCreator(Document document, String defaultLangIsoCode) {
+    Map<String, List<String>> parseCreator(Document document, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
             defaultLangIsoCode, document, CREATORS_XPATH, ParsingStrategies::creatorStrategy);
     }
@@ -182,7 +183,7 @@ public class CMMStudyMapper {
      * <p>
      * Xpath = {@value OaiPmhConstants#CLASSIFICATIONS_XPATH }
      */
-    public Map<String, List<TermVocabAttributes>> parseClassifications(Document doc, String defaultLangIsoCode) {
+    Map<String, List<TermVocabAttributes>> parseClassifications(Document doc, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
             defaultLangIsoCode, doc, CLASSIFICATIONS_XPATH,
             element -> termVocabAttributeStrategy(element, false));
@@ -193,7 +194,7 @@ public class CMMStudyMapper {
      * <p>
      * Xpath = {@value OaiPmhConstants#KEYWORDS_XPATH }
      */
-    public Map<String, List<TermVocabAttributes>> parseKeywords(Document doc, String defaultLangIsoCode) {
+    Map<String, List<TermVocabAttributes>> parseKeywords(Document doc, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
             defaultLangIsoCode, doc, KEYWORDS_XPATH,
             element -> termVocabAttributeStrategy(element, false));
@@ -204,7 +205,7 @@ public class CMMStudyMapper {
      * <p>
      * Xpath = {@value OaiPmhConstants#TYPE_OF_TIME_METHOD_XPATH }
      */
-    public Map<String, List<TermVocabAttributes>> parseTypeOfTimeMethod(Document doc, String defaultLangIsoCode) {
+    Map<String, List<TermVocabAttributes>> parseTypeOfTimeMethod(Document doc, String defaultLangIsoCode) {
 
         return docElementParser.extractMetadataObjectListForEachLang(
             defaultLangIsoCode, doc, TYPE_OF_TIME_METHOD_XPATH,
@@ -216,7 +217,7 @@ public class CMMStudyMapper {
      * <p>
      * Xpath = {@value OaiPmhConstants#TYPE_OF_MODE_OF_COLLECTION_XPATH }
      */
-    public Map<String, List<TermVocabAttributes>> parseTypeOfModeOfCollection(Document doc, String defaultLangIsoCode) {
+    Map<String, List<TermVocabAttributes>> parseTypeOfModeOfCollection(Document doc, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
             defaultLangIsoCode, doc, TYPE_OF_MODE_OF_COLLECTION_XPATH,
             element -> termVocabAttributeStrategy(element, true));
@@ -227,7 +228,7 @@ public class CMMStudyMapper {
      * <p>
      * Xpath = {@value OaiPmhConstants#UNIT_TYPE_XPATH }
      */
-    public Map<String, List<TermVocabAttributes>> parseUnitTypes(Document document, String defaultLangIsoCode) {
+    Map<String, List<TermVocabAttributes>> parseUnitTypes(Document document, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
             defaultLangIsoCode, document, UNIT_TYPE_XPATH,
             element -> termVocabAttributeStrategy(element, true));
@@ -238,7 +239,7 @@ public class CMMStudyMapper {
      * <p>
      * Xpath = {@value OaiPmhConstants#TYPE_OF_SAMPLING_XPATH }
      */
-    public Map<String, List<VocabAttributes>> parseTypeOfSamplingProcedure(Document doc, String defaultLangIsoCode) {
+    Map<String, List<VocabAttributes>> parseTypeOfSamplingProcedure(Document doc, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(defaultLangIsoCode, doc, TYPE_OF_SAMPLING_XPATH,
             element -> samplingTermVocabAttributeStrategy(element, true));
     }
@@ -248,7 +249,7 @@ public class CMMStudyMapper {
      * <p>
      * Xpath = {@value OaiPmhConstants#STUDY_AREA_COUNTRIES_XPATH }
      */
-    public Map<String, List<Country>> parseStudyAreaCountries(Document document, String defaultLangIsoCode) {
+    Map<String, List<Country>> parseStudyAreaCountries(Document document, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
             defaultLangIsoCode, document, STUDY_AREA_COUNTRIES_XPATH, ParsingStrategies::countryStrategy);
     }
@@ -259,7 +260,7 @@ public class CMMStudyMapper {
      * Xpath = {@value OaiPmhConstants#PUBLISHER_XPATH } and
      * Xpath = {@value OaiPmhConstants#DISTRIBUTOR_XPATH }
      */
-    public Map<String, Publisher> parsePublisher(Document document, String defaultLang) {
+    Map<String, Publisher> parsePublisher(Document document, String defaultLang) {
         Map<String, Publisher> producerPathMap = docElementParser.extractMetadataObjectForEachLang(defaultLang, document,
             PUBLISHER_XPATH, ParsingStrategies::publisherStrategy);
         Map<String, Publisher> distrPathMap = docElementParser.extractMetadataObjectForEachLang(defaultLang, document,
@@ -270,8 +271,8 @@ public class CMMStudyMapper {
         return mergedStudyUrls;
     }
 
-    private Map<String, String> parseLanguageContentOfElement(Document document, String langCode, String titleXpath, boolean isConcatenating) {
-        List<Element> elements = docElementParser.getElements(document, titleXpath);
+    Map<String, String> parseLanguageContentOfElement(Document document, String langCode, String titleXpath, boolean isConcatenating) {
+        List<Element> elements = DocElementParser.getElements(document, titleXpath);
         return docElementParser.getLanguageKeyValuePairs(elements, isConcatenating, langCode, Element::getText);
     }
 
@@ -280,7 +281,7 @@ public class CMMStudyMapper {
      * <p>
      * Xpath = {@value OaiPmhConstants#TITLE_XPATH } and {@value OaiPmhConstants#PAR_TITLE_XPATH }
      */
-    public Map<String, String> parseStudyTitle(Document document, String langCode) {
+    Map<String, String> parseStudyTitle(Document document, String langCode) {
 
         Map<String, String> titles = parseLanguageContentOfElement(document, langCode, TITLE_XPATH, false);
 
@@ -301,10 +302,10 @@ public class CMMStudyMapper {
      * Xpath = {@value OaiPmhConstants#STUDY_URL_DOC_DSCR_XPATH }
      * Xpath = {@value OaiPmhConstants#STUDY_URL_STDY_DSCR_XPATH }
      */
-    public Map<String, String> parseStudyUrl(Document document, String langCode) {
+    Map<String, String> parseStudyUrl(Document document, String langCode) {
 
-        var docDscrElement = docElementParser.getElements(document, STUDY_URL_DOC_DSCR_XPATH);
-        var stdyDscrElements = docElementParser.getElements(document, STUDY_URL_STDY_DSCR_XPATH);
+        var docDscrElement = DocElementParser.getElements(document, STUDY_URL_DOC_DSCR_XPATH);
+        var stdyDscrElements = DocElementParser.getElements(document, STUDY_URL_STDY_DSCR_XPATH);
         var urlFromDocDscr = docElementParser.getLanguageKeyValuePairs(docDscrElement, false, langCode, ParsingStrategies::uriStrategy);
         var urlFromStdyDscr = docElementParser.getLanguageKeyValuePairs(stdyDscrElements, false, langCode, ParsingStrategies::uriStrategy);
 
@@ -322,7 +323,7 @@ public class CMMStudyMapper {
      * <p>
      * Xpath = {@value OaiPmhConstants#TYPE_OF_SAMPLING_XPATH }
      */
-    public Map<String, List<String>> parseSamplingProcedureFreeTexts(Document doc, String defaultLangIsoCode) {
+    Map<String, List<String>> parseSamplingProcedureFreeTexts(Document doc, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
             defaultLangIsoCode, doc, TYPE_OF_SAMPLING_XPATH, ParsingStrategies::nullableElementValueStrategy);
     }
@@ -332,7 +333,7 @@ public class CMMStudyMapper {
      * <p>
      * Xpath = {@value OaiPmhConstants#TYPE_OF_SAMPLING_XPATH }
      */
-    public Map<String, List<String>> parseDataAccessFreeText(Document doc, String defaultLangIsoCode) {
+    Map<String, List<String>> parseDataAccessFreeText(Document doc, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
             defaultLangIsoCode, doc, DATA_RESTRCTN_XPATH, ParsingStrategies::nullableElementValueStrategy);
     }
@@ -342,7 +343,7 @@ public class CMMStudyMapper {
      * <p>
      * Xpath = {@value OaiPmhConstants#DATA_COLLECTION_PERIODS_PATH }
      */
-    public Map<String, List<DataCollectionFreeText>> parseDataCollectionFreeTexts(Document document, String defaultLangIsoCode) {
+    Map<String, List<DataCollectionFreeText>> parseDataCollectionFreeTexts(Document document, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
             defaultLangIsoCode, document, DATA_COLLECTION_PERIODS_PATH, ParsingStrategies::dataCollFreeTextStrategy);
     }
@@ -356,20 +357,22 @@ public class CMMStudyMapper {
      *
      * @throws DateNotParsedException if a date string cannot be parsed.
      */
-    public DataCollectionPeriod parseDataCollectionDates(Document doc) throws DateNotParsedException {
-        var dateAttrs = docElementParser.getDateElementAttributesValueMap(doc, DATA_COLLECTION_PERIODS_PATH);
+    DataCollectionPeriod parseDataCollectionDates(Document doc) throws DateNotParsedException {
+        var dateAttrs = DocElementParser.getDateElementAttributesValueMap(doc, DATA_COLLECTION_PERIODS_PATH);
 
         var dataCollectionPeriodBuilder = DataCollectionPeriod.builder();
 
         if (dateAttrs.containsKey(SINGLE_ATTR)) {
             final String singleDateValue = dateAttrs.get(SINGLE_ATTR);
             dataCollectionPeriodBuilder.startDate(singleDateValue);
-            dataCollectionPeriodBuilder.dataCollectionYear(parseYearFromDateString(singleDateValue));
+            var localDateTime = TimeUtility.getLocalDateTime(singleDateValue);
+            dataCollectionPeriodBuilder.dataCollectionYear(localDateTime.getYear());
         } else {
             if (dateAttrs.containsKey(START_ATTR)) {
                 final String startDateValue = dateAttrs.get(START_ATTR);
                 dataCollectionPeriodBuilder.startDate(startDateValue);
-                dataCollectionPeriodBuilder.dataCollectionYear(parseYearFromDateString(startDateValue));
+                var localDateTime = TimeUtility.getLocalDateTime(startDateValue);
+                dataCollectionPeriodBuilder.dataCollectionYear(localDateTime.getYear());
             }
             if (dateAttrs.containsKey(END_ATTR)) {
                 dataCollectionPeriodBuilder.endDate(dateAttrs.get(END_ATTR));
@@ -386,9 +389,9 @@ public class CMMStudyMapper {
      *
      * @return a set with all of the file languages
      */
-    public Set<String> parseFileLanguages(Document document) {
-        List<String> fileTxtAttrs = docElementParser.getAttributeValues(document, FILE_TXT_LANGUAGES_XPATH);
-        List<String> fileNameAttrs = docElementParser.getAttributeValues(document, FILENAME_LANGUAGES_XPATH);
+    Set<String> parseFileLanguages(Document document) {
+        List<String> fileTxtAttrs = DocElementParser.getAttributeValues(document, FILE_TXT_LANGUAGES_XPATH);
+        List<String> fileNameAttrs = DocElementParser.getAttributeValues(document, FILENAME_LANGUAGES_XPATH);
         return Stream.concat(fileTxtAttrs.stream(), fileNameAttrs.stream()).collect(Collectors.toSet());
     }
 

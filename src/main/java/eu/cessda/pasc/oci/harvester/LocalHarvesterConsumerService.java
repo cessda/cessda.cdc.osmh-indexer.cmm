@@ -21,6 +21,8 @@ import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.configurations.Repo;
+import eu.cessda.pasc.oci.parser.RecordHeaderParser;
+import eu.cessda.pasc.oci.parser.RecordXMLParser;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,10 +96,11 @@ public class LocalHarvesterConsumerService extends AbstractHarvesterConsumerServ
                 )
             );
         } catch (HarvesterException e) {
-            log.warn(FAILED_TO_GET_STUDY_ID,
+            log.warn(FAILED_TO_GET_STUDY_ID_WITH_MESSAGE,
                 value(LoggingConstants.REPO_NAME, repo.getCode()),
                 value(LoggingConstants.STUDY_ID, recordHeader.getIdentifier()),
-                e.toString()
+                value(LoggingConstants.EXCEPTION_NAME, e.getClass().getName()),
+                value(LoggingConstants.REASON, e.getMessage())
             );
         }
         return Optional.empty();

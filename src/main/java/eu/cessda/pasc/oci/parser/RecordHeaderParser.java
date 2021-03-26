@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.harvester;
+package eu.cessda.pasc.oci.parser;
 
 import eu.cessda.pasc.oci.exception.HarvesterException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
@@ -21,9 +21,6 @@ import eu.cessda.pasc.oci.exception.XMLParseException;
 import eu.cessda.pasc.oci.http.HttpClient;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.configurations.Repo;
-import eu.cessda.pasc.oci.parser.ListIdentifiersResponseValidator;
-import eu.cessda.pasc.oci.parser.OaiPmhConstants;
-import eu.cessda.pasc.oci.parser.OaiPmhHelpers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,7 +47,7 @@ import java.util.stream.IntStream;
  */
 @Service
 @Slf4j
-class RecordHeaderParser {
+public class RecordHeaderParser {
 
     // Messaging and Exceptions
     private static final String RECORD_HEADER = "RecordHeader";
@@ -66,46 +63,32 @@ class RecordHeaderParser {
     }
 
     /**
-     * Gets a list of record headers from the specified repository. The returned list is immutable.
-     * <p>
-     * This method uses the {@code ListIdentifiers} verb.
+     * Checks if the response has an {@literal <error>} element.
      *
-     * @param repo the repository to retrieve records from
-     * @return a list of record headers
-     * @throws OaiPmhException    if the repository returns an OAI-PMH error
-     * @throws XMLParseException  if the XML cannot be parsed, or if an IO error occurs
-     * @throws HarvesterException if the OAI-PMH repository returns a XML document with no {@code <oai>} element
+     * @param document the document to map to.
+     * @throws OaiPmhException         if an {@literal <error>} element was present.
+     * @throws HarvesterException if the given document has no OAI element.
      */
-    List<RecordHeader> getRecordHeaders(Repo repo) throws HarvesterException {
+    private static void validateResponse(Document document) throws HarvesterException {
+        NodeList oAINode = document.getElementsByTagName(OaiPmhConstants.OAI_PMH);
 
-        log.debug("[{}] Parsing record headers.", repo.getCode());
+        if (oAINode.getLength() == 0) {
+            throw new HarvesterException("Missing OAI element");
+        }
 
-        URI fullListRecordUrlPath = OaiPmhHelpers.appendListRecordParams(repo);
-        var recordHeadersDocument = getRecordHeadersDocument(fullListRecordUrlPath);
-
-        // Exit if the response has an <error> element
-        ListIdentifiersResponseValidator.validateResponse(recordHeadersDocument);
-
-        Optional<String> resumptionToken;
-        var recordHeaders = new ArrayList<RecordHeader>();
-
-        do {
-            // Parse and add all found record headers
-            recordHeaders.addAll(parseRecordHeadersFromDoc(recordHeadersDocument));
-
-            // Check and loop when there is a resumptionToken
-            resumptionToken = parseResumptionToken(recordHeadersDocument);
-            if (resumptionToken.isPresent()) {
-                URI repoUrlWithResumptionToken = OaiPmhHelpers.appendListRecordResumptionToken(repo.getUrl(), resumptionToken.get());
-                log.trace("Looping for [{}].", repoUrlWithResumptionToken);
-                recordHeadersDocument = getRecordHeadersDocument(repoUrlWithResumptionToken);
+        for (int i = 0; i < oAINode.getLength(); i++) {
+            NodeList childNodes = oAINode.item(i).getChildNodes();
+            for (int childNodeIndex = 0; childNodeIndex < childNodes.getLength(); childNodeIndex++) {
+                Node item = childNodes.item(childNodeIndex);
+                if (OaiPmhConstants.ERROR.equals(item.getLocalName())) {
+                    if (item.getTextContent() != null && !item.getTextContent().isEmpty()) {
+                        throw new OaiPmhException(OaiPmhException.Code.valueOf(item.getAttributes().getNamedItem("code").getTextContent()), item.getTextContent());
+                    } else {
+                        throw new OaiPmhException(OaiPmhException.Code.valueOf(item.getAttributes().getNamedItem("code").getTextContent()));
+                    }
+                }
             }
-
-        } while (resumptionToken.isPresent());
-
-        log.debug("[{}] ParseRecordHeaders ended:  No more resumption tokens to process.", repo.getCode());
-
-        return Collections.unmodifiableList(recordHeaders);
+        }
     }
 
     private Document getRecordHeadersDocument(URI repoUrl) throws XMLParseException {
@@ -174,5 +157,48 @@ class RecordHeaderParser {
             }
         });
         return recordHeaderBuilder.build();
+    }
+
+    /**
+     * Gets a list of record headers from the specified repository. The returned list is immutable.
+     * <p>
+     * This method uses the {@code ListIdentifiers} verb.
+     *
+     * @param repo the repository to retrieve records from
+     * @return a list of record headers
+     * @throws OaiPmhException    if the repository returns an OAI-PMH error
+     * @throws XMLParseException  if the XML cannot be parsed, or if an IO error occurs
+     * @throws HarvesterException if the OAI-PMH repository returns a XML document with no {@code <oai>} element
+     */
+    public List<RecordHeader> getRecordHeaders(Repo repo) throws HarvesterException {
+
+        log.debug("[{}] Parsing record headers.", repo.getCode());
+
+        URI fullListRecordUrlPath = OaiPmhHelpers.appendListRecordParams(repo);
+        var recordHeadersDocument = getRecordHeadersDocument(fullListRecordUrlPath);
+
+        // Exit if the response has an <error> element
+        validateResponse(recordHeadersDocument);
+
+        Optional<String> resumptionToken;
+        var recordHeaders = new ArrayList<RecordHeader>();
+
+        do {
+            // Parse and add all found record headers
+            recordHeaders.addAll(parseRecordHeadersFromDoc(recordHeadersDocument));
+
+            // Check and loop when there is a resumptionToken
+            resumptionToken = parseResumptionToken(recordHeadersDocument);
+            if (resumptionToken.isPresent()) {
+                URI repoUrlWithResumptionToken = OaiPmhHelpers.appendListRecordResumptionToken(repo.getUrl(), resumptionToken.get());
+                log.trace("Looping for [{}].", repoUrlWithResumptionToken);
+                recordHeadersDocument = getRecordHeadersDocument(repoUrlWithResumptionToken);
+            }
+
+        } while (resumptionToken.isPresent());
+
+        log.debug("[{}] ParseRecordHeaders ended:  No more resumption tokens to process.", repo.getCode());
+
+        return Collections.unmodifiableList(recordHeaders);
     }
 }

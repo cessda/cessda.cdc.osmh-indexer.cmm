@@ -15,11 +15,11 @@
  */
 package eu.cessda.pasc.oci.harvester;
 
+import eu.cessda.pasc.oci.DateNotParsedException;
+import eu.cessda.pasc.oci.TimeUtility;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.configurations.Repo;
-import eu.cessda.pasc.oci.parser.DateNotParsedException;
-import eu.cessda.pasc.oci.parser.TimeUtility;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
@@ -60,7 +60,7 @@ abstract class AbstractHarvesterConsumerService implements HarvesterConsumerServ
      * @param ingestedLastModifiedDate the last modified date to filter by, can be null.
      * @return a list of filtered records.
      */
-    protected List<RecordHeader> filterRecords(Collection<RecordHeader> unfilteredRecordHeaders, LocalDateTime ingestedLastModifiedDate) {
+    protected static List<RecordHeader> filterRecords(Collection<RecordHeader> unfilteredRecordHeaders, LocalDateTime ingestedLastModifiedDate) {
         if (ingestedLastModifiedDate != null) {
             var filteredHeaders = unfilteredRecordHeaders.stream()
                 .filter(recordHeader -> isHeaderTimeGreater(recordHeader, ingestedLastModifiedDate))
@@ -90,14 +90,14 @@ abstract class AbstractHarvesterConsumerService implements HarvesterConsumerServ
      *
      * @param recordHeader the deleted record header
      */
-    private CMMStudy createInactiveRecord(RecordHeader recordHeader) {
+    private static CMMStudy createInactiveRecord(RecordHeader recordHeader) {
         return CMMStudy.builder().active(false)
             .studyNumber(recordHeader.getIdentifier())
             .lastModified(recordHeader.getLastModified())
             .build();
     }
 
-    private boolean isHeaderTimeGreater(RecordHeader recordHeader, LocalDateTime lastModifiedDate) {
+    private static boolean isHeaderTimeGreater(RecordHeader recordHeader, LocalDateTime lastModifiedDate) {
         String lastModified = recordHeader.getLastModified();
         try {
             var currentHeaderLastModified = TimeUtility.getLocalDateTime(lastModified);

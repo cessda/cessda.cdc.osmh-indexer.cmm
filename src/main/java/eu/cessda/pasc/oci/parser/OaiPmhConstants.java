@@ -37,12 +37,12 @@ public class OaiPmhConstants {
     static final String ERROR_PATH = "//oai:error";
 
     // Elements
-    public static final String IDENTIFIER_ELEMENT = "identifier";
-    public static final String DATESTAMP_ELEMENT = "datestamp";
-    public static final String SET_SPEC_ELEMENT = "setSpec";
-    public static final String HEADER_ELEMENT = "header";
-    public static final String RESUMPTION_TOKEN_ELEMENT = "resumptionToken";
-    public static final String DELETED = "deleted";
+    static final String IDENTIFIER_ELEMENT = "identifier";
+    static final String DATESTAMP_ELEMENT = "datestamp";
+    static final String SET_SPEC_ELEMENT = "setSpec";
+    static final String HEADER_ELEMENT = "header";
+    static final String RESUMPTION_TOKEN_ELEMENT = "resumptionToken";
+    static final String DELETED = "deleted";
 
     // Codebook Paths
     static final String ABSTRACT_XPATH = "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:abstract";
