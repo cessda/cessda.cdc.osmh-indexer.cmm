@@ -46,17 +46,17 @@ public class TimeUtility {
      * @throws IllegalArgumentException if the string is {@code null}
      */
     @SuppressWarnings("JdkObsolete")
-    public static Optional<LocalDateTime> getLocalDateTime(String dateString) {
+    public static LocalDateTime getLocalDateTime(String dateString) throws DateNotParsedException {
         try {
             Date date = DateUtils.parseDate(dateString, EXPECTED_DATE_FORMATS);
-            return Optional.of(date.toInstant().atZone(ZoneOffset.UTC).toLocalDateTime());
+            return date.toInstant().atZone(ZoneOffset.UTC).toLocalDateTime();
         } catch (ParseException e) {
-            log.error("Cannot parse date string [{}] using expected date formats [{}]: {}", dateString, EXPECTED_DATE_FORMATS, e.toString());
-            return Optional.empty();
+            throw new DateNotParsedException(dateString, EXPECTED_DATE_FORMATS, e);
         }
     }
 
-    static Optional<Integer> parseYearFromDateString(String dateString) {
-        return TimeUtility.getLocalDateTime(dateString).map(LocalDateTime::getYear);
+    static int parseYearFromDateString(String dateString) throws DateNotParsedException {
+        var localDateTime = TimeUtility.getLocalDateTime(dateString);
+        return localDateTime.getYear();
     }
 }

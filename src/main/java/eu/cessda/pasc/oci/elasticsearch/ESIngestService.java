@@ -19,6 +19,7 @@ import eu.cessda.pasc.oci.ResourceHandler;
 import eu.cessda.pasc.oci.configurations.ESConfigurationProperties;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
+import eu.cessda.pasc.oci.parser.DateNotParsedException;
 import eu.cessda.pasc.oci.parser.TimeUtility;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -174,6 +175,7 @@ public class ESIngestService implements IngestService {
     }
 
     @Override
+    @SuppressWarnings("java:S1141")
     public Optional<LocalDateTime> getMostRecentLastModified() {
 
         SearchResponse response = getMatchAllSearchRequest("*")
@@ -185,9 +187,12 @@ public class ESIngestService implements IngestService {
         try {
             if (hits.length != 0) {
                 CMMStudyOfLanguage study = cmmStudyOfLanguageConverter.getReader().readValue(hits[0].getSourceRef().streamInput());
-                String lastModified = study.getLastModified();
-                Optional<LocalDateTime> localDateTimeOpt = TimeUtility.getLocalDateTime(lastModified);
-                return localDateTimeOpt.map(localDateTime -> localDateTime.withHour(0).withMinute(0).withSecond(0).withNano(0));
+                try {
+                    var localDateTime = TimeUtility.getLocalDateTime(study.getLastModified());
+                    return Optional.of(localDateTime.withHour(0).withMinute(0).withSecond(0).withNano(0));
+                } catch (DateNotParsedException e) {
+                    log.error("[{}] lastModified field is not a valid ISO date: {}", study.getId(), e.toString());
+                }
             }
         } catch (IOException e) {
             log.error("Couldn't decode {} into an instance of {}: {}", hits[0].getId(), CMMStudyOfLanguage.class.getName(), e.toString());

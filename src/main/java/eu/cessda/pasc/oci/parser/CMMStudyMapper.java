@@ -353,8 +353,10 @@ public class CMMStudyMapper {
      * Xpath = {@value OaiPmhConstants#DATA_COLLECTION_PERIODS_PATH}
      * <p>
      * For Data Collection start and end date plus the four digit Year value as Data Collection Year
+     *
+     * @throws DateNotParsedException if a date string cannot be parsed.
      */
-    public DataCollectionPeriod parseDataCollectionDates(Document doc) {
+    public DataCollectionPeriod parseDataCollectionDates(Document doc) throws DateNotParsedException {
         var dateAttrs = docElementParser.getDateElementAttributesValueMap(doc, DATA_COLLECTION_PERIODS_PATH);
 
         var dataCollectionPeriodBuilder = DataCollectionPeriod.builder();
@@ -362,12 +364,12 @@ public class CMMStudyMapper {
         if (dateAttrs.containsKey(SINGLE_ATTR)) {
             final String singleDateValue = dateAttrs.get(SINGLE_ATTR);
             dataCollectionPeriodBuilder.startDate(singleDateValue);
-            dataCollectionPeriodBuilder.dataCollectionYear(parseYearFromDateString(singleDateValue).orElse(0));
+            dataCollectionPeriodBuilder.dataCollectionYear(parseYearFromDateString(singleDateValue));
         } else {
             if (dateAttrs.containsKey(START_ATTR)) {
                 final String startDateValue = dateAttrs.get(START_ATTR);
                 dataCollectionPeriodBuilder.startDate(startDateValue);
-                dataCollectionPeriodBuilder.dataCollectionYear(parseYearFromDateString(startDateValue).orElse(0));
+                dataCollectionPeriodBuilder.dataCollectionYear(parseYearFromDateString(startDateValue));
             }
             if (dateAttrs.containsKey(END_ATTR)) {
                 dataCollectionPeriodBuilder.endDate(dateAttrs.get(END_ATTR));

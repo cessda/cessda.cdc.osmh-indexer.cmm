@@ -18,6 +18,7 @@ package eu.cessda.pasc.oci.harvester;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.configurations.Repo;
+import eu.cessda.pasc.oci.parser.DateNotParsedException;
 import eu.cessda.pasc.oci.parser.TimeUtility;
 import lombok.extern.slf4j.Slf4j;
 
@@ -98,11 +99,12 @@ abstract class AbstractHarvesterConsumerService implements HarvesterConsumerServ
 
     private boolean isHeaderTimeGreater(RecordHeader recordHeader, LocalDateTime lastModifiedDate) {
         String lastModified = recordHeader.getLastModified();
-        Optional<LocalDateTime> currentHeaderLastModified = TimeUtility.getLocalDateTime(lastModified);
-        return currentHeaderLastModified.map(localDateTime -> localDateTime.isAfter(lastModifiedDate))
-            .orElseGet(() -> {
-                log.warn("Could not parse RecordIdentifier lastModifiedDate [{}]. Filtering out from list.", lastModified);
-                return false;
-            });
+        try {
+            var currentHeaderLastModified = TimeUtility.getLocalDateTime(lastModified);
+            return currentHeaderLastModified.isAfter(lastModifiedDate);
+        } catch (DateNotParsedException e) {
+            log.warn("Could not parse lastModifiedDate. Filtering out from list: {}", e.toString());
+            return false;
+        }
     }
 }
