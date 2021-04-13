@@ -141,12 +141,13 @@ osmhConsumer:
         handler: 'OAI-PMH'
         setSpec: subject:social-sciences
         preferredMetadataParam: oai_ddi25
-      - url: https://www.sodha.be
+      - url: https://www.sodha.be/oai
         code: SODHA
         name: 'Social Sciences and Digital Humanities Archive (SODHA)'
         handler: 'OAI-PMH'
+        setSpec: SODHA_CDC
         preferredMetadataParam: oai_ddi
-        defaultLanguage: fr
+     # defaultLanguage: 
       - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
         code: UKDS
         name: 'UK Data Service'
