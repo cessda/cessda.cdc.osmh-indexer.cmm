@@ -7,7 +7,6 @@
         "type": "custom",
         "tokenizer": "standard",
         "filter": [
-          "standard",
           "lowercase",
           "asciifolding",
           "hungarian_stop"
@@ -17,7 +16,6 @@
         "type": "custom",
         "tokenizer": "standard",
         "filter": [
-          "standard",
           "lowercase",
           "asciifolding",
           "hungarian_stop",

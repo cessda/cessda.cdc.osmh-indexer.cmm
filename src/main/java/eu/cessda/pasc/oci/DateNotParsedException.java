@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.parser;
+package eu.cessda.pasc.oci;
 
 import java.text.ParseException;
 import java.time.LocalDateTime;

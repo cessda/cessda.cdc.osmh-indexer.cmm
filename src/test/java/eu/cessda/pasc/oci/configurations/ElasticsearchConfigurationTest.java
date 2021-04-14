@@ -24,19 +24,6 @@ import static org.junit.Assert.assertSame;
 
 public class ElasticsearchConfigurationTest {
 
-
-    @Test
-    public void shouldReturnObjectMapper() {
-        try (var elasticsearchConfiguration = new ElasticsearchConfiguration()) {
-
-            // Given
-            var objectMapper = elasticsearchConfiguration.objectMapper();
-
-            // Then
-            assertNotNull(objectMapper);
-        }
-    }
-
     @Test
     public void shouldCreateElasticsearchClient() throws UnknownHostException {
         // Given

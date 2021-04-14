@@ -15,9 +15,11 @@
  */
 package eu.cessda.pasc.oci.exception;
 
-import com.vividsolutions.jts.util.Assert;
 import eu.cessda.pasc.oci.mock.data.ReposTestData;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class HandlerNotFoundExceptionTest {
 
@@ -30,8 +32,8 @@ public class HandlerNotFoundExceptionTest {
         var handlerNotFoundException = new HandlerNotFoundException(ukdsRepo);
 
         // Should contain the repository as a field
-        Assert.equals(ukdsRepo, handlerNotFoundException.getRepo());
-        Assert.isTrue(handlerNotFoundException.getMessage().contains(ukdsRepo.getCode()));
-        Assert.isTrue(handlerNotFoundException.getMessage().contains(ukdsRepo.getHandler()));
+        assertEquals(ukdsRepo, handlerNotFoundException.getRepo());
+        assertTrue(handlerNotFoundException.getMessage().contains(ukdsRepo.getCode()));
+        assertTrue(handlerNotFoundException.getMessage().contains(ukdsRepo.getHandler()));
     }
 }

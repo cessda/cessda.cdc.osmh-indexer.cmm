@@ -72,7 +72,7 @@ class DocElementParser {
      * @param xPathToElement the xPath
      * @return nonNull list of {@link Element}
      */
-    List<Element> getElements(Document document, String xPathToElement) {
+    static List<Element> getElements(Document document, String xPathToElement) {
         XPathExpression<Element> expression = XPathFactory.instance().compile(xPathToElement, Filters.element(), null, OAI_AND_DDI_NS);
         return expression.evaluate(document);
     }
@@ -146,7 +146,7 @@ class DocElementParser {
      * @param xPathToElement the XPath.
      * @return The first {@link Element}, or an empty {@link Optional} if no elements were found.
      */
-    Optional<Element> getFirstElement(Document document, String xPathToElement) {
+    static Optional<Element> getFirstElement(Document document, String xPathToElement) {
         var elements = getElements(document, xPathToElement);
         return elements.stream().findFirst();
     }
@@ -158,7 +158,7 @@ class DocElementParser {
      * @param xPathToElement the XPath.
      * @return The first {@link Attribute}, or an empty {@link Optional} if no attributes were found.
      */
-    Optional<Attribute> getFirstAttribute(Document document, String xPathToElement) {
+    static Optional<Attribute> getFirstAttribute(Document document, String xPathToElement) {
         var attributes = getAttributes(document, xPathToElement);
         return attributes.stream().findFirst();
     }
@@ -177,7 +177,7 @@ class DocElementParser {
      * @param elementXpath the XPath to search.
      * @return a {@link Map} with the keys set to the {@value OaiPmhConstants#EVENT_ATTR} and the values set to the date values.
      */
-    Map<String, String> getDateElementAttributesValueMap(Document document, String elementXpath) {
+    static Map<String, String> getDateElementAttributesValueMap(Document document, String elementXpath) {
         var elements = getElements(document, elementXpath);
         return elements.stream()
             .filter(element -> getAttributeValue(element, DATE_ATTR).isPresent()) //PUG requirement: we only care about those with @date CV
@@ -192,7 +192,7 @@ class DocElementParser {
      * @param xPathToElement the XPath to search.
      * @return a list of {@link Attribute}s.
      */
-    private List<Attribute> getAttributes(Document document, String xPathToElement) {
+    private static List<Attribute> getAttributes(Document document, String xPathToElement) {
         XPathExpression<Attribute> expression = XPathFactory.instance().compile(xPathToElement, Filters.attribute(), null, DDI_NS);
         return expression.evaluate(document);
     }
@@ -244,18 +244,18 @@ class DocElementParser {
      * @param elementXpath the Element parent node to retrieve
      * @return Array String Values of the attributes
      */
-    List<String> getAttributeValues(Document document, String elementXpath) {
+    static List<String> getAttributeValues(Document document, String elementXpath) {
         List<Attribute> attributes = getAttributes(document, elementXpath);
         return attributes.stream().map(Attribute::getValue).collect(Collectors.toList());
     }
 
     /**
-     * Checks if the record has an {@literal <error>} element.
+     * Checks if the record has an {@code <error>} element.
      *
      * @param document the document to map to.
-     * @throws OaiPmhException if an {@literal <error>} element was present.
+     * @throws OaiPmhException if an {@code <error>} element was present.
      */
-    void validateResponse(Document document) throws OaiPmhException {
+    static void validateResponse(Document document) throws OaiPmhException {
 
         final Optional<Element> optionalElement = getFirstElement(document, ERROR_PATH);
 

@@ -35,6 +35,7 @@ public interface IngestService {
      * @param languageCMMStudiesMap of records
      * @param languageIsoCode       index post-end token
      * @return true If bulkIndexing was successful with no known error.
+     * @throws org.elasticsearch.ElasticsearchException if an error occurs when indexing the studies to Elasticsearch.
      */
     boolean bulkIndex(Collection<CMMStudyOfLanguage> languageCMMStudiesMap, String languageIsoCode);
 

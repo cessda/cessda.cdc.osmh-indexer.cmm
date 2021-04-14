@@ -15,6 +15,7 @@
  */
 package eu.cessda.pasc.oci.elasticsearch;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
@@ -34,7 +35,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.elasticsearch.ElasticsearchException;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -44,7 +44,6 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static eu.cessda.pasc.oci.mock.data.RecordTestData.*;
 import static org.assertj.core.api.Java6BDDAssertions.then;
@@ -76,6 +75,8 @@ public class ESIngestServiceTestIT {
     @Autowired
     private ElasticsearchTemplate elasticsearchTemplate;
 
+    private final CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter = new CMMStudyOfLanguageConverter();
+
     /**
      * Reset Elasticsearch after each test
      */
@@ -90,7 +91,7 @@ public class ESIngestServiceTestIT {
         // Given
         final JsonNode expectedTree = mapper.readTree(getSyntheticCMMStudyOfLanguageEn());
         List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX1();
-        ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, esConfigProp, null);
+        ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, esConfigProp, cmmStudyOfLanguageConverter);
 
         // Set the id to a random UUID
         final String expected = studyOfLanguages.get(0).getId();
@@ -108,6 +109,7 @@ public class ESIngestServiceTestIT {
             .actionGet();
 
         // Should return the same ID
+        then(response.getHits()).isNotEmpty();
         then(response.getHits().getAt(0).getId()).isEqualTo(expected);
 
         // And Assert full json equality
@@ -120,7 +122,6 @@ public class ESIngestServiceTestIT {
 
         // Given
         List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
-        CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter = new CMMStudyOfLanguageConverter();
         ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, esConfigProp, cmmStudyOfLanguageConverter);
         boolean isSuccessful = ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
 
@@ -151,7 +152,7 @@ public class ESIngestServiceTestIT {
 
         //Setup
         ElasticsearchTemplate elasticsearchTemplate = Mockito.mock(ElasticsearchTemplate.class);
-        ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, esConfigProp, null);
+        ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, esConfigProp, cmmStudyOfLanguageConverter);
         List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
 
         // When
@@ -166,7 +167,7 @@ public class ESIngestServiceTestIT {
 
         //Setup
         ElasticsearchTemplate elasticsearchTemplate = Mockito.mock(ElasticsearchTemplate.class);
-        ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, esConfigProp, null);
+        ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, esConfigProp, cmmStudyOfLanguageConverter);
         List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
 
         // When
@@ -196,7 +197,6 @@ public class ESIngestServiceTestIT {
 
         // Setup
         List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
-        CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter = new CMMStudyOfLanguageConverter();
         ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, esConfigProp, cmmStudyOfLanguageConverter);
 
         // Given
@@ -215,12 +215,12 @@ public class ESIngestServiceTestIT {
         // Setup
         List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
         ObjectReader objectReader = Mockito.mock(ObjectReader.class);
-        CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter = Mockito.mock(CMMStudyOfLanguageConverter.class);
-        ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, esConfigProp, cmmStudyOfLanguageConverter);
+        var cmmStudyOfLanguageConverterSpy = Mockito.spy(CMMStudyOfLanguageConverter.class);
+        ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, esConfigProp, cmmStudyOfLanguageConverterSpy);
 
         // Given
-        Mockito.when(cmmStudyOfLanguageConverter.getReader()).thenReturn(objectReader);
-        Mockito.when(objectReader.readValue(Mockito.any(InputStream.class))).thenThrow(new IOException());
+        Mockito.when(cmmStudyOfLanguageConverterSpy.getReader()).thenReturn(objectReader);
+        Mockito.when(objectReader.readValue(Mockito.any(InputStream.class))).thenThrow(IOException.class);
         boolean isSuccessful = ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
         then(isSuccessful).isTrue();
         elasticsearchTemplate.refresh(INDEX_NAME);
@@ -235,7 +235,6 @@ public class ESIngestServiceTestIT {
 
         // Setup
         List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
-        CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter = new CMMStudyOfLanguageConverter();
         ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, esConfigProp, cmmStudyOfLanguageConverter);
 
         // Given
@@ -254,7 +253,6 @@ public class ESIngestServiceTestIT {
 
         // Setup
         ElasticsearchTemplate elasticsearchTemplate = new ElasticsearchTemplate(this.elasticsearchTemplate.getClient());
-        CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter = new CMMStudyOfLanguageConverter();
         ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, esConfigProp, cmmStudyOfLanguageConverter);
 
         // Then
@@ -268,12 +266,12 @@ public class ESIngestServiceTestIT {
         // Setup
         List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
         ObjectReader objectReader = Mockito.mock(ObjectReader.class);
-        CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter = Mockito.mock(CMMStudyOfLanguageConverter.class);
-        ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, esConfigProp, cmmStudyOfLanguageConverter);
+        var cmmStudyOfLanguageConverterSpy = Mockito.spy(CMMStudyOfLanguageConverter.class);
+        ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, esConfigProp, cmmStudyOfLanguageConverterSpy);
 
         // Given
-        Mockito.when(cmmStudyOfLanguageConverter.getReader()).thenReturn(objectReader);
-        Mockito.when(objectReader.readValue(Mockito.any(byte[].class))).thenThrow(new IOException());
+        Mockito.when(cmmStudyOfLanguageConverterSpy.getReader()).thenReturn(objectReader);
+        Mockito.when(objectReader.readValue(Mockito.any(byte[].class))).thenThrow(IOException.class);
         boolean isSuccessful = ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
         then(isSuccessful).isTrue();
         var expectedStudy = studyOfLanguages.get(0);
@@ -289,13 +287,13 @@ public class ESIngestServiceTestIT {
         // Setup
         List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
         ElasticsearchTemplate elasticsearchTemplate = new ElasticsearchTemplate(this.elasticsearchTemplate.getClient());
-        var elasticTemplateSpy = Mockito.spy(elasticsearchTemplate);
-        CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter = Mockito.mock(CMMStudyOfLanguageConverter.class);
-        ESIngestService ingestService = new ESIngestService(elasticTemplateSpy, esConfigProp, cmmStudyOfLanguageConverter);
+        var cmmStudyOfLanguageConverterSpy = Mockito.spy(this.cmmStudyOfLanguageConverter);
+        var objectWriterSpy = Mockito.spy(this.cmmStudyOfLanguageConverter.getWriter());
+        ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, esConfigProp, cmmStudyOfLanguageConverterSpy);
 
         // Given
-        var mockedFailure = studyOfLanguages.stream().collect(Collectors.toMap(CMMStudyOfLanguage::getId, study -> "Mocked Failure"));
-        Mockito.doThrow(new ElasticsearchException("Failed indexing", mockedFailure)).when(elasticTemplateSpy).bulkIndex(Mockito.anyList());
+        Mockito.doReturn(objectWriterSpy).when(cmmStudyOfLanguageConverterSpy).getWriter();
+        Mockito.doThrow(JsonProcessingException.class).when(objectWriterSpy).writeValueAsBytes(Mockito.any(CMMStudyOfLanguage.class));
 
         // Then - indexing should report true as Elasticsearch was accessible
         boolean indexingResult = ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
@@ -306,7 +304,6 @@ public class ESIngestServiceTestIT {
     public void shouldDeleteGivenStudies() throws IOException {
         // Setup
         List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
-        CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter = new CMMStudyOfLanguageConverter();
         ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, esConfigProp, cmmStudyOfLanguageConverter);
         boolean isSuccessful = ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
         then(isSuccessful).isTrue();

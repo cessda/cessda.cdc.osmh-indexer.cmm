@@ -15,31 +15,29 @@
  */
 package eu.cessda.pasc.oci.elasticsearch;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import eu.cessda.pasc.oci.DateNotParsedException;
 import eu.cessda.pasc.oci.ResourceHandler;
+import eu.cessda.pasc.oci.TimeUtility;
 import eu.cessda.pasc.oci.configurations.ESConfigurationProperties;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
-import eu.cessda.pasc.oci.parser.DateNotParsedException;
-import eu.cessda.pasc.oci.parser.TimeUtility;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.Requests;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.IndexNotFoundException;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.elasticsearch.ElasticsearchException;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
-import org.springframework.data.elasticsearch.core.query.DeleteQuery;
-import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -76,26 +74,34 @@ public class ESIngestService implements IngestService {
         var indexName = String.format(INDEX_NAME_TEMPLATE, languageIsoCode);
 
         if (createIndex(indexName)) {
+            log.debug("[{}] Indexing {} studies", indexName, languageCMMStudiesMap.size());
 
-            // Allocate all space needed upfront, this avoids unnecessary resizes
-            var queries = new ArrayList<IndexQuery>(Integer.min(languageCMMStudiesMap.size(), INDEX_COMMIT_SIZE));
+            var bulkIndexQuery = esTemplate.getClient().prepareBulk();
 
-            log.debug("[{}] Indexing...", indexName);
+            for (var study : languageCMMStudiesMap) {
+                try {
+                    var json = cmmStudyOfLanguageConverter.getWriter().writeValueAsBytes(study);
+                    var indexRequest = Requests.indexRequest(indexName)
+                        .type(INDEX_TYPE)
+                        .id(study.getId())
+                        .source(json, XContentType.JSON);
 
-            for (CMMStudyOfLanguage cmmStudyOfLanguage : languageCMMStudiesMap) {
-                var indexQuery = getIndexQuery(cmmStudyOfLanguage, indexName);
-                queries.add(indexQuery);
-                if (queries.size() == INDEX_COMMIT_SIZE) {
-                    log.trace("[{}] Bulk Indexing {} studies", indexName, INDEX_COMMIT_SIZE);
-                    executeBulk(queries);
-                    queries.clear();
+                    bulkIndexQuery.add(indexRequest);
+
+                    if (bulkIndexQuery.numberOfActions() == INDEX_COMMIT_SIZE) {
+                        log.trace("[{}] Bulk Indexing {} studies", indexName, INDEX_COMMIT_SIZE);
+                        bulkIndexQuery.get();
+                        bulkIndexQuery = esTemplate.getClient().prepareBulk();
+                    }
+                } catch (JsonProcessingException e) {
+                    log.warn("[{}] Failed to convert {} into JSON: {}", indexName, study.getId(), e.toString());
                 }
             }
 
             // Commit all remaining studies
-            if (!queries.isEmpty()) {
-                log.trace("[{}] Bulk Indexing {} studies", indexName, queries.size());
-                executeBulk(queries);
+            if (bulkIndexQuery.numberOfActions() > 0) {
+                log.trace("[{}] Bulk Indexing {} studies", indexName, bulkIndexQuery.numberOfActions());
+                bulkIndexQuery.get();
             }
 
             log.debug("[{}] Indexing completed.", indexName);
@@ -108,27 +114,25 @@ public class ESIngestService implements IngestService {
     @Override
     public void bulkDelete(Collection<CMMStudyOfLanguage> cmmStudiesToDelete, String languageIsoCode) {
 
-        var deleteQuery = new DeleteQuery();
+        var deleteBulkRequest = esTemplate.getClient().prepareBulk();
 
         // Set the index
         var indexName = String.format(INDEX_NAME_TEMPLATE, languageIsoCode);
-        deleteQuery.setIndex(indexName);
 
         // Extract the ids from the studies, and add them to the delete query
-        var studyIds = cmmStudiesToDelete.stream().map(CMMStudyOfLanguage::getId).toArray(String[]::new);
-        deleteQuery.setType(INDEX_TYPE);
-        deleteQuery.setQuery(QueryBuilders.idsQuery().addIds(studyIds));
+        cmmStudiesToDelete.stream().map(CMMStudyOfLanguage::getId)
+            .map(id -> Requests.deleteRequest(indexName).type(INDEX_TYPE).id(id))
+            .forEach(deleteBulkRequest::add);
 
         // Perform the deletion
-        esTemplate.delete(deleteQuery);
+        deleteBulkRequest.get();
     }
 
     @Override
     public long getTotalHitCount(String language) {
         var matchAllSearchRequest = getMatchAllSearchRequest(language).setSize(0);
         var response = matchAllSearchRequest.get();
-        var hits = response.getHits();
-        return hits.getTotalHits();
+        return response.getHits().getTotalHits();
     }
 
     @Override
@@ -201,22 +205,6 @@ public class ESIngestService implements IngestService {
     }
 
     /**
-     * Creates an {@link IndexQuery} for the given {@link CMMStudyOfLanguage} and sets the target index to
-     * the given index name.
-     *
-     * @param cmmStudyOfLanguage the study to index
-     * @param indexName          the index to save the study to
-     */
-    private IndexQuery getIndexQuery(CMMStudyOfLanguage cmmStudyOfLanguage, String indexName) {
-        IndexQuery indexQuery = new IndexQuery();
-        indexQuery.setId(cmmStudyOfLanguage.getId());
-        indexQuery.setObject(cmmStudyOfLanguage);
-        indexQuery.setIndexName(indexName);
-        indexQuery.setType(INDEX_TYPE);
-        return indexQuery;
-    }
-
-    /**
      * Creates an index with the given name. If the index already exists, then no operation is performed.
      *
      * @param indexName the name of the index to create
@@ -260,18 +248,4 @@ public class ESIngestService implements IngestService {
         return false;
     }
 
-    /**
-     * Index the given list of {@link IndexQuery}s into Elasticsearch.
-     *
-     * @param queries the queries to index
-     */
-    private void executeBulk(List<IndexQuery> queries) {
-        try {
-            esTemplate.bulkIndex(queries);
-        } catch (ElasticsearchException e) {
-            var failedDocuments = new StringBuilder();
-            e.getFailedDocuments().forEach((key, value) -> failedDocuments.append(String.format("%nFailed to index id [%s]: [%s]", key, value)));
-            log.error("Failed to index all documents: {}: {}", e.toString(), failedDocuments);
-        }
-    }
 }

@@ -19,6 +19,8 @@ import eu.cessda.pasc.oci.exception.HarvesterException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.configurations.Repo;
+import eu.cessda.pasc.oci.parser.RecordHeaderParser;
+import eu.cessda.pasc.oci.parser.RecordXMLParser;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

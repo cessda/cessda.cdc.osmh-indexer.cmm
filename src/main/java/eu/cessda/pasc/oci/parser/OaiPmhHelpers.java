@@ -20,7 +20,9 @@ import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jdom2.input.SAXBuilder;
 
+import javax.xml.XMLConstants;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
@@ -64,5 +66,12 @@ public class OaiPmhHelpers {
             VERB_PARAM_KEY, LIST_IDENTIFIERS_VALUE, // verb=ListIdentifier
             RESUMPTION_TOKEN_KEY, URLEncoder.encode(resumptionToken, StandardCharsets.UTF_8)) // &resumptionToken=0001/500....
         );
+    }
+
+    static SAXBuilder getSaxBuilder() {
+        SAXBuilder saxBuilder = new SAXBuilder();
+        saxBuilder.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        saxBuilder.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        return saxBuilder;
     }
 }

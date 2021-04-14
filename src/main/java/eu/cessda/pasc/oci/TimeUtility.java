@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.parser;
+package eu.cessda.pasc.oci;
 
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,6 @@ import org.apache.commons.lang.time.DateUtils;
 import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Date;
 import java.util.Optional;
 
 @Slf4j
@@ -45,18 +44,12 @@ public class TimeUtility {
      * @return the {@link Optional} of {@link LocalDateTime}, or an {@link Optional#empty()} if the date failed to parse.
      * @throws IllegalArgumentException if the string is {@code null}
      */
-    @SuppressWarnings("JdkObsolete")
     public static LocalDateTime getLocalDateTime(String dateString) throws DateNotParsedException {
         try {
-            Date date = DateUtils.parseDate(dateString, EXPECTED_DATE_FORMATS);
+            var date = DateUtils.parseDate(dateString, EXPECTED_DATE_FORMATS);
             return date.toInstant().atZone(ZoneOffset.UTC).toLocalDateTime();
         } catch (ParseException e) {
             throw new DateNotParsedException(dateString, EXPECTED_DATE_FORMATS, e);
         }
-    }
-
-    static int parseYearFromDateString(String dateString) throws DateNotParsedException {
-        var localDateTime = TimeUtility.getLocalDateTime(dateString);
-        return localDateTime.getYear();
     }
 }
