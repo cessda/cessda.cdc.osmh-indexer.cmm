@@ -48,9 +48,7 @@ spring:
       password: password
       roles: ACTUATOR
 elasticsearch:
-  clustername: elasticsearch
   host: 127.0.0.1
-  port: 9300
   numberOfShards: 2
   numberOfReplicas: 0
 osmhConsumer:

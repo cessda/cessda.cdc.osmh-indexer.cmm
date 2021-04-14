@@ -62,4 +62,31 @@ public class ElasticsearchConfigurationTest {
             assertNotNull(esTemplate);
         }
     }
+
+    @Test
+    public void shouldCreateElasticsearchRestClient() {
+        // Given
+        var elasticsearchConfiguration = new ElasticsearchConfiguration();
+        var client = elasticsearchConfiguration.elasticsearchClient();
+
+        // Then
+        assertNotNull(client);
+
+        // Close
+        elasticsearchConfiguration.close();
+        elasticsearchConfiguration.close(); // Should not throw on repeated calls
+    }
+
+    @Test
+    public void shouldReturnExistingElasticsearchRestClient() {
+        try (var elasticsearchConfiguration = new ElasticsearchConfiguration()) {
+
+            // Given
+            var firstESClient = elasticsearchConfiguration.elasticsearchClient();
+            var secondESClient = elasticsearchConfiguration.elasticsearchClient();
+
+            // Then
+            assertSame(firstESClient, secondESClient);
+        }
+    }
 }

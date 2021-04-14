@@ -16,7 +16,10 @@
 package eu.cessda.pasc.oci.configurations;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpHost;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.TransportAddress;
@@ -27,6 +30,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 
 import javax.annotation.PreDestroy;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -37,17 +41,21 @@ import java.net.UnknownHostException;
  */
 @Configuration
 @Slf4j
-public class ElasticsearchConfiguration implements AutoCloseable {
+public class ElasticsearchConfiguration implements AutoCloseable   {
 
-    @Value("${elasticsearch.host}")
+    @Value("${elasticsearch.host:localhost}")
     private String esHost;
 
-    @Value("${elasticsearch.port}")
+    @Value("${elasticsearch.port:9300}")
     private int esPort;
 
-    @Value("${elasticsearch.clustername}")
+    @Value("${elasticsearch.httpPort:9200}")
+    private int esHttpPort;
+
+    @Value("${elasticsearch.clustername:elasticsearch}")
     private String esClusterName;
 
+    private RestHighLevelClient restHighLevelClient;
     private TransportClient transportClient;
 
     @SuppressWarnings({"resource", "IOResourceOpenedButNotSafelyClosed"})
@@ -56,11 +64,18 @@ public class ElasticsearchConfiguration implements AutoCloseable {
         if (transportClient == null) {
             log.debug("Creating Elasticsearch Client\nCluster name={}\nHostname={}", esClusterName, esHost);
             Settings esSettings = Settings.builder().put("cluster.name", esClusterName).build();
-
-            // https://www.elastic.co/guide/en/elasticsearch/guide/current/_transport_client_versus_node_client.html
             transportClient = new PreBuiltTransportClient(esSettings).addTransportAddress(new TransportAddress(InetAddress.getByName(esHost), esPort));
         }
         return transportClient;
+    }
+
+    @Bean
+    public RestHighLevelClient elasticsearchClient() {
+        if (restHighLevelClient == null) {
+            var esHosts = new HttpHost(esHost, esHttpPort, "http");
+            restHighLevelClient = new RestHighLevelClient(RestClient.builder(esHosts));
+        }
+        return restHighLevelClient;
     }
 
     @Bean
@@ -74,6 +89,14 @@ public class ElasticsearchConfiguration implements AutoCloseable {
         if (transportClient != null) {
             transportClient.close();
             transportClient = null;
+        }
+        if (restHighLevelClient != null) {
+            try {
+                restHighLevelClient.close();
+            } catch (IOException e) {
+                log.debug("Error occurred when closing ES REST client", e);
+            }
+            restHighLevelClient = null;
         }
     }
 }

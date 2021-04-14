@@ -125,7 +125,9 @@ public class ESIngestService implements IngestService {
             .forEach(deleteBulkRequest::add);
 
         // Perform the deletion
-        deleteBulkRequest.get();
+        if (deleteBulkRequest.numberOfActions() > 0) {
+            deleteBulkRequest.get();
+        }
     }
 
     @Override
