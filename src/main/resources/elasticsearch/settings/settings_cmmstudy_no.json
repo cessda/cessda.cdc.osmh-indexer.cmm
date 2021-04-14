@@ -7,7 +7,6 @@
         "type": "custom",
         "tokenizer": "standard",
         "filter": [
-          "standard",
           "lowercase",
           "asciifolding",
           "norwegian_stop",
@@ -18,7 +17,6 @@
         "type": "custom",
         "tokenizer": "standard",
         "filter": [
-          "standard",
           "lowercase",
           "asciifolding",
           "norwegian_stop",

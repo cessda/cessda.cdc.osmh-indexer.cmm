@@ -18,6 +18,7 @@ package eu.cessda.pasc.oci.models.cmmstudy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,7 @@ import java.io.IOException;
 public class CMMStudyOfLanguageConverter {
 
     private final ObjectReader reader;
+    private final ObjectWriter writer;
 
     public CMMStudyOfLanguageConverter() {
         this(new ObjectMapper());
@@ -51,6 +53,7 @@ public class CMMStudyOfLanguageConverter {
     @Autowired
     private CMMStudyOfLanguageConverter(ObjectMapper mapper) {
         reader = mapper.readerFor(CMMStudyOfLanguage.class);
+        writer = mapper.writerFor(CMMStudyOfLanguage.class);
     }
 
     public CMMStudyOfLanguage fromJsonString(String json) throws IOException {

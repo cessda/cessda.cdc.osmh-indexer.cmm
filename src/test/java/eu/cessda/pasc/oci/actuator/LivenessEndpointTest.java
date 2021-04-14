@@ -15,14 +15,15 @@
  */
 package eu.cessda.pasc.oci.actuator;
 
-import com.vividsolutions.jts.util.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
 
 public class LivenessEndpointTest {
 
     @Test
     public void testLiveness() {
         var livenessEndpoint = new LivenessEndpoint();
-        Assert.isTrue(!livenessEndpoint.testLiveness().isEmpty());
+        assertFalse(livenessEndpoint.testLiveness().isEmpty());
     }
 }

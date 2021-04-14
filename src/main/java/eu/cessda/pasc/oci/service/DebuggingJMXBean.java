@@ -19,6 +19,7 @@ import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.settings.Settings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.jmx.export.annotation.ManagedOperation;
@@ -51,7 +52,7 @@ public class DebuggingJMXBean {
   public String printElasticSearchInfo() {
 
     Client client = elasticsearchTemplate.getClient();
-    Map<String, String> asMap = client.settings().getAsMap();
+    Map<String, Settings> asMap = client.settings().getAsGroups();
     String elasticsearchInfo = String.format("Elasticsearch Client Settings: [%n%s]", asMap.entrySet().stream()
             .map(entry -> "\t" + entry.getKey() + "=" + entry.getValue() + "\n")
             .collect(Collectors.joining())
