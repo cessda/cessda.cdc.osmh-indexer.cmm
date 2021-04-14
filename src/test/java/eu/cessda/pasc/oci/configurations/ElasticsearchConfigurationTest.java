@@ -24,10 +24,19 @@ import static org.junit.Assert.assertSame;
 
 public class ElasticsearchConfigurationTest {
 
+    private ElasticsearchConfiguration getElasticsearchConfiguration() {
+        return new ElasticsearchConfiguration(
+            "localhost",
+            9300,
+            9200,
+            "es-test"
+        );
+    }
+
     @Test
     public void shouldCreateElasticsearchClient() throws UnknownHostException {
         // Given
-        var elasticsearchConfiguration = new ElasticsearchConfiguration();
+        var elasticsearchConfiguration = getElasticsearchConfiguration();
         var client = elasticsearchConfiguration.client();
 
         // Then
@@ -40,7 +49,7 @@ public class ElasticsearchConfigurationTest {
 
     @Test
     public void shouldReturnExistingElasticsearchClient() throws UnknownHostException {
-        try (var elasticsearchConfiguration = new ElasticsearchConfiguration()) {
+        try (var elasticsearchConfiguration = getElasticsearchConfiguration()) {
 
             // Given
             var firstESClient = elasticsearchConfiguration.client();
@@ -53,7 +62,7 @@ public class ElasticsearchConfigurationTest {
 
     @Test
     public void shouldReturnElasticsearchTemplate() throws UnknownHostException {
-        try (var elasticsearchConfiguration = new ElasticsearchConfiguration()) {
+        try (var elasticsearchConfiguration = getElasticsearchConfiguration()) {
 
             // Given
             var esTemplate = elasticsearchConfiguration.elasticsearchTemplate();
@@ -66,7 +75,7 @@ public class ElasticsearchConfigurationTest {
     @Test
     public void shouldCreateElasticsearchRestClient() {
         // Given
-        var elasticsearchConfiguration = new ElasticsearchConfiguration();
+        var elasticsearchConfiguration = getElasticsearchConfiguration();
         var client = elasticsearchConfiguration.elasticsearchClient();
 
         // Then
@@ -79,7 +88,7 @@ public class ElasticsearchConfigurationTest {
 
     @Test
     public void shouldReturnExistingElasticsearchRestClient() {
-        try (var elasticsearchConfiguration = new ElasticsearchConfiguration()) {
+        try (var elasticsearchConfiguration = getElasticsearchConfiguration()) {
 
             // Given
             var firstESClient = elasticsearchConfiguration.elasticsearchClient();

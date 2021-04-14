@@ -43,20 +43,25 @@ import java.net.UnknownHostException;
 @Slf4j
 public class ElasticsearchConfiguration implements AutoCloseable   {
 
-    @Value("${elasticsearch.host:localhost}")
-    private String esHost;
-
-    @Value("${elasticsearch.port:9300}")
-    private int esPort;
-
-    @Value("${elasticsearch.httpPort:9200}")
-    private int esHttpPort;
-
-    @Value("${elasticsearch.clustername:elasticsearch}")
-    private String esClusterName;
+    private final String esHost;
+    private final int esPort;
+    private final int esHttpPort;
+    private final String esClusterName;
 
     private RestHighLevelClient restHighLevelClient;
     private TransportClient transportClient;
+
+    public ElasticsearchConfiguration(
+        @Value("${elasticsearch.host:localhost}") String esHost,
+        @Value("${elasticsearch.port:9300}") int esPort,
+        @Value("${elasticsearch.httpPort:9200}") int esHttpPort,
+        @Value("${elasticsearch.clustername:elasticsearch}") String esClusterName
+    ) {
+        this.esHost = esHost;
+        this.esPort = esPort;
+        this.esHttpPort = esHttpPort;
+        this.esClusterName = esClusterName;
+    }
 
     @SuppressWarnings({"resource", "IOResourceOpenedButNotSafelyClosed"})
     @Bean
