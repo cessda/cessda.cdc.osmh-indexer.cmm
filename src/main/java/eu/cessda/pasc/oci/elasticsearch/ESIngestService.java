@@ -23,6 +23,7 @@ import eu.cessda.pasc.oci.configurations.ESConfigurationProperties;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Requests;
@@ -90,7 +91,9 @@ public class ESIngestService implements IngestService {
 
                     if (bulkIndexQuery.numberOfActions() == INDEX_COMMIT_SIZE) {
                         log.trace("[{}] Bulk Indexing {} studies", indexName, INDEX_COMMIT_SIZE);
-                        bulkIndexQuery.get();
+                        indexBulkRequest(indexName, bulkIndexQuery.get());
+
+                        // Clear the bulk request
                         bulkIndexQuery = esTemplate.getClient().prepareBulk();
                     }
                 } catch (JsonProcessingException e) {
@@ -101,7 +104,7 @@ public class ESIngestService implements IngestService {
             // Commit all remaining studies
             if (bulkIndexQuery.numberOfActions() > 0) {
                 log.trace("[{}] Bulk Indexing {} studies", indexName, bulkIndexQuery.numberOfActions());
-                bulkIndexQuery.get();
+                indexBulkRequest(indexName, bulkIndexQuery.get());
             }
 
             log.debug("[{}] Indexing completed.", indexName);
@@ -109,6 +112,12 @@ public class ESIngestService implements IngestService {
         }
 
         return false;
+    }
+
+    private void indexBulkRequest(String indexName, BulkResponse response) {
+        if (response.hasFailures()) {
+            log.warn("[{}] {}", indexName, response.buildFailureMessage());
+        }
     }
 
     @Override
