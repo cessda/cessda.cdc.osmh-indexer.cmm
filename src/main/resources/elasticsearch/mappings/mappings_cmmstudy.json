@@ -16,7 +16,8 @@
       },
       "abstract": {
         "type": "text",
-        "analyzer": "pasc_standard_analyzer",
+        "analyzer": "pasc_index_autocomplete_analyzer",
+        "search_analyzer": "pasc_standard_analyzer",
         "term_vector": "with_positions_offsets"
       },
       "code": {
@@ -125,7 +126,9 @@
             "ignore_above": 256
           },
           "country": {
-            "type": "text"
+            "type": "text",
+            "analyzer": "pasc_index_autocomplete_analyzer",
+            "search_analyzer": "pasc_standard_analyzer"
           },
           "searchField": {
             "type": "keyword",
@@ -156,7 +159,8 @@
           },
           "term": {
             "type": "text",
-            "analyzer": "pasc_standard_analyzer",
+            "analyzer": "pasc_index_autocomplete_analyzer",
+            "search_analyzer": "pasc_standard_analyzer",
             "term_vector": "with_positions_offsets"
           },
           "vocab": {
