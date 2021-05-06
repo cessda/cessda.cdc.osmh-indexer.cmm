@@ -15,8 +15,8 @@
  */
 package eu.cessda.pasc.oci.elasticsearch;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
-import lombok.EqualsAndHashCode;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
@@ -31,20 +31,27 @@ import java.util.NoSuchElementException;
 
 /**
  * An implementation of the set interface that supports iterating over an Elasticsearch scroll.
+ * This is an unmodifiable collection.
  *
- * @param <T> the type to decode the JSON into
+ * @param <T> the type to decode the JSON into.
  */
-@EqualsAndHashCode(callSuper = true)
+@SuppressWarnings("java:S2160") // The super class will handle equality comparisons
 public class ElasticsearchSet<T> extends AbstractSet<T> {
 
     private final SearchRequestBuilder searchRequestBuilder;
     private final Client client;
     private final ObjectReader objectReader;
 
-    ElasticsearchSet(SearchRequestBuilder searchRequestBuilder, Client client, ObjectReader objectReader) {
+    /**
+     * Constructs a new Elasticsearch Set that will contain the results of the given search query.
+     * @param searchRequestBuilder the search request to execute.
+     * @param client the Elasticsearch Client to use.
+     * @param clazz the class to serialise the returned JSON into.
+     */
+    ElasticsearchSet(SearchRequestBuilder searchRequestBuilder, Client client, Class<T> clazz) {
         this.searchRequestBuilder = searchRequestBuilder;
         this.client = client;
-        this.objectReader = objectReader;
+        this.objectReader = new ObjectMapper().readerFor(clazz);
     }
 
     /**
@@ -69,7 +76,7 @@ public class ElasticsearchSet<T> extends AbstractSet<T> {
     }
 
     /**
-     * An iterator that iterates over an Elasticsearch scroll and decodes the resulting JSON
+     * An iterator that iterates over an Elasticsearch scroll and decodes the resulting JSON.
      */
     private class ElasticsearchIterator implements Iterator<T> {
 

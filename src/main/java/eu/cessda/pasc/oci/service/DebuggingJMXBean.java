@@ -53,19 +53,17 @@ public class DebuggingJMXBean {
 
     Client client = elasticsearchTemplate.getClient();
     Map<String, Settings> asMap = client.settings().getAsGroups();
-    String elasticsearchInfo = String.format("Elasticsearch Client Settings: [%n%s]", asMap.entrySet().stream()
-            .map(entry -> "\t" + entry.getKey() + "=" + entry.getValue() + "\n")
-            .collect(Collectors.joining())
-    );
+    String elasticsearchInfo = "Elasticsearch Client Settings: [\n" + asMap.entrySet().stream()
+        .map(entry -> "\t" + entry.getKey() + "=" + entry.getValue() + "\n")
+        .collect(Collectors.joining()) + "]";
 
     ClusterHealthResponse healths = client.admin().cluster().prepareHealth().get();
     client.admin().cluster().prepareHealth().get();
 
-    elasticsearchInfo += String.format("%nElasticsearch Cluster Details:%n\tCluster Name [%s]\tNumberOfDataNodes [%s]\tNumberOfNodes [%s]",
-            healths.getClusterName(),
-            healths.getNumberOfDataNodes(),
-            healths.getNumberOfNodes()
-    );
+    elasticsearchInfo += "\nElasticsearch Cluster Details:\n" +
+        "\tCluster Name [" + healths.getClusterName() + "]" +
+        "\tNumberOfDataNodes [" + healths.getNumberOfDataNodes() + "]" +
+        "\tNumberOfNodes [" + healths.getNumberOfNodes() + "]";
 
     return elasticsearchInfo;
   }
@@ -74,6 +72,6 @@ public class DebuggingJMXBean {
   public String printCurrentlyConfiguredRepoEndpoints() {
     String reposStr = appConfigProps.getEndpoints().getRepos().stream().map(repo -> "\t" + repo + "\n")
             .collect(Collectors.joining());
-    return String.format("Configured Repositories: [%n%s]", reposStr);
+    return "Configured Repositories: [\n" + reposStr + "]";
   }
 }

@@ -40,9 +40,7 @@ public class DateNotParsedException extends Exception {
      */
     DateNotParsedException(String dateString, String[] expectedDateFormats, ParseException cause) {
         super(
-            String.format("Failed parsing using expected date formats %s: %s",
-                Arrays.toString(expectedDateFormats), cause.toString()
-            ),
+            "Failed parsing using expected date formats " + Arrays.toString(expectedDateFormats) + ": " + cause.toString(),
             cause
         );
         this.dateString = dateString;

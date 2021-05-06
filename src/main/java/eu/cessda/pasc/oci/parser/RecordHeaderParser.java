@@ -112,7 +112,7 @@ public class RecordHeaderParser {
         NodeList resumptionToken = doc.getElementsByTagName(OaiPmhConstants.RESUMPTION_TOKEN_ELEMENT);
         if (resumptionToken.getLength() > 0) {
             Node item = resumptionToken.item(0);
-            if (!item.getTextContent().trim().isEmpty()) {
+            if (!item.getTextContent().isEmpty()) {
                 return Optional.of(item.getTextContent());
             }
         }
@@ -131,8 +131,10 @@ public class RecordHeaderParser {
             recordHeaderBuilder.deleted(OaiPmhConstants.DELETED.equals(deletedAttribute));
         }
 
+        // Parse the elements of the header
         var headerElements = headerNode.getChildNodes();
-        IntStream.range(0, headerElements.getLength()).mapToObj(headerElements::item).forEach(headerElement -> {
+        for (int i = 0; i < headerElements.getLength(); i++) {
+            var headerElement = headerElements.item(i);
             final String currentHeaderElementValue;
             switch (headerElement.getNodeName()) {
                 case OaiPmhConstants.IDENTIFIER_ELEMENT:
@@ -155,7 +157,7 @@ public class RecordHeaderParser {
                     // nothing to do
                     break;
             }
-        });
+        }
         return recordHeaderBuilder.build();
     }
 
