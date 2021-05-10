@@ -17,13 +17,16 @@ package eu.cessda.pasc.oci.configurations;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.TransportAddress;
-import org.elasticsearch.transport.client.PreBuiltTransportClient;
+import org.elasticsearch.xpack.client.PreBuiltXPackTransportClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,6 +50,8 @@ public class ElasticsearchConfiguration implements AutoCloseable   {
     private final int esPort;
     private final int esHttpPort;
     private final String esClusterName;
+    private final String esUsername;
+    private final String esPassword;
 
     private RestHighLevelClient restHighLevelClient;
     private TransportClient transportClient;
@@ -55,21 +60,29 @@ public class ElasticsearchConfiguration implements AutoCloseable   {
         @Value("${elasticsearch.host:localhost}") String esHost,
         @Value("${elasticsearch.port:9300}") int esPort,
         @Value("${elasticsearch.httpPort:9200}") int esHttpPort,
-        @Value("${elasticsearch.clustername:elasticsearch}") String esClusterName
+        @Value("${elasticsearch.clustername:elasticsearch}") String esClusterName,
+        @Value("${elasticsearch.username:#{null}}") String esUsername,
+        @Value("${elasticsearch.password:#{null}}") String esPassword
     ) {
         this.esHost = esHost;
         this.esPort = esPort;
         this.esHttpPort = esHttpPort;
         this.esClusterName = esClusterName;
+        this.esUsername = esUsername;
+        this.esPassword = esPassword;
     }
 
-    @SuppressWarnings({"resource", "IOResourceOpenedButNotSafelyClosed"})
+    @SuppressWarnings({"resource", "IOResourceOpenedButNotSafelyClosed", "java:S2095"})
     @Bean
     public Client client() throws UnknownHostException {
         if (transportClient == null) {
             log.debug("Creating Elasticsearch Client\nCluster name={}\nHostname={}", esClusterName, esHost);
-            Settings esSettings = Settings.builder().put("cluster.name", esClusterName).build();
-            transportClient = new PreBuiltTransportClient(esSettings).addTransportAddress(new TransportAddress(InetAddress.getByName(esHost), esPort));
+            var esSettings = Settings.builder().put("cluster.name", esClusterName);
+            if (esUsername != null && esPassword != null) {
+                esSettings.put("xpack.security.user", esUsername + ":" + esPassword);
+            }
+            transportClient = new PreBuiltXPackTransportClient(esSettings.build())
+                .addTransportAddress(new TransportAddress(InetAddress.getByName(esHost), esPort));
         }
         return transportClient;
     }
@@ -78,7 +91,19 @@ public class ElasticsearchConfiguration implements AutoCloseable   {
     public RestHighLevelClient elasticsearchClient() {
         if (restHighLevelClient == null) {
             var esHosts = new HttpHost(esHost, esHttpPort, "http");
-            restHighLevelClient = new RestHighLevelClient(RestClient.builder(esHosts));
+
+            final var restClientBuilder = RestClient.builder(esHosts);
+
+            if (esUsername != null && esPassword != null) {
+                // Set HTTP credentials
+                var credentialsProvider = new BasicCredentialsProvider();
+                credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(esUsername, esPassword));
+                restClientBuilder.setHttpClientConfigCallback(httpClientBuilder ->
+                    httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider)
+                );
+            }
+
+            restHighLevelClient = new RestHighLevelClient(restClientBuilder);
         }
         return restHighLevelClient;
     }

@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.TimeZone;
 
-import static org.assertj.core.api.Java6BDDAssertions.then;
+import static org.assertj.core.api.BDDAssertions.then;
 
 /**
  * Parameterised test for various date possibilities

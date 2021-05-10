@@ -87,6 +87,19 @@ If the application is registered at a [Spring Boot Admin server](https://github.
 
 The OSMH harvester has many settings that change the behaviour of the harvest. These settings are defined under the `osmhConsumer` and `osmhhandler` keys in `application.yml`.
 
+### Elasticsearch Properties
+
+Elasticsearch properties are configured under the `elasticsearch` key.
+
+```yaml
+elasticsearch:
+  host: localhost # The Elasticsearch host
+  username: elastic # The username to use when connecting to a secured Elasticsearch cluster
+  password: examplePassword # The password to use when connecting to a secured Elasticsearch cluster
+  numberOfShards: 2 # The number of primary shards the created indices will have
+  numberOfReplicas: 0 # The number of replicas each primary shard has
+```
+
 ### Timer Properties
 
 Harvesting Schedule timers are specified under `osmhConsumer.delay` and `osmhConsumer.daily`:

@@ -31,7 +31,7 @@ import java.util.List;
 import static eu.cessda.pasc.oci.mock.data.RecordTestData.getASingleSyntheticCMMStudyAsList;
 import static eu.cessda.pasc.oci.mock.data.RecordTestData.getSyntheticCMMStudyAndADeletedRecordAsList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Java6BDDAssertions.then;
+import static org.assertj.core.api.BDDAssertions.then;
 
 /**
  * Tests related to {@link LanguageExtractor}
