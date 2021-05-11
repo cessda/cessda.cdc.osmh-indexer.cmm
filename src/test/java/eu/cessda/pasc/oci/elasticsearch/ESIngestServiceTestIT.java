@@ -46,7 +46,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static eu.cessda.pasc.oci.mock.data.RecordTestData.*;
-import static org.assertj.core.api.Java6BDDAssertions.then;
+import static org.assertj.core.api.BDDAssertions.then;
 import static org.junit.Assert.assertFalse;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
@@ -144,7 +144,7 @@ public class ESIngestServiceTestIT {
         Optional<LocalDateTime> mostRecentLastModified = ingestService.getMostRecentLastModified();
 
         // Then
-        then(mostRecentLastModified.orElse(null)).isEqualByComparingTo(LocalDateTime.parse("2017-11-17T00:00:00"));
+        then(mostRecentLastModified.orElse(null)).isEqualTo(LocalDateTime.parse("2017-11-17T00:00:00"));
     }
 
     @Test

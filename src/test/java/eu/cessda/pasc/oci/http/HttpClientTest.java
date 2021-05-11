@@ -27,7 +27,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 import static eu.cessda.pasc.oci.mock.data.RecordTestData.LIST_RECORDER_HEADERS_BODY_EXAMPLE;
-import static org.assertj.core.api.Java6BDDAssertions.then;
+import static org.assertj.core.api.BDDAssertions.then;
 
 
 /**

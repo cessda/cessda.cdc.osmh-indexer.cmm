@@ -272,7 +272,7 @@ public class RecordXMLParserTest {
 
         ProcessingReport validate = schema.validate(jsonNodeRecord);
         if (!validate.isSuccess()) {
-            fail("Validation not successful : " + validate.toString());
+            fail("Validation not successful : " + validate);
         }
     }
 

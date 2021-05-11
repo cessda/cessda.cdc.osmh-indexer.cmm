@@ -234,11 +234,11 @@ public class ESIngestService implements IngestService {
         try {
 
             // Load language specific settings
-            var settingsTemplate = ResourceHandler.getResourceAsString(String.format("elasticsearch/settings/settings_%s.json", indexName));
+            var settingsTemplate = ResourceHandler.getResourceAsString("elasticsearch/settings/settings_" + indexName + ".json");
             var settings = String.format(settingsTemplate, esConfig.getNumberOfShards(), esConfig.getNumberOfReplicas());
 
             // Load mappings
-            var mappings = ResourceHandler.getResourceAsString(String.format("elasticsearch/mappings/mappings_%s.json", INDEX_TYPE));
+            var mappings = ResourceHandler.getResourceAsString("elasticsearch/mappings/mappings_" + INDEX_TYPE + ".json");
 
             log.trace("[{}] custom index creation: Settings: \n{}\nMappings:\n{}", indexName, settings, mappings);
 

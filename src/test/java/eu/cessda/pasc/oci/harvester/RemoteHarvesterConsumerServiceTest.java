@@ -43,7 +43,7 @@ import java.util.Optional;
 import static eu.cessda.pasc.oci.mock.data.RecordTestData.*;
 import static eu.cessda.pasc.oci.mock.data.ReposTestData.getUKDSRepo;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Java6BDDAssertions.then;
+import static org.assertj.core.api.BDDAssertions.then;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -97,7 +97,7 @@ public class RemoteHarvesterConsumerServiceTest {
         assertThat(recordHeaders).hasSize(2);
         for (RecordHeader recordHeader : recordHeaders) {
             var currentLastModified = TimeUtility.getLocalDateTime(recordHeader.getLastModified());
-            then(currentLastModified).isGreaterThan(lastModifiedDateCutOff);
+            then(currentLastModified).isAfter(lastModifiedDateCutOff);
         }
     }
 
@@ -114,7 +114,7 @@ public class RemoteHarvesterConsumerServiceTest {
         assertThat(recordHeaders).hasSize(1);
         for (RecordHeader recordHeader : recordHeaders) {
             var currentLastModified = TimeUtility.getLocalDateTime(recordHeader.getLastModified());
-            then(currentLastModified).isGreaterThan(lastModifiedCutOff);
+            then(currentLastModified).isAfter(lastModifiedCutOff);
         }
     }
 

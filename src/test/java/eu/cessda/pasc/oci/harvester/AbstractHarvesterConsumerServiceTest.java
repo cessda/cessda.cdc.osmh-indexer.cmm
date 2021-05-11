@@ -54,7 +54,7 @@ public class AbstractHarvesterConsumerServiceTest {
         var header = RecordHeader.builder().lastModified("Not a date").build();
 
         // When
-        var records = abstractHarvesterConsumerService.filterRecords(Collections.singleton(header), LocalDateTime.now());
+        var records = AbstractHarvesterConsumerService.filterRecords(Collections.singleton(header), LocalDateTime.now());
 
         // Then the record should be filtered
         Assert.assertTrue(records.isEmpty());
@@ -66,7 +66,7 @@ public class AbstractHarvesterConsumerServiceTest {
         var header = RecordHeader.builder().lastModified(LocalDateTime.now().toString()).build();
 
         // When
-        var records = abstractHarvesterConsumerService.filterRecords(Collections.singleton(header), null);
+        var records = AbstractHarvesterConsumerService.filterRecords(Collections.singleton(header), null);
 
         // Then the same object should be returned
         Assert.assertFalse(records.isEmpty());

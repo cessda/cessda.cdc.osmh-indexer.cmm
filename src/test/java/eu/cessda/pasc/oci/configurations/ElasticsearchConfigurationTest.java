@@ -29,7 +29,9 @@ public class ElasticsearchConfigurationTest {
             "localhost",
             9300,
             9200,
-            "es-test"
+            "es-test",
+            null,
+            null
         );
     }
 

@@ -44,7 +44,7 @@ public class HTTPException extends IOException {
      * @param externalResponseBody the body of the external response that caused this exception
      */
     public HTTPException(int statusCode, byte[] externalResponseBody) {
-        super(String.format("Server returned %d", statusCode));
+        super("Server returned " + statusCode);
         externalResponse = new ExternalResponse(externalResponseBody, statusCode);
     }
 

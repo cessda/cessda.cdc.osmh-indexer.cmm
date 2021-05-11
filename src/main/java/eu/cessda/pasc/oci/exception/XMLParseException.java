@@ -33,10 +33,10 @@ public class XMLParseException extends HarvesterException {
      * Constructs a new exception with the specified XML source and caught exception.
      *
      * @param xmlSource The URL that the XML was located at.
-     * @param cause The exception that caused the XML parsing to fail.
+     * @param cause The throwable that caused the XML parsing to fail.
      */
     public XMLParseException(URI xmlSource, Throwable cause) {
-        super(String.format("Parsing %s failed: %s", xmlSource, cause), cause);
+        super("Parsing " + xmlSource + " failed: " + cause, cause);
         this.xmlSource = xmlSource;
     }
 }

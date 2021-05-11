@@ -103,8 +103,9 @@ public class MicrometerMetrics implements Metrics {
         AtomicLong languageRecords = recordsLanguagesMap.get(language);
         if (languageRecords != null) {
             return languageRecords;
+        } else {
+            throw new IllegalArgumentException("Invalid language code [" + language + "]");
         }
-        throw new IllegalArgumentException(String.format("Invalid language code [%s]", language));
     }
 
     /**
@@ -155,8 +156,9 @@ public class MicrometerMetrics implements Metrics {
         AtomicLong endpointRecord = recordsEndpointMap.get(repository);
         if (endpointRecord != null) {
             return endpointRecord;
+        } else {
+            throw new IllegalArgumentException("Invalid repository [" + repository.getCode() + "]");
         }
-        throw new IllegalArgumentException(String.format("Invalid repository [%s]", repository.getCode()));
     }
 
     /**
