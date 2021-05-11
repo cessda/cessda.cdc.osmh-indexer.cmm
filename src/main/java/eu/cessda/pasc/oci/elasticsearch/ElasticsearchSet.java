@@ -15,7 +15,6 @@
  */
 package eu.cessda.pasc.oci.elasticsearch;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
@@ -46,12 +45,12 @@ public class ElasticsearchSet<T> extends AbstractSet<T> {
      * Constructs a new Elasticsearch Set that will contain the results of the given search query.
      * @param searchRequestBuilder the search request to execute.
      * @param client the Elasticsearch Client to use.
-     * @param clazz the class to serialise the returned JSON into.
+     * @param objectReader the object reader to use to deserialize the JSON.
      */
-    ElasticsearchSet(SearchRequestBuilder searchRequestBuilder, Client client, Class<T> clazz) {
+    ElasticsearchSet(SearchRequestBuilder searchRequestBuilder, Client client, ObjectReader objectReader) {
         this.searchRequestBuilder = searchRequestBuilder;
         this.client = client;
-        this.objectReader = new ObjectMapper().readerFor(clazz);
+        this.objectReader = objectReader;
     }
 
     /**

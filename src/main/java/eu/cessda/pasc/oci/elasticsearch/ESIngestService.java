@@ -149,7 +149,7 @@ public class ESIngestService implements IngestService {
     @Override
     public ElasticsearchSet<CMMStudyOfLanguage> getAllStudies(String language) {
         log.debug("Getting all studies for language [{}]", language);
-        return new ElasticsearchSet<>(getMatchAllSearchRequest("*"), esTemplate.getClient(), CMMStudyOfLanguage.class);
+        return new ElasticsearchSet<>(getMatchAllSearchRequest("*"), esTemplate.getClient(), cmmStudyOfLanguageConverter.getReader());
     }
 
     @Override
