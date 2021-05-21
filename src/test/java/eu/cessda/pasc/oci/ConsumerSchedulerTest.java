@@ -153,7 +153,7 @@ public class ConsumerSchedulerTest {
         return harvesterConsumerService;
     }
 
-    private void thenVerifyFullRun(HarvesterConsumerService harvesterConsumerService, DebuggingJMXBean debuggingJMXBean) {
+    private void thenVerifyFullRun(HarvesterConsumerService harvesterConsumerService, DebuggingJMXBean debuggingJMXBean) throws IOException {
         verify(debuggingJMXBean, times(1)).printElasticSearchInfo();
         verify(debuggingJMXBean, times(1)).printCurrentlyConfiguredRepoEndpoints();
         verifyNoMoreInteractions(debuggingJMXBean);

@@ -16,17 +16,20 @@
 package eu.cessda.pasc.oci.elasticsearch;
 
 import com.fasterxml.jackson.databind.ObjectReader;
-import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
+import org.elasticsearch.action.search.SearchScrollRequest;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.unit.TimeValue;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.time.Duration;
 import java.util.AbstractSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.concurrent.TimeUnit;
+
+import static org.elasticsearch.client.RequestOptions.DEFAULT;
 
 /**
  * An implementation of the set interface that supports iterating over an Elasticsearch scroll.
@@ -37,41 +40,53 @@ import java.util.NoSuchElementException;
 @SuppressWarnings("java:S2160") // The super class will handle equality comparisons
 public class ElasticsearchSet<T> extends AbstractSet<T> {
 
-    private final SearchRequestBuilder searchRequestBuilder;
-    private final Client client;
+    /**
+     * Scroll timeout
+     */
+    private static final TimeValue timeout = new TimeValue(60, TimeUnit.SECONDS);
+    private final SearchRequest searchRequest;
     private final ObjectReader objectReader;
+    private final RestHighLevelClient client;
 
     /**
      * Constructs a new Elasticsearch Set that will contain the results of the given search query.
-     * @param searchRequestBuilder the search request to execute.
+     * @param searchRequest the search request to execute.
      * @param client the Elasticsearch Client to use.
      * @param objectReader the object reader to use to deserialize the JSON.
      */
-    ElasticsearchSet(SearchRequestBuilder searchRequestBuilder, Client client, ObjectReader objectReader) {
-        this.searchRequestBuilder = searchRequestBuilder;
+    ElasticsearchSet(SearchRequest searchRequest, RestHighLevelClient client, ObjectReader objectReader) {
+        this.searchRequest = searchRequest;
         this.client = client;
         this.objectReader = objectReader;
     }
 
     /**
-     * Scroll timeout
+     * {@inheritDoc}
+     *
+     * @throws java.io.UncheckedIOException if an IO error occurs when decoding the JSON.
      */
-    private static final TimeValue timeout = new TimeValue(Duration.ofSeconds(60).toMillis());
+    @Override
+    public Iterator<T> iterator() {
+        try {
+            return new ElasticsearchIterator();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
 
     /**
      * {@inheritDoc}
      *
-     * @throws java.io.UncheckedIOException if an IO error occurs when decoding the JSON
+     * @throws java.io.UncheckedIOException if an IO error occurs when accessing Elasticsearch.
      */
     @Override
-    public Iterator<T> iterator() {
-        return new ElasticsearchIterator();
-    }
-
-    @Override
     public int size() {
-        long totalHits = searchRequestBuilder.get().getHits().getTotalHits();
-        return totalHits < Integer.MAX_VALUE ? (int) totalHits : Integer.MAX_VALUE;
+        try {
+            long totalHits = client.search(searchRequest, DEFAULT).getHits().getTotalHits();
+            return totalHits < Integer.MAX_VALUE ? (int) totalHits : Integer.MAX_VALUE;
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     /**
@@ -79,15 +94,29 @@ public class ElasticsearchSet<T> extends AbstractSet<T> {
      */
     private class ElasticsearchIterator implements Iterator<T> {
 
-        private SearchResponse response = searchRequestBuilder.setSize(1000).setScroll(timeout).get();
-        private int currentIndex = 0;
+        private SearchResponse response;
+        private int currentIndex;
 
+        private ElasticsearchIterator() throws IOException {
+            response = client.search(searchRequest.scroll(timeout), DEFAULT);
+            currentIndex = 0;
+        }
+
+        /**
+         * {@inheritDoc}
+         *
+         * @throws UncheckedIOException if an IO error occurs when accessing Elasticsearch.
+         */
         @Override
         public boolean hasNext() {
             if (currentIndex >= response.getHits().getHits().length) {
                 // Reached the end of the current scroll, collect the next scroll
-                response = client.prepareSearchScroll(response.getScrollId()).setScroll(timeout).get();
-                currentIndex = 0;
+                try {
+                    response = client.scroll(new SearchScrollRequest(response.getScrollId()), DEFAULT);
+                    currentIndex = 0;
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
             }
             return response.getHits().getHits().length > 0;
         }
@@ -95,7 +124,7 @@ public class ElasticsearchSet<T> extends AbstractSet<T> {
         /**
          * {@inheritDoc}
          *
-         * @throws UncheckedIOException if an IO error occurs when decoding the JSON
+         * @throws UncheckedIOException if an IO error occurs when decoding the JSON.
          */
         @Override
         public T next() {

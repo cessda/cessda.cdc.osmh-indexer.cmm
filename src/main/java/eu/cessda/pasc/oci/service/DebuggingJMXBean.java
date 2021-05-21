@@ -17,17 +17,21 @@ package eu.cessda.pasc.oci.service;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
-import org.elasticsearch.client.Client;
+import org.elasticsearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
 import org.elasticsearch.common.settings.Settings;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static org.elasticsearch.client.RequestOptions.DEFAULT;
 
 /**
  * Bean for JMX debugging
@@ -39,33 +43,34 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DebuggingJMXBean {
 
-  private final ElasticsearchTemplate elasticsearchTemplate;
+  private final ElasticsearchRestTemplate elasticsearchTemplate;
   private final AppConfigurationProperties appConfigProps;
 
   @Autowired
-  public DebuggingJMXBean(ElasticsearchTemplate elasticsearchTemplate, AppConfigurationProperties appConfigProps) {
+  public DebuggingJMXBean(ElasticsearchRestTemplate elasticsearchTemplate, AppConfigurationProperties appConfigProps) {
     this.elasticsearchTemplate = elasticsearchTemplate;
     this.appConfigProps = appConfigProps;
   }
 
   @ManagedOperation(description = "Prints to log the Elasticsearch server state.")
   public String printElasticSearchInfo() {
+      try {
+          var client = elasticsearchTemplate.getClient();
+          Map<String, Settings> asMap = client.cluster().getSettings(new ClusterGetSettingsRequest(), DEFAULT).getPersistentSettings().getAsGroups();
+          String elasticsearchInfo = "Elasticsearch Client Settings: [\n" + asMap.entrySet().stream()
+              .map(entry -> "\t" + entry.getKey() + "=" + entry.getValue() + "\n")
+              .collect(Collectors.joining()) + "]";
 
-    Client client = elasticsearchTemplate.getClient();
-    Map<String, Settings> asMap = client.settings().getAsGroups();
-    String elasticsearchInfo = "Elasticsearch Client Settings: [\n" + asMap.entrySet().stream()
-        .map(entry -> "\t" + entry.getKey() + "=" + entry.getValue() + "\n")
-        .collect(Collectors.joining()) + "]";
+          ClusterHealthResponse healths = client.cluster().health(new ClusterHealthRequest(), DEFAULT);
 
-    ClusterHealthResponse healths = client.admin().cluster().prepareHealth().get();
-    client.admin().cluster().prepareHealth().get();
-
-    elasticsearchInfo += "\nElasticsearch Cluster Details:\n" +
-        "\tCluster Name [" + healths.getClusterName() + "]" +
-        "\tNumberOfDataNodes [" + healths.getNumberOfDataNodes() + "]" +
-        "\tNumberOfNodes [" + healths.getNumberOfNodes() + "]";
-
-    return elasticsearchInfo;
+          elasticsearchInfo += "\nElasticsearch Cluster Details:\n" +
+              "\tCluster Name [" + healths.getClusterName() + "]" +
+              "\tNumberOfDataNodes [" + healths.getNumberOfDataNodes() + "]" +
+              "\tNumberOfNodes [" + healths.getNumberOfNodes() + "]";
+          return elasticsearchInfo;
+      } catch (IOException e) {
+          return "Elasticsearch connection error: " + e;
+      }
   }
 
   @ManagedOperation(description = "Show which SP repo Endpoints are currently active.")

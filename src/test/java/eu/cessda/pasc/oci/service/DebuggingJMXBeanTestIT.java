@@ -20,7 +20,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -41,18 +41,16 @@ public class DebuggingJMXBeanTestIT {
     private AppConfigurationProperties appConfigurationProperties;
 
     @Autowired
-    private ElasticsearchTemplate elasticsearchTemplate;
+    private ElasticsearchRestTemplate elasticsearchTemplate;
 
     @Test
     public void shouldPrintElasticsearchDetails() {
-        ElasticsearchTemplate elasticsearchTemplate = new ElasticsearchTemplate(this.elasticsearchTemplate.getClient());
         debuggingJMXBean = new DebuggingJMXBean(elasticsearchTemplate, appConfigurationProperties);
         assertThat(debuggingJMXBean.printElasticSearchInfo()).startsWith("Elasticsearch Client Settings");
     }
 
     @Test
     public void shouldPrintCurrentlyConfiguredRepoEndpoints() {
-        ElasticsearchTemplate elasticsearchTemplate = new ElasticsearchTemplate(this.elasticsearchTemplate.getClient());
         debuggingJMXBean = new DebuggingJMXBean(elasticsearchTemplate, appConfigurationProperties);
 
         // When

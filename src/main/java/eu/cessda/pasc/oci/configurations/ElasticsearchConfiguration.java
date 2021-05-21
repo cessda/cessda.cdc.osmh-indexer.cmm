@@ -20,22 +20,16 @@ import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.elasticsearch.client.Client;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.TransportAddress;
-import org.elasticsearch.xpack.client.PreBuiltXPackTransportClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 
 import javax.annotation.PreDestroy;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 /**
  * Extra Util configuration
@@ -47,7 +41,6 @@ import java.net.UnknownHostException;
 public class ElasticsearchConfiguration implements AutoCloseable   {
 
     private final String esHost;
-    private final int esPort;
     private final int esHttpPort;
     private final String esClusterName;
     private final String esUsername;
@@ -58,33 +51,16 @@ public class ElasticsearchConfiguration implements AutoCloseable   {
 
     public ElasticsearchConfiguration(
         @Value("${elasticsearch.host:localhost}") String esHost,
-        @Value("${elasticsearch.port:9300}") int esPort,
         @Value("${elasticsearch.httpPort:9200}") int esHttpPort,
         @Value("${elasticsearch.clustername:elasticsearch}") String esClusterName,
         @Value("${elasticsearch.username:#{null}}") String esUsername,
         @Value("${elasticsearch.password:#{null}}") String esPassword
     ) {
         this.esHost = esHost;
-        this.esPort = esPort;
         this.esHttpPort = esHttpPort;
         this.esClusterName = esClusterName;
         this.esUsername = esUsername;
         this.esPassword = esPassword;
-    }
-
-    @SuppressWarnings({"resource", "IOResourceOpenedButNotSafelyClosed", "java:S2095"})
-    @Bean
-    public Client client() throws UnknownHostException {
-        if (transportClient == null) {
-            log.debug("Creating Elasticsearch Client\nCluster name={}\nHostname={}", esClusterName, esHost);
-            var esSettings = Settings.builder().put("cluster.name", esClusterName);
-            if (esUsername != null && esPassword != null) {
-                esSettings.put("xpack.security.user", esUsername + ":" + esPassword);
-            }
-            transportClient = new PreBuiltXPackTransportClient(esSettings.build())
-                .addTransportAddress(new TransportAddress(InetAddress.getByName(esHost), esPort));
-        }
-        return transportClient;
     }
 
     @Bean
@@ -109,8 +85,8 @@ public class ElasticsearchConfiguration implements AutoCloseable   {
     }
 
     @Bean
-    public ElasticsearchTemplate elasticsearchTemplate() throws UnknownHostException {
-        return new ElasticsearchTemplate(client());
+    public ElasticsearchRestTemplate elasticsearchTemplate() {
+        return new ElasticsearchRestTemplate(elasticsearchClient());
     }
 
     @Override

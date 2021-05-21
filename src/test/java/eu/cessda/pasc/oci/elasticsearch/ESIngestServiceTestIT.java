@@ -23,9 +23,14 @@ import eu.cessda.pasc.oci.configurations.ESConfigurationProperties;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.action.get.GetRequest;
+import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.json.JSONException;
 import org.junit.After;
@@ -35,7 +40,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -73,7 +78,7 @@ public class ESIngestServiceTestIT {
     private ESConfigurationProperties esConfigProp;
 
     @Autowired
-    private ElasticsearchTemplate elasticsearchTemplate;
+    private ElasticsearchRestTemplate elasticsearchTemplate;
 
     private final CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter = new CMMStudyOfLanguageConverter();
 
@@ -81,8 +86,8 @@ public class ESIngestServiceTestIT {
      * Reset Elasticsearch after each test
      */
     @After
-    public void tearDown() {
-        elasticsearchTemplate.getClient().admin().indices().prepareDelete("_all").get();
+    public void tearDown() throws IOException {
+        elasticsearchTemplate.getClient().indices().delete(new DeleteIndexRequest("_all"), RequestOptions.DEFAULT);
     }
 
     @Test
@@ -102,11 +107,10 @@ public class ESIngestServiceTestIT {
         // Then
         then(isSuccessful).isTrue();
         this.elasticsearchTemplate.refresh(INDEX_NAME);
-        SearchResponse response = elasticsearchTemplate.getClient().prepareSearch(INDEX_NAME)
-            .setTypes(INDEX_TYPE)
-            .setQuery(QueryBuilders.idsQuery().addIds(expected))
-            .execute()
-            .actionGet();
+        SearchResponse response = elasticsearchTemplate.getClient().search(
+            new SearchRequest(INDEX_NAME).types(INDEX_TYPE).source(new SearchSourceBuilder().query(QueryBuilders.idsQuery().addIds(expected))),
+            RequestOptions.DEFAULT
+        );
 
         // Should return the same ID
         then(response.getHits()).isNotEmpty();
@@ -127,12 +131,12 @@ public class ESIngestServiceTestIT {
 
         then(isSuccessful).isTrue();
         this.elasticsearchTemplate.refresh(INDEX_NAME);
-        SearchResponse response = elasticsearchTemplate.getClient().prepareSearch(INDEX_NAME)
-            .setTypes(INDEX_TYPE)
-            .setQuery(QueryBuilders.matchAllQuery())
-            .addSort("lastModified", SortOrder.DESC)
-            .execute()
-            .actionGet();
+        SearchResponse response = elasticsearchTemplate.getClient().search(
+            new SearchRequest(INDEX_NAME).types(INDEX_TYPE).source(
+                new SearchSourceBuilder().query(QueryBuilders.matchAllQuery()).sort("lastModified", SortOrder.DESC)
+            ),
+            RequestOptions.DEFAULT
+        );
 
         // And state is as expected
         then(response.getHits().getTotalHits()).isEqualTo(3);
@@ -151,7 +155,7 @@ public class ESIngestServiceTestIT {
     public void shouldReturnFalseOnIndexCreationFailure() throws IOException {
 
         //Setup
-        ElasticsearchTemplate elasticsearchTemplate = Mockito.mock(ElasticsearchTemplate.class);
+        var elasticsearchTemplate = Mockito.mock(ElasticsearchRestTemplate.class);
         ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, esConfigProp, cmmStudyOfLanguageConverter);
         List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
 
@@ -166,7 +170,7 @@ public class ESIngestServiceTestIT {
     public void shouldReturnFalseOnPutMappingFailure() throws IOException {
 
         //Setup
-        ElasticsearchTemplate elasticsearchTemplate = Mockito.mock(ElasticsearchTemplate.class);
+        var elasticsearchTemplate = Mockito.mock(ElasticsearchRestTemplate.class);
         ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, esConfigProp, cmmStudyOfLanguageConverter);
         List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
 
@@ -181,7 +185,7 @@ public class ESIngestServiceTestIT {
     public void shouldNotCreateAnIndexWhenAnIOExceptionIsThrown() throws IOException {
 
         //Setup
-        ElasticsearchTemplate elasticsearchTemplate = Mockito.mock(ElasticsearchTemplate.class);
+        var elasticsearchTemplate = Mockito.mock(ElasticsearchRestTemplate.class);
         ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, esConfigProp, null);
         List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
 
@@ -252,7 +256,7 @@ public class ESIngestServiceTestIT {
     public void shouldReturnEmptyOptionalOnInvalidIndex() {
 
         // Setup
-        ElasticsearchTemplate elasticsearchTemplate = new ElasticsearchTemplate(this.elasticsearchTemplate.getClient());
+        var elasticsearchTemplate = new ElasticsearchRestTemplate(this.elasticsearchTemplate.getClient());
         ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, esConfigProp, cmmStudyOfLanguageConverter);
 
         // Then
@@ -286,7 +290,7 @@ public class ESIngestServiceTestIT {
     public void shouldLogFailedIndexOperations() throws IOException {
         // Setup
         List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
-        ElasticsearchTemplate elasticsearchTemplate = new ElasticsearchTemplate(this.elasticsearchTemplate.getClient());
+        var elasticsearchTemplate = new ElasticsearchRestTemplate(this.elasticsearchTemplate.getClient());
         var cmmStudyOfLanguageConverterSpy = Mockito.spy(this.cmmStudyOfLanguageConverter);
         var objectWriterSpy = Mockito.spy(this.cmmStudyOfLanguageConverter.getWriter());
         ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, esConfigProp, cmmStudyOfLanguageConverterSpy);
@@ -315,13 +319,16 @@ public class ESIngestServiceTestIT {
 
         // Then - the study should not be present, but other studies should be
         elasticsearchTemplate.refresh(INDEX_NAME);
-        assertFalse(elasticsearchTemplate.getClient().prepareGet(INDEX_NAME, INDEX_TYPE, studyToDelete.get(0).getId()).get().isExists());
+        assertFalse(elasticsearchTemplate.getClient().get(
+            new GetRequest(INDEX_NAME, INDEX_TYPE, studyToDelete.get(0).getId()), RequestOptions.DEFAULT
+        ).isExists());
 
-        SearchResponse response = elasticsearchTemplate.getClient().prepareSearch(INDEX_NAME)
-            .setTypes(INDEX_TYPE)
-            .setQuery(QueryBuilders.matchAllQuery())
-            .addSort("lastModified", SortOrder.DESC)
-            .get();
+        SearchResponse response = elasticsearchTemplate.getClient().search(
+            new SearchRequest(INDEX_NAME).types(INDEX_TYPE).source(
+                new SearchSourceBuilder().query(QueryBuilders.matchAllQuery()).sort("lastModified", SortOrder.DESC)
+            ),
+            RequestOptions.DEFAULT
+        );
 
         then(response.getHits().getTotalHits()).isEqualTo(2); // Should be two studies
         then(Arrays.stream(response.getHits().getHits()).map(SearchHit::getId).toArray()) // Should not contain the deleted study

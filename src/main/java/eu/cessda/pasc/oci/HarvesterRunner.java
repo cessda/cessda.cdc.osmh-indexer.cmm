@@ -29,6 +29,7 @@ import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -172,16 +173,20 @@ public class HarvesterRunner {
             }
 
             // Perform indexing and deletions
-            if (ingestService.bulkIndex(studiesToIndex, langIsoCode)) {
-                ingestService.bulkDelete(studiesToDelete, langIsoCode);
-                log.info("[{}({})] Indexing succeeded: [{}] studies created, [{}] studies deleted, [{}] studies updated.",
+            try {
+                if (ingestService.bulkIndex(studiesToIndex, langIsoCode)) {
+                    ingestService.bulkDelete(studiesToDelete, langIsoCode);
+                    log.info("[{}({})] Indexing succeeded: [{}] studies created, [{}] studies deleted, [{}] studies updated.",
                         repo.getCode(),
                         langIsoCode,
                         value("created_cmm_studies", studiesUpdated.studiesCreated),
                         value("deleted_cmm_studies", studiesUpdated.studiesDeleted),
                         value("updated_cmm_studies", studiesUpdated.studiesUpdated));
-            } else {
-                log.error("[{}({})] Indexing failed!", repo.getCode(), langIsoCode);
+                } else {
+                    log.error("[{}({})] Indexing failed!", repo.getCode(), langIsoCode);
+                }
+            } catch (IOException e) {
+                log.error("[{}({})] Indexing failed: {}", repo.getCode(), langIsoCode, e.toString());
             }
         }
     }
