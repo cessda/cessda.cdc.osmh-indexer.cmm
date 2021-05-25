@@ -53,6 +53,7 @@ import java.util.*;
 import static eu.cessda.pasc.oci.mock.data.RecordTestData.*;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 
@@ -152,6 +153,51 @@ public class ESIngestServiceTestIT {
     }
 
     @Test
+    public void shouldReturnEmptyOptionalOnIOExceptions() throws IOException {
+
+        // Given
+        List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
+
+        var objectReader = Mockito.mock(ObjectReader.class);
+        var cmmStudyOfLanguageConverterSpy = Mockito.spy(CMMStudyOfLanguageConverter.class);
+        var ingestService = new ESIngestService(elasticsearchTemplate, esConfigProp, cmmStudyOfLanguageConverterSpy);
+
+        // Given
+        Mockito.when(cmmStudyOfLanguageConverterSpy.getReader()).thenReturn(objectReader);
+        Mockito.when(objectReader.readValue(Mockito.any(InputStream.class))).thenThrow(IOException.class);
+
+        boolean isSuccessful = ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
+
+        then(isSuccessful).isTrue();
+        this.elasticsearchTemplate.refresh(INDEX_NAME);
+        elasticsearchTemplate.getClient().search(
+            new SearchRequest(INDEX_NAME).types(INDEX_TYPE).source(
+                new SearchSourceBuilder().query(QueryBuilders.matchAllQuery()).sort("lastModified", SortOrder.DESC)
+            ),
+            RequestOptions.DEFAULT
+        );
+
+        // When
+        Optional<LocalDateTime> mostRecentLastModified = ingestService.getMostRecentLastModified();
+
+        // Then
+        then(mostRecentLastModified.isEmpty()).isTrue();
+    }
+
+    @Test
+    public void shouldReturnEmptyOptionalWithNoResults() {
+
+        // Given
+        var ingestService = new ESIngestService(elasticsearchTemplate, esConfigProp, cmmStudyOfLanguageConverter);
+
+        // When
+        Optional<LocalDateTime> mostRecentLastModified = ingestService.getMostRecentLastModified();
+
+        // Then
+        then(mostRecentLastModified.isEmpty()).isTrue();
+    }
+
+    @Test
     public void shouldReturnFalseOnIndexCreationFailure() throws IOException {
 
         //Setup
@@ -163,7 +209,7 @@ public class ESIngestServiceTestIT {
         Mockito.when(elasticsearchTemplate.createIndex(Mockito.anyString(), Mockito.any())).thenReturn(false);
 
         boolean isSuccessful = ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
-        Assert.assertFalse(isSuccessful);
+        assertFalse(isSuccessful);
     }
 
     @Test
@@ -178,7 +224,7 @@ public class ESIngestServiceTestIT {
         Mockito.when(elasticsearchTemplate.createIndex(Mockito.anyString(), Mockito.any())).thenReturn(true);
         Mockito.when(elasticsearchTemplate.putMapping(Mockito.anyString(), Mockito.anyString(), Mockito.any())).thenReturn(false);
 
-        Assert.assertFalse(ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE));
+        assertFalse(ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE));
     }
 
     @Test
@@ -193,7 +239,7 @@ public class ESIngestServiceTestIT {
         Mockito.when(elasticsearchTemplate.createIndex(Mockito.anyString()))
             .thenThrow(new AssertionError("The index shouldn't be created"));
 
-        Assert.assertFalse(ingestService.bulkIndex(studyOfLanguages, "zz"));
+        assertFalse(ingestService.bulkIndex(studyOfLanguages, "zz"));
     }
 
     @Test
@@ -244,12 +290,12 @@ public class ESIngestServiceTestIT {
         // Given
         boolean isSuccessful = ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
         then(isSuccessful).isTrue();
-        var expectedStudy = studyOfLanguages.get(0);
 
-        // Then
-        var study = ingestService.getStudy(expectedStudy.getId(), LANGUAGE_ISO_CODE);
-
-        Assert.assertEquals(expectedStudy, study.orElseThrow());
+        // Then - check if all studies are present
+        for (var expectedStudy : studyOfLanguages) {
+            var study = ingestService.getStudy(expectedStudy.getId(), LANGUAGE_ISO_CODE);
+            Assert.assertEquals(expectedStudy, study.orElseThrow());
+        }
     }
 
     @Test
@@ -263,6 +309,22 @@ public class ESIngestServiceTestIT {
         var study = ingestService.getStudy(UUID.randomUUID().toString(), "moon");
 
         Assert.assertEquals(Optional.empty(), study);
+    }
+
+    @Test
+    public void shouldReturnEmptyOptionalIfStudyCannotBeFound() throws IOException {
+
+        // Setup
+        List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
+        ESIngestService ingestService = new ESIngestService(elasticsearchTemplate, esConfigProp, cmmStudyOfLanguageConverter);
+
+        // Given
+        boolean isSuccessful = ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
+        then(isSuccessful).isTrue();
+
+        // Then
+        var study = ingestService.getStudy(UUID.randomUUID().toString(), LANGUAGE_ISO_CODE);
+        assertTrue(study.isEmpty());
     }
 
     @Test
