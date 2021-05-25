@@ -23,23 +23,27 @@ import eu.cessda.pasc.oci.configurations.ESConfigurationProperties;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.ElasticsearchStatusException;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.get.GetRequest;
+import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.IndexNotFoundException;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.rest.RestStatus;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Optional;
+
+import static org.elasticsearch.client.RequestOptions.DEFAULT;
 
 /**
  * Service responsible for triggering harvesting and Metadata ingestion to the search engine
@@ -59,25 +63,25 @@ public class ESIngestService implements IngestService {
      */
     private static final int INDEX_COMMIT_SIZE = 500;
 
-    private final ElasticsearchTemplate esTemplate;
+    private final ElasticsearchRestTemplate esTemplate;
     private final ESConfigurationProperties esConfig;
     private final CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter;
 
     @Autowired
-    public ESIngestService(ElasticsearchTemplate esTemplate, ESConfigurationProperties esConfig, CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter) {
+    public ESIngestService(ElasticsearchRestTemplate esTemplate, ESConfigurationProperties esConfig, CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter) {
         this.esTemplate = esTemplate;
         this.esConfig = esConfig;
         this.cmmStudyOfLanguageConverter = cmmStudyOfLanguageConverter;
     }
 
     @Override
-    public boolean bulkIndex(Collection<CMMStudyOfLanguage> languageCMMStudiesMap, String languageIsoCode) {
+    public boolean bulkIndex(Collection<CMMStudyOfLanguage> languageCMMStudiesMap, String languageIsoCode) throws IOException {
         var indexName = String.format(INDEX_NAME_TEMPLATE, languageIsoCode);
 
         if (createIndex(indexName)) {
             log.debug("[{}] Indexing {} studies", indexName, languageCMMStudiesMap.size());
 
-            var bulkIndexQuery = esTemplate.getClient().prepareBulk();
+            var bulkIndexQuery = new BulkRequest();
 
             for (var study : languageCMMStudiesMap) {
                 try {
@@ -91,10 +95,10 @@ public class ESIngestService implements IngestService {
 
                     if (bulkIndexQuery.numberOfActions() == INDEX_COMMIT_SIZE) {
                         log.trace("[{}] Bulk Indexing {} studies", indexName, INDEX_COMMIT_SIZE);
-                        indexBulkRequest(indexName, bulkIndexQuery.get());
+                        indexBulkRequest(indexName, bulkIndexQuery);
 
                         // Clear the bulk request
-                        bulkIndexQuery = esTemplate.getClient().prepareBulk();
+                        bulkIndexQuery = new BulkRequest();
                     }
                 } catch (JsonProcessingException e) {
                     log.warn("[{}] Failed to convert {} into JSON: {}", indexName, study.getId(), e.toString());
@@ -104,7 +108,7 @@ public class ESIngestService implements IngestService {
             // Commit all remaining studies
             if (bulkIndexQuery.numberOfActions() > 0) {
                 log.trace("[{}] Bulk Indexing {} studies", indexName, bulkIndexQuery.numberOfActions());
-                indexBulkRequest(indexName, bulkIndexQuery.get());
+                indexBulkRequest(indexName, bulkIndexQuery);
             }
 
             log.debug("[{}] Indexing completed.", indexName);
@@ -114,42 +118,44 @@ public class ESIngestService implements IngestService {
         return false;
     }
 
-    private void indexBulkRequest(String indexName, BulkResponse response) {
+    private void indexBulkRequest(String indexName, BulkRequest request) throws IOException {
+        var response = esTemplate.getClient().bulk(request, DEFAULT);
         if (response.hasFailures()) {
             log.warn("[{}] {}", indexName, response.buildFailureMessage());
         }
     }
 
     @Override
-    public void bulkDelete(Collection<CMMStudyOfLanguage> cmmStudiesToDelete, String languageIsoCode) {
-
-        var deleteBulkRequest = esTemplate.getClient().prepareBulk();
-
+    public void bulkDelete(Collection<CMMStudyOfLanguage> cmmStudiesToDelete, String languageIsoCode) throws IOException {
         // Set the index
         var indexName = String.format(INDEX_NAME_TEMPLATE, languageIsoCode);
 
         // Extract the ids from the studies, and add them to the delete query
-        cmmStudiesToDelete.stream().map(CMMStudyOfLanguage::getId)
+        var deleteBulkRequest = cmmStudiesToDelete.stream().map(CMMStudyOfLanguage::getId)
             .map(id -> Requests.deleteRequest(indexName).type(INDEX_TYPE).id(id))
-            .forEach(deleteBulkRequest::add);
+            .collect(BulkRequest::new, BulkRequest::add, (a,b) -> a.add(b.requests()));
 
         // Perform the deletion
         if (deleteBulkRequest.numberOfActions() > 0) {
-            deleteBulkRequest.get();
+            indexBulkRequest(indexName, deleteBulkRequest);
         }
     }
 
     @Override
-    public long getTotalHitCount(String language) {
-        var matchAllSearchRequest = getMatchAllSearchRequest(language).setSize(0);
-        var response = matchAllSearchRequest.get();
+    public long getTotalHitCount(String language) throws IOException {
+        var matchAllSearchRequest = getSearchRequest(language, new SearchSourceBuilder().size(0));
+        var response = esTemplate.getClient().search(matchAllSearchRequest, DEFAULT);
         return response.getHits().getTotalHits();
     }
 
     @Override
     public ElasticsearchSet<CMMStudyOfLanguage> getAllStudies(String language) {
         log.debug("Getting all studies for language [{}]", language);
-        return new ElasticsearchSet<>(getMatchAllSearchRequest("*"), esTemplate.getClient(), cmmStudyOfLanguageConverter.getReader());
+        return new ElasticsearchSet<>(
+            getSearchRequest("*", new SearchSourceBuilder().query(QueryBuilders.matchAllQuery())),
+            esTemplate.getClient(),
+            cmmStudyOfLanguageConverter.getReader()
+        );
     }
 
     @Override
@@ -157,20 +163,21 @@ public class ESIngestService implements IngestService {
         log.trace("Retrieving study [{}], language [{}]", id, language);
 
         try {
-            var response = esTemplate.getClient().prepareGet()
-                    .setIndex(String.format(INDEX_NAME_TEMPLATE, language))
-                    .setType(INDEX_TYPE)
-                    .setId(id)
-                    .get();
+            var request = new GetRequest(String.format(INDEX_NAME_TEMPLATE, language), INDEX_TYPE, id);
+            var response = esTemplate.getClient().get(request, DEFAULT);
 
             var sourceAsBytes = response.getSourceAsBytes();
 
             if (sourceAsBytes != null) {
                 return Optional.of(cmmStudyOfLanguageConverter.getReader().readValue(sourceAsBytes));
             }
-        } catch (IndexNotFoundException e) {
+        } catch (ElasticsearchStatusException e) {
             // This is expected when the index is not available
-            log.trace("Index for language [{}] not found: {}", language, e.toString());
+            if (e.status().equals(RestStatus.NOT_FOUND)) {
+                log.trace("Index for language [{}] not found: {}", language, e.toString());
+            } else {
+                throw e;
+            }
         } catch (IOException e) {
             log.error("Failed to retrieve study [{}]: {}", id, e.toString());
         }
@@ -179,40 +186,52 @@ public class ESIngestService implements IngestService {
     }
 
     /**
-     * Gets a match all {@link SearchRequestBuilder} for the language specified.
+     * Gets a {@link SearchRequest} for the language specified.
      *
      * @param language the language to get results for.
      */
-    private SearchRequestBuilder getMatchAllSearchRequest(String language) {
-        return esTemplate.getClient().prepareSearch(String.format(INDEX_NAME_TEMPLATE, language))
-                .setTypes(INDEX_TYPE)
-                .setQuery(QueryBuilders.matchAllQuery());
+    private SearchRequest getSearchRequest(String language, SearchSourceBuilder source) {
+        return new SearchRequest(String.format(INDEX_NAME_TEMPLATE, language))
+            .types(INDEX_TYPE)
+            .source(source);
     }
 
     @Override
     @SuppressWarnings("java:S1141")
     public Optional<LocalDateTime> getMostRecentLastModified() {
 
-        SearchResponse response = getMatchAllSearchRequest("*")
-                .addSort(LAST_MODIFIED_FIELD, SortOrder.DESC)
-                .setSize(1)
-                .get();
+        var request = getSearchRequest("*",
+                new SearchSourceBuilder().size(1).sort(LAST_MODIFIED_FIELD, SortOrder.DESC)
+        );
 
-        SearchHit[] hits = response.getHits().getHits();
+        SearchResponse response;
+        try {
+            response = esTemplate.getClient().search(request, DEFAULT);
+        } catch (IOException e) {
+            log.error("IO Error when retrieving last modified study: {}", e.toString());
+            return Optional.empty();
+        }
+
+        var hits = response.getHits().getHits();
+        CMMStudyOfLanguage study;
         try {
             if (hits.length != 0) {
-                CMMStudyOfLanguage study = cmmStudyOfLanguageConverter.getReader().readValue(hits[0].getSourceRef().streamInput());
-                try {
-                    var localDateTime = TimeUtility.getLocalDateTime(study.getLastModified());
-                    return Optional.of(localDateTime.withHour(0).withMinute(0).withSecond(0).withNano(0));
-                } catch (DateNotParsedException e) {
-                    log.error("[{}] lastModified field is not a valid ISO date: {}", study.getId(), e.toString());
-                }
+                study = cmmStudyOfLanguageConverter.getReader().readValue(hits[0].getSourceRef().streamInput());
+            } else {
+                return Optional.empty();
             }
         } catch (IOException e) {
             log.error("Couldn't decode {} into an instance of {}: {}", hits[0].getId(), CMMStudyOfLanguage.class.getName(), e.toString());
+            return Optional.empty();
         }
-        return Optional.empty();
+
+        try {
+            var localDateTime = TimeUtility.getLocalDateTime(study.getLastModified());
+            return Optional.of(localDateTime.withHour(0).withMinute(0).withSecond(0).withNano(0));
+        } catch (DateNotParsedException e) {
+            log.error("[{}] lastModified field is not a valid ISO date: {}", study.getId(), e.toString());
+            return Optional.empty();
+        }
     }
 
     /**

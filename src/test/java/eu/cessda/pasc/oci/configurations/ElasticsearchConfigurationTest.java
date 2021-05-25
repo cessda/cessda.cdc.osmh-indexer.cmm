@@ -17,8 +17,6 @@ package eu.cessda.pasc.oci.configurations;
 
 import org.junit.Test;
 
-import java.net.UnknownHostException;
-
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
@@ -27,7 +25,6 @@ public class ElasticsearchConfigurationTest {
     private ElasticsearchConfiguration getElasticsearchConfiguration() {
         return new ElasticsearchConfiguration(
             "localhost",
-            9300,
             9200,
             "es-test",
             null,
@@ -36,34 +33,7 @@ public class ElasticsearchConfigurationTest {
     }
 
     @Test
-    public void shouldCreateElasticsearchClient() throws UnknownHostException {
-        // Given
-        var elasticsearchConfiguration = getElasticsearchConfiguration();
-        var client = elasticsearchConfiguration.client();
-
-        // Then
-        assertNotNull(client);
-
-        // Close
-        elasticsearchConfiguration.close();
-        elasticsearchConfiguration.close(); // Should not throw on repeated calls
-    }
-
-    @Test
-    public void shouldReturnExistingElasticsearchClient() throws UnknownHostException {
-        try (var elasticsearchConfiguration = getElasticsearchConfiguration()) {
-
-            // Given
-            var firstESClient = elasticsearchConfiguration.client();
-            var secondESClient = elasticsearchConfiguration.client();
-
-            // Then
-            assertSame(firstESClient, secondESClient);
-        }
-    }
-
-    @Test
-    public void shouldReturnElasticsearchTemplate() throws UnknownHostException {
+    public void shouldReturnElasticsearchTemplate() {
         try (var elasticsearchConfiguration = getElasticsearchConfiguration()) {
 
             // Given

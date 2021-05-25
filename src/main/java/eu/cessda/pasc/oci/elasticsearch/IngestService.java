@@ -17,6 +17,7 @@ package eu.cessda.pasc.oci.elasticsearch;
 
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Optional;
@@ -37,7 +38,7 @@ public interface IngestService {
      * @return true If bulkIndexing was successful with no known error.
      * @throws org.elasticsearch.ElasticsearchException if an error occurs when indexing the studies to Elasticsearch.
      */
-    boolean bulkIndex(Collection<CMMStudyOfLanguage> languageCMMStudiesMap, String languageIsoCode);
+    boolean bulkIndex(Collection<CMMStudyOfLanguage> languageCMMStudiesMap, String languageIsoCode) throws IOException;
 
     /**
      * Delete the specified studies from all indices.
@@ -47,7 +48,7 @@ public interface IngestService {
      * @param languageIsoCode the language of the index to delete the studies from
      * @throws org.elasticsearch.ElasticsearchException if an error occurs connecting to Elasticsearch.
      */
-    void bulkDelete(Collection<CMMStudyOfLanguage> cmmStudiesToDelete, String languageIsoCode);
+    void bulkDelete(Collection<CMMStudyOfLanguage> cmmStudiesToDelete, String languageIsoCode) throws IOException;
 
     /**
      * Gets the total number of hits for the specified language. The language is in the same form as languages configured
@@ -57,7 +58,7 @@ public interface IngestService {
      * @throws org.elasticsearch.index.IndexNotFoundException if a corresponding index is not found.
      * @throws org.elasticsearch.ElasticsearchException       if an error occurs connecting to Elasticsearch.
      */
-    long getTotalHitCount(String language);
+    long getTotalHitCount(String language) throws IOException;
 
     /**
      * Gets a set of all studies stored in Elasticsearch.

@@ -25,13 +25,15 @@ import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import net.logstash.logback.argument.StructuredArguments;
 import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.index.IndexNotFoundException;
+import org.elasticsearch.ElasticsearchStatusException;
+import org.elasticsearch.rest.RestStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
-import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -108,24 +110,25 @@ public class MicrometerMetrics implements Metrics {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @throws ElasticsearchException if Elasticsearch is unavailable.
-     */
     @Override
-    public void updateLanguageMetrics() {
+    public void updateLanguageMetrics() throws IOException {
         log.debug(UPDATING_METRIC, LIST_RECORD_LANGCODE);
         for (var language : appConfigurationProperties.getLanguages()) {
             try {
                 long totalHitCount = ingestService.getTotalHitCount(language);
                 getRecordCount(language).set(totalHitCount);
-                log.info("[{}] Current records [{}]", StructuredArguments.value(LoggingConstants.LANG_CODE, language),
-                    StructuredArguments.value("language_record_count", totalHitCount));
-            } catch (IndexNotFoundException e) {
+                log.info("[{}] Current records [{}]",
+                    StructuredArguments.value(LoggingConstants.LANG_CODE, language),
+                    StructuredArguments.value("language_record_count", totalHitCount)
+                );
+            } catch (ElasticsearchStatusException e) {
                 // There are no records in an index that does not exist
-                getRecordCount(language).set(0);
-                log.debug("Index not found for language [{}].", language);
+                if (e.status().equals(RestStatus.NOT_FOUND)) {
+                    getRecordCount(language).set(0);
+                    log.debug("Index not found for language [{}].", language);
+                } else {
+                    throw e;
+                }
             }
         }
     }
@@ -133,10 +136,11 @@ public class MicrometerMetrics implements Metrics {
     /**
      * {@inheritDoc}
      *
-     * @throws ElasticsearchException if Elasticsearch is unavailable.
+     * @throws ElasticsearchException if an error occurs in Elasticsearch.
+     * @throws IOException if Elasticsearch cannot be contacted.
      */
     @Override
-    public void updateTotalRecordsMetric() {
+    public void updateTotalRecordsMetric() throws IOException {
         log.debug(UPDATING_METRIC, NUM_RECORDS_HARVESTED);
         totalRecords.set(ingestService.getTotalHitCount("*"));
     }
@@ -170,11 +174,11 @@ public class MicrometerMetrics implements Metrics {
     void updateEndpointsRecordsMetric(Collection<CMMStudyOfLanguage> studies) {
         log.debug(UPDATING_METRIC, LIST_RECORDS_ENDPOINT);
 
-        var hostEntryMap = studies.stream().filter(study -> study.getStudyXmlSourceUrl() != null)
-            .map(study -> URI.create(study.getStudyXmlSourceUrl()))
+        var hostEntryMap = studies.stream().map(CMMStudyOfLanguage::getStudyXmlSourceUrl)
+            .filter(Objects::nonNull).map(URI::create)
             .collect(Collectors.groupingBy(URI::getHost, Collectors.counting()));
 
-        for (Map.Entry<String, Long> hostEntry : hostEntryMap.entrySet()) {
+        for (var hostEntry : hostEntryMap.entrySet()) {
             recordsEndpointMap.entrySet().stream()
                 .filter(repoEntry -> repoEntry.getKey().getUrl().getHost().equalsIgnoreCase(hostEntry.getKey()))
                 .findAny().ifPresentOrElse(repoAtomicLongEntry -> {
@@ -190,10 +194,11 @@ public class MicrometerMetrics implements Metrics {
     /**
      * {@inheritDoc}
      *
-     * @throws ElasticsearchException if Elasticsearch is unavailable.
+     * @throws ElasticsearchException if an error occurs in Elasticsearch.
+     * @throws IOException if Elasticsearch cannot be contacted.
      */
     @Override
-    public void updateMetrics() {
+    public void updateMetrics() throws IOException {
         updateTotalRecordsMetric();
         updateLanguageMetrics();
         var allStudies = ingestService.getAllStudies("*");

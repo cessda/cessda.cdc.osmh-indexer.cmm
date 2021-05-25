@@ -59,7 +59,7 @@ public class ConsumerSchedulerTest {
         when(appConfigurationProperties.getLanguages()).thenReturn(Arrays.asList("cs", "da", "de", "el", "en", "et", "fi", "fr", "hu", "it", "nl", "no", "pt", "sk", "sl", "sr", "sv"));
     }
 
-    private DebuggingJMXBean mockDebuggingJMXBean() {
+    private DebuggingJMXBean mockDebuggingJMXBean() throws IOException {
         var debuggingJMXBean = mock(DebuggingJMXBean.class);
 
         when(debuggingJMXBean.printCurrentlyConfiguredRepoEndpoints()).thenReturn("printed repo info");
@@ -111,7 +111,7 @@ public class ConsumerSchedulerTest {
     }
 
     @Test
-    public void shouldLogErrorOnException() {
+    public void shouldLogErrorOnException() throws IOException {
 
         var debuggingJMXBean = mockDebuggingJMXBean();
 
@@ -153,7 +153,7 @@ public class ConsumerSchedulerTest {
         return harvesterConsumerService;
     }
 
-    private void thenVerifyFullRun(HarvesterConsumerService harvesterConsumerService, DebuggingJMXBean debuggingJMXBean) {
+    private void thenVerifyFullRun(HarvesterConsumerService harvesterConsumerService, DebuggingJMXBean debuggingJMXBean) throws IOException {
         verify(debuggingJMXBean, times(1)).printElasticSearchInfo();
         verify(debuggingJMXBean, times(1)).printCurrentlyConfiguredRepoEndpoints();
         verifyNoMoreInteractions(debuggingJMXBean);
