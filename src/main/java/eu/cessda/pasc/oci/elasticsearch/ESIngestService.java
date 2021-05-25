@@ -31,6 +31,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,6 @@ import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Optional;
@@ -142,14 +142,10 @@ public class ESIngestService implements IngestService {
     }
 
     @Override
-    public long getTotalHitCount(String language) {
+    public long getTotalHitCount(String language) throws IOException {
         var matchAllSearchRequest = getSearchRequest(language, new SearchSourceBuilder().size(0));
-        try {
-            var response = esTemplate.getClient().search(matchAllSearchRequest, DEFAULT);
-            return response.getHits().getTotalHits();
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        var response = esTemplate.getClient().search(matchAllSearchRequest, DEFAULT);
+        return response.getHits().getTotalHits();
     }
 
     @Override
@@ -177,7 +173,11 @@ public class ESIngestService implements IngestService {
             }
         } catch (ElasticsearchStatusException e) {
             // This is expected when the index is not available
-            log.trace("Index for language [{}] not found: {}", language, e.toString());
+            if (e.status().equals(RestStatus.NOT_FOUND)) {
+                log.trace("Index for language [{}] not found: {}", language, e.toString());
+            } else {
+                throw e;
+            }
         } catch (IOException e) {
             log.error("Failed to retrieve study [{}]: {}", id, e.toString());
         }

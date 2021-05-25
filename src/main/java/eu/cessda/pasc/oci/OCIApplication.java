@@ -27,6 +27,7 @@ import org.springframework.jmx.support.RegistrationPolicy;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import java.io.IOException;
 import java.util.TimeZone;
 
 @SpringBootApplication
@@ -56,7 +57,7 @@ public class OCIApplication {
 		try {
 			metrics.updateLanguageMetrics();
 			metrics.updateTotalRecordsMetric();
-		} catch (ElasticsearchException e) {
+		} catch (ElasticsearchException | IOException e) {
 			log.warn("Couldn't initialise metrics on startup. \n{}", e.toString());
 		}
 	}

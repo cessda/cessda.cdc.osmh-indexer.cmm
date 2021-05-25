@@ -24,6 +24,8 @@ import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.IOException;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -44,7 +46,7 @@ public class DebuggingJMXBeanTestIT {
     private ElasticsearchRestTemplate elasticsearchTemplate;
 
     @Test
-    public void shouldPrintElasticsearchDetails() {
+    public void shouldPrintElasticsearchDetails() throws IOException {
         debuggingJMXBean = new DebuggingJMXBean(elasticsearchTemplate, appConfigurationProperties);
         assertThat(debuggingJMXBean.printElasticSearchInfo()).startsWith("Elasticsearch Client Settings");
     }

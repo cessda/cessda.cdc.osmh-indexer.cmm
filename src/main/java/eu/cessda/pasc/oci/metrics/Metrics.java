@@ -17,25 +17,30 @@ package eu.cessda.pasc.oci.metrics;
 
 import org.elasticsearch.ElasticsearchException;
 
+import java.io.IOException;
+
 public interface Metrics {
     /**
      * Iterates through all configured languages and updates them.
      *
-     * @throws ElasticsearchException if Elasticsearch is unavailable.
+     * @throws ElasticsearchException if an error occurs in Elasticsearch.
+     * @throws IOException if Elasticsearch cannot be contacted.
      */
-    void updateLanguageMetrics();
+    void updateLanguageMetrics() throws IOException;
 
     /**
      * Updates the total records stored in Elasticsearch.
      *
-     * @throws ElasticsearchException if Elasticsearch is unavailable.
+     * @throws ElasticsearchException if an error occurs in Elasticsearch.
+     * @throws IOException if Elasticsearch cannot be contacted.
      */
-    void updateTotalRecordsMetric();
+    void updateTotalRecordsMetric() throws IOException;
 
     /**
      * Updates all configured metrics.
      *
-     * @throws ElasticsearchException if Elasticsearch is unavailable.
+     * @throws ElasticsearchException if an error occurs in Elasticsearch.
+     * @throws IOException if Elasticsearch cannot be contacted.
      */
-    void updateMetrics();
+    void updateMetrics() throws IOException;
 }

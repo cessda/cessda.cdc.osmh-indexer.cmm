@@ -22,7 +22,8 @@ import eu.cessda.pasc.oci.mock.data.ReposTestData;
 import eu.cessda.pasc.oci.models.configurations.Endpoints;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import io.micrometer.core.instrument.MeterRegistry;
-import org.elasticsearch.index.IndexNotFoundException;
+import org.elasticsearch.ElasticsearchStatusException;
+import org.elasticsearch.rest.RestStatus;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -74,7 +75,7 @@ public class MicrometerMetricsTests {
 
 
     @Test
-    public void shouldContainCorrectAmountOfRecordsForEachLanguage() {
+    public void shouldContainCorrectAmountOfRecordsForEachLanguage() throws IOException {
         IngestService ingestService = Mockito.mock(IngestService.class);
 
         // When
@@ -99,12 +100,12 @@ public class MicrometerMetricsTests {
     }
 
     @Test
-    public void shouldSetRecordCountToZeroWhenIndexIsNotFound() {
+    public void shouldSetRecordCountToZeroWhenIndexIsNotFound() throws IOException {
         IngestService ingestService = Mockito.mock(IngestService.class);
 
         // When
         String language = "en";
-        Mockito.when(ingestService.getTotalHitCount(Mockito.anyString())).thenThrow(new IndexNotFoundException(""));
+        Mockito.when(ingestService.getTotalHitCount(Mockito.anyString())).thenThrow(new ElasticsearchStatusException("", RestStatus.NOT_FOUND));
 
         var micrometerMetrics = new MicrometerMetrics(appConfigurationProperties, ingestService, meterRegistry);
         micrometerMetrics.getRecordCount(language).set(23);
@@ -115,8 +116,21 @@ public class MicrometerMetricsTests {
         Assert.assertEquals(0L, micrometerMetrics.getRecordCount(language).get());
     }
 
+    @Test(expected = ElasticsearchStatusException.class)
+    public void shouldThrowOnAnyOtherElasticsearchException() throws IOException {
+        IngestService ingestService = Mockito.mock(IngestService.class);
+
+        // When
+        Mockito.when(ingestService.getTotalHitCount(Mockito.anyString())).thenThrow(new ElasticsearchStatusException("", RestStatus.INTERNAL_SERVER_ERROR));
+
+        var micrometerMetrics = new MicrometerMetrics(appConfigurationProperties, ingestService, meterRegistry);
+
+        // Then
+        micrometerMetrics.updateLanguageMetrics();
+    }
+
     @Test
-    public void shouldGetTotalRecordsFromElasticsearch() {
+    public void shouldGetTotalRecordsFromElasticsearch() throws IOException {
         IngestService ingestService = Mockito.mock(IngestService.class);
 
         // When
@@ -186,7 +200,7 @@ public class MicrometerMetricsTests {
     }
 
     @Test
-    public void shouldUpdateAllMetrics() {
+    public void shouldUpdateAllMetrics() throws IOException {
         IngestService ingestService = Mockito.mock(IngestService.class);
         Mockito.when(ingestService.getAllStudies("*")).thenReturn(Collections.emptySet());
         var micrometerMetrics = new MicrometerMetrics(appConfigurationProperties, ingestService, meterRegistry);

@@ -58,7 +58,7 @@ public interface IngestService {
      * @throws org.elasticsearch.index.IndexNotFoundException if a corresponding index is not found.
      * @throws org.elasticsearch.ElasticsearchException       if an error occurs connecting to Elasticsearch.
      */
-    long getTotalHitCount(String language);
+    long getTotalHitCount(String language) throws IOException;
 
     /**
      * Gets a set of all studies stored in Elasticsearch.

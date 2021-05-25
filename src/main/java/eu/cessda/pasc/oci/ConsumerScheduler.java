@@ -26,6 +26,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -91,8 +92,9 @@ public class ConsumerScheduler {
     /**
      * Runs the harvest.
      *
-     * @param runType     the run type, used for logging
-     * @param harvestFrom the LocalDateTime to harvest from, where null is a full harvest
+     * @param runType     the run type, used for logging.
+     * @param harvestFrom the LocalDateTime to harvest from, where null is a full harvest.
+     * @throws IllegalStateException if Elasticsearch is unavailable.
      */
     @SuppressWarnings("try")
     private void run(String runType, LocalDateTime harvestFrom) {
@@ -100,6 +102,8 @@ public class ConsumerScheduler {
             final var startTime = logStartStatus(runType);
             harvesterRunner.executeHarvestAndIngest(harvestFrom);
             logEndStatus(startTime, runType);
+        } catch (IOException e) {
+            throw new IllegalStateException("Cannot connect to Elasticsearch: " + e);
         }
     }
 
@@ -122,7 +126,7 @@ public class ConsumerScheduler {
         return DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.now(ZoneId.systemDefault()));
     }
 
-    private OffsetDateTime logStartStatus(final String runDescription) {
+    private OffsetDateTime logStartStatus(final String runDescription) throws IOException {
         final OffsetDateTime startTime = OffsetDateTime.now(ZoneId.systemDefault());
         log.info("[{}] Consume and Ingest All SPs Repos: \n" +
                 "Started at [{}]\n" +

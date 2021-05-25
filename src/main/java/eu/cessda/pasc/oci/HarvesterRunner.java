@@ -37,13 +37,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import static java.util.concurrent.CompletableFuture.runAsync;
 import static net.logstash.logback.argument.StructuredArguments.value;
 
 @Component
@@ -60,8 +60,12 @@ public class HarvesterRunner {
 
     private final AtomicBoolean indexerRunning = new AtomicBoolean(false);
 
-    public HarvesterRunner(AppConfigurationProperties configurationProperties, HarvesterConsumerService remoteHarvesterConsumerService, HarvesterConsumerService localHarvesterConsumerService,
-                           IngestService ingestService, LanguageExtractor extractor, Metrics metrics) {
+    public HarvesterRunner(AppConfigurationProperties configurationProperties,
+                           HarvesterConsumerService remoteHarvesterConsumerService,
+                           HarvesterConsumerService localHarvesterConsumerService,
+                           IngestService ingestService,
+                           LanguageExtractor extractor,
+                           Metrics metrics) {
         this.configurationProperties = configurationProperties;
         this.localHarvester = localHarvesterConsumerService;
         this.ingestService = ingestService;
@@ -86,7 +90,7 @@ public class HarvesterRunner {
                 var contextMap = MDC.getCopyOfContextMap();
                 var executor = Executors.newFixedThreadPool(repos.size());
                 var futures = repos.stream()
-                    .map(repo -> CompletableFuture.runAsync(() -> harvestRepository(repo, lastModifiedDateTime, contextMap), executor))
+                    .map(repo -> runAsync(() -> harvestRepository(repo, lastModifiedDateTime, contextMap), executor))
                     .collect(Collectors.toList());
 
                 for (var f : futures) {
@@ -106,6 +110,8 @@ public class HarvesterRunner {
                 log.info("Harvest finished. Summary of the current state:");
                 log.info("Total number of records: {}", value("total_cmm_studies", ingestService.getTotalHitCount("*")));
                 metrics.updateMetrics();
+            } catch (IOException e) {
+                log.error("IO Error when getting the total number of records: {}", e.toString());
             } finally {
                 // Ensure that the running state is always set to false even if an exception is thrown
                 indexerRunning.set(false);

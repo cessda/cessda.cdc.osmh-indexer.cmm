@@ -53,24 +53,20 @@ public class DebuggingJMXBean {
   }
 
   @ManagedOperation(description = "Prints to log the Elasticsearch server state.")
-  public String printElasticSearchInfo() {
-      try {
-          var client = elasticsearchTemplate.getClient();
-          Map<String, Settings> asMap = client.cluster().getSettings(new ClusterGetSettingsRequest(), DEFAULT).getPersistentSettings().getAsGroups();
-          String elasticsearchInfo = "Elasticsearch Client Settings: [\n" + asMap.entrySet().stream()
-              .map(entry -> "\t" + entry.getKey() + "=" + entry.getValue() + "\n")
-              .collect(Collectors.joining()) + "]";
+  public String printElasticSearchInfo() throws IOException {
+      var client = elasticsearchTemplate.getClient();
+      Map<String, Settings> asMap = client.cluster().getSettings(new ClusterGetSettingsRequest(), DEFAULT).getPersistentSettings().getAsGroups();
+      String elasticsearchInfo = "Elasticsearch Client Settings: [\n" + asMap.entrySet().stream()
+          .map(entry -> "\t" + entry.getKey() + "=" + entry.getValue() + "\n")
+          .collect(Collectors.joining()) + "]";
 
-          ClusterHealthResponse healths = client.cluster().health(new ClusterHealthRequest(), DEFAULT);
+      ClusterHealthResponse healths = client.cluster().health(new ClusterHealthRequest(), DEFAULT);
 
-          elasticsearchInfo += "\nElasticsearch Cluster Details:\n" +
-              "\tCluster Name [" + healths.getClusterName() + "]" +
-              "\tNumberOfDataNodes [" + healths.getNumberOfDataNodes() + "]" +
-              "\tNumberOfNodes [" + healths.getNumberOfNodes() + "]";
-          return elasticsearchInfo;
-      } catch (IOException e) {
-          return "Elasticsearch connection error: " + e;
-      }
+      elasticsearchInfo += "\nElasticsearch Cluster Details:\n" +
+          "\tCluster Name [" + healths.getClusterName() + "]" +
+          "\tNumberOfDataNodes [" + healths.getNumberOfDataNodes() + "]" +
+          "\tNumberOfNodes [" + healths.getNumberOfNodes() + "]";
+      return elasticsearchInfo;
   }
 
   @ManagedOperation(description = "Show which SP repo Endpoints are currently active.")
