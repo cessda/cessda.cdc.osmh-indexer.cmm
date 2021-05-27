@@ -52,6 +52,7 @@ import java.util.*;
 
 import static eu.cessda.pasc.oci.mock.data.RecordTestData.*;
 import static org.assertj.core.api.BDDAssertions.then;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
@@ -278,6 +279,18 @@ public class ESIngestServiceTestIT {
         // Then
         var hitCountPerRepository = ingestService.getAllStudies("*");
         hitCountPerRepository.iterator().next(); // Should throw
+    }
+
+    @Test
+    public void shouldReturnNoStudiesForAnEmptyIndex() {
+
+        // Setup
+        var ingestService = new ESIngestService(elasticsearchTemplate, esConfigProp, cmmStudyOfLanguageConverter);
+
+        // Then
+        var hitCountPerRepository = ingestService.getAllStudies("*");
+        assertEquals(0, hitCountPerRepository.size());
+        assertFalse(hitCountPerRepository.iterator().hasNext());
     }
 
     @Test
