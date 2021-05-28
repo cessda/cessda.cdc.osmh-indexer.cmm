@@ -40,13 +40,19 @@
           "dataCollectionFreeText": {
             "type": "text",
             "analyzer": "pasc_standard_analyzer",
-            "term_vector": "with_positions_offsets"
+            "term_vector": "with_positions_offsets",
+            "copy_to": "dataCollectionFreeTextSearchField"
           },
           "event": {
             "type": "text",
-            "analyzer": "pasc_standard_analyzer"
+            "analyzer": "pasc_standard_analyzer",
+            "copy_to": "dataCollectionFreeTextSearchField"
           }
         }
+      },
+      "dataCollectionFreeTextSearchField": {
+        "type": "text",
+        "analyzer": "pasc_standard_analyzer"
       },
       "dataCollectionPeriodEnddate": {
         "type": "date",
@@ -85,13 +91,19 @@
         "properties": {
           "agency": {
             "type": "keyword",
-            "ignore_above": 256
+            "ignore_above": 256,
+            "copy_to": "pidStudiesSearchField"
           },
           "pid": {
             "type": "keyword",
-            "ignore_above": 256
+            "ignore_above": 256,
+            "copy_to": "pidStudiesSearchField"
           }
         }
+      },
+      "pidStudiesSearchField": {
+        "type": "text",
+        "analyzer": "pasc_standard_analyzer"
       },
       "publicationYear": {
         "type": "date",
@@ -109,9 +121,14 @@
           },
           "publisher": {
             "type": "keyword",
-            "ignore_above": 256
+            "ignore_above": 256,
+            "copy_to": "publisherSearchField"
           }
         }
+      },
+      "publisherSearchField": {
+        "type": "text",
+        "analyzer": "pasc_standard_analyzer"
       },
       "samplingProcedureFreeTexts": {
         "type": "text",
@@ -123,18 +140,25 @@
         "properties": {
           "abbr": {
             "type": "keyword",
-            "ignore_above": 256
+            "ignore_above": 256,
+            "copy_to": "studyAreaCountriesSearchField"
           },
           "country": {
             "type": "text",
             "analyzer": "pasc_index_autocomplete_analyzer",
-            "search_analyzer": "pasc_standard_analyzer"
+            "search_analyzer": "pasc_standard_analyzer",
+            "copy_to": "studyAreaCountriesSearchField"
           },
           "searchField": {
             "type": "keyword",
-            "ignore_above": 256
+            "ignore_above": 256,
+            "copy_to": "studyAreaCountriesSearchField"
           }
         }
+      },
+      "studyAreaCountriesSearchField": {
+        "type": "text",
+        "analyzer": "pasc_standard_analyzer"
       },
       "studyNumber": {
         "type": "keyword",
@@ -161,121 +185,167 @@
             "type": "text",
             "analyzer": "pasc_index_autocomplete_analyzer",
             "search_analyzer": "pasc_standard_analyzer",
-            "term_vector": "with_positions_offsets"
+            "term_vector": "with_positions_offsets",
+            "copy_to": "keywordsSearchField"
           },
           "vocab": {
             "type": "keyword",
-            "ignore_above": 256
+            "ignore_above": 256,
+            "copy_to": "keywordsSearchField"
           },
           "vocabUri": {
             "type": "keyword",
-            "ignore_above": 256
+            "ignore_above": 256,
+            "copy_to": "keywordsSearchField"
           }
         }
+      },
+      "keywordsSearchField": {
+        "type": "text",
+        "analyzer": "pasc_standard_analyzer"
       },
       "typeOfModeOfCollections": {
         "type": "nested",
         "properties": {
           "id": {
             "type": "keyword",
-            "ignore_above": 256
+            "ignore_above": 256,
+            "copy_to": "typeOfModeOfCollectionsSearchField"
           },
           "term": {
             "type": "text",
             "analyzer": "pasc_standard_analyzer",
-            "term_vector": "with_positions_offsets"
+            "term_vector": "with_positions_offsets",
+            "copy_to": "typeOfModeOfCollectionsSearchField"
           },
           "vocab": {
             "type": "keyword",
-            "ignore_above": 256
+            "ignore_above": 256,
+            "copy_to": "typeOfModeOfCollectionsSearchField"
           },
           "vocabUri": {
             "type": "keyword",
-            "ignore_above": 256
+            "ignore_above": 256,
+            "copy_to": "typeOfModeOfCollectionsSearchField"
           }
         }
+      },
+      "typeOfModeOfCollectionsSearchField": {
+        "type": "text",
+        "analyzer": "pasc_standard_analyzer"
       },
       "typeOfSamplingProcedures": {
         "type": "nested",
         "properties": {
           "id": {
             "type": "keyword",
-            "ignore_above": 256
+            "ignore_above": 256,
+            "copy_to": "typeOfSamplingProceduresSearchField"
           },
           "vocab": {
             "type": "keyword",
-            "ignore_above": 256
+            "ignore_above": 256,
+            "copy_to": "typeOfSamplingProceduresSearchField"
           },
           "vocabUri": {
             "type": "keyword",
-            "ignore_above": 256
+            "ignore_above": 256,
+            "copy_to": "typeOfSamplingProceduresSearchField"
           }
         }
+      },
+      "typeOfSamplingProceduresSearchField": {
+        "type": "text",
+        "analyzer": "pasc_standard_analyzer"
       },
       "typeOfTimeMethods": {
         "type": "nested",
         "properties": {
           "id": {
             "type": "keyword",
-            "ignore_above": 256
+            "ignore_above": 256,
+            "copy_to": "typeOfTimeMethodsSearchField"
           },
           "term": {
             "type": "text",
             "analyzer": "pasc_standard_analyzer",
-            "term_vector": "with_positions_offsets"
+            "term_vector": "with_positions_offsets",
+            "copy_to": "typeOfTimeMethodsSearchField"
           },
           "vocab": {
             "type": "keyword",
-            "ignore_above": 256
+            "ignore_above": 256,
+            "copy_to": "typeOfTimeMethodsSearchField"
           },
           "vocabUri": {
             "type": "keyword",
-            "ignore_above": 256
+            "ignore_above": 256,
+            "copy_to": "typeOfTimeMethodsSearchField"
           }
         }
+      },
+      "typeOfTimeMethodsSearchField": {
+        "type": "text",
+        "analyzer": "pasc_standard_analyzer"
       },
       "unitTypes": {
         "type": "nested",
         "properties": {
           "id": {
             "type": "keyword",
-            "ignore_above": 256
+            "ignore_above": 256,
+            "copy_to": "unitTypesSearchField"
           },
           "term": {
             "type": "text",
             "analyzer": "pasc_standard_analyzer",
-            "term_vector": "with_positions_offsets"
+            "term_vector": "with_positions_offsets",
+            "copy_to": "unitTypesSearchField"
           },
           "vocab": {
             "type": "keyword",
-            "ignore_above": 256
+            "ignore_above": 256,
+            "copy_to": "unitTypesSearchField"
           },
           "vocabUri": {
             "type": "keyword",
-            "ignore_above": 256
+            "ignore_above": 256,
+            "copy_to": "unitTypesSearchField"
           }
         }
+      },
+      "unitTypesSearchField": {
+        "type": "text",
+        "analyzer": "pasc_standard_analyzer"
       },
       "classifications": {
         "type": "nested",
         "properties": {
           "id": {
             "type": "keyword",
-            "ignore_above": 256
+            "ignore_above": 256,
+            "copy_to": "classificationsSearchField"
           },
           "term": {
             "type": "keyword",
-            "ignore_above": 256
+            "ignore_above": 256,
+            "copy_to": "classificationsSearchField"
           },
           "vocab": {
             "type": "keyword",
-            "ignore_above": 256
+            "ignore_above": 256,
+            "copy_to": "classificationsSearchField"
           },
           "vocabUri": {
             "type": "keyword",
-            "ignore_above": 256
+            "ignore_above": 256,
+            "copy_to": "classificationsSearchField"
           }
         }
+      },
+      "classificationsSearchField": {
+        "type": "text",
+        "analyzer": "pasc_standard_analyzer"
       }
     }
   }
