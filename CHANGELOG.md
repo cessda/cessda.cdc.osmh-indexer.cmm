@@ -12,6 +12,27 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 *- Fixed (for any bug fixes)*
 *- Security (in case of vulnerabilities)*
 
+## [2.4.0]
+
+### Additions
+
+- Log the time it takes to harvest each repository ([#296](https://bitbucket.org/cessda/cessda.cdc.version2/issues/296))
+- Use the autocomplete analyser in Elasticsearch for the abstract, country and term fields ([#285](https://bitbucket.org/cessda/cessda.cdc.version2/issues/285))
+
+### Changes
+
+- Update GESIS' repository endpoint URL ([#303](https://bitbucket.org/cessda/cessda.cdc.version2/issues/303))
+- Update SoDaNet's repository endpoint URL ([#277](https://bitbucket.org/cessda/cessda.cdc.version2/issues/277))
+- Support Elasticsearch 6.8, migrate to the Elasticsearch REST client and remove the Transport Client ([#312](https://bitbucket.org/cessda/cessda.cdc.version2/issues/312))
+    - This allows the indexer to connect to secured Elasticsearch clusters
+- Update Spring Boot to 2.2.13([#312](https://bitbucket.org/cessda/cessda.cdc.version2/issues/312))
+- Disable dynamic Elasticsearch mapping ([#312](https://bitbucket.org/cessda/cessda.cdc.version2/issues/312))
+- Add support for Elasticsearch security ([#321](https://bitbucket.org/cessda/cessda.cdc.version2/issues/321))
+
+### Fixes
+
+- Fix nested fields in Elasticsearch not being searchable ([#335](https://bitbucket.org/cessda/cessda.cdc.version2/issues/335))
+
 ## [2.3.1] - 2021-02-11
 
 [10.5281/zenodo.4534741](https://zenodo.org/record/4534741)
