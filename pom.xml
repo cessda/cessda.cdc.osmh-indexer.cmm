@@ -318,13 +318,13 @@
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
-                <version>4.0</version>
+                <version>4.1</version>
                 <configuration>
                     <header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
                     <properties>
                         <owner>CESSDA ERIC</owner>
                         <email>support@cessda.eu</email>
-                        <project.inceptionYear>2017-2021</project.inceptionYear>
+                        <year>2017-2021</year>
                     </properties>
                     <excludes>
                         <exclude>mvnw*</exclude>
