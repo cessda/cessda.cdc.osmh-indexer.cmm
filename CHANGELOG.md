@@ -12,7 +12,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 *- Fixed (for any bug fixes)*
 *- Security (in case of vulnerabilities)*
 
-## [2.4.0]
+## [2.4.0] - 2021-06-23
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5017358.svg)](https://doi.org/10.5281/zenodo.5017358)
 
 ### Additions
 
