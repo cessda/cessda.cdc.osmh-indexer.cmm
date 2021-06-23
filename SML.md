@@ -1,6 +1,6 @@
 ## CESSDA Software Maturity Levels (SML) ##
 
-The overall score for OSMH Consumer Indexer (v2.3.0) is **Level 3**
+The overall score for OSMH Consumer Indexer (v2.4.0) is **Level 3**
 
 Which means *"Software is usable; the software can be used by most users although there may be some cost and risk"* (i.e. expected standard for CESSDA RI use).
 
