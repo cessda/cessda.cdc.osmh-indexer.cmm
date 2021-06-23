@@ -317,7 +317,7 @@
                     <properties>
                         <owner>CESSDA ERIC</owner>
                         <email>support@cessda.eu</email>
-                        <project.inceptionYear>2017-2021</project.inceptionYear>
+                        <year>2017-2021</year>
                     </properties>
                     <excludes>
                         <exclude>mvnw*</exclude>
