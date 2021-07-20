@@ -205,7 +205,5 @@ public final class RecordHeadersMock {
     }
 
     //language=xml
-    public static String getEmptyXML() {
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\" ?><emptyDocumemt/>";
-    }
+    public static final String EMPTY_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?><emptyDocumemt/>";
 }

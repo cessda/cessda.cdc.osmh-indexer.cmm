@@ -68,7 +68,7 @@ public class HarvesterConsumerServiceRunnerTestIT {
     }
 
     private int processAndVerify(Repo repo) {
-        var recordHeaders = localHarvesterConsumerService.listRecordHeaders(repo, null);
+        var recordHeaders = localHarvesterConsumerService.listRecordHeaders(repo, null).collect(Collectors.toList());
         log.info("Total records found: [{}]", recordHeaders.size());
 
         // We are only interested in the first valid record

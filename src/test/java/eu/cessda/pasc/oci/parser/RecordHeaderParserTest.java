@@ -23,6 +23,7 @@ import eu.cessda.pasc.oci.exception.XMLParseException;
 import eu.cessda.pasc.oci.http.HttpClient;
 import eu.cessda.pasc.oci.mock.data.RecordHeadersMock;
 import eu.cessda.pasc.oci.mock.data.ReposTestData;
+import eu.cessda.pasc.oci.models.Record;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import org.junit.Assert;
@@ -35,6 +36,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static eu.cessda.pasc.oci.parser.OaiPmhHelpers.appendListRecordResumptionToken;
 import static org.assertj.core.api.BDDAssertions.then;
@@ -70,7 +72,7 @@ public class RecordHeaderParserTest {
         );
 
         // When
-        List<RecordHeader> recordHeaders = recordHeaderParser.getRecordHeaders(ukdsEndpoint);
+        List<RecordHeader> recordHeaders = recordHeaderParser.getRecordHeaders(ukdsEndpoint).map(Record::getRecordHeader).collect(Collectors.toList());
 
         then(recordHeaders).hasSize(3);
         then(recordHeaders).extracting("identifier").containsOnly("850229", "850232", "850235");
@@ -127,7 +129,7 @@ public class RecordHeaderParserTest {
         );
 
         // When
-        List<RecordHeader> recordHeaders = recordHeaderParser.getRecordHeaders(ukdsEndpoint);
+        List<RecordHeader> recordHeaders = recordHeaderParser.getRecordHeaders(ukdsEndpoint).map(Record::getRecordHeader).collect(Collectors.toList());
 
         then(recordHeaders).hasSize(7);
         then(recordHeaders).extracting("identifier")
@@ -184,19 +186,19 @@ public class RecordHeaderParserTest {
         );
 
         // When
-        List<RecordHeader> recordHeaders = recordHeaderParser.getRecordHeaders(ukdsEndpoint);
+        List<RecordHeader> recordHeaders = recordHeaderParser.getRecordHeaders(ukdsEndpoint).map(Record::getRecordHeader).collect(Collectors.toList());
         Assert.assertTrue(recordHeaders.get(0).isDeleted());
     }
 
     @Test(expected = HarvesterException.class)
-    public void shouldThrowExceptionIfOAIElementIsMissing() throws HarvesterException, IOException {
+    public void shouldThrowExceptionIfOAIElementIsMissing() throws IOException, HarvesterException {
         // Given
         Repo ukdsEndpoint = ReposTestData.getUKDSRepo();
 
         String fullListRecordRepoUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=ListIdentifiers&metadataPrefix=ddi";
 
         given(httpClient.getInputStream(URI.create(fullListRecordRepoUrl))).willReturn(
-            new ByteArrayInputStream(RecordHeadersMock.getEmptyXML().getBytes(StandardCharsets.UTF_8))
+            new ByteArrayInputStream(RecordHeadersMock.EMPTY_XML.getBytes(StandardCharsets.UTF_8))
         );
 
         // When

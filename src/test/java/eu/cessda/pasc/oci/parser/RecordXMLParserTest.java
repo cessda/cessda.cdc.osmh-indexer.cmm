@@ -27,6 +27,8 @@ import eu.cessda.pasc.oci.exception.HarvesterException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.http.HttpClient;
 import eu.cessda.pasc.oci.mock.data.ReposTestData;
+import eu.cessda.pasc.oci.models.Record;
+import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.configurations.Repo;
@@ -64,12 +66,14 @@ public class RecordXMLParserTest {
     private final String recordIdentifier;
     private final URI fullRecordUrl;
     private final CMMStudyMapper cmmStudyMapper = new CMMStudyMapper();
+    private final Record recordHeader;
 
     public RecordXMLParserTest() {
         // Needed because TimeUtility only works properly in UTC timezones
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         repo = ReposTestData.getUKDSRepo();
         recordIdentifier = "http://my-example_url:80/obj/fStudy/ch.sidos.ddi.468.7773";
+        recordHeader = new Record(RecordHeader.builder().identifier(recordIdentifier).build(), null);
         fullRecordUrl = URI.create(repo.getUrl() + "?verb=GetRecord&identifier=" + URLEncoder.encode(recordIdentifier, StandardCharsets.UTF_8) + "&metadataPrefix=ddi");
     }
 
@@ -82,7 +86,7 @@ public class RecordXMLParserTest {
         );
 
         // When
-        CMMStudy result = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordIdentifier);
+        CMMStudy result = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
 
         then(result).isNotNull();
         validateCMMStudyResultAgainstSchema(result);
@@ -99,7 +103,7 @@ public class RecordXMLParserTest {
         );
 
         // When
-        CMMStudy result = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordIdentifier);
+        CMMStudy result = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
 
         then(result).isNotNull();
 
@@ -123,7 +127,7 @@ public class RecordXMLParserTest {
         );
 
         // When
-        CMMStudy record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordIdentifier);
+        CMMStudy record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
 
         // Then
         then(record).isNotNull();
@@ -140,7 +144,7 @@ public class RecordXMLParserTest {
         );
 
         // When
-        CMMStudy record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordIdentifier);
+        CMMStudy record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
         then(record).isNotNull();
         validateCMMStudyResultAgainstSchema(record);
         final ObjectMapper mapper = new ObjectMapper();
@@ -162,7 +166,7 @@ public class RecordXMLParserTest {
         );
 
         // When
-        CMMStudy record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordIdentifier);
+        CMMStudy record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
         String actualCmmStudyJsonString = cmmConverter.toJsonString(record);
 
         // then
@@ -183,7 +187,7 @@ public class RecordXMLParserTest {
         );
 
         // When
-        CMMStudy record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordIdentifier);
+        CMMStudy record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
 
         then(record).isNotNull();
         then(record.getAbstractField().size()).isEqualTo(3);
@@ -205,7 +209,7 @@ public class RecordXMLParserTest {
         );
 
         // When
-        CMMStudy record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordIdentifier);
+        CMMStudy record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
 
         then(record).isNotNull();
         then(record.getTitleStudy().size()).isEqualTo(3);
@@ -222,7 +226,7 @@ public class RecordXMLParserTest {
         );
 
         // When
-        CMMStudy record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordIdentifier);
+        CMMStudy record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
 
         // Then
         then(record).isNotNull();
@@ -238,7 +242,7 @@ public class RecordXMLParserTest {
         );
 
         // When
-        new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordIdentifier);
+        new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
 
         // Then an exception is thrown.
     }
@@ -252,7 +256,7 @@ public class RecordXMLParserTest {
         );
 
         // When
-        CMMStudy result = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordIdentifier);
+        CMMStudy result = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
 
         then(result).isNotNull();
         validateCMMStudyResultAgainstSchema(result);
@@ -338,7 +342,7 @@ public class RecordXMLParserTest {
         );
 
         // When
-        CMMStudy result = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repository, recordIdentifier);
+        CMMStudy result = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repository, recordHeader);
 
         then(result).isNotNull();
         validateCMMStudyResultAgainstSchema(result);

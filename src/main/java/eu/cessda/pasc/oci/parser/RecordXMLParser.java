@@ -20,6 +20,7 @@ import eu.cessda.pasc.oci.exception.HarvesterException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.exception.XMLParseException;
 import eu.cessda.pasc.oci.http.HttpClient;
+import eu.cessda.pasc.oci.models.Record;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.extern.slf4j.Slf4j;
@@ -55,20 +56,28 @@ public class RecordXMLParser {
     /**
      * Gets a record from a remote repository.
      * @param repo the repository to retrieve the record from.
-     * @param studyIdentifier the study to retrieve.
+     * @param record the study to retrieve.
      * @return a {@link CMMStudy} representing the study.
      * @throws OaiPmhException if the document contains an {@code <error>} element.
      * @throws XMLParseException if an error occurred parsing the XML.
      * @throws HarvesterException if the request URL could not be converted into a {@link URI}.
      */
-    public CMMStudy getRecord(Repo repo, String studyIdentifier) throws HarvesterException {
-        log.debug("[{}] Querying for StudyID [{}]", repo.getCode(), studyIdentifier);
+    public CMMStudy getRecord(Repo repo, Record record) throws HarvesterException {
+        log.debug("[{}] Querying for StudyID [{}]", repo.getCode(), record.getRecordHeader().getIdentifier());
         URI fullUrl = null;
         try {
-            fullUrl = OaiPmhHelpers.buildGetStudyFullUrl(repo, studyIdentifier);
-            try (InputStream recordXML = httpClient.getInputStream(fullUrl)) {
-                return mapDDIRecordToCMMStudy(recordXML, fullUrl, repo);
+            fullUrl = OaiPmhHelpers.buildGetStudyFullUrl(repo, record.getRecordHeader().getIdentifier());
+            Document document;
+            if (record.getDocument() == null) {
+                // If the document is not present retrieve it from the OAI-PMH endpoint.
+                try (InputStream recordXML = httpClient.getInputStream(fullUrl)) {
+                    document = parseDocument(recordXML);
+                }
+            } else {
+                // The document has already been parsed.
+                document = record.getDocument();
             }
+            return mapDDIRecordToCMMStudy(document, fullUrl, repo);
         } catch (JDOMException | IOException e) {
             throw new XMLParseException(fullUrl, e);
         } catch (URISyntaxException e) {
@@ -76,14 +85,9 @@ public class RecordXMLParser {
         }
     }
 
-    private CMMStudy mapDDIRecordToCMMStudy(InputStream recordXML, URI sourceUri, Repo repository) throws JDOMException, IOException, OaiPmhException {
+    private CMMStudy mapDDIRecordToCMMStudy(Document document, URI sourceUri, Repo repository) throws JDOMException, IOException, OaiPmhException {
 
         CMMStudy.CMMStudyBuilder builder = CMMStudy.builder();
-        Document document = OaiPmhHelpers.getSaxBuilder().build(recordXML);
-
-        if (log.isTraceEnabled()) {
-            log.trace("Record XML String [{}]", new XMLOutputter().outputString(document));
-        }
 
         // Short-Circuit. We carry on to parse beyond the headers only if the record is active.
         var headerElement = cmmStudyMapper.parseHeaderElement(document);
@@ -120,6 +124,15 @@ public class RecordXMLParser {
             builder.dataCollectionFreeTexts(cmmStudyMapper.parseDataCollectionFreeTexts(document, defaultLangIsoCode));
         }
         return builder.studyXmlSourceUrl(sourceUri.toString()).build();
+    }
+
+    private Document parseDocument(InputStream recordXML) throws JDOMException, IOException {
+        Document document = OaiPmhHelpers.getSaxBuilder().build(recordXML);
+
+        if (log.isTraceEnabled()) {
+            log.trace("Record XML String [{}]", new XMLOutputter().outputString(document));
+        }
+        return document;
     }
 
 }

@@ -19,9 +19,11 @@ import eu.cessda.pasc.oci.exception.HarvesterException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.exception.XMLParseException;
 import eu.cessda.pasc.oci.http.HttpClient;
+import eu.cessda.pasc.oci.models.Record;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.extern.slf4j.Slf4j;
+import org.jdom2.input.DOMBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
@@ -33,12 +35,13 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * Service implementation to handle Listing Record Headers
@@ -55,40 +58,12 @@ public class RecordHeaderParser {
 
     private final HttpClient httpClient;
     private final DocumentBuilderFactory builderFactory;
+    private final DOMBuilder domBuilder = new DOMBuilder();
 
     @Autowired
     public RecordHeaderParser(HttpClient httpClient, DocumentBuilderFactory builderFactory) {
         this.httpClient = httpClient;
         this.builderFactory = builderFactory;
-    }
-
-    /**
-     * Checks if the response has an {@literal <error>} element.
-     *
-     * @param document the document to map to.
-     * @throws OaiPmhException         if an {@literal <error>} element was present.
-     * @throws HarvesterException if the given document has no OAI element.
-     */
-    private static void validateResponse(Document document) throws HarvesterException {
-        NodeList oAINode = document.getElementsByTagName(OaiPmhConstants.OAI_PMH);
-
-        if (oAINode.getLength() == 0) {
-            throw new HarvesterException("Missing OAI element");
-        }
-
-        for (int i = 0; i < oAINode.getLength(); i++) {
-            NodeList childNodes = oAINode.item(i).getChildNodes();
-            for (int childNodeIndex = 0; childNodeIndex < childNodes.getLength(); childNodeIndex++) {
-                Node item = childNodes.item(childNodeIndex);
-                if (OaiPmhConstants.ERROR.equals(item.getLocalName())) {
-                    if (item.getTextContent() != null && !item.getTextContent().isEmpty()) {
-                        throw new OaiPmhException(OaiPmhException.Code.valueOf(item.getAttributes().getNamedItem("code").getTextContent()), item.getTextContent());
-                    } else {
-                        throw new OaiPmhException(OaiPmhException.Code.valueOf(item.getAttributes().getNamedItem("code").getTextContent()));
-                    }
-                }
-            }
-        }
     }
 
     private Document getRecordHeadersDocument(URI repoUrl) throws XMLParseException {
@@ -166,41 +141,72 @@ public class RecordHeaderParser {
      * <p>
      * This method uses the {@code ListIdentifiers} verb.
      *
-     * @param repo the repository to retrieve records from
-     * @return a list of record headers
-     * @throws OaiPmhException    if the repository returns an OAI-PMH error
-     * @throws XMLParseException  if the XML cannot be parsed, or if an IO error occurs
-     * @throws HarvesterException if the OAI-PMH repository returns a XML document with no {@code <oai>} element
+     * @param repo the repository to retrieve records from.
+     * @return a list of record headers.
+     * @throws OaiPmhException    if the repository returns an OAI-PMH error.
+     * @throws XMLParseException  if the XML cannot be parsed, or if an IO error occurs.
+     * @throws HarvesterException if the OAI-PMH repository returns a XML document with no {@code <oai>} element.
      */
-    public List<RecordHeader> getRecordHeaders(Repo repo) throws HarvesterException {
+    @SuppressWarnings({"java:S2095", "resource"}) // This is closed by the calling method
+    public Stream<Record> getRecordHeaders(Repo repo) throws HarvesterException {
 
         log.debug("[{}] Parsing record headers.", repo.getCode());
 
-        URI fullListRecordUrlPath = OaiPmhHelpers.appendListRecordParams(repo);
-        var recordHeadersDocument = getRecordHeadersDocument(fullListRecordUrlPath);
+        if (repo.getUrl() != null) {
 
-        // Exit if the response has an <error> element
-        validateResponse(recordHeadersDocument);
+            URI fullListRecordUrlPath = OaiPmhHelpers.appendListRecordParams(repo);
+            var recordHeadersDocument = getRecordHeadersDocument(fullListRecordUrlPath);
 
-        Optional<String> resumptionToken;
-        var recordHeaders = new ArrayList<RecordHeader>();
+            // Check if the document has
+            NodeList oAINode = recordHeadersDocument.getElementsByTagName(OaiPmhConstants.OAI_PMH);
 
-        do {
-            // Parse and add all found record headers
-            recordHeaders.addAll(parseRecordHeadersFromDoc(recordHeadersDocument));
-
-            // Check and loop when there is a resumptionToken
-            resumptionToken = parseResumptionToken(recordHeadersDocument);
-            if (resumptionToken.isPresent()) {
-                URI repoUrlWithResumptionToken = OaiPmhHelpers.appendListRecordResumptionToken(repo.getUrl(), resumptionToken.get());
-                log.trace("Looping for [{}].", repoUrlWithResumptionToken);
-                recordHeadersDocument = getRecordHeadersDocument(repoUrlWithResumptionToken);
+            if (oAINode.getLength() == 0) {
+                throw new HarvesterException("Missing OAI element");
             }
 
-        } while (resumptionToken.isPresent());
+            // Exit if the response has an <error> element
+            DocElementParser.validateResponse(domBuilder.build(recordHeadersDocument));
 
-        log.debug("[{}] ParseRecordHeaders ended:  No more resumption tokens to process.", repo.getCode());
+            Optional<String> resumptionToken;
+            var recordHeaders = new ArrayList<RecordHeader>();
 
-        return Collections.unmodifiableList(recordHeaders);
+            do {
+                // Parse and add all found record headers
+                recordHeaders.addAll(parseRecordHeadersFromDoc(recordHeadersDocument));
+
+                // Check and loop when there is a resumptionToken
+                resumptionToken = parseResumptionToken(recordHeadersDocument);
+                if (resumptionToken.isPresent()) {
+                    URI repoUrlWithResumptionToken = OaiPmhHelpers.appendListRecordResumptionToken(repo.getUrl(), resumptionToken.get());
+                    log.trace("Looping for [{}].", repoUrlWithResumptionToken);
+                    recordHeadersDocument = getRecordHeadersDocument(repoUrlWithResumptionToken);
+                }
+
+            } while (resumptionToken.isPresent());
+
+            log.debug("[{}] ParseRecordHeaders ended:  No more resumption tokens to process.", repo.getCode());
+
+            return recordHeaders.stream().map(recordHeader -> new Record(recordHeader, null));
+        } else if (repo.getPath() != null) {
+            try {
+                return Files.walk(repo.getPath()).filter(Files::isRegularFile)
+                    .flatMap(p -> {
+                        try (var inputStream = Files.newInputStream(p)) {
+                            return Stream.of(builderFactory.newDocumentBuilder().parse(inputStream));
+                        } catch (IOException | ParserConfigurationException | SAXException e) {
+                            log.warn("[{}] Couldn't parse {}: {}", repo.getCode(), p, e.toString());
+                            return Stream.empty();
+                        }
+                    }).flatMap(doc -> {
+                        var recordHeaders = parseRecordHeadersFromDoc(doc);
+                        return recordHeaders.stream().map(recordHeader -> new Record(recordHeader, domBuilder.build(doc)));
+                    });
+            } catch (IOException e) {
+                log.error("[{}] Reading path failed: {}", repo.getCode(), e.toString());
+            }
+        } else {
+            throw new IllegalArgumentException("Repo " + repo.getCode() + " has no URL or path defined");
+        }
+        return Stream.empty();
     }
 }

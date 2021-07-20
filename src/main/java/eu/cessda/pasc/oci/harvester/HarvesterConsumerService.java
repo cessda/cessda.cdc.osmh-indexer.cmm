@@ -15,13 +15,14 @@
  */
 package eu.cessda.pasc.oci.harvester;
 
+import eu.cessda.pasc.oci.models.Record;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Service responsible for consuming harvested and Metadata via OSMH Harvester
@@ -36,7 +37,11 @@ public interface HarvesterConsumerService {
      * @param lastModifiedDate to filter headers on, can be null.
      * @return a list of record headers retrieved from the remote repository.
      */
-    List<RecordHeader> listRecordHeaders(Repo repo, LocalDateTime lastModifiedDate);
+    Stream<Record> listRecordHeaders(Repo repo, LocalDateTime lastModifiedDate);
 
-    Optional<CMMStudy> getRecord(Repo repo, RecordHeader recordHeader);
+    Optional<CMMStudy> getRecord(Repo repo, Record record);
+
+    default Optional<CMMStudy> getRecord(Repo repo, RecordHeader recordHeader) {
+        return getRecord(repo, new Record(recordHeader, null));
+    }
 }
