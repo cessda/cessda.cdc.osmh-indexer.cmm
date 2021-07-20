@@ -22,7 +22,6 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.client.transport.TransportClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,23 +41,19 @@ public class ElasticsearchConfiguration implements AutoCloseable   {
 
     private final String esHost;
     private final int esHttpPort;
-    private final String esClusterName;
     private final String esUsername;
     private final String esPassword;
 
     private RestHighLevelClient restHighLevelClient;
-    private TransportClient transportClient;
 
     public ElasticsearchConfiguration(
         @Value("${elasticsearch.host:localhost}") String esHost,
         @Value("${elasticsearch.httpPort:9200}") int esHttpPort,
-        @Value("${elasticsearch.clustername:elasticsearch}") String esClusterName,
         @Value("${elasticsearch.username:#{null}}") String esUsername,
         @Value("${elasticsearch.password:#{null}}") String esPassword
     ) {
         this.esHost = esHost;
         this.esHttpPort = esHttpPort;
-        this.esClusterName = esClusterName;
         this.esUsername = esUsername;
         this.esPassword = esPassword;
     }
@@ -92,10 +87,6 @@ public class ElasticsearchConfiguration implements AutoCloseable   {
     @Override
     @PreDestroy
     public void close() {
-        if (transportClient != null) {
-            transportClient.close();
-            transportClient = null;
-        }
         if (restHighLevelClient != null) {
             try {
                 restHighLevelClient.close();

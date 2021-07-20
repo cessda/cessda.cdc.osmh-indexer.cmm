@@ -26,7 +26,6 @@ public class ElasticsearchConfigurationTest {
         return new ElasticsearchConfiguration(
             "localhost",
             9200,
-            "es-test",
             null,
             null
         );
