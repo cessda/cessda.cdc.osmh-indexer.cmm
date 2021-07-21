@@ -22,9 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.net.http.HttpClient;
 import java.time.Duration;
 
@@ -47,16 +44,6 @@ public class UtilitiesConfiguration {
     @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper();
-    }
-
-    @Bean
-    public DocumentBuilderFactory documentBuilderFactory() throws ParserConfigurationException {
-        var factory = DocumentBuilderFactory.newInstance();
-        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-        factory.setNamespaceAware(true);
-        return factory;
     }
 
     @Bean

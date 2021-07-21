@@ -15,7 +15,6 @@
  */
 package eu.cessda.pasc.oci.parser;
 
-import eu.cessda.pasc.oci.configurations.UtilitiesConfiguration;
 import eu.cessda.pasc.oci.exception.HTTPException;
 import eu.cessda.pasc.oci.exception.HarvesterException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
@@ -30,7 +29,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
@@ -56,8 +54,8 @@ public class RecordHeaderParserTest {
 
     private final RecordHeaderParser recordHeaderParser;
 
-    public RecordHeaderParserTest() throws ParserConfigurationException {
-        recordHeaderParser = new RecordHeaderParser(httpClient, new UtilitiesConfiguration(null).documentBuilderFactory());
+    public RecordHeaderParserTest() {
+        recordHeaderParser = new RecordHeaderParser(httpClient);
     }
 
     @Test

@@ -23,16 +23,12 @@ import eu.cessda.pasc.oci.models.Record;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.extern.slf4j.Slf4j;
-import org.jdom2.input.DOMBuilder;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -40,7 +36,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
@@ -57,67 +52,53 @@ public class RecordHeaderParser {
     private static final String STUDY = "Study";
 
     private final HttpClient httpClient;
-    private final DocumentBuilderFactory builderFactory;
-    private final DOMBuilder domBuilder = new DOMBuilder();
 
     @Autowired
-    public RecordHeaderParser(HttpClient httpClient, DocumentBuilderFactory builderFactory) {
+    public RecordHeaderParser(HttpClient httpClient) {
         this.httpClient = httpClient;
-        this.builderFactory = builderFactory;
     }
 
     private Document getRecordHeadersDocument(URI repoUrl) throws XMLParseException {
         try (var documentInputStream = httpClient.getInputStream(repoUrl)) {
-            return builderFactory.newDocumentBuilder().parse(documentInputStream);
-        } catch (IOException | SAXException | ParserConfigurationException e) {
+            return OaiPmhHelpers.getSaxBuilder().build(documentInputStream);
+        } catch (IOException | JDOMException e) {
             throw new XMLParseException(repoUrl, e);
         }
     }
 
     private List<RecordHeader> parseRecordHeadersFromDoc(Document doc) {
-        NodeList headers = doc.getElementsByTagName(OaiPmhConstants.HEADER_ELEMENT);
-
-        return IntStream.range(0, headers.getLength()).mapToObj(headers::item)
-            .map(this::parseRecordHeader)
-            .collect(Collectors.toList());
+        var headers = DocElementParser.getElements(doc, OaiPmhConstants.HEADER_ELEMENT);
+        return headers.stream().map(this::parseRecordHeader).collect(Collectors.toList());
     }
 
     private Optional<String> parseResumptionToken(Document doc) {
         // OAI-PMH mandatory resumption tag in response.  Value can be empty to suggest end of list
-        NodeList resumptionToken = doc.getElementsByTagName(OaiPmhConstants.RESUMPTION_TOKEN_ELEMENT);
-        if (resumptionToken.getLength() > 0) {
-            Node item = resumptionToken.item(0);
-            if (!item.getTextContent().isEmpty()) {
-                return Optional.of(item.getTextContent());
-            }
-        }
-        log.debug("Resumption token empty.");
-        return Optional.empty();
+        var resumptionToken = DocElementParser.getFirstElement(doc, OaiPmhConstants.RESUMPTION_TOKEN_ELEMENT);
+        return resumptionToken.map(Element::getText).filter(t -> !t.isEmpty());
     }
 
-    private RecordHeader parseRecordHeader(Node headerNode) {
+    private RecordHeader parseRecordHeader(Element headerElement) {
 
         var recordHeaderBuilder = RecordHeader.builder();
         recordHeaderBuilder.recordType(RECORD_HEADER);
 
         // Check if the record is deleted
-        if (headerNode.hasAttributes()) {
-            String deletedAttribute = headerNode.getAttributes().getNamedItem(OaiPmhConstants.STATUS_ATTR).getNodeValue();
+        if (headerElement.hasAttributes()) {
+            var deletedAttribute = headerElement.getAttributeValue(OaiPmhConstants.STATUS_ATTR);
             recordHeaderBuilder.deleted(OaiPmhConstants.DELETED.equals(deletedAttribute));
         }
 
         // Parse the elements of the header
-        var headerElements = headerNode.getChildNodes();
-        for (int i = 0; i < headerElements.getLength(); i++) {
-            var headerElement = headerElements.item(i);
+        var childElements = headerElement.getChildren();
+        for (var child : childElements) {
             final String currentHeaderElementValue;
-            switch (headerElement.getNodeName()) {
+            switch (child.getName()) {
                 case OaiPmhConstants.IDENTIFIER_ELEMENT:
-                    currentHeaderElementValue = headerElement.getTextContent();
+                    currentHeaderElementValue = child.getText();
                     recordHeaderBuilder.identifier(currentHeaderElementValue);
                     break;
                 case OaiPmhConstants.DATESTAMP_ELEMENT:
-                    currentHeaderElementValue = headerElement.getTextContent();
+                    currentHeaderElementValue = child.getText();
                     recordHeaderBuilder.lastModified(currentHeaderElementValue);
                     break;
                 case OaiPmhConstants.SET_SPEC_ELEMENT:
@@ -158,14 +139,11 @@ public class RecordHeaderParser {
             var recordHeadersDocument = getRecordHeadersDocument(fullListRecordUrlPath);
 
             // Check if the document has
-            NodeList oAINode = recordHeadersDocument.getElementsByTagName(OaiPmhConstants.OAI_PMH);
-
-            if (oAINode.getLength() == 0) {
-                throw new HarvesterException("Missing OAI element");
-            }
+            DocElementParser.getFirstElement(recordHeadersDocument, OaiPmhConstants.OAI_PMH)
+                .orElseThrow(() -> new HarvesterException("Missing OAI element"));
 
             // Exit if the response has an <error> element
-            DocElementParser.validateResponse(domBuilder.build(recordHeadersDocument));
+            DocElementParser.validateResponse(recordHeadersDocument);
 
             Optional<String> resumptionToken;
             var recordHeaders = new ArrayList<RecordHeader>();
@@ -192,14 +170,14 @@ public class RecordHeaderParser {
                 return Files.walk(repo.getPath()).filter(Files::isRegularFile)
                     .flatMap(p -> {
                         try (var inputStream = Files.newInputStream(p)) {
-                            return Stream.of(builderFactory.newDocumentBuilder().parse(inputStream));
-                        } catch (IOException | ParserConfigurationException | SAXException e) {
+                            return Stream.of(OaiPmhHelpers.getSaxBuilder().build(inputStream));
+                        } catch (IOException | JDOMException e) {
                             log.warn("[{}] Couldn't parse {}: {}", repo.getCode(), p, e.toString());
                             return Stream.empty();
                         }
                     }).flatMap(doc -> {
                         var recordHeaders = parseRecordHeadersFromDoc(doc);
-                        return recordHeaders.stream().map(recordHeader -> new Record(recordHeader, domBuilder.build(doc)));
+                        return recordHeaders.stream().map(recordHeader -> new Record(recordHeader, doc));
                     });
             } catch (IOException e) {
                 log.error("[{}] Reading path failed: {}", repo.getCode(), e.toString());

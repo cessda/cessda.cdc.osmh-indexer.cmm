@@ -85,7 +85,7 @@ public class RecordXMLParser {
         }
     }
 
-    private CMMStudy mapDDIRecordToCMMStudy(Document document, URI sourceUri, Repo repository) throws JDOMException, IOException, OaiPmhException {
+    private CMMStudy mapDDIRecordToCMMStudy(Document document, URI sourceUri, Repo repository) throws OaiPmhException {
 
         CMMStudy.CMMStudyBuilder builder = CMMStudy.builder();
 

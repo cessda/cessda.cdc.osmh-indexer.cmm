@@ -40,8 +40,8 @@ public class OaiPmhConstants {
     static final String IDENTIFIER_ELEMENT = "identifier";
     static final String DATESTAMP_ELEMENT = "datestamp";
     static final String SET_SPEC_ELEMENT = "setSpec";
-    static final String HEADER_ELEMENT = "header";
-    static final String RESUMPTION_TOKEN_ELEMENT = "resumptionToken";
+    static final String HEADER_ELEMENT = "//oai:header";
+    static final String RESUMPTION_TOKEN_ELEMENT = "//oai:resumptionToken";
     static final String DELETED = "deleted";
 
     // Codebook Paths
@@ -85,15 +85,14 @@ public class OaiPmhConstants {
     static final String AGENCY_ATTR = "agency";
     static final String CONCEPT_EL = "concept";
     static final String URI_ATTR = "URI";
-    static final String OAI_PMH = "OAI-PMH";
-    static final String ERROR = "error";
+    static final String OAI_PMH = "//oai:OAI-PMH";
 
     // URL Paths tokens
     static final String VERB_PARAM_KEY = "verb";
     static final String METADATA_PREFIX_PARAM_KEY = "metadataPrefix";
     static final String SET_SPEC_PARAM_KEY = "set";
     static final String IDENTIFIER_PARAM_KEY = IDENTIFIER_ELEMENT;
-    static final String RESUMPTION_TOKEN_KEY = RESUMPTION_TOKEN_ELEMENT;
+    static final String RESUMPTION_TOKEN_KEY = "resumptionToken";
     static final String LIST_IDENTIFIERS_VALUE = "ListIdentifiers";
     static final String GET_RECORD_VALUE = "GetRecord";
 }
