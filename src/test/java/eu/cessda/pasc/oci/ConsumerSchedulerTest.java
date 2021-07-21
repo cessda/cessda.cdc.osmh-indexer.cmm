@@ -25,6 +25,7 @@ import eu.cessda.pasc.oci.models.Record;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.service.DebuggingJMXBean;
+import org.elasticsearch.ElasticsearchException;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -172,7 +173,7 @@ public class ConsumerSchedulerTest {
         verify(esIndexer, times(3)).bulkDelete(anyList(), anyString());
 
         // Called for logging purposes
-        verify(esIndexer, atLeastOnce()).getStudy(Mockito.anyString(), Mockito.anyString());
+        verify(esIndexer, times(6)).getStudy(Mockito.anyString(), Mockito.anyString());
         verify(esIndexer, times(1)).getTotalHitCount("*");
         verifyNoMoreInteractions(esIndexer);
     }
@@ -233,6 +234,55 @@ public class ConsumerSchedulerTest {
         // Called for logging purposes
         verify(esIndexer, atLeastOnce()).getStudy(Mockito.anyString(), Mockito.anyString());
         verify(esIndexer, times(2)).getTotalHitCount("*");
+        verifyNoMoreInteractions(esIndexer);
+    }
+
+    @Test
+    public void shouldHandleElasticsearchExceptions() throws IOException {
+        // mock for our record headers
+        var harvesterConsumerService = mockRecordRequests();
+        var debuggingJMXBean = mockDebuggingJMXBean();
+
+        // mock for ES bulking
+        when(esIndexer.bulkIndex(anyList(), anyString())).thenThrow(new ElasticsearchException("Mocked"));
+        when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
+
+        // Given
+        var harvesterRunner = new HarvesterRunner(appConfigurationProperties, harvesterConsumerService, harvesterConsumerService, esIndexer, extractor, micrometerMetrics);
+        var scheduler = new ConsumerScheduler(debuggingJMXBean, esIndexer, harvesterRunner);
+
+        // When
+        scheduler.weeklyFullHarvestAndIngestionAllConfiguredSPsReposRecords();
+
+        // Verify that the mock was called
+        verify(esIndexer, times(6)).getStudy(Mockito.anyString(), Mockito.anyString());
+        verify(esIndexer, times(1)).getTotalHitCount("*");
+        verify(esIndexer, times(3)).bulkIndex(anyList(), anyString());
+        verifyNoMoreInteractions(esIndexer);
+    }
+
+    @Test
+    public void shouldHandleIOExceptions() throws IOException {
+        // mock for our record headers
+        var harvesterConsumerService = mockRecordRequests();
+        var debuggingJMXBean = mockDebuggingJMXBean();
+
+        // mock for ES bulking
+        when(esIndexer.bulkIndex(anyList(), anyString())).thenThrow(IOException.class);
+        when(esIndexer.getTotalHitCount(eq("*"))).thenThrow(IOException.class);
+        when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
+
+        // Given
+        var harvesterRunner = new HarvesterRunner(appConfigurationProperties, harvesterConsumerService, harvesterConsumerService, esIndexer, extractor, micrometerMetrics);
+        var scheduler = new ConsumerScheduler(debuggingJMXBean, esIndexer, harvesterRunner);
+
+        // When
+        scheduler.weeklyFullHarvestAndIngestionAllConfiguredSPsReposRecords();
+
+        // Verify that the mock was called
+        verify(esIndexer, times(6)).getStudy(Mockito.anyString(), Mockito.anyString());
+        verify(esIndexer, times(1)).getTotalHitCount("*");
+        verify(esIndexer, times(3)).bulkIndex(anyList(), anyString());
         verifyNoMoreInteractions(esIndexer);
     }
 }

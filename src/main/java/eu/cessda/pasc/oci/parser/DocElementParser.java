@@ -120,23 +120,24 @@ class DocElementParser {
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> b));
     }
 
-    private Optional<String> parseLanguageCode(Element element, String defaultLangIsoCode) {
+    /**
+     * Checks if the record has an {@code <error>} element.
+     *
+     * @param document the document to map to.
+     * @throws OaiPmhException if an {@code <error>} element was present.
+     */
+    static void validateResponse(Document document) throws OaiPmhException {
 
-        Attribute langAttr = element.getAttribute(LANG_ATTR, Namespace.XML_NAMESPACE);
-        if (langAttr == null) {
-            Element concept = element.getChild("concept", DDI_NS);
-            if (concept != null) {
-                langAttr = concept.getAttribute(LANG_ATTR, Namespace.XML_NAMESPACE);
+        final Optional<Element> optionalElement = getFirstElement(document, ERROR_PATH);
+
+        if (optionalElement.isPresent()) {
+            final Element element = optionalElement.get();
+            if (!element.getText().isEmpty()) {
+                throw new OaiPmhException(OaiPmhException.Code.valueOf(element.getAttributeValue(CODE_ATTR)), element.getText());
+            } else {
+                throw new OaiPmhException(OaiPmhException.Code.valueOf(element.getAttributeValue(CODE_ATTR)));
             }
         }
-
-        if (langAttr != null && !langAttr.getValue().isEmpty()) {
-            return Optional.of(langAttr.getValue());
-        } else if (oaiPmh.getMetadataParsingDefaultLang().isActive()) {
-            return Optional.of(defaultLangIsoCode);
-        }
-
-        return Optional.empty();
     }
 
     /**
@@ -197,36 +198,23 @@ class DocElementParser {
         return expression.evaluate(document);
     }
 
-    /**
-     * Parses value of given {@link Element} for every given xml@lang attributed.
-     * <p>
-     * If no lang is found attempts to default to a configured xml@lang.
-     * <p>
-     * If configuration is set to not default to a given lang, effect is this element is not extracted.
-     *
-     * @param elements               a list of {@link Element}s to parse.
-     * @param isConcatenating        if true, concatenate multiple {@link Element}s of the same language
-     * @param langCode               the default language to use if an element does not have a {@value OaiPmhConstants#LANG_ATTR} attribute.
-     * @param textExtractionStrategy the text extraction strategy to apply.
-     */
-    Map<String, String> getLanguageKeyValuePairs(List<Element> elements, boolean isConcatenating, String langCode,
-                                                 Function<Element, String> textExtractionStrategy) {
+    private Optional<String> parseLanguageCode(Element element, String defaultLangIsoCode) {
 
-        var titlesMap = new HashMap<String, String>();
-        for (Element element : elements) {
-
-            var langAttribute = element.getAttribute(LANG_ATTR, Namespace.XML_NAMESPACE);
-
-            if (langAttribute != null && !langAttribute.getValue().isEmpty()) {
-                putElementInMap(titlesMap, langAttribute.getValue(), textExtractionStrategy.apply(element), isConcatenating);
-            } else {
-                // If defaulting lang is not configured skip, the language is not known
-                if (oaiPmh.getMetadataParsingDefaultLang().isActive()) {
-                    putElementInMap(titlesMap, langCode, textExtractionStrategy.apply(element), isConcatenating);
-                }
+        Attribute langAttr = element.getAttribute(LANG_ATTR, Namespace.XML_NAMESPACE);
+        if (langAttr == null) {
+            Element concept = element.getChild("concept", DDI_NS);
+            if (concept != null) {
+                langAttr = concept.getAttribute(LANG_ATTR, Namespace.XML_NAMESPACE);
             }
         }
-        return titlesMap;
+
+        if (langAttr != null) {
+            return Optional.of(langAttr.getValue());
+        } else if (oaiPmh.getMetadataParsingDefaultLang().isActive()) {
+            return Optional.of(defaultLangIsoCode);
+        }
+
+        return Optional.empty();
     }
 
     private void putElementInMap(Map<String, String> titlesMap, String langCode, String elementText, boolean isConcatenating) {
@@ -250,22 +238,34 @@ class DocElementParser {
     }
 
     /**
-     * Checks if the record has an {@code <error>} element.
+     * Parses value of given {@link Element} for every given xml@lang attributed.
+     * <p>
+     * If no lang is found attempts to default to a configured xml@lang.
+     * <p>
+     * If configuration is set to not default to a given lang, effect is this element is not extracted.
      *
-     * @param document the document to map to.
-     * @throws OaiPmhException if an {@code <error>} element was present.
+     * @param elements               a list of {@link Element}s to parse.
+     * @param isConcatenating        if true, concatenate multiple {@link Element}s of the same language
+     * @param langCode               the default language to use if an element does not have a {@value OaiPmhConstants#LANG_ATTR} attribute.
+     * @param textExtractionStrategy the text extraction strategy to apply.
      */
-    static void validateResponse(Document document) throws OaiPmhException {
+    Map<String, String> getLanguageKeyValuePairs(List<Element> elements, boolean isConcatenating, String langCode,
+                                                 Function<Element, String> textExtractionStrategy) {
 
-        final Optional<Element> optionalElement = getFirstElement(document, ERROR_PATH);
+        var titlesMap = new HashMap<String, String>();
+        for (Element element : elements) {
 
-        if (optionalElement.isPresent()) {
-            final Element element = optionalElement.get();
-            if (element.getText() != null && !element.getText().trim().isEmpty()) {
-                throw new OaiPmhException(OaiPmhException.Code.valueOf(element.getAttributeValue(CODE_ATTR)), element.getText());
+            var langAttribute = element.getAttribute(LANG_ATTR, Namespace.XML_NAMESPACE);
+
+            if (langAttribute != null ) {
+                putElementInMap(titlesMap, langAttribute.getValue(), textExtractionStrategy.apply(element), isConcatenating);
             } else {
-                throw new OaiPmhException(OaiPmhException.Code.valueOf(element.getAttributeValue(CODE_ATTR)));
+                // If defaulting lang is not configured skip, the language is not known
+                if (oaiPmh.getMetadataParsingDefaultLang().isActive()) {
+                    putElementInMap(titlesMap, langCode, textExtractionStrategy.apply(element), isConcatenating);
+                }
             }
         }
+        return titlesMap;
     }
 }
