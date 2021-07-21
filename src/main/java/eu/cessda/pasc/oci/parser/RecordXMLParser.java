@@ -63,29 +63,42 @@ public class RecordXMLParser {
      * @throws HarvesterException if the request URL could not be converted into a {@link URI}.
      */
     public CMMStudy getRecord(Repo repo, Record record) throws HarvesterException {
-        log.debug("[{}] Querying for StudyID [{}]", repo.getCode(), record.getRecordHeader().getIdentifier());
-        URI fullUrl = null;
-        try {
-            fullUrl = OaiPmhHelpers.buildGetStudyFullUrl(repo, record.getRecordHeader().getIdentifier());
-            Document document;
-            if (record.getDocument() == null) {
+
+        final Document document;
+
+        if (record.getDocument() == null) {
+            URI fullUrl = null;
+            try {
                 // If the document is not present retrieve it from the OAI-PMH endpoint.
+                fullUrl = OaiPmhHelpers.buildGetStudyFullUrl(repo, record.getRecordHeader().getIdentifier());
+
+                log.debug("[{}] Querying for StudyID [{}]", repo.getCode(), record.getRecordHeader().getIdentifier());
+
                 try (InputStream recordXML = httpClient.getInputStream(fullUrl)) {
-                    document = parseDocument(recordXML);
+                    document = OaiPmhHelpers.getSaxBuilder().build(recordXML);
+                    if (log.isTraceEnabled()) {
+                        log.trace("Record XML String [{}]", new XMLOutputter().outputString(document));
+                    }
                 }
-            } else {
-                // The document has already been parsed.
-                document = record.getDocument();
+            } catch (JDOMException | IOException e) {
+                throw new XMLParseException(fullUrl, e);
+            } catch (URISyntaxException e) {
+                throw new HarvesterException(e);
             }
-            return mapDDIRecordToCMMStudy(document, fullUrl, repo);
-        } catch (JDOMException | IOException e) {
-            throw new XMLParseException(fullUrl, e);
-        } catch (URISyntaxException e) {
-            throw new HarvesterException(e);
+        } else {
+            // The document has already been parsed.
+            document = record.getDocument();
         }
+        return mapDDIRecordToCMMStudy(document, repo);
     }
 
-    private CMMStudy mapDDIRecordToCMMStudy(Document document, URI sourceUri, Repo repository) throws OaiPmhException {
+    /**
+     * Convert a {@link Document} to a {@link CMMStudy}.
+     * @param document the {@link Document} to convert.
+     * @param repository the source repository.
+     * @throws OaiPmhException if the document contains an {@code <error>} element.
+     */
+    private CMMStudy mapDDIRecordToCMMStudy(Document document, Repo repository) throws OaiPmhException {
 
         CMMStudy.CMMStudyBuilder builder = CMMStudy.builder();
 
@@ -123,16 +136,7 @@ public class RecordXMLParser {
             }
             builder.dataCollectionFreeTexts(cmmStudyMapper.parseDataCollectionFreeTexts(document, defaultLangIsoCode));
         }
-        return builder.studyXmlSourceUrl(sourceUri.toString()).build();
-    }
-
-    private Document parseDocument(InputStream recordXML) throws JDOMException, IOException {
-        Document document = OaiPmhHelpers.getSaxBuilder().build(recordXML);
-
-        if (log.isTraceEnabled()) {
-            log.trace("Record XML String [{}]", new XMLOutputter().outputString(document));
-        }
-        return document;
+        return builder.build();
     }
 
 }
