@@ -28,15 +28,18 @@ import eu.cessda.pasc.oci.models.configurations.Repo;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.springframework.core.io.ClassPathResource;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static eu.cessda.pasc.oci.parser.OaiPmhHelpers.appendListRecordResumptionToken;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -203,5 +206,59 @@ public class RecordHeaderParserTest {
         recordHeaderParser.getRecordHeaders(ukdsEndpoint);
 
         // An exception should be thrown
+    }
+
+    @Test
+    public void shouldParseAHeaderFromAPath() throws HarvesterException, IOException {
+        // Given
+        var ukdsEndpoint  = ReposTestData.getUKDSRepo();
+        ukdsEndpoint.setUrl(null);
+        ukdsEndpoint.setPath(new ClassPathResource("xml/ddi_record_1683.xml").getFile().toPath());
+
+        // When
+        var records = recordHeaderParser.getRecordHeaders(ukdsEndpoint).collect(Collectors.toList());
+
+        // Then
+        assertThat(records).extracting(Record::getRecordHeader).extracting(RecordHeader::getIdentifier).contains("1683");
+        assertThat(records).extracting(Record::getDocument).isNotNull(); // The document should be stored as a field
+    }
+
+    @Test
+    public void shouldHandleParsingErrors() throws IOException, HarvesterException {
+        // Given
+        var ukdsEndpoint  = ReposTestData.getUKDSRepo();
+        ukdsEndpoint.setUrl(null);
+
+        // Load a JSON instead of an XML
+        ukdsEndpoint.setPath(new ClassPathResource("record_ukds_998.json").getFile().toPath());
+
+        // When
+        var records = recordHeaderParser.getRecordHeaders(ukdsEndpoint).collect(Collectors.toList());
+
+        // Then
+        assertThat(records).isEmpty();
+    }
+
+    @Test(expected = HarvesterException.class)
+    public void shouldHandleIOErrorsWhenLookingForDirectories() throws HarvesterException {
+        // Given
+        var ukdsEndpoint  = ReposTestData.getUKDSRepo();
+        ukdsEndpoint.setUrl(null);
+
+        // Load a JSON instead of an XML
+        ukdsEndpoint.setPath(Path.of("noSuchDirectory"));
+
+        // When
+        recordHeaderParser.getRecordHeaders(ukdsEndpoint);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowIfAURLAndAPathIsNotConfigured() throws HarvesterException {
+        // Given
+        var ukdsEndpoint  = ReposTestData.getUKDSRepo();
+        ukdsEndpoint.setUrl(null);
+
+        // When
+        var records = recordHeaderParser.getRecordHeaders(ukdsEndpoint).collect(Collectors.toList());
     }
 }

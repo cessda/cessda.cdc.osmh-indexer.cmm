@@ -118,7 +118,7 @@ public class RecordHeaderParser {
     }
 
     /**
-     * Gets a list of record headers from the specified repository. The returned list is immutable.
+     * Gets a stream of record headers from the specified repository.
      * <p>
      * This method uses the {@code ListIdentifiers} verb.
      *
@@ -138,7 +138,7 @@ public class RecordHeaderParser {
             URI fullListRecordUrlPath = OaiPmhHelpers.appendListRecordParams(repo);
             var recordHeadersDocument = getRecordHeadersDocument(fullListRecordUrlPath);
 
-            // Check if the document has
+            // Check if the document has an OAI element
             DocElementParser.getFirstElement(recordHeadersDocument, OaiPmhConstants.OAI_PMH)
                 .orElseThrow(() -> new HarvesterException("Missing OAI element"));
 
@@ -180,11 +180,10 @@ public class RecordHeaderParser {
                         return recordHeaders.stream().map(recordHeader -> new Record(recordHeader, doc));
                     });
             } catch (IOException e) {
-                log.error("[{}] Reading path failed: {}", repo.getCode(), e.toString());
+                throw new HarvesterException("Reading path failed: " + e, e);
             }
         } else {
             throw new IllegalArgumentException("Repo " + repo.getCode() + " has no URL or path defined");
         }
-        return Stream.empty();
     }
 }
