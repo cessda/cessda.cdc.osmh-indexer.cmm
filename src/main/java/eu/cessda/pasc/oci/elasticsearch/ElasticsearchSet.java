@@ -16,7 +16,6 @@
 package eu.cessda.pasc.oci.elasticsearch;
 
 import com.fasterxml.jackson.databind.ObjectReader;
-import org.elasticsearch.action.search.ClearScrollRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchScrollRequest;
