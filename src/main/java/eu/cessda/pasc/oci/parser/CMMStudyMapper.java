@@ -291,7 +291,7 @@ public class CMMStudyMapper {
             parTitles.forEach(titles::putIfAbsent);  // parTitl lang must not be same as or override titl lang
 
             // Remove return characters from the values
-            titles.replaceAll((key, value) -> HTMLFilter.cleanCharacterReturns(value));
+            titles.replaceAll((key, value) -> ParsingStrategies.cleanCharacterReturns(value));
         }
         return titles;
     }

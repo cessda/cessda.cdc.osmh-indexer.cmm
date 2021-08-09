@@ -22,7 +22,6 @@ import org.jdom2.Element;
 import java.util.Optional;
 
 import static eu.cessda.pasc.oci.parser.DocElementParser.getAttributeValue;
-import static eu.cessda.pasc.oci.parser.HTMLFilter.cleanCharacterReturns;
 import static eu.cessda.pasc.oci.parser.OaiPmhConstants.*;
 import static java.util.Optional.ofNullable;
 
@@ -88,9 +87,9 @@ class ParsingStrategies {
      * @param element the {@link Element} to parse.
      */
     static Optional<String> creatorStrategy(Element element) {
-        return Optional.of(getAttributeValue(element, CREATOR_AFFILIATION_ATTR)
+        return getAttributeValue(element, CREATOR_AFFILIATION_ATTR)
             .map(valueString -> (element.getText() + " (" + valueString + ")"))
-            .orElseGet(element::getText));
+            .or(() -> Optional.of(element.getText()));
     }
 
     /**
@@ -173,5 +172,12 @@ class ParsingStrategies {
         }
 
         return Optional.empty();
+    }
+
+    /**
+     * Remove return characters (i.e. {@code \n}) from the string.
+     */
+    static String cleanCharacterReturns(String candidate) {
+        return candidate.replace("\n", "");
     }
 }

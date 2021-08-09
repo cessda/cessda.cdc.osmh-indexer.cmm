@@ -69,7 +69,7 @@ public class OaiPmhConstants {
     static final String RECORD_DEFAULT_LANGUAGE_XPATH = "//ddi:codeBook/@xml:lang";
 
     // Attributes
-    public static final String STATUS_ATTR = "status";
+    static final String STATUS_ATTR = "status";
     static final String LANG_ATTR = "lang";
     static final String DATE_ATTR = "date";
     static final String END_ATTR = "end";
