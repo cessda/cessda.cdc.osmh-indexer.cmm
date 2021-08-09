@@ -22,7 +22,6 @@ import org.elasticsearch.action.search.SearchScrollRequest;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.unit.TimeValue;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.AbstractSet;
@@ -93,7 +92,7 @@ public class ElasticsearchSet<T> extends AbstractSet<T> {
     /**
      * An iterator that iterates over an Elasticsearch scroll and decodes the resulting JSON.
      */
-    private class ElasticsearchIterator implements Iterator<T>, Closeable {
+    private class ElasticsearchIterator implements Iterator<T> {
 
         private SearchResponse response;
         private int currentIndex;
@@ -111,13 +110,11 @@ public class ElasticsearchSet<T> extends AbstractSet<T> {
         @Override
         public boolean hasNext() {
             if (currentIndex >= response.getHits().getHits().length) {
-                // Reached the end of the current scroll, collect the next scroll
-                currentIndex = 0;
-
-                // If the scroll is still valid
+                // Reached the end of the current scroll, collect the next scroll if available.
                 if (response.getScrollId() != null) {
                     try {
                         response = client.scroll(new SearchScrollRequest(response.getScrollId()), DEFAULT);
+                        currentIndex = 0; // Only reset the index once an update has been retrieved.
                     } catch (IOException e) {
                         throw new UncheckedIOException(e);
                     }
@@ -142,16 +139,6 @@ public class ElasticsearchSet<T> extends AbstractSet<T> {
                 return objectReader.readValue(response.getHits().getHits()[currentIndex++].getSourceRef().streamInput());
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
-            }
-        }
-
-        @Override
-        public void close() throws IOException {
-            // Release the scroll context
-            if (response.getScrollId() != null) {
-                var clearScroll = new ClearScrollRequest();
-                clearScroll.addScrollId(response.getScrollId());
-                client.clearScroll(clearScroll, DEFAULT);
             }
         }
     }
