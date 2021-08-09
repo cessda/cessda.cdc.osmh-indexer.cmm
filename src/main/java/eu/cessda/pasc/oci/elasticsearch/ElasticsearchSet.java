@@ -16,7 +16,6 @@
 package eu.cessda.pasc.oci.elasticsearch;
 
 import com.fasterxml.jackson.databind.ObjectReader;
-import org.elasticsearch.action.search.ClearScrollRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchScrollRequest;
@@ -110,13 +109,19 @@ public class ElasticsearchSet<T> extends AbstractSet<T> {
          */
         @Override
         public boolean hasNext() {
-            if (currentIndex >= response.getHits().getHits().length && response.getScrollId() != null) {
+            if (currentIndex >= response.getHits().getHits().length) {
                 // Reached the end of the current scroll, collect the next scroll
-                try {
-                    response = client.scroll(new SearchScrollRequest(response.getScrollId()), DEFAULT);
-                    currentIndex = 0;
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
+                currentIndex = 0;
+
+                // If the scroll is still valid
+                if (response.getScrollId() != null) {
+                    try {
+                        response = client.scroll(new SearchScrollRequest(response.getScrollId()), DEFAULT);
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                } else {
+                    return false;
                 }
             }
             return response.getHits().getHits().length > 0;
