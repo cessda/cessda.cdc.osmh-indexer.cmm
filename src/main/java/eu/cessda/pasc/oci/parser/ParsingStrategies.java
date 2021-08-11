@@ -178,6 +178,6 @@ class ParsingStrategies {
      * Remove return characters (i.e. {@code \n}) from the string.
      */
     static String cleanCharacterReturns(String candidate) {
-        return candidate.replace("\n", "");
+        return candidate.replace("\n", "").trim();
     }
 }
