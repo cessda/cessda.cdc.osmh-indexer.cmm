@@ -33,7 +33,6 @@ public class ReposTestData
         repo.setUrl(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
         repo.setHandler("OAI-PMH");
         repo.setPreferredMetadataParam("ddi");
-        repo.setXPaths(Repo.XPaths.DDI_2_5);
         return repo;
     }
 
@@ -58,6 +57,15 @@ public class ReposTestData
         repo.setPreferredMetadataParam("oai_ddi25");
         repo.setSetSpec("study_groups:energia");
         repo.setHandler("OAI-PMH");
+        return repo;
+    }
+
+    public static Repo getNSDRepo() {
+        var repo = new Repo();
+        repo.setUrl(URI.create("https://oai-pmh.nsd.no/oai-pmh"));
+        repo.setCode("NSD");
+        repo.setPreferredMetadataParam("oai_ddi");
+        repo.setHandler("NESSTAR");
         return repo;
     }
 

@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/">
+    <responseDate>2018-05-10T13:24:46.022Z</responseDate>
+    <request verb="GetRecord" identifier="http://fors-getdata.unil.ch:80/obj/fStudy/ch.sidos.ddi.468.7773" metadataPrefix="oai_ddi">
+        http://fors-getdata.unil.ch/
+    </request>
+    <GetRecord>
+        <record>
+            <header>
+                <identifier>http://fors-getdata.unil.ch:80/obj/fStudy/ch.sidos.ddi.468.7773</identifier>
+                <datestamp>2015-05-04T22:55:30+0000</datestamp>
+            </header>
+            <metadata>
+                <codeBook ID="ch.sidos.ddi.468.7773" version="1.2.2" schemaLocation="http://www.icpsr.umich.edu/DDI http://www.icpsr.umich.edu/DDI/Version1-2-2.xsd" xmlns="http://www.icpsr.umich.edu/DDI">
+                    <docDscr xmlns="">
+                        <citation>
+                            <titlStmt>
+                                <titl>
+                                    Documentation pour "European Social Survey in Switzerland - 2004"
+                                </titl>
+                                <parTitl xml:lang="en">
+                                    VALU 2018 - SVT exit poll survey parliamentary election 2018
+                                </parTitl>
+                                <IDNo>
+                                    ch.sidos.ddi.468.7773
+                                </IDNo>
+                                <agency>
+                                    doi
+                                </agency>
+                            </titlStmt>
+                            <rspStmt>
+                                <AuthEnty affiliation="Service suisse d'information et d'archivage de données pour les sciences sociales - SIDOS">
+                                    Joye, Dominique (resp.)
+                                </AuthEnty>
+                                <AuthEnty affiliation="Service suisse d'information et d'archivage de données pour les sciences sociales - SIDOS">
+                                    Schöbi, Nicole
+                                </AuthEnty>
+                                <AuthEnty affiliation="Service suisse d'information et d'archivage de données pour les sciences sociales - SIDOS">
+                                    Kaenel, Céline
+                                </AuthEnty>
+                            </rspStmt>
+                            <prodStmt>
+                                <producer abbr="DARIS" affiliation="FORS " role="Editor">
+                                    Data and Research Information Services
+                                </producer>
+                                <copyright>
+                                    FORS
+                                </copyright>
+                                <prodDate date="2013-11-01">
+                                    2013-11-01
+                                </prodDate>
+                                <prodPlac>
+                                    FORS - c/o Université de Lausanne - Bâtiment Géopolis - CH-1015 Lausanne - Suisse
+                                </prodPlac>
+                                <software date="2013-04-23" version="4.0.9">
+                                    Nesstar Publisher
+                                </software>
+                            </prodStmt>
+                            <distStmt>
+                                <depositr/>
+                            </distStmt>
+                            <verStmt>
+                                <version date="2013-11-01">
+                                    1.1
+                                </version>
+                                <verResp>
+                                    François Lorétan
+                                </verResp>
+                                <notes>
+                                    - Intégration du template de métadonnées DARIS
+                                </notes>
+                            </verStmt>
+                        </citation>
+                        <docSrc>
+                            <titlStmt>
+                                <titl>
+                                    2004AP
+                                </titl>
+                            </titlStmt>
+                            <distStmt>
+                                <depositr/>
+                            </distStmt>
+                        </docSrc>
+                    </docDscr>
+                    <stdyDscr xmlns="">
+                        <citation>
+                            <titlStmt>
+                                <titl>
+                                    European Social Survey in Switzerland - 2004
+                                </titl>
+                                <subTitl>
+                                    European Social Survey in Switzerland - round 2
+                                </subTitl>
+                                <altTitl>
+                                    ESS04
+                                </altTitl>
+                                <parTitl>
+                                    Enquête sociale européenne
+                                </parTitl>
+                                <IDNo>
+                                    ch.sidos.ddi.468.7773
+                                </IDNo>
+                                <agency>
+                                    doi
+                                </agency>
+                            </titlStmt>
+                            <rspStmt>
+                                <AuthEnty affiliation="Service suisse d'information et d'archivage de données pour les sciences sociales - SIDOS">
+                                    Joye, Dominique (resp.)
+                                </AuthEnty>
+                                <AuthEnty affiliation="Service suisse d'information et d'archivage de données pour les sciences sociales - SIDOS">
+                                    Schöbi, Nicole
+                                </AuthEnty>
+                                <AuthEnty affiliation="Service suisse d'information et d'archivage de données pour les sciences sociales - SIDOS">
+                                    Kaenel, Céline
+                                </AuthEnty>
+                            </rspStmt>
+                            <prodStmt>
+                                <producer abbr="SIDOS" role="Producer">
+                                    Service suisse d'information et d'archivage de données pour les sciences sociales
+                                </producer>
+                                <copyright>
+                                    FORS
+                                </copyright>
+                                <prodDate date="2006-08-16">
+                                    2006-08-16
+                                </prodDate>
+                                <software date="2013-04-23" version="4.0.9">
+                                    Nesstar Publisher
+                                </software>
+                                <fundAg abbr="FNS">
+                                    Fonds national suisse de la recherche scientifique
+                                </fundAg>
+                            </prodStmt>
+                            <distStmt>
+                                <distrbtr URI="http://forscenter.ch/fr/service-de-donnees-et-d-information-sur-la-recherche/" abbr="DARIS" affiliation="FORS">
+                                    Data and Research Information Services
+                                </distrbtr>
+                                <depositr/>
+                                <distDate date="2007"/>
+                            </distStmt>
+                            <serStmt>
+                                <serName>
+                                    European Social Survey
+                                </serName>
+                            </serStmt>
+                            <verStmt>
+                                <version date="2013-11-01">
+                                    1.1
+                                </version>
+                                <verResp>
+                                    Eliane Ferrez
+                                </verResp>
+                                <notes>
+                                    - Intégration du template de métadonnées DARIS
+                                </notes>
+                            </verStmt>
+                            <biblCit>
+                                Dominique Joye, Nicole Schöbi, Nanette Wälti: European Social Survey, Switzerland - 2004
+                                [Dataset]. Schweizerischer Informations- und Daten-Archivdienst für die
+                                Sozialwissenschaften - SIDOS, Neuchâtel. Distributed by FORS, Lausanne, 2007.
+                            </biblCit>
+                        </citation>
+                        <stdyInfo>
+                            <subject>
+                                <keyword>
+                                    Médias et confiance
+                                </keyword>
+                                <keyword>
+                                    Politique
+                                </keyword>
+                                <keyword>
+                                    Immigration
+                                </keyword>
+                                <keyword>
+                                    Bien-être subjectif
+                                </keyword>
+                                <keyword>
+                                    Religion
+                                </keyword>
+                                <keyword>
+                                    Exclusion sociale
+                                </keyword>
+                                <keyword>
+                                    Santé et soins
+                                </keyword>
+                                <keyword>
+                                    Moralité économique
+                                </keyword>
+                                <keyword>
+                                    Démographie
+                                </keyword>
+                                <keyword>
+                                    Famille et bien-être
+                                </keyword>
+                                <keyword>
+                                    Valeurs
+                                </keyword>
+                                <keyword>
+                                    Identification
+                                </keyword>
+                                <keyword>
+                                    Participation
+                                </keyword>
+                                <topcClas>
+                                    Médias, confiance, politique, immigration, bien-être subjectif, religion, exclusion
+                                    sociale, santé et soins, moralité économique, démographie, famille, valeurs,
+                                    identification, participation
+                                </topcClas>
+                            </subject>
+                            <abstract>
+                                L'enquête "European Social Survey" (ESS, http://www.europeansocialsurvey.org) est une
+                                nouvelle enquête destinée à mesurer les attitudes et croyances des populations
+                                européennes et à expliquer les réactions aux changements des institutions en Europe.
+                                Pourquoi une nouvelle enquête ? D'abord pour attaquer des problématiques qui sont au
+                                coeur des préoccupations des chercheurs aujourd'hui. Par exemple, qu'est-ce que la
+                                citoyenneté aujourd'hui ? Comment les différents pays européens vivent-ils les questions
+                                posées par l'immigration ?
+                                Cette enquête est aussi nouvelle car elle vise des standards de qualité très élevés, et
+                                impose donc de nombreuses et sévères conditions méthodologiques, de telle sorte que les
+                                données soient vraiment comparables entre les pays. Plus de 20 pays ont participé à la
+                                deuxième édition qui s'est déroulée en automne 2004. La prochaine édition aura lieu en
+                                2006, puisqu'il est prévu de réaliser une enquête ESS toutes les deux années.
+
+                                La deuxième enquête ESS en Suisse fut réalisée par l'institut MIS Trend, mandaté par
+                                l'archive suisse pour les sciences sociales, le SIDOS (actuellement FORS :
+                                http://forscenter.ch/fr/ ). Le terrain s'est terminé fin février 2005, avec plus de 2000
+                                personnes interrogées en Suisse.
+                            </abstract>
+                            <sumDscr>
+                                <timePrd date="1994" event="start"/>
+                                <timePrd date="2004" event="end"/>
+                                <collDate date="2004-09-16" event="start">
+                                    start: only extract when /@date is missing
+                                </collDate>
+                                <collDate date="2005-02-28" event="end">
+                                    end: only extract when /@date is missing
+                                </collDate>
+                                <collDate>No date: extract as /@date is missing</collDate>
+                                <nation abbr="CH">
+                                    Suisse
+                                </nation>
+                                <geogCover>
+                                    Suisse (CH)
+                                </geogCover>
+                                <anlyUnit>
+                                    Individu
+                                </anlyUnit>
+                                <universe>
+                                    Population suisse âgée de 15 ans et plus parlant allemand, français ou italien.
+                                </universe>
+                                <dataKind>
+                                    Données quantitatives
+                                </dataKind>
+                            </sumDscr>
+                        </stdyInfo>
+                        <method>
+                            <dataColl>
+                                <timeMeth>
+                                    Enquête transversale
+                                </timeMeth>
+                                <dataCollector abbr="M.I.S. Trend">
+                                    M.I.S. Trend SA, Pont Bessières 3, 1005 Lausanne
+                                </dataCollector>
+                                <sampProc>
+                                    Sélection aléatoire à 3 phases:
+                                    1) Tirage aléatoire de Sample points: 222 Sample Points ont été tirés aléatoirement
+                                    après qu'ils aient été stratifiés selon les six régions suivantes:
+                                    - Région lémanique (VD, VS, GE)
+                                    - Espace Mittelland (BE, FR, SO, NE, JU)
+                                    - Nordschweiz (ZH, BS, BL, AG)
+                                    - Ostschweiz (GL, SH, AR, AI, SG, GR, TG)
+                                    - Zentralschweiz (LU, UR, SZ, OW, NW, ZG)
+                                    - Ticino (TI)
+                                    2) Sélection aléatoire des ménages à partir du registre téléphonique;
+                                    3) Tirage de la personne-cible au moyen de la méthode KISH.
+                                </sampProc>
+                                <collMode>
+                                    Entretien téléphonique
+                                </collMode>
+                                <resInstru>
+                                    Questionnaire
+                                </resInstru>
+                                <sources/>
+                                <weight>
+                                    Design weight
+                                </weight>
+                            </dataColl>
+                            <anlyInfo>
+                                <respRate>
+                                    46.9% (sur l'échtillon net)
+                                </respRate>
+                            </anlyInfo>
+                        </method>
+                        <dataAccs>
+                            <setAvail media="Fichier de données informatisé">
+                                <accsPlac URI="http://forscenter.ch/fr/service-de-donnees-et-d-information-sur-la-recherche/">
+                                    Data and Research Information Services - FORS
+                                </accsPlac>
+                                <avlStatus>
+                                    Données disponibles aux conditions générales
+                                </avlStatus>
+                                <complete>
+                                    Version standard anonymisée
+                                </complete>
+                                <notes>
+                                    Une version du jeu de données contenant des variables supplémentaires est
+                                    disponible. Sa diffusion est soumise à des conditions plus strictes. Contact et
+                                    informations: dataservice@fors.unil.ch
+                                </notes>
+                            </setAvail>
+                            <useStmt>
+                                <confDec required="yes">
+                                    Inscription comme utilisateur Nesstar obligatoire:
+                                    login et acceptation en ligne de la déclaration utilisateur
+                                    / En cas de problème, contacter dataservice@fors.unil.ch
+                                </confDec>
+                                <specPerm required="yes">
+                                    Aucune
+                                </specPerm>
+                                <restrctn>
+                                    Aucune
+                                </restrctn>
+                                <disclaimer>
+                                    FORS décline toute responsabilité concernant les analyses et résultats obtenus par
+                                    l'usage des données mises à disposition. FORS décline également toute responsabilité
+                                    en cas de mésusage, d'usage abusif ou contraire aux termes de la déclaration
+                                    Utilisateur. Finalement, FORS n'offre aucune garantie par rapport à la qualité des
+                                    données distribuées, laquelle demeure de la responsabilité des chercheurs primaires.
+                                </disclaimer>
+                            </useStmt>
+                        </dataAccs>
+                    </stdyDscr>
+                </codeBook>
+            </metadata>
+        </record>
+    </GetRecord>
+</OAI-PMH>

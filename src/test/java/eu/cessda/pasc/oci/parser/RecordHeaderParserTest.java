@@ -213,7 +213,7 @@ public class RecordHeaderParserTest {
         // Given
         var ukdsEndpoint  = ReposTestData.getUKDSRepo();
         ukdsEndpoint.setUrl(null);
-        ukdsEndpoint.setPath(new ClassPathResource("xml/ddi_record_1683.xml").getFile().toPath());
+        ukdsEndpoint.setPath(new ClassPathResource("xml/ddi_2_5/ddi_record_1683.xml").getFile().toPath());
 
         // When
         var records = recordHeaderParser.getRecordHeaders(ukdsEndpoint).collect(Collectors.toList());

@@ -35,7 +35,10 @@ import org.jdom2.xpath.XPathFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -62,7 +65,7 @@ public class CMMStudyMapper {
         defaultLangSettings.setLang("en");
         oaiPmh.setMetadataParsingDefaultLang(defaultLangSettings);
         oaiPmh.setConcatRepeatedElements(true);
-        oaiPmh.setConcatSeparator("+<br>");
+        oaiPmh.setConcatSeparator("<br>");
         docElementParser = new DocElementParser(oaiPmh);
     }
 
@@ -317,19 +320,18 @@ public class CMMStudyMapper {
      * Xpath = {@link XPaths#getStudyURLStudyDscrXPath()}
      */
     Map<String, String> parseStudyUrl(Document document, XPaths xPaths, String langCode) {
-
-        var docDscrElement = DocElementParser.getElements(document, xPaths.getStudyURLDocDscrXPath(), xPaths.getOaiAndDdiNs());
         var stdyDscrElements = DocElementParser.getElements(document, xPaths.getStudyURLStudyDscrXPath(), xPaths.getOaiAndDdiNs());
-        var urlFromDocDscr = docElementParser.getLanguageKeyValuePairs(docDscrElement, false, langCode, ParsingStrategies::uriStrategy);
         var urlFromStdyDscr = docElementParser.getLanguageKeyValuePairs(stdyDscrElements, false, langCode, ParsingStrategies::uriStrategy);
 
-        // The map returned is not guaranteed to be mutable
-        var mergedStudyUrls = new HashMap<>(urlFromDocDscr);
+        // If studyURLStudyDscrXPath defined, use that XPath as well.
+        return xPaths.getStudyURLDocDscrXPath().map(xpath -> {
+            var docDscrElement = DocElementParser.getElements(document, xpath, xPaths.getOaiAndDdiNs());
+            var urlFromDocDscr = docElementParser.getLanguageKeyValuePairs(docDscrElement, false, langCode, ParsingStrategies::uriStrategy);
 
-        // If absent, use the URL from mergedStudyUrls
-        urlFromStdyDscr.forEach(mergedStudyUrls::putIfAbsent);
-
-        return mergedStudyUrls;
+            // If absent, use the URL from studyDscr
+            urlFromStdyDscr.forEach(urlFromDocDscr::putIfAbsent);
+            return urlFromDocDscr;
+        }).orElse(urlFromStdyDscr);
     }
 
     /**
@@ -410,9 +412,14 @@ public class CMMStudyMapper {
      * @return a set with all of the file languages
      */
     Set<String> parseFileLanguages(Document document, XPaths xPaths) {
-        List<String> fileTxtAttrs = DocElementParser.getAttributeValues(document, xPaths.getFileTxtLanguagesXPath(), xPaths.getDdiNS());
-        List<String> fileNameAttrs = DocElementParser.getAttributeValues(document, xPaths.getFilenameLanguagesXPath(), xPaths.getDdiNS());
-        return Stream.concat(fileTxtAttrs.stream(), fileNameAttrs.stream()).collect(Collectors.toSet());
+
+        var fileTxtAttrsStream = xPaths.getFileTxtLanguagesXPath().stream()
+            .flatMap(xpath -> DocElementParser.getAttributeValues(document, xpath, xPaths.getDdiNS()).stream());
+
+        var fileNameAttrsStream = xPaths.getFilenameLanguagesXPath().stream()
+            .flatMap(xpath -> DocElementParser.getAttributeValues(document, xpath, xPaths.getDdiNS()).stream());
+
+        return Stream.concat(fileTxtAttrsStream, fileNameAttrsStream).collect(Collectors.toSet());
     }
 
     @Value

@@ -233,7 +233,7 @@ public class HarvesterRunner {
         final HarvesterConsumerService harvester;
 
         // OAI-PMH repositories can be handled by the internal harvester, all other types should be delegated to remote handlers
-        if (repo.getHandler().equalsIgnoreCase("OAI-PMH")) {
+        if (repo.getHandler().equalsIgnoreCase("OAI-PMH") || repo.getHandler().equalsIgnoreCase("NESSTAR")) {
             harvester = localHarvester;
         } else {
             harvester = remoteHarvester;

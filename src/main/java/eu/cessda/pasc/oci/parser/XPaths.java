@@ -20,6 +20,7 @@ import org.jdom2.Namespace;
 
 import javax.annotation.Nullable;
 import java.io.Serializable;
+import java.util.Optional;
 
 /**
  * XPath constants used to extract metadata from DDI XML documents.
@@ -29,7 +30,50 @@ import java.io.Serializable;
 @Getter
 @ToString
 public final class XPaths implements Serializable {
+    @NonNull
+    private final Namespace ddiNS;
+    private final Namespace[] oaiAndDdiNs;
+    // Codebook Paths
+    private final String recordDefaultLanguage;
+    private final String yearOfPubXPath;
+    private final String abstractXPath;
+    private final String titleXPath;
+    private final String parTitleXPath;
+    @Nullable
+    private final String studyURLDocDscrXPath;
+    private final String studyURLStudyDscrXPath;
+    private final String pidStudyXPath;
+    private final String creatorsXPath;
+    private final String dataRestrctnXPath;
+    private final String dataCollectionPeriodsXPath;
+    private final String classificationsXPath;
+    private final String keywordsXPath;
+    private final String typeOfTimeMethodXPath;
+    private final String studyAreaCountriesXPath;
+    private final String unitTypeXPath;
+    private final String publisherXPath;
+    private final String distributorXPath;
+    @Nullable
+    private final String fileTxtLanguagesXPath;
+    @Nullable
+    private final String filenameLanguagesXPath;
+    private final String samplingXPath;
+    private final String typeOfModeOfCollectionXPath;
+
+    public Optional<String> getStudyURLDocDscrXPath() {
+        return Optional.ofNullable(studyURLDocDscrXPath);
+    }
+
+    public Optional<String> getFileTxtLanguagesXPath() {
+        return Optional.ofNullable(fileTxtLanguagesXPath);
+    }
+
+    public Optional<String> getFilenameLanguagesXPath() {
+        return Optional.ofNullable(filenameLanguagesXPath);
+    }
+
     private static final Namespace DDI_NS = Namespace.getNamespace("ddi", "ddi:codebook:2_5");
+
     /**
      * XPaths needed to extract metadata from DDI 2.5 documents.
      */
@@ -59,7 +103,9 @@ public final class XPaths implements Serializable {
         .typeOfModeOfCollectionXPath("//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:collMode")
         .recordDefaultLanguage("//ddi:codeBook/@xml:lang")
         .build();
+
     private static final Namespace NESSTAR_DDI_NS = Namespace.getNamespace("ddi", "http://www.icpsr.umich.edu/DDI");
+
     /**
      * XPaths needed to extract metadata from NESSTAR flavoured DDI 1.2.2 documents.
      */
@@ -90,33 +136,4 @@ public final class XPaths implements Serializable {
         .samplingXPath("//ddi:codeBook/stdyDscr/method/dataColl/sampProc")
         .typeOfModeOfCollectionXPath("//ddi:codeBook/stdyDscr/method/dataColl/collMode")
         .build();
-    @NonNull
-    private final Namespace ddiNS;
-    private final Namespace[] oaiAndDdiNs;
-    // Codebook Paths
-    private final String recordDefaultLanguage;
-    private final String yearOfPubXPath;
-    private final String abstractXPath;
-    private final String titleXPath;
-    private final String parTitleXPath;
-    @Nullable
-    private final String studyURLDocDscrXPath;
-    private final String studyURLStudyDscrXPath;
-    private final String pidStudyXPath;
-    private final String creatorsXPath;
-    private final String dataRestrctnXPath;
-    private final String dataCollectionPeriodsXPath;
-    private final String classificationsXPath;
-    private final String keywordsXPath;
-    private final String typeOfTimeMethodXPath;
-    private final String studyAreaCountriesXPath;
-    private final String unitTypeXPath;
-    private final String publisherXPath;
-    private final String distributorXPath;
-    @Nullable
-    private final String fileTxtLanguagesXPath;
-    @Nullable
-    private final String filenameLanguagesXPath;
-    private final String samplingXPath;
-    private final String typeOfModeOfCollectionXPath;
 }

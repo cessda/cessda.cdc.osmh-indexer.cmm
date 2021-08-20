@@ -31,7 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -74,7 +73,7 @@ public class RecordXMLParser {
 
                 log.debug("[{}] Querying for StudyID [{}]", repo.getCode(), record.getRecordHeader().getIdentifier());
 
-                try (InputStream recordXML = httpClient.getInputStream(fullUrl)) {
+                try (var recordXML = httpClient.getInputStream(fullUrl)) {
                     document = OaiPmhHelpers.getSaxBuilder().build(recordXML);
                     if (log.isTraceEnabled()) {
                         log.trace("Record XML String [{}]", new XMLOutputter().outputString(document));
@@ -141,11 +140,11 @@ public class RecordXMLParser {
     }
 
     private XPaths getXPaths(Repo repository) {
-        if (repository.getXPaths() == Repo.XPaths.DDI_2_5) {
+        if (repository.getHandler().equalsIgnoreCase("OAI-PMH")) {
             return XPaths.DDI_2_5_XPATHS;
-        } else if (repository.getXPaths() == Repo.XPaths.NESSTAR) {
+        } else if (repository.getHandler().equalsIgnoreCase("NESSTAR")) {
             return XPaths.NESSTAR_XPATHS;
         }
-        throw new IllegalArgumentException("Unexpected value: " + repository.getXPaths());
+        throw new IllegalArgumentException("Unexpected value: " + repository.getHandler());
     }
 }

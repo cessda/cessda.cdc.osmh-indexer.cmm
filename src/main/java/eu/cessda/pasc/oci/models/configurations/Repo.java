@@ -67,10 +67,4 @@ public class Repo implements Serializable {
      * The default language, overrides the global default if set
      */
     private String defaultLanguage;
-    /**
-     * The XPaths to use.
-     */
-    private XPaths xPaths;
-
-    public enum XPaths { DDI_2_5, NESSTAR }
 }

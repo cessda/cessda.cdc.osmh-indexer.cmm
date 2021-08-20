@@ -82,7 +82,7 @@ public class RecordXMLParserTest {
 
         // Given
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            ResourceHandler.getResourceAsStream("xml/synthetic_compliant_cmm.xml")
+            ResourceHandler.getResourceAsStream("xml/ddi_2_5/synthetic_compliant_cmm.xml")
         );
 
         // When
@@ -99,7 +99,7 @@ public class RecordXMLParserTest {
 
         // Given
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            ResourceHandler.getResourceAsStream("xml/oai-fsd_uta_fi-FSD3187.xml")
+            ResourceHandler.getResourceAsStream("xml/ddi_2_5/oai-fsd_uta_fi-FSD3187.xml")
         );
 
         // When
@@ -123,7 +123,7 @@ public class RecordXMLParserTest {
 
         // Given
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            ResourceHandler.getResourceAsStream("xml/ddi_record_1683.xml")
+            ResourceHandler.getResourceAsStream("xml/ddi_2_5/ddi_record_1683.xml")
         );
 
         // When
@@ -140,7 +140,7 @@ public class RecordXMLParserTest {
 
         // Given
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            ResourceHandler.getResourceAsStream("xml/ddi_record_1683.xml")
+            ResourceHandler.getResourceAsStream("xml/ddi_2_5/ddi_record_1683.xml")
         );
 
         // When
@@ -162,7 +162,7 @@ public class RecordXMLParserTest {
         // Given
         String expectedCmmStudyJsonString = ResourceHandler.getResourceAsString("json/ddi_record_1683_with_codebookXmlLag.json");
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            ResourceHandler.getResourceAsStream("xml/ddi_record_1683_with_codebookXmlLag.xml")
+            ResourceHandler.getResourceAsStream("xml/ddi_2_5/ddi_record_1683_with_codebookXmlLag.xml")
         );
 
         // When
@@ -179,11 +179,11 @@ public class RecordXMLParserTest {
 
         Map<String, String> expectedAbstract = new HashMap<>();
         expectedAbstract.put("de", "de de");
-        expectedAbstract.put("fi", "Haastattelu+<br>Jyväskylä");
-        expectedAbstract.put("en", "1. The data+<br>2. The datafiles");
+        expectedAbstract.put("fi", "Haastattelu<br>Jyväskylä");
+        expectedAbstract.put("en", "1. The data<br>2. The datafiles");
 
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            ResourceHandler.getResourceAsStream("xml/ddi_record_2305_fsd_repeat_abstract.xml")
+            ResourceHandler.getResourceAsStream("xml/ddi_2_5/ddi_record_2305_fsd_repeat_abstract.xml")
         );
 
         // When
@@ -205,7 +205,7 @@ public class RecordXMLParserTest {
         expectedTitle.put("yy", "Enquête sociale européenne");
 
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            ResourceHandler.getResourceAsStream("xml/ddi_record_1683.xml")
+            ResourceHandler.getResourceAsStream("xml/ddi_2_5/ddi_record_1683.xml")
         );
 
         // When
@@ -222,7 +222,7 @@ public class RecordXMLParserTest {
 
         // Given
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            ResourceHandler.getResourceAsStream("xml/ddi_record_1031_deleted.xml")
+            ResourceHandler.getResourceAsStream("xml/ddi_2_5/ddi_record_1031_deleted.xml")
         );
 
         // When
@@ -238,7 +238,7 @@ public class RecordXMLParserTest {
 
         // Given
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            ResourceHandler.getResourceAsStream("xml/ddi_record_WithError.xml")
+            ResourceHandler.getResourceAsStream("xml/ddi_2_5/ddi_record_WithError.xml")
         );
 
         // When
@@ -252,7 +252,7 @@ public class RecordXMLParserTest {
 
         // Given
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            ResourceHandler.getResourceAsStream("xml/ddi_record_ukds_example.xml")
+            ResourceHandler.getResourceAsStream("xml/ddi_2_5/ddi_record_ukds_example.xml")
         );
 
         // When
@@ -337,7 +337,7 @@ public class RecordXMLParserTest {
 
         // Given
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            ResourceHandler.getResourceAsStream("xml/ddi_record_ukds_example.xml")
+            ResourceHandler.getResourceAsStream("xml/ddi_2_5/ddi_record_ukds_example.xml")
         );
 
         // When
