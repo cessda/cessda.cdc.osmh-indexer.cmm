@@ -108,35 +108,44 @@ public class RecordXMLParser {
         headerElement.getLastModified().ifPresent(builder::lastModified);
         builder.active(headerElement.isRecordActive());
         if (headerElement.isRecordActive()) {
-            String defaultLangIsoCode = cmmStudyMapper.parseDefaultLanguage(document, repository);
-            builder.titleStudy(cmmStudyMapper.parseStudyTitle(document, defaultLangIsoCode));
-            builder.studyUrl(cmmStudyMapper.parseStudyUrl(document, defaultLangIsoCode));
-            builder.abstractField(cmmStudyMapper.parseAbstract(document, defaultLangIsoCode));
-            builder.pidStudies(cmmStudyMapper.parsePidStudies(document, defaultLangIsoCode));
-            builder.creators(cmmStudyMapper.parseCreator(document, defaultLangIsoCode));
-            builder.dataAccessFreeTexts(cmmStudyMapper.parseDataAccessFreeText(document, defaultLangIsoCode));
-            builder.classifications(cmmStudyMapper.parseClassifications(document, defaultLangIsoCode));
-            builder.keywords(cmmStudyMapper.parseKeywords(document, defaultLangIsoCode));
-            builder.typeOfTimeMethods(cmmStudyMapper.parseTypeOfTimeMethod(document, defaultLangIsoCode));
-            builder.studyAreaCountries(cmmStudyMapper.parseStudyAreaCountries(document, defaultLangIsoCode));
-            builder.unitTypes(cmmStudyMapper.parseUnitTypes(document, defaultLangIsoCode));
-            builder.publisher(cmmStudyMapper.parsePublisher(document, defaultLangIsoCode));
-            cmmStudyMapper.parseYrOfPublication(document).ifPresent(builder::publicationYear);
-            builder.fileLanguages(cmmStudyMapper.parseFileLanguages(document));
-            builder.typeOfSamplingProcedures(cmmStudyMapper.parseTypeOfSamplingProcedure(document, defaultLangIsoCode));
-            builder.samplingProcedureFreeTexts(cmmStudyMapper.parseSamplingProcedureFreeTexts(document, defaultLangIsoCode));
-            builder.typeOfModeOfCollections(cmmStudyMapper.parseTypeOfModeOfCollection(document, defaultLangIsoCode));
+            var xPaths = getXPaths(repository);
+            var defaultLangIsoCode = cmmStudyMapper.parseDefaultLanguage(document, repository, xPaths);
+            builder.titleStudy(cmmStudyMapper.parseStudyTitle(document, xPaths, defaultLangIsoCode));
+            builder.studyUrl(cmmStudyMapper.parseStudyUrl(document, xPaths, defaultLangIsoCode));
+            builder.abstractField(cmmStudyMapper.parseAbstract(document, xPaths, defaultLangIsoCode));
+            builder.pidStudies(cmmStudyMapper.parsePidStudies(document, xPaths, defaultLangIsoCode));
+            builder.creators(cmmStudyMapper.parseCreator(document, xPaths, defaultLangIsoCode));
+            builder.dataAccessFreeTexts(cmmStudyMapper.parseDataAccessFreeText(document, xPaths, defaultLangIsoCode));
+            builder.classifications(cmmStudyMapper.parseClassifications(document, xPaths, defaultLangIsoCode));
+            builder.keywords(cmmStudyMapper.parseKeywords(document, xPaths, defaultLangIsoCode));
+            builder.typeOfTimeMethods(cmmStudyMapper.parseTypeOfTimeMethod(document, xPaths, defaultLangIsoCode));
+            builder.studyAreaCountries(cmmStudyMapper.parseStudyAreaCountries(document, xPaths, defaultLangIsoCode));
+            builder.unitTypes(cmmStudyMapper.parseUnitTypes(document, xPaths, defaultLangIsoCode));
+            builder.publisher(cmmStudyMapper.parsePublisher(document, xPaths, defaultLangIsoCode));
+            cmmStudyMapper.parseYrOfPublication(document, xPaths).ifPresent(builder::publicationYear);
+            builder.fileLanguages(cmmStudyMapper.parseFileLanguages(document, xPaths));
+            builder.typeOfSamplingProcedures(cmmStudyMapper.parseTypeOfSamplingProcedure(document, xPaths, defaultLangIsoCode));
+            builder.samplingProcedureFreeTexts(cmmStudyMapper.parseSamplingProcedureFreeTexts(document, xPaths, defaultLangIsoCode));
+            builder.typeOfModeOfCollections(cmmStudyMapper.parseTypeOfModeOfCollection(document, xPaths, defaultLangIsoCode));
             try {
-                var dataCollectionPeriod = cmmStudyMapper.parseDataCollectionDates(document);
+                var dataCollectionPeriod = cmmStudyMapper.parseDataCollectionDates(document, xPaths);
                 dataCollectionPeriod.getStartDate().ifPresent(builder::dataCollectionPeriodStartdate);
                 dataCollectionPeriod.getEndDate().ifPresent(builder::dataCollectionPeriodEnddate);
                 builder.dataCollectionYear(dataCollectionPeriod.getDataCollectionYear());
             } catch (DateNotParsedException e) {
                 log.warn("[{}] Some dates in study {} couldn't be parsed: {}", repository.getCode(), headerElement.getStudyNumber().orElse(""), e.toString());
             }
-            builder.dataCollectionFreeTexts(cmmStudyMapper.parseDataCollectionFreeTexts(document, defaultLangIsoCode));
+            builder.dataCollectionFreeTexts(cmmStudyMapper.parseDataCollectionFreeTexts(document, xPaths, defaultLangIsoCode));
         }
         return builder.build();
     }
 
+    private XPaths getXPaths(Repo repository) {
+        if (repository.getXPaths() == Repo.XPaths.DDI_2_5) {
+            return XPaths.DDI_2_5_XPATHS;
+        } else if (repository.getXPaths() == Repo.XPaths.NESSTAR) {
+            return XPaths.NESSTAR_XPATHS;
+        }
+        throw new IllegalArgumentException("Unexpected value: " + repository.getXPaths());
+    }
 }

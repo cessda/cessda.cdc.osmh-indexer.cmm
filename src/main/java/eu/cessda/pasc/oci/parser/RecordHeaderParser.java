@@ -67,13 +67,13 @@ public class RecordHeaderParser {
     }
 
     private List<RecordHeader> parseRecordHeadersFromDoc(Document doc) {
-        var headers = DocElementParser.getElements(doc, OaiPmhConstants.HEADER_ELEMENT);
+        var headers = DocElementParser.getElements(doc, OaiPmhConstants.HEADER_ELEMENT, OaiPmhConstants.OAI_NS);
         return headers.stream().map(this::parseRecordHeader).collect(Collectors.toList());
     }
 
     private Optional<String> parseResumptionToken(Document doc) {
         // OAI-PMH mandatory resumption tag in response.  Value can be empty to suggest end of list
-        var resumptionToken = DocElementParser.getFirstElement(doc, OaiPmhConstants.RESUMPTION_TOKEN_ELEMENT);
+        var resumptionToken = DocElementParser.getFirstElement(doc, OaiPmhConstants.RESUMPTION_TOKEN_ELEMENT, OaiPmhConstants.OAI_NS);
         return resumptionToken.map(Element::getText).filter(t -> !t.isEmpty());
     }
 
@@ -139,7 +139,7 @@ public class RecordHeaderParser {
             var recordHeadersDocument = getRecordHeadersDocument(fullListRecordUrlPath);
 
             // Check if the document has an OAI element
-            DocElementParser.getFirstElement(recordHeadersDocument, OaiPmhConstants.OAI_PMH)
+            DocElementParser.getFirstElement(recordHeadersDocument, OaiPmhConstants.OAI_PMH, OaiPmhConstants.OAI_NS)
                 .orElseThrow(() -> new HarvesterException("Missing OAI element"));
 
             // Exit if the response has an <error> element

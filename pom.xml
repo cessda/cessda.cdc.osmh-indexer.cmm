@@ -54,7 +54,7 @@
 
     <properties>
         <buildNumber>SNAPSHOT</buildNumber>
-        <revision>2.4.0-${buildNumber}</revision>
+        <revision>2.5.0-${buildNumber}</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
@@ -144,10 +144,6 @@
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.ehcache</groupId>
-            <artifactId>ehcache</artifactId>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

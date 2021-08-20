@@ -33,6 +33,7 @@ public class ReposTestData
         repo.setUrl(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
         repo.setHandler("OAI-PMH");
         repo.setPreferredMetadataParam("ddi");
+        repo.setXPaths(Repo.XPaths.DDI_2_5);
         return repo;
     }
 

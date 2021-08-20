@@ -32,10 +32,8 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 @Setter
 public class ESConfigurationProperties {
-
-  private String clustername;
-  private String host;
-  private String port;
-  private int numberOfShards = 1;
-  private int numberOfReplicas = 1;
+    private String host;
+    private String port;
+    private int numberOfShards = 1;
+    private int numberOfReplicas = 1;
 }

@@ -18,6 +18,7 @@ package eu.cessda.pasc.oci.parser;
 import eu.cessda.pasc.oci.models.cmmstudy.*;
 import lombok.experimental.UtilityClass;
 import org.jdom2.Element;
+import org.jdom2.Namespace;
 
 import java.util.Optional;
 
@@ -109,8 +110,8 @@ class ParsingStrategies {
             .build();
     }
 
-    static Optional<TermVocabAttributes> termVocabAttributeStrategy(Element element, boolean hasControlledValue) {
-        var conceptVal = ofNullable(element.getChild(CONCEPT_EL, DDI_NS)).orElse(new Element(EMPTY_EL));
+    static Optional<TermVocabAttributes> termVocabAttributeStrategy(Element element, Namespace namespace, boolean hasControlledValue) {
+        var conceptVal = ofNullable(element.getChild(CONCEPT_EL, namespace)).orElse(new Element(EMPTY_EL));
 
         var builder = TermVocabAttributes.builder();
         builder.term(cleanCharacterReturns(element.getText()));
@@ -136,9 +137,9 @@ class ParsingStrategies {
         return ofNullable(element.getAttributeValue(URI_ATTR)).orElse("");
     }
 
-    static Optional<VocabAttributes> samplingTermVocabAttributeStrategy(Element element, boolean hasControlledValue) {
+    static Optional<VocabAttributes> samplingTermVocabAttributeStrategy(Element element, Namespace namespace, boolean hasControlledValue) {
         //PUG req. only process if element has a <concept>
-        return ofNullable(element.getChild(CONCEPT_EL, DDI_NS)).map(conceptVal -> {
+        return ofNullable(element.getChild(CONCEPT_EL, namespace)).map(conceptVal -> {
             var builder = VocabAttributes.builder();
             if (hasControlledValue) {
                 builder.vocab(getAttributeValue(conceptVal, VOCAB_ATTR).orElse(""))
