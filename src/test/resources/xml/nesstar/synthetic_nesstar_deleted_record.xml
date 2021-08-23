@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/">
+  <responseDate>2018-05-10T13:24:46.022Z</responseDate>
+  <request verb="GetRecord" identifier="http://fors-getdata.unil.ch:80/obj/fStudy/ch.sidos.ddi.468.7773"
+           metadataPrefix="oai_ddi">http://fors-getdata.unil.ch/
+  </request>
+  <GetRecord>
+    <record>
+      <header status="deleted">
+        <identifier>http://fors-getdata.unil.ch:80/obj/fStudy/ch.sidos.ddi.468.7773</identifier>
+        <datestamp>2015-05-04T22:55:30+0000</datestamp>
+      </header>
+    </record>
+  </GetRecord>
+</OAI-PMH>

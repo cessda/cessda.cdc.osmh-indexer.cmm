@@ -110,13 +110,11 @@ public class ElasticsearchSet<T> extends AbstractSet<T> {
         @Override
         public boolean hasNext() {
             if (currentIndex >= response.getHits().getHits().length) {
-                // Reached the end of the current scroll, collect the next scroll
-                currentIndex = 0;
-
-                // If the scroll is still valid
+                // Reached the end of the current scroll, collect the next scroll if available.
                 if (response.getScrollId() != null) {
                     try {
                         response = client.scroll(new SearchScrollRequest(response.getScrollId()), DEFAULT);
+                        currentIndex = 0; // Only reset the index once an update has been retrieved.
                     } catch (IOException e) {
                         throw new UncheckedIOException(e);
                     }

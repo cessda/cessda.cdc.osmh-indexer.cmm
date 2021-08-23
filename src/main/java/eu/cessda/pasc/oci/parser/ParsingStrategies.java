@@ -18,11 +18,11 @@ package eu.cessda.pasc.oci.parser;
 import eu.cessda.pasc.oci.models.cmmstudy.*;
 import lombok.experimental.UtilityClass;
 import org.jdom2.Element;
+import org.jdom2.Namespace;
 
 import java.util.Optional;
 
 import static eu.cessda.pasc.oci.parser.DocElementParser.getAttributeValue;
-import static eu.cessda.pasc.oci.parser.HTMLFilter.cleanCharacterReturns;
 import static eu.cessda.pasc.oci.parser.OaiPmhConstants.*;
 import static java.util.Optional.ofNullable;
 
@@ -88,9 +88,9 @@ class ParsingStrategies {
      * @param element the {@link Element} to parse.
      */
     static Optional<String> creatorStrategy(Element element) {
-        return Optional.of(getAttributeValue(element, CREATOR_AFFILIATION_ATTR)
+        return getAttributeValue(element, CREATOR_AFFILIATION_ATTR)
             .map(valueString -> (element.getText() + " (" + valueString + ")"))
-            .orElseGet(element::getText));
+            .or(() -> Optional.of(element.getText()));
     }
 
     /**
@@ -110,8 +110,8 @@ class ParsingStrategies {
             .build();
     }
 
-    static Optional<TermVocabAttributes> termVocabAttributeStrategy(Element element, boolean hasControlledValue) {
-        var conceptVal = ofNullable(element.getChild(CONCEPT_EL, DDI_NS)).orElse(new Element(EMPTY_EL));
+    static Optional<TermVocabAttributes> termVocabAttributeStrategy(Element element, Namespace namespace, boolean hasControlledValue) {
+        var conceptVal = ofNullable(element.getChild(CONCEPT_EL, namespace)).orElse(new Element(EMPTY_EL));
 
         var builder = TermVocabAttributes.builder();
         builder.term(cleanCharacterReturns(element.getText()));
@@ -137,9 +137,9 @@ class ParsingStrategies {
         return ofNullable(element.getAttributeValue(URI_ATTR)).orElse("");
     }
 
-    static Optional<VocabAttributes> samplingTermVocabAttributeStrategy(Element element, boolean hasControlledValue) {
+    static Optional<VocabAttributes> samplingTermVocabAttributeStrategy(Element element, Namespace namespace, boolean hasControlledValue) {
         //PUG req. only process if element has a <concept>
-        return ofNullable(element.getChild(CONCEPT_EL, DDI_NS)).map(conceptVal -> {
+        return ofNullable(element.getChild(CONCEPT_EL, namespace)).map(conceptVal -> {
             var builder = VocabAttributes.builder();
             if (hasControlledValue) {
                 builder.vocab(getAttributeValue(conceptVal, VOCAB_ATTR).orElse(""))
@@ -173,5 +173,12 @@ class ParsingStrategies {
         }
 
         return Optional.empty();
+    }
+
+    /**
+     * Remove return characters (i.e. {@code \n}) from the string.
+     */
+    static String cleanCharacterReturns(String candidate) {
+        return candidate.replace("\n", "").trim();
     }
 }

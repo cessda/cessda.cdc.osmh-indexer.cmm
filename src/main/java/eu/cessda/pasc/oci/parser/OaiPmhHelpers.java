@@ -39,6 +39,14 @@ import static eu.cessda.pasc.oci.parser.OaiPmhConstants.*;
 @UtilityClass
 public class OaiPmhHelpers {
 
+    @SuppressWarnings("java:S5164") // This is only used by threads that will exit.
+    private static final ThreadLocal<SAXBuilder> SAX_BUILDER_THREAD_LOCAL = ThreadLocal.withInitial(() -> {
+        var saxBuilder = new SAXBuilder();
+        saxBuilder.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        saxBuilder.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        return saxBuilder;
+    });
+
     public static URI buildGetStudyFullUrl(@NonNull Repo repo, @NonNull String studyIdentifier) throws URISyntaxException {
         return new URI(String.format(
             "%s?%s=%s&%s=%s&%s=%s", repo.getUrl(),
@@ -68,10 +76,10 @@ public class OaiPmhHelpers {
         );
     }
 
+    /**
+     * Retrieve an instance of a {@link SAXBuilder}.
+     */
     static SAXBuilder getSaxBuilder() {
-        SAXBuilder saxBuilder = new SAXBuilder();
-        saxBuilder.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-        saxBuilder.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-        return saxBuilder;
+        return SAX_BUILDER_THREAD_LOCAL.get();
     }
 }

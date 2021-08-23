@@ -34,6 +34,7 @@ import static org.assertj.core.api.BDDAssertions.then;
  */
 public class OaiPmhHelpersTest {
 
+    private static final String STUDY_IDENTIFIER = "15454";
 
     private final AppConfigurationProperties appConfigurationProperties = Mockito.mock(AppConfigurationProperties.class);
 
@@ -42,30 +43,50 @@ public class OaiPmhHelpersTest {
     }
 
     @Test
-    public void ShouldAppendMetaDataPrefixForGivenFSD() throws URISyntaxException {
+    public void shouldAppendMetaDataPrefixForGivenFSD() throws URISyntaxException {
 
         // Given
         Repo fsdEndpoint = appConfigurationProperties.getEndpoints().getRepos()
             .stream().filter(repo -> repo.getCode().equals("FSD")).findAny().orElseThrow();
-        String expectedReqUrl = "http://services.fsd.uta.fi/v0/oai?verb=GetRecord&identifier=15454&metadataPrefix=oai_ddi25";
+
+        var expectedReqUrl = URI.create("http://services.fsd.uta.fi/v0/oai?verb=GetRecord&identifier=" + STUDY_IDENTIFIER +
+            "&metadataPrefix=" + fsdEndpoint.getPreferredMetadataParam());
 
         // When
-        URI builtUrl = buildGetStudyFullUrl(fsdEndpoint, "15454");
+        URI builtUrl = buildGetStudyFullUrl(fsdEndpoint, STUDY_IDENTIFIER);
 
-        then(builtUrl.toString()).isEqualTo(expectedReqUrl);
+        then(builtUrl).isEqualTo(expectedReqUrl);
     }
 
     @Test
-    public void ShouldAppendMetaDataPrefixForGivenUKDS() throws URISyntaxException {
+    public void shouldAppendMetaDataPrefixForGivenUKDS() throws URISyntaxException {
 
         // Given
         Repo ukdsEndpoint = appConfigurationProperties.getEndpoints().getRepos()
                 .stream().filter(repo -> repo.getCode().equals("UKDS")).findAny().orElseThrow();
-        String expectedReqUrl = "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=GetRecord&identifier=15454&metadataPrefix=ddi";
+
+        var expectedReqUrl = URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=GetRecord&identifier=" + STUDY_IDENTIFIER +
+            "&metadataPrefix=" + ukdsEndpoint.getPreferredMetadataParam());
 
         // When
-        URI builtUrl = buildGetStudyFullUrl(ukdsEndpoint, "15454");
+        URI builtUrl = buildGetStudyFullUrl(ukdsEndpoint, STUDY_IDENTIFIER);
 
-        then(builtUrl.toString()).isEqualTo(expectedReqUrl);
+        then(builtUrl).isEqualTo(expectedReqUrl);
+    }
+
+    @Test
+    public void shouldAppendListRecordParams() {
+        // Given
+        Repo fsdEndpoint = appConfigurationProperties.getEndpoints().getRepos()
+            .stream().filter(repo -> repo.getCode().equals("FSD")).findAny().orElseThrow();
+
+        var expectedReqUrl = URI.create("http://services.fsd.uta.fi/v0/oai?verb=ListIdentifiers" +
+            "&metadataPrefix=" + fsdEndpoint.getPreferredMetadataParam() +
+            "&set=" + fsdEndpoint.getSetSpec());
+
+        // When
+        var listRecordParams = OaiPmhHelpers.appendListRecordParams(fsdEndpoint);
+
+        then(listRecordParams).isEqualTo(expectedReqUrl);
     }
 }

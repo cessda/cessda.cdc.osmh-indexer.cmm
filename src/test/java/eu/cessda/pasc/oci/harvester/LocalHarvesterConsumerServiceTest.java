@@ -17,6 +17,7 @@ package eu.cessda.pasc.oci.harvester;
 
 import eu.cessda.pasc.oci.exception.HarvesterException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
+import eu.cessda.pasc.oci.models.Record;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.parser.RecordHeaderParser;
@@ -26,7 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.util.List;
+import java.util.stream.Collectors;
 
 import static eu.cessda.pasc.oci.mock.data.ReposTestData.getUKDSRepo;
 
@@ -39,7 +40,7 @@ public class LocalHarvesterConsumerServiceTest {
 
 
     private static final Repo UKDS_REPO = getUKDSRepo();
-    private static final RecordHeader STUDY_NUMBER = RecordHeader.builder().identifier("oai:ukds/5436").build();
+    private static final Record STUDY_NUMBER = new Record(RecordHeader.builder().identifier("oai:ukds/5436").build(), null);
     private final RecordHeaderParser recordHeaderParser = Mockito.mock(RecordHeaderParser.class);
     private final RecordXMLParser recordXMLParser = Mockito.mock(RecordXMLParser.class);
     /**
@@ -58,7 +59,7 @@ public class LocalHarvesterConsumerServiceTest {
         Mockito.when(recordHeaderParser.getRecordHeaders(UKDS_REPO)).thenThrow(new OaiPmhException(OaiPmhException.Code.badArgument, "Invalid argument"));
 
         // Then
-        List<RecordHeader> recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(UKDS_REPO, null);
+        var recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(UKDS_REPO, null).collect(Collectors.toList());
         Assert.assertTrue(recordHeaders.isEmpty());
     }
 
@@ -68,7 +69,7 @@ public class LocalHarvesterConsumerServiceTest {
         Mockito.when(recordHeaderParser.getRecordHeaders(UKDS_REPO)).thenThrow(new OaiPmhException(OaiPmhException.Code.badArgument));
 
         // Then
-        List<RecordHeader> recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(UKDS_REPO, null);
+        var recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(UKDS_REPO, null).collect(Collectors.toList());
         Assert.assertTrue(recordHeaders.isEmpty());
     }
 
@@ -78,14 +79,14 @@ public class LocalHarvesterConsumerServiceTest {
         Mockito.when(recordHeaderParser.getRecordHeaders(UKDS_REPO)).thenThrow(HarvesterException.class);
 
         // Then
-        List<RecordHeader> recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(UKDS_REPO, null);
+        var recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(UKDS_REPO, null).collect(Collectors.toList());
         Assert.assertTrue(recordHeaders.isEmpty());
     }
 
     @Test
     public void getRecordShouldLogOaiErrorCodeAndMessageWhenAnOaiExceptionIsThrown() throws HarvesterException {
         // When
-        Mockito.when(recordXMLParser.getRecord(UKDS_REPO, STUDY_NUMBER.getIdentifier())).thenThrow(new OaiPmhException(OaiPmhException.Code.badArgument, "Invalid argument"));
+        Mockito.when(recordXMLParser.getRecord(UKDS_REPO, STUDY_NUMBER)).thenThrow(new OaiPmhException(OaiPmhException.Code.badArgument, "Invalid argument"));
 
         // Then
         var record = remoteHarvesterConsumerService.getRecord(UKDS_REPO, STUDY_NUMBER);
@@ -95,7 +96,7 @@ public class LocalHarvesterConsumerServiceTest {
     @Test
     public void getRecordShouldLogOaiErrorCodeWhenAnOaiExceptionIsThrown() throws HarvesterException {
         // When
-        Mockito.when(recordXMLParser.getRecord(UKDS_REPO, STUDY_NUMBER.getIdentifier())).thenThrow(new OaiPmhException(OaiPmhException.Code.badArgument));
+        Mockito.when(recordXMLParser.getRecord(UKDS_REPO, STUDY_NUMBER)).thenThrow(new OaiPmhException(OaiPmhException.Code.badArgument));
 
         // Then
         var record = remoteHarvesterConsumerService.getRecord(UKDS_REPO, STUDY_NUMBER);
@@ -105,7 +106,7 @@ public class LocalHarvesterConsumerServiceTest {
     @Test
     public void getRecordShouldLogWhenACustomHandlerExceptionIsThrown() throws HarvesterException {
         // When
-        Mockito.when(recordXMLParser.getRecord(UKDS_REPO, STUDY_NUMBER.getIdentifier())).thenThrow(HarvesterException.class);
+        Mockito.when(recordXMLParser.getRecord(UKDS_REPO, STUDY_NUMBER)).thenThrow(HarvesterException.class);
 
         // Then
         var record = remoteHarvesterConsumerService.getRecord(UKDS_REPO, STUDY_NUMBER);

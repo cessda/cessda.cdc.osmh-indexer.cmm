@@ -29,12 +29,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.Namespace;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -61,7 +65,7 @@ public class CMMStudyMapper {
         defaultLangSettings.setLang("en");
         oaiPmh.setMetadataParsingDefaultLang(defaultLangSettings);
         oaiPmh.setConcatRepeatedElements(true);
-        oaiPmh.setConcatSeparator("+<br>");
+        oaiPmh.setConcatSeparator("<br>");
         docElementParser = new DocElementParser(oaiPmh);
     }
 
@@ -98,7 +102,7 @@ public class CMMStudyMapper {
     /**
      * Attempts to parse the default language from the given document.
      * <p>
-     * This method will first attempt to find the language attribute at {@value OaiPmhConstants#RECORD_DEFAULT_LANGUAGE_XPATH}.
+     * This method will first attempt to find the language attribute at {@link XPaths#getRecordDefaultLanguage()}.
      * If this attribute doesn't exist, the default language of the repository will be used if set.
      * Otherwise, the global default language will be used.
      *
@@ -106,8 +110,8 @@ public class CMMStudyMapper {
      * @param repository the repository used to set the default language.
      * @return the default language of the document.
      */
-    String parseDefaultLanguage(Document document, Repo repository) {
-        var codeBookLang = DocElementParser.getFirstAttribute(document, RECORD_DEFAULT_LANGUAGE_XPATH);
+    String parseDefaultLanguage(Document document, Repo repository, XPaths xPaths) {
+        var codeBookLang = DocElementParser.getFirstAttribute(document, xPaths.getRecordDefaultLanguage(), xPaths.getDdiNS());
         if (codeBookLang.isPresent() && !codeBookLang.get().getValue().trim().isEmpty()) {
             return codeBookLang.get().getValue().trim();
             // #192 - Per repository override of the default language
@@ -121,11 +125,11 @@ public class CMMStudyMapper {
     /**
      * Parses PID Study(s) from:
      * <p>
-     * Xpath = {@value OaiPmhConstants#PID_STUDY_XPATH }
+     * Xpath = {@link XPaths#getPidStudyXPath()}
      */
-    Map<String, List<Pid>> parsePidStudies(Document document, String defaultLangIsoCode) {
+    Map<String, List<Pid>> parsePidStudies(Document document, XPaths xPaths, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, document, PID_STUDY_XPATH, ParsingStrategies::pidStrategy);
+            defaultLangIsoCode, document, xPaths.getPidStudyXPath(), xPaths.getDdiNS(), ParsingStrategies::pidStrategy);
     }
 
     /**
@@ -140,158 +144,171 @@ public class CMMStudyMapper {
      * Parse last Modified.
      */
     private Optional<String> parseLastModified(Document document) {
-        return DocElementParser.getFirstElement(document, LAST_MODIFIED_DATE_XPATH).map(Element::getText);
+        return DocElementParser.getFirstElement(document, LAST_MODIFIED_DATE_XPATH, OAI_NS).map(Element::getText);
     }
 
     /**
      * Parse study number.
      */
     private Optional<String> parseStudyNumber(Document document) {
-        return DocElementParser.getFirstElement(document, IDENTIFIER_XPATH).map(Element::getText);
+        return DocElementParser.getFirstElement(document, IDENTIFIER_XPATH, OAI_NS).map(Element::getText);
     }
 
     /**
      * Parses Abstract
      * <p>
-     * Xpath = {@value OaiPmhConstants#ABSTRACT_XPATH }
+     * Xpath = {@link XPaths#getAbstractXPath() }
      */
-    Map<String, String> parseAbstract(Document document, String langCode) {
-        return parseLanguageContentOfElement(document, langCode, ABSTRACT_XPATH, true);
+    Map<String, String> parseAbstract(Document document, XPaths xPaths, String langCode) {
+        return parseLanguageContentOfElement(document, langCode, xPaths.getAbstractXPath(), true, xPaths.getOaiAndDdiNs());
     }
 
     /**
      * Parses Year of Publication from:
      * <p>
-     * Xpath = {@value OaiPmhConstants#YEAR_OF_PUB_XPATH }
+     * Xpath = {@link XPaths#getYearOfPubXPath()}
      */
-    Optional<String> parseYrOfPublication(Document document) {
-        return DocElementParser.getFirstAttribute(document, YEAR_OF_PUB_XPATH).map(Attribute::getValue);
+    Optional<String> parseYrOfPublication(Document document, XPaths xPaths) {
+        return DocElementParser.getFirstAttribute(document, xPaths.getYearOfPubXPath(), xPaths.getDdiNS()).map(Attribute::getValue);
     }
 
     /**
      * Parses PID Study(s) from:
      * <p>
-     * Xpath = {@value OaiPmhConstants#CREATORS_XPATH }
+     * Xpath = {@link XPaths#getCreatorsXPath()}  }
      */
-    Map<String, List<String>> parseCreator(Document document, String defaultLangIsoCode) {
+    Map<String, List<String>> parseCreator(Document document, XPaths xPaths, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, document, CREATORS_XPATH, ParsingStrategies::creatorStrategy);
+            defaultLangIsoCode, document, xPaths.getCreatorsXPath(), xPaths.getDdiNS(), ParsingStrategies::creatorStrategy
+        );
     }
 
     /**
      * Parses PID Study(s) from:
      * <p>
-     * Xpath = {@value OaiPmhConstants#CLASSIFICATIONS_XPATH }
+     * Xpath = {@link XPaths#getClassificationsXPath()}
      */
-    Map<String, List<TermVocabAttributes>> parseClassifications(Document doc, String defaultLangIsoCode) {
+    Map<String, List<TermVocabAttributes>> parseClassifications(Document doc, XPaths xPaths, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, doc, CLASSIFICATIONS_XPATH,
-            element -> termVocabAttributeStrategy(element, false));
+            defaultLangIsoCode, doc, xPaths.getClassificationsXPath(), xPaths.getDdiNS(),
+            element -> termVocabAttributeStrategy(element, xPaths.getDdiNS(), false)
+        );
     }
 
     /**
      * Parses parseKeyword(s) from:
      * <p>
-     * Xpath = {@value OaiPmhConstants#KEYWORDS_XPATH }
+     * Xpath = {@link XPaths#getKeywordsXPath()}
      */
-    Map<String, List<TermVocabAttributes>> parseKeywords(Document doc, String defaultLangIsoCode) {
+    Map<String, List<TermVocabAttributes>> parseKeywords(Document doc, XPaths xPaths, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, doc, KEYWORDS_XPATH,
-            element -> termVocabAttributeStrategy(element, false));
+            defaultLangIsoCode, doc, xPaths.getKeywordsXPath(), xPaths.getDdiNS(),
+            element -> termVocabAttributeStrategy(element, xPaths.getDdiNS(), false)
+        );
     }
 
     /**
      * Parses Type Of Time Method(s) from:
      * <p>
-     * Xpath = {@value OaiPmhConstants#TYPE_OF_TIME_METHOD_XPATH }
+     * Xpath = {@link XPaths#getTypeOfTimeMethodXPath()}  }
      */
-    Map<String, List<TermVocabAttributes>> parseTypeOfTimeMethod(Document doc, String defaultLangIsoCode) {
+    Map<String, List<TermVocabAttributes>> parseTypeOfTimeMethod(Document doc, XPaths xPaths, String defaultLangIsoCode) {
 
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, doc, TYPE_OF_TIME_METHOD_XPATH,
-            element -> termVocabAttributeStrategy(element, true));
+            defaultLangIsoCode, doc, xPaths.getTypeOfTimeMethodXPath(), xPaths.getDdiNS(),
+            element -> termVocabAttributeStrategy(element, xPaths.getDdiNS(),true)
+        );
     }
 
     /**
      * Parses Type Of Mode Of Collection(s) from:
      * <p>
-     * Xpath = {@value OaiPmhConstants#TYPE_OF_MODE_OF_COLLECTION_XPATH }
+     * Xpath = {@link XPaths#getTypeOfModeOfCollectionXPath()}
      */
-    Map<String, List<TermVocabAttributes>> parseTypeOfModeOfCollection(Document doc, String defaultLangIsoCode) {
+    Map<String, List<TermVocabAttributes>> parseTypeOfModeOfCollection(Document doc, XPaths xPaths, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, doc, TYPE_OF_MODE_OF_COLLECTION_XPATH,
-            element -> termVocabAttributeStrategy(element, true));
+            defaultLangIsoCode, doc, xPaths.getTypeOfModeOfCollectionXPath(), xPaths.getDdiNS(),
+            element -> termVocabAttributeStrategy(element, xPaths.getDdiNS(), true)
+        );
     }
 
     /**
      * Parses Unit Type(s) from:
      * <p>
-     * Xpath = {@value OaiPmhConstants#UNIT_TYPE_XPATH }
+     * Xpath = {@link XPaths#getUnitTypeXPath()}
      */
-    Map<String, List<TermVocabAttributes>> parseUnitTypes(Document document, String defaultLangIsoCode) {
+    Map<String, List<TermVocabAttributes>> parseUnitTypes(Document document, XPaths xPaths, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, document, UNIT_TYPE_XPATH,
-            element -> termVocabAttributeStrategy(element, true));
+            defaultLangIsoCode, document, xPaths.getUnitTypeXPath(), xPaths.getDdiNS(),
+            element -> termVocabAttributeStrategy(element, xPaths.getDdiNS(), true)
+        );
     }
 
     /**
      * Parses Type Of Sampling Procedure(s) from:
      * <p>
-     * Xpath = {@value OaiPmhConstants#TYPE_OF_SAMPLING_XPATH }
+     * Xpath = {@link XPaths#getSamplingXPath()}
      */
-    Map<String, List<VocabAttributes>> parseTypeOfSamplingProcedure(Document doc, String defaultLangIsoCode) {
-        return docElementParser.extractMetadataObjectListForEachLang(defaultLangIsoCode, doc, TYPE_OF_SAMPLING_XPATH,
-            element -> samplingTermVocabAttributeStrategy(element, true));
+    Map<String, List<VocabAttributes>> parseTypeOfSamplingProcedure(Document doc, XPaths xPaths, String defaultLangIsoCode) {
+        return docElementParser.extractMetadataObjectListForEachLang(
+            defaultLangIsoCode, doc, xPaths.getSamplingXPath(), xPaths.getDdiNS(),
+            element -> samplingTermVocabAttributeStrategy(element, xPaths.getDdiNS(), true)
+        );
     }
 
     /**
      * Parses area Countries covered by a study:
      * <p>
-     * Xpath = {@value OaiPmhConstants#STUDY_AREA_COUNTRIES_XPATH }
+     * Xpath = {@link XPaths#getStudyAreaCountriesXPath()}
      */
-    Map<String, List<Country>> parseStudyAreaCountries(Document document, String defaultLangIsoCode) {
+    Map<String, List<Country>> parseStudyAreaCountries(Document document, XPaths xPaths, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, document, STUDY_AREA_COUNTRIES_XPATH, ParsingStrategies::countryStrategy);
+            defaultLangIsoCode, document, xPaths.getStudyAreaCountriesXPath(), xPaths.getDdiNS(),
+            ParsingStrategies::countryStrategy
+        );
     }
 
     /**
      * Parse Publisher from:
      * <p>
-     * Xpath = {@value OaiPmhConstants#PUBLISHER_XPATH } and
-     * Xpath = {@value OaiPmhConstants#DISTRIBUTOR_XPATH }
+     * Xpath = {@link XPaths#getPublisherXPath()} and
+     * Xpath = {@link XPaths#getDistributorXPath()}
      */
-    Map<String, Publisher> parsePublisher(Document document, String defaultLang) {
-        Map<String, Publisher> producerPathMap = docElementParser.extractMetadataObjectForEachLang(defaultLang, document,
-            PUBLISHER_XPATH, ParsingStrategies::publisherStrategy);
-        Map<String, Publisher> distrPathMap = docElementParser.extractMetadataObjectForEachLang(defaultLang, document,
-            DISTRIBUTOR_XPATH, ParsingStrategies::publisherStrategy);
+    Map<String, Publisher> parsePublisher(Document document, XPaths xPaths, String defaultLang) {
+        var producerPathMap = docElementParser.extractMetadataObjectForEachLang(
+            defaultLang, document, xPaths.getPublisherXPath(), xPaths.getDdiNS(),
+            ParsingStrategies::publisherStrategy
+        );
+        var distrPathMap = docElementParser.extractMetadataObjectForEachLang(
+            defaultLang, document, xPaths.getDistributorXPath(), xPaths.getDdiNS(),
+            ParsingStrategies::publisherStrategy
+        );
 
-        Map<String, Publisher> mergedStudyUrls = new HashMap<>(producerPathMap);
-        distrPathMap.forEach((k, v) -> mergedStudyUrls.merge(k, v, (docDscrValue, stdyDscrValue) -> docDscrValue));
-        return mergedStudyUrls;
+        distrPathMap.forEach((k, v) -> producerPathMap.merge(k, v, (docDscrValue, stdyDscrValue) -> docDscrValue));
+        return producerPathMap;
     }
 
-    Map<String, String> parseLanguageContentOfElement(Document document, String langCode, String titleXpath, boolean isConcatenating) {
-        List<Element> elements = DocElementParser.getElements(document, titleXpath);
+    Map<String, String> parseLanguageContentOfElement(Document document, String langCode, String titleXpath, boolean isConcatenating, Namespace... namespaces) {
+        var elements = DocElementParser.getElements(document, titleXpath, namespaces);
         return docElementParser.getLanguageKeyValuePairs(elements, isConcatenating, langCode, Element::getText);
     }
 
     /**
      * Parses Study Title.
      * <p>
-     * Xpath = {@value OaiPmhConstants#TITLE_XPATH } and {@value OaiPmhConstants#PAR_TITLE_XPATH }
+     * Xpath = {@link XPaths#getTitleXPath()} and {@link XPaths#getParTitleXPath()}
      */
-    Map<String, String> parseStudyTitle(Document document, String langCode) {
+    Map<String, String> parseStudyTitle(Document document, XPaths xPaths, String langCode) {
 
-        Map<String, String> titles = parseLanguageContentOfElement(document, langCode, TITLE_XPATH, false);
+        Map<String, String> titles = parseLanguageContentOfElement(document, langCode, xPaths.getTitleXPath(), false, xPaths.getOaiAndDdiNs());
 
         // https://bitbucket.org/cessda/cessda.cdc.version2/issues/135
         if (!titles.isEmpty()) {
-            Map<String, String> parTitles = parseLanguageContentOfElement(document, langCode, PAR_TITLE_XPATH, false);
+            Map<String, String> parTitles = parseLanguageContentOfElement(document, langCode, xPaths.getParTitleXPath(), false, xPaths.getOaiAndDdiNs());
             parTitles.forEach(titles::putIfAbsent);  // parTitl lang must not be same as or override titl lang
 
             // Remove return characters from the values
-            titles.replaceAll((key, value) -> HTMLFilter.cleanCharacterReturns(value));
+            titles.replaceAll((key, value) -> ParsingStrategies.cleanCharacterReturns(value));
         }
         return titles;
     }
@@ -299,66 +316,71 @@ public class CMMStudyMapper {
     /**
      * Parses parse Study Url from two plausible allowed xPaths
      * <p>
-     * Xpath = {@value OaiPmhConstants#STUDY_URL_DOC_DSCR_XPATH }
-     * Xpath = {@value OaiPmhConstants#STUDY_URL_STDY_DSCR_XPATH }
+     * Xpath = {@link XPaths#getStudyURLDocDscrXPath()}
+     * Xpath = {@link XPaths#getStudyURLStudyDscrXPath()}
      */
-    Map<String, String> parseStudyUrl(Document document, String langCode) {
-
-        var docDscrElement = DocElementParser.getElements(document, STUDY_URL_DOC_DSCR_XPATH);
-        var stdyDscrElements = DocElementParser.getElements(document, STUDY_URL_STDY_DSCR_XPATH);
-        var urlFromDocDscr = docElementParser.getLanguageKeyValuePairs(docDscrElement, false, langCode, ParsingStrategies::uriStrategy);
+    Map<String, String> parseStudyUrl(Document document, XPaths xPaths, String langCode) {
+        var stdyDscrElements = DocElementParser.getElements(document, xPaths.getStudyURLStudyDscrXPath(), xPaths.getOaiAndDdiNs());
         var urlFromStdyDscr = docElementParser.getLanguageKeyValuePairs(stdyDscrElements, false, langCode, ParsingStrategies::uriStrategy);
 
-        // The map returned is not guaranteed to be mutable
-        var mergedStudyUrls = new HashMap<>(urlFromDocDscr);
+        // If studyURLStudyDscrXPath defined, use that XPath as well.
+        return xPaths.getStudyURLDocDscrXPath().map(xpath -> {
+            var docDscrElement = DocElementParser.getElements(document, xpath, xPaths.getOaiAndDdiNs());
+            var urlFromDocDscr = docElementParser.getLanguageKeyValuePairs(docDscrElement, false, langCode, ParsingStrategies::uriStrategy);
 
-        // If absent, use the URL from mergedStudyUrls
-        urlFromStdyDscr.forEach(mergedStudyUrls::putIfAbsent);
-
-        return mergedStudyUrls;
+            // If absent, use the URL from studyDscr
+            urlFromStdyDscr.forEach(urlFromDocDscr::putIfAbsent);
+            return urlFromDocDscr;
+        }).orElse(urlFromStdyDscr);
     }
 
     /**
      * Parses Sampling Procedure(s) from:
      * <p>
-     * Xpath = {@value OaiPmhConstants#TYPE_OF_SAMPLING_XPATH }
+     * Xpath = {@link XPaths#getSamplingXPath()}
      */
-    Map<String, List<String>> parseSamplingProcedureFreeTexts(Document doc, String defaultLangIsoCode) {
+    Map<String, List<String>> parseSamplingProcedureFreeTexts(Document doc, XPaths xPaths, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, doc, TYPE_OF_SAMPLING_XPATH, ParsingStrategies::nullableElementValueStrategy);
+            defaultLangIsoCode, doc, xPaths.getSamplingXPath(), xPaths.getDdiNS(),
+            ParsingStrategies::nullableElementValueStrategy
+        );
     }
 
     /**
      * Parses Sampling Procedure(s) from:
      * <p>
-     * Xpath = {@value OaiPmhConstants#TYPE_OF_SAMPLING_XPATH }
+     * Xpath = {@link XPaths#getDataRestrctnXPath()}
      */
-    Map<String, List<String>> parseDataAccessFreeText(Document doc, String defaultLangIsoCode) {
+    Map<String, List<String>> parseDataAccessFreeText(Document doc, XPaths xPaths, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, doc, DATA_RESTRCTN_XPATH, ParsingStrategies::nullableElementValueStrategy);
+            defaultLangIsoCode, doc, xPaths.getDataRestrctnXPath(), xPaths.getDdiNS(),
+            ParsingStrategies::nullableElementValueStrategy
+        );
     }
 
     /**
      * Parses area Countries covered by a study:
      * <p>
-     * Xpath = {@value OaiPmhConstants#DATA_COLLECTION_PERIODS_PATH }
+     * Xpath = {@link XPaths#getDataCollectionPeriodsXPath()}
      */
-    Map<String, List<DataCollectionFreeText>> parseDataCollectionFreeTexts(Document document, String defaultLangIsoCode) {
+    Map<String, List<DataCollectionFreeText>> parseDataCollectionFreeTexts(Document document, XPaths xPaths, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, document, DATA_COLLECTION_PERIODS_PATH, ParsingStrategies::dataCollFreeTextStrategy);
+            defaultLangIsoCode, document, xPaths.getDataCollectionPeriodsXPath(), xPaths.getDdiNS(),
+            ParsingStrategies::dataCollFreeTextStrategy
+        );
     }
 
     /**
      * Parses Data Collection Period dates from:
      * <p>
-     * Xpath = {@value OaiPmhConstants#DATA_COLLECTION_PERIODS_PATH}
+     * Xpath = {@link XPaths#getDataCollectionPeriodsXPath()}
      * <p>
      * For Data Collection start and end date plus the four digit Year value as Data Collection Year
      *
      * @throws DateNotParsedException if a date string cannot be parsed.
      */
-    DataCollectionPeriod parseDataCollectionDates(Document doc) throws DateNotParsedException {
-        var dateAttrs = DocElementParser.getDateElementAttributesValueMap(doc, DATA_COLLECTION_PERIODS_PATH);
+    DataCollectionPeriod parseDataCollectionDates(Document doc, XPaths xPaths) throws DateNotParsedException {
+        var dateAttrs = DocElementParser.getDateElementAttributesValueMap(doc, xPaths.getDataCollectionPeriodsXPath(), xPaths.getDdiNS());
 
         var dataCollectionPeriodBuilder = DataCollectionPeriod.builder();
 
@@ -385,14 +407,19 @@ public class CMMStudyMapper {
     /**
      * Parses File Language(s) from:
      * <p>
-     * Xpath = {@value OaiPmhConstants#FILE_TXT_LANGUAGES_XPATH }
+     * Xpath = {@link XPaths#getFileTxtLanguagesXPath() }
      *
      * @return a set with all of the file languages
      */
-    Set<String> parseFileLanguages(Document document) {
-        List<String> fileTxtAttrs = DocElementParser.getAttributeValues(document, FILE_TXT_LANGUAGES_XPATH);
-        List<String> fileNameAttrs = DocElementParser.getAttributeValues(document, FILENAME_LANGUAGES_XPATH);
-        return Stream.concat(fileTxtAttrs.stream(), fileNameAttrs.stream()).collect(Collectors.toSet());
+    Set<String> parseFileLanguages(Document document, XPaths xPaths) {
+
+        var fileTxtAttrsStream = xPaths.getFileTxtLanguagesXPath().stream()
+            .flatMap(xpath -> DocElementParser.getAttributeValues(document, xpath, xPaths.getDdiNS()).stream());
+
+        var fileNameAttrsStream = xPaths.getFilenameLanguagesXPath().stream()
+            .flatMap(xpath -> DocElementParser.getAttributeValues(document, xpath, xPaths.getDdiNS()).stream());
+
+        return Stream.concat(fileTxtAttrsStream, fileNameAttrsStream).collect(Collectors.toSet());
     }
 
     @Value

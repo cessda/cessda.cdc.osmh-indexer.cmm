@@ -24,6 +24,7 @@ import eu.cessda.pasc.oci.exception.HTTPException;
 import eu.cessda.pasc.oci.http.HttpClient;
 import eu.cessda.pasc.oci.mock.data.ReposTestData;
 import eu.cessda.pasc.oci.models.ErrorMessage;
+import eu.cessda.pasc.oci.models.Record;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
@@ -37,8 +38,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static eu.cessda.pasc.oci.mock.data.RecordTestData.*;
 import static eu.cessda.pasc.oci.mock.data.ReposTestData.getUKDSRepo;
@@ -59,7 +60,7 @@ public class RemoteHarvesterConsumerServiceTest {
     private static final CMMStudyConverter cmmStudyConverter = new CMMStudyConverter();
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    private static final RecordHeader STUDY_NUMBER = RecordHeader.builder().identifier("4124325").build();
+    private static final Record STUDY_NUMBER = new Record(RecordHeader.builder().identifier("4124325").build(), null);
 
     /**
      * Class to test
@@ -80,7 +81,7 @@ public class RemoteHarvesterConsumerServiceTest {
         );
         Repo repo = getUKDSRepo();
 
-        List<RecordHeader> recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(repo, null);
+        var recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(repo, null).collect(Collectors.toList());
         assertThat(recordHeaders).hasSize(2);
     }
 
@@ -92,11 +93,12 @@ public class RemoteHarvesterConsumerServiceTest {
         when(httpClient.getInputStream(any(URI.class))).thenReturn(
             new ByteArrayInputStream(LIST_RECORDER_HEADERS_X6.getBytes(StandardCharsets.UTF_8))
         );
-        List<RecordHeader> recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(repo, lastModifiedDateCutOff);
+
+        var recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(repo, lastModifiedDateCutOff).collect(Collectors.toList());
 
         assertThat(recordHeaders).hasSize(2);
-        for (RecordHeader recordHeader : recordHeaders) {
-            var currentLastModified = TimeUtility.getLocalDateTime(recordHeader.getLastModified());
+        for (var recordHeader : recordHeaders) {
+            var currentLastModified = TimeUtility.getLocalDateTime(recordHeader.getRecordHeader().getLastModified());
             then(currentLastModified).isAfter(lastModifiedDateCutOff);
         }
     }
@@ -109,11 +111,12 @@ public class RemoteHarvesterConsumerServiceTest {
         when(httpClient.getInputStream(any(URI.class))).thenReturn(
             new ByteArrayInputStream(LIST_RECORDER_HEADERS_WITH_INVALID_DATETIME.getBytes(StandardCharsets.UTF_8))
         );
-        List<RecordHeader> recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(repo, lastModifiedCutOff);
+
+        var recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(repo, lastModifiedCutOff).collect(Collectors.toList());
 
         assertThat(recordHeaders).hasSize(1);
-        for (RecordHeader recordHeader : recordHeaders) {
-            var currentLastModified = TimeUtility.getLocalDateTime(recordHeader.getLastModified());
+        for (var recordHeader : recordHeaders) {
+            var currentLastModified = TimeUtility.getLocalDateTime(recordHeader.getRecordHeader().getLastModified());
             then(currentLastModified).isAfter(lastModifiedCutOff);
         }
     }
@@ -127,7 +130,7 @@ public class RemoteHarvesterConsumerServiceTest {
         );
         Repo repo = getUKDSRepo();
 
-        List<RecordHeader> recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(repo, null);
+        var recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(repo, null).collect(Collectors.toList());
         assertThat(recordHeaders).hasSize(6);
     }
 
@@ -137,7 +140,7 @@ public class RemoteHarvesterConsumerServiceTest {
         when(httpClient.getInputStream(any(URI.class))).thenThrow(new IOException("Mocked!"));
         Repo repo = getUKDSRepo();
 
-        List<RecordHeader> recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(repo, null);
+        var recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(repo, null).collect(Collectors.toList());
         assertThat(recordHeaders).isEmpty();
     }
 
@@ -147,7 +150,7 @@ public class RemoteHarvesterConsumerServiceTest {
         when(httpClient.getInputStream(any(URI.class))).thenThrow(IOException.class);
         Repo repo = getUKDSRepo();
 
-        List<RecordHeader> recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(repo, null);
+        var recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(repo, null).collect(Collectors.toList());
         assertThat(recordHeaders).isEmpty();
     }
 

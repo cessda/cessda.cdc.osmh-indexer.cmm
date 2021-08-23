@@ -15,27 +15,29 @@
  */
 package eu.cessda.pasc.oci.harvester;
 
+import eu.cessda.pasc.oci.models.Record;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.configurations.Repo;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class AbstractHarvesterConsumerServiceTest {
 
     private final AbstractHarvesterConsumerService abstractHarvesterConsumerService = new AbstractHarvesterConsumerService() {
         @Override
-        public List<RecordHeader> listRecordHeaders(Repo repo, LocalDateTime lastModifiedDate) {
-            return Collections.emptyList();
+        public Stream<Record> listRecordHeaders(Repo repo, LocalDateTime lastModifiedDate) {
+            return Stream.empty();
         }
 
         @Override
-        protected Optional<CMMStudy> getRecordFromRemote(Repo repo, RecordHeader recordHeader) {
+        protected Optional<CMMStudy> getRecordFromRemote(Repo repo, Record recordHeader) {
             return Optional.empty();
         }
     };
@@ -45,8 +47,8 @@ public class AbstractHarvesterConsumerServiceTest {
         var header = RecordHeader.builder().deleted(true).build();
 
         var study = abstractHarvesterConsumerService.getRecord(null, header);
-        Assert.assertTrue(study.isPresent());
-        Assert.assertFalse(study.get().isActive());
+        assertTrue(study.isPresent());
+        assertFalse(study.get().isActive());
     }
 
     @Test
@@ -54,10 +56,10 @@ public class AbstractHarvesterConsumerServiceTest {
         var header = RecordHeader.builder().lastModified("Not a date").build();
 
         // When
-        var records = AbstractHarvesterConsumerService.filterRecords(Collections.singleton(header), LocalDateTime.now());
+        var records = AbstractHarvesterConsumerService.filterRecord(header, LocalDateTime.now());
 
         // Then the record should be filtered
-        Assert.assertTrue(records.isEmpty());
+        assertFalse(records);
     }
 
     @Test
@@ -66,10 +68,9 @@ public class AbstractHarvesterConsumerServiceTest {
         var header = RecordHeader.builder().lastModified(LocalDateTime.now().toString()).build();
 
         // When
-        var records = AbstractHarvesterConsumerService.filterRecords(Collections.singleton(header), null);
+        var records = AbstractHarvesterConsumerService.filterRecord(header, null);
 
         // Then the same object should be returned
-        Assert.assertFalse(records.isEmpty());
-        Assert.assertTrue(records.contains(header));
+        assertTrue(records);
     }
 }

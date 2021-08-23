@@ -19,6 +19,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.net.URI;
+import java.nio.file.Path;
 
 /**
  * Repo configuration model
@@ -28,12 +29,16 @@ import java.net.URI;
 @Data
 public class Repo implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     /**
      * The URL of the repository.
      */
     private URI url;
+    /**
+     * The path to the repository directory.
+     */
+    private transient Path path;
     /**
      * The short name of the repository.
      */

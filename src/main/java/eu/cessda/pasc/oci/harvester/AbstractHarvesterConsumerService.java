@@ -17,17 +17,14 @@ package eu.cessda.pasc.oci.harvester;
 
 import eu.cessda.pasc.oci.DateNotParsedException;
 import eu.cessda.pasc.oci.TimeUtility;
+import eu.cessda.pasc.oci.models.Record;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Service responsible for consuming harvested and Metadata via OSMH Harvester
@@ -42,47 +39,29 @@ abstract class AbstractHarvesterConsumerService implements HarvesterConsumerServ
     protected static final String LIST_RECORD_HEADERS_FAILED_WITH_MESSAGE = LIST_RECORD_HEADERS_FAILED + ": {}";
     protected static final String FAILED_TO_GET_STUDY_ID_WITH_MESSAGE = FAILED_TO_GET_STUDY_ID + ": {}";
 
-    @Override
-    public Optional<CMMStudy> getRecord(Repo repo, RecordHeader recordHeader) {
-        // Handle deleted records
-        if (recordHeader.isDeleted()) {
-            return Optional.of(createInactiveRecord(recordHeader));
-        }
-        return getRecordFromRemote(repo,recordHeader);
-    }
-
     /**
      * Filter records that are newer than the specified last modified date.
      * <p/>
      * If ingestedLastModifiedDate is null no filtering will be performed and the returned list will have the same contents as unfilteredRecordHeaders.
      *
-     * @param unfilteredRecordHeaders  a collection of unfiltered records.
+     * @param recordHeader an unfiltered record header.
      * @param ingestedLastModifiedDate the last modified date to filter by, can be null.
      * @return a list of filtered records.
      */
-    protected static List<RecordHeader> filterRecords(Collection<RecordHeader> unfilteredRecordHeaders, LocalDateTime ingestedLastModifiedDate) {
-        if (ingestedLastModifiedDate != null) {
-            var filteredHeaders = unfilteredRecordHeaders.stream()
-                .filter(recordHeader -> isHeaderTimeGreater(recordHeader, ingestedLastModifiedDate))
-                .collect(Collectors.toList());
-
-            log.info("Returning [{}] filtered recordHeaders by date greater than [{}] | out of [{}] unfiltered.",
-                filteredHeaders.size(),
-                ingestedLastModifiedDate,
-                unfilteredRecordHeaders.size()
-            );
-
-            return filteredHeaders;
-        }
-
-        log.debug("Nothing filterable. No date specified.");
-        if (unfilteredRecordHeaders instanceof List) {
-            return (List<RecordHeader>) unfilteredRecordHeaders;
-        }
-        return new ArrayList<>(unfilteredRecordHeaders);
+    protected static boolean filterRecord(RecordHeader recordHeader, LocalDateTime ingestedLastModifiedDate) {
+        return ingestedLastModifiedDate == null || isHeaderTimeGreater(recordHeader, ingestedLastModifiedDate);
     }
 
-    protected abstract Optional<CMMStudy> getRecordFromRemote(Repo repo, RecordHeader recordHeader);
+    @Override
+    public Optional<CMMStudy> getRecord(Repo repo, Record record) {
+        // Handle deleted records
+        if (record.getRecordHeader().isDeleted()) {
+            return Optional.of(createInactiveRecord(record.getRecordHeader()));
+        }
+        return getRecordFromRemote(repo,record);
+    }
+
+    protected abstract Optional<CMMStudy> getRecordFromRemote(Repo repo, Record recordHeader);
 
     /**
      * Creates an inactive {@link CMMStudy} using the details in the record header.

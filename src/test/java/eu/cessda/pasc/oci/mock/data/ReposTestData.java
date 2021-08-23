@@ -60,6 +60,15 @@ public class ReposTestData
         return repo;
     }
 
+    public static Repo getNSDRepo() {
+        var repo = new Repo();
+        repo.setUrl(URI.create("https://oai-pmh.nsd.no/oai-pmh"));
+        repo.setCode("NSD");
+        repo.setPreferredMetadataParam("oai_ddi");
+        repo.setHandler("NESSTAR");
+        return repo;
+    }
+
     public static Harvester getOaiPmhHarvester() {
         var nesstarHarvester = new Harvester();
         nesstarHarvester.setUrl(URI.create("http://localhost:9091"));

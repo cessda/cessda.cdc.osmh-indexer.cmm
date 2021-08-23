@@ -89,7 +89,7 @@ public class MicrometerMetrics implements Metrics {
             recordsEndpointMap.put(endpoint, new AtomicLong());
             var builder = Gauge.builder(LIST_RECORDS_ENDPOINT, () -> getRecordCount(endpoint));
             builder.description("Amount of records stored per endpoint");
-            builder.tag("endpoint", endpoint.getUrl().toString()); // Should this be the short name
+            builder.tag("endpoint", endpoint.getCode());
             builder.register(meterRegistry);
         }
     }
@@ -180,6 +180,7 @@ public class MicrometerMetrics implements Metrics {
 
         for (var hostEntry : hostEntryMap.entrySet()) {
             recordsEndpointMap.entrySet().stream()
+                .filter(repoEntry -> repoEntry.getKey().getUrl().getHost() != null)
                 .filter(repoEntry -> repoEntry.getKey().getUrl().getHost().equalsIgnoreCase(hostEntry.getKey()))
                 .findAny().ifPresentOrElse(repoAtomicLongEntry -> {
                     repoAtomicLongEntry.getValue().set(hostEntry.getValue());

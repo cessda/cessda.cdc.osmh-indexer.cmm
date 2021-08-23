@@ -23,6 +23,7 @@ import eu.cessda.pasc.oci.exception.HTTPException;
 import eu.cessda.pasc.oci.exception.HandlerNotFoundException;
 import eu.cessda.pasc.oci.http.HttpClient;
 import eu.cessda.pasc.oci.models.ErrorMessage;
+import eu.cessda.pasc.oci.models.Record;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
@@ -39,9 +40,9 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static net.logstash.logback.argument.StructuredArguments.value;
 
@@ -70,13 +71,15 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
     }
 
     @Override
-    public List<RecordHeader> listRecordHeaders(Repo repo, LocalDateTime lastModifiedDate) {
+    public Stream<Record> listRecordHeaders(Repo repo, LocalDateTime lastModifiedDate) {
         try {
             URI finalUrl = constructListRecordUrl(repo);
             try (InputStream recordHeadersJsonStream = httpClient.getInputStream(finalUrl)) {
                 List<RecordHeader> recordHeadersUnfiltered = recordHeaderObjectReader.readValue(recordHeadersJsonStream);
                 log.info("[{}] Retrieved [{}] record headers.", repo.getCode(), recordHeadersUnfiltered.size());
-                return filterRecords(recordHeadersUnfiltered, lastModifiedDate);
+                return recordHeadersUnfiltered.stream()
+                    .filter(recordHeader -> filterRecord(recordHeader, lastModifiedDate))
+                    .map(recordHeader -> new Record(recordHeader, null));
             }
         }
         catch (HTTPException e) {
@@ -98,16 +101,16 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
         } catch (IOException | IllegalArgumentException | URISyntaxException e) {
             log.error(LIST_RECORD_HEADERS_FAILED, value(LoggingConstants.REPO_NAME, repo.getCode()), e.toString());
         }
-        return Collections.emptyList();
+        return Stream.empty();
     }
 
     @Override
-    public Optional<CMMStudy> getRecordFromRemote(Repo repo, RecordHeader recordHeader) {
+    public Optional<CMMStudy> getRecordFromRemote(Repo repo, Record recordHeader) {
 
-        log.debug("[{}] Querying repository handler {} for studyNumber {}.", repo.getHandler(), repo.getCode(), recordHeader.getIdentifier());
+        log.debug("[{}] Querying repository handler {} for studyNumber {}.", repo.getHandler(), repo.getCode(), recordHeader.getRecordHeader().getIdentifier());
 
         try {
-            URI finalUrl = constructGetRecordUrl(repo, recordHeader.getIdentifier());
+            URI finalUrl = constructGetRecordUrl(repo, recordHeader.getRecordHeader().getIdentifier());
             try (InputStream recordJsonStream = httpClient.getInputStream(finalUrl)) {
                 return Optional.of(cmmStudyConverter.fromJsonStream(recordJsonStream));
             }
@@ -116,14 +119,14 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
                 ErrorMessage errorMessage = errorMessageObjectReader.readValue(e.getExternalResponse().getBody());
                 log.warn(FAILED_TO_GET_STUDY_ID_WITH_MESSAGE,
                     value(LoggingConstants.REPO_NAME, repo.getCode()),
-                    value(LoggingConstants.STUDY_ID, recordHeader.getIdentifier()),
+                    value(LoggingConstants.STUDY_ID, recordHeader.getRecordHeader().getIdentifier()),
                     value(LoggingConstants.EXCEPTION_NAME, errorMessage.getException()),
                     value(LoggingConstants.REASON, errorMessage.getMessage())
                 );
             } catch (IOException jsonException) {
                 log.warn(FAILED_TO_GET_STUDY_ID + ": Response body: {}",
                     value(LoggingConstants.REPO_NAME, repo.getCode()),
-                    value(LoggingConstants.STUDY_ID, recordHeader.getIdentifier()),
+                    value(LoggingConstants.STUDY_ID, recordHeader.getRecordHeader().getIdentifier()),
                     e.toString(),
                     value(LoggingConstants.REASON, e.getExternalResponse().getBodyAsString())
                 );
@@ -132,7 +135,7 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
         } catch (IOException | IllegalArgumentException | URISyntaxException e) {
             log.error(FAILED_TO_GET_STUDY_ID,
                 value(LoggingConstants.REPO_NAME, repo.getCode()),
-                value(LoggingConstants.STUDY_ID, recordHeader.getIdentifier()),
+                value(LoggingConstants.STUDY_ID, recordHeader.getRecordHeader().getIdentifier()),
                 e.toString()
             );
         }

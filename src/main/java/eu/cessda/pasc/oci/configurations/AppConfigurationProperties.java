@@ -20,9 +20,13 @@ import eu.cessda.pasc.oci.models.configurations.RestTemplateProps;
 import eu.cessda.pasc.oci.models.oai.configuration.OaiPmh;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.stereotype.Component;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,4 +46,14 @@ public class AppConfigurationProperties {
   private final List<String> languages = new ArrayList<>();
   private final OaiPmh oaiPmh = new OaiPmh();
 
+    @Component
+    @ConfigurationPropertiesBinding
+    public static class PathConverter implements Converter<String, Path>
+    {
+        @Override
+        public Path convert( String s )
+        {
+            return Path.of(s).normalize();
+        }
+    }
 }

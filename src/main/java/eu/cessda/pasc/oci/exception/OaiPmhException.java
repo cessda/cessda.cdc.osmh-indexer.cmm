@@ -30,7 +30,6 @@ public class OaiPmhException extends HarvesterException {
     /**
      * The OAI-PMH error code.
      */
-    @NonNull
     private final Code code;
     /**
      * The OAI-PMH error message. This is an optional field.
@@ -78,7 +77,7 @@ public class OaiPmhException extends HarvesterException {
     /**
      * OAI-PMH error codes
      */
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "java:S115"})
     public enum Code {
         badArgument,
         badResumptionToken,

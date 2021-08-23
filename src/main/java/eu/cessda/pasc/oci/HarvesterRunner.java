@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -83,38 +84,35 @@ public class HarvesterRunner {
      */
     public void executeHarvestAndIngest(LocalDateTime lastModifiedDateTime) {
         if (!indexerRunning.getAndSet(true)) {
-            try {
-                List<Repo> repos = configurationProperties.getEndpoints().getRepos();
 
-                // Store the MDC so that it can be used in the running thread
-                var contextMap = MDC.getCopyOfContextMap();
-                var executor = Executors.newFixedThreadPool(repos.size());
+            List<Repo> repos = configurationProperties.getEndpoints().getRepos();
+            var executor = Executors.newFixedThreadPool(repos.size());
+
+            // Store the MDC so that it can be used in the running thread
+            var contextMap = MDC.getCopyOfContextMap();
+
+            try {
                 var futures = repos.stream()
                     .map(repo -> runAsync(() -> harvestRepository(repo, lastModifiedDateTime, contextMap), executor))
-                    .collect(Collectors.toList());
+                    .toArray(CompletableFuture[]::new);
 
-                for (var f : futures) {
-                    try {
-                        f.get();
-                    } catch (InterruptedException e) {
-                        executor.shutdownNow();
-                        Thread.currentThread().interrupt();
-                    } catch (ExecutionException e) {
-                        log.error("Unexpected error occurred when harvesting!", e.getCause());
-                    }
-                }
-
-                executor.shutdown();
-                MDC.setContextMap(contextMap);
+                CompletableFuture.allOf(futures).get();
 
                 log.info("Harvest finished. Summary of the current state:");
                 log.info("Total number of records: {}", value("total_cmm_studies", ingestService.getTotalHitCount("*")));
                 metrics.updateMetrics();
             } catch (IOException e) {
                 log.error("IO Error when getting the total number of records: {}", e.toString());
+            } catch (InterruptedException e) {
+                executor.shutdownNow();
+                Thread.currentThread().interrupt();
+            }  catch (ExecutionException e) {
+                log.error("Unexpected error occurred when harvesting!", e);
             } finally {
                 // Ensure that the running state is always set to false even if an exception is thrown
                 indexerRunning.set(false);
+                executor.shutdown();
+                MDC.setContextMap(contextMap);
             }
         } else {
             throw new IllegalStateException("Indexer is already running");
@@ -235,34 +233,34 @@ public class HarvesterRunner {
         final HarvesterConsumerService harvester;
 
         // OAI-PMH repositories can be handled by the internal harvester, all other types should be delegated to remote handlers
-        if (repo.getHandler().equalsIgnoreCase("OAI-PMH")) {
+        if (repo.getHandler().equalsIgnoreCase("OAI-PMH") || repo.getHandler().equalsIgnoreCase("NESSTAR")) {
             harvester = localHarvester;
         } else {
             harvester = remoteHarvester;
         }
 
-        var recordHeaders = harvester.listRecordHeaders(repo, lastModifiedDateTime);
+        try (var recordHeaders = harvester.listRecordHeaders(repo, lastModifiedDateTime)) {
 
-        var studies = new AtomicInteger();
+            var studies = new AtomicInteger();
 
-        var collectLanguageCmmStudy = recordHeaders.stream()
-            .flatMap(recordHeader -> harvester.getRecord(repo, recordHeader).stream()) // Retrieve the record
-            .flatMap(cmmStudy -> {
-                // Extract language specific variants of the record
-                var extractedStudies = extractor.extractFromStudy(cmmStudy, repo);
-                if (!extractedStudies.isEmpty()) {
-                    studies.getAndIncrement();
-                }
-                return extractedStudies.entrySet().stream();
-            }).collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
+            var collectLanguageCmmStudy = recordHeaders
+                .flatMap(recordHeader -> harvester.getRecord(repo, recordHeader).stream()) // Retrieve the record
+                .flatMap(cmmStudy -> {
+                    // Extract language specific variants of the record
+                    var extractedStudies = extractor.extractFromStudy(cmmStudy, repo);
+                    if (!extractedStudies.isEmpty()) {
+                        studies.getAndIncrement();
+                    }
+                    return extractedStudies.entrySet().stream();
+                }).collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
 
-        log.info("[{}] Retrieved [{}] studies from [{}] header entries.",
-            value(LoggingConstants.REPO_NAME, repo.getCode()),
-            value("present_cmm_record", studies.get()),
-            value("total_cmm_record", recordHeaders.size())
-        );
+            log.info("[{}] Retrieved [{}] studies.",
+                value(LoggingConstants.REPO_NAME, repo.getCode()),
+                value("present_cmm_record", studies.get())
+            );
 
-        return collectLanguageCmmStudy;
+            return collectLanguageCmmStudy;
+        }
     }
 
     @Value
