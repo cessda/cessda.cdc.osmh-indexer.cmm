@@ -58,11 +58,10 @@ public class LanguageExtractor {
             .collect(Collectors.toList());
 
         if (!validLanguages.isEmpty()) {
-            var studyOfLanguages = new TreeMap<String, CMMStudyOfLanguage>();
-            for (var langCode : validLanguages) {
-                studyOfLanguages.put(langCode, getCmmStudyOfLanguage(cmmStudy, langCode, validLanguages, repository));
-            }
-            return Collections.unmodifiableMap(studyOfLanguages);
+            return validLanguages.stream().collect(Collectors.toUnmodifiableMap(
+                langCode -> langCode,
+                langCode -> getCmmStudyOfLanguage(cmmStudy, langCode, validLanguages, repository)
+            ));
         } else {
             log.debug("[{}] No valid languages for study [{}]", repository.getCode(), cmmStudy.getStudyNumber());
             return Collections.emptyMap();
