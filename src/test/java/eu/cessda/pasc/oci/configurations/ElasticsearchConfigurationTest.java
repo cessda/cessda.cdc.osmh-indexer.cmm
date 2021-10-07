@@ -32,18 +32,6 @@ public class ElasticsearchConfigurationTest {
     }
 
     @Test
-    public void shouldReturnElasticsearchTemplate() {
-        try (var elasticsearchConfiguration = getElasticsearchConfiguration()) {
-
-            // Given
-            var esTemplate = elasticsearchConfiguration.elasticsearchTemplate();
-
-            // Then
-            assertNotNull(esTemplate);
-        }
-    }
-
-    @Test
     public void shouldCreateElasticsearchRestClient() {
         // Given
         var elasticsearchConfiguration = getElasticsearchConfiguration();

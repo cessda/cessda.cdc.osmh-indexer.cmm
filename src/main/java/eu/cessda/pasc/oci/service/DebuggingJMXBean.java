@@ -20,9 +20,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.settings.Settings;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Component;
@@ -43,18 +43,17 @@ import static org.elasticsearch.client.RequestOptions.DEFAULT;
 @Slf4j
 public class DebuggingJMXBean {
 
-  private final ElasticsearchRestTemplate elasticsearchTemplate;
+  private final RestHighLevelClient client;
   private final AppConfigurationProperties appConfigProps;
 
   @Autowired
-  public DebuggingJMXBean(ElasticsearchRestTemplate elasticsearchTemplate, AppConfigurationProperties appConfigProps) {
-    this.elasticsearchTemplate = elasticsearchTemplate;
+  public DebuggingJMXBean(RestHighLevelClient client, AppConfigurationProperties appConfigProps) {
+    this.client = client;
     this.appConfigProps = appConfigProps;
   }
 
   @ManagedOperation(description = "Prints to log the Elasticsearch server state.")
   public String printElasticSearchInfo() throws IOException {
-      var client = elasticsearchTemplate.getClient();
       Map<String, Settings> asMap = client.cluster().getSettings(new ClusterGetSettingsRequest(), DEFAULT).getPersistentSettings().getAsGroups();
       String elasticsearchInfo = "Elasticsearch Client Settings: [\n" + asMap.entrySet().stream()
           .map(entry -> "\t" + entry.getKey() + "=" + entry.getValue() + "\n")

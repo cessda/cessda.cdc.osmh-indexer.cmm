@@ -25,7 +25,6 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 
 import javax.annotation.PreDestroy;
 import java.io.IOException;
@@ -77,11 +76,6 @@ public class ElasticsearchConfiguration implements AutoCloseable   {
             restHighLevelClient = new RestHighLevelClient(restClientBuilder);
         }
         return restHighLevelClient;
-    }
-
-    @Bean
-    public ElasticsearchRestTemplate elasticsearchTemplate() {
-        return new ElasticsearchRestTemplate(elasticsearchClient());
     }
 
     @Override

@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Value;
 import lombok.With;
-import org.springframework.data.annotation.Id;
 
 import java.util.List;
 import java.util.Set;
@@ -38,7 +37,7 @@ import java.util.Set;
 @SuppressWarnings("ReferenceEquality")
 public class CMMStudyOfLanguage {
 
-    @Id
+    @JsonProperty("id")
     String id;
 
     @JsonProperty("code")

@@ -37,7 +37,7 @@ import org.mockito.Mockito;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
-import java.util.HashMap;
+import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.fail;
@@ -47,6 +47,16 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 public class RecordXMLParserNesstarTest {
     private static final String STUDY_IDENTIFIER = "http://fors-getdata.unil.ch:80/obj/fStudy/ch.sidos.ddi.468.7773";
+    private static final Map<String, String> ABSTRACT_FIXTURE = Map.of(
+        "de", "de de",
+        "fi", "Haastattelu",
+        "en", "First: English abstract<br>Second: English abstract",
+        "xy", "Jyväskylä<br>Jyväskylä"
+    );
+    private static final Map<String, String> TITLE_FIXTURE = Map.of(
+        "xy", "European Social Survey in Switzerland - 2004",
+        "yy", "Enquête sociale européenne"
+    );
 
     private final Repo nesstarRepo = ReposTestData.getNSDRepo();
     private final URI fullRecordURL = URI.create(nesstarRepo.getUrl() + "?verb=GetRecord&identifier=" + URLEncoder.encode(STUDY_IDENTIFIER, UTF_8) + "&metadataPrefix=oai_ddi");
@@ -56,22 +66,6 @@ public class RecordXMLParserNesstarTest {
     private final CMMStudyMapper cmmStudyMapper = new CMMStudyMapper();
     private final CMMStudyConverter cmmConverter = new CMMStudyConverter();
     private final ObjectMapper mapper = new ObjectMapper();
-
-    private static HashMap<String, String> getAbstractFixture() {
-        var expectedAbstract = new HashMap<String, String>();
-        expectedAbstract.put("de", "de de");
-        expectedAbstract.put("fi", "Haastattelu");
-        expectedAbstract.put("en", "First: English abstract<br>Second: English abstract");
-        expectedAbstract.put("xy", "Jyväskylä<br>Jyväskylä");
-        return expectedAbstract;
-    }
-
-    private static HashMap<String, String> getTitleFixture() {
-        var expectedTitle = new HashMap<String, String>();
-        expectedTitle.put("xy", "European Social Survey in Switzerland - 2004");
-        expectedTitle.put("yy", "Enquête sociale européenne");
-        return expectedTitle;
-    }
 
     @Test
     public void shouldReturnValidCMMStudyRecordFromAFullyComplaintCmmDdiRecord() throws IOException, ProcessingException, JSONException, HarvesterException {
@@ -147,7 +141,6 @@ public class RecordXMLParserNesstarTest {
     public void shouldReturnCMMStudyRecordWithRepeatedAbstractConcatenated() throws HarvesterException, IOException, ProcessingException {
 
         // Given
-        var expectedAbstract = getAbstractFixture();
         given(httpClient.getInputStream(fullRecordURL))
             .willReturn(ResourceHandler.getResourceAsStream("xml/nesstar/synthetic_compliant_cmm_nesstar_repeated_abstract.xml"));
 
@@ -157,7 +150,7 @@ public class RecordXMLParserNesstarTest {
         // Then
         then(record).isNotNull();
         then(record.getAbstractField().size()).isEqualTo(4);
-        then(record.getAbstractField()).isEqualTo(expectedAbstract);
+        then(record.getAbstractField()).isEqualTo(ABSTRACT_FIXTURE);
         validateCMMStudyResultAgainstSchema(record);
     }
 
@@ -166,8 +159,6 @@ public class RecordXMLParserNesstarTest {
     public void shouldReturnCMMStudyRecordWithOutParTitleWhenThereIsALangDifferentFromDefault() throws HarvesterException, IOException, ProcessingException {
 
         // Given
-        var expectedTitle = getTitleFixture();
-
         given(httpClient.getInputStream(fullRecordURL))
             .willReturn(ResourceHandler.getResourceAsStream("xml/nesstar/synthetic_compliant_cmm_nesstar_with_perTitl_xml_lang.xml"));
 
@@ -177,7 +168,7 @@ public class RecordXMLParserNesstarTest {
         // Then
         then(record).isNotNull();
         then(record.getTitleStudy().size()).isEqualTo(2);
-        then(record.getTitleStudy()).isEqualTo(expectedTitle);
+        then(record.getTitleStudy()).isEqualTo(TITLE_FIXTURE);
         validateCMMStudyResultAgainstSchema(record);
     }
 
