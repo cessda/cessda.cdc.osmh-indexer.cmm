@@ -35,10 +35,9 @@ import org.jdom2.xpath.XPathFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -128,8 +127,23 @@ public class CMMStudyMapper {
      * Xpath = {@link XPaths#getPidStudyXPath()}
      */
     Map<String, List<Pid>> parsePidStudies(Document document, XPaths xPaths, String defaultLangIsoCode) {
-        return docElementParser.extractMetadataObjectListForEachLang(
+        var pidStudies = docElementParser.extractMetadataObjectListForEachLang(
             defaultLangIsoCode, document, xPaths.getPidStudyXPath(), xPaths.getDdiNS(), ParsingStrategies::pidStrategy);
+
+        var pidIsPresent = pidStudies.values().stream().flatMap(Collection::stream).anyMatch(pid -> {
+            try {
+                new URI(pid.getElementText());
+                return true;
+            } catch (URISyntaxException e) {
+                return false;
+            }
+        });
+
+        if (pidIsPresent) {
+            return pidStudies;
+        } else {
+            return Collections.emptyMap();
+        }
     }
 
     /**
