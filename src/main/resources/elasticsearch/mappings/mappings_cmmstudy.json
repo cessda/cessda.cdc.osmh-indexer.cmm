@@ -56,12 +56,12 @@
       },
       "dataCollectionPeriodEnddate": {
         "type": "date",
-        "format": "strict_date_optional_time||epoch_millis||year",
+        "format": "strict_date_optional_time||epoch_millis||year_month||year",
         "ignore_malformed": true
       },
       "dataCollectionPeriodStartdate": {
         "type": "date",
-        "format": "strict_date_optional_time||epoch_millis||year",
+        "format": "strict_date_optional_time||epoch_millis||year_month||year",
         "ignore_malformed": true
       },
       "dataCollectionYear": {
@@ -107,7 +107,7 @@
       },
       "publicationYear": {
         "type": "date",
-        "format": "strict_date_optional_time||epoch_millis||year",
+        "format": "strict_date_optional_time||epoch_millis||year_month||year",
         "ignore_malformed": true,
         "index": false
       },
