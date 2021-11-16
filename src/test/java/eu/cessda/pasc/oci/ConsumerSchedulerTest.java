@@ -269,7 +269,7 @@ public class ConsumerSchedulerTest {
 
         // mock for ES bulking
         when(esIndexer.bulkIndex(anyList(), anyString())).thenThrow(IOException.class);
-        when(esIndexer.getTotalHitCount(eq("*"))).thenThrow(IOException.class);
+        when(esIndexer.getTotalHitCount("*")).thenThrow(IOException.class);
         when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
 
         // Given

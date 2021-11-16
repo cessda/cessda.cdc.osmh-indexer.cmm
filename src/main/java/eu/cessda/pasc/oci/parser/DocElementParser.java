@@ -89,7 +89,7 @@ class DocElementParser {
         final Optional<Element> optionalElement = getFirstElement(document, ERROR_PATH, OAI_NS);
 
         if (optionalElement.isPresent()) {
-            final Element element = optionalElement.get();
+            final var element = optionalElement.get();
             if (!element.getText().isEmpty()) {
                 throw new OaiPmhException(OaiPmhException.Code.valueOf(element.getAttributeValue(CODE_ATTR)), element.getText());
             } else {

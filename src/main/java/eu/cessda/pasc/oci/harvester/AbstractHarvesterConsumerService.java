@@ -53,12 +53,12 @@ abstract class AbstractHarvesterConsumerService implements HarvesterConsumerServ
     }
 
     @Override
-    public Optional<CMMStudy> getRecord(Repo repo, Record record) {
+    public Optional<CMMStudy> getRecord(Repo repo, Record recordVar) {
         // Handle deleted records
-        if (record.getRecordHeader().isDeleted()) {
-            return Optional.of(createInactiveRecord(record.getRecordHeader()));
+        if (recordVar.getRecordHeader().isDeleted()) {
+            return Optional.of(createInactiveRecord(recordVar.getRecordHeader()));
         }
-        return getRecordFromRemote(repo,record);
+        return getRecordFromRemote(repo,recordVar);
     }
 
     protected abstract Optional<CMMStudy> getRecordFromRemote(Repo repo, Record recordHeader);
