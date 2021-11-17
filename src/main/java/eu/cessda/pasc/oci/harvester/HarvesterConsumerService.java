@@ -39,7 +39,7 @@ public interface HarvesterConsumerService {
      */
     Stream<Record> listRecordHeaders(Repo repo, LocalDateTime lastModifiedDate);
 
-    Optional<CMMStudy> getRecord(Repo repo, Record record);
+    Optional<CMMStudy> getRecord(Repo repo, Record recordVar);
 
     default Optional<CMMStudy> getRecord(Repo repo, RecordHeader recordHeader) {
         return getRecord(repo, new Record(recordHeader, null));

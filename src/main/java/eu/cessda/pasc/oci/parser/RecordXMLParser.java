@@ -55,23 +55,23 @@ public class RecordXMLParser {
     /**
      * Gets a record from a remote repository.
      * @param repo the repository to retrieve the record from.
-     * @param record the study to retrieve.
+     * @param recordVar the study to retrieve.
      * @return a {@link CMMStudy} representing the study.
      * @throws OaiPmhException if the document contains an {@code <error>} element.
      * @throws XMLParseException if an error occurred parsing the XML.
      * @throws HarvesterException if the request URL could not be converted into a {@link URI}.
      */
-    public CMMStudy getRecord(Repo repo, Record record) throws HarvesterException {
+    public CMMStudy getRecord(Repo repo, Record recordVar) throws HarvesterException {
 
         final Document document;
 
-        if (record.getDocument() == null) {
+        if (recordVar.getDocument() == null) {
             URI fullUrl = null;
             try {
                 // If the document is not present retrieve it from the OAI-PMH endpoint.
-                fullUrl = OaiPmhHelpers.buildGetStudyFullUrl(repo, record.getRecordHeader().getIdentifier());
+                fullUrl = OaiPmhHelpers.buildGetStudyFullUrl(repo, recordVar.getRecordHeader().getIdentifier());
 
-                log.debug("[{}] Querying for StudyID [{}]", repo.getCode(), record.getRecordHeader().getIdentifier());
+                log.debug("[{}] Querying for StudyID [{}]", repo.getCode(), recordVar.getRecordHeader().getIdentifier());
 
                 try (var recordXML = httpClient.getInputStream(fullUrl)) {
                     document = OaiPmhHelpers.getSaxBuilder().build(recordXML);
@@ -86,7 +86,7 @@ public class RecordXMLParser {
             }
         } else {
             // The document has already been parsed.
-            document = record.getDocument();
+            document = recordVar.getDocument();
         }
         return mapDDIRecordToCMMStudy(document, repo);
     }

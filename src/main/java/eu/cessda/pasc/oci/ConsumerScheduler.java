@@ -127,7 +127,7 @@ public class ConsumerScheduler {
     }
 
     private OffsetDateTime logStartStatus(final String runDescription) throws IOException {
-        final OffsetDateTime startTime = OffsetDateTime.now(ZoneId.systemDefault());
+        final var startTime = OffsetDateTime.now(ZoneId.systemDefault());
         log.info("[{}] Consume and Ingest All SPs Repos: \n" +
                 "Started at [{}]\n" +
                 "Current state before run:\n" +

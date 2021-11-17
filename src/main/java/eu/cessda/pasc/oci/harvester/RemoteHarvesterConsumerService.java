@@ -34,7 +34,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
@@ -74,7 +73,7 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
     public Stream<Record> listRecordHeaders(Repo repo, LocalDateTime lastModifiedDate) {
         try {
             URI finalUrl = constructListRecordUrl(repo);
-            try (InputStream recordHeadersJsonStream = httpClient.getInputStream(finalUrl)) {
+            try (var recordHeadersJsonStream = httpClient.getInputStream(finalUrl)) {
                 List<RecordHeader> recordHeadersUnfiltered = recordHeaderObjectReader.readValue(recordHeadersJsonStream);
                 log.info("[{}] Retrieved [{}] record headers.", repo.getCode(), recordHeadersUnfiltered.size());
                 return recordHeadersUnfiltered.stream()
@@ -111,7 +110,7 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
 
         try {
             URI finalUrl = constructGetRecordUrl(repo, recordHeader.getRecordHeader().getIdentifier());
-            try (InputStream recordJsonStream = httpClient.getInputStream(finalUrl)) {
+            try (var recordJsonStream = httpClient.getInputStream(finalUrl)) {
                 return Optional.of(cmmStudyConverter.fromJsonStream(recordJsonStream));
             }
         } catch (HTTPException e) {
@@ -145,7 +144,7 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
     private URI constructListRecordUrl(Repo repo) throws URISyntaxException {
         var harvester = appConfigurationProperties.getEndpoints().getHarvesters().get(repo.getHandler().toUpperCase());
         if (harvester != null) {
-            String finalUrlString = String.format("%s/%s/ListRecordHeaders?Repository=%s",
+            var finalUrlString = String.format("%s/%s/ListRecordHeaders?Repository=%s",
                 harvester.getUrl(),
                 harvester.getVersion(),
                 URLEncoder.encode(repo.getUrl().toString(), StandardCharsets.UTF_8)
@@ -162,7 +161,7 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
         Harvester harvester = appConfigurationProperties.getEndpoints().getHarvesters().get(repo.getHandler().toUpperCase());
         if (harvester != null) {
             String encodedStudyID = StudyIdentifierEncoder.encodeStudyIdentifier(studyNumber);
-            String finalUrlString = String.format("%s/%s/GetRecord/CMMStudy/%s?Repository=%s",
+            var finalUrlString = String.format("%s/%s/GetRecord/CMMStudy/%s?Repository=%s",
                 harvester.getUrl(),
                 harvester.getVersion(),
                 encodedStudyID,
@@ -171,7 +170,7 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
             if (repo.getDefaultLanguage() != null) {
                 finalUrlString += "&defaultLanguage=" + repo.getDefaultLanguage();
             }
-            URI finalUrl = new URI(finalUrlString);
+            var finalUrl = new URI(finalUrlString);
             log.trace("[{}] Final GetRecord Handler url [{}] constructed.", repo.getUrl(), finalUrl);
             return finalUrl;
         } else {
