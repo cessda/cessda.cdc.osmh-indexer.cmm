@@ -5,12 +5,32 @@ All notable changes to the OSMH Consumer Indexer will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 *For each release, use the following sub-sections:*
-*- Added (for new features)*
-*- Changed (for changes in existing functionality)*
-*- Deprecated (for soon-to-be removed features)*
-*- Removed (for now removed features)*
-*- Fixed (for any bug fixes)*
-*- Security (in case of vulnerabilities)*
+
+- *Added (for new features)*
+- *Changed (for changes in existing functionality)*
+- *Deprecated (for soon-to-be removed features)*
+- *Removed (for now removed features)*
+- *Fixed (for any bug fixes)*
+- *Security (in case of vulnerabilities)*
+
+## [2.5.0] - 2021-11-23
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5710021.svg)](https://doi.org/10.5281/zenodo.5710021)
+
+### Additions
+
+- Added support for indexing a repository from a folder on disk ([#146](https://bitbucket.org/cessda/cessda.cdc.version2/issues/146))
+- Add support for Year-Month dates to Elasticsearch ([#352](https://bitbucket.org/cessda/cessda.cdc.version2/issues/352))
+
+### Changes
+
+- Updated UniData's Endpoint ([#366](https://bitbucket.org/cessda/cessda.cdc.version2/issues/366))
+- Updated OpenJDK to 17 ([#269](https://bitbucket.org/cessda/cessda.cdc.version2/issues/269))
+- Removed usages of Spring Data Elasticsearch and replaced them with direct use of the Elasticsearch client ([#146](https://bitbucket.org/cessda/cessda.cdc.version2/issues/146))
+
+### Fixes
+
+- Fixed some code smells identified by SonarQube ([#369](https://bitbucket.org/cessda/cessda.cdc.version2/issues/369))
+- Fixed `ElasticsearchSet` throwing an `ArrayIndexOutOfBoundsException` when accessing an Elasticsearch scroll that does not have a scroll ID ([#INDEXER-2](https://bitbucket.org/cessda/cessda.cdc.osmh-indexer.cmm/issues/2))
 
 ## [2.4.0] - 2021-06-23
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5017358.svg)](https://doi.org/10.5281/zenodo.5017358)
