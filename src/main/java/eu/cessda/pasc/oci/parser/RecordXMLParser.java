@@ -65,8 +65,9 @@ public class RecordXMLParser {
 
         final Document document;
 
+        URI fullUrl = null;
+
         if (recordVar.getDocument() == null) {
-            URI fullUrl = null;
             try {
                 // If the document is not present retrieve it from the OAI-PMH endpoint.
                 fullUrl = OaiPmhHelpers.buildGetStudyFullUrl(repo, recordVar.getRecordHeader().getIdentifier());
@@ -87,8 +88,15 @@ public class RecordXMLParser {
         } else {
             // The document has already been parsed.
             document = recordVar.getDocument();
+            if (recordVar.getBaseURL() != null) {
+                try {
+                    fullUrl = OaiPmhHelpers.buildGetStudyFullUrl(recordVar.getBaseURL(), recordVar.getRecordHeader().getIdentifier(), repo.getPreferredMetadataParam());
+                } catch (URISyntaxException e) {
+                    throw new HarvesterException(e);
+                }
+            }
         }
-        return mapDDIRecordToCMMStudy(document, repo);
+        return mapDDIRecordToCMMStudy(document, fullUrl, repo);
     }
 
     /**
@@ -97,7 +105,7 @@ public class RecordXMLParser {
      * @param repository the source repository.
      * @throws OaiPmhException if the document contains an {@code <error>} element.
      */
-    private CMMStudy mapDDIRecordToCMMStudy(Document document, Repo repository) throws OaiPmhException {
+    private CMMStudy mapDDIRecordToCMMStudy(Document document, URI fullUrl, Repo repository) throws OaiPmhException {
 
         CMMStudy.CMMStudyBuilder builder = CMMStudy.builder();
 
@@ -136,6 +144,10 @@ public class RecordXMLParser {
             }
             builder.dataCollectionFreeTexts(cmmStudyMapper.parseDataCollectionFreeTexts(document, xPaths, defaultLangIsoCode));
         }
+        if (fullUrl != null) {
+            builder.studyXmlSourceUrl(fullUrl.toString());
+        }
+
         return builder.build();
     }
 

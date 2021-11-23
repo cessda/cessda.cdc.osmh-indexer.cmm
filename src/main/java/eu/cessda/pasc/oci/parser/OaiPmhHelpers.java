@@ -48,11 +48,15 @@ public class OaiPmhHelpers {
     });
 
     public static URI buildGetStudyFullUrl(@NonNull Repo repo, @NonNull String studyIdentifier) throws URISyntaxException {
+        return buildGetStudyFullUrl(repo.getUrl(), studyIdentifier, repo.getPreferredMetadataParam());
+    }
+
+    public static URI buildGetStudyFullUrl(@NonNull URI repoUrl, @NonNull String studyIdentifier, @NonNull String metadataPrefix) throws URISyntaxException {
         return new URI(String.format(
-            "%s?%s=%s&%s=%s&%s=%s", repo.getUrl(),
+            "%s?%s=%s&%s=%s&%s=%s", repoUrl,
             VERB_PARAM_KEY, GET_RECORD_VALUE, // verb=GetRecord
             IDENTIFIER_PARAM_KEY, URLEncoder.encode(studyIdentifier, StandardCharsets.UTF_8), //&identifier=1683
-            METADATA_PREFIX_PARAM_KEY, URLEncoder.encode(repo.getPreferredMetadataParam(), StandardCharsets.UTF_8) //&metadataPrefix=ddi
+            METADATA_PREFIX_PARAM_KEY, URLEncoder.encode(metadataPrefix, StandardCharsets.UTF_8) //&metadataPrefix=ddi
         ));
     }
 

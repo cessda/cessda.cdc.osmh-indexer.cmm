@@ -50,7 +50,7 @@ public class RecordXMLParserNesstarTest {
 
     private final Repo nesstarRepo = ReposTestData.getNSDRepo();
     private final URI fullRecordURL = URI.create(nesstarRepo.getUrl() + "?verb=GetRecord&identifier=" + URLEncoder.encode(STUDY_IDENTIFIER, UTF_8) + "&metadataPrefix=oai_ddi");
-    private final Record recordHeader = new Record(RecordHeader.builder().identifier(STUDY_IDENTIFIER).build(), null);
+    private final Record recordHeader = new Record(RecordHeader.builder().identifier(STUDY_IDENTIFIER).build(), null, null);
     
     private final HttpClient httpClient = Mockito.mock(HttpClient.class);
     private final CMMStudyMapper cmmStudyMapper = new CMMStudyMapper();

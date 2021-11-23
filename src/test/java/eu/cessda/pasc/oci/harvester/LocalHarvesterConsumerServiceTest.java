@@ -40,7 +40,7 @@ public class LocalHarvesterConsumerServiceTest {
 
 
     private static final Repo UKDS_REPO = getUKDSRepo();
-    private static final Record STUDY_NUMBER = new Record(RecordHeader.builder().identifier("oai:ukds/5436").build(), null);
+    private static final Record STUDY_NUMBER = new Record(RecordHeader.builder().identifier("oai:ukds/5436").build(), null,null);
     private final RecordHeaderParser recordHeaderParser = Mockito.mock(RecordHeaderParser.class);
     private final RecordXMLParser recordXMLParser = Mockito.mock(RecordXMLParser.class);
     /**

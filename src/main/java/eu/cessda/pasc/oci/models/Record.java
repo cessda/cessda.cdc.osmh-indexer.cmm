@@ -19,6 +19,8 @@ import lombok.NonNull;
 import lombok.Value;
 import org.jdom2.Document;
 
+import java.net.URI;
+
 /**
  * Represents a record header that potentially has a document attached.
  */
@@ -29,6 +31,10 @@ public class Record {
      */
     @NonNull
     RecordHeader recordHeader;
+    /**
+     * The repository URL
+     */
+    URI baseURL;
     /**
      * A parsed document.
      */

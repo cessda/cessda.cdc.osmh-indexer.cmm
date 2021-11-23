@@ -42,6 +42,6 @@ public interface HarvesterConsumerService {
     Optional<CMMStudy> getRecord(Repo repo, Record recordVar);
 
     default Optional<CMMStudy> getRecord(Repo repo, RecordHeader recordHeader) {
-        return getRecord(repo, new Record(recordHeader, null));
+        return getRecord(repo, new Record(recordHeader, null,null));
     }
 }

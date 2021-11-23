@@ -143,11 +143,11 @@ public class ConsumerSchedulerTest {
 
         // Mock requests for the repository headers
         when(harvesterConsumerService.listRecordHeaders(any(Repo.class), any()))
-            .thenReturn(recordHeaders.stream().map(recordHeader -> new Record(recordHeader, null)));
+            .thenReturn(recordHeaders.stream().map(recordHeader -> new Record(recordHeader, null,null)));
 
         // mock record requests from each header
         for (var recordHeader : recordHeaders) {
-            when(harvesterConsumerService.getRecord(any(Repo.class), eq(new Record(recordHeader, null))))
+            when(harvesterConsumerService.getRecord(any(Repo.class), eq(new Record(recordHeader, null,null))))
                 .thenReturn(Optional.of(getSyntheticCmmStudy(recordHeader.getIdentifier())));
         }
 
@@ -188,14 +188,14 @@ public class ConsumerSchedulerTest {
         var recordHeaderList = objectMapper.<List<RecordHeader>>readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE, collectionType);
         var recordHeaderListIncrement = objectMapper.<List<RecordHeader>>readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE_WITH_INCREMENT, collectionType);
         when(harvesterConsumerService.listRecordHeaders(any(Repo.class), any()))
-            .thenReturn(recordHeaderList.stream().map(recordHeader -> new Record(recordHeader, null))) // First call
-            .thenReturn(recordHeaderListIncrement.stream().map(recordHeader -> new Record(recordHeader, null))); // Second call / Incremental run
+            .thenReturn(recordHeaderList.stream().map(recordHeader -> new Record(recordHeader, null,null))) // First call
+            .thenReturn(recordHeaderListIncrement.stream().map(recordHeader -> new Record(recordHeader, null,null))); // Second call / Incremental run
 
         // mock record requests from each header, a set is used so that each header is only registered once
         var allRecordHeaders = new HashSet<>(recordHeaderList);
         allRecordHeaders.addAll(recordHeaderListIncrement);
         for (var recordHeader : allRecordHeaders) {
-            when(harvesterConsumerService.getRecord(any(Repo.class), eq(new Record(recordHeader, null))))
+            when(harvesterConsumerService.getRecord(any(Repo.class), eq(new Record(recordHeader, null,null))))
                 .thenReturn(Optional.of(getSyntheticCmmStudy(recordHeader.getIdentifier())));
         }
 

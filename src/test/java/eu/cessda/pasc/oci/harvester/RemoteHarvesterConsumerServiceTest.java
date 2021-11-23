@@ -60,7 +60,7 @@ public class RemoteHarvesterConsumerServiceTest {
     private static final CMMStudyConverter cmmStudyConverter = new CMMStudyConverter();
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    private static final Record STUDY_NUMBER = new Record(RecordHeader.builder().identifier("4124325").build(), null);
+    private static final Record STUDY_NUMBER = new Record(RecordHeader.builder().identifier("4124325").build(), null,null);
 
     /**
      * Class to test

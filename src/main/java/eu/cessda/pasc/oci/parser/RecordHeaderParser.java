@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -117,6 +118,11 @@ public class RecordHeaderParser {
         return recordHeaderBuilder.build();
     }
 
+    private static Optional<String> parseRequestElement(Document document) {
+        var element = DocElementParser.getFirstElement(document, OaiPmhConstants.REQUEST_ELEMENT, OaiPmhConstants.OAI_NS);
+        return element.map(Element::getText);
+    }
+
     /**
      * Gets a stream of record headers from the specified repository.
      * <p>
@@ -164,7 +170,7 @@ public class RecordHeaderParser {
 
             log.debug("[{}] ParseRecordHeaders ended:  No more resumption tokens to process.", repo.getCode());
 
-            return recordHeaders.stream().map(recordHeader -> new Record(recordHeader, null));
+            return recordHeaders.stream().map(recordHeader -> new Record(recordHeader, repo.getUrl(),null));
         } else if (repo.getPath() != null) {
             try {
                 return Files.walk(repo.getPath()).filter(Files::isRegularFile)
@@ -176,8 +182,20 @@ public class RecordHeaderParser {
                             return Stream.empty();
                         }
                     }).flatMap(doc -> {
+                        // Parse request element to retrieve the base URL of the repository
+                        var baseUrl = parseRequestElement(doc).map(String::trim).map(urlString -> {
+                            try {
+                                return new URI(urlString);
+                            } catch (URISyntaxException e) {
+                                log.warn("{}: {} could not be parsed as a URL: {}", repo.getCode(), urlString, e.toString());
+                                return null;
+                            }
+                        }).orElse(null);
+
+                        // Parse the record header from the document
                         var recordHeaders = parseRecordHeadersFromDoc(doc);
-                        return recordHeaders.stream().map(recordHeader -> new Record(recordHeader, doc));
+
+                        return recordHeaders.stream().map(recordHeader -> new Record(recordHeader, baseUrl, doc));
                     });
             } catch (IOException e) {
                 throw new HarvesterException("Reading path failed: " + e, e);
