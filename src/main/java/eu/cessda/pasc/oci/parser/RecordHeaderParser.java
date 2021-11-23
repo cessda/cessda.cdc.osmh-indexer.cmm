@@ -118,9 +118,19 @@ public class RecordHeaderParser {
         return recordHeaderBuilder.build();
     }
 
-    private static Optional<String> parseRequestElement(Document document) {
-        var element = DocElementParser.getFirstElement(document, OaiPmhConstants.REQUEST_ELEMENT, OaiPmhConstants.OAI_NS);
-        return element.map(Element::getText);
+    private static Optional<Record.Request> parseRequestElement(Repo repo, Document document) {
+        return DocElementParser.getFirstElement(document, OaiPmhConstants.REQUEST_ELEMENT, OaiPmhConstants.OAI_NS).map(elem -> {
+            var metadataPrefix = elem.getAttributeValue(OaiPmhConstants.METADATA_PREFIX_PARAM_KEY, OaiPmhConstants.OAI_NS);
+
+            URI baseURL = null;
+            try {
+                baseURL = new URI(elem.getText());
+            } catch (URISyntaxException e) {
+                log.warn("{}: {} could not be parsed as a URL: {}", repo.getCode(), elem.getText(), e.toString());
+            }
+
+            return new Record.Request(baseURL, metadataPrefix);
+        });
     }
 
     /**
@@ -170,7 +180,7 @@ public class RecordHeaderParser {
 
             log.debug("[{}] ParseRecordHeaders ended:  No more resumption tokens to process.", repo.getCode());
 
-            return recordHeaders.stream().map(recordHeader -> new Record(recordHeader, repo.getUrl(),null));
+            return recordHeaders.stream().map(recordHeader -> new Record(recordHeader, new Record.Request(repo.getUrl(), repo.getPreferredMetadataParam()),null));
         } else if (repo.getPath() != null) {
             try {
                 return Files.walk(repo.getPath()).filter(Files::isRegularFile)
@@ -183,19 +193,12 @@ public class RecordHeaderParser {
                         }
                     }).flatMap(doc -> {
                         // Parse request element to retrieve the base URL of the repository
-                        var baseUrl = parseRequestElement(doc).map(String::trim).map(urlString -> {
-                            try {
-                                return new URI(urlString);
-                            } catch (URISyntaxException e) {
-                                log.warn("{}: {} could not be parsed as a URL: {}", repo.getCode(), urlString, e.toString());
-                                return null;
-                            }
-                        }).orElse(null);
+                        var request = parseRequestElement(repo, doc);
 
                         // Parse the record header from the document
                         var recordHeaders = parseRecordHeadersFromDoc(doc);
 
-                        return recordHeaders.stream().map(recordHeader -> new Record(recordHeader, baseUrl, doc));
+                        return recordHeaders.stream().map(recordHeader -> new Record(recordHeader, request.orElse(null), doc));
                     });
             } catch (IOException e) {
                 throw new HarvesterException("Reading path failed: " + e, e);
