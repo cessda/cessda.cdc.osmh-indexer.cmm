@@ -29,6 +29,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 ### Fixes
 
+- Fixed JSON data previously included studyXmlSourceUrl pointing to the source record ([#385](https://bitbucket.org/cessda/cessda.cdc.versions/issues/385))
 - Fixed some code smells identified by SonarQube ([#369](https://bitbucket.org/cessda/cessda.cdc.version2/issues/369))
 - Fixed `ElasticsearchSet` throwing an `ArrayIndexOutOfBoundsException` when accessing an Elasticsearch scroll that does not have a scroll ID ([#INDEXER-2](https://bitbucket.org/cessda/cessda.cdc.osmh-indexer.cmm/issues/2))
 
