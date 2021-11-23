@@ -64,7 +64,6 @@ public class RecordXMLParserTest {
     private final CMMStudyConverter cmmConverter = new CMMStudyConverter();
     private final HttpClient httpClient = Mockito.mock(HttpClient.class);
     private final Repo repo;
-    private final String recordIdentifier;
     private final URI fullRecordUrl;
     private final CMMStudyMapper cmmStudyMapper = new CMMStudyMapper();
     private final Record recordHeader;
@@ -73,7 +72,7 @@ public class RecordXMLParserTest {
         // Needed because TimeUtility only works properly in UTC timezones
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         repo = ReposTestData.getUKDSRepo();
-        recordIdentifier = "http://my-example_url:80/obj/fStudy/ch.sidos.ddi.468.7773";
+        var recordIdentifier = "http://my-example_url:80/obj/fStudy/ch.sidos.ddi.468.7773";
         recordHeader = new Record(RecordHeader.builder().identifier(recordIdentifier).build(), null, null);
         fullRecordUrl = URI.create(repo.getUrl() + "?verb=GetRecord&identifier=" + URLEncoder.encode(recordIdentifier, StandardCharsets.UTF_8) + "&metadataPrefix=ddi");
     }

@@ -88,7 +88,7 @@ public class RecordXMLParser {
         } else {
             // The document has already been parsed.
             document = recordVar.getDocument();
-            if (recordVar.getRequest().getBaseURL() != null) {
+            if (recordVar.getRequest() != null) {
                 try {
                     fullUrl = OaiPmhHelpers.buildGetStudyFullUrl(recordVar.getRequest().getBaseURL(), recordVar.getRecordHeader().getIdentifier(), recordVar.getRequest().getMetadataPrefix());
                 } catch (URISyntaxException e) {

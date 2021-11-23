@@ -120,7 +120,7 @@ public class RecordHeaderParser {
 
     private static Optional<Record.Request> parseRequestElement(Repo repo, Document document) {
         return DocElementParser.getFirstElement(document, OaiPmhConstants.REQUEST_ELEMENT, OaiPmhConstants.OAI_NS).map(elem -> {
-            var metadataPrefix = elem.getAttributeValue(OaiPmhConstants.METADATA_PREFIX_PARAM_KEY, OaiPmhConstants.OAI_NS);
+            var metadataPrefix = elem.getAttributeValue(OaiPmhConstants.METADATA_PREFIX_PARAM_KEY);
 
             URI baseURL = null;
             try {
