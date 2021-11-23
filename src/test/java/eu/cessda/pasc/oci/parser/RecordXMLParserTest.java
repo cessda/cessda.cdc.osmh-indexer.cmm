@@ -33,6 +33,7 @@ import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.extern.slf4j.Slf4j;
+import org.jdom2.JDOMException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -73,7 +74,7 @@ public class RecordXMLParserTest {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         repo = ReposTestData.getUKDSRepo();
         recordIdentifier = "http://my-example_url:80/obj/fStudy/ch.sidos.ddi.468.7773";
-        recordHeader = new Record(RecordHeader.builder().identifier(recordIdentifier).build(), null);
+        recordHeader = new Record(RecordHeader.builder().identifier(recordIdentifier).build(), repo.getUrl(),null);
         fullRecordUrl = URI.create(repo.getUrl() + "?verb=GetRecord&identifier=" + URLEncoder.encode(recordIdentifier, StandardCharsets.UTF_8) + "&metadataPrefix=ddi");
     }
 
@@ -348,5 +349,21 @@ public class RecordXMLParserTest {
 
         // Assert the language is as expected
         Assert.assertNotNull(result.getTitleStudy().get("zz"));
+    }
+
+    @Test
+    public void shouldUseAlreadyParsedDocumentIfPresent() throws IOException, JDOMException, JSONException, ProcessingException, HarvesterException {
+        // Given
+        var document = OaiPmhHelpers.getSaxBuilder().build(ResourceHandler.getResourceAsStream("xml/ddi_2_5/ddi_record_ukds_example.xml"));
+
+        var header = new Record(recordHeader.getRecordHeader(), repo.getUrl(), document);
+
+        // When
+        var result = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, header);
+
+        then(result).isNotNull();
+        validateCMMStudyResultAgainstSchema(result);
+
+        then(result.getStudyXmlSourceUrl()).isEqualTo("https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=GetRecord&identifier=http%3A%2F%2Fmy-example_url%3A80%2Fobj%2FfStudy%2Fch.sidos.ddi.468.7773&metadataPrefix=ddi");
     }
 }

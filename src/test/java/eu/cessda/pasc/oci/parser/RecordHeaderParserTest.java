@@ -220,6 +220,7 @@ public class RecordHeaderParserTest {
 
         // Then
         assertThat(records).extracting(Record::getRecordHeader).extracting(RecordHeader::getIdentifier).contains("1683");
+        assertThat(records).extracting(Record::getBaseURL).contains(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
         assertThat(records).extracting(Record::getDocument).isNotNull(); // The document should be stored as a field
     }
 

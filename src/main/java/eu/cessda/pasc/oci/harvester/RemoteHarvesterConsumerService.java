@@ -78,7 +78,7 @@ public class RemoteHarvesterConsumerService extends AbstractHarvesterConsumerSer
                 log.info("[{}] Retrieved [{}] record headers.", repo.getCode(), recordHeadersUnfiltered.size());
                 return recordHeadersUnfiltered.stream()
                     .filter(recordHeader -> filterRecord(recordHeader, lastModifiedDate))
-                    .map(recordHeader -> new Record(recordHeader, null));
+                    .map(recordHeader -> new Record(recordHeader, null,null));
             }
         }
         catch (HTTPException e) {
