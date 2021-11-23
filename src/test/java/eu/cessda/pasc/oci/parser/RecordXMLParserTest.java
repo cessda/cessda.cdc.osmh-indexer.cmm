@@ -74,7 +74,7 @@ public class RecordXMLParserTest {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         repo = ReposTestData.getUKDSRepo();
         recordIdentifier = "http://my-example_url:80/obj/fStudy/ch.sidos.ddi.468.7773";
-        recordHeader = new Record(RecordHeader.builder().identifier(recordIdentifier).build(), repo.getUrl(),null);
+        recordHeader = new Record(RecordHeader.builder().identifier(recordIdentifier).build(), null, null);
         fullRecordUrl = URI.create(repo.getUrl() + "?verb=GetRecord&identifier=" + URLEncoder.encode(recordIdentifier, StandardCharsets.UTF_8) + "&metadataPrefix=ddi");
     }
 
@@ -356,7 +356,7 @@ public class RecordXMLParserTest {
         // Given
         var document = OaiPmhHelpers.getSaxBuilder().build(ResourceHandler.getResourceAsStream("xml/ddi_2_5/ddi_record_ukds_example.xml"));
 
-        var header = new Record(recordHeader.getRecordHeader(), repo.getUrl(), document);
+        var header = new Record(recordHeader.getRecordHeader(), new Record.Request(repo.getUrl(), "ddi"), document);
 
         // When
         var result = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, header);

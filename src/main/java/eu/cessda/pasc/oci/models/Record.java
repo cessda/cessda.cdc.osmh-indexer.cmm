@@ -31,12 +31,26 @@ public class Record {
      */
     @NonNull
     RecordHeader recordHeader;
+
     /**
-     * The repository URL
+     * The request element.
      */
-    URI baseURL;
+    Request request;
+
     /**
      * A parsed document.
      */
     Document document;
+
+    @Value
+    public static class Request {
+        /**
+         * The repository URL.
+         */
+        URI baseURL;
+        /**
+         * The metadata prefix.
+         */
+        String metadataPrefix;
+    }
 }
