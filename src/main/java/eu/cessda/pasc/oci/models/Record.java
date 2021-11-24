@@ -19,6 +19,7 @@ import lombok.NonNull;
 import lombok.Value;
 import org.jdom2.Document;
 
+import javax.annotation.Nullable;
 import java.net.URI;
 
 /**
@@ -35,11 +36,13 @@ public class Record {
     /**
      * The request element.
      */
+    @Nullable
     Request request;
 
     /**
      * A parsed document.
      */
+    @Nullable
     Document document;
 
     @Value
@@ -47,10 +50,12 @@ public class Record {
         /**
          * The repository URL.
          */
+        @NonNull
         URI baseURL;
         /**
          * The metadata prefix.
          */
+        @NonNull
         String metadataPrefix;
     }
 }

@@ -67,9 +67,31 @@ public class RecordHeaderParser {
         }
     }
 
-    private List<RecordHeader> parseRecordHeadersFromDoc(Document doc) {
-        var headers = DocElementParser.getElements(doc, OaiPmhConstants.HEADER_ELEMENT, OaiPmhConstants.OAI_NS);
-        return headers.stream().map(this::parseRecordHeader).collect(Collectors.toList());
+    /**
+     * Parse the OAI-PMH {@code <request/>} element.
+     * @param repo the repository that the request came from.
+     * @param document the XML document representing the OAI-PMH request.
+     * @return the request element, or an empty {@link Optional} if either the request element was not present
+     * or if the request element was missing either the metadata prefix or the repository URL.
+     */
+    private static Optional<Record.Request> parseRequestElement(Repo repo, Document document) {
+        return DocElementParser.getFirstElement(document, OaiPmhConstants.REQUEST_ELEMENT, OaiPmhConstants.OAI_NS).flatMap(elem -> {
+            var metadataPrefix = DocElementParser.getAttributeValue(elem, OaiPmhConstants.METADATA_PREFIX_PARAM_KEY);
+
+            var baseURL = Optional.<URI>empty();
+            try {
+                baseURL = Optional.of(new URI(elem.getText()));
+            } catch (URISyntaxException e) {
+                log.warn("{}: {} could not be parsed as a URL: {}", repo.getCode(), elem.getText(), e.toString());
+            }
+
+            // Check if required parts of the request element are present
+            if (metadataPrefix.isPresent() && baseURL.isPresent()) {
+                return Optional.of(new Record.Request(baseURL.orElseThrow(), metadataPrefix.orElseThrow()));
+            } else {
+                return Optional.empty();
+            }
+        });
     }
 
     private Optional<String> parseResumptionToken(Document doc) {
@@ -118,19 +140,9 @@ public class RecordHeaderParser {
         return recordHeaderBuilder.build();
     }
 
-    private static Optional<Record.Request> parseRequestElement(Repo repo, Document document) {
-        return DocElementParser.getFirstElement(document, OaiPmhConstants.REQUEST_ELEMENT, OaiPmhConstants.OAI_NS).map(elem -> {
-            var metadataPrefix = elem.getAttributeValue(OaiPmhConstants.METADATA_PREFIX_PARAM_KEY);
-
-            URI baseURL = null;
-            try {
-                baseURL = new URI(elem.getText());
-            } catch (URISyntaxException e) {
-                log.warn("{}: {} could not be parsed as a URL: {}", repo.getCode(), elem.getText(), e.toString());
-            }
-
-            return new Record.Request(baseURL, metadataPrefix);
-        });
+    private List<RecordHeader> parseRecordHeadersFromDoc(Document doc) {
+        var headers = DocElementParser.getElements(doc, OaiPmhConstants.HEADER_ELEMENT, OaiPmhConstants.OAI_NS);
+        return headers.stream().map(this::parseRecordHeader).collect(Collectors.toCollection(() -> new ArrayList<>(headers.size())));
     }
 
     /**
@@ -179,6 +191,9 @@ public class RecordHeaderParser {
             } while (resumptionToken.isPresent());
 
             log.debug("[{}] ParseRecordHeaders ended:  No more resumption tokens to process.", repo.getCode());
+
+            // Trim the arraylist
+            recordHeaders.trimToSize();
 
             return recordHeaders.stream().map(recordHeader -> new Record(recordHeader, new Record.Request(repo.getUrl(), repo.getPreferredMetadataParam()),null));
         } else if (repo.getPath() != null) {
