@@ -226,6 +226,22 @@ public class RecordHeaderParserTest {
     }
 
     @Test
+    public void shouldNotIncludeARequestFieldIfRequiredElementsAreNotPresent() throws IOException, HarvesterException {
+        // Given
+        var ukdsEndpoint  = ReposTestData.getUKDSRepo();
+        ukdsEndpoint.setUrl(null);
+        ukdsEndpoint.setPath(new ClassPathResource("xml/ddi_2_5/synthetic_compliant_cmm.xml").getFile().toPath());
+
+        // When
+        var records = recordHeaderParser.getRecordHeaders(ukdsEndpoint).collect(Collectors.toList());
+
+        // Then
+        assertThat(records).extracting(Record::getRecordHeader).extracting(RecordHeader::getIdentifier).contains("2305");
+        assertThat(records).extracting(Record::getRequest).contains((Record.Request) null); // The request field should not be present
+        assertThat(records).extracting(Record::getDocument).isNotNull(); // The document should be stored as a field
+    }
+
+    @Test
     public void shouldHandleParsingErrors() throws IOException, HarvesterException {
         // Given
         var ukdsEndpoint  = ReposTestData.getUKDSRepo();
