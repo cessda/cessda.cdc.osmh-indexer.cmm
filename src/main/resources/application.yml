@@ -11,15 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-server:
-  port: 9902
-management:
-  endpoint:
-    health.show-details: always
-    shutdown.enabled: true
-  endpoints:
-    web:
-      exposure.include: '*'
 logging:
   pattern:
     console: '%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) %40.40((%file:%line\)) - %message%n'
@@ -27,42 +18,12 @@ logging:
   level:
     ROOT: WARN
     eu.cessda.pasc.oci: INFO
-spring:
-  application:
-    name: pasc-oci
-  jmx:
-    default-domain: pasc-oci
-  boot:
-    admin:
-      client:
-        name: pasc-oci
-        instance:
-          metadata:
-            user:
-              # Send the username and password for authentication to Spring Boot Admin
-              name: ${spring.security.user.name}
-              password: ${spring.security.user.password}
-  security:
-    user:
-      name: user
-      password: password
-      roles: ACTUATOR
 elasticsearch:
   host: 127.0.0.1
   numberOfShards: 2
   numberOfReplicas: 0
 osmhConsumer:
   languages: ['cs', 'da', 'de', 'el', 'en', 'et', 'fi', 'fr', 'hu', 'it', 'nl', 'no', 'pt', 'sk', 'sl', 'sr', 'sv']
-  delay:
-    # Auto Starts after delay of 2 seconds at startup
-    initial: '2000'
-    fixed: '315360000000'
-  daily:
-    # Daily Harvest and Ingestion run at 00:01am.
-    run: '0 01 00 * * *'
-    # Then run every Sunday at 09:00
-    sunday.run: '0 00 09 * * SUN'
-  # The OAI-PMH handler is predefined, this is used for setting external handlers
   endpoints:
     harvesters:
       NESSTAR:
