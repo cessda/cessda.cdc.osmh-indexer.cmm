@@ -64,6 +64,7 @@ public class OCIApplication {
 
     @Component
     @Profile("!test")
+    @SuppressWarnings("java:S3985")
     private class Runner implements CommandLineRunner {
         /**
          * Run the indexer. If an exception is thrown, the exit code of the indexer is set to -1.
