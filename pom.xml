@@ -76,19 +76,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
 
         <!-- Elasticsearch -->
         <dependency>
@@ -110,11 +97,7 @@
             <artifactId>elasticsearch-rest-high-level-client</artifactId>
         </dependency>
 
-        <!-- Spring boot Admin-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
+        <!-- Logging -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
@@ -148,11 +131,6 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>de.codecentric</groupId>
-            <artifactId>spring-boot-admin-starter-client</artifactId>
-            <version>2.2.3</version>
         </dependency>
         <dependency>
             <groupId>org.jdom</groupId>
@@ -249,14 +227,8 @@
                     <compilerArgs>
                         <arg>-Xlint:all</arg>
                         <arg>-XDcompilePolicy=simple</arg>
-                        <arg>-Xplugin:ErrorProne -Xep:UnusedVariable:OFF</arg>
                     </compilerArgs>
                     <annotationProcessorPaths>
-                        <path>
-                            <groupId>com.google.errorprone</groupId>
-                            <artifactId>error_prone_core</artifactId>
-                            <version>2.4.0</version>
-                        </path>
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
