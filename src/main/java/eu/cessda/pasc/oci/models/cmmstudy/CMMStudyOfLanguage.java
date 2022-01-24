@@ -23,6 +23,7 @@ import lombok.Value;
 import lombok.With;
 import org.springframework.data.annotation.Id;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Set;
 
@@ -84,7 +85,7 @@ public class CMMStudyOfLanguage {
     String titleStudy;
 
     @JsonProperty("studyUrl")
-    String studyUrl;
+    URI studyUrl;
 
     @JsonProperty("studyNumber")
     String studyNumber;

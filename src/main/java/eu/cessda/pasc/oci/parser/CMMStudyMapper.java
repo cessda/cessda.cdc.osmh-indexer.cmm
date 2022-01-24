@@ -35,6 +35,7 @@ import org.jdom2.xpath.XPathFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -314,19 +315,19 @@ public class CMMStudyMapper {
     }
 
     /**
-     * Parses parse Study Url from two plausible allowed xPaths
+     * Parses the Study Url from two plausible allowed xPaths
      * <p>
      * Xpath = {@link XPaths#getStudyURLDocDscrXPath()}
      * Xpath = {@link XPaths#getStudyURLStudyDscrXPath()}
      */
-    Map<String, String> parseStudyUrl(Document document, XPaths xPaths, String langCode) {
+    Map<String, URI> parseStudyUrl(Document document, XPaths xPaths, String langCode) {
         var stdyDscrElements = DocElementParser.getElements(document, xPaths.getStudyURLStudyDscrXPath(), xPaths.getOaiAndDdiNs());
-        var urlFromStdyDscr = docElementParser.getLanguageKeyValuePairs(stdyDscrElements, false, langCode, ParsingStrategies::uriStrategy);
+        var urlFromStdyDscr = docElementParser.getLanguageKeyValuePairs(stdyDscrElements, langCode, ParsingStrategies::uriStrategy);
 
         // If studyURLStudyDscrXPath defined, use that XPath as well.
         return xPaths.getStudyURLDocDscrXPath().map(xpath -> {
             var docDscrElement = DocElementParser.getElements(document, xpath, xPaths.getOaiAndDdiNs());
-            var urlFromDocDscr = docElementParser.getLanguageKeyValuePairs(docDscrElement, false, langCode, ParsingStrategies::uriStrategy);
+            var urlFromDocDscr = docElementParser.getLanguageKeyValuePairs(docDscrElement, langCode, ParsingStrategies::uriStrategy);
 
             // If absent, use the URL from studyDscr
             urlFromStdyDscr.forEach(urlFromDocDscr::putIfAbsent);

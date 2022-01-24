@@ -67,6 +67,7 @@ public class HarvesterConsumerServiceRunnerTestIT {
         log.info("Total Count: [{}]", sum);
     }
 
+    @SuppressWarnings("ReturnValueIgnored")
     private int processAndVerify(Repo repo) {
         var recordHeaders = localHarvesterConsumerService.listRecordHeaders(repo, null).collect(Collectors.toList());
         log.info("Total records found: [{}]", recordHeaders.size());

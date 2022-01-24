@@ -23,6 +23,7 @@ import lombok.Builder;
 import lombok.Value;
 import lombok.With;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -108,7 +109,7 @@ public class CMMStudy {
     Map<String, String> titleStudy;
 
     @JsonProperty("studyUrl")
-    Map<String, String> studyUrl;
+    Map<String, URI> studyUrl;
 
     @JsonProperty("studyNumber")
     String studyNumber;
