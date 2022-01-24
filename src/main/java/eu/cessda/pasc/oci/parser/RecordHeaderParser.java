@@ -167,8 +167,9 @@ public class RecordHeaderParser {
             var recordHeadersDocument = getRecordHeadersDocument(fullListRecordUrlPath);
 
             // Check if the document has an OAI element
-            DocElementParser.getFirstElement(recordHeadersDocument, OaiPmhConstants.OAI_PMH, OaiPmhConstants.OAI_NS)
-                .orElseThrow(() -> new HarvesterException("Missing OAI element"));
+            if(DocElementParser.getFirstElement(recordHeadersDocument, OaiPmhConstants.OAI_PMH, OaiPmhConstants.OAI_NS).isEmpty()) {
+               throw new HarvesterException("Missing OAI element");
+            }
 
             // Exit if the response has an <error> element
             DocElementParser.validateResponse(recordHeadersDocument);
@@ -195,7 +196,7 @@ public class RecordHeaderParser {
             // Trim the arraylist
             recordHeaders.trimToSize();
 
-            return recordHeaders.stream().map(recordHeader -> new Record(recordHeader, new Record.Request(repo.getUrl(), repo.getPreferredMetadataParam()),null));
+            return recordHeaders.parallelStream().map(recordHeader -> new Record(recordHeader, new Record.Request(repo.getUrl(), repo.getPreferredMetadataParam()),null));
         } else if (repo.getPath() != null) {
             try {
                 return Files.walk(repo.getPath()).filter(Files::isRegularFile)

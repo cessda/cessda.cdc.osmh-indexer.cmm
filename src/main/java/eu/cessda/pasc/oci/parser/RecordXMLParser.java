@@ -17,6 +17,7 @@ package eu.cessda.pasc.oci.parser;
 
 import eu.cessda.pasc.oci.DateNotParsedException;
 import eu.cessda.pasc.oci.exception.HarvesterException;
+import eu.cessda.pasc.oci.exception.InvalidURIException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.exception.XMLParseException;
 import eu.cessda.pasc.oci.http.HttpClient;
@@ -118,7 +119,11 @@ public class RecordXMLParser {
             var xPaths = getXPaths(repository);
             var defaultLangIsoCode = cmmStudyMapper.parseDefaultLanguage(document, repository, xPaths);
             builder.titleStudy(cmmStudyMapper.parseStudyTitle(document, xPaths, defaultLangIsoCode));
-            builder.studyUrl(cmmStudyMapper.parseStudyUrl(document, xPaths, defaultLangIsoCode));
+            try {
+                builder.studyUrl(cmmStudyMapper.parseStudyUrl(document, xPaths, defaultLangIsoCode));
+            } catch (InvalidURIException e) {
+                log.warn("[{}] Some URLs in study {} couldn't be parsed: {}", repository.getCode(), headerElement.getStudyNumber().orElse(""), e.toString());
+            }
             builder.abstractField(cmmStudyMapper.parseAbstract(document, xPaths, defaultLangIsoCode));
             builder.pidStudies(cmmStudyMapper.parsePidStudies(document, xPaths, defaultLangIsoCode));
             builder.creators(cmmStudyMapper.parseCreator(document, xPaths, defaultLangIsoCode));

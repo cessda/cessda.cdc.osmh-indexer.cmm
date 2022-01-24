@@ -15,11 +15,14 @@
  */
 package eu.cessda.pasc.oci.parser;
 
+import eu.cessda.pasc.oci.exception.InvalidURIException;
 import eu.cessda.pasc.oci.models.cmmstudy.*;
 import lombok.experimental.UtilityClass;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Optional;
 
 import static eu.cessda.pasc.oci.parser.DocElementParser.getAttributeValue;
@@ -133,8 +136,16 @@ class ParsingStrategies {
      * @param element the {@link Element} to parse.
      * @return the value of the attribute, or an empty string if the attribute was not present.
      */
-    static String uriStrategy(Element element) {
-        return ofNullable(element.getAttributeValue(URI_ATTR)).orElse("");
+    static URI uriStrategy(Element element) {
+        var uriString = element.getAttributeValue(URI_ATTR);
+        try {
+            if (uriString != null) {
+                return new URI(uriString);
+            }
+        } catch (URISyntaxException e) {
+            throw new InvalidURIException(e);
+        }
+        return null;
     }
 
     static Optional<VocabAttributes> samplingTermVocabAttributeStrategy(Element element, Namespace namespace, boolean hasControlledValue) {

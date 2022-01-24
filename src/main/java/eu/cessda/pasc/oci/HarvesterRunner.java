@@ -38,8 +38,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -86,32 +84,29 @@ public class HarvesterRunner {
         if (!indexerRunning.getAndSet(true)) {
 
             List<Repo> repos = configurationProperties.getEndpoints().getRepos();
-            var executor = Executors.newFixedThreadPool(repos.size());
 
             // Store the MDC so that it can be used in the running thread
             var contextMap = MDC.getCopyOfContextMap();
 
             try {
                 var futures = repos.stream()
-                    .map(repo -> runAsync(() -> harvestRepository(repo, lastModifiedDateTime, contextMap), executor))
-                    .toArray(CompletableFuture[]::new);
+                    .map(repo -> runAsync(() -> harvestRepository(repo, lastModifiedDateTime, contextMap))
+                            .exceptionally(e -> {
+                                log.error("Unexpected error occurred when harvesting!", e);
+                                return null;
+                            })
+                    ).toArray(CompletableFuture[]::new);
 
-                CompletableFuture.allOf(futures).get();
+                CompletableFuture.allOf(futures).join();
 
                 log.info("Harvest finished. Summary of the current state:");
                 log.info("Total number of records: {}", value("total_cmm_studies", ingestService.getTotalHitCount("*")));
                 metrics.updateMetrics();
             } catch (IOException e) {
                 log.error("IO Error when getting the total number of records: {}", e.toString());
-            } catch (InterruptedException e) {
-                executor.shutdownNow();
-                Thread.currentThread().interrupt();
-            }  catch (ExecutionException e) {
-                log.error("Unexpected error occurred when harvesting!", e);
             } finally {
                 // Ensure that the running state is always set to false even if an exception is thrown
                 indexerRunning.set(false);
-                executor.shutdown();
                 MDC.setContextMap(contextMap);
             }
         } else {
