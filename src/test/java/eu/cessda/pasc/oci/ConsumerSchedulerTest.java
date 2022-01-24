@@ -129,6 +129,9 @@ public class ConsumerSchedulerTest {
         // When
         scheduler.fullHarvestAndIngestionAllConfiguredSPsReposRecords();
 
+        // Verify hit counts were obtained
+        verify(esIndexer).getTotalHitCount("*");
+
         // Verify that nothing else happened
         verifyNoMoreInteractions(esIndexer);
     }
