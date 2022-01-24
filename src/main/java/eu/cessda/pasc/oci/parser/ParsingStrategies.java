@@ -131,10 +131,11 @@ class ParsingStrategies {
     }
 
     /**
-     * Gets the value of the {@value OaiPmhConstants#URI_ATTR} attribute.
+     * Parses the value of the {@value OaiPmhConstants#URI_ATTR} attribute as a {@link URI}.
      *
      * @param element the {@link Element} to parse.
-     * @return the value of the attribute, or an empty string if the attribute was not present.
+     * @return the value of the attribute as a {@link URI}, or {@code null} if the attribute was not present.
+     * @throws InvalidURIException if the value of the {@value OaiPmhConstants#URI_ATTR} contains a string that violates RFC 2396.
      */
     static URI uriStrategy(Element element) {
         var uriString = element.getAttributeValue(URI_ATTR);
