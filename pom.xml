@@ -355,7 +355,7 @@
             <plugin>
                 <groupId>com.github.alexcojocaru</groupId>
                 <artifactId>elasticsearch-maven-plugin</artifactId>
-                <version>6.19</version>
+                <version>6.20</version>
                 <configuration>
                     <version>6.8.15</version>
                     <timeout>300</timeout>
