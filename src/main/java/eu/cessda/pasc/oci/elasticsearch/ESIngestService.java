@@ -29,13 +29,14 @@ import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Requests;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -63,13 +64,13 @@ public class ESIngestService implements IngestService {
      */
     private static final int INDEX_COMMIT_SIZE = 500;
 
-    private final ElasticsearchRestTemplate esTemplate;
+    private final RestHighLevelClient esClient;
     private final ESConfigurationProperties esConfig;
     private final CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter;
 
     @Autowired
-    public ESIngestService(ElasticsearchRestTemplate esTemplate, ESConfigurationProperties esConfig, CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter) {
-        this.esTemplate = esTemplate;
+    public ESIngestService(RestHighLevelClient esClient, ESConfigurationProperties esConfig, CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter) {
+        this.esClient = esClient;
         this.esConfig = esConfig;
         this.cmmStudyOfLanguageConverter = cmmStudyOfLanguageConverter;
     }
@@ -119,7 +120,7 @@ public class ESIngestService implements IngestService {
     }
 
     private void indexBulkRequest(String indexName, BulkRequest request) throws IOException {
-        var response = esTemplate.getClient().bulk(request, DEFAULT);
+        var response = esClient.bulk(request, DEFAULT);
         if (response.hasFailures()) {
             log.warn("[{}] {}", indexName, response.buildFailureMessage());
         }
@@ -144,7 +145,7 @@ public class ESIngestService implements IngestService {
     @Override
     public long getTotalHitCount(String language) throws IOException {
         var matchAllSearchRequest = getSearchRequest(language, new SearchSourceBuilder().size(0));
-        var response = esTemplate.getClient().search(matchAllSearchRequest, DEFAULT);
+        var response = esClient.search(matchAllSearchRequest, DEFAULT);
         return response.getHits().getTotalHits();
     }
 
@@ -153,7 +154,7 @@ public class ESIngestService implements IngestService {
         log.debug("Getting all studies for language [{}]", language);
         return new ElasticsearchSet<>(
             getSearchRequest("*", new SearchSourceBuilder().query(QueryBuilders.matchAllQuery())),
-            esTemplate.getClient(),
+            esClient,
             cmmStudyOfLanguageConverter.getReader()
         );
     }
@@ -164,7 +165,7 @@ public class ESIngestService implements IngestService {
 
         try {
             var request = new GetRequest(String.format(INDEX_NAME_TEMPLATE, language), INDEX_TYPE, id);
-            var response = esTemplate.getClient().get(request, DEFAULT);
+            var response = esClient.get(request, DEFAULT);
 
             var sourceAsBytes = response.getSourceAsBytes();
 
@@ -206,7 +207,7 @@ public class ESIngestService implements IngestService {
 
         SearchResponse response;
         try {
-            response = esTemplate.getClient().search(request, DEFAULT);
+            response = esClient.search(request, DEFAULT);
         } catch (IOException e) {
             log.error("IO Error when retrieving last modified study: {}", e.toString());
             return Optional.empty();
@@ -241,41 +242,53 @@ public class ESIngestService implements IngestService {
      * @return {@code true} if the index was created or if the index already existed,
      * {@code false} if an error occurred during index creation
      */
-    private boolean createIndex(String indexName) {
+    private boolean createIndex(String indexName) throws IOException {
 
-        if (esTemplate.indexExists(indexName)) {
+        if (esClient.indices().exists(new GetIndexRequest(indexName), DEFAULT)) {
             log.debug("[{}] index name already exists, Skipping creation.", indexName);
             return true;
         }
 
         log.debug("[{}] index name does not exist and will be created", indexName);
 
+        final String settings;
+        final String mappings;
+
         try {
 
             // Load language specific settings
             var settingsTemplate = ResourceHandler.getResourceAsString("elasticsearch/settings/settings_" + indexName + ".json");
-            var settings = String.format(settingsTemplate, esConfig.getNumberOfShards(), esConfig.getNumberOfReplicas());
+            settings = String.format(settingsTemplate, esConfig.getNumberOfShards(), esConfig.getNumberOfReplicas());
 
             // Load mappings
-            var mappings = ResourceHandler.getResourceAsString("elasticsearch/mappings/mappings_" + INDEX_TYPE + ".json");
+            mappings = ResourceHandler.getResourceAsString("elasticsearch/mappings/mappings_" + INDEX_TYPE + ".json");
 
-            log.trace("[{}] custom index creation: Settings: \n{}\nMappings:\n{}", indexName, settings, mappings);
+        } catch (IOException e) {
+            log.error("[{}] Couldn't load settings for Elasticsearch: {}", indexName, e.toString());
+            return false;
+        }
 
-            // Create the index and set the mappings
-            if (esTemplate.createIndex(indexName, settings) && esTemplate.putMapping(indexName, INDEX_TYPE, mappings)) {
+
+        log.trace("[{}] custom index creation: Settings: \n{}\nMappings:\n{}", indexName, settings, mappings);
+
+        // Create the index and set the mappings
+        var indexCreationRequest = Requests.createIndexRequest(indexName)
+            .settings(settings, XContentType.JSON)
+            .mapping(INDEX_TYPE, mappings, XContentType.JSON);
+
+        try {
+            var response = esClient.indices().create(indexCreationRequest, DEFAULT);
+            if (response.isAcknowledged()) {
                 log.info("[{}] Index created.", indexName);
                 return true;
             } else {
                 log.error("[{}] Index creation failed!", indexName);
-                esTemplate.deleteIndex(indexName);
                 return false;
             }
-
         } catch (IOException e) {
-            log.error("[{}] Couldn't load settings for Elasticsearch: {}", indexName, e.toString());
+            log.error("[{}] Index creation failed: {}", indexName, e.toString());
+            return false;
         }
-
-        return false;
     }
 
 }
