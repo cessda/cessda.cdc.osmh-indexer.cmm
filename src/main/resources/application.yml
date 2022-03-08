@@ -169,7 +169,7 @@ osmhConsumer:
 ---
 # For debugging
 spring:
-  profiles: local
+  config.activate.on-profile: local
   boot:
     admin:
       client:

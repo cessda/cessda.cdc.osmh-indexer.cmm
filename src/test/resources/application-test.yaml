@@ -14,7 +14,7 @@
 spring:
   main:
     banner-mode: "off"
-  profiles: test
+  config.activate.on-profile: test
 logging:
   level:
     eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor: DEBUG
