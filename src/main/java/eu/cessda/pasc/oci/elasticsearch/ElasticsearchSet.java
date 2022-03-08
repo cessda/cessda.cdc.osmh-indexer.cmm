@@ -20,7 +20,7 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchScrollRequest;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.core.TimeValue;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -82,7 +82,7 @@ public class ElasticsearchSet<T> extends AbstractSet<T> {
     @Override
     public int size() {
         try {
-            long totalHits = client.search(searchRequest, DEFAULT).getHits().getTotalHits();
+            long totalHits = client.search(searchRequest, DEFAULT).getHits().getTotalHits().value;
             return totalHits < Integer.MAX_VALUE ? (int) totalHits : Integer.MAX_VALUE;
         } catch (IOException e) {
             throw new UncheckedIOException(e);

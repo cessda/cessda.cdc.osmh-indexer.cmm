@@ -142,7 +142,7 @@ public class ESIngestServiceTestIT {
         );
 
         // And state is as expected
-        then(response.getHits().getTotalHits()).isEqualTo(3);
+        then(response.getHits().getTotalHits().value).isEqualTo(3);
         then(response.getHits().getAt(0).getId()).isEqualTo("UK-Data-Service__2305");
         then(response.getHits().getAt(1).getId()).isEqualTo("UK-Data-Service__999");
         then(response.getHits().getAt(2).getId()).isEqualTo("UK-Data-Service__1000");
@@ -359,7 +359,7 @@ public class ESIngestServiceTestIT {
             RequestOptions.DEFAULT
         );
 
-        then(response.getHits().getTotalHits()).isEqualTo(2); // Should be two studies
+        then(response.getHits().getTotalHits().value).isEqualTo(2); // Should be two studies
         then(Arrays.stream(response.getHits().getHits()).map(SearchHit::getId).toArray()) // Should not contain the deleted study
             .containsExactlyInAnyOrder(studyOfLanguages.get(1).getId(), studyOfLanguages.get(2).getId());
     }

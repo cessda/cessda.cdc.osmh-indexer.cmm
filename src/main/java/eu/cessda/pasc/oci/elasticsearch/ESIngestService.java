@@ -25,7 +25,6 @@ import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchStatusException;
 import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Requests;
@@ -146,7 +145,7 @@ public class ESIngestService implements IngestService {
     public long getTotalHitCount(String language) throws IOException {
         var matchAllSearchRequest = getSearchRequest(language, new SearchSourceBuilder().size(0));
         var response = esClient.search(matchAllSearchRequest, DEFAULT);
-        return response.getHits().getTotalHits();
+        return response.getHits().getTotalHits().value;
     }
 
     @Override
@@ -164,7 +163,7 @@ public class ESIngestService implements IngestService {
         log.trace("Retrieving study [{}], language [{}]", id, language);
 
         try {
-            var request = new GetRequest(String.format(INDEX_NAME_TEMPLATE, language), INDEX_TYPE, id);
+            var request = Requests.getRequest(String.format(INDEX_NAME_TEMPLATE, language)).type(INDEX_TYPE).id(id);
             var response = esClient.get(request, DEFAULT);
 
             var sourceAsBytes = response.getSourceAsBytes();
