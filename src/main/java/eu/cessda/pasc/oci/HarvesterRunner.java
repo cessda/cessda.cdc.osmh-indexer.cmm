@@ -41,6 +41,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.concurrent.CompletableFuture.runAsync;
 import static net.logstash.logback.argument.StructuredArguments.value;
@@ -52,25 +53,25 @@ public class HarvesterRunner {
 
     private final AppConfigurationProperties configurationProperties;
     private final HarvesterConsumerService localHarvester;
+    private final PipelineUtilities pipelineUtilities;
     private final IngestService ingestService;
     private final LanguageExtractor extractor;
     private final Metrics metrics;
-    private final HarvesterConsumerService remoteHarvester;
 
     private final AtomicBoolean indexerRunning = new AtomicBoolean(false);
 
     public HarvesterRunner(AppConfigurationProperties configurationProperties,
-                           HarvesterConsumerService remoteHarvesterConsumerService,
                            HarvesterConsumerService localHarvesterConsumerService,
+                           PipelineUtilities pipelineUtilities,
                            IngestService ingestService,
                            LanguageExtractor extractor,
                            Metrics metrics) {
         this.configurationProperties = configurationProperties;
         this.localHarvester = localHarvesterConsumerService;
+        this.pipelineUtilities = pipelineUtilities;
         this.ingestService = ingestService;
         this.extractor = extractor;
         this.metrics = metrics;
-        this.remoteHarvester = remoteHarvesterConsumerService;
     }
 
 
@@ -83,18 +84,22 @@ public class HarvesterRunner {
     public void executeHarvestAndIngest(LocalDateTime lastModifiedDateTime) {
         if (!indexerRunning.getAndSet(true)) {
 
-            List<Repo> repos = configurationProperties.getEndpoints().getRepos();
+            // Load explicitly configured repositories
+            var repos = configurationProperties.getEndpoints().getRepos();
+
+            // Discover repositories by attempting to find pipeline.json instances if a base directory is configured
+            var repoParsedFromJson = pipelineUtilities.discoverRepositories(configurationProperties.getBaseDirectory());
 
             // Store the MDC so that it can be used in the running thread
             var contextMap = MDC.getCopyOfContextMap();
 
             try {
-                var futures = repos.stream()
+                var futures = Stream.concat(repoParsedFromJson.stream(), repos.stream())
                     .map(repo -> runAsync(() -> harvestRepository(repo, lastModifiedDateTime, contextMap))
-                            .exceptionally(e -> {
-                                log.error("Unexpected error occurred when harvesting!", e);
-                                return null;
-                            })
+                        .exceptionally(e -> {
+                            log.error("Unexpected error occurred when harvesting!", e);
+                            return null;
+                        })
                     ).toArray(CompletableFuture[]::new);
 
                 CompletableFuture.allOf(futures).join();
@@ -225,14 +230,8 @@ public class HarvesterRunner {
 
     private Map<String, List<CMMStudyOfLanguage>> getCmmStudiesOfEachLangIsoCodeMap(Repo repo, LocalDateTime lastModifiedDateTime) {
 
-        final HarvesterConsumerService harvester;
-
         // OAI-PMH repositories can be handled by the internal harvester, all other types should be delegated to remote handlers
-        if (repo.getHandler().equalsIgnoreCase("OAI-PMH") || repo.getHandler().equalsIgnoreCase("NESSTAR")) {
-            harvester = localHarvester;
-        } else {
-            harvester = remoteHarvester;
-        }
+        var harvester = localHarvester;
 
         try (var recordHeaders = harvester.listRecordHeaders(repo, lastModifiedDateTime)) {
 
@@ -268,7 +267,7 @@ public class HarvesterRunner {
     @PreDestroy
     private void shutdown() {
         if (indexerRunning.getAndSet(false)) {
-            log.info("Harvest cancelled");
+            log.info("Indexing cancelled");
         }
     }
 }

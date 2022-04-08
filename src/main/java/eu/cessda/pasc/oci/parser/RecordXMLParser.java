@@ -157,7 +157,7 @@ public class RecordXMLParser {
     }
 
     private XPaths getXPaths(Repo repository) {
-        if (repository.getHandler().equalsIgnoreCase("OAI-PMH")) {
+        if (repository.getHandler().equalsIgnoreCase("DDI_2_5")) {
             return XPaths.DDI_2_5_XPATHS;
         } else if (repository.getHandler().equalsIgnoreCase("NESSTAR")) {
             return XPaths.NESSTAR_XPATHS;
