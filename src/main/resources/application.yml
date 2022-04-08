@@ -22,7 +22,6 @@ elasticsearch:
   host: 127.0.0.1
   numberOfShards: 2
   numberOfReplicas: 0
-baseDirectory: "Test Data"
 languages: [ 'cs', 'da', 'de', 'el', 'en', 'et', 'fi', 'fr', 'hu', 'it', 'nl', 'no', 'pt', 'sk', 'sl', 'sr', 'sv' ]
 endpoints:
   #
