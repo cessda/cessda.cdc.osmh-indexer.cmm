@@ -219,7 +219,7 @@
                     <compilerArgs>
                         <arg>-Xlint:all</arg>
                         <arg>-XDcompilePolicy=simple</arg>
-                        <arg>-Xplugin:ErrorProne -Xep:UnusedVariable:OFF -Xep:SameNameButDifferent:OFF</arg>
+                        <arg>-Xplugin:ErrorProne -Xep:UnusedVariable:OFF -Xep:SameNameButDifferent:OFF -Xep:UnusedMethod:OFF</arg>
                         <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
                         <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
                         <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
@@ -348,9 +348,14 @@
                 <artifactId>elasticsearch-maven-plugin</artifactId>
                 <version>6.22</version>
                 <configuration>
-                    <version>6.8.15</version>
+                    <version>7.17.1</version>
                     <httpPort>9250</httpPort>
                     <transportPort>9350</transportPort>
+                    <instanceSettings>
+                        <setting>
+                            <discovery.type>single-node</discovery.type>
+                        </setting>
+                    </instanceSettings>
                 </configuration>
                 <executions>
                     <execution>

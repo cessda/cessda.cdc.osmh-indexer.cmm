@@ -111,7 +111,7 @@ public class ESIngestServiceTestIT {
         then(isSuccessful).isTrue();
         elasticsearchClient.indices().refresh(Requests.refreshRequest(INDEX_NAME), RequestOptions.DEFAULT);
         SearchResponse response = elasticsearchClient.search(
-            new SearchRequest(INDEX_NAME).types(INDEX_TYPE).source(new SearchSourceBuilder().query(QueryBuilders.idsQuery().addIds(expected))),
+            new SearchRequest(INDEX_NAME).source(new SearchSourceBuilder().query(QueryBuilders.idsQuery().addIds(expected))),
             RequestOptions.DEFAULT
         );
 
@@ -135,7 +135,7 @@ public class ESIngestServiceTestIT {
         then(isSuccessful).isTrue();
         elasticsearchClient.indices().refresh(Requests.refreshRequest(INDEX_NAME), RequestOptions.DEFAULT);
         SearchResponse response = elasticsearchClient.search(
-            new SearchRequest(INDEX_NAME).types(INDEX_TYPE).source(
+            new SearchRequest(INDEX_NAME).source(
                 new SearchSourceBuilder().query(QueryBuilders.matchAllQuery()).sort("lastModified", SortOrder.DESC)
             ),
             RequestOptions.DEFAULT
@@ -173,7 +173,7 @@ public class ESIngestServiceTestIT {
         then(isSuccessful).isTrue();
         elasticsearchClient.indices().refresh(Requests.refreshRequest(INDEX_NAME), RequestOptions.DEFAULT);
         elasticsearchClient.search(
-            new SearchRequest(INDEX_NAME).types(INDEX_TYPE).source(
+            new SearchRequest(INDEX_NAME).source(
                 new SearchSourceBuilder().query(QueryBuilders.matchAllQuery()).sort("lastModified", SortOrder.DESC)
             ),
             RequestOptions.DEFAULT
@@ -238,10 +238,11 @@ public class ESIngestServiceTestIT {
     }
 
     @Test
-    public void shouldReturnNoStudiesForAnEmptyIndex() {
+    public void shouldReturnNoStudiesForAnEmptyIndex() throws IOException {
 
         // Setup
         var ingestService = new ESIngestService(elasticsearchClient, esConfigProp, cmmStudyOfLanguageConverter);
+        ingestService.bulkIndex(Collections.emptyList(), LANGUAGE_ISO_CODE);
 
         // Then
         var hitCountPerRepository = ingestService.getAllStudies("*");
@@ -263,7 +264,7 @@ public class ESIngestServiceTestIT {
         // Then - check if all studies are present
         for (var expectedStudy : studyOfLanguages) {
             var study = ingestService.getStudy(expectedStudy.getId(), LANGUAGE_ISO_CODE);
-            Assert.assertEquals(expectedStudy, study.orElseThrow());
+            assertEquals(expectedStudy, study.orElseThrow());
         }
     }
 
@@ -349,11 +350,11 @@ public class ESIngestServiceTestIT {
         // Then - the study should not be present, but other studies should be
         elasticsearchClient.indices().refresh(Requests.refreshRequest(INDEX_NAME), RequestOptions.DEFAULT);
         assertFalse(elasticsearchClient.get(
-            new GetRequest(INDEX_NAME, INDEX_TYPE, studyToDelete.get(0).getId()), RequestOptions.DEFAULT
+            new GetRequest(INDEX_NAME, studyToDelete.get(0).getId()), RequestOptions.DEFAULT
         ).isExists());
 
         SearchResponse response = elasticsearchClient.search(
-            new SearchRequest(INDEX_NAME).types(INDEX_TYPE).source(
+            Requests.searchRequest(INDEX_NAME).source(
                 new SearchSourceBuilder().query(QueryBuilders.matchAllQuery()).sort("lastModified", SortOrder.DESC)
             ),
             RequestOptions.DEFAULT

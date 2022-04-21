@@ -29,6 +29,7 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -87,7 +88,6 @@ public class ESIngestService implements IngestService {
                 try {
                     var json = cmmStudyOfLanguageConverter.getWriter().writeValueAsBytes(study);
                     var indexRequest = Requests.indexRequest(indexName)
-                        .type(INDEX_TYPE)
                         .id(study.getId())
                         .source(json, XContentType.JSON);
 
@@ -132,7 +132,7 @@ public class ESIngestService implements IngestService {
 
         // Extract the ids from the studies, and add them to the delete query
         var deleteBulkRequest = cmmStudiesToDelete.stream().map(CMMStudyOfLanguage::getId)
-            .map(id -> Requests.deleteRequest(indexName).type(INDEX_TYPE).id(id))
+            .map(id -> Requests.deleteRequest(indexName).id(id))
             .collect(BulkRequest::new, BulkRequest::add, (a,b) -> a.add(b.requests()));
 
         // Perform the deletion
@@ -163,7 +163,7 @@ public class ESIngestService implements IngestService {
         log.trace("Retrieving study [{}], language [{}]", id, language);
 
         try {
-            var request = Requests.getRequest(String.format(INDEX_NAME_TEMPLATE, language)).type(INDEX_TYPE).id(id);
+            var request = Requests.getRequest(String.format(INDEX_NAME_TEMPLATE, language)).id(id);
             var response = esClient.get(request, DEFAULT);
 
             var sourceAsBytes = response.getSourceAsBytes();
@@ -191,9 +191,7 @@ public class ESIngestService implements IngestService {
      * @param language the language to get results for.
      */
     private SearchRequest getSearchRequest(String language, SearchSourceBuilder source) {
-        return new SearchRequest(String.format(INDEX_NAME_TEMPLATE, language))
-            .types(INDEX_TYPE)
-            .source(source);
+        return new SearchRequest(String.format(INDEX_NAME_TEMPLATE, language)).source(source);
     }
 
     @Override
@@ -271,14 +269,18 @@ public class ESIngestService implements IngestService {
         log.trace("[{}] custom index creation: Settings: \n{}\nMappings:\n{}", indexName, settings, mappings);
 
         // Create the index and set the mappings
-        var indexCreationRequest = Requests.createIndexRequest(indexName)
+        var indexCreationRequest = new CreateIndexRequest(indexName)
             .settings(settings, XContentType.JSON)
-            .mapping(INDEX_TYPE, mappings, XContentType.JSON);
+            .mapping(mappings, XContentType.JSON);
 
         try {
             var response = esClient.indices().create(indexCreationRequest, DEFAULT);
             if (response.isAcknowledged()) {
                 log.info("[{}] Index created.", indexName);
+
+                // Wait until the index is ready
+                esClient.indices().open(Requests.openIndexRequest(indexName), DEFAULT);
+
                 return true;
             } else {
                 log.error("[{}] Index creation failed!", indexName);
