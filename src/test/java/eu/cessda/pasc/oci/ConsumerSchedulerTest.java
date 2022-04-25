@@ -82,7 +82,7 @@ public class ConsumerSchedulerTest {
         when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
 
         // Given
-        var harvesterRunner = new HarvesterRunner(appConfigurationProperties, harvesterConsumerService, pipelineUtilities, esIndexer, extractor, micrometerMetrics);
+        var harvesterRunner = new IndexerRunner(appConfigurationProperties, harvesterConsumerService, pipelineUtilities, esIndexer, extractor, micrometerMetrics);
         var scheduler = new ConsumerScheduler(debuggingJMXBean, esIndexer, harvesterRunner);
 
         // When
@@ -104,7 +104,7 @@ public class ConsumerSchedulerTest {
         when(esIndexer.getStudy(Mockito.eq("UKDS__998"), Mockito.anyString())).thenReturn(Optional.of(getCmmStudyOfLanguageCodeEnX1().get(0)));
 
         // Given
-        var harvesterRunner = new HarvesterRunner(appConfigurationProperties, harvesterConsumerService, pipelineUtilities, esIndexer, extractor, micrometerMetrics);
+        var harvesterRunner = new IndexerRunner(appConfigurationProperties, harvesterConsumerService, pipelineUtilities, esIndexer, extractor, micrometerMetrics);
         var scheduler = new ConsumerScheduler(debuggingJMXBean, esIndexer, harvesterRunner);
 
         // When
@@ -124,7 +124,7 @@ public class ConsumerSchedulerTest {
             .thenThrow(RuntimeException.class);
 
         // Given
-        var harvesterRunner = new HarvesterRunner(appConfigurationProperties, harvesterConsumerService, pipelineUtilities, esIndexer, extractor, micrometerMetrics);
+        var harvesterRunner = new IndexerRunner(appConfigurationProperties, harvesterConsumerService, pipelineUtilities, esIndexer, extractor, micrometerMetrics);
         var scheduler = new ConsumerScheduler(debuggingJMXBean, esIndexer, harvesterRunner);
 
         // When
@@ -211,7 +211,7 @@ public class ConsumerSchedulerTest {
         when(esIndexer.getStudy(Mockito.eq("UKDS__999"), Mockito.anyString())).thenReturn(Optional.of(getCmmStudyOfLanguageCodeEnX1().get(0)));
 
         // Given
-        var harvesterRunner = new HarvesterRunner(appConfigurationProperties, harvesterConsumerService, pipelineUtilities, esIndexer, extractor, micrometerMetrics);
+        var harvesterRunner = new IndexerRunner(appConfigurationProperties, harvesterConsumerService, pipelineUtilities, esIndexer, extractor, micrometerMetrics);
         var scheduler = new ConsumerScheduler(debuggingJMXBean, esIndexer, harvesterRunner);
 
         // When
@@ -254,7 +254,7 @@ public class ConsumerSchedulerTest {
         when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
 
         // Given
-        var harvesterRunner = new HarvesterRunner(appConfigurationProperties, harvesterConsumerService, pipelineUtilities, esIndexer, extractor, micrometerMetrics);
+        var harvesterRunner = new IndexerRunner(appConfigurationProperties, harvesterConsumerService, pipelineUtilities, esIndexer, extractor, micrometerMetrics);
         var scheduler = new ConsumerScheduler(debuggingJMXBean, esIndexer, harvesterRunner);
 
         // When
@@ -279,7 +279,7 @@ public class ConsumerSchedulerTest {
         when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
 
         // Given
-        var harvesterRunner = new HarvesterRunner(appConfigurationProperties, harvesterConsumerService, pipelineUtilities, esIndexer, extractor, micrometerMetrics);
+        var harvesterRunner = new IndexerRunner(appConfigurationProperties, harvesterConsumerService, pipelineUtilities, esIndexer, extractor, micrometerMetrics);
         var scheduler = new ConsumerScheduler(debuggingJMXBean, esIndexer, harvesterRunner);
 
         // When

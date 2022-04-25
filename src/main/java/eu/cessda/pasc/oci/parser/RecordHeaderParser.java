@@ -15,7 +15,7 @@
  */
 package eu.cessda.pasc.oci.parser;
 
-import eu.cessda.pasc.oci.exception.HarvesterException;
+import eu.cessda.pasc.oci.exception.IndexerException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.exception.XMLParseException;
 import eu.cessda.pasc.oci.http.HttpClient;
@@ -156,10 +156,10 @@ public class RecordHeaderParser {
      * @return a list of record headers.
      * @throws OaiPmhException    if the repository returns an OAI-PMH error.
      * @throws XMLParseException  if the XML cannot be parsed, or if an IO error occurs.
-     * @throws HarvesterException if the OAI-PMH repository returns a XML document with no {@code <oai>} element.
+     * @throws IndexerException if the OAI-PMH repository returns a XML document with no {@code <oai>} element.
      */
     @SuppressWarnings({"java:S2095", "resource"}) // This is closed by the calling method
-    public Stream<Record> getRecordHeaders(Repo repo) throws HarvesterException {
+    public Stream<Record> getRecordHeaders(Repo repo) throws IndexerException {
 
         log.debug("[{}] Parsing record headers.", repo.getCode());
 
@@ -185,7 +185,7 @@ public class RecordHeaderParser {
                     return recordHeaders.stream().map(recordHeader -> new Record(recordHeader, request.orElse(null), doc));
                 });
             } catch (IOException e) {
-                throw new HarvesterException("Reading path failed: " + e, e);
+                throw new IndexerException("Reading path failed: " + e, e);
             }
         } else if (repo.getUrl() != null) {
 
@@ -194,7 +194,7 @@ public class RecordHeaderParser {
 
             // Check if the document has an OAI element
             if (DocElementParser.getFirstElement(recordHeadersDocument, OaiPmhConstants.OAI_PMH, OaiPmhConstants.OAI_NS).isEmpty()) {
-                throw new HarvesterException("Missing OAI element");
+                throw new IndexerException("Missing OAI element");
             }
 
             // Exit if the response has an <error> element

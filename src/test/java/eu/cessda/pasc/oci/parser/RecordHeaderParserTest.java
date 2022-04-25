@@ -16,7 +16,7 @@
 package eu.cessda.pasc.oci.parser;
 
 import eu.cessda.pasc.oci.exception.HTTPException;
-import eu.cessda.pasc.oci.exception.HarvesterException;
+import eu.cessda.pasc.oci.exception.IndexerException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.exception.XMLParseException;
 import eu.cessda.pasc.oci.http.HttpClient;
@@ -62,7 +62,7 @@ public class RecordHeaderParserTest {
     }
 
     @Test
-    public void shouldReturnRecordHeadersForGivenRepo() throws IOException, HarvesterException {
+    public void shouldReturnRecordHeadersForGivenRepo() throws IOException, IndexerException {
 
         // Given
         Repo ukdsEndpoint = ReposTestData.getUKDSRepo();
@@ -82,7 +82,7 @@ public class RecordHeaderParserTest {
     }
 
     @Test(expected = XMLParseException.class)
-    public void shouldThrowWhenRequestForHeaderFails() throws IOException, HarvesterException {
+    public void shouldThrowWhenRequestForHeaderFails() throws IOException, IndexerException {
 
         // Given
         Repo ukdsEndpoint = ReposTestData.getUKDSRepo();
@@ -102,7 +102,7 @@ public class RecordHeaderParserTest {
 
     @Test
     public void shouldRecursivelyLoopThroughTheOaiPMHResponseResumptionTokenToRetrieveReposCompleteListSize()
-        throws IOException, HarvesterException {
+        throws IOException, IndexerException {
 
         // Given
         Repo ukdsEndpoint = ReposTestData.getUKDSRepo();
@@ -141,7 +141,7 @@ public class RecordHeaderParserTest {
     }
 
     @Test(expected = OaiPmhException.class)
-    public void shouldThrowExceptionForRecordHeadersInvalidMetadataToken() throws IOException, HarvesterException {
+    public void shouldThrowExceptionForRecordHeadersInvalidMetadataToken() throws IOException, IndexerException {
 
         // Given
         Repo ukdsEndpoint = ReposTestData.getUKDSRepo();
@@ -158,7 +158,7 @@ public class RecordHeaderParserTest {
     }
 
     @Test(expected = OaiPmhException.class)
-    public void shouldThrowExceptionForRecordHeadersErrorWithNoMessage() throws IOException, HarvesterException {
+    public void shouldThrowExceptionForRecordHeadersErrorWithNoMessage() throws IOException, IndexerException {
 
         // Given
         Repo ukdsEndpoint = ReposTestData.getUKDSRepo();
@@ -175,7 +175,7 @@ public class RecordHeaderParserTest {
     }
 
     @Test
-    public void shouldReturnDeletedRecordHeaderWhenStudyIsDeleted() throws IOException, HarvesterException {
+    public void shouldReturnDeletedRecordHeaderWhenStudyIsDeleted() throws IOException, IndexerException {
         // Given
         Repo ukdsEndpoint = ReposTestData.getUKDSRepo();
 
@@ -191,8 +191,8 @@ public class RecordHeaderParserTest {
         Assert.assertTrue(recordHeaders.get(0).isDeleted());
     }
 
-    @Test(expected = HarvesterException.class)
-    public void shouldThrowExceptionIfOAIElementIsMissing() throws IOException, HarvesterException {
+    @Test(expected = IndexerException.class)
+    public void shouldThrowExceptionIfOAIElementIsMissing() throws IOException, IndexerException {
         // Given
         Repo ukdsEndpoint = ReposTestData.getUKDSRepo();
 
@@ -209,7 +209,7 @@ public class RecordHeaderParserTest {
     }
 
     @Test
-    public void shouldParseAHeaderFromAPath() throws HarvesterException, IOException {
+    public void shouldParseAHeaderFromAPath() throws IndexerException, IOException {
         // Given
         var ukdsEndpoint  = ReposTestData.getUKDSRepo();
         ukdsEndpoint.setUrl(null);
@@ -226,7 +226,7 @@ public class RecordHeaderParserTest {
     }
 
     @Test
-    public void shouldNotIncludeARequestFieldIfRequiredElementsAreNotPresent() throws IOException, HarvesterException {
+    public void shouldNotIncludeARequestFieldIfRequiredElementsAreNotPresent() throws IOException, IndexerException {
         // Given
         var ukdsEndpoint  = ReposTestData.getUKDSRepo();
         ukdsEndpoint.setUrl(null);
@@ -242,7 +242,7 @@ public class RecordHeaderParserTest {
     }
 
     @Test
-    public void shouldHandleParsingErrors() throws IOException, HarvesterException {
+    public void shouldHandleParsingErrors() throws IOException, IndexerException {
         // Given
         var ukdsEndpoint  = ReposTestData.getUKDSRepo();
         ukdsEndpoint.setUrl(null);
@@ -257,8 +257,8 @@ public class RecordHeaderParserTest {
         assertThat(records).isEmpty();
     }
 
-    @Test(expected = HarvesterException.class)
-    public void shouldHandleIOErrorsWhenLookingForDirectories() throws HarvesterException {
+    @Test(expected = IndexerException.class)
+    public void shouldHandleIOErrorsWhenLookingForDirectories() throws IndexerException {
         // Given
         var ukdsEndpoint  = ReposTestData.getUKDSRepo();
         ukdsEndpoint.setUrl(null);
@@ -271,7 +271,7 @@ public class RecordHeaderParserTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouldThrowIfAURLAndAPathIsNotConfigured() throws HarvesterException {
+    public void shouldThrowIfAURLAndAPathIsNotConfigured() throws IndexerException {
         // Given
         var ukdsEndpoint  = ReposTestData.getUKDSRepo();
         ukdsEndpoint.setUrl(null);

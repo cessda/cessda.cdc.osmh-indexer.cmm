@@ -48,8 +48,7 @@ import static net.logstash.logback.argument.StructuredArguments.value;
 
 @Component
 @Slf4j
-@SuppressWarnings("unused")
-public class HarvesterRunner {
+public class IndexerRunner {
 
     private final AppConfigurationProperties configurationProperties;
     private final HarvesterConsumerService localHarvester;
@@ -60,12 +59,12 @@ public class HarvesterRunner {
 
     private final AtomicBoolean indexerRunning = new AtomicBoolean(false);
 
-    public HarvesterRunner(AppConfigurationProperties configurationProperties,
-                           HarvesterConsumerService localHarvesterConsumerService,
-                           PipelineUtilities pipelineUtilities,
-                           IngestService ingestService,
-                           LanguageExtractor extractor,
-                           Metrics metrics) {
+    public IndexerRunner(AppConfigurationProperties configurationProperties,
+                         HarvesterConsumerService localHarvesterConsumerService,
+                         PipelineUtilities pipelineUtilities,
+                         IngestService ingestService,
+                         LanguageExtractor extractor,
+                         Metrics metrics) {
         this.configurationProperties = configurationProperties;
         this.localHarvester = localHarvesterConsumerService;
         this.pipelineUtilities = pipelineUtilities;
@@ -95,7 +94,7 @@ public class HarvesterRunner {
 
             try {
                 var futures = Stream.concat(repoParsedFromJson.stream(), repos.stream())
-                    .map(repo -> runAsync(() -> harvestRepository(repo, lastModifiedDateTime, contextMap))
+                    .map(repo -> runAsync(() -> indexRepository(repo, lastModifiedDateTime, contextMap))
                         .exceptionally(e -> {
                             log.error("Unexpected error occurred when harvesting!", e);
                             return null;
@@ -127,7 +126,7 @@ public class HarvesterRunner {
      * @param contextMap           the logging context map.
      */
     @SuppressWarnings("try")
-    private void harvestRepository(Repo repo, LocalDateTime lastModifiedDateTime, Map<String, String> contextMap) {
+    private void indexRepository(Repo repo, LocalDateTime lastModifiedDateTime, Map<String, String> contextMap) {
         MDC.setContextMap(contextMap);
 
         // Set the MDC so that the record name is attached to all downstream logs
@@ -137,7 +136,7 @@ public class HarvesterRunner {
             var langStudies = getCmmStudiesOfEachLangIsoCodeMap(repo, lastModifiedDateTime);
             for (var entry : langStudies.entrySet()) {
                 try (var langClosable = MDC.putCloseable(LoggingConstants.LANG_CODE, entry.getKey())) {
-                    executeBulk(repo, entry.getKey(), entry.getValue());
+                    indexRecords(repo, entry.getKey(), entry.getValue());
                 } catch (ElasticsearchException e) {
                     log.error("[{}({})] Error communicating with Elasticsearch!: {}", repo.getCode(), entry.getKey(), e.toString());
                 }
@@ -160,13 +159,13 @@ public class HarvesterRunner {
      * @param langIsoCode the language code.
      * @param cmmStudies  the studies to index.
      */
-    private void executeBulk(Repo repo, String langIsoCode, Collection<CMMStudyOfLanguage> cmmStudies) {
+    private void indexRecords(Repo repo, String langIsoCode, List<CMMStudyOfLanguage> cmmStudies) {
         if (indexerRunning.get() && !cmmStudies.isEmpty()) {
             log.info("[{}({})] Indexing...", repo.getCode(), langIsoCode);
             var studiesUpdated = getUpdatedStudies(cmmStudies, langIsoCode);
 
             // Split the studies into studies to index and studies to delete
-            var studiesToIndex = new ArrayList<CMMStudyOfLanguage>();
+            var studiesToIndex = new ArrayList<CMMStudyOfLanguage>(cmmStudies.size());
             var studiesToDelete = new ArrayList<CMMStudyOfLanguage>();
             for (var study : cmmStudies) {
                 if (study.isActive()) {

@@ -23,7 +23,7 @@ import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import eu.cessda.pasc.oci.ResourceHandler;
-import eu.cessda.pasc.oci.exception.HarvesterException;
+import eu.cessda.pasc.oci.exception.IndexerException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.http.HttpClient;
 import eu.cessda.pasc.oci.mock.data.ReposTestData;
@@ -78,7 +78,7 @@ public class RecordXMLParserTest {
     }
 
     @Test
-    public void shouldReturnValidCMMStudyRecordFromAFullyComplaintCmmDdiRecord() throws IOException, ProcessingException, JSONException, HarvesterException {
+    public void shouldReturnValidCMMStudyRecordFromAFullyComplaintCmmDdiRecord() throws IOException, ProcessingException, JSONException, IndexerException {
 
         // Given
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
@@ -95,7 +95,7 @@ public class RecordXMLParserTest {
 
     @Test
     @SuppressWarnings("PreferJavaTimeOverload")
-    public void shouldHarvestedContentForLanguageSpecificDimensionFromElementWithCorrectXmlLangAttribute() throws IOException, HarvesterException {
+    public void shouldHarvestedContentForLanguageSpecificDimensionFromElementWithCorrectXmlLangAttribute() throws IOException, IndexerException {
 
         // Given
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
@@ -119,7 +119,7 @@ public class RecordXMLParserTest {
     }
 
     @Test
-    public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord() throws IOException, ProcessingException, JSONException, HarvesterException {
+    public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord() throws IOException, ProcessingException, JSONException, IndexerException {
 
         // Given
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
@@ -136,7 +136,7 @@ public class RecordXMLParserTest {
 
     @Test
     @SuppressWarnings("PreferJavaTimeOverload")
-    public void shouldOnlyExtractSingleDateAsStartDateForRecordsWithASingleDateAttr() throws IOException, ProcessingException, JSONException, HarvesterException {
+    public void shouldOnlyExtractSingleDateAsStartDateForRecordsWithASingleDateAttr() throws IOException, ProcessingException, JSONException, IndexerException {
 
         // Given
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
@@ -157,7 +157,7 @@ public class RecordXMLParserTest {
     }
 
     @Test
-    public void shouldExtractDefaultLanguageFromCodebookXMLLagIfPresent() throws IOException, JSONException, HarvesterException {
+    public void shouldExtractDefaultLanguageFromCodebookXMLLagIfPresent() throws IOException, JSONException, IndexerException {
 
         // Given
         String expectedCmmStudyJsonString = ResourceHandler.getResourceAsString("json/ddi_record_1683_with_codebookXmlLag.json");
@@ -175,7 +175,7 @@ public class RecordXMLParserTest {
 
     @Test
     @SuppressWarnings("PreferJavaTimeOverload")
-    public void shouldReturnCMMStudyRecordWithRepeatedAbstractConcatenated() throws IOException, ProcessingException, JSONException, HarvesterException {
+    public void shouldReturnCMMStudyRecordWithRepeatedAbstractConcatenated() throws IOException, ProcessingException, JSONException, IndexerException {
 
         Map<String, String> expectedAbstract = new HashMap<>();
         expectedAbstract.put("de", "de de");
@@ -197,7 +197,7 @@ public class RecordXMLParserTest {
 
     @Test // https://bitbucket.org/cessda/cessda.cdc.version2/issues/135
     @SuppressWarnings("PreferJavaTimeOverload")
-    public void shouldReturnCMMStudyRecordWithOutParTitleWhenThereIsALangDifferentFromDefault() throws IOException, ProcessingException, JSONException, HarvesterException {
+    public void shouldReturnCMMStudyRecordWithOutParTitleWhenThereIsALangDifferentFromDefault() throws IOException, ProcessingException, JSONException, IndexerException {
 
         Map<String, String> expectedTitle = new HashMap<>();
         expectedTitle.put("en", "Machinery of Government, 1976-1977");
@@ -218,7 +218,7 @@ public class RecordXMLParserTest {
     }
 
     @Test()
-    public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord_MarkedAsNotActive() throws IOException, HarvesterException {
+    public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord_MarkedAsNotActive() throws IOException, IndexerException {
 
         // Given
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
@@ -234,7 +234,7 @@ public class RecordXMLParserTest {
     }
 
     @Test(expected = OaiPmhException.class)
-    public void shouldThrowExceptionForRecordWithErrorElement() throws IOException, HarvesterException {
+    public void shouldThrowExceptionForRecordWithErrorElement() throws IOException, IndexerException {
 
         // Given
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
@@ -248,7 +248,7 @@ public class RecordXMLParserTest {
     }
 
     @Test
-    public void shouldExtractAllRequiredCMMFieldsForAGivenAUKDSRecord() throws IOException, ProcessingException, JSONException, HarvesterException {
+    public void shouldExtractAllRequiredCMMFieldsForAGivenAUKDSRecord() throws IOException, ProcessingException, JSONException, IndexerException {
 
         // Given
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
@@ -331,7 +331,7 @@ public class RecordXMLParserTest {
     }
 
     @Test
-    public void shouldOverrideGlobalLanguageDefaultIfAPerRepositoryOverrideIsSpecified() throws IOException, ProcessingException, JSONException, HarvesterException {
+    public void shouldOverrideGlobalLanguageDefaultIfAPerRepositoryOverrideIsSpecified() throws IOException, ProcessingException, JSONException, IndexerException {
 
         var repository = ReposTestData.getUKDSLanguageOverrideRepository();
 
@@ -351,7 +351,7 @@ public class RecordXMLParserTest {
     }
 
     @Test
-    public void shouldUseAlreadyParsedDocumentIfPresent() throws IOException, JDOMException, JSONException, ProcessingException, HarvesterException {
+    public void shouldUseAlreadyParsedDocumentIfPresent() throws IOException, JDOMException, JSONException, ProcessingException, IndexerException {
         // Given
         var document = OaiPmhHelpers.getSaxBuilder().build(ResourceHandler.getResourceAsStream("xml/ddi_2_5/ddi_record_ukds_example.xml"));
 

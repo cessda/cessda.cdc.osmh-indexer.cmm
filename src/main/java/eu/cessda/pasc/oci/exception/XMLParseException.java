@@ -23,7 +23,7 @@ import java.net.URI;
  * Thrown when an error occurs parsing XML.
  */
 @Getter
-public class XMLParseException extends HarvesterException {
+public class XMLParseException extends IndexerException {
 
     private static final long serialVersionUID = -1280955307589066817L;
 

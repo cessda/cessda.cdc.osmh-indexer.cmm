@@ -54,13 +54,13 @@ public class ConsumerScheduler {
 
     private final DebuggingJMXBean debuggingJMXBean;
     private final IngestService esIndexerService;
-    private final HarvesterRunner harvesterRunner;
+    private final IndexerRunner indexerRunner;
 
     @Autowired
-    public ConsumerScheduler(DebuggingJMXBean debuggingJMXBean, IngestService esIndexerService, HarvesterRunner harvesterRunner) {
+    public ConsumerScheduler(DebuggingJMXBean debuggingJMXBean, IngestService esIndexerService, IndexerRunner indexerRunner) {
         this.debuggingJMXBean = debuggingJMXBean;
         this.esIndexerService = esIndexerService;
-        this.harvesterRunner = harvesterRunner;
+        this.indexerRunner = indexerRunner;
     }
 
     /**
@@ -100,7 +100,7 @@ public class ConsumerScheduler {
     private void run(String runType, LocalDateTime harvestFrom) {
         try (var jobKeyClosable = MDC.putCloseable(INDEXER_JOB_ID, getJobId())) {
             final var startTime = logStartStatus(runType);
-            harvesterRunner.executeHarvestAndIngest(harvestFrom);
+            indexerRunner.executeHarvestAndIngest(harvestFrom);
             logEndStatus(startTime, runType);
         } catch (IOException e) {
             throw new IllegalStateException("Cannot connect to Elasticsearch: " + e);

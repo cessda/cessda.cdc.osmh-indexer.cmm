@@ -15,7 +15,7 @@
  */
 package eu.cessda.pasc.oci.harvester;
 
-import eu.cessda.pasc.oci.exception.HarvesterException;
+import eu.cessda.pasc.oci.exception.IndexerException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.models.Record;
 import eu.cessda.pasc.oci.models.RecordHeader;
@@ -27,16 +27,19 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 import static eu.cessda.pasc.oci.mock.data.ReposTestData.getUKDSRepo;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
- * Tests related to {@link LocalHarvesterConsumerService}
+ * Tests related to {@link IndexerConsumerService}
  *
  * @author moses AT doraventures DOT com
  */
-public class LocalHarvesterConsumerServiceTest {
+public class IndexerConsumerServiceTest {
 
 
     private static final Repo UKDS_REPO = getUKDSRepo();
@@ -46,15 +49,15 @@ public class LocalHarvesterConsumerServiceTest {
     /**
      * Class to test
      */
-    private LocalHarvesterConsumerService remoteHarvesterConsumerService;
+    private IndexerConsumerService remoteHarvesterConsumerService;
 
     @Before
     public void setUp() {
-        remoteHarvesterConsumerService = new LocalHarvesterConsumerService(recordHeaderParser, recordXMLParser);
+        remoteHarvesterConsumerService = new IndexerConsumerService(recordHeaderParser, recordXMLParser);
     }
 
     @Test
-    public void shouldLogOaiErrorCodeAndMessageWhenAnOaiExceptionIsThrown() throws HarvesterException {
+    public void shouldLogOaiErrorCodeAndMessageWhenAnOaiExceptionIsThrown() throws IndexerException {
         // When;
         Mockito.when(recordHeaderParser.getRecordHeaders(UKDS_REPO)).thenThrow(new OaiPmhException(OaiPmhException.Code.badArgument, "Invalid argument"));
 
@@ -64,7 +67,7 @@ public class LocalHarvesterConsumerServiceTest {
     }
 
     @Test
-    public void shouldLogOaiErrorCodeWhenAnOaiExceptionIsThrown() throws HarvesterException {
+    public void shouldLogOaiErrorCodeWhenAnOaiExceptionIsThrown() throws IndexerException {
         // When
         Mockito.when(recordHeaderParser.getRecordHeaders(UKDS_REPO)).thenThrow(new OaiPmhException(OaiPmhException.Code.badArgument));
 
@@ -74,9 +77,9 @@ public class LocalHarvesterConsumerServiceTest {
     }
 
     @Test
-    public void shouldLogWhenACustomHandlerExceptionIsThrown() throws HarvesterException {
+    public void shouldLogWhenACustomHandlerExceptionIsThrown() throws IndexerException {
         // When
-        Mockito.when(recordHeaderParser.getRecordHeaders(UKDS_REPO)).thenThrow(HarvesterException.class);
+        Mockito.when(recordHeaderParser.getRecordHeaders(UKDS_REPO)).thenThrow(IndexerException.class);
 
         // Then
         var recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(UKDS_REPO, null).collect(Collectors.toList());
@@ -84,7 +87,7 @@ public class LocalHarvesterConsumerServiceTest {
     }
 
     @Test
-    public void getRecordShouldLogOaiErrorCodeAndMessageWhenAnOaiExceptionIsThrown() throws HarvesterException {
+    public void getRecordShouldLogOaiErrorCodeAndMessageWhenAnOaiExceptionIsThrown() throws IndexerException {
         // When
         Mockito.when(recordXMLParser.getRecord(UKDS_REPO, STUDY_NUMBER)).thenThrow(new OaiPmhException(OaiPmhException.Code.badArgument, "Invalid argument"));
 
@@ -94,7 +97,7 @@ public class LocalHarvesterConsumerServiceTest {
     }
 
     @Test
-    public void getRecordShouldLogOaiErrorCodeWhenAnOaiExceptionIsThrown() throws HarvesterException {
+    public void getRecordShouldLogOaiErrorCodeWhenAnOaiExceptionIsThrown() throws IndexerException {
         // When
         Mockito.when(recordXMLParser.getRecord(UKDS_REPO, STUDY_NUMBER)).thenThrow(new OaiPmhException(OaiPmhException.Code.badArgument));
 
@@ -104,12 +107,44 @@ public class LocalHarvesterConsumerServiceTest {
     }
 
     @Test
-    public void getRecordShouldLogWhenACustomHandlerExceptionIsThrown() throws HarvesterException {
+    public void getRecordShouldLogWhenACustomHandlerExceptionIsThrown() throws IndexerException {
         // When
-        Mockito.when(recordXMLParser.getRecord(UKDS_REPO, STUDY_NUMBER)).thenThrow(HarvesterException.class);
+        Mockito.when(recordXMLParser.getRecord(UKDS_REPO, STUDY_NUMBER)).thenThrow(IndexerException.class);
 
         // Then
         var record = remoteHarvesterConsumerService.getRecord(UKDS_REPO, STUDY_NUMBER);
         Assert.assertTrue(record.isEmpty());
+    }
+
+    @Test
+    public void shouldReturnAnInactiveRecordIfMarkedDeleted() {
+        var header = RecordHeader.builder().deleted(true).build();
+
+        var study = remoteHarvesterConsumerService.getRecord(null, header);
+        assertTrue(study.isPresent());
+        assertFalse(study.get().isActive());
+    }
+
+    @Test
+    public void shouldWarnOnNotParsableDate() {
+        var header = RecordHeader.builder().lastModified("Not a date").build();
+
+        // When
+        var records = IndexerConsumerService.filterRecord(header, LocalDateTime.now());
+
+        // Then the record should be filtered
+        assertFalse(records);
+    }
+
+    @Test
+    public void shouldNotFilterOnNullLastModifiedDate() {
+        // Construct an object to be used for identity purposes
+        var header = RecordHeader.builder().lastModified(LocalDateTime.now().toString()).build();
+
+        // When
+        var records = IndexerConsumerService.filterRecord(header, null);
+
+        // Then the same object should be returned
+        assertTrue(records);
     }
 }
