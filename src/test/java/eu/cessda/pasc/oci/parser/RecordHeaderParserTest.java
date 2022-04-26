@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 
 import static eu.cessda.pasc.oci.parser.OaiPmhHelpers.appendListRecordResumptionToken;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -73,7 +74,7 @@ public class RecordHeaderParserTest {
         );
 
         // When
-        List<RecordHeader> recordHeaders = recordHeaderParser.getRecordHeaders(ukdsEndpoint).map(Record::getRecordHeader).collect(Collectors.toList());
+        List<RecordHeader> recordHeaders = recordHeaderParser.getRecordHeaders(ukdsEndpoint);
 
         then(recordHeaders).hasSize(3);
         then(recordHeaders).extracting("identifier").containsOnly("850229", "850232", "850235");
@@ -130,7 +131,7 @@ public class RecordHeaderParserTest {
         );
 
         // When
-        List<RecordHeader> recordHeaders = recordHeaderParser.getRecordHeaders(ukdsEndpoint).map(Record::getRecordHeader).collect(Collectors.toList());
+        List<RecordHeader> recordHeaders = recordHeaderParser.getRecordHeaders(ukdsEndpoint);
 
         then(recordHeaders).hasSize(7);
         then(recordHeaders).extracting("identifier")
@@ -187,7 +188,7 @@ public class RecordHeaderParserTest {
         );
 
         // When
-        List<RecordHeader> recordHeaders = recordHeaderParser.getRecordHeaders(ukdsEndpoint).map(Record::getRecordHeader).collect(Collectors.toList());
+        List<RecordHeader> recordHeaders = recordHeaderParser.getRecordHeaders(ukdsEndpoint);
         Assert.assertTrue(recordHeaders.get(0).isDeleted());
     }
 
@@ -216,7 +217,7 @@ public class RecordHeaderParserTest {
         ukdsEndpoint.setPath(new ClassPathResource("xml/ddi_2_5/ddi_record_1683.xml").getFile().toPath());
 
         // When
-        var records = recordHeaderParser.getRecordHeaders(ukdsEndpoint).collect(Collectors.toList());
+        var records = recordHeaderParser.getRecordHeaders(ukdsEndpoint, ukdsEndpoint.getPath()).collect(Collectors.toList());
 
         // Then
         assertThat(records).extracting(Record::getRecordHeader).extracting(RecordHeader::getIdentifier).contains("1683");
@@ -233,7 +234,7 @@ public class RecordHeaderParserTest {
         ukdsEndpoint.setPath(new ClassPathResource("xml/ddi_2_5/synthetic_compliant_cmm.xml").getFile().toPath());
 
         // When
-        var records = recordHeaderParser.getRecordHeaders(ukdsEndpoint).collect(Collectors.toList());
+        var records = recordHeaderParser.getRecordHeaders(ukdsEndpoint, ukdsEndpoint.getPath()).collect(Collectors.toList());
 
         // Then
         assertThat(records).extracting(Record::getRecordHeader).extracting(RecordHeader::getIdentifier).contains("2305");
@@ -242,7 +243,7 @@ public class RecordHeaderParserTest {
     }
 
     @Test
-    public void shouldHandleParsingErrors() throws IOException, IndexerException {
+    public void shouldHandleParsingErrors() throws IOException {
         // Given
         var ukdsEndpoint  = ReposTestData.getUKDSRepo();
         ukdsEndpoint.setUrl(null);
@@ -251,10 +252,8 @@ public class RecordHeaderParserTest {
         ukdsEndpoint.setPath(new ClassPathResource("record_ukds_998.json").getFile().toPath());
 
         // When
-        var records = recordHeaderParser.getRecordHeaders(ukdsEndpoint).collect(Collectors.toList());
-
-        // Then
-        assertThat(records).isEmpty();
+        assertThatThrownBy(() -> recordHeaderParser.getRecordHeaders(ukdsEndpoint, ukdsEndpoint.getPath()))
+            .isInstanceOf(XMLParseException.class);
     }
 
     @Test(expected = IndexerException.class)
@@ -268,15 +267,5 @@ public class RecordHeaderParserTest {
 
         // When
         recordHeaderParser.getRecordHeaders(ukdsEndpoint);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldThrowIfAURLAndAPathIsNotConfigured() throws IndexerException {
-        // Given
-        var ukdsEndpoint  = ReposTestData.getUKDSRepo();
-        ukdsEndpoint.setUrl(null);
-
-        // When
-        var records = recordHeaderParser.getRecordHeaders(ukdsEndpoint).collect(Collectors.toList());
     }
 }

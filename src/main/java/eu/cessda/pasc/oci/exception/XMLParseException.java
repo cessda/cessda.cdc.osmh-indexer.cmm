@@ -39,4 +39,9 @@ public class XMLParseException extends IndexerException {
         super("Parsing " + xmlSource + " failed: " + cause, cause);
         this.xmlSource = xmlSource;
     }
+
+    public XMLParseException(Throwable cause) {
+        super(cause);
+        this.xmlSource = null;
+    }
 }

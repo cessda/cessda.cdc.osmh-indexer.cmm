@@ -16,14 +16,16 @@
 package eu.cessda.pasc.oci;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.elasticsearch.IngestService;
-import eu.cessda.pasc.oci.harvester.HarvesterConsumerService;
-import eu.cessda.pasc.oci.harvester.LanguageExtractor;
+import eu.cessda.pasc.oci.exception.IndexerException;
 import eu.cessda.pasc.oci.metrics.MicrometerMetrics;
 import eu.cessda.pasc.oci.models.Record;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.configurations.Repo;
+import eu.cessda.pasc.oci.parser.RecordHeaderParser;
+import eu.cessda.pasc.oci.parser.RecordXMLParser;
 import eu.cessda.pasc.oci.service.DebuggingJMXBean;
 import org.elasticsearch.ElasticsearchException;
 import org.junit.Test;
@@ -38,6 +40,7 @@ import java.util.Optional;
 
 import static eu.cessda.pasc.oci.mock.data.RecordTestData.*;
 import static eu.cessda.pasc.oci.mock.data.ReposTestData.getSingleEndpoint;
+import static eu.cessda.pasc.oci.mock.data.ReposTestData.getUKDSRepo;
 import static org.mockito.Mockito.*;
 
 
@@ -53,8 +56,11 @@ public class ConsumerSchedulerTest {
     private final PipelineUtilities pipelineUtilities = mock(PipelineUtilities.class);
     private final LanguageExtractor extractor = new LanguageExtractor(appConfigurationProperties);
     private final MicrometerMetrics micrometerMetrics = mock(MicrometerMetrics.class);
+    private final RecordXMLParser recordXMLParser = mock(RecordXMLParser.class);
+    private final RecordHeaderParser recordHeaderParser = mock(RecordHeaderParser.class);
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final CollectionType RECORD_HEADER_LIST = objectMapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class);
 
     public ConsumerSchedulerTest() {
         // mock for configuration of our repos
@@ -72,7 +78,7 @@ public class ConsumerSchedulerTest {
     }
 
     @Test
-    public void shouldHarvestAndIngestAllMetadata() throws IOException {
+    public void shouldHarvestAndIngestAllMetadata() throws IOException, IndexerException {
         // mock for our record headers
         var harvesterConsumerService = mockRecordRequests();
         var debuggingJMXBean = mockDebuggingJMXBean();
@@ -82,17 +88,17 @@ public class ConsumerSchedulerTest {
         when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
 
         // Given
-        var harvesterRunner = new IndexerRunner(appConfigurationProperties, harvesterConsumerService, pipelineUtilities, esIndexer, extractor, micrometerMetrics);
+        var harvesterRunner = new IndexerRunner(appConfigurationProperties, harvesterConsumerService, pipelineUtilities, esIndexer, micrometerMetrics);
         var scheduler = new ConsumerScheduler(debuggingJMXBean, esIndexer, harvesterRunner);
 
         // When
         scheduler.fullHarvestAndIngestionAllConfiguredSPsReposRecords();
 
-        thenVerifyFullRun(harvesterConsumerService, debuggingJMXBean);
+        thenVerifyFullRun(debuggingJMXBean);
     }
 
     @Test
-    public void shouldHarvestAndIngestAllMetadataForWeeklyRun() throws IOException {
+    public void shouldHarvestAndIngestAllMetadataForWeeklyRun() throws IOException, IndexerException {
 
         // mock for our record headers
         var harvesterConsumerService = mockRecordRequests();
@@ -104,13 +110,13 @@ public class ConsumerSchedulerTest {
         when(esIndexer.getStudy(Mockito.eq("UKDS__998"), Mockito.anyString())).thenReturn(Optional.of(getCmmStudyOfLanguageCodeEnX1().get(0)));
 
         // Given
-        var harvesterRunner = new IndexerRunner(appConfigurationProperties, harvesterConsumerService, pipelineUtilities, esIndexer, extractor, micrometerMetrics);
+        var harvesterRunner = new IndexerRunner(appConfigurationProperties, harvesterConsumerService, pipelineUtilities, esIndexer, micrometerMetrics);
         var scheduler = new ConsumerScheduler(debuggingJMXBean, esIndexer, harvesterRunner);
 
         // When
         scheduler.weeklyFullHarvestAndIngestionAllConfiguredSPsReposRecords();
 
-        thenVerifyFullRun(harvesterConsumerService, debuggingJMXBean);
+        thenVerifyFullRun(debuggingJMXBean);
     }
 
     @Test
@@ -119,12 +125,12 @@ public class ConsumerSchedulerTest {
         var debuggingJMXBean = mockDebuggingJMXBean();
 
         // Throw a non-specific exception
-        var harvesterConsumerService = mock(HarvesterConsumerService.class);
-        when(harvesterConsumerService.listRecordHeaders(any(Repo.class), any()))
+        var indexerConsumerService = mock(IndexerConsumerService.class);
+        when(indexerConsumerService.getRecords(any(Repo.class), any()))
             .thenThrow(RuntimeException.class);
 
         // Given
-        var harvesterRunner = new IndexerRunner(appConfigurationProperties, harvesterConsumerService, pipelineUtilities, esIndexer, extractor, micrometerMetrics);
+        var harvesterRunner = new IndexerRunner(appConfigurationProperties, indexerConsumerService, pipelineUtilities, esIndexer, micrometerMetrics);
         var scheduler = new ConsumerScheduler(debuggingJMXBean, esIndexer, harvesterRunner);
 
         // When
@@ -138,27 +144,29 @@ public class ConsumerSchedulerTest {
     }
 
     /**
-     * Creates a mocked {@link HarvesterConsumerService} that responds to header and record requests.
+     * Creates a mocked {@link IndexerConsumerService} that responds to header and record requests.
      */
-    private HarvesterConsumerService mockRecordRequests() throws IOException {
-        var harvesterConsumerService = mock(HarvesterConsumerService.class);
-        var collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class);
-        var recordHeaders = objectMapper.<List<RecordHeader>>readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE, collectionType);
+    private IndexerConsumerService mockRecordRequests() throws IOException, IndexerException {
+
+        var indexerConsumerService = new IndexerConsumerService(extractor, recordHeaderParser, recordXMLParser);
+        var recordHeaders = objectMapper.<List<RecordHeader>>readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE, RECORD_HEADER_LIST);
 
         // Mock requests for the repository headers
-        when(harvesterConsumerService.listRecordHeaders(any(Repo.class), any()))
-            .thenReturn(recordHeaders.stream().map(recordHeader -> new Record(recordHeader, null,null)));
+        when(recordHeaderParser.getRecordHeaders(any(Repo.class))).thenReturn(recordHeaders);
 
         // mock record requests from each header
+        var ukdsRepo = getUKDSRepo();
         for (var recordHeader : recordHeaders) {
-            when(harvesterConsumerService.getRecord(any(Repo.class), eq(new Record(recordHeader, null,null))))
-                .thenReturn(Optional.of(getSyntheticCmmStudy(recordHeader.getIdentifier())));
+            when(recordXMLParser.getRecord(
+                ukdsRepo,
+                new Record(recordHeader, new Record.Request(ukdsRepo.getUrl(), ukdsRepo.getPreferredMetadataParam()),null)
+            )).thenReturn(getSyntheticCmmStudy(recordHeader.getIdentifier()));
         }
 
-        return harvesterConsumerService;
+        return indexerConsumerService;
     }
 
-    private void thenVerifyFullRun(HarvesterConsumerService harvesterConsumerService, DebuggingJMXBean debuggingJMXBean) throws IOException {
+    private void thenVerifyFullRun(DebuggingJMXBean debuggingJMXBean) throws IOException, IndexerException {
         verify(debuggingJMXBean, times(1)).printElasticSearchInfo();
         verify(debuggingJMXBean, times(1)).printCurrentlyConfiguredRepoEndpoints();
         verifyNoMoreInteractions(debuggingJMXBean);
@@ -168,9 +176,11 @@ public class ConsumerSchedulerTest {
         verify(appConfigurationProperties, atLeastOnce()).getBaseDirectory();
         verifyNoMoreInteractions(appConfigurationProperties);
 
-        verify(harvesterConsumerService, times(1)).listRecordHeaders(any(Repo.class), any());
-        verify(harvesterConsumerService, times(2)).getRecord(any(Repo.class), any(Record.class));
-        verifyNoMoreInteractions(harvesterConsumerService);
+        verify(recordHeaderParser, times(1)).getRecordHeaders(any(Repo.class));
+        verifyNoMoreInteractions(recordHeaderParser);
+
+        verify(recordXMLParser, times(2)).getRecord(any(Repo.class), any(Record.class));
+        verifyNoMoreInteractions(recordXMLParser);
 
         // No bulk attempt should have been made for "sv" as it does not have the minimum valid cmm fields
         // 'en', 'fi', 'de' has all minimum fields
@@ -184,24 +194,25 @@ public class ConsumerSchedulerTest {
     }
 
     @Test
-    public void shouldDoIncrementalHarvestAndIngestionOfNewerRecordsOnly() throws IOException {
+    public void shouldDoIncrementalHarvestAndIngestionOfNewerRecordsOnly() throws IOException, IndexerException {
         // MOCKS ---------------------------------------------------------------------------------------------------------
         var debuggingJMXBean = mockDebuggingJMXBean();
         // mock for our record headers
-        var harvesterConsumerService = mock(HarvesterConsumerService.class);
-        var collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class);
-        var recordHeaderList = objectMapper.<List<RecordHeader>>readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE, collectionType);
-        var recordHeaderListIncrement = objectMapper.<List<RecordHeader>>readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE_WITH_INCREMENT, collectionType);
-        when(harvesterConsumerService.listRecordHeaders(any(Repo.class), any()))
-            .thenReturn(recordHeaderList.stream().map(recordHeader -> new Record(recordHeader, null,null))) // First call
-            .thenReturn(recordHeaderListIncrement.stream().map(recordHeader -> new Record(recordHeader, null,null))); // Second call / Incremental run
+        var indexerConsumerService = new IndexerConsumerService(extractor, recordHeaderParser, recordXMLParser);
+        var recordHeaderList = objectMapper.<List<RecordHeader>>readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE, RECORD_HEADER_LIST);
+        var recordHeaderListIncrement = objectMapper.<List<RecordHeader>>readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE_WITH_INCREMENT, RECORD_HEADER_LIST);
+
+        when(recordHeaderParser.getRecordHeaders(any(Repo.class)))
+            .thenReturn(recordHeaderList) // First call
+            .thenReturn(recordHeaderListIncrement); // Second call / Incremental run
 
         // mock record requests from each header, a set is used so that each header is only registered once
         var allRecordHeaders = new HashSet<>(recordHeaderList);
         allRecordHeaders.addAll(recordHeaderListIncrement);
+        var ukdsRepo = getUKDSRepo();
         for (var recordHeader : allRecordHeaders) {
-            when(harvesterConsumerService.getRecord(any(Repo.class), eq(new Record(recordHeader, null,null))))
-                .thenReturn(Optional.of(getSyntheticCmmStudy(recordHeader.getIdentifier())));
+            when(recordXMLParser.getRecord(ukdsRepo, new Record(recordHeader, new Record.Request(ukdsRepo.getUrl(), ukdsRepo.getPreferredMetadataParam()),null)))
+                .thenReturn(getSyntheticCmmStudy(recordHeader.getIdentifier()));
         }
 
         // mock for ES methods
@@ -211,7 +222,7 @@ public class ConsumerSchedulerTest {
         when(esIndexer.getStudy(Mockito.eq("UKDS__999"), Mockito.anyString())).thenReturn(Optional.of(getCmmStudyOfLanguageCodeEnX1().get(0)));
 
         // Given
-        var harvesterRunner = new IndexerRunner(appConfigurationProperties, harvesterConsumerService, pipelineUtilities, esIndexer, extractor, micrometerMetrics);
+        var harvesterRunner = new IndexerRunner(appConfigurationProperties, indexerConsumerService, pipelineUtilities, esIndexer, micrometerMetrics);
         var scheduler = new ConsumerScheduler(debuggingJMXBean, esIndexer, harvesterRunner);
 
         // When
@@ -227,13 +238,15 @@ public class ConsumerSchedulerTest {
         verify(appConfigurationProperties, times(2)).getBaseDirectory();
         verifyNoMoreInteractions(appConfigurationProperties);
 
-        verify(harvesterConsumerService, times(2)).listRecordHeaders(any(Repo.class), any());
+        verify(recordHeaderParser, times(2)).getRecordHeaders(any(Repo.class));
+        verifyNoMoreInteractions(recordHeaderParser);
+
         // Expects 5 GetRecord call 2 from Full run and 3 from incremental run (minuses old lastModified record)
-        verify(harvesterConsumerService, times(5)).getRecord(any(Repo.class), any(Record.class));
-        verifyNoMoreInteractions(harvesterConsumerService);
+        verify(recordXMLParser, times(5)).getRecord(any(Repo.class), any(Record.class));
+        verifyNoMoreInteractions(recordXMLParser);
 
         verify(esIndexer, times(1)).getMostRecentLastModified(); // Call by incremental run to get LastModified
-        // No bulk attempt should have been made for "sv" as we dont have any records for "sv". We do for 'en', 'fi', 'de'
+        // No bulk attempt should have been made for "sv" as we don't have any records for "sv". We do for 'en', 'fi', 'de'
         verify(esIndexer, times(6)).bulkIndex(anyList(), anyString());
         verify(esIndexer, times(6)).bulkDelete(anyList(), anyString());
 
@@ -244,7 +257,7 @@ public class ConsumerSchedulerTest {
     }
 
     @Test
-    public void shouldHandleElasticsearchExceptions() throws IOException {
+    public void shouldHandleElasticsearchExceptions() throws IOException, IndexerException {
         // mock for our record headers
         var harvesterConsumerService = mockRecordRequests();
         var debuggingJMXBean = mockDebuggingJMXBean();
@@ -254,7 +267,7 @@ public class ConsumerSchedulerTest {
         when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
 
         // Given
-        var harvesterRunner = new IndexerRunner(appConfigurationProperties, harvesterConsumerService, pipelineUtilities, esIndexer, extractor, micrometerMetrics);
+        var harvesterRunner = new IndexerRunner(appConfigurationProperties, harvesterConsumerService, pipelineUtilities, esIndexer, micrometerMetrics);
         var scheduler = new ConsumerScheduler(debuggingJMXBean, esIndexer, harvesterRunner);
 
         // When
@@ -268,7 +281,7 @@ public class ConsumerSchedulerTest {
     }
 
     @Test
-    public void shouldHandleIOExceptions() throws IOException {
+    public void shouldHandleIOExceptions() throws IOException, IndexerException {
         // mock for our record headers
         var harvesterConsumerService = mockRecordRequests();
         var debuggingJMXBean = mockDebuggingJMXBean();
@@ -279,7 +292,7 @@ public class ConsumerSchedulerTest {
         when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
 
         // Given
-        var harvesterRunner = new IndexerRunner(appConfigurationProperties, harvesterConsumerService, pipelineUtilities, esIndexer, extractor, micrometerMetrics);
+        var harvesterRunner = new IndexerRunner(appConfigurationProperties, harvesterConsumerService, pipelineUtilities, esIndexer, micrometerMetrics);
         var scheduler = new ConsumerScheduler(debuggingJMXBean, esIndexer, harvesterRunner);
 
         // When

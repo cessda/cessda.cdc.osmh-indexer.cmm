@@ -35,65 +35,65 @@ endpoints:
     - url: https://www.adp.fdv.uni-lj.si/v0/oai
       code: ADP
       name: 'Slovenian Social Science Data Archives (ADP)'
-      handler: 'OAI-PMH'
+      handler: 'DDI_2_5'
       preferredMetadataParam: oai_ddi25
       defaultLanguage: sl
     # Included since v2.1.0 (see #147)
     - url: http://194.117.18.18:6003/v0/oai
       code: APIS
       name: 'Portuguese Archive of Social Information (APIS)'
-      handler: 'OAI-PMH'
+      handler: 'DDI_2_5'
       preferredMetadataParam: oai_ddi25
       defaultLanguage: pt
     # Included since v2.0.0 (see #67)
     - url: https://data2.aussda.at/oai
       code: AUSSDA
       name: 'Austrian Social Science Data Archive (AUSSDA)'
-      handler: 'OAI-PMH'
+      handler: 'DDI_2_5'
       preferredMetadataParam: oai_ddi
     # 2x endpoints included since v2.3.1 (see #280)
     - url: https://easy.dans.knaw.nl/oai/
       code: DANS
       name: 'DANS-KNAW'
-      handler: 'OAI-PMH'
+      handler: 'DDI_2_5'
       preferredMetadataParam: oai_ddi25_nl
       defaultLanguage: nl
     # 2x endpoints included since v2.3.1 (see #280)
     - url: https://easy.dans.knaw.nl/oai/
       code: DANS
       name: 'DANS-KNAW'
-      handler: 'OAI-PMH'
+      handler: 'DDI_2_5'
       preferredMetadataParam: oai_ddi25_en
       defaultLanguage: en
     # Included since v2.x.x (see #xx)
     - url: https://kuha.sa.dk/v0/oai
       code: DNA
       name: 'Danish National Archives (DNA)'
-      handler: 'OAI-PMH'
+      handler: 'DDI_2_5'
       preferredMetadataParam: oai_ddi25
     # Placeholder for FORS
     #      - url:
     #        code: FORS
     #        name: 'FORS - Swiss Centre of Expertise in the Social Sciences'
-    #        handler: 'OAI-PMH'
+    #        handler: 'DDI_2_5'
     #        preferredMetadataParam: oai_ddi25
     # Included since v2.3.0 (see #253)
     - url: http://services.fsd.tuni.fi/v0/oai
       code: FSD
       name: 'Finnish Social Science Data Archive (FSD)'
-      handler: 'OAI-PMH'
+      handler: 'DDI_2_5'
       preferredMetadataParam: oai_ddi25
     # Included since v2.4.0 (see #303)
     - url: https://dbkapps.gesis.org/dbkoai
       code: GESIS
       name: 'GESIS - Leibniz Institute for the Social Sciences'
-      handler: 'OAI-PMH'
+      handler: 'DDI_2_5'
       preferredMetadataParam: oai_ddi25
     # Included since v2.3.0 (see #177)
     - url: https://data.sciencespo.fr/oai
       code: ProgedoSciencesPo
       name: 'PROGEDO: Sciences Po'
-      handler: 'OAI-PMH'
+      handler: 'DDI_2_5'
       setSpec: CDSP
       preferredMetadataParam: oai_ddi
       defaultLanguage: fr
@@ -101,20 +101,20 @@ endpoints:
     - url: http://147.213.4.44:6003/v0/oai
       code: SASD
       name: 'Slovak Archive of Social Data (SASD)'
-      handler: 'OAI-PMH'
+      handler: 'DDI_2_5'
       preferredMetadataParam: oai_ddi25
     # Included since v2.0.0 (see #67)
     - url: https://snd.gu.se/en/oai-pmh
       code: SND
       name: 'Swedish National Data Service (SND)'
-      handler: 'OAI-PMH'
+      handler: 'DDI_2_5'
       setSpec: subject:social-sciences
       preferredMetadataParam: oai_ddi25
     # Included since v2.4.0 (see #311)
     - url: https://www.sodha.be/oai
       code: SODHA
       name: 'Social Sciences and Digital Humanities Archive (SODHA)'
-      handler: 'OAI-PMH'
+      handler: 'DDI_2_5'
       setSpec: SODHA_CDC
       preferredMetadataParam: oai_ddi
       # defaultLanguage:
@@ -122,7 +122,7 @@ endpoints:
     - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
       code: UKDS
       name: 'UK Data Service'
-      handler: 'OAI-PMH'
+      handler: 'DDI_2_5'
       preferredMetadataParam: ddi
     # Included since v2.0 (see #94)
     - url: http://nesstar.soc.cas.cz/oai-pmh
@@ -141,7 +141,7 @@ endpoints:
     - url: https://datacatalogue.sodanet.gr/oai
       code: SoDaNet
       name: 'SoDaNet - Greek Research Infrastructure for Social Science'
-      handler: 'OAI-PMH'
+      handler: 'DDI_2_5'
       #  setSpec: CESSDA
       preferredMetadataParam: oai_ddi
       defaultLanguage: el
@@ -149,7 +149,7 @@ endpoints:
     - url: http://oai.unidata.unimib.it/v0/oai
       code: UniData
       name: 'UniData - Bicocca Data Archive'
-      handler: 'OAI-PMH'
+      handler: 'DDI_2_5'
       preferredMetadataParam: oai_ddi25
 restTemplateProps:
   connTimeout: 10000 # increased from 5 seconds to 10 seconds to deal with slower Nesstar repos

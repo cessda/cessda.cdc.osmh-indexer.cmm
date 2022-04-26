@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.harvester;
+package eu.cessda.pasc.oci;
 
-import eu.cessda.pasc.oci.DateNotParsedException;
-import eu.cessda.pasc.oci.LoggingConstants;
-import eu.cessda.pasc.oci.TimeUtility;
 import eu.cessda.pasc.oci.exception.IndexerException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
+import eu.cessda.pasc.oci.exception.XMLParseException;
 import eu.cessda.pasc.oci.models.Record;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
+import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.parser.RecordHeaderParser;
 import eu.cessda.pasc.oci.parser.RecordXMLParser;
@@ -31,15 +30,23 @@ import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.google.common.io.Files.getFileExtension;
 import static net.logstash.logback.argument.StructuredArguments.value;
 
 @Service
 @Slf4j
-public class IndexerConsumerService implements HarvesterConsumerService {
+public class IndexerConsumerService {
 
     protected static final String FAILED_TO_GET_STUDY_ID = "[{}] Failed to get StudyId [{}]: {}";
     protected static final String LIST_RECORD_HEADERS_FAILED = "[{}] ListRecordHeaders failed: {}";
@@ -47,9 +54,11 @@ public class IndexerConsumerService implements HarvesterConsumerService {
     protected static final String FAILED_TO_GET_STUDY_ID_WITH_MESSAGE = FAILED_TO_GET_STUDY_ID + ": {}";
     private final RecordHeaderParser recordHeaderParser;
     private final RecordXMLParser recordXMLParser;
+    private final LanguageExtractor languageExtractor;
 
     @Autowired
-    public IndexerConsumerService(RecordHeaderParser recordHeaderParser, RecordXMLParser recordXMLParser) {
+    public IndexerConsumerService(LanguageExtractor languageExtractor, RecordHeaderParser recordHeaderParser, RecordXMLParser recordXMLParser) {
+        this.languageExtractor = languageExtractor;
         this.recordHeaderParser = recordHeaderParser;
         this.recordXMLParser = recordXMLParser;
     }
@@ -91,10 +100,61 @@ public class IndexerConsumerService implements HarvesterConsumerService {
         }
     }
 
-    @Override
-    public Stream<Record> listRecordHeaders(Repo repo, LocalDateTime lastModifiedDate) {
+    /**
+     * Queries the remote repository for records. Records are filtered if lastModifiedDate is provided.
+     *
+     * @param repo             the repository to query.
+     * @param lastModifiedDate to filter headers on, can be null.
+     * @return a list of records retrieved from the remote repository.
+     */
+    @SuppressWarnings({"resource", "UnstableApiUsage"}) // The stream will always be closed
+    public Map<String, List<CMMStudyOfLanguage>> getRecords(Repo repo, LocalDateTime lastModifiedDate) {
+        log.debug("[{}] Parsing record headers.", repo.getCode());
+
+        Stream<Record> stream = Stream.empty();
+
         try {
-            return recordHeaderParser.getRecordHeaders(repo).filter(header -> filterRecord(header.getRecordHeader(), lastModifiedDate));
+            if (repo.getPath() != null) {
+                stream = Files.find(repo.getPath(), 1, (path, attributes) ->
+                    // Find XML files in the source directory.
+                    attributes.isRegularFile() && getFileExtension(path.toString()).equals("xml")
+                ).flatMap(path -> {
+                    try {
+                        return recordHeaderParser.getRecordHeaders(repo, path);
+                    } catch (XMLParseException e) {
+                        log.warn("[{}]: Failed to parse study from [{}]: {}", repo.getCode(), path, e.toString());
+                        return Stream.empty();
+                    }
+                });
+            } else if (repo.getUrl() != null) {
+                var recordHeaders = recordHeaderParser.getRecordHeaders(repo);
+                stream = recordHeaders.parallelStream().map(recordHeader -> new Record(recordHeader, new Record.Request(repo.getUrl(), repo.getPreferredMetadataParam()), null));
+            } else {
+                throw new IllegalArgumentException("Repo " + repo.getCode() + " has no URL or path defined");
+            }
+
+            var studies = new AtomicInteger();
+
+            var studiesByLanguage = stream
+                .filter(header -> filterRecord(header.getRecordHeader(), lastModifiedDate))
+                .map(header -> getRecord(repo, header))
+                .flatMap(Optional::stream)
+                .flatMap(cmmStudy -> {
+                    // Extract language specific variants of the record
+                    var extractedStudies = languageExtractor.extractFromStudy(cmmStudy, repo);
+                    if (!extractedStudies.isEmpty()) {
+                        studies.getAndIncrement();
+                    }
+                    return extractedStudies.entrySet().stream();
+                })
+                .collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
+
+            log.info("[{}] Retrieved [{}] studies.",
+                value(LoggingConstants.REPO_NAME, repo.getCode()),
+                value("present_cmm_record", studies.get())
+            );
+
+            return studiesByLanguage;
         } catch (OaiPmhException e) {
             // Check if there was a message attached to the OAI error response
             e.getOaiErrorMessage().ifPresentOrElse(
@@ -108,18 +168,26 @@ public class IndexerConsumerService implements HarvesterConsumerService {
                     value(LoggingConstants.OAI_ERROR_CODE, e.getCode())
                 )
             );
-        } catch (IndexerException e) {
+        }
+        catch (IndexerException | IOException e) {
             log.error(LIST_RECORD_HEADERS_FAILED_WITH_MESSAGE,
                 value(LoggingConstants.REPO_NAME, repo.getCode()),
                 value(LoggingConstants.EXCEPTION_NAME, e.getClass().getName()),
                 value(LoggingConstants.REASON, e.getMessage())
             );
+        } finally {
+            stream.close();
         }
-        return Stream.empty();
+        return Collections.emptyMap();
     }
 
-    @Override
-    public Optional<CMMStudy> getRecord(Repo repo, Record recordVar) {
+    /**
+     * Retrieve a record from a record header.
+     * @param repo the repository that the record originated from
+     * @param recordVar the record header.
+     * @return an {@link Optional} containing a {@link CMMStudy} or an empty optional if an error occurred.
+     */
+    Optional<CMMStudy> getRecord(Repo repo, Record recordVar) {
         // Handle deleted records
         if (recordVar.getRecordHeader().isDeleted()) {
             return Optional.of(createInactiveRecord(recordVar.getRecordHeader()));

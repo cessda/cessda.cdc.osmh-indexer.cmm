@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.harvester;
+package eu.cessda.pasc.oci;
 
 import com.neovisionaries.i18n.CountryCode;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
@@ -137,7 +137,7 @@ public class LanguageExtractor {
         Optional.ofNullable(cmmStudy.getDataAccessFreeTexts()).map(map -> map.get(lang)).ifPresent(builder::dataAccessFreeTexts);
 
         // #142 - Use any language to set the study url field
-        Optional.ofNullable(cmmStudy.getStudyUrl()).flatMap(map -> map.values().stream().findAny()).ifPresent(builder::studyUrl);
+        Optional.ofNullable(cmmStudy.getStudyUrl()).flatMap(map -> map.values().stream().filter(Objects::nonNull).findAny()).ifPresent(builder::studyUrl);
 
         // Override with the language specific variant
         Optional.ofNullable(cmmStudy.getStudyUrl()).map(map -> map.get(lang)).ifPresent(builder::studyUrl);

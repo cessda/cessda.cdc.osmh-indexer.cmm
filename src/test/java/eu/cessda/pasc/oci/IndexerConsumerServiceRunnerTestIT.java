@@ -13,10 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.harvester;
+package eu.cessda.pasc.oci;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
+import eu.cessda.pasc.oci.exception.IndexerException;
+import eu.cessda.pasc.oci.models.Record;
 import eu.cessda.pasc.oci.models.configurations.Repo;
+import eu.cessda.pasc.oci.parser.RecordHeaderParser;
+import eu.cessda.pasc.oci.parser.RecordXMLParser;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -26,8 +30,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.HashMap;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * Manual Consumer test class this can be used to explore end to end behavior of this consumer and to some extend some
@@ -45,19 +49,26 @@ import java.util.stream.Collectors;
 @ActiveProfiles("test")
 @Ignore("Ignoring: For manual Integration testing only")
 @Slf4j
-public class HarvesterConsumerServiceRunnerTestIT {
+public class IndexerConsumerServiceRunnerTestIT {
 
     @Autowired
-    private HarvesterConsumerService localHarvesterConsumerService;
+    private RecordHeaderParser recordHeaderParser;
+
+    @Autowired
+    private RecordXMLParser recordXMLParser;
 
     @Autowired
     private AppConfigurationProperties appConfigurationProperties;
 
     @Test
-    public void shouldReturnASuccessfulResponseForAllConfiguredRepositories() {
+    @SuppressWarnings("java:S2699")
+    public void shouldReturnASuccessfulResponseForAllConfiguredRepositories() throws IndexerException {
 
         var repos = appConfigurationProperties.getEndpoints().getRepos();
-        var countReport = repos.stream().collect(Collectors.toMap(Repo::getCode, this::processAndVerify));
+        var countReport = new HashMap<String, Integer>();
+        for (var repo : repos) {
+            countReport.put(repo.getCode(), processAndVerify(repo));
+        }
 
         log.info("\n#############################" +
             "\nPrinting Report for all repos" +
@@ -68,18 +79,22 @@ public class HarvesterConsumerServiceRunnerTestIT {
     }
 
     @SuppressWarnings("ReturnValueIgnored")
-    private int processAndVerify(Repo repo) {
-        var recordHeaders = localHarvesterConsumerService.listRecordHeaders(repo, null).collect(Collectors.toList());
+    private int processAndVerify(Repo repo) throws IndexerException {
+        var recordHeaders = recordHeaderParser.getRecordHeaders(repo);
         log.info("Total records found: [{}]", recordHeaders.size());
 
         // We are only interested in the first valid record
         recordHeaders.stream().map(recordHeader -> {
-            var record = localHarvesterConsumerService.getRecord(repo, recordHeader).orElse(null);
-            log.info("|------------------------------Record Header----------------------------------------|");
-            log.info(recordHeader.toString());
-            log.info("|------------------------------Record CmmStudy--------------------------------------|");
-            log.info(String.valueOf(record));
-            return record;
+            try {
+                var record = recordXMLParser.getRecord(repo, new Record(recordHeader, null, null));
+                log.info("|------------------------------Record Header----------------------------------------|");
+                log.info(recordHeader.toString());
+                log.info("|------------------------------Record CmmStudy--------------------------------------|");
+                log.info(String.valueOf(record));
+                return record;
+            } catch (IndexerException e) {
+                return null;
+            }
         }).filter(Objects::nonNull).findAny().orElseThrow(); // If no records can be retrieved, fail the test
 
         return recordHeaders.size();

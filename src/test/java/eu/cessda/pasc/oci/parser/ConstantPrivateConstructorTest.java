@@ -16,6 +16,7 @@
 package eu.cessda.pasc.oci.parser;
 
 import eu.cessda.pasc.oci.TimeUtility;
+import org.assertj.core.api.Assertions;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -36,11 +37,10 @@ public class ConstantPrivateConstructorTest {
   public final ExpectedException exception = ExpectedException.none();
 
   @Test
-  public void timeUtilityShouldHaveAPrivateConstructor() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+  public void timeUtilityShouldHaveAPrivateConstructor() throws NoSuchMethodException {
     Constructor<TimeUtility> constructor = TimeUtility.class.getDeclaredConstructor();
     assertTrue("Constructor is not private", Modifier.isPrivate(constructor.getModifiers()));
     constructor.setAccessible(true);
-    exception.expect(InvocationTargetException.class);
-    constructor.newInstance();
+    Assertions.assertThatThrownBy(constructor::newInstance).isInstanceOf(InvocationTargetException.class);
   }
 }

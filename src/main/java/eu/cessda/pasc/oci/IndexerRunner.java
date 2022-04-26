@@ -17,8 +17,6 @@ package eu.cessda.pasc.oci;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.elasticsearch.IngestService;
-import eu.cessda.pasc.oci.harvester.HarvesterConsumerService;
-import eu.cessda.pasc.oci.harvester.LanguageExtractor;
 import eu.cessda.pasc.oci.metrics.Metrics;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.configurations.Repo;
@@ -40,7 +38,6 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.concurrent.CompletableFuture.runAsync;
@@ -51,25 +48,22 @@ import static net.logstash.logback.argument.StructuredArguments.value;
 public class IndexerRunner {
 
     private final AppConfigurationProperties configurationProperties;
-    private final HarvesterConsumerService localHarvester;
+    private final IndexerConsumerService indexer;
     private final PipelineUtilities pipelineUtilities;
     private final IngestService ingestService;
-    private final LanguageExtractor extractor;
     private final Metrics metrics;
 
     private final AtomicBoolean indexerRunning = new AtomicBoolean(false);
 
     public IndexerRunner(AppConfigurationProperties configurationProperties,
-                         HarvesterConsumerService localHarvesterConsumerService,
+                         IndexerConsumerService localHarvesterConsumerService,
                          PipelineUtilities pipelineUtilities,
                          IngestService ingestService,
-                         LanguageExtractor extractor,
                          Metrics metrics) {
         this.configurationProperties = configurationProperties;
-        this.localHarvester = localHarvesterConsumerService;
+        this.indexer = localHarvesterConsumerService;
         this.pipelineUtilities = pipelineUtilities;
         this.ingestService = ingestService;
-        this.extractor = extractor;
         this.metrics = metrics;
     }
 
@@ -96,7 +90,7 @@ public class IndexerRunner {
                 var futures = Stream.concat(repoParsedFromJson.stream(), repos.stream())
                     .map(repo -> runAsync(() -> indexRepository(repo, lastModifiedDateTime, contextMap))
                         .exceptionally(e -> {
-                            log.error("Unexpected error occurred when harvesting!", e);
+                            log.error("[{}]: Unexpected error occurred when harvesting!", repo.getCode(), e);
                             return null;
                         })
                     ).toArray(CompletableFuture[]::new);
@@ -133,7 +127,7 @@ public class IndexerRunner {
         try (var repoNameClosable = MDC.putCloseable(LoggingConstants.REPO_NAME, repo.getCode())) {
             var startTime = Instant.now();
             log.info("Processing Repo [{}]", repo);
-            var langStudies = getCmmStudiesOfEachLangIsoCodeMap(repo, lastModifiedDateTime);
+            var langStudies = indexer.getRecords(repo, lastModifiedDateTime);
             for (var entry : langStudies.entrySet()) {
                 try (var langClosable = MDC.putCloseable(LoggingConstants.LANG_CODE, entry.getKey())) {
                     indexRecords(repo, entry.getKey(), entry.getValue());
@@ -227,34 +221,6 @@ public class IndexerRunner {
         return new UpdatedStudies(studiesCreated.get(), studiesDeleted.get(), studiesUpdated.get());
     }
 
-    private Map<String, List<CMMStudyOfLanguage>> getCmmStudiesOfEachLangIsoCodeMap(Repo repo, LocalDateTime lastModifiedDateTime) {
-
-        // OAI-PMH repositories can be handled by the internal harvester, all other types should be delegated to remote handlers
-        var harvester = localHarvester;
-
-        try (var recordHeaders = harvester.listRecordHeaders(repo, lastModifiedDateTime)) {
-
-            var studies = new AtomicInteger();
-
-            var collectLanguageCmmStudy = recordHeaders
-                .flatMap(recordHeader -> harvester.getRecord(repo, recordHeader).stream()) // Retrieve the record
-                .flatMap(cmmStudy -> {
-                    // Extract language specific variants of the record
-                    var extractedStudies = extractor.extractFromStudy(cmmStudy, repo);
-                    if (!extractedStudies.isEmpty()) {
-                        studies.getAndIncrement();
-                    }
-                    return extractedStudies.entrySet().stream();
-                }).collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
-
-            log.info("[{}] Retrieved [{}] studies.",
-                value(LoggingConstants.REPO_NAME, repo.getCode()),
-                value("present_cmm_record", studies.get())
-            );
-
-            return collectLanguageCmmStudy;
-        }
-    }
 
     @Value
     private static class UpdatedStudies {

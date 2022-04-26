@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.harvester;
+package eu.cessda.pasc.oci;
 
 import eu.cessda.pasc.oci.exception.IndexerException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
+import eu.cessda.pasc.oci.mock.data.ReposTestData;
 import eu.cessda.pasc.oci.models.Record;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.configurations.Repo;
@@ -28,9 +29,9 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.time.LocalDateTime;
-import java.util.stream.Collectors;
 
 import static eu.cessda.pasc.oci.mock.data.ReposTestData.getUKDSRepo;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -46,14 +47,15 @@ public class IndexerConsumerServiceTest {
     private static final Record STUDY_NUMBER = new Record(RecordHeader.builder().identifier("oai:ukds/5436").build(), null,null);
     private final RecordHeaderParser recordHeaderParser = Mockito.mock(RecordHeaderParser.class);
     private final RecordXMLParser recordXMLParser = Mockito.mock(RecordXMLParser.class);
+    private final LanguageExtractor languageExtractor = Mockito.mock(LanguageExtractor.class);
     /**
      * Class to test
      */
-    private IndexerConsumerService remoteHarvesterConsumerService;
+    private IndexerConsumerService indexerConsumerService;
 
     @Before
     public void setUp() {
-        remoteHarvesterConsumerService = new IndexerConsumerService(recordHeaderParser, recordXMLParser);
+        indexerConsumerService = new IndexerConsumerService(languageExtractor, recordHeaderParser, recordXMLParser);
     }
 
     @Test
@@ -62,7 +64,7 @@ public class IndexerConsumerServiceTest {
         Mockito.when(recordHeaderParser.getRecordHeaders(UKDS_REPO)).thenThrow(new OaiPmhException(OaiPmhException.Code.badArgument, "Invalid argument"));
 
         // Then
-        var recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(UKDS_REPO, null).collect(Collectors.toList());
+        var recordHeaders = indexerConsumerService.getRecords(UKDS_REPO, null);
         Assert.assertTrue(recordHeaders.isEmpty());
     }
 
@@ -72,7 +74,7 @@ public class IndexerConsumerServiceTest {
         Mockito.when(recordHeaderParser.getRecordHeaders(UKDS_REPO)).thenThrow(new OaiPmhException(OaiPmhException.Code.badArgument));
 
         // Then
-        var recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(UKDS_REPO, null).collect(Collectors.toList());
+        var recordHeaders = indexerConsumerService.getRecords(UKDS_REPO, null);
         Assert.assertTrue(recordHeaders.isEmpty());
     }
 
@@ -82,7 +84,7 @@ public class IndexerConsumerServiceTest {
         Mockito.when(recordHeaderParser.getRecordHeaders(UKDS_REPO)).thenThrow(IndexerException.class);
 
         // Then
-        var recordHeaders = remoteHarvesterConsumerService.listRecordHeaders(UKDS_REPO, null).collect(Collectors.toList());
+        var recordHeaders = indexerConsumerService.getRecords(UKDS_REPO, null);
         Assert.assertTrue(recordHeaders.isEmpty());
     }
 
@@ -92,7 +94,7 @@ public class IndexerConsumerServiceTest {
         Mockito.when(recordXMLParser.getRecord(UKDS_REPO, STUDY_NUMBER)).thenThrow(new OaiPmhException(OaiPmhException.Code.badArgument, "Invalid argument"));
 
         // Then
-        var record = remoteHarvesterConsumerService.getRecord(UKDS_REPO, STUDY_NUMBER);
+        var record = indexerConsumerService.getRecord(UKDS_REPO, STUDY_NUMBER);
         Assert.assertTrue(record.isEmpty());
     }
 
@@ -102,7 +104,7 @@ public class IndexerConsumerServiceTest {
         Mockito.when(recordXMLParser.getRecord(UKDS_REPO, STUDY_NUMBER)).thenThrow(new OaiPmhException(OaiPmhException.Code.badArgument));
 
         // Then
-        var record = remoteHarvesterConsumerService.getRecord(UKDS_REPO, STUDY_NUMBER);
+        var record = indexerConsumerService.getRecord(UKDS_REPO, STUDY_NUMBER);
         Assert.assertTrue(record.isEmpty());
     }
 
@@ -112,7 +114,7 @@ public class IndexerConsumerServiceTest {
         Mockito.when(recordXMLParser.getRecord(UKDS_REPO, STUDY_NUMBER)).thenThrow(IndexerException.class);
 
         // Then
-        var record = remoteHarvesterConsumerService.getRecord(UKDS_REPO, STUDY_NUMBER);
+        var record = indexerConsumerService.getRecord(UKDS_REPO, STUDY_NUMBER);
         Assert.assertTrue(record.isEmpty());
     }
 
@@ -120,7 +122,7 @@ public class IndexerConsumerServiceTest {
     public void shouldReturnAnInactiveRecordIfMarkedDeleted() {
         var header = RecordHeader.builder().deleted(true).build();
 
-        var study = remoteHarvesterConsumerService.getRecord(null, header);
+        var study = indexerConsumerService.getRecord(null, new Record(header, null, null));
         assertTrue(study.isPresent());
         assertFalse(study.get().isActive());
     }
@@ -146,5 +148,16 @@ public class IndexerConsumerServiceTest {
 
         // Then the same object should be returned
         assertTrue(records);
+    }
+
+    @Test
+    public void shouldThrowIfAURLAndAPathIsNotConfigured() {
+        // Given
+        var ukdsEndpoint  = ReposTestData.getUKDSRepo();
+        ukdsEndpoint.setUrl(null);
+
+        // When
+        assertThatThrownBy(() -> indexerConsumerService.getRecords(ukdsEndpoint, null))
+            .isInstanceOf(IllegalArgumentException.class);
     }
 }
