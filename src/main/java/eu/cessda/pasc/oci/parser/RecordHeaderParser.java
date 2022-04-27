@@ -39,6 +39,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.google.common.io.Files.getFileExtension;
+
 /**
  * Service implementation to handle Listing Record Headers
  *
@@ -161,14 +163,38 @@ public class RecordHeaderParser {
 
         log.debug("[{}] Parsing record headers.", repo.getCode());
 
-        if (repo.getUrl() != null) {
+        if (repo.getPath() != null) {
+            try {
+                return Files.find(repo.getPath(), 1, (path, attributes) ->
+                    // Find XML files in the source directory.
+                    attributes.isRegularFile() && getFileExtension(path.toString()).equals("xml")
+                ).flatMap(p -> {
+                    try (var inputStream = Files.newInputStream(p)) {
+                        return Stream.of(OaiPmhHelpers.getSaxBuilder().build(inputStream));
+                    } catch (IOException | JDOMException e) {
+                        log.warn("[{}] Couldn't parse {}: {}", repo.getCode(), p, e.toString());
+                        return Stream.empty();
+                    }
+                }).flatMap(doc -> {
+                    // Parse request element to retrieve the base URL of the repository
+                    var request = parseRequestElement(repo, doc);
+
+                    // Parse the record header from the document
+                    var recordHeaders = parseRecordHeadersFromDoc(doc);
+
+                    return recordHeaders.stream().map(recordHeader -> new Record(recordHeader, request.orElse(null), doc));
+                });
+            } catch (IOException e) {
+                throw new HarvesterException("Reading path failed: " + e, e);
+            }
+        } else if (repo.getUrl() != null) {
 
             URI fullListRecordUrlPath = OaiPmhHelpers.appendListRecordParams(repo);
             var recordHeadersDocument = getRecordHeadersDocument(fullListRecordUrlPath);
 
             // Check if the document has an OAI element
-            if(DocElementParser.getFirstElement(recordHeadersDocument, OaiPmhConstants.OAI_PMH, OaiPmhConstants.OAI_NS).isEmpty()) {
-               throw new HarvesterException("Missing OAI element");
+            if (DocElementParser.getFirstElement(recordHeadersDocument, OaiPmhConstants.OAI_PMH, OaiPmhConstants.OAI_NS).isEmpty()) {
+                throw new HarvesterException("Missing OAI element");
             }
 
             // Exit if the response has an <error> element
@@ -197,28 +223,6 @@ public class RecordHeaderParser {
             recordHeaders.trimToSize();
 
             return recordHeaders.parallelStream().map(recordHeader -> new Record(recordHeader, new Record.Request(repo.getUrl(), repo.getPreferredMetadataParam()),null));
-        } else if (repo.getPath() != null) {
-            try {
-                return Files.walk(repo.getPath()).filter(Files::isRegularFile)
-                    .flatMap(p -> {
-                        try (var inputStream = Files.newInputStream(p)) {
-                            return Stream.of(OaiPmhHelpers.getSaxBuilder().build(inputStream));
-                        } catch (IOException | JDOMException e) {
-                            log.warn("[{}] Couldn't parse {}: {}", repo.getCode(), p, e.toString());
-                            return Stream.empty();
-                        }
-                    }).flatMap(doc -> {
-                        // Parse request element to retrieve the base URL of the repository
-                        var request = parseRequestElement(repo, doc);
-
-                        // Parse the record header from the document
-                        var recordHeaders = parseRecordHeadersFromDoc(doc);
-
-                        return recordHeaders.stream().map(recordHeader -> new Record(recordHeader, request.orElse(null), doc));
-                    });
-            } catch (IOException e) {
-                throw new HarvesterException("Reading path failed: " + e, e);
-            }
         } else {
             throw new IllegalArgumentException("Repo " + repo.getCode() + " has no URL or path defined");
         }

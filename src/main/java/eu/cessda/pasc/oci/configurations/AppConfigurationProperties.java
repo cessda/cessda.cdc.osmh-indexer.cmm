@@ -37,22 +37,21 @@ import java.util.List;
  */
 @Configuration
 @EnableConfigurationProperties
-@ConfigurationProperties(prefix = "osmhconsumer")
+@ConfigurationProperties
 @Data
 public class AppConfigurationProperties {
 
-  private Endpoints endpoints = new Endpoints();
-  private RestTemplateProps restTemplateProps = new RestTemplateProps();
-  private final List<String> languages = new ArrayList<>();
-  private final OaiPmh oaiPmh = new OaiPmh();
+    private final Endpoints endpoints = new Endpoints();
+    private final RestTemplateProps restTemplateProps = new RestTemplateProps();
+    private final List<String> languages = new ArrayList<>();
+    private final OaiPmh oaiPmh = new OaiPmh();
+    private Path baseDirectory = null;
 
     @Component
     @ConfigurationPropertiesBinding
-    public static class PathConverter implements Converter<String, Path>
-    {
+    public static class PathConverter implements Converter<String, Path> {
         @Override
-        public Path convert( String s )
-        {
+        public Path convert(String s) {
             return Path.of(s).normalize();
         }
     }

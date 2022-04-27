@@ -31,7 +31,7 @@ public class ReposTestData
         Repo repo = new Repo();
         repo.setCode("UKDS");
         repo.setUrl(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
-        repo.setHandler("OAI-PMH");
+        repo.setHandler("DDI_2_5");
         repo.setPreferredMetadataParam("ddi");
         return repo;
     }
@@ -46,7 +46,7 @@ public class ReposTestData
         Repo repo = new Repo();
         repo.setCode("GESIS");
         repo.setUrl(URI.create("https://dbkapps.gesis.org/dbkoai3"));
-        repo.setHandler("OAI-PMH");
+        repo.setHandler("DDI_2_5");
         return repo;
     }
 
@@ -56,7 +56,7 @@ public class ReposTestData
         repo.setCode("FSD");
         repo.setPreferredMetadataParam("oai_ddi25");
         repo.setSetSpec("study_groups:energia");
-        repo.setHandler("OAI-PMH");
+        repo.setHandler("DDI_2_5");
         return repo;
     }
 
@@ -86,7 +86,7 @@ public class ReposTestData
     public static Endpoints getSingleEndpoint() {
         Endpoints endpoints = new Endpoints();
         endpoints.getRepos().add(getUKDSRepo());
-        endpoints.getHarvesters().put("OAI-PMH", getOaiPmhHarvester());
+        endpoints.getHarvesters().put("DDI_2_5", getOaiPmhHarvester());
         endpoints.getHarvesters().put("NESSTAR", getNesstarHarvester());
         return endpoints;
     }
@@ -96,7 +96,7 @@ public class ReposTestData
         endpoints.getRepos().add(getUKDSRepo());
         endpoints.getRepos().add(getGesisEnRepo());
         endpoints.getRepos().add(getFSDRepo());
-        endpoints.getHarvesters().put("OAI-PMH", getOaiPmhHarvester());
+        endpoints.getHarvesters().put("DDI_2_5", getOaiPmhHarvester());
         endpoints.getHarvesters().put("NESSTAR", getNesstarHarvester());
         return endpoints;
     }
