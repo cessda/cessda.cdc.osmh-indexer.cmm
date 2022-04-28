@@ -33,7 +33,6 @@ import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -65,13 +64,12 @@ public class ConsumerSchedulerTest {
     public ConsumerSchedulerTest() {
         // mock for configuration of our repos
         when(appConfigurationProperties.getEndpoints()).thenReturn(getSingleEndpoint());
-        when(appConfigurationProperties.getLanguages()).thenReturn(Arrays.asList("cs", "da", "de", "el", "en", "et", "fi", "fr", "hu", "it", "nl", "no", "pt", "sk", "sl", "sr", "sv"));
+        when(appConfigurationProperties.getLanguages()).thenReturn(List.of("cs", "da", "de", "el", "en", "et", "fi", "fr", "hu", "it", "nl", "no", "pt", "sk", "sl", "sr", "sv"));
     }
 
     private DebuggingJMXBean mockDebuggingJMXBean() throws IOException {
         var debuggingJMXBean = mock(DebuggingJMXBean.class);
 
-        when(debuggingJMXBean.printCurrentlyConfiguredRepoEndpoints()).thenReturn("printed repo info");
         when(debuggingJMXBean.printElasticSearchInfo()).thenReturn("printed ES Info");
 
         return debuggingJMXBean;
@@ -168,7 +166,6 @@ public class ConsumerSchedulerTest {
 
     private void thenVerifyFullRun(DebuggingJMXBean debuggingJMXBean) throws IOException, IndexerException {
         verify(debuggingJMXBean, times(1)).printElasticSearchInfo();
-        verify(debuggingJMXBean, times(1)).printCurrentlyConfiguredRepoEndpoints();
         verifyNoMoreInteractions(debuggingJMXBean);
 
         verify(appConfigurationProperties, times(1)).getEndpoints();
@@ -230,7 +227,6 @@ public class ConsumerSchedulerTest {
         scheduler.dailyIncrementalHarvestAndIngestionAllConfiguredSPsReposRecords();
 
         verify(debuggingJMXBean, times(2)).printElasticSearchInfo();
-        verify(debuggingJMXBean, times(2)).printCurrentlyConfiguredRepoEndpoints();
         verifyNoMoreInteractions(debuggingJMXBean);
 
         verify(appConfigurationProperties, times(2)).getEndpoints();

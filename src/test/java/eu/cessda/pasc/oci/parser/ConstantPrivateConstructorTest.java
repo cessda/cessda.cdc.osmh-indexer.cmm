@@ -17,9 +17,7 @@ package eu.cessda.pasc.oci.parser;
 
 import eu.cessda.pasc.oci.TimeUtility;
 import org.assertj.core.api.Assertions;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -32,10 +30,6 @@ import static org.junit.Assert.assertTrue;
  * @author moses AT doraventures DOT com
  */
 public class ConstantPrivateConstructorTest {
-
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
-
   @Test
   public void timeUtilityShouldHaveAPrivateConstructor() throws NoSuchMethodException {
     Constructor<TimeUtility> constructor = TimeUtility.class.getDeclaredConstructor();

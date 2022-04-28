@@ -19,7 +19,6 @@ import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.elasticsearch.IngestService;
 import eu.cessda.pasc.oci.mock.data.RecordTestData;
 import eu.cessda.pasc.oci.mock.data.ReposTestData;
-import eu.cessda.pasc.oci.models.configurations.Endpoints;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.elasticsearch.ElasticsearchStatusException;
@@ -42,7 +41,7 @@ public class MicrometerMetricsTests {
     private final MeterRegistry meterRegistry = Mockito.mock(MeterRegistry.class);
 
     public MicrometerMetricsTests() {
-        var endpoints = Mockito.mock(Endpoints.class);
+        var endpoints = Mockito.mock(AppConfigurationProperties.Endpoints.class);
         Mockito.when(appConfigurationProperties.getLanguages()).thenReturn(Arrays.asList("en", "de", "sv", "cz"));
         Mockito.when(appConfigurationProperties.getEndpoints()).thenReturn(endpoints);
         Mockito.when(endpoints.getRepos()).thenReturn(Arrays.asList(
@@ -187,7 +186,7 @@ public class MicrometerMetricsTests {
         // When
         var testSet = new HashSet<>(RecordTestData.getCmmStudyOfLanguageCodeEnX3());
         AppConfigurationProperties properties = Mockito.mock(AppConfigurationProperties.class);
-        var endpoints = Mockito.mock(Endpoints.class);
+        var endpoints = Mockito.mock(AppConfigurationProperties.Endpoints.class);
         Mockito.when(properties.getLanguages()).thenReturn(Arrays.asList("en", "de", "sv", "cz"));
         Mockito.when(properties.getEndpoints()).thenReturn(endpoints);
         Mockito.when(endpoints.getRepos()).thenReturn(Collections.emptyList());

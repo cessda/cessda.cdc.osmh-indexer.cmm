@@ -64,7 +64,7 @@ public class PipelineUtilities {
                         repo.setPath(json.getParent());
                         repo.setDefaultLanguage(sharedModel.getDefaultLanguage());
 
-                        // Add the repo object to the list
+                        // Add the repo object to the stream
                         return Stream.of(repo);
                     } catch (IOException e) {
                         log.error("Failed to load pipeline definition \"{}\": {}", json, e.toString());

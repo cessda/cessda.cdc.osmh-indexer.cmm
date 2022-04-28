@@ -131,9 +131,8 @@ public class ConsumerScheduler {
         log.info("[{}] Consume and Ingest All SPs Repos: \n" +
                 "Started at [{}]\n" +
                 "Current state before run:\n" +
-                "{}\n" +
                 "{}",
-            runDescription, startTime, debuggingJMXBean.printCurrentlyConfiguredRepoEndpoints(),
+            runDescription, startTime,
             debuggingJMXBean.printElasticSearchInfo());
         return startTime;
     }

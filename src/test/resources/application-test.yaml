@@ -20,28 +20,27 @@ logging:
     eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor: DEBUG
     eu.cessda.pasc.oci.repository.DaoBaseImpl: TRACE
     eu.cessda.pasc.oci.service.helpers.DebuggingJMXBean: DEBUG
-osmhConsumer:
-  endpoints:
-    supportedRecordTypes:
-      - Study
-      - StudyGroup
-      - Variable
-      - Question
-      - CMM
-    repos:
-      - url: https://data2.aussda.at/oai/
-        preferredMetadataParam: oai_ddi
-        code: 'AUSSDA'
-        handler: 'OAI-PMH'
-      - url: http://services.fsd.uta.fi/v0/oai
-        preferredMetadataParam: oai_ddi25
-        setSpec: study_groups:energia
-        code: 'FSD'
-        handler: 'OAI-PMH'
-      - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
-        preferredMetadataParam: ddi
-        code: 'UKDS'
-        handler: 'OAI-PMH'
+endpoints:
+  supportedRecordTypes:
+    - Study
+    - StudyGroup
+    - Variable
+    - Question
+    - CMM
+  repos:
+    - url: https://data2.aussda.at/oai/
+      preferredMetadataParam: oai_ddi
+      code: 'AUSSDA'
+      handler: 'OAI-PMH'
+    - url: http://services.fsd.uta.fi/v0/oai
+      preferredMetadataParam: oai_ddi25
+      setSpec: study_groups:energia
+      code: 'FSD'
+      handler: 'OAI-PMH'
+    - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
+      preferredMetadataParam: ddi
+      code: 'UKDS'
+      handler: 'OAI-PMH'
   delay:
     # For tests, the delay should be effectively disabled
     initial: '315360000000'
