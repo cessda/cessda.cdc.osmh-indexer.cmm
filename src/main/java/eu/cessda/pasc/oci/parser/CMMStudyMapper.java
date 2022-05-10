@@ -18,6 +18,7 @@ package eu.cessda.pasc.oci.parser;
 import eu.cessda.pasc.oci.DateNotParsedException;
 import eu.cessda.pasc.oci.TimeUtility;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
+import eu.cessda.pasc.oci.exception.InvalidURIException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.models.cmmstudy.*;
 import eu.cessda.pasc.oci.models.configurations.Repo;
@@ -317,6 +318,8 @@ public class CMMStudyMapper {
      * <p>
      * Xpath = {@link XPaths#getStudyURLDocDscrXPath()}
      * Xpath = {@link XPaths#getStudyURLStudyDscrXPath()}
+     *
+     * @throws InvalidURIException if the value of the "URI" contains a string that violates RFC 2396.
      */
     Map<String, URI> parseStudyUrl(Document document, XPaths xPaths, String langCode) {
         var stdyDscrElements = DocElementParser.getElements(document, xPaths.getStudyURLStudyDscrXPath(), xPaths.getOaiAndDdiNs());
