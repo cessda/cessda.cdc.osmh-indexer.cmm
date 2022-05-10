@@ -24,7 +24,7 @@ import java.util.Optional;
  *
  * @see <a href="http://www.openarchives.org/OAI/openarchivesprotocol.html#ErrorConditions">OAI-PMH Error and Exception Conditions</a>
  */
-public class OaiPmhException extends HarvesterException {
+public class OaiPmhException extends IndexerException {
     private static final long serialVersionUID = 4623452253483287507L;
 
     /**

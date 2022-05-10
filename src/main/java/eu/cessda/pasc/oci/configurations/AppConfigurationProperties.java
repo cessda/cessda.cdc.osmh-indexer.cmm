@@ -15,20 +15,22 @@
  */
 package eu.cessda.pasc.oci.configurations;
 
-import eu.cessda.pasc.oci.models.configurations.Endpoints;
+import eu.cessda.pasc.oci.models.configurations.Harvester;
+import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.models.configurations.RestTemplateProps;
-import eu.cessda.pasc.oci.models.oai.configuration.OaiPmh;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Loads Default Configurations from application*.yml
@@ -37,23 +39,57 @@ import java.util.List;
  */
 @Configuration
 @EnableConfigurationProperties
-@ConfigurationProperties(prefix = "osmhconsumer")
+@ConfigurationProperties
 @Data
 public class AppConfigurationProperties {
 
-  private Endpoints endpoints = new Endpoints();
-  private RestTemplateProps restTemplateProps = new RestTemplateProps();
-  private final List<String> languages = new ArrayList<>();
-  private final OaiPmh oaiPmh = new OaiPmh();
+    private Endpoints endpoints = new Endpoints();
+    private RestTemplateProps restTemplateProps = new RestTemplateProps();
+    private List<String> languages = List.of("cs", "da", "de", "el", "en", "et", "fi", "fr", "hu", "it", "nl", "no", "pt", "sk", "sl", "sr", "sv");
+    private OaiPmh oaiPmh = new OaiPmh();
+    private Path baseDirectory = null;
 
     @Component
     @ConfigurationPropertiesBinding
-    public static class PathConverter implements Converter<String, Path>
-    {
+    public static class PathConverter implements Converter<String, Path> {
         @Override
-        public Path convert( String s )
-        {
+        public Path convert(@NonNull String s) {
             return Path.of(s).normalize();
+        }
+    }
+
+    /**
+     * Endpoints configuration model
+     *
+     * @author moses AT doraventures DOT com
+     */
+    @Data
+    public static class Endpoints {
+        private Map<String, Harvester> harvesters = Collections.emptyMap();
+        private List<Repo> repos = Collections.emptyList();
+    }
+
+    /**
+     * OaiPmh configuration model
+     *
+     * @author moses AT doraventures DOT com
+     */
+    @Data
+    public static class OaiPmh {
+      private MetadataParsingDefaultLang metadataParsingDefaultLang;
+      private boolean concatRepeatedElements;
+      private String concatSeparator;
+
+        /**
+         * Defaults for parsing metadata fields with no xml:lang specified,
+         * where lang is extracted content is to be mapped against a lang
+         *
+         * @author moses AT doraventures DOT com
+         */
+        @Data
+        public static class MetadataParsingDefaultLang {
+          private boolean active;
+          private String lang;
         }
     }
 }

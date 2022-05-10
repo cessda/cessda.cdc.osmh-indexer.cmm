@@ -15,13 +15,16 @@
  */
 package eu.cessda.pasc.oci.mock.data;
 
-import eu.cessda.pasc.oci.models.configurations.Endpoints;
+import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.models.configurations.Harvester;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.experimental.UtilityClass;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
+
+import static java.util.Map.entry;
 
 @UtilityClass
 public class ReposTestData
@@ -31,7 +34,7 @@ public class ReposTestData
         Repo repo = new Repo();
         repo.setCode("UKDS");
         repo.setUrl(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
-        repo.setHandler("OAI-PMH");
+        repo.setHandler("DDI_2_5");
         repo.setPreferredMetadataParam("ddi");
         return repo;
     }
@@ -46,7 +49,7 @@ public class ReposTestData
         Repo repo = new Repo();
         repo.setCode("GESIS");
         repo.setUrl(URI.create("https://dbkapps.gesis.org/dbkoai3"));
-        repo.setHandler("OAI-PMH");
+        repo.setHandler("DDI_2_5");
         return repo;
     }
 
@@ -56,7 +59,7 @@ public class ReposTestData
         repo.setCode("FSD");
         repo.setPreferredMetadataParam("oai_ddi25");
         repo.setSetSpec("study_groups:energia");
-        repo.setHandler("OAI-PMH");
+        repo.setHandler("DDI_2_5");
         return repo;
     }
 
@@ -83,21 +86,27 @@ public class ReposTestData
         return nesstarHarvester;
     }
 
-    public static Endpoints getSingleEndpoint() {
-        Endpoints endpoints = new Endpoints();
-        endpoints.getRepos().add(getUKDSRepo());
-        endpoints.getHarvesters().put("OAI-PMH", getOaiPmhHarvester());
-        endpoints.getHarvesters().put("NESSTAR", getNesstarHarvester());
+    public static AppConfigurationProperties.Endpoints getSingleEndpoint() {
+        var endpoints = new AppConfigurationProperties.Endpoints();
+        endpoints.setRepos(List.of(getUKDSRepo()));
+        endpoints.setHarvesters(Map.ofEntries(
+            entry("DDI_2_5", getOaiPmhHarvester()),
+            entry("NESSTAR", getNesstarHarvester())
+        ));
         return endpoints;
     }
 
-    public static Endpoints getEndpoints() {
-        Endpoints endpoints = new Endpoints();
-        endpoints.getRepos().add(getUKDSRepo());
-        endpoints.getRepos().add(getGesisEnRepo());
-        endpoints.getRepos().add(getFSDRepo());
-        endpoints.getHarvesters().put("OAI-PMH", getOaiPmhHarvester());
-        endpoints.getHarvesters().put("NESSTAR", getNesstarHarvester());
+    public static AppConfigurationProperties.Endpoints getEndpoints() {
+        var endpoints = new AppConfigurationProperties.Endpoints();
+        endpoints.setRepos(List.of(
+            getUKDSRepo(),
+            getGesisEnRepo(),
+            getFSDRepo()
+        ));
+        endpoints.setHarvesters(Map.ofEntries(
+            entry("DDI_2_5", getOaiPmhHarvester()),
+            entry("NESSTAR", getNesstarHarvester())
+        ));
         return endpoints;
     }
 

@@ -36,9 +36,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("test")
 public class DebuggingJMXBeanTestIT {
 
-    // Class under test
-    private DebuggingJMXBean debuggingJMXBean;
-
     @Autowired
     private AppConfigurationProperties appConfigurationProperties;
 
@@ -47,16 +44,8 @@ public class DebuggingJMXBeanTestIT {
 
     @Test
     public void shouldPrintElasticsearchDetails() throws IOException {
-        debuggingJMXBean = new DebuggingJMXBean(elasticsearchTemplate, appConfigurationProperties);
+        // Class under test
+        DebuggingJMXBean debuggingJMXBean = new DebuggingJMXBean(elasticsearchTemplate);
         assertThat(debuggingJMXBean.printElasticSearchInfo()).startsWith("Elasticsearch Client Settings");
-    }
-
-    @Test
-    public void shouldPrintCurrentlyConfiguredRepoEndpoints() {
-        debuggingJMXBean = new DebuggingJMXBean(elasticsearchTemplate, appConfigurationProperties);
-
-        // When
-        String actualRepos = debuggingJMXBean.printCurrentlyConfiguredRepoEndpoints();
-        assertThat(actualRepos).isNotEmpty();
     }
 }

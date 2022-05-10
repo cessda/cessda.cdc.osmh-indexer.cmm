@@ -16,7 +16,7 @@
 package eu.cessda.pasc.oci.parser;
 
 import eu.cessda.pasc.oci.DateNotParsedException;
-import eu.cessda.pasc.oci.exception.HarvesterException;
+import eu.cessda.pasc.oci.exception.IndexerException;
 import eu.cessda.pasc.oci.exception.InvalidURIException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.exception.XMLParseException;
@@ -60,9 +60,9 @@ public class RecordXMLParser {
      * @return a {@link CMMStudy} representing the study.
      * @throws OaiPmhException if the document contains an {@code <error>} element.
      * @throws XMLParseException if an error occurred parsing the XML.
-     * @throws HarvesterException if the request URL could not be converted into a {@link URI}.
+     * @throws IndexerException if the request URL could not be converted into a {@link URI}.
      */
-    public CMMStudy getRecord(Repo repo, Record recordVar) throws HarvesterException {
+    public CMMStudy getRecord(Repo repo, Record recordVar) throws IndexerException {
 
         final Document document;
 
@@ -84,7 +84,7 @@ public class RecordXMLParser {
             } catch (JDOMException | IOException e) {
                 throw new XMLParseException(fullUrl, e);
             } catch (URISyntaxException e) {
-                throw new HarvesterException(e);
+                throw new IndexerException(e);
             }
         } else {
             // The document has already been parsed.
@@ -93,7 +93,7 @@ public class RecordXMLParser {
                 try {
                     fullUrl = OaiPmhHelpers.buildGetStudyFullUrl(recordVar.getRequest().getBaseURL(), recordVar.getRecordHeader().getIdentifier(), recordVar.getRequest().getMetadataPrefix());
                 } catch (URISyntaxException e) {
-                    throw new HarvesterException(e);
+                    throw new IndexerException(e);
                 }
             }
         }
@@ -157,7 +157,7 @@ public class RecordXMLParser {
     }
 
     private XPaths getXPaths(Repo repository) {
-        if (repository.getHandler().equalsIgnoreCase("OAI-PMH")) {
+        if (repository.getHandler().equalsIgnoreCase("DDI_2_5")) {
             return XPaths.DDI_2_5_XPATHS;
         } else if (repository.getHandler().equalsIgnoreCase("NESSTAR")) {
             return XPaths.NESSTAR_XPATHS;

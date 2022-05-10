@@ -1,0 +1,11 @@
+{
+  "code": "UniData",
+  "name": null,
+  "url": "http://oai.unidata.unimib.it/v0/oai",
+  "setSpec": null,
+  "metadataPrefix": "oai_ddi25",
+  "ddiVersion": "DDI_2_5",
+  "profile": "https://cmv.cessda.eu/profiles/cdc/ddi-2.5/latest/profile.xml",
+  "validationGate": "BASIC",
+  "defaultLanguage": null
+}
