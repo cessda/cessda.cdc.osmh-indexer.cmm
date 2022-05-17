@@ -19,7 +19,6 @@ import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.mock.data.ReposTestData;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -36,10 +35,11 @@ public class OaiPmhHelpersTest {
 
     private static final String STUDY_IDENTIFIER = "15454";
 
-    private final AppConfigurationProperties appConfigurationProperties = Mockito.mock(AppConfigurationProperties.class);
+    private final AppConfigurationProperties appConfigurationProperties;
 
     public OaiPmhHelpersTest() {
-        Mockito.when(appConfigurationProperties.getEndpoints()).thenReturn(ReposTestData.getEndpoints());
+        appConfigurationProperties = new AppConfigurationProperties();
+        appConfigurationProperties.setEndpoints(ReposTestData.getEndpoints());
     }
 
     @Test

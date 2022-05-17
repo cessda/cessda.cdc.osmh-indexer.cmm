@@ -17,7 +17,6 @@ package eu.cessda.pasc.oci.parser;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
-import eu.cessda.pasc.oci.models.oai.configuration.OaiPmh;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -44,9 +43,9 @@ import static org.jdom2.Namespace.XML_NAMESPACE;
 @Component
 class DocElementParser {
 
-    private final OaiPmh oaiPmh;
+    private final AppConfigurationProperties.OaiPmh oaiPmh;
 
-    DocElementParser(OaiPmh oaiPmh) {
+    DocElementParser(AppConfigurationProperties.OaiPmh oaiPmh) {
         this.oaiPmh = oaiPmh;
     }
 

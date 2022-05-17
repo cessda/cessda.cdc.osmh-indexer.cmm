@@ -21,8 +21,6 @@ import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.models.cmmstudy.*;
 import eu.cessda.pasc.oci.models.configurations.Repo;
-import eu.cessda.pasc.oci.models.oai.configuration.MetadataParsingDefaultLang;
-import eu.cessda.pasc.oci.models.oai.configuration.OaiPmh;
 import lombok.Builder;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
@@ -56,12 +54,12 @@ import static eu.cessda.pasc.oci.parser.ParsingStrategies.termVocabAttributeStra
 @Component
 public class CMMStudyMapper {
 
-    private final OaiPmh oaiPmh;
+    private final AppConfigurationProperties.OaiPmh oaiPmh;
     private final DocElementParser docElementParser;
 
     public CMMStudyMapper() {
-        oaiPmh = new OaiPmh();
-        var defaultLangSettings = new MetadataParsingDefaultLang();
+        oaiPmh = new AppConfigurationProperties.OaiPmh();
+        var defaultLangSettings = new AppConfigurationProperties.OaiPmh.MetadataParsingDefaultLang();
         defaultLangSettings.setActive(true);
         defaultLangSettings.setLang("en");
         oaiPmh.setMetadataParsingDefaultLang(defaultLangSettings);

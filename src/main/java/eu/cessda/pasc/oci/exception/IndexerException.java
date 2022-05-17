@@ -20,25 +20,25 @@ package eu.cessda.pasc.oci.exception;
  *
  * @author moses AT doraventures DOT com
  */
-public class HarvesterException extends Exception {
+public class IndexerException extends Exception {
 
     private static final long serialVersionUID = -1848837478104997356L;
 
     /**
-     * Constructs a new {@link HarvesterException} with the specified detail message.
+     * Constructs a new {@link IndexerException} with the specified detail message.
      * The cause is not initialized, and may subsequently be initialized by a call to initCause.
      * @param message the detail message. The detail message is saved for later retrieval by the
-     * {@link HarvesterException#getMessage} method.
+     * {@link IndexerException#getMessage} method.
      */
-    public HarvesterException(String message) {
+    public IndexerException(String message) {
         super(message);
     }
 
-    public HarvesterException(String message, Throwable cause) {
+    public IndexerException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public HarvesterException(Throwable cause) {
+    public IndexerException(Throwable cause) {
         super(cause);
     }
 }

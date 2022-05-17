@@ -15,7 +15,6 @@
  */
 package eu.cessda.pasc.oci.service;
 
-import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
@@ -41,12 +40,10 @@ import static org.elasticsearch.client.RequestOptions.DEFAULT;
 public class DebuggingJMXBean {
 
   private final RestHighLevelClient elasticsearchClient;
-  private final AppConfigurationProperties appConfigProps;
 
   @Autowired
-  public DebuggingJMXBean(RestHighLevelClient elasticsearchClient, AppConfigurationProperties appConfigProps) {
+  public DebuggingJMXBean(RestHighLevelClient elasticsearchClient) {
     this.elasticsearchClient = elasticsearchClient;
-    this.appConfigProps = appConfigProps;
   }
 
   @ManagedOperation(description = "Prints to log the Elasticsearch server state.")
@@ -63,12 +60,5 @@ public class DebuggingJMXBean {
           "\tNumberOfDataNodes [" + healths.getNumberOfDataNodes() + "]" +
           "\tNumberOfNodes [" + healths.getNumberOfNodes() + "]";
       return elasticsearchInfo;
-  }
-
-  @ManagedOperation(description = "Show which SP repo Endpoints are currently active.")
-  public String printCurrentlyConfiguredRepoEndpoints() {
-    String reposStr = appConfigProps.getEndpoints().getRepos().stream().map(repo -> "\t" + repo + "\n")
-            .collect(Collectors.joining());
-    return "Configured Repositories: [\n" + reposStr + "]";
   }
 }

@@ -18,27 +18,27 @@ package eu.cessda.pasc.oci.exception;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class HarvesterExceptionTest {
+public class IndexerExceptionTest {
 
     private static final Exception INNER_EXCEPTION = new Exception("Inner exception");
     private static final String MESSAGE = "Message";
 
     @Test
     public void shouldInstanceWithAMessage() {
-        var internalSystemException = new HarvesterException(MESSAGE);
+        var internalSystemException = new IndexerException(MESSAGE);
         Assert.assertEquals(MESSAGE, internalSystemException.getMessage());
     }
 
     @Test
     public void shouldInstanceWithAMessageAndACause() {
-        var internalSystemException = new HarvesterException(MESSAGE, INNER_EXCEPTION);
+        var internalSystemException = new IndexerException(MESSAGE, INNER_EXCEPTION);
         Assert.assertEquals(MESSAGE, internalSystemException.getMessage());
         Assert.assertEquals(INNER_EXCEPTION, internalSystemException.getCause());
     }
 
     @Test
     public void shouldInstanceWithACause() {
-        var internalSystemException = new HarvesterException(INNER_EXCEPTION);
+        var internalSystemException = new IndexerException(INNER_EXCEPTION);
         Assert.assertEquals(INNER_EXCEPTION, internalSystemException.getCause());
     }
 }

@@ -16,7 +16,7 @@
 package eu.cessda.pasc.oci.parser;
 
 import eu.cessda.pasc.oci.exception.HTTPException;
-import eu.cessda.pasc.oci.exception.HarvesterException;
+import eu.cessda.pasc.oci.exception.IndexerException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.exception.XMLParseException;
 import eu.cessda.pasc.oci.http.HttpClient;
@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 
 import static eu.cessda.pasc.oci.parser.OaiPmhHelpers.appendListRecordResumptionToken;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -62,7 +63,7 @@ public class RecordHeaderParserTest {
     }
 
     @Test
-    public void shouldReturnRecordHeadersForGivenRepo() throws IOException, HarvesterException {
+    public void shouldReturnRecordHeadersForGivenRepo() throws IOException, IndexerException {
 
         // Given
         Repo ukdsEndpoint = ReposTestData.getUKDSRepo();
@@ -73,7 +74,7 @@ public class RecordHeaderParserTest {
         );
 
         // When
-        List<RecordHeader> recordHeaders = recordHeaderParser.getRecordHeaders(ukdsEndpoint).map(Record::getRecordHeader).collect(Collectors.toList());
+        List<RecordHeader> recordHeaders = recordHeaderParser.getRecordHeaders(ukdsEndpoint);
 
         then(recordHeaders).hasSize(3);
         then(recordHeaders).extracting("identifier").containsOnly("850229", "850232", "850235");
@@ -82,7 +83,7 @@ public class RecordHeaderParserTest {
     }
 
     @Test(expected = XMLParseException.class)
-    public void shouldThrowWhenRequestForHeaderFails() throws IOException, HarvesterException {
+    public void shouldThrowWhenRequestForHeaderFails() throws IOException, IndexerException {
 
         // Given
         Repo ukdsEndpoint = ReposTestData.getUKDSRepo();
@@ -102,7 +103,7 @@ public class RecordHeaderParserTest {
 
     @Test
     public void shouldRecursivelyLoopThroughTheOaiPMHResponseResumptionTokenToRetrieveReposCompleteListSize()
-        throws IOException, HarvesterException {
+        throws IOException, IndexerException {
 
         // Given
         Repo ukdsEndpoint = ReposTestData.getUKDSRepo();
@@ -130,7 +131,7 @@ public class RecordHeaderParserTest {
         );
 
         // When
-        List<RecordHeader> recordHeaders = recordHeaderParser.getRecordHeaders(ukdsEndpoint).map(Record::getRecordHeader).collect(Collectors.toList());
+        List<RecordHeader> recordHeaders = recordHeaderParser.getRecordHeaders(ukdsEndpoint);
 
         then(recordHeaders).hasSize(7);
         then(recordHeaders).extracting("identifier")
@@ -141,7 +142,7 @@ public class RecordHeaderParserTest {
     }
 
     @Test(expected = OaiPmhException.class)
-    public void shouldThrowExceptionForRecordHeadersInvalidMetadataToken() throws IOException, HarvesterException {
+    public void shouldThrowExceptionForRecordHeadersInvalidMetadataToken() throws IOException, IndexerException {
 
         // Given
         Repo ukdsEndpoint = ReposTestData.getUKDSRepo();
@@ -158,7 +159,7 @@ public class RecordHeaderParserTest {
     }
 
     @Test(expected = OaiPmhException.class)
-    public void shouldThrowExceptionForRecordHeadersErrorWithNoMessage() throws IOException, HarvesterException {
+    public void shouldThrowExceptionForRecordHeadersErrorWithNoMessage() throws IOException, IndexerException {
 
         // Given
         Repo ukdsEndpoint = ReposTestData.getUKDSRepo();
@@ -175,7 +176,7 @@ public class RecordHeaderParserTest {
     }
 
     @Test
-    public void shouldReturnDeletedRecordHeaderWhenStudyIsDeleted() throws IOException, HarvesterException {
+    public void shouldReturnDeletedRecordHeaderWhenStudyIsDeleted() throws IOException, IndexerException {
         // Given
         Repo ukdsEndpoint = ReposTestData.getUKDSRepo();
 
@@ -187,12 +188,12 @@ public class RecordHeaderParserTest {
         );
 
         // When
-        List<RecordHeader> recordHeaders = recordHeaderParser.getRecordHeaders(ukdsEndpoint).map(Record::getRecordHeader).collect(Collectors.toList());
+        List<RecordHeader> recordHeaders = recordHeaderParser.getRecordHeaders(ukdsEndpoint);
         Assert.assertTrue(recordHeaders.get(0).isDeleted());
     }
 
-    @Test(expected = HarvesterException.class)
-    public void shouldThrowExceptionIfOAIElementIsMissing() throws IOException, HarvesterException {
+    @Test(expected = IndexerException.class)
+    public void shouldThrowExceptionIfOAIElementIsMissing() throws IOException, IndexerException {
         // Given
         Repo ukdsEndpoint = ReposTestData.getUKDSRepo();
 
@@ -209,14 +210,14 @@ public class RecordHeaderParserTest {
     }
 
     @Test
-    public void shouldParseAHeaderFromAPath() throws HarvesterException, IOException {
+    public void shouldParseAHeaderFromAPath() throws IndexerException, IOException {
         // Given
         var ukdsEndpoint  = ReposTestData.getUKDSRepo();
         ukdsEndpoint.setUrl(null);
         ukdsEndpoint.setPath(new ClassPathResource("xml/ddi_2_5/ddi_record_1683.xml").getFile().toPath());
 
         // When
-        var records = recordHeaderParser.getRecordHeaders(ukdsEndpoint).collect(Collectors.toList());
+        var records = recordHeaderParser.getRecordHeaders(ukdsEndpoint, ukdsEndpoint.getPath()).collect(Collectors.toList());
 
         // Then
         assertThat(records).extracting(Record::getRecordHeader).extracting(RecordHeader::getIdentifier).contains("1683");
@@ -226,14 +227,14 @@ public class RecordHeaderParserTest {
     }
 
     @Test
-    public void shouldNotIncludeARequestFieldIfRequiredElementsAreNotPresent() throws IOException, HarvesterException {
+    public void shouldNotIncludeARequestFieldIfRequiredElementsAreNotPresent() throws IOException, IndexerException {
         // Given
         var ukdsEndpoint  = ReposTestData.getUKDSRepo();
         ukdsEndpoint.setUrl(null);
         ukdsEndpoint.setPath(new ClassPathResource("xml/ddi_2_5/synthetic_compliant_cmm.xml").getFile().toPath());
 
         // When
-        var records = recordHeaderParser.getRecordHeaders(ukdsEndpoint).collect(Collectors.toList());
+        var records = recordHeaderParser.getRecordHeaders(ukdsEndpoint, ukdsEndpoint.getPath()).collect(Collectors.toList());
 
         // Then
         assertThat(records).extracting(Record::getRecordHeader).extracting(RecordHeader::getIdentifier).contains("2305");
@@ -242,7 +243,7 @@ public class RecordHeaderParserTest {
     }
 
     @Test
-    public void shouldHandleParsingErrors() throws IOException, HarvesterException {
+    public void shouldHandleParsingErrors() throws IOException {
         // Given
         var ukdsEndpoint  = ReposTestData.getUKDSRepo();
         ukdsEndpoint.setUrl(null);
@@ -251,14 +252,12 @@ public class RecordHeaderParserTest {
         ukdsEndpoint.setPath(new ClassPathResource("record_ukds_998.json").getFile().toPath());
 
         // When
-        var records = recordHeaderParser.getRecordHeaders(ukdsEndpoint).collect(Collectors.toList());
-
-        // Then
-        assertThat(records).isEmpty();
+        assertThatThrownBy(() -> recordHeaderParser.getRecordHeaders(ukdsEndpoint, ukdsEndpoint.getPath()))
+            .isInstanceOf(XMLParseException.class);
     }
 
-    @Test(expected = HarvesterException.class)
-    public void shouldHandleIOErrorsWhenLookingForDirectories() throws HarvesterException {
+    @Test(expected = IndexerException.class)
+    public void shouldHandleIOErrorsWhenLookingForDirectories() throws IndexerException {
         // Given
         var ukdsEndpoint  = ReposTestData.getUKDSRepo();
         ukdsEndpoint.setUrl(null);
@@ -268,15 +267,5 @@ public class RecordHeaderParserTest {
 
         // When
         recordHeaderParser.getRecordHeaders(ukdsEndpoint);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldThrowIfAURLAndAPathIsNotConfigured() throws HarvesterException {
-        // Given
-        var ukdsEndpoint  = ReposTestData.getUKDSRepo();
-        ukdsEndpoint.setUrl(null);
-
-        // When
-        var records = recordHeaderParser.getRecordHeaders(ukdsEndpoint).collect(Collectors.toList());
     }
 }

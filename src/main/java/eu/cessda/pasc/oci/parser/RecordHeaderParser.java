@@ -15,7 +15,7 @@
  */
 package eu.cessda.pasc.oci.parser;
 
-import eu.cessda.pasc.oci.exception.HarvesterException;
+import eu.cessda.pasc.oci.exception.IndexerException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.exception.XMLParseException;
 import eu.cessda.pasc.oci.http.HttpClient;
@@ -33,13 +33,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static com.google.common.io.Files.getFileExtension;
 
 /**
  * Service implementation to handle Listing Record Headers
@@ -66,6 +65,14 @@ public class RecordHeaderParser {
             return OaiPmhHelpers.getSaxBuilder().build(documentInputStream);
         } catch (IOException | JDOMException e) {
             throw new XMLParseException(repoUrl, e);
+        }
+    }
+
+    private Document getRecordHeadersDocument (Path path) throws XMLParseException {
+        try (var inputStream = Files.newInputStream(path)) {
+            return OaiPmhHelpers.getSaxBuilder().build(inputStream);
+        } catch (IOException | JDOMException e) {
+            throw new XMLParseException(e);
         }
     }
 
@@ -154,77 +161,65 @@ public class RecordHeaderParser {
      *
      * @param repo the repository to retrieve records from.
      * @return a list of record headers.
+     * @throws XMLParseException  if the XML cannot be parsed, or if an IO error occurs.
+     */
+    public Stream<Record> getRecordHeaders(Repo repo, Path path) throws XMLParseException {
+        // Retrieve
+        var recordHeadersDocument = getRecordHeadersDocument(path);
+
+        // Parse request element to retrieve the base URL of the repository
+        var request = parseRequestElement(repo, recordHeadersDocument);
+
+        // Parse the record header from the document
+        var recordHeaders = parseRecordHeadersFromDoc(recordHeadersDocument);
+
+        return recordHeaders.stream().map(recordHeader -> new Record(recordHeader, request.orElse(null), recordHeadersDocument));
+    }
+
+    /**
+     * Gets a stream of record headers from the specified repository.
+     * <p>
+     * This method uses the {@code ListIdentifiers} verb.
+     *
+     * @param repo the repository to retrieve records from.
+     * @return a list of record headers.
      * @throws OaiPmhException    if the repository returns an OAI-PMH error.
      * @throws XMLParseException  if the XML cannot be parsed, or if an IO error occurs.
-     * @throws HarvesterException if the OAI-PMH repository returns a XML document with no {@code <oai>} element.
+     * @throws IndexerException if the OAI-PMH repository returns a XML document with no {@code <oai>} element.
      */
-    @SuppressWarnings({"java:S2095", "resource"}) // This is closed by the calling method
-    public Stream<Record> getRecordHeaders(Repo repo) throws HarvesterException {
+    public List<RecordHeader> getRecordHeaders(Repo repo) throws IndexerException {
+        URI fullListRecordUrlPath = OaiPmhHelpers.appendListRecordParams(repo);
+        var recordHeadersDocument = getRecordHeadersDocument(fullListRecordUrlPath);
 
-        log.debug("[{}] Parsing record headers.", repo.getCode());
-
-        if (repo.getPath() != null) {
-            try {
-                return Files.find(repo.getPath(), 1, (path, attributes) ->
-                    // Find XML files in the source directory.
-                    attributes.isRegularFile() && getFileExtension(path.toString()).equals("xml")
-                ).flatMap(p -> {
-                    try (var inputStream = Files.newInputStream(p)) {
-                        return Stream.of(OaiPmhHelpers.getSaxBuilder().build(inputStream));
-                    } catch (IOException | JDOMException e) {
-                        log.warn("[{}] Couldn't parse {}: {}", repo.getCode(), p, e.toString());
-                        return Stream.empty();
-                    }
-                }).flatMap(doc -> {
-                    // Parse request element to retrieve the base URL of the repository
-                    var request = parseRequestElement(repo, doc);
-
-                    // Parse the record header from the document
-                    var recordHeaders = parseRecordHeadersFromDoc(doc);
-
-                    return recordHeaders.stream().map(recordHeader -> new Record(recordHeader, request.orElse(null), doc));
-                });
-            } catch (IOException e) {
-                throw new HarvesterException("Reading path failed: " + e, e);
-            }
-        } else if (repo.getUrl() != null) {
-
-            URI fullListRecordUrlPath = OaiPmhHelpers.appendListRecordParams(repo);
-            var recordHeadersDocument = getRecordHeadersDocument(fullListRecordUrlPath);
-
-            // Check if the document has an OAI element
-            if (DocElementParser.getFirstElement(recordHeadersDocument, OaiPmhConstants.OAI_PMH, OaiPmhConstants.OAI_NS).isEmpty()) {
-                throw new HarvesterException("Missing OAI element");
-            }
-
-            // Exit if the response has an <error> element
-            DocElementParser.validateResponse(recordHeadersDocument);
-
-            Optional<String> resumptionToken;
-            var recordHeaders = new ArrayList<RecordHeader>();
-
-            do {
-                // Parse and add all found record headers
-                recordHeaders.addAll(parseRecordHeadersFromDoc(recordHeadersDocument));
-
-                // Check and loop when there is a resumptionToken
-                resumptionToken = parseResumptionToken(recordHeadersDocument);
-                if (resumptionToken.isPresent()) {
-                    URI repoUrlWithResumptionToken = OaiPmhHelpers.appendListRecordResumptionToken(repo.getUrl(), resumptionToken.get());
-                    log.trace("Looping for [{}].", repoUrlWithResumptionToken);
-                    recordHeadersDocument = getRecordHeadersDocument(repoUrlWithResumptionToken);
-                }
-
-            } while (resumptionToken.isPresent());
-
-            log.debug("[{}] ParseRecordHeaders ended:  No more resumption tokens to process.", repo.getCode());
-
-            // Trim the arraylist
-            recordHeaders.trimToSize();
-
-            return recordHeaders.parallelStream().map(recordHeader -> new Record(recordHeader, new Record.Request(repo.getUrl(), repo.getPreferredMetadataParam()),null));
-        } else {
-            throw new IllegalArgumentException("Repo " + repo.getCode() + " has no URL or path defined");
+        // Check if the document has an OAI element
+        if (DocElementParser.getFirstElement(recordHeadersDocument, OaiPmhConstants.OAI_PMH, OaiPmhConstants.OAI_NS).isEmpty()) {
+            throw new IndexerException("Missing OAI element");
         }
+
+        // Exit if the response has an <error> element
+        DocElementParser.validateResponse(recordHeadersDocument);
+
+        Optional<String> resumptionToken;
+        var recordHeaders = new ArrayList<RecordHeader>();
+
+        do {
+            // Parse and add all found record headers
+            recordHeaders.addAll(parseRecordHeadersFromDoc(recordHeadersDocument));
+
+            // Check and loop when there is a resumptionToken
+            resumptionToken = parseResumptionToken(recordHeadersDocument);
+            if (resumptionToken.isPresent()) {
+                URI repoUrlWithResumptionToken = OaiPmhHelpers.appendListRecordResumptionToken(repo.getUrl(), resumptionToken.get());
+                log.trace("Looping for [{}].", repoUrlWithResumptionToken);
+                recordHeadersDocument = getRecordHeadersDocument(repoUrlWithResumptionToken);
+            }
+
+        } while (resumptionToken.isPresent());
+
+        log.debug("[{}] ParseRecordHeaders ended:  No more resumption tokens to process.", repo.getCode());
+
+        // Trim the arraylist
+        recordHeaders.trimToSize();
+        return recordHeaders;
     }
 }

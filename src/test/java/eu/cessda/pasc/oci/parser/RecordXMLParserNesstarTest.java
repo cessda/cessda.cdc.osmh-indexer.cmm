@@ -20,7 +20,7 @@ import com.github.fge.jackson.JsonLoader;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import eu.cessda.pasc.oci.ResourceHandler;
-import eu.cessda.pasc.oci.exception.HarvesterException;
+import eu.cessda.pasc.oci.exception.IndexerException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.http.HttpClient;
 import eu.cessda.pasc.oci.mock.data.ReposTestData;
@@ -74,7 +74,7 @@ public class RecordXMLParserNesstarTest {
     }
 
     @Test
-    public void shouldReturnValidCMMStudyRecordFromAFullyComplaintCmmDdiRecord() throws IOException, ProcessingException, JSONException, HarvesterException {
+    public void shouldReturnValidCMMStudyRecordFromAFullyComplaintCmmDdiRecord() throws IOException, ProcessingException, JSONException, IndexerException {
 
         // Given
         given(httpClient.getInputStream(fullRecordURL))
@@ -90,7 +90,7 @@ public class RecordXMLParserNesstarTest {
     }
 
     @Test
-    public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord() throws IOException, ProcessingException, HarvesterException {
+    public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord() throws IOException, ProcessingException, IndexerException {
 
         // Given
         given(httpClient.getInputStream(fullRecordURL))
@@ -106,7 +106,7 @@ public class RecordXMLParserNesstarTest {
 
     @Test
     @SuppressWarnings("PreferJavaTimeOverload")
-    public void shouldOnlyExtractSingleDateAsStartDateForRecordsWithASingleDateAttr() throws IOException, ProcessingException, HarvesterException {
+    public void shouldOnlyExtractSingleDateAsStartDateForRecordsWithASingleDateAttr() throws IOException, ProcessingException, IndexerException {
 
         // Given
         given(httpClient.getInputStream(fullRecordURL))
@@ -126,7 +126,7 @@ public class RecordXMLParserNesstarTest {
     }
 
     @Test
-    public void shouldExtractDefaultLanguageFromCodebookXMLLagIfPresent() throws HarvesterException, IOException {
+    public void shouldExtractDefaultLanguageFromCodebookXMLLagIfPresent() throws IndexerException, IOException {
 
         // Given
         var expectedCmmStudyJsonString = ResourceHandler.getResourceAsStream("xml/nesstar/synthetic_compliant_cmm_nesstar.xml");
@@ -144,7 +144,7 @@ public class RecordXMLParserNesstarTest {
 
     @Test
     @SuppressWarnings("PreferJavaTimeOverload")
-    public void shouldReturnCMMStudyRecordWithRepeatedAbstractConcatenated() throws HarvesterException, IOException, ProcessingException {
+    public void shouldReturnCMMStudyRecordWithRepeatedAbstractConcatenated() throws IndexerException, IOException, ProcessingException {
 
         // Given
         var expectedAbstract = getAbstractFixture();
@@ -163,7 +163,7 @@ public class RecordXMLParserNesstarTest {
 
     @Test // https://bitbucket.org/cessda/cessda.cdc.version2/issues/135
     @SuppressWarnings("PreferJavaTimeOverload")
-    public void shouldReturnCMMStudyRecordWithOutParTitleWhenThereIsALangDifferentFromDefault() throws HarvesterException, IOException, ProcessingException {
+    public void shouldReturnCMMStudyRecordWithOutParTitleWhenThereIsALangDifferentFromDefault() throws IndexerException, IOException, ProcessingException {
 
         // Given
         var expectedTitle = getTitleFixture();
@@ -183,7 +183,7 @@ public class RecordXMLParserNesstarTest {
 
     @Test()
     public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord_MarkedAsNotActive()
-        throws HarvesterException, IOException {
+        throws IndexerException, IOException {
 
         // Given
         given(httpClient.getInputStream(fullRecordURL)).willReturn(
@@ -199,7 +199,7 @@ public class RecordXMLParserNesstarTest {
     }
 
     @Test(expected = OaiPmhException.class)
-    public void shouldThrowExceptionForRecordWithErrorElement() throws HarvesterException, IOException {
+    public void shouldThrowExceptionForRecordWithErrorElement() throws IndexerException, IOException {
 
         // Given
         given(httpClient.getInputStream(fullRecordURL)).willReturn(
@@ -213,7 +213,7 @@ public class RecordXMLParserNesstarTest {
     }
 
     @Test
-    public void shouldExtractAllRequiredCMMFieldsForAGivenAUKDSRecord() throws HarvesterException, IOException, ProcessingException, JSONException {
+    public void shouldExtractAllRequiredCMMFieldsForAGivenAUKDSRecord() throws IndexerException, IOException, ProcessingException, JSONException {
 
         // Given
         given(httpClient.getInputStream(fullRecordURL)).willReturn(
@@ -291,7 +291,7 @@ public class RecordXMLParserNesstarTest {
     }
 
     @Test
-    public void shouldOverrideGlobalLanguageDefaultIfAPerRepositoryOverrideIsSpecified() throws HarvesterException, IOException, ProcessingException {
+    public void shouldOverrideGlobalLanguageDefaultIfAPerRepositoryOverrideIsSpecified() throws IndexerException, IOException, ProcessingException {
 
         // Given
         given(httpClient.getInputStream(fullRecordURL)).willReturn(
