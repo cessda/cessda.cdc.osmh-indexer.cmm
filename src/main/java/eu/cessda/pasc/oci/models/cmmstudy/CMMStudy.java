@@ -143,4 +143,7 @@ public class CMMStudy {
 
     @JsonProperty("studyXmlSourceUrl")
     String studyXmlSourceUrl;
+
+    @JsonProperty("repositoryUrl")
+    URI repositoryUrl;
 }
