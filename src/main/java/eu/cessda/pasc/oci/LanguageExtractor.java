@@ -22,9 +22,11 @@ import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.Publisher;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -93,9 +95,13 @@ public class LanguageExtractor {
 
         CMMStudyOfLanguage.CMMStudyOfLanguageBuilder builder = CMMStudyOfLanguage.builder();
 
+        // Identifier generation -
+        var id = cmmStudy.getRepositoryUrl() + "-" + cmmStudy.getStudyNumber();
+        var hashedId = DigestUtils.sha256Hex(id.getBytes(StandardCharsets.UTF_8));
+
         // Language neutral specific field extraction
-        String idPrefix = repository.getCode().trim().replace(" ", "-") + "__"; // UK Data Service = UK-Data-Service__
-        builder.id(idPrefix + cmmStudy.getStudyNumber())
+        // UK Data Service = UK-Data-Service__
+        builder.id(hashedId)
             .code(repository.getCode())
             .studyNumber(cmmStudy.getStudyNumber())
             .active(cmmStudy.isActive())

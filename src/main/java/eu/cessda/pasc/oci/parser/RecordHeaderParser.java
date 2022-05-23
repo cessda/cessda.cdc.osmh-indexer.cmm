@@ -89,7 +89,7 @@ public class RecordHeaderParser {
 
             var baseURL = Optional.<URI>empty();
             try {
-                baseURL = Optional.of(new URI(elem.getText()));
+                baseURL = Optional.of(new URI(elem.getText().trim()));
             } catch (URISyntaxException e) {
                 log.warn("{}: {} could not be parsed as a URL: {}", repo.getCode(), elem.getText(), e.toString());
             }
