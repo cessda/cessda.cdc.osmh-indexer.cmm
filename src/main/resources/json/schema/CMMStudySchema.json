@@ -470,6 +470,10 @@
     "studyXmlSourceUrl": {
       "type": "string",
       "description": "The Study's Full xml URL of the Service Provider's endpoint"
+    },
+    "repositoryUrl": {
+      "type": "string",
+      "description": "The URL of the repository as defined in the repository's configuration"
     }
   }
 }
