@@ -141,7 +141,7 @@ class ParsingStrategies {
         var uriString = element.getAttributeValue(URI_ATTR);
         try {
             if (uriString != null) {
-                return new URI(uriString);
+                return new URI(uriString.trim());
             }
         } catch (URISyntaxException e) {
             throw new InvalidURIException(e);

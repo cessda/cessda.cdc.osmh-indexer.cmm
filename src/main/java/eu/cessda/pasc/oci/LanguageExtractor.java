@@ -114,8 +114,9 @@ public class LanguageExtractor {
             .langAvailableIn(Set.copyOf(availableLanguages))
             .studyXmlSourceUrl(cmmStudy.getStudyXmlSourceUrl());
 
-        // #183: The CDC user group would like the publisher to be set based on the indexer's configuration
-        builder.publisher(Publisher.builder().name(repository.getName()).abbreviation(repository.getCode()).build());
+
+        // #430: Set the publisher filter based on the source repository.
+        builder.publisherFilter(Publisher.builder().name(repository.getName()).abbreviation(repository.getCode()).build());
 
         // Language specific field extraction
         Optional.ofNullable(cmmStudy.getTitleStudy()).map(map -> map.get(lang)).ifPresent(builder::titleStudy);
@@ -141,6 +142,7 @@ public class LanguageExtractor {
         Optional.ofNullable(cmmStudy.getTitleStudy()).map(map -> map.get(lang)).ifPresent(builder::titleStudy);
         Optional.ofNullable(cmmStudy.getDataCollectionFreeTexts()).map(map -> map.get(lang)).ifPresent(builder::dataCollectionFreeTexts);
         Optional.ofNullable(cmmStudy.getDataAccessFreeTexts()).map(map -> map.get(lang)).ifPresent(builder::dataAccessFreeTexts);
+        Optional.ofNullable(cmmStudy.getPublisher()).map(map -> map.get(lang)).ifPresent(builder::publisher);
 
         // #142 - Use any language to set the study url field
         Optional.ofNullable(cmmStudy.getStudyUrl()).flatMap(map -> map.values().stream().filter(Objects::nonNull).findAny()).ifPresent(builder::studyUrl);
