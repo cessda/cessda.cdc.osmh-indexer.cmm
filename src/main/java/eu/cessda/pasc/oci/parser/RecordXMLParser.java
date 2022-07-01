@@ -97,7 +97,7 @@ public class RecordXMLParser {
                 }
             }
         }
-        return mapDDIRecordToCMMStudy(document, fullUrl, repo);
+        return mapDDIRecordToCMMStudy(document, recordVar.getRequest(), fullUrl, repo);
     }
 
     /**
@@ -106,7 +106,7 @@ public class RecordXMLParser {
      * @param repository the source repository.
      * @throws OaiPmhException if the document contains an {@code <error>} element.
      */
-    private CMMStudy mapDDIRecordToCMMStudy(Document document, URI fullUrl, Repo repository) throws OaiPmhException {
+    private CMMStudy mapDDIRecordToCMMStudy(Document document, Record.Request request, URI fullUrl, Repo repository) throws OaiPmhException {
 
         CMMStudy.CMMStudyBuilder builder = CMMStudy.builder();
 
@@ -151,6 +151,9 @@ public class RecordXMLParser {
         }
         if (fullUrl != null) {
             builder.studyXmlSourceUrl(fullUrl.toString());
+        }
+        if (request != null) {
+            builder.repositoryUrl(request.getBaseURL());
         }
 
         return builder.build();

@@ -22,9 +22,11 @@ import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.Publisher;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -93,9 +95,13 @@ public class LanguageExtractor {
 
         CMMStudyOfLanguage.CMMStudyOfLanguageBuilder builder = CMMStudyOfLanguage.builder();
 
+        // Identifier generation -
+        var id = cmmStudy.getRepositoryUrl() + "-" + cmmStudy.getStudyNumber();
+        var hashedId = DigestUtils.sha256Hex(id.getBytes(StandardCharsets.UTF_8));
+
         // Language neutral specific field extraction
-        String idPrefix = repository.getCode().trim().replace(" ", "-") + "__"; // UK Data Service = UK-Data-Service__
-        builder.id(idPrefix + cmmStudy.getStudyNumber())
+        // UK Data Service = UK-Data-Service__
+        builder.id(hashedId)
             .code(repository.getCode())
             .studyNumber(cmmStudy.getStudyNumber())
             .active(cmmStudy.isActive())
@@ -108,8 +114,9 @@ public class LanguageExtractor {
             .langAvailableIn(Set.copyOf(availableLanguages))
             .studyXmlSourceUrl(cmmStudy.getStudyXmlSourceUrl());
 
-        // #183: The CDC user group would like the publisher to be set based on the indexer's configuration
-        builder.publisher(Publisher.builder().name(repository.getName()).abbreviation(repository.getCode()).build());
+
+        // #430: Set the publisher filter based on the source repository.
+        builder.publisherFilter(Publisher.builder().name(repository.getName()).abbreviation(repository.getCode()).build());
 
         // Language specific field extraction
         Optional.ofNullable(cmmStudy.getTitleStudy()).map(map -> map.get(lang)).ifPresent(builder::titleStudy);
@@ -135,6 +142,7 @@ public class LanguageExtractor {
         Optional.ofNullable(cmmStudy.getTitleStudy()).map(map -> map.get(lang)).ifPresent(builder::titleStudy);
         Optional.ofNullable(cmmStudy.getDataCollectionFreeTexts()).map(map -> map.get(lang)).ifPresent(builder::dataCollectionFreeTexts);
         Optional.ofNullable(cmmStudy.getDataAccessFreeTexts()).map(map -> map.get(lang)).ifPresent(builder::dataAccessFreeTexts);
+        Optional.ofNullable(cmmStudy.getPublisher()).map(map -> map.get(lang)).ifPresent(builder::publisher);
 
         // #142 - Use any language to set the study url field
         Optional.ofNullable(cmmStudy.getStudyUrl()).flatMap(map -> map.values().stream().filter(Objects::nonNull).findAny()).ifPresent(builder::studyUrl);

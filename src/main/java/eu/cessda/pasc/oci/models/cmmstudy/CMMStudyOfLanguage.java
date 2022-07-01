@@ -100,6 +100,9 @@ public class CMMStudyOfLanguage {
     @JsonProperty("publisher")
     Publisher publisher;
 
+    @JsonProperty("publisherFilter")
+    Publisher publisherFilter;
+
     @JsonProperty("studyAreaCountries")
     List<Country> studyAreaCountries;
 
