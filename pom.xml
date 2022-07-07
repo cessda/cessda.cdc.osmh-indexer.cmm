@@ -348,7 +348,7 @@
             <plugin>
                 <groupId>com.github.alexcojocaru</groupId>
                 <artifactId>elasticsearch-maven-plugin</artifactId>
-                <version>6.22</version>
+                <version>6.23</version>
                 <configuration>
                     <version>6.8.15</version>
                     <httpPort>9250</httpPort>
