@@ -353,11 +353,6 @@
                     <version>7.17.1</version>
                     <httpPort>9250</httpPort>
                     <transportPort>9350</transportPort>
-                    <instanceSettings>
-                        <setting>
-                            <discovery.type>single-node</discovery.type>
-                        </setting>
-                    </instanceSettings>
                 </configuration>
                 <executions>
                     <execution>
