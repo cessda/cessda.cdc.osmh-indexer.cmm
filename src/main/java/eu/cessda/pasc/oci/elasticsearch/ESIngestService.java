@@ -23,6 +23,7 @@ import eu.cessda.pasc.oci.configurations.ESConfigurationProperties;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.ElasticsearchStatusException;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.search.SearchRequest;
@@ -31,6 +32,7 @@ import org.elasticsearch.client.Requests;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.GetIndexRequest;
+import org.elasticsearch.client.indices.PutMappingRequest;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -57,6 +59,7 @@ public class ESIngestService implements IngestService {
 
     private static final String LAST_MODIFIED_FIELD = "lastModified";
     private static final String INDEX_TYPE = "cmmstudy";
+    private static final String MAPPINGS_JSON = "elasticsearch/mappings/mappings_" + INDEX_TYPE + ".json";
     private static final String INDEX_NAME_TEMPLATE = INDEX_TYPE + "_%s";
 
     /**
@@ -121,7 +124,22 @@ public class ESIngestService implements IngestService {
     private void indexBulkRequest(String indexName, BulkRequest request) throws IOException {
         var response = esClient.bulk(request, DEFAULT);
         if (response.hasFailures()) {
-            log.warn("[{}] {}", indexName, response.buildFailureMessage());
+            for (var item : response.getItems()) {
+                if (item.isFailed() && item.getFailure().getCause().getMessage().contains("strict_dynamic_mapping_exception")) {
+                    // Attempt updating field mappings
+                    var updateMappingRequest = new PutMappingRequest(indexName)
+                        .source(ResourceHandler.getResourceAsString(MAPPINGS_JSON), XContentType.JSON);
+                    esClient.indices().putMapping(updateMappingRequest, DEFAULT);
+
+                    // Retry indexing with updated mappings.
+                    response = esClient.bulk(request, DEFAULT);
+                    break;
+                }
+            }
+
+            if (response.hasFailures()) {
+                log.warn("[{}] {}", indexName, response.buildFailureMessage());
+            }
         }
     }
 
@@ -258,7 +276,7 @@ public class ESIngestService implements IngestService {
             settings = String.format(settingsTemplate, esConfig.getNumberOfShards(), esConfig.getNumberOfReplicas());
 
             // Load mappings
-            mappings = ResourceHandler.getResourceAsString("elasticsearch/mappings/mappings_" + INDEX_TYPE + ".json");
+            mappings = ResourceHandler.getResourceAsString(MAPPINGS_JSON);
 
         } catch (IOException e) {
             log.error("[{}] Couldn't load settings for Elasticsearch: {}", indexName, e.toString());
@@ -286,6 +304,13 @@ public class ESIngestService implements IngestService {
                 log.error("[{}] Index creation failed!", indexName);
                 return false;
             }
+        } catch (ElasticsearchException e) {
+          if (e.getMessage().contains("resource_already_exists_exception")) {
+              // Index exists, continue
+              return true;
+          } else {
+              throw e;
+          }
         } catch (IOException e) {
             log.error("[{}] Index creation failed: {}", indexName, e.toString());
             return false;
