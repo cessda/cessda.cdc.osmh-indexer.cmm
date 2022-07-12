@@ -114,6 +114,10 @@ public class IndexerConsumerService {
         Stream<Record> stream = Stream.empty();
 
         try {
+            /*
+            * Repositories are indexed from their path by default, but can be indexed directly from
+            * OAI-PMH repositories if a path is not defined but a URL is.
+            */
             if (repo.getPath() != null) {
                 stream = Files.find(repo.getPath(), 1, (path, attributes) ->
                     // Find XML files in the source directory.
