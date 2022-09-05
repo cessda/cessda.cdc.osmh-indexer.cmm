@@ -13,31 +13,31 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 - *Fixed (for any bug fixes)*
 - *Security (in case of vulnerabilities)*
 
+## [3.0.2] - 2022-09-06
+
+### Changes
+
+- Update Elasticsearch to v7 ([#429](https://bitbucket.org/cessda/cessda.cdc.versions/issues/429))
+
 ## [3.0.0] - 2022-06-07
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6577776.svg)](https://doi.org/10.5281/zenodo.6577776)
 
 ### Additions
 
 - Filter out invalid URLs from the study URL field ([#390](https://bitbucket.org/cessda/cessda.cdc.versions/issues/390))
-
 - Add a publisherFilter field ([#430](https://bitbucket.org/cessda/cessda.cdc.versions/issues/430))
 
 ### Changes
 
 - Updated Elasticsearch imports ([#269](https://bitbucket.org/cessda/cessda.cdc.versions/issues/269))
-
 - Generate identifiers based on the CDC identifier specification ([#386](https://bitbucket.org/cessda/cessda.cdc.versions/issues/386))
-
 - Convert the indexer into a command line application that can be run as a scheduled task ([#392](https://bitbucket.org/cessda/cessda.cdc.versions/issues/392))
-
 - Add support for defining repositories using a pipeline.json file. Update ReadMe file accordingly ([#409](https://bitbucket.org/cessda/cessda.cdc.versions/issues/409))
-
 - Refactor the indexer, simplify configuration ([#428](https://bitbucket.org/cessda/cessda.cdc.versions/issues/428))
 
 ### Removed
 
 - Remove Spring Data Elasticsearch as a dependency, use the Elasticsearch client directly ([#405](https://bitbucket.org/cessda/cessda.cdc.versions/issues/405))
-
 
 ## [2.5.0] - 2021-11-25
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5710021.svg)](https://doi.org/10.5281/zenodo.5710021)

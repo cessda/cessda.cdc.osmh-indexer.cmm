@@ -28,7 +28,7 @@
     <description>
         Fetches CMM Metadata using internal or remote repository handlers. Part of the OSMH harvester.
     </description>
-    <url>https://bitbucket.org/cessda/cessda.cdc.version2/wiki/Home</url>
+    <url>https://bitbucket.org/cessda/cessda.cdc.versions</url>
     <organization>
         <name>CESSDA ERIC</name>
         <url>https://www.cessda.eu/</url>
@@ -54,7 +54,7 @@
 
     <properties>
         <buildNumber>SNAPSHOT</buildNumber>
-        <revision>3.0.0-${buildNumber}</revision>
+        <revision>3.0.2-${buildNumber}</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
