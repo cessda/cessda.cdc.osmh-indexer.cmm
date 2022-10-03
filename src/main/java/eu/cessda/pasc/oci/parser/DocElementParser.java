@@ -27,7 +27,10 @@ import org.jdom2.xpath.XPathFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -139,7 +142,7 @@ class DocElementParser {
         var elements = getElements(document, elementXpath, namespaces);
         return elements.stream()
             .filter(element -> getAttributeValue(element, DATE_ATTR).isPresent()) //PUG requirement: we only care about those with @date CV
-            .filter(element -> Objects.nonNull(element.getAttributeValue(EVENT_ATTR)))
+            .filter(element -> element.getAttributeValue(EVENT_ATTR) != null)
             .collect(Collectors.toMap(element -> element.getAttributeValue(EVENT_ATTR), element -> element.getAttributeValue(DATE_ATTR), (a, b) -> a));
     }
 
@@ -231,7 +234,14 @@ class DocElementParser {
         }
 
         if (langAttr != null) {
-            return Optional.of(langAttr.getValue());
+            // If a language-region tag is present, i.e. en-GB, only keep the first part
+            var langValue = langAttr.getValue();
+            var dashIndex = langValue.indexOf('-');
+            if (dashIndex != -1) {
+                return Optional.of(langValue.substring(0, dashIndex));
+            } else {
+                return Optional.of(langValue);
+            }
         } else if (oaiPmh.getMetadataParsingDefaultLang().isActive()) {
             return Optional.of(defaultLangIsoCode);
         }
@@ -250,21 +260,22 @@ class DocElementParser {
      * @param langCode               the default language to use if an element does not have a {@value OaiPmhConstants#LANG_ATTR} attribute.
      * @param extractionStrategy the extraction strategy to apply.
      */
-    <T> HashMap<String, T> getLanguageKeyValuePairs(List<Element> elements, String langCode, Function<Element, T> extractionStrategy) {
+    <T> HashMap<String, T> getLanguageKeyValuePairs(List<Element> elements, String langCode, Function<Element, Optional<T>> extractionStrategy) {
 
         var titlesMap = new HashMap<String, T>();
         for (var element : elements) {
 
             var langAttribute = element.getAttribute(LANG_ATTR, XML_NAMESPACE);
-
-            if (langAttribute != null ) {
-                titlesMap.put(langAttribute.getValue(), extractionStrategy.apply(element));
-            } else {
-                // If defaulting lang is not configured skip, the language is not known
-                if (oaiPmh.getMetadataParsingDefaultLang().isActive()) {
-                    titlesMap.put(langCode, extractionStrategy.apply(element));
+            extractionStrategy.apply(element).ifPresent(extractedValue -> {
+                if (langAttribute != null) {
+                    titlesMap.put(langAttribute.getValue(), extractedValue);
+                } else {
+                    // If defaulting lang is not configured skip, the language is not known
+                    if (oaiPmh.getMetadataParsingDefaultLang().isActive()) {
+                        titlesMap.put(langCode, extractedValue);
+                    }
                 }
-            }
+            });
         }
         return titlesMap;
     }

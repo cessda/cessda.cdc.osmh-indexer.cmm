@@ -15,18 +15,13 @@
  */
 package eu.cessda.pasc.oci;
 
-import eu.cessda.pasc.oci.metrics.Metrics;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.ElasticsearchException;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Profile;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.TimeZone;
 
 @SpringBootApplication
@@ -36,12 +31,10 @@ public class OCIApplication {
     private static int exitCode = 0;
 
     private final ConsumerScheduler consumerScheduler;
-    private final Metrics metrics;
 
-	public OCIApplication(ConsumerScheduler consumerScheduler, Metrics metrics) {
+    public OCIApplication(ConsumerScheduler consumerScheduler) {
         this.consumerScheduler = consumerScheduler;
-        this.metrics = metrics;
-	}
+    }
 
 	public static void main(String[] args) {
         // Set settings needed for the application to work properly
@@ -50,17 +43,6 @@ public class OCIApplication {
         // Start the application
         System.exit(SpringApplication.exit(SpringApplication.run(OCIApplication.class, args), () -> exitCode));
     }
-
-	@EventListener
-	public void startupMetrics(ContextRefreshedEvent contextRefreshedEvent) {
-		log.debug("Setting metrics");
-		try {
-			metrics.updateLanguageMetrics();
-			metrics.updateTotalRecordsMetric();
-		} catch (ElasticsearchException | IOException e) {
-			log.warn("Couldn't initialise metrics on startup. \n{}", e.toString());
-		}
-	}
 
     @Component
     @Profile("!test")
