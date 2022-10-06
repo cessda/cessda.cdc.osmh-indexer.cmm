@@ -360,6 +360,25 @@
     "classificationsSearchField": {
       "type": "text",
       "analyzer": "pasc_standard_analyzer"
+    },
+    "universes": {
+      "type": "nested",
+      "properties": {
+        "content": {
+          "type": "text",
+          "analyzer": "pasc_standard_analyzer",
+          "term_vector": "with_positions_offsets",
+          "copy_to": "universeSearchField"
+        },
+        "clusion": {
+          "type": "keyword",
+          "ignore_above": 256
+        }
+      }
+    },
+    "universeSearchField": {
+      "type": "text",
+      "analyzer": "pasc_standard_analyzer"
     }
   }
 }

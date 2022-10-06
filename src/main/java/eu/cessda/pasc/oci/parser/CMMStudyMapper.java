@@ -35,10 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.net.URI;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -422,6 +419,29 @@ public class CMMStudyMapper {
             .flatMap(xpath -> DocElementParser.getAttributeValues(document, xpath, xPaths.getDdiNS()).stream());
 
         return Stream.concat(fileTxtAttrsStream, fileNameAttrsStream).collect(Collectors.toSet());
+    }
+
+    /**
+     * Parses universes from:
+     * <p>
+     * Xpath = {@link XPaths#getUniverseXPath()}
+     * <p>
+     *
+     * @return a map with the key set to the language, and the value a list of universes found.
+     */
+    Map<String, List<Universe>> parseUniverses(Document document, XPaths xPaths, String defaultLangIsoCode) {
+        var universeXPath = xPaths.getUniverseXPath();
+        if (universeXPath.isPresent()) {
+            return docElementParser.extractMetadataObjectListForEachLang(
+                defaultLangIsoCode,
+                document,
+                universeXPath.orElseThrow(),
+                xPaths.getDdiNS(),
+                ParsingStrategies::universeStrategy
+            );
+        } else {
+            return Collections.emptyMap();
+        }
     }
 
     @Value

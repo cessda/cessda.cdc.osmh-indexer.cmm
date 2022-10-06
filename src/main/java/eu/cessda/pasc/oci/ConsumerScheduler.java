@@ -18,7 +18,6 @@ package eu.cessda.pasc.oci;
 import eu.cessda.pasc.oci.elasticsearch.IngestService;
 import eu.cessda.pasc.oci.service.DebuggingJMXBean;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.ElasticsearchException;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedOperation;
@@ -103,7 +102,7 @@ public class ConsumerScheduler {
             final var startTime = logStartStatus(runType);
             indexerRunner.executeHarvestAndIngest(harvestFrom);
             logEndStatus(startTime, runType);
-        } catch (ElasticsearchException | IOException e) {
+        } catch (IOException e) {
             log.error("Cannot connect to Elasticsearch: " + e);
         }
     }
