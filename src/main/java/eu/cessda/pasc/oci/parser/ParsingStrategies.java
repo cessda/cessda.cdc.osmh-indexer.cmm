@@ -16,6 +16,7 @@
 package eu.cessda.pasc.oci.parser;
 
 import eu.cessda.pasc.oci.exception.InvalidURIException;
+import eu.cessda.pasc.oci.exception.InvalidUniverseException;
 import eu.cessda.pasc.oci.models.cmmstudy.*;
 import lombok.experimental.UtilityClass;
 import org.jdom2.Element;
@@ -193,5 +194,26 @@ class ParsingStrategies {
      */
     static String cleanCharacterReturns(String candidate) {
         return candidate.replace("\n", "").trim();
+    }
+
+    static Optional<Universe> universeStrategy(Element element) {
+        var universe = new Universe();
+
+        // Set the text content
+        var content = element.getTextTrim();
+
+        universe.setContent(content);
+
+        // Set the inclusion/exclusion status if defined, defaults to inclusion if not defined
+        var clusion = element.getAttributeValue("clusion");
+        if (clusion != null) {
+            try {
+                universe.setClusion(Universe.Clusion.valueOf(clusion));
+            } catch (IllegalArgumentException e) {
+                throw new InvalidUniverseException(clusion, e);
+            }
+        }
+
+        return Optional.of(universe);
     }
 }

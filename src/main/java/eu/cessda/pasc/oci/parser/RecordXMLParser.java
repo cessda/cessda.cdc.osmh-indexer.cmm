@@ -16,10 +16,7 @@
 package eu.cessda.pasc.oci.parser;
 
 import eu.cessda.pasc.oci.DateNotParsedException;
-import eu.cessda.pasc.oci.exception.IndexerException;
-import eu.cessda.pasc.oci.exception.InvalidURIException;
-import eu.cessda.pasc.oci.exception.OaiPmhException;
-import eu.cessda.pasc.oci.exception.XMLParseException;
+import eu.cessda.pasc.oci.exception.*;
 import eu.cessda.pasc.oci.http.HttpClient;
 import eu.cessda.pasc.oci.models.Record;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
@@ -148,6 +145,11 @@ public class RecordXMLParser {
                 log.warn("[{}] Some dates in study {} couldn't be parsed: {}", repository.getCode(), headerElement.getStudyNumber().orElse(""), e.toString());
             }
             builder.dataCollectionFreeTexts(cmmStudyMapper.parseDataCollectionFreeTexts(document, xPaths, defaultLangIsoCode));
+            try {
+                builder.universes(cmmStudyMapper.parseUniverses(document, xPaths, defaultLangIsoCode));
+            } catch (InvalidUniverseException e) {
+                log.warn("[{}] Some universes in study {} couldn't be parsed: {}", repository.getCode(), headerElement.getStudyNumber().orElse(""), e.toString());
+            }
         }
         if (fullUrl != null) {
             builder.studyXmlSourceUrl(fullUrl.toString());

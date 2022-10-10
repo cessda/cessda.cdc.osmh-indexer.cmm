@@ -30,6 +30,8 @@ import java.util.Optional;
 @Getter
 @ToString
 public final class XPaths implements Serializable {
+    private static final long serialVersionUID = -6226660931460780008L;
+
     @NonNull
     private final Namespace ddiNS;
     private final Namespace[] oaiAndDdiNs;
@@ -59,6 +61,8 @@ public final class XPaths implements Serializable {
     private final String filenameLanguagesXPath;
     private final String samplingXPath;
     private final String typeOfModeOfCollectionXPath;
+    @Nullable
+    private final String universeXPath;
 
     public Optional<String> getStudyURLDocDscrXPath() {
         return Optional.ofNullable(studyURLDocDscrXPath);
@@ -70,6 +74,10 @@ public final class XPaths implements Serializable {
 
     public Optional<String> getFilenameLanguagesXPath() {
         return Optional.ofNullable(filenameLanguagesXPath);
+    }
+
+    public Optional<String> getUniverseXPath() {
+        return Optional.ofNullable(universeXPath);
     }
 
     private static final Namespace DDI_NS = Namespace.getNamespace("ddi", "ddi:codebook:2_5");
@@ -102,6 +110,7 @@ public final class XPaths implements Serializable {
         .samplingXPath("//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:sampProc")
         .typeOfModeOfCollectionXPath("//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:collMode")
         .recordDefaultLanguage("//ddi:codeBook/@xml:lang")
+        .universeXPath("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:universe")
         .build();
 
     private static final Namespace NESSTAR_DDI_NS = Namespace.getNamespace("ddi", "http://www.icpsr.umich.edu/DDI");
@@ -135,5 +144,6 @@ public final class XPaths implements Serializable {
         .distributorXPath("//ddi:codeBook/stdyDscr/citation/distStmt/distrbtr")
         .samplingXPath("//ddi:codeBook/stdyDscr/method/dataColl/sampProc")
         .typeOfModeOfCollectionXPath("//ddi:codeBook/stdyDscr/method/dataColl/collMode")
+        .universeXPath("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/universe")
         .build();
 }

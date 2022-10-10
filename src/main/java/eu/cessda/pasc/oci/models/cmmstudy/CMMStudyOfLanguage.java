@@ -112,6 +112,9 @@ public class CMMStudyOfLanguage {
     @JsonProperty("pidStudies")
     List<Pid> pidStudies;
 
+    @JsonProperty("universes")
+    List<Universe> universes;
+
     @JsonProperty("lastModified")
     String lastModified;
 

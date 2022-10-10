@@ -60,7 +60,8 @@ import java.util.Set;
     "studyUrl",
     "isActive",
     "langAvailableIn",
-    "studyXmlSourceUrl"
+    "studyXmlSourceUrl",
+    "universes"
 })
 @AllArgsConstructor
 @Builder
@@ -134,6 +135,9 @@ public class CMMStudy {
 
     @JsonProperty("pidStudies")
     Map<String, List<Pid>> pidStudies;
+
+    @JsonProperty("universes")
+    Map<String, List<Universe>> universes;
 
     @JsonProperty("lastModified")
     String lastModified;
