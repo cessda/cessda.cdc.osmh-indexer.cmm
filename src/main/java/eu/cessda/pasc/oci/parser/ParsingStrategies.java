@@ -134,20 +134,20 @@ class ParsingStrategies {
      * Parses the value of the {@value OaiPmhConstants#URI_ATTR} attribute as a {@link URI}.
      *
      * @param element the {@link Element} to parse.
-     * @return the value of the attribute as a {@link URI}, or {@code null} if the attribute was not present.
+     * @return the value of the attribute as a {@link URI}, or {@link Optional#empty()} if the attribute was not present.
      * @throws InvalidURIException if the value of the {@value OaiPmhConstants#URI_ATTR} contains a string that violates RFC 2396.
      */
-    static URI uriStrategy(Element element) {
+    static Optional<URI> uriStrategy(Element element) {
         var uriString = element.getAttributeValue(URI_ATTR);
         try {
             if (uriString != null) {
                 // Trim the URI before constructing.
-                return new URI(uriString.trim());
+                return Optional.of(new URI(uriString.trim()));
             }
         } catch (URISyntaxException e) {
             throw new InvalidURIException(e);
         }
-        return null;
+        return Optional.empty();
     }
 
     static Optional<VocabAttributes> samplingTermVocabAttributeStrategy(Element element, Namespace namespace, boolean hasControlledValue) {
