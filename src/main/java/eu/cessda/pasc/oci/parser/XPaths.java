@@ -144,5 +144,6 @@ public final class XPaths implements Serializable {
         .distributorXPath("//ddi:codeBook/stdyDscr/citation/distStmt/distrbtr")
         .samplingXPath("//ddi:codeBook/stdyDscr/method/dataColl/sampProc")
         .typeOfModeOfCollectionXPath("//ddi:codeBook/stdyDscr/method/dataColl/collMode")
+        .universeXPath("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/universe")
         .build();
 }

@@ -79,8 +79,8 @@ public class RecordXMLParserTest {
 
     @Test
     public void shouldReturnValidCMMStudyRecordFromAFullyComplaintCmmDdiRecord() throws IOException, ProcessingException, JSONException, IndexerException {
-
         // Given
+        var expectedJson = ResourceHandler.getResourceAsString("json/synthetic_compliant_record.json");
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
             ResourceHandler.getResourceAsStream("xml/ddi_2_5/synthetic_compliant_cmm.xml")
         );
@@ -90,7 +90,11 @@ public class RecordXMLParserTest {
 
         then(result).isNotNull();
         validateCMMStudyResultAgainstSchema(result);
-        assertFieldsAreExtractedAsExpected(result);
+
+        String actualJson = cmmConverter.toJsonString(result);
+
+        // Check if the JSON generated differs from the expected source
+        assertEquals(expectedJson, actualJson, true);
     }
 
     @Test
@@ -278,40 +282,6 @@ public class RecordXMLParserTest {
         if (!validate.isSuccess()) {
             fail("Validation not successful : " + validate);
         }
-    }
-
-    @SuppressWarnings("PreferJavaTimeOverload")
-    private void assertFieldsAreExtractedAsExpected(CMMStudy record) throws IOException, JSONException {
-
-        final ObjectMapper mapper = new ObjectMapper();
-        String jsonString = cmmConverter.toJsonString(record);
-        String expectedJson = ResourceHandler.getResourceAsString("json/synthetic_compliant_record.json");
-        final JsonNode actualTree = mapper.readTree(jsonString);
-        final JsonNode expectedTree = mapper.readTree(expectedJson);
-
-        // This following could be compared with one single Uber Json compare, but probably best this way to easily know
-        // which field test assertion line below that fails.
-        then(expectedTree.get("publicationYear").toString()).isEqualTo(actualTree.get("publicationYear").toString());
-        then(expectedTree.get("dataCollectionPeriodStartdate").toString()).isEqualTo(actualTree.get("dataCollectionPeriodStartdate").toString());
-        then(expectedTree.get("dataCollectionPeriodEnddate").toString()).isEqualTo(actualTree.get("dataCollectionPeriodEnddate").toString());
-        then(expectedTree.get("dataCollectionYear").asInt()).isEqualTo(actualTree.get("dataCollectionYear").asInt());
-        assertEquals(expectedTree.get("abstract").toString(), actualTree.get("abstract").toString(), true);
-        assertEquals(expectedTree.get("classifications").toString(), actualTree.get("classifications").toString(), true);
-        assertEquals(expectedTree.get("keywords").toString(), actualTree.get("keywords").toString(), true);
-        assertEquals(expectedTree.get("typeOfTimeMethods").toString(), actualTree.get("typeOfTimeMethods").toString(), true);
-        assertEquals(expectedTree.get("studyAreaCountries").toString(), actualTree.get("studyAreaCountries").toString(), true);
-        assertEquals(expectedTree.get("pidStudies").toString(), actualTree.get("pidStudies").toString(), true);
-        assertEquals(expectedTree.get("unitTypes").toString(), actualTree.get("unitTypes").toString(), true);
-        assertEquals(expectedTree.get("titleStudy").toString(), actualTree.get("titleStudy").toString(), true);
-        assertEquals(expectedTree.get("publisher").toString(), actualTree.get("publisher").toString(), true);
-        assertEquals(expectedTree.get("creators").toString(), actualTree.get("creators").toString(), true);
-        assertEquals(expectedTree.get("fileLanguages").toString(), actualTree.get("fileLanguages").toString(), true);
-        assertEquals(expectedTree.get("typeOfSamplingProcedures").toString(), actualTree.get("typeOfSamplingProcedures").toString(), true);
-        assertEquals(expectedTree.get("samplingProcedureFreeTexts").toString(), actualTree.get("samplingProcedureFreeTexts").toString(), true);
-        assertEquals(expectedTree.get("typeOfModeOfCollections").toString(), actualTree.get("typeOfModeOfCollections").toString(), true);
-        assertEquals(expectedTree.get("dataCollectionFreeTexts").toString(), actualTree.get("dataCollectionFreeTexts").toString(), true);
-        assertEquals(expectedTree.get("dataAccessFreeTexts").toString(), actualTree.get("dataAccessFreeTexts").toString(), true);
-        assertEquals(expectedTree.get("studyUrl").toString(), actualTree.get("studyUrl").toString(), true);
     }
 
     private void assertThatCmmRequiredFieldsAreExtracted(CMMStudy record) throws IOException, JSONException {
