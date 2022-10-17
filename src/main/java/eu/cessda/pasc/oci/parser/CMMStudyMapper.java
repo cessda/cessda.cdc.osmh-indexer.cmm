@@ -40,8 +40,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static eu.cessda.pasc.oci.parser.OaiPmhConstants.*;
-import static eu.cessda.pasc.oci.parser.ParsingStrategies.samplingTermVocabAttributeStrategy;
-import static eu.cessda.pasc.oci.parser.ParsingStrategies.termVocabAttributeStrategy;
+import static eu.cessda.pasc.oci.parser.ParsingStrategies.*;
 
 /**
  * Responsible for Mapping oai-pmh fields to a CMMStudy
@@ -442,6 +441,13 @@ public class CMMStudyMapper {
         } else {
             return Collections.emptyMap();
         }
+    }
+
+    Map<String, List<RelatedPublication>> parseRelatedPublications(Document document, XPaths xPaths, String defaultLangIsoCode) {
+        return docElementParser.extractMetadataObjectListForEachLang(
+            defaultLangIsoCode, document, xPaths.getRelatedPublicationsXPath(), xPaths.getDdiNS(),
+            element -> relatedPublicationsStrategy(element, xPaths.getDdiNS())
+        );
     }
 
     @Value

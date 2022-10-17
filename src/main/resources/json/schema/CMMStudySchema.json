@@ -503,6 +503,36 @@
           ]
         }
       }
+    },
+    "relatedPublications": {
+      "type": "object",
+      "description": "Related publications to this study. This may be present in multiple languages.",
+      "patternProperties": {
+        "[a-z]{2}$": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "description": "A related publications object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "description": "The title of the related publication"
+                },
+                "holdings": {
+                  "type": "array",
+                  "description": "The URIs of the holdings of the related publication.",
+                  "items": [
+                    {
+                      "type": "string"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
     }
   }
 }

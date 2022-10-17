@@ -382,5 +382,20 @@
       }
     ]
   },
+  "relatedPublications": {
+    "en": [
+      {
+        "title": "Speight, S. Smith, R. and Lloyd, E. with Coshall, C. (2010) Families experiencing multiple disadvantage: their use of and views on childcare provision, Research Report No. DCSF-RR191, London: Department for Children, Schools and Families/National Centre for Social Research. ISBN 978 1 84775 628 2.",
+        "holdings": []
+      },
+      {
+        "title": "Arosio A. (2015). Parental divorce, cohabitation and the celebration of marriage in Italy. International Review of Sociology, 25(1), 166-179. doi:10.1080/03906701.2014.976950",
+        "holdings": [
+          "http://dx.doi.org/10.1080/03906701.2014.976950",
+          "http://example.com/test-holding"
+        ]
+      }
+    ]
+  },
   "studyXmlSourceUrl": "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=GetRecord&identifier=http%3A%2F%2Fmy-example_url%3A80%2Fobj%2FfStudy%2Fch.sidos.ddi.468.7773&metadataPrefix=ddi"
 }

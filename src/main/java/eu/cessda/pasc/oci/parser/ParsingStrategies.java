@@ -189,6 +189,51 @@ class ParsingStrategies {
         return Optional.empty();
     }
 
+    static Optional<RelatedPublication> relatedPublicationsStrategy(Element element, Namespace namespace) {
+
+        var relatedPublication = new RelatedPublication();
+
+        // Determine whether the element has a citation in it
+        var citation = element.getChild("citation", namespace);
+        if (citation != null) {
+            // Extract the title from the titlStmt if present
+            var titlStmt = citation.getChild("titlStmt", namespace);
+            if (titlStmt != null) {
+                var titl = titlStmt.getChild("titl", namespace);
+                if (titl != null) {
+                    relatedPublication.setTitle(titl.getTextTrim());
+                }
+            }
+
+            var holdingsElements = citation.getChildren("holdings", namespace);
+            for (var holdings : holdingsElements) {
+                var holdingsURIAttrValue = holdings.getAttributeValue(URI_ATTR);
+                if (holdingsURIAttrValue != null) {
+                    // Attempt to parse the holdings URI, drop if invalid
+                    try {
+                        var holdingsURI = new URI(holdingsURIAttrValue.trim());
+                        relatedPublication.getHoldings().add(holdingsURI);
+                    } catch (URISyntaxException e) {
+                        // filter out invalid URIs
+                    }
+                }
+            }
+        }
+
+        // The element's citation may contain no content, try to extract directly
+        if (relatedPublication.getTitle() == null || relatedPublication.getTitle().isEmpty()) {
+            var elementText = element.getTextTrim();
+            if (!elementText.isBlank()) {
+                relatedPublication.setTitle(elementText);
+            } else {
+                // No title has been found, return an empty optional
+                return Optional.empty();
+            }
+        }
+
+        return Optional.of(relatedPublication);
+    }
+
     /**
      * Remove return characters (i.e. {@code \n}) from the string.
      */
