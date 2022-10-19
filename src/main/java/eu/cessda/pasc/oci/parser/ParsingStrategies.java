@@ -196,7 +196,7 @@ class ParsingStrategies {
      * <p>
      * The strategy tries to extract the title from the //citation/titlStmt/titl and the holdings from
      * //citation/holdings using the URI attribute. If the titl element cannot be found, or if the titl element
-     * is blank then the methodattempts to extract directly from the element.
+     * is blank then the method attempts to extract directly from the element.
      * If a title cannot be extracted, an empty {@link Optional} is returned.
      * @param element the {@link Element} to parse.
      * @param namespace the DDI {@link Namespace}.
