@@ -61,6 +61,7 @@ public final class XPaths implements Serializable {
     private final String filenameLanguagesXPath;
     private final String samplingXPath;
     private final String typeOfModeOfCollectionXPath;
+    private final String relatedPublicationsXPath;
     @Nullable
     private final String universeXPath;
 
@@ -109,6 +110,7 @@ public final class XPaths implements Serializable {
         .filenameLanguagesXPath("//ddi:codeBook/ddi:fileDscr/ddi:fileTxt/ddi:fileName/@xml:lang")
         .samplingXPath("//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:sampProc")
         .typeOfModeOfCollectionXPath("//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:collMode")
+        .relatedPublicationsXPath("//ddi:codeBook/ddi:stdyDscr/ddi:othrStdyMat/ddi:relPubl")
         .recordDefaultLanguage("//ddi:codeBook/@xml:lang")
         .universeXPath("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:universe")
         .build();
@@ -144,6 +146,7 @@ public final class XPaths implements Serializable {
         .distributorXPath("//ddi:codeBook/stdyDscr/citation/distStmt/distrbtr")
         .samplingXPath("//ddi:codeBook/stdyDscr/method/dataColl/sampProc")
         .typeOfModeOfCollectionXPath("//ddi:codeBook/stdyDscr/method/dataColl/collMode")
+        .relatedPublicationsXPath("//ddi:codeBook/stdyDscr/othrStdyMat/relPubl")
         .universeXPath("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/universe")
         .build();
 }

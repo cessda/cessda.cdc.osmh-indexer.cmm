@@ -150,6 +150,7 @@ public class RecordXMLParser {
             } catch (InvalidUniverseException e) {
                 log.warn("[{}] Some universes in study {} couldn't be parsed: {}", repository.getCode(), headerElement.getStudyNumber().orElse(""), e.toString());
             }
+            builder.relatedPublications(cmmStudyMapper.parseRelatedPublications(document, xPaths, defaultLangIsoCode));
         }
         if (fullUrl != null) {
             builder.studyXmlSourceUrl(fullUrl.toString());

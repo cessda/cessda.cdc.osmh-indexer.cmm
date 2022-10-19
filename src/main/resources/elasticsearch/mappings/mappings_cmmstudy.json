@@ -379,6 +379,26 @@
     "universeSearchField": {
       "type": "text",
       "analyzer": "pasc_standard_analyzer"
+    },
+    "relatedPublications": {
+      "type": "nested",
+      "properties": {
+        "title": {
+          "type": "text",
+          "analyzer": "pasc_standard_analyzer",
+          "term_vector": "with_positions_offsets",
+          "copy_to": "relatedPublicationsSearchField"
+        },
+        "holdings": {
+          "type": "keyword",
+          "ignore_above": 256,
+          "copy_to": "relatedPublicationsSearchField"
+        }
+      }
+    },
+    "relatedPublicationsSearchField": {
+      "type": "text",
+      "analyzer": "pasc_standard_analyzer"
     }
   }
 }

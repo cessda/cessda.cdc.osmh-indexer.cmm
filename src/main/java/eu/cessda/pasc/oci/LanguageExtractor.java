@@ -144,6 +144,7 @@ public class LanguageExtractor {
         Optional.ofNullable(cmmStudy.getDataAccessFreeTexts()).map(map -> map.get(lang)).ifPresent(builder::dataAccessFreeTexts);
         Optional.ofNullable(cmmStudy.getPublisher()).map(map -> map.get(lang)).ifPresent(builder::publisher);
         Optional.ofNullable(cmmStudy.getUniverses()).map(map -> map.get(lang)).ifPresent(builder::universes);
+        Optional.ofNullable(cmmStudy.getRelatedPublications()).map(map -> map.get(lang)).ifPresent(builder::relatedPublications);
 
         // #142 - Use any language to set the study url field
         Optional.ofNullable(cmmStudy.getStudyUrl()).flatMap(map -> map.values().stream().filter(Objects::nonNull).findAny()).ifPresent(builder::studyUrl);

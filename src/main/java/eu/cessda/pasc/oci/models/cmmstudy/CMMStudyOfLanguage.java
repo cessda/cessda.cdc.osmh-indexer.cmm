@@ -40,6 +40,12 @@ public class CMMStudyOfLanguage {
 
     String id;
 
+    @JsonProperty("abstract")
+    String abstractField;
+
+    @JsonProperty("classifications")
+    List<TermVocabAttributes> classifications;
+
     @JsonProperty("code")
     String code;
 
@@ -61,41 +67,17 @@ public class CMMStudyOfLanguage {
     @JsonProperty("dataAccessFreeTexts")
     List<String> dataAccessFreeTexts;
 
-    @JsonProperty("publicationYear")
-    String publicationYear;
-
-    @JsonProperty("typeOfModeOfCollections")
-    List<TermVocabAttributes> typeOfModeOfCollections;
+    @JsonProperty("fileLanguages")
+    Set<String> fileLanguages;
 
     @JsonProperty("keywords")
     List<TermVocabAttributes> keywords;
 
-    @JsonProperty("samplingProcedureFreeTexts")
-    List<String> samplingProcedureFreeTexts;
+    @JsonProperty("pidStudies")
+    List<Pid> pidStudies;
 
-    @JsonProperty("classifications")
-    List<TermVocabAttributes> classifications;
-
-    @JsonProperty("abstract")
-    String abstractField;
-
-    @JsonProperty("titleStudy")
-    String titleStudy;
-
-    @JsonProperty("studyUrl")
-    URI studyUrl;
-
-    @JsonProperty("studyNumber")
-    String studyNumber;
-
-    @JsonProperty("typeOfTimeMethods")
-    List<TermVocabAttributes> typeOfTimeMethods;
-
-    @JsonProperty("fileLanguages")
-    Set<String> fileLanguages;
-
-    @JsonProperty("typeOfSamplingProcedures")
-    List<VocabAttributes> typeOfSamplingProcedures;
+    @JsonProperty("publicationYear")
+    String publicationYear;
 
     @JsonProperty("publisher")
     Publisher publisher;
@@ -103,18 +85,40 @@ public class CMMStudyOfLanguage {
     @JsonProperty("publisherFilter")
     Publisher publisherFilter;
 
+    @JsonProperty("relatedPublications")
+    List<RelatedPublication> relatedPublications;
+
+    @JsonProperty("samplingProcedureFreeTexts")
+    List<String> samplingProcedureFreeTexts;
+
     @JsonProperty("studyAreaCountries")
     List<Country> studyAreaCountries;
+
+    @JsonProperty("studyNumber")
+    String studyNumber;
+
+    @JsonProperty("studyUrl")
+    URI studyUrl;
+
+    @JsonProperty("typeOfModeOfCollections")
+    List<TermVocabAttributes> typeOfModeOfCollections;
+
+    @JsonProperty("titleStudy")
+    String titleStudy;
+
+    @JsonProperty("typeOfTimeMethods")
+    List<TermVocabAttributes> typeOfTimeMethods;
+
+    @JsonProperty("typeOfSamplingProcedures")
+    List<VocabAttributes> typeOfSamplingProcedures;
 
     @JsonProperty("unitTypes")
     List<TermVocabAttributes> unitTypes;
 
-    @JsonProperty("pidStudies")
-    List<Pid> pidStudies;
-
     @JsonProperty("universes")
     List<Universe> universes;
 
+    // Internal metadata
     @JsonProperty("lastModified")
     String lastModified;
 

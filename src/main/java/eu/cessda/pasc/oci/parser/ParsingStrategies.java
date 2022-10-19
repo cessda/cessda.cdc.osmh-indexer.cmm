@@ -24,6 +24,8 @@ import org.jdom2.Namespace;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static eu.cessda.pasc.oci.parser.DocElementParser.getAttributeValue;
@@ -187,6 +189,84 @@ class ParsingStrategies {
         }
 
         return Optional.empty();
+    }
+
+    /**
+     * Constructs a {@link RelatedPublication} using the given element.
+     * <p>
+     * The strategy tries to extract the title from {@code //citation/titlStmt/titl} and the holdings from
+     * {@code //citation/holdings} using the URI attribute. If the {@code titl} element cannot be found, or if the
+     * {@code titl} element is blank then the method attempts to extract directly from the element.
+     * If a title cannot be extracted, an empty {@link Optional} is returned.
+     * @param element the {@link Element} to parse.
+     * @param namespace the DDI {@link Namespace}.
+     * @return a {@link RelatedPublication}, or an empty {@link Optional} if a title cannot be extracted.
+     */
+    static Optional<RelatedPublication> relatedPublicationsStrategy(Element element, Namespace namespace) {
+
+        var relatedPublication = new RelatedPublication();
+
+        // Determine whether the element has a citation in it
+        var citation = element.getChild("citation", namespace);
+        if (citation != null) {
+            // Extract the title from the titlStmt if present
+            relatedPublication.setTitle(parseTitlStmtElement(citation, namespace));
+            relatedPublication.setHoldings(parseHoldingsURI(citation, namespace));
+        }
+
+        // The element's citation may contain no content, try to extract directly
+        if (relatedPublication.getTitle() == null || relatedPublication.getTitle().isEmpty()) {
+            var elementText = element.getTextTrim();
+            if (!elementText.isBlank()) {
+                relatedPublication.setTitle(elementText);
+            } else {
+                // No title has been found, return an empty optional
+                return Optional.empty();
+            }
+        }
+
+        return Optional.of(relatedPublication);
+    }
+
+    /**
+     * Parse the title element of a citation.
+     * @return the text of the title element (may be empty), or null if the title element cannot be found.
+     */
+    private static String parseTitlStmtElement(Element citation, Namespace namespace) {
+        var titlStmt = citation.getChild("titlStmt", namespace);
+        if (titlStmt != null) {
+            var titl = titlStmt.getChild("titl", namespace);
+            if (titl != null) {
+                return titl.getTextTrim();
+            }
+        }
+
+        // No titl element, return null
+        return null;
+    }
+
+    /**
+     * Parse the URIs of the holdings of a citation.
+     * @return a list of URIs of the holdings of a citation.
+     */
+    private static List<URI> parseHoldingsURI(Element citation, Namespace namespace) {
+        var holdingsElements = citation.getChildren("holdings", namespace);
+        var holdingsURIList = new ArrayList<URI>(holdingsElements.size());
+
+        for (var holdings : holdingsElements) {
+            var holdingsURIAttrValue = holdings.getAttributeValue(URI_ATTR);
+            if (holdingsURIAttrValue != null) {
+                // Attempt to parse the holdings URI, drop if invalid
+                try {
+                    var holdingsURI = new URI(holdingsURIAttrValue.trim());
+                    holdingsURIList.add(holdingsURI);
+                } catch (URISyntaxException e) {
+                    // filter out invalid URIs
+                }
+            }
+        }
+
+        return holdingsURIList;
     }
 
     /**
