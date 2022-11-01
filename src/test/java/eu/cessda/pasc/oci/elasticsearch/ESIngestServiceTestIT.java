@@ -364,4 +364,33 @@ public class ESIngestServiceTestIT {
         then(Arrays.stream(response.getHits().getHits()).map(SearchHit::getId).toArray()) // Should not contain the deleted study
             .containsExactlyInAnyOrder(studyOfLanguages.get(1).getId(), studyOfLanguages.get(2).getId());
     }
+
+    @Test
+    public void shouldReturnAllStudiesBelongingToARepository() throws IOException {
+        // Setup
+        List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
+
+        // Study with a different lang code
+        var studyWithDifferentRepoCode = getCmmStudyOfLanguageCodeEnX1().get(0)
+            .withId(UUID.randomUUID().toString()).withCode("TEST");
+
+        var studiesToIngest = new ArrayList<>(studyOfLanguages);
+        studiesToIngest.add(studyWithDifferentRepoCode);
+
+        ESIngestService ingestService = new ESIngestService(elasticsearchClient, esConfigProp, cmmStudyOfLanguageConverter);
+        boolean isSuccessful = ingestService.bulkIndex(studiesToIngest, LANGUAGE_ISO_CODE);
+        then(isSuccessful).isTrue();
+        elasticsearchClient.indices().refresh(Requests.refreshRequest(INDEX_NAME), RequestOptions.DEFAULT);
+
+        // Given
+        var repoCode = studyOfLanguages.get(0).getCode();
+
+        // Expect 3 studies to be returned
+        var studies = ingestService.getStudiesByRepository(repoCode, LANGUAGE_ISO_CODE);
+        then(studies).containsAll(studyOfLanguages).doesNotContain(studyWithDifferentRepoCode);
+
+        // Expect 1 study to be returned
+        studies = ingestService.getStudiesByRepository("TEST", LANGUAGE_ISO_CODE);
+        then(studies).contains(studyWithDifferentRepoCode).doesNotContainAnyElementsOf(studyOfLanguages);
+    }
 }

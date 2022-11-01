@@ -86,12 +86,12 @@ public class RecordXMLParserTest {
         );
 
         // When
-        CMMStudy result = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
+        var result = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
 
-        then(result).isNotNull();
-        validateCMMStudyResultAgainstSchema(result);
+        then(result).isPresent();
+        validateCMMStudyResultAgainstSchema(result.get());
 
-        String actualJson = cmmConverter.toJsonString(result);
+        String actualJson = cmmConverter.toJsonString(result.get());
 
         // Check if the JSON generated differs from the expected source
         assertEquals(expectedJson, actualJson, true);
@@ -107,9 +107,11 @@ public class RecordXMLParserTest {
         );
 
         // When
-        CMMStudy result = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
+        var optionalResult = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
 
-        then(result).isNotNull();
+        then(optionalResult).isPresent();
+
+        var result = optionalResult.get();
 
         // Verifies timeMeth extraction
         then(result.getTypeOfTimeMethods().size()).isEqualTo(2);
@@ -131,11 +133,11 @@ public class RecordXMLParserTest {
         );
 
         // When
-        CMMStudy record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
+        var record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
 
         // Then
-        then(record).isNotNull();
-        validateCMMStudyResultAgainstSchema(record);
+        then(record).isPresent();
+        validateCMMStudyResultAgainstSchema(record.get());
     }
 
     @Test
@@ -148,11 +150,11 @@ public class RecordXMLParserTest {
         );
 
         // When
-        CMMStudy record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
-        then(record).isNotNull();
-        validateCMMStudyResultAgainstSchema(record);
+        var record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
+        then(record).isPresent();
+        validateCMMStudyResultAgainstSchema(record.get());
         final ObjectMapper mapper = new ObjectMapper();
-        String jsonString = cmmConverter.toJsonString(record);
+        String jsonString = cmmConverter.toJsonString(record.get());
         final JsonNode actualTree = mapper.readTree(jsonString);
 
         then(actualTree.get("dataCollectionPeriodStartdate").asText()).isEqualTo("1976-01-01T00:00:00Z");
@@ -170,8 +172,8 @@ public class RecordXMLParserTest {
         );
 
         // When
-        CMMStudy record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
-        String actualCmmStudyJsonString = cmmConverter.toJsonString(record);
+        var record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
+        String actualCmmStudyJsonString = cmmConverter.toJsonString(record.orElseThrow());
 
         // then
         assertEquals(expectedCmmStudyJsonString, actualCmmStudyJsonString, false);
@@ -191,12 +193,12 @@ public class RecordXMLParserTest {
         );
 
         // When
-        CMMStudy record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
+        var record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
 
-        then(record).isNotNull();
-        then(record.getAbstractField().size()).isEqualTo(3);
-        then(record.getAbstractField()).isEqualTo(expectedAbstract);
-        validateCMMStudyResultAgainstSchema(record);
+        then(record).isPresent();
+        then(record.get().getAbstractField().size()).isEqualTo(3);
+        then(record.get().getAbstractField()).isEqualTo(expectedAbstract);
+        validateCMMStudyResultAgainstSchema(record.get());
     }
 
     @Test // https://bitbucket.org/cessda/cessda.cdc.version2/issues/135
@@ -213,16 +215,16 @@ public class RecordXMLParserTest {
         );
 
         // When
-        CMMStudy record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
+        var record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
 
-        then(record).isNotNull();
-        then(record.getTitleStudy().size()).isEqualTo(3);
-        then(record.getTitleStudy()).isEqualTo(expectedTitle);
-        validateCMMStudyResultAgainstSchema(record);
+        then(record).isPresent();
+        then(record.get().getTitleStudy().size()).isEqualTo(3);
+        then(record.get().getTitleStudy()).isEqualTo(expectedTitle);
+        validateCMMStudyResultAgainstSchema(record.get());
     }
 
     @Test()
-    public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord_MarkedAsNotActive() throws IOException, IndexerException {
+    public void shouldReturnEmptyOptionalFromOaiPmhDDI2_5MetadataRecord_MarkedAsNotActive() throws IOException, IndexerException {
 
         // Given
         given(httpClient.getInputStream(fullRecordUrl)).willReturn(
@@ -230,11 +232,10 @@ public class RecordXMLParserTest {
         );
 
         // When
-        CMMStudy record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
+        var record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
 
         // Then
-        then(record).isNotNull();
-        then(record.isActive()).isFalse();
+        then(record).isEmpty();
     }
 
     @Test(expected = OaiPmhException.class)
@@ -260,23 +261,20 @@ public class RecordXMLParserTest {
         );
 
         // When
-        CMMStudy result = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
+        var result = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
 
-        then(result).isNotNull();
-        validateCMMStudyResultAgainstSchema(result);
-        assertThatCmmRequiredFieldsAreExtracted(result);
+        then(result).isPresent();
+        validateCMMStudyResultAgainstSchema(result.get());
+        assertThatCmmRequiredFieldsAreExtracted(result.get());
     }
 
     private void validateCMMStudyResultAgainstSchema(CMMStudy record) throws IOException, ProcessingException, JSONException {
-
-        then(record.isActive()).isTrue(); // No need to carry on validating other fields if marked as inActive
-
         String jsonString = cmmConverter.toJsonString(record);
         JSONObject json = new JSONObject(jsonString);
         log.debug("RETRIEVED STUDY JSON: \n" + json.toString(4));
 
         JsonNode jsonNodeRecord = JsonLoader.fromString(jsonString);
-        final JsonSchema schema = JsonSchemaFactory.byDefault().getJsonSchema("resource:/json/schema/CMMStudySchema.json");
+        final JsonSchema schema = JsonSchemaFactory.byDefault().getJsonSchema("resource:/json/schema/CMMStudy.schema.json");
 
         ProcessingReport validate = schema.validate(jsonNodeRecord);
         if (!validate.isSuccess()) {
@@ -311,13 +309,13 @@ public class RecordXMLParserTest {
         );
 
         // When
-        CMMStudy result = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repository, recordHeader);
+        var result = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repository, recordHeader);
 
-        then(result).isNotNull();
-        validateCMMStudyResultAgainstSchema(result);
+        then(result).isPresent();
+        validateCMMStudyResultAgainstSchema(result.get());
 
         // Assert the language is as expected
-        Assert.assertNotNull(result.getTitleStudy().get("zz"));
+        Assert.assertNotNull(result.get().getTitleStudy().get("zz"));
     }
 
     @Test
@@ -330,9 +328,9 @@ public class RecordXMLParserTest {
         // When
         var result = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, header);
 
-        then(result).isNotNull();
-        validateCMMStudyResultAgainstSchema(result);
+        then(result).isPresent();
+        validateCMMStudyResultAgainstSchema(result.get());
 
-        then(result.getStudyXmlSourceUrl()).isEqualTo("https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=GetRecord&identifier=http%3A%2F%2Fmy-example_url%3A80%2Fobj%2FfStudy%2Fch.sidos.ddi.468.7773&metadataPrefix=ddi");
+        then(result.get().getStudyXmlSourceUrl()).isEqualTo("https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=GetRecord&identifier=http%3A%2F%2Fmy-example_url%3A80%2Fobj%2FfStudy%2Fch.sidos.ddi.468.7773&metadataPrefix=ddi");
     }
 }

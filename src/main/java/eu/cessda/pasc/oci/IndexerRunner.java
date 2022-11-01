@@ -31,13 +31,11 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.concurrent.CompletableFuture.runAsync;
@@ -156,22 +154,22 @@ public class IndexerRunner {
     private void indexRecords(Repo repo, String langIsoCode, List<CMMStudyOfLanguage> cmmStudies) {
         if (indexerRunning.get() && !cmmStudies.isEmpty()) {
             log.info("[{}({})] Indexing...", repo.getCode(), langIsoCode);
-            var studiesUpdated = getUpdatedStudies(cmmStudies, langIsoCode);
 
-            // Split the studies into studies to index and studies to delete
-            var studiesToIndex = new ArrayList<CMMStudyOfLanguage>(cmmStudies.size());
+            // Discover studies to delete, we do this by creating a HashSet of ids and then comparing what's in the database
+            var studyIds = cmmStudies.stream().map(CMMStudyOfLanguage::getId).collect(Collectors.toCollection(HashSet::new));
             var studiesToDelete = new ArrayList<CMMStudyOfLanguage>();
-            for (var study : cmmStudies) {
-                if (study.isActive()) {
-                    studiesToIndex.add(study);
-                } else {
-                    studiesToDelete.add(study);
+            for (var presentStudy : ingestService.getStudiesByRepository(repo.getCode(), langIsoCode)) {
+                if (!studyIds.contains(presentStudy.getId())) {
+                    studiesToDelete.add(presentStudy);
                 }
             }
 
+            // Calculate the amount of changed studies
+            var studiesUpdated = getUpdatedStudies(cmmStudies, studiesToDelete.size(), langIsoCode);
+
             // Perform indexing and deletions
             try {
-                if (ingestService.bulkIndex(studiesToIndex, langIsoCode)) {
+                if (ingestService.bulkIndex(cmmStudies, langIsoCode)) {
                     ingestService.bulkDelete(studiesToDelete, langIsoCode);
                     log.info("[{}({})] Indexing succeeded: [{}] studies created, [{}] studies deleted, [{}] studies updated.",
                         repo.getCode(),
@@ -195,30 +193,24 @@ public class IndexerRunner {
      * @param language   the language of the studies
      * @return a {@link UpdatedStudies} describing the amount of created, deleted and updated studies
      */
-    private UpdatedStudies getUpdatedStudies(Collection<CMMStudyOfLanguage> cmmStudies, String language) {
+    private UpdatedStudies getUpdatedStudies(Collection<CMMStudyOfLanguage> cmmStudies, int studiesToDelete, String language) {
 
         var studiesCreated = new AtomicInteger(0);
-        var studiesDeleted = new AtomicInteger(0);
         var studiesUpdated = new AtomicInteger(0);
 
-        cmmStudies.parallelStream().forEach(remoteStudy -> ingestService.getStudy(remoteStudy.getId(), language)
+        cmmStudies.parallelStream().forEach(localStudy -> ingestService.getStudy(localStudy.getId(), language)
             .ifPresentOrElse(study -> {
-                if (!remoteStudy.isActive()) {
-                    // The study has been deleted
-                    studiesDeleted.getAndIncrement();
-                } else if (!remoteStudy.equals(study)) {
+                if (!localStudy.equals(study)) {
                     // The study has been updated
                     studiesUpdated.getAndIncrement();
                 }
-            }, () -> {
-                if (remoteStudy.isActive()) {
-                    // If empty then the study didn't exist in Elasticsearch, and will be created
-                    studiesCreated.getAndIncrement();
-                }
-            })
+            },
+                // If empty then the study didn't exist in Elasticsearch, and will be created
+                studiesCreated::getAndIncrement
+            )
         );
 
-        return new UpdatedStudies(studiesCreated.get(), studiesDeleted.get(), studiesUpdated.get());
+        return new UpdatedStudies(studiesCreated.get(), studiesToDelete, studiesUpdated.get());
     }
 
 

@@ -1,5 +1,6 @@
 {
   "id": "UK-Data-Service__2305",
+  "code": "UKDS",
   "studyNumber": "2305",
   "titleStudy": "Jyväskylä Longitudinal Study of Personality and Social Development (JYLS): Interviews of 14-Year-Olds 1974: Text Data.",
   "abstract": "The data are part of the Jyväskylä Longitudinal Study of Personality and Social Development (JYLS), in which the same individuals have been followed over 30 years. At this research stage, the data were collected using peer nominations and teacher ratings (FSD2073), a parent interview (FSD2074), and a theme interview. This dataset contains the transcribed responses to the questions presented in the theme interview. No predetermined response categories were used. The recorded interviews were classified only afterwards, when it was possible to observe the whole range of responses. The interview topics covered family and parents, school and education, housing, identity, use of alcohol and smoking, free time activities, and hobbies.",
@@ -167,6 +168,5 @@
     "fi",
     "en"
   ],
-  "isActive": true,
   "studyXmlSourceUrl": "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=GetRecord&identifier=10.5255%2FUKDA-FAKE-2305-1&metadataPrefix=ddi"
 }

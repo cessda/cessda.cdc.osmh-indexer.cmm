@@ -80,13 +80,12 @@ public class LanguageExtractor {
      * @throws NullPointerException if any of the parameters are {@code null}
      */
     boolean isValidCMMStudyForLang(CMMStudy cmmStudy, String languageIsoCode) {
-
-        // Inactive = deleted record, no need to validate against CMM below. This will be deleted in the index.
-        if (!cmmStudy.isActive()) {
-            return true;
-        }
-
-        return hasMinimumCmmFields(cmmStudy, languageIsoCode);
+        // the CMM record must meet the minimum CMM Fields requirements for given Lang Iso Code
+        // It must have a title, an abstract field, a study number and a publisher
+        return (cmmStudy.getTitleStudy() != null) && (cmmStudy.getTitleStudy().get(languageIsoCode) != null) &&
+            (cmmStudy.getAbstractField() != null) && (cmmStudy.getAbstractField().get(languageIsoCode) != null) &&
+            (cmmStudy.getStudyNumber() != null) && !cmmStudy.getStudyNumber().isEmpty() &&
+            (cmmStudy.getPublisher() != null) && (cmmStudy.getPublisher().get(languageIsoCode) != null);
     }
 
     private CMMStudyOfLanguage getCmmStudyOfLanguage(CMMStudy cmmStudy, String lang, Collection<String> availableLanguages, Repo repository) {
@@ -104,7 +103,6 @@ public class LanguageExtractor {
         builder.id(hashedId)
             .code(repository.getCode())
             .studyNumber(cmmStudy.getStudyNumber())
-            .active(cmmStudy.isActive())
             .lastModified(cmmStudy.getLastModified())
             .publicationYear(cmmStudy.getPublicationYear())
             .fileLanguages(cmmStudy.getFileLanguages())
@@ -155,12 +153,4 @@ public class LanguageExtractor {
         return builder.build();
     }
 
-    private boolean hasMinimumCmmFields(CMMStudy cmmStudy, String languageIsoCode) {
-        // the CMM record must meet the minimum CMM Fields requirements for given Lang Iso Code
-        // It must have a title, an abstract field, a study number and a publisher
-        return (cmmStudy.getTitleStudy() != null) && (cmmStudy.getTitleStudy().get(languageIsoCode) != null) &&
-            (cmmStudy.getAbstractField() != null) && (cmmStudy.getAbstractField().get(languageIsoCode) != null) &&
-            (cmmStudy.getStudyNumber() != null) && !cmmStudy.getStudyNumber().isEmpty() &&
-            (cmmStudy.getPublisher() != null) && (cmmStudy.getPublisher().get(languageIsoCode) != null);
-    }
 }

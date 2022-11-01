@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Optional;
 
 /**
  * Service Class responsible for querying the repository to fetch remote records.
@@ -59,7 +60,7 @@ public class RecordXMLParser {
      * @throws XMLParseException if an error occurred parsing the XML.
      * @throws IndexerException if the request URL could not be converted into a {@link URI}.
      */
-    public CMMStudy getRecord(Repo repo, Record recordVar) throws IndexerException {
+    public Optional<CMMStudy> getRecord(Repo repo, Record recordVar) throws IndexerException {
 
         final Document document;
 
@@ -103,16 +104,15 @@ public class RecordXMLParser {
      * @param repository the source repository.
      * @throws OaiPmhException if the document contains an {@code <error>} element.
      */
-    private CMMStudy mapDDIRecordToCMMStudy(Document document, Record.Request request, URI fullUrl, Repo repository) throws OaiPmhException {
+    private Optional<CMMStudy> mapDDIRecordToCMMStudy(Document document, Record.Request request, URI fullUrl, Repo repository) throws OaiPmhException {
 
         CMMStudy.CMMStudyBuilder builder = CMMStudy.builder();
 
         // Short-Circuit. We carry on to parse beyond the headers only if the record is active.
         var headerElement = cmmStudyMapper.parseHeaderElement(document);
-        headerElement.getStudyNumber().ifPresent(builder::studyNumber);
-        headerElement.getLastModified().ifPresent(builder::lastModified);
-        builder.active(headerElement.isRecordActive());
         if (headerElement.isRecordActive()) {
+            headerElement.getStudyNumber().ifPresent(builder::studyNumber);
+            headerElement.getLastModified().ifPresent(builder::lastModified);
             var xPaths = getXPaths(repository);
             var defaultLangIsoCode = cmmStudyMapper.parseDefaultLanguage(document, repository, xPaths);
             builder.titleStudy(cmmStudyMapper.parseStudyTitle(document, xPaths, defaultLangIsoCode));
@@ -151,15 +151,17 @@ public class RecordXMLParser {
                 log.warn("[{}] Some universes in study {} couldn't be parsed: {}", repository.getCode(), headerElement.getStudyNumber().orElse(""), e.toString());
             }
             builder.relatedPublications(cmmStudyMapper.parseRelatedPublications(document, xPaths, defaultLangIsoCode));
-        }
-        if (fullUrl != null) {
-            builder.studyXmlSourceUrl(fullUrl.toString());
-        }
-        if (request != null) {
-            builder.repositoryUrl(request.getBaseURL());
-        }
+            if (fullUrl != null) {
+                builder.studyXmlSourceUrl(fullUrl.toString());
+            }
+            if (request != null) {
+                builder.repositoryUrl(request.getBaseURL());
+            }
 
-        return builder.build();
+            return Optional.of(builder.build());
+        } else {
+            return Optional.empty();
+        }
     }
 
     private XPaths getXPaths(Repo repository) {

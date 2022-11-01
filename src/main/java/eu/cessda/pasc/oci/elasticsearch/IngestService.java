@@ -69,6 +69,14 @@ public interface IngestService {
     Set<CMMStudyOfLanguage> getAllStudies(String language);
 
     /**
+     * Gets a set of all studies from a specific repository for a given language.
+     *
+     * @param repository the code of the repository.
+     * @param language the language of the index to search in. Use * to search all indexes.
+     */
+    Set<CMMStudyOfLanguage> getStudiesByRepository(String repository, String language);
+
+    /**
      * Gets a study with a specific ID.
      *
      * @param id       the id of the study to get.
