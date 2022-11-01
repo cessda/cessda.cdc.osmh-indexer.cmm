@@ -1,0 +1,483 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$defs":  {
+    "vocabAttributes": {
+      "type": "object",
+      "description": "A term in a controlled vocabulary.",
+      "properties": {
+        "vocab": {
+          "type": "string",
+          "description": "The name of the controlled vocabulary."
+        },
+        "vocabUri": {
+          "type": "string",
+          "description": "The URI of the controlled vocabulary."
+        },
+        "id": {
+          "type": "string",
+          "description": "The ID of the item in the controlled vocabulary."
+        },
+        "term": {
+          "type": "string",
+          "description": "The term being referenced."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "title": "CMMStudy",
+  "description": "This schema defines the format of the CMMStudy record type.",
+  "type": "object",
+  "required": [
+    "studyNumber"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "abstract": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "string",
+          "description": "A CMMStudy abstract for the given language code."
+        }
+      },
+      "additionalProperties": false,
+      "description": "An object containing an abstract in various languages. Uses language code properties and abstract values. E.g. {'en': 'An abstract', 'no': 'Et sammendrag'}"
+    },
+    "accessClass": {
+      "type": "string",
+      "description": "Class of availability of the research data."
+    },
+    "associatedInstitutions": {
+      "type": "array",
+      "description": "An array of Associated Institutions for this CMMStudy.",
+      "items": {
+        "type": "string",
+        "description": "A CMMStudy Associated Institution ."
+      }
+    },
+    "classIdentifier": {
+      "type": "string",
+      "description": "Unique identifier of class/category within the classification system."
+    },
+    "classifications": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "array",
+          "items": [
+            {
+              "$ref": "#/$defs/vocabAttributes"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "description": "Topics(classifications) for this CMMStudy in potentially multiple languages."
+    },
+    "code": {
+      "type": "string",
+      "description": "The short name of the repository as defined in the CESSDA Vocabularies Service."
+    },
+    "creators": {
+      "type": "object",
+      "description": "A Collection of Creators(affiliation) eg \"Ami Doe(University of DV)\". Potentially in many translated languages",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "array",
+          "description": "A Collection of Creators(affiliation) translated in this language",
+          "items": [
+            {
+              "type": "string",
+              "description": "A Creators(affiliation).",
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "dataAccess": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "string",
+          "description": "Freetext description of possibilities to access data."
+        }
+      },
+      "additionalProperties": false,
+      "description": "An object containing Freetext description of possibilities to access data. E.g. {'en': 'via web', 'no': 'Et via web'}."
+    },
+    "dataAccessFreeTexts": {
+      "type": "object",
+      "description": "A Collection of Data Access Free Texts descriptions for data collection. In potentially translated in multiple languages",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "array",
+          "items": [
+            {
+              "type": "string",
+              "description": "A Data Access Free Texts description for data collection.",
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "dataCollectionFreeTexts": {
+      "type": "object",
+      "description": "A collection of data collection FreeTexts Dates in Potentially many languages",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "array",
+          "description": "A collection data collection FreeTexts for this given language",
+          "items": [
+            {
+              "type": "object",
+              "description": "A data Collection FreeTexts instance",
+              "properties": {
+                "dataCollectionFreeText": {
+                  "type": "string"
+                },
+                "event": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "dataCollectionPeriodEnddate": {
+      "type": "string",
+      "description": "A JSON date string in ISO 8601 format, e.g. 2012-04-23T18:25:43.511Z. In future restrict to [\"format\": \"date-time\" or \"date\"]"
+    },
+    "dataCollectionPeriodStartdate": {
+      "type": "string",
+      "description": "A JSON date string in ISO 8601 format, e.g. 2012-04-23T18:25:43.511Z. In future restrict to [\"format\": \"date-time\" or \"date\"]"
+    },
+    "dataCollectionYear": {
+      "type": "integer",
+      "description": "A JSON date year string, e.g. 2012."
+    },
+    "fileLanguages": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "A CMMStudy File Language (standardised ISO)."
+      },
+      "description": "An array of File Languages (standardised ISO) for this CMMStudy."
+    },
+    "isActive": {
+      "type": "boolean",
+      "description": "Is the record marked as deleted. If record is deleted this = false.",
+      "default": true
+    },
+    "keywords": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "array",
+          "description": "An array of Keywords for this CMMStudy in this Given iso Language code",
+          "items": [
+            {
+              "type": "object",
+              "description": "A CMMStudy keyword.",
+              "properties": {
+                "vocab": {
+                  "type": "string"
+                },
+                "vocabUri": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "term": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "description": "Keywords for this CMMStudy in potentially multiple languages."
+    },
+    "langAvailableIn": {
+      "type": "array"
+    },
+    "lastModified": {
+      "type": "string",
+      "description": "A JSON date string in ISO 8601 format, e.g. 2012-04-23T18:25:43.511Z.",
+      "format": "date-time"
+    },
+    "oaiIdentifier": {
+      "type": "string",
+      "description": "The OAI identifier that is returned by the OAI-PMH repository."
+    },
+    "pidStudies": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "array",
+          "description": "An array of Persistent Identifiers for this CMMStudy in this Given iso Language code.",
+          "items": [
+            {
+              "type": "object",
+              "description": "A CMMStudy Persistent Identifier.",
+              "properties": {
+                "agency": {
+                  "type": "string"
+                },
+                "pid": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "description": "Persistent Identifiers for this CMMStudy in potentially multiple languages."
+    },
+    "publicationYear": {
+      "type": "string",
+      "description": "Year of publication (by publisher) of the study (for citation) - [YYYY] or the whole [YYYY-MM-DD]."
+    },
+    "publisher": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "object",
+          "description": "A CMMStudy institution publishing the research data for the given language code.",
+          "properties": {
+            "abbr": {
+              "type": "string"
+            },
+            "publisher": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false,
+      "description": "An object containing Study Titles in various languages. Uses language code properties and abstract values. E.g. {'en': 'An studyTitle', 'no': 'Et studyTitle'}."
+    },
+    "recordType": {
+      "type": "string",
+      "description": "The type of record, i.e.'CMMStudy'.",
+      "enum": [
+        "CMMStudy"
+      ]
+    },
+    "relatedPublications": {
+      "type": "object",
+      "description": "Related publications to this study. This may be present in multiple languages.",
+      "patternProperties": {
+        "[a-z]{2}$": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "description": "A related publications object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "description": "The title of the related publication"
+                },
+                "holdings": {
+                  "type": "array",
+                  "description": "The URIs of the holdings of the related publication.",
+                  "items": [
+                    {
+                      "type": "string"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "repositoryUrl": {
+      "type": "string",
+      "description": "The URL of the repository as defined in the repository's configuration"
+    },
+    "samplingProcedureFreeTexts": {
+      "type": "object",
+      "description": "Sampling procedures freeText description for data collection.",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "array",
+          "items": [
+            {
+              "type": "string",
+              "description": "A Sampling procedure freeText description for data collection.",
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "studyAreaCountries": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "array",
+          "description": "An array of Countries for this CMMStudy in this Given iso Language code.",
+          "items": [
+            {
+              "type": "object",
+              "description": "A CMMStudy Country.",
+              "properties": {
+                "abbr": {
+                  "type": "string"
+                },
+                "country": {
+                  "type": "string"
+                },
+                "searchField": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "description": "Countries for this CMMStudy in potentially multiple languages."
+    },
+    "studyNumber": {
+      "type": "string",
+      "description": "A studyNumber that uniquely identifies the CMMStudy within the datacatalogue."
+    },
+    "studyUrl": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "string",
+          "description": "A CMMStudy study Url for the given language code."
+        }
+      },
+      "additionalProperties": false,
+      "description": "An object containing CmmStudy Urls in various languages."
+    },
+    "studyXmlSourceUrl": {
+      "type": "string",
+      "description": "The Study's Full xml URL of the Service Provider's endpoint"
+    },
+    "titleStudy": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "string",
+          "description": "A CMMStudy studyTitle for the given language code."
+        }
+      },
+      "additionalProperties": false,
+      "description": "An object containing Study Titles in various languages. Uses language code properties and abstract values. E.g. {'en': 'An studyTitle', 'no': 'Et studyTitle'}."
+    },
+    "typeOfModeOfCollections": {
+      "type": "object",
+      "description": "A collection of description of the methods of data collection in Potentially many languages",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "array",
+          "description": "A collection of description of methods for this given language",
+          "items": [
+            {
+              "$ref": "#/$defs/vocabAttributes"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "typeOfSamplingProcedures": {
+      "type": "object",
+      "description": "Sampling procedures used for data collection.",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "array",
+          "items": [
+            {
+              "$ref": "#/$defs/vocabAttributes"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "typeOfTimeMethods": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "array",
+          "description": "An array of timeDimensions for this CMMStudy in this Given iso Language code.",
+          "items": [
+            {
+              "$ref": "#/$defs/vocabAttributes"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "description": "Time Methods for this CMMStudy in potentially multiple languages."
+    },
+    "unitTypes": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "array",
+          "description": "An array of Analysis Units for this CMMStudy in this Given iso Language code.",
+          "items": [
+            {
+              "$ref": "#/$defs/vocabAttributes"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "description": "Analysis Units for this CMMStudy in potentially multiple languages."
+    },
+    "universes": {
+      "type": "object",
+      "description": "The universes that the study belongs to. This may be present in multiple languages.",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "description": "A universes instance",
+              "properties": {
+                "content": {
+                  "type": "string"
+                },
+                "clusion": {
+                  "type": "string",
+                  "description": "Specifies whether the universe is included (I) or excluded (E).",
+                  "enum": [
+                    "I",
+                    "E"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      }
+    }
+  }
+}

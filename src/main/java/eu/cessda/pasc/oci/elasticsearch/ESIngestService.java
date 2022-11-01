@@ -30,10 +30,12 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.core.CountRequest;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.client.indices.PutMappingRequest;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
@@ -161,9 +163,9 @@ public class ESIngestService implements IngestService {
 
     @Override
     public long getTotalHitCount(String language) throws IOException {
-        var matchAllSearchRequest = getSearchRequest(language, new SearchSourceBuilder().size(0));
-        var response = esClient.search(matchAllSearchRequest, DEFAULT);
-        return response.getHits().getTotalHits().value;
+        var matchAllCountRequest = new CountRequest(String.format(INDEX_NAME_TEMPLATE, language));
+        var response = esClient.count(matchAllCountRequest, DEFAULT);
+        return response.getCount();
     }
 
     @Override
@@ -174,6 +176,15 @@ public class ESIngestService implements IngestService {
             esClient,
             cmmStudyOfLanguageConverter.getReader()
         );
+    }
+
+    @Override
+    public ElasticsearchSet<CMMStudyOfLanguage> getStudiesByRepository(String repository, String language) {
+        log.debug("Getting all studies for repository [{}] with language [{}]", repository, language);
+        var repositorySearchRequest = getSearchRequest(language,
+            new SearchSourceBuilder().query(new TermQueryBuilder("code", repository))
+        );
+        return new ElasticsearchSet<>(repositorySearchRequest, esClient, cmmStudyOfLanguageConverter.getReader());
     }
 
     @Override

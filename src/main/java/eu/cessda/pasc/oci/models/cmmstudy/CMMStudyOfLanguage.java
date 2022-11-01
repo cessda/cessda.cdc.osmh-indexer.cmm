@@ -16,6 +16,7 @@
 package eu.cessda.pasc.oci.models.cmmstudy;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
@@ -32,6 +33,7 @@ import java.util.Set;
  * @author moses AT doraventures DOT com
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties({ "isActive" })
 @Builder
 @Value
 @With
@@ -121,9 +123,6 @@ public class CMMStudyOfLanguage {
     // Internal metadata
     @JsonProperty("lastModified")
     String lastModified;
-
-    @JsonProperty("isActive")
-    boolean active;
 
     @JsonProperty("langAvailableIn")
     Set<String> langAvailableIn;

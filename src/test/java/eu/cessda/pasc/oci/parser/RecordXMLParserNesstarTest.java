@@ -84,10 +84,10 @@ public class RecordXMLParserNesstarTest {
         var result = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(nesstarRepo, recordHeader);
 
         // Then
-        then(result).isNotNull();
-        validateCMMStudyResultAgainstSchema(result);
+        then(result).isPresent();
+        validateCMMStudyResultAgainstSchema(result.get());
 
-        var actualJson = cmmConverter.toJsonString(result);
+        var actualJson = cmmConverter.toJsonString(result.get());
         var expectedJson = ResourceHandler.getResourceAsString("json/synthetic_compliant_record_nesstar.json");
 
         // Compare the generated JSON to the expected result
@@ -105,8 +105,8 @@ public class RecordXMLParserNesstarTest {
         var record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(nesstarRepo, recordHeader);
 
         // Then
-        then(record).isNotNull();
-        validateCMMStudyResultAgainstSchema(record);
+        then(record).isPresent();
+        validateCMMStudyResultAgainstSchema(record.get());
     }
 
     @Test
@@ -119,9 +119,9 @@ public class RecordXMLParserNesstarTest {
 
         // When
         var record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(nesstarRepo, recordHeader);
-        then(record).isNotNull();
-        validateCMMStudyResultAgainstSchema(record);
-        var jsonString = cmmConverter.toJsonString(record);
+        then(record).isPresent();
+        validateCMMStudyResultAgainstSchema(record.get());
+        var jsonString = cmmConverter.toJsonString(record.get());
         var actualTree = mapper.readTree(jsonString);
 
         // Then
@@ -138,7 +138,7 @@ public class RecordXMLParserNesstarTest {
         given(httpClient.getInputStream(fullRecordURL)).willReturn(expectedCmmStudyJsonString);
 
         // When
-        var record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(nesstarRepo, recordHeader);
+        var record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(nesstarRepo, recordHeader).orElseThrow();
 
         // Then
         then(record.getTitleStudy().containsKey("xy")).isTrue();
@@ -160,10 +160,10 @@ public class RecordXMLParserNesstarTest {
         var record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(nesstarRepo, recordHeader);
 
         // Then
-        then(record).isNotNull();
-        then(record.getAbstractField().size()).isEqualTo(4);
-        then(record.getAbstractField()).isEqualTo(expectedAbstract);
-        validateCMMStudyResultAgainstSchema(record);
+        then(record).isPresent();
+        then(record.get().getAbstractField().size()).isEqualTo(4);
+        then(record.get().getAbstractField()).isEqualTo(expectedAbstract);
+        validateCMMStudyResultAgainstSchema(record.get());
     }
 
     @Test // https://bitbucket.org/cessda/cessda.cdc.version2/issues/135
@@ -180,14 +180,14 @@ public class RecordXMLParserNesstarTest {
         var record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(nesstarRepo, recordHeader);
 
         // Then
-        then(record).isNotNull();
-        then(record.getTitleStudy().size()).isEqualTo(2);
-        then(record.getTitleStudy()).isEqualTo(expectedTitle);
-        validateCMMStudyResultAgainstSchema(record);
+        then(record).isPresent();
+        then(record.get().getTitleStudy().size()).isEqualTo(2);
+        then(record.get().getTitleStudy()).isEqualTo(expectedTitle);
+        validateCMMStudyResultAgainstSchema(record.get());
     }
 
     @Test()
-    public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord_MarkedAsNotActive()
+    public void shouldReturnEmptyOptionalFromOaiPmhDDI2_5MetadataRecord_MarkedAsNotActive()
         throws IndexerException, IOException {
 
         // Given
@@ -199,8 +199,7 @@ public class RecordXMLParserNesstarTest {
         var record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(nesstarRepo, recordHeader);
 
         // Then
-        then(record).isNotNull();
-        then(record.isActive()).isFalse();
+        then(record).isEmpty();
     }
 
     @Test(expected = OaiPmhException.class)
@@ -229,19 +228,16 @@ public class RecordXMLParserNesstarTest {
         var result = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(nesstarRepo, recordHeader);
 
         // Then
-        then(result).isNotNull();
-        validateCMMStudyResultAgainstSchema(result);
-        assertThatCmmRequiredFieldsAreExtracted(result);
+        then(result).isPresent();
+        validateCMMStudyResultAgainstSchema(result.get());
+        assertThatCmmRequiredFieldsAreExtracted(result.get());
     }
 
     private void validateCMMStudyResultAgainstSchema(CMMStudy record) throws IOException, ProcessingException {
-
-        then(record.isActive()).isTrue(); // No need to carry on validating other fields if marked as inActive
-
         var jsonString = cmmConverter.toJsonString(record);
 
         var jsonNodeRecord = JsonLoader.fromString(jsonString);
-        var schema = JsonSchemaFactory.byDefault().getJsonSchema("resource:/json/schema/CMMStudySchema.json");
+        var schema = JsonSchemaFactory.byDefault().getJsonSchema("resource:/json/schema/CMMStudy.schema.json");
 
         var validate = schema.validate(jsonNodeRecord);
         if (!validate.isSuccess()) {
@@ -278,10 +274,10 @@ public class RecordXMLParserNesstarTest {
         // When
         var result = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(langRepo, recordHeader);
 
-        then(result).isNotNull();
-        validateCMMStudyResultAgainstSchema(result);
+        then(result).isPresent();
+        validateCMMStudyResultAgainstSchema(result.get());
 
         // Assert the language is as expected
-        Assert.assertNotNull(result.getTitleStudy().get("zz"));
+        Assert.assertNotNull(result.get().getTitleStudy().get("zz"));
     }
 }

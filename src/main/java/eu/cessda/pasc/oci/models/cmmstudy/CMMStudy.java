@@ -15,6 +15,7 @@
  */
 package eu.cessda.pasc.oci.models.cmmstudy;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -33,6 +34,7 @@ import java.util.Set;
  * @author moses AT doraventures DOT com
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties({ "isActive" })
 @AllArgsConstructor
 @Builder
 @Value
@@ -115,9 +117,6 @@ public class CMMStudy {
     // Internal metadata
     @JsonProperty("lastModified")
     String lastModified;
-
-    @JsonProperty("isActive")
-    boolean active;
 
     @JsonProperty("studyXmlSourceUrl")
     String studyXmlSourceUrl;

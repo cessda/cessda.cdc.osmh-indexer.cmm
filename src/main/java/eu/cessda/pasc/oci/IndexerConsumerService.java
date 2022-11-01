@@ -76,19 +76,6 @@ public class IndexerConsumerService {
         return ingestedLastModifiedDate == null || isHeaderTimeGreater(recordHeader, ingestedLastModifiedDate);
     }
 
-    /**
-     * Creates an inactive {@link CMMStudy} using the details in the record header.
-     * <p>
-     *
-     * @param recordHeader the deleted record header
-     */
-    private static CMMStudy createInactiveRecord(RecordHeader recordHeader) {
-        return CMMStudy.builder().active(false)
-            .studyNumber(recordHeader.getIdentifier())
-            .lastModified(recordHeader.getLastModified())
-            .build();
-    }
-
     private static boolean isHeaderTimeGreater(RecordHeader recordHeader, LocalDateTime lastModifiedDate) {
         String lastModified = recordHeader.getLastModified();
         try {
@@ -194,11 +181,11 @@ public class IndexerConsumerService {
     Optional<CMMStudy> getRecord(Repo repo, Record recordVar) {
         // Handle deleted records
         if (recordVar.getRecordHeader().isDeleted()) {
-            return Optional.of(createInactiveRecord(recordVar.getRecordHeader()));
+            return Optional.empty();
         }
 
         try (var identifierClosable = MDC.putCloseable(LoggingConstants.STUDY_ID, recordVar.getRecordHeader().getIdentifier())) {
-            return Optional.of(recordXMLParser.getRecord(repo, recordVar));
+            return recordXMLParser.getRecord(repo, recordVar);
         } catch (OaiPmhException e) {
             e.getOaiErrorMessage().ifPresentOrElse(
                 oaiErrorMessage -> log.warn(FAILED_TO_GET_STUDY_ID_WITH_MESSAGE,

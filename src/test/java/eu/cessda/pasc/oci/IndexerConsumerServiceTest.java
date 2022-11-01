@@ -123,8 +123,7 @@ public class IndexerConsumerServiceTest {
         var header = RecordHeader.builder().deleted(true).build();
 
         var study = indexerConsumerService.getRecord(null, new Record(header, null, null));
-        assertTrue(study.isPresent());
-        assertFalse(study.get().isActive());
+        assertFalse(study.isPresent());
     }
 
     @Test

@@ -33,6 +33,7 @@ import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -84,6 +85,9 @@ public class ConsumerSchedulerTest {
         // mock for ES bulking
         when(esIndexer.bulkIndex(anyList(), anyString())).thenReturn(true);
         when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
+
+        // Mock requests for indexed repository content
+        when(esIndexer.getStudiesByRepository(anyString(), anyString())).thenReturn(Collections.emptySet());
 
         // Given
         var harvesterRunner = new IndexerRunner(appConfigurationProperties, harvesterConsumerService, pipelineUtilities, esIndexer, micrometerMetrics);
@@ -158,7 +162,7 @@ public class ConsumerSchedulerTest {
             when(recordXMLParser.getRecord(
                 ukdsRepo,
                 new Record(recordHeader, new Record.Request(ukdsRepo.getUrl(), ukdsRepo.getPreferredMetadataParam()),null)
-            )).thenReturn(getSyntheticCmmStudy(recordHeader.getIdentifier()));
+            )).thenReturn(Optional.of(getSyntheticCmmStudy(recordHeader.getIdentifier())));
         }
 
         return indexerConsumerService;
@@ -183,6 +187,9 @@ public class ConsumerSchedulerTest {
         // 'en', 'fi', 'de' has all minimum fields
         verify(esIndexer, times(3)).bulkIndex(anyList(), anyString());
         verify(esIndexer, times(3)).bulkDelete(anyList(), anyString());
+
+        // Called for deletions
+        verify(esIndexer, times(3)).getStudiesByRepository(anyString(), anyString());
 
         // Called for logging purposes
         verify(esIndexer, times(6)).getStudy(Mockito.anyString(), Mockito.anyString());
@@ -209,7 +216,7 @@ public class ConsumerSchedulerTest {
         var ukdsRepo = getUKDSRepo();
         for (var recordHeader : allRecordHeaders) {
             when(recordXMLParser.getRecord(ukdsRepo, new Record(recordHeader, new Record.Request(ukdsRepo.getUrl(), ukdsRepo.getPreferredMetadataParam()),null)))
-                .thenReturn(getSyntheticCmmStudy(recordHeader.getIdentifier()));
+                .thenReturn(Optional.of(getSyntheticCmmStudy(recordHeader.getIdentifier())));
         }
 
         // mock for ES methods
@@ -249,6 +256,7 @@ public class ConsumerSchedulerTest {
         // Called for logging purposes
         verify(esIndexer, atLeastOnce()).getStudy(Mockito.anyString(), Mockito.anyString());
         verify(esIndexer, times(2)).getTotalHitCount("*");
+        verify(esIndexer, times(6)).getStudiesByRepository(anyString(), anyString());
         verifyNoMoreInteractions(esIndexer);
     }
 
@@ -273,6 +281,7 @@ public class ConsumerSchedulerTest {
         verify(esIndexer, times(6)).getStudy(Mockito.anyString(), Mockito.anyString());
         verify(esIndexer, times(1)).getTotalHitCount("*");
         verify(esIndexer, times(3)).bulkIndex(anyList(), anyString());
+        verify(esIndexer, times(3)).getStudiesByRepository(anyString(), anyString());
         verifyNoMoreInteractions(esIndexer);
     }
 
@@ -298,6 +307,7 @@ public class ConsumerSchedulerTest {
         verify(esIndexer, times(6)).getStudy(Mockito.anyString(), Mockito.anyString());
         verify(esIndexer, times(1)).getTotalHitCount("*");
         verify(esIndexer, times(3)).bulkIndex(anyList(), anyString());
+        verify(esIndexer, times(3)).getStudiesByRepository(anyString(), anyString());
         verifyNoMoreInteractions(esIndexer);
     }
 }

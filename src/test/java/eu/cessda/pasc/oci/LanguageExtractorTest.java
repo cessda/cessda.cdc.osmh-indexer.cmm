@@ -70,7 +70,6 @@ public class LanguageExtractorTest {
 
         // Given
         CMMStudy syntheticCmmStudy = RecordTestData.getSyntheticCmmStudy();
-        syntheticCmmStudy.withActive(false);
 
         // When
         boolean validCMMStudyForLang = languageExtractor.isValidCMMStudyForLang(syntheticCmmStudy, "de");
@@ -108,7 +107,7 @@ public class LanguageExtractorTest {
     }
 
     @Test
-    public void shouldReturnExtractedDocInTheirRespectiveLangDocumentsIncludingDeletedRecordsMarkedAsInActive() {
+    public void shouldReturnExtractedDocInTheirRespectiveLangDocumentsExcudingDeletedDocuments() {
 
         // Given
         List<CMMStudy> studies = getSyntheticCMMStudyAndADeletedRecordAsList();
@@ -123,11 +122,11 @@ public class LanguageExtractorTest {
         }
 
         then(languageDocMap).isNotNull();
-        then(languageDocMap).hasSize(17);
-        then(languageDocMap).containsOnlyKeys("cs", "da", "de", "el", "en", "et", "fi", "fr", "hu", "it", "nl", "no", "pt", "sk", "sl", "sr", "sv");
-        then(languageDocMap.get("de")).hasSize(2); // a deleted record and an active record that is valid
-        then(languageDocMap.get("en")).hasSize(2); // a deleted record and an active record that is valid
-        then(languageDocMap.get("fi")).hasSize(2); // a deleted record and an active record that is valid
+        then(languageDocMap).hasSize(3);
+        then(languageDocMap).containsOnlyKeys("de", "en", "fi");
+        then(languageDocMap.get("de")).hasSize(1); // an active record that is valid
+        then(languageDocMap.get("en")).hasSize(1); // an active record that is valid
+        then(languageDocMap.get("fi")).hasSize(1); // an active record that is valid
 
     }
 
