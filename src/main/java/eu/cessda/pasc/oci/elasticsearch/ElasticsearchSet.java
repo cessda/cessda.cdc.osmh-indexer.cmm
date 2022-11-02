@@ -20,6 +20,7 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchScrollRequest;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.core.CountRequest;
 import org.elasticsearch.core.TimeValue;
 
 import java.io.IOException;
@@ -82,7 +83,8 @@ public class ElasticsearchSet<T> extends AbstractSet<T> {
     @Override
     public int size() {
         try {
-            long totalHits = client.search(searchRequest, DEFAULT).getHits().getTotalHits().value;
+            var countRequest = new CountRequest(searchRequest.indices(), searchRequest.source().query());
+            long totalHits = client.count(countRequest, DEFAULT).getCount();
             return totalHits < Integer.MAX_VALUE ? (int) totalHits : Integer.MAX_VALUE;
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -95,10 +97,12 @@ public class ElasticsearchSet<T> extends AbstractSet<T> {
     private class ElasticsearchIterator implements Iterator<T> {
 
         private SearchResponse response;
+        private String scrollId;
         private int currentIndex;
 
         private ElasticsearchIterator() throws IOException {
             response = client.search(searchRequest.scroll(timeout), DEFAULT);
+            scrollId = response.getScrollId();
             currentIndex = 0;
         }
 
@@ -111,9 +115,15 @@ public class ElasticsearchSet<T> extends AbstractSet<T> {
         public boolean hasNext() {
             if (currentIndex >= response.getHits().getHits().length) {
                 // Reached the end of the current scroll, collect the next scroll if available.
-                if (response.getScrollId() != null) {
+                if (scrollId != null) {
                     try {
-                        response = client.scroll(new SearchScrollRequest(response.getScrollId()), DEFAULT);
+                        response = client.scroll(new SearchScrollRequest(scrollId), DEFAULT);
+
+                        // Check if the response has a scroll ID, otherwise reuse the previous one
+                        if (response.getScrollId() != null) {
+                            scrollId = response.getScrollId();
+                        }
+
                         currentIndex = 0; // Only reset the index once an update has been retrieved.
                     } catch (IOException e) {
                         throw new UncheckedIOException(e);
