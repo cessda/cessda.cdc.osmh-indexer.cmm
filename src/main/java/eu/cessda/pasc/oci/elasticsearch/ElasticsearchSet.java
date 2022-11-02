@@ -16,6 +16,8 @@
 package eu.cessda.pasc.oci.elasticsearch;
 
 import com.fasterxml.jackson.databind.ObjectReader;
+import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.action.search.ClearScrollRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchScrollRequest;
@@ -97,12 +99,10 @@ public class ElasticsearchSet<T> extends AbstractSet<T> {
     private class ElasticsearchIterator implements Iterator<T> {
 
         private SearchResponse response;
-        private String scrollId;
         private int currentIndex;
 
         private ElasticsearchIterator() throws IOException {
             response = client.search(searchRequest.scroll(timeout), DEFAULT);
-            scrollId = response.getScrollId();
             currentIndex = 0;
         }
 
@@ -115,24 +115,25 @@ public class ElasticsearchSet<T> extends AbstractSet<T> {
         public boolean hasNext() {
             if (currentIndex >= response.getHits().getHits().length) {
                 // Reached the end of the current scroll, collect the next scroll if available.
-                if (scrollId != null) {
-                    try {
-                        response = client.scroll(new SearchScrollRequest(scrollId), DEFAULT);
-
-                        // Check if the response has a scroll ID, otherwise reuse the previous one
-                        if (response.getScrollId() != null) {
-                            scrollId = response.getScrollId();
-                        }
-
-                        currentIndex = 0; // Only reset the index once an update has been retrieved.
-                    } catch (IOException e) {
-                        throw new UncheckedIOException(e);
-                    }
-                } else {
-                    return false;
+                try {
+                    response = client.scroll(new SearchScrollRequest(response.getScrollId()).scroll(timeout), DEFAULT);
+                    currentIndex = 0; // Only reset the index once an update has been retrieved.
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
                 }
             }
-            return response.getHits().getHits().length > 0;
+            var hasNext = response.getHits().getHits().length > 0;
+            if (!hasNext) {
+                // If no more results are available, clear the scroll context
+                try {
+                    var clearScrollRequest = new ClearScrollRequest();
+                    clearScrollRequest.addScrollId(response.getScrollId());
+                    client.clearScroll(clearScrollRequest, DEFAULT);
+                } catch (ElasticsearchException | IOException e)  {
+                    //ignored
+                }
+            }
+            return hasNext;
         }
 
         /**
