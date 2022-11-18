@@ -15,7 +15,6 @@
  */
 package eu.cessda.pasc.oci.parser;
 
-import eu.cessda.pasc.oci.exception.InvalidURIException;
 import eu.cessda.pasc.oci.exception.InvalidUniverseException;
 import eu.cessda.pasc.oci.models.cmmstudy.*;
 import lombok.experimental.UtilityClass;
@@ -138,19 +137,16 @@ class ParsingStrategies {
      *
      * @param element the {@link Element} to parse.
      * @return the value of the attribute as a {@link URI}, or {@link Optional#empty()} if the attribute was not present.
-     * @throws InvalidURIException if the value of the {@value OaiPmhConstants#URI_ATTR} contains a string that violates RFC 2396.
+     * @throws URISyntaxException if the value of the {@value OaiPmhConstants#URI_ATTR} contains a string that violates RFC 2396.
      */
-    static Optional<URI> uriStrategy(Element element) {
+    static Optional<URI> uriStrategy(Element element) throws URISyntaxException {
         var uriString = element.getAttributeValue(URI_ATTR);
-        try {
-            if (uriString != null) {
-                // Trim the URI before constructing.
-                return Optional.of(new URI(uriString.trim()));
-            }
-        } catch (URISyntaxException e) {
-            throw new InvalidURIException(e);
+        if (uriString != null) {
+            // Trim the URI before constructing.
+            return Optional.of(new URI(uriString.trim()));
+        } else {
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 
     static Optional<VocabAttributes> samplingTermVocabAttributeStrategy(Element element, Namespace namespace, boolean hasControlledValue) {
@@ -207,42 +203,56 @@ class ParsingStrategies {
         var relatedPublication = new RelatedPublication();
 
         // Determine whether the element has a citation in it
-        var citation = element.getChild("citation", namespace);
-        if (citation != null) {
-            // Extract the title from the titlStmt if present
-            relatedPublication.setTitle(parseTitlStmtElement(citation, namespace));
-            relatedPublication.setHoldings(parseHoldingsURI(citation, namespace));
+        var citation = ofNullable(element.getChild("citation", namespace));
+
+        // Determine if ExtLink has a URI
+        ofNullable(element.getChild("ExtLink", namespace))
+            .map(e -> e.getAttributeValue(URI_ATTR))
+            .map(uriString -> {
+                try {
+                    return new URI(uriString.trim());
+                } catch (URISyntaxException e) {
+                    // filter out invalid URIs
+                    return null;
+                }
+            }).ifPresent(t -> relatedPublication.getHoldings().add(t));
+
+        // Parse the holdings in the citation if present
+        if (citation.isPresent()) {
+            var uris = parseHoldingsURI(citation.get(), namespace);
+            relatedPublication.getHoldings().addAll(uris);
         }
 
-        // The element's citation may contain no content, try to extract directly
-        if (relatedPublication.getTitle() == null || relatedPublication.getTitle().isEmpty()) {
-            var elementText = element.getTextTrim();
-            if (!elementText.isBlank()) {
-                relatedPublication.setTitle(elementText);
+        // Try to extract text from the relPubl element
+        var elementText = element.getTextTrim();
+        if (!elementText.isBlank()) {
+            relatedPublication.setTitle(elementText);
+        } else {
+            final Optional<Element> titleElement;
+
+            // Try to locate biblCit
+            var bibCit = citation.map(c -> c.getChild("biblCit", namespace));
+            if (bibCit.isPresent()) {
+                // Use biblCit for the title
+                titleElement = bibCit;
             } else {
-                // No title has been found, return an empty optional
-                return Optional.empty();
+                // No text has been found, try to parse the citation if present
+                titleElement = citation.map(c -> c.getChild("titlStmt", namespace))
+                    .map(titlStmt -> titlStmt.getChild("titl", namespace));
             }
+
+            // Extract the text from the element
+            titleElement.map(Element::getTextTrim)
+                .filter(s -> !s.isBlank())
+                .ifPresent(relatedPublication::setTitle);
         }
 
-        return Optional.of(relatedPublication);
-    }
-
-    /**
-     * Parse the title element of a citation.
-     * @return the text of the title element (may be empty), or null if the title element cannot be found.
-     */
-    private static String parseTitlStmtElement(Element citation, Namespace namespace) {
-        var titlStmt = citation.getChild("titlStmt", namespace);
-        if (titlStmt != null) {
-            var titl = titlStmt.getChild("titl", namespace);
-            if (titl != null) {
-                return titl.getTextTrim();
-            }
+        // Only return if the title is set
+        if (relatedPublication.getTitle() != null) {
+            return Optional.of(relatedPublication);
+        } else {
+            return Optional.empty();
         }
-
-        // No titl element, return null
-        return null;
     }
 
     /**

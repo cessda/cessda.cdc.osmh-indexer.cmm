@@ -204,6 +204,17 @@
                         <titlStmt/>
                     </citation>
                 </relPubl>
+                <!-- Example to test precedence rules -->
+                <relPubl xml:lang="en">
+                    This should be present
+                    <citation>
+                        <titlStmt>
+                            <titl xml:lang="en">This should not be present</titl>
+                        </titlStmt>
+                        <holdings URI="http://dx.doi.org/10.1080/03906701.2014.976950" xml:lang="en"/>
+                    </citation>
+                    <ExtLink URI="http://example.com/test-ext-link"/>
+                </relPubl>
             </othrStdyMat>
           </stdyDscr>
           <fileDscr>

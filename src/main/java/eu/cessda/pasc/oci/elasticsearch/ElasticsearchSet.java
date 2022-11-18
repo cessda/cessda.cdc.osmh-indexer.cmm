@@ -16,11 +16,8 @@
 package eu.cessda.pasc.oci.elasticsearch;
 
 import com.fasterxml.jackson.databind.ObjectReader;
-import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.action.search.ClearScrollRequest;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchScrollRequest;
+import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.search.*;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.core.CountRequest;
 import org.elasticsearch.core.TimeValue;
@@ -125,13 +122,19 @@ public class ElasticsearchSet<T> extends AbstractSet<T> {
             var hasNext = response.getHits().getHits().length > 0;
             if (!hasNext) {
                 // If no more results are available, clear the scroll context
-                try {
-                    var clearScrollRequest = new ClearScrollRequest();
-                    clearScrollRequest.addScrollId(response.getScrollId());
-                    client.clearScroll(clearScrollRequest, DEFAULT);
-                } catch (ElasticsearchException | IOException e)  {
-                    //ignored
-                }
+                var clearScrollRequest = new ClearScrollRequest();
+                clearScrollRequest.addScrollId(response.getScrollId());
+                client.clearScrollAsync(clearScrollRequest, DEFAULT, new ActionListener<>() {
+                    @Override
+                    public void onResponse(ClearScrollResponse clearScrollResponse) {
+                        // ignored
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        // ignored
+                    }
+                });
             }
             return hasNext;
         }

@@ -225,11 +225,11 @@ class DocElementParser {
 
     private Optional<String> parseLanguageCode(Element element, String defaultLangIsoCode, Namespace ddiNamespace) {
 
-        var langAttr = element.getAttribute(LANG_ATTR, XML_NAMESPACE);
+        var langAttr = getLangAttribute(element);
         if (langAttr == null) {
             var concept = element.getChild("concept", ddiNamespace);
             if (concept != null) {
-                langAttr = concept.getAttribute(LANG_ATTR, XML_NAMESPACE);
+                langAttr = getLangAttribute(concept);
             }
         }
 
@@ -247,6 +247,21 @@ class DocElementParser {
         }
 
         return Optional.empty();
+    }
+
+    /**
+     * Attempt to find the {@code xml:lang} attribute in the given element.
+     * @param element the element to parse.
+     * @return the attribute, or {@code null} if the attribute cannot be found.
+     */
+    private static Attribute getLangAttribute(Element element) {
+        var langAttr = element.getAttribute(LANG_ATTR, XML_NAMESPACE);
+        if (langAttr != null) {
+            return langAttr;
+        } else {
+            // Try to parse older DDI styles of the language
+            return element.getAttribute("xml-lang");
+        }
     }
 
     /**
