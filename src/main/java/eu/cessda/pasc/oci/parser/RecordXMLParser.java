@@ -15,8 +15,10 @@
  */
 package eu.cessda.pasc.oci.parser;
 
-import eu.cessda.pasc.oci.DateNotParsedException;
-import eu.cessda.pasc.oci.exception.*;
+import eu.cessda.pasc.oci.exception.IndexerException;
+import eu.cessda.pasc.oci.exception.InvalidUniverseException;
+import eu.cessda.pasc.oci.exception.OaiPmhException;
+import eu.cessda.pasc.oci.exception.XMLParseException;
 import eu.cessda.pasc.oci.http.HttpClient;
 import eu.cessda.pasc.oci.models.Record;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
@@ -116,11 +118,17 @@ public class RecordXMLParser {
             var xPaths = getXPaths(repository);
             var defaultLangIsoCode = cmmStudyMapper.parseDefaultLanguage(document, repository, xPaths);
             builder.titleStudy(cmmStudyMapper.parseStudyTitle(document, xPaths, defaultLangIsoCode));
-            try {
-                builder.studyUrl(cmmStudyMapper.parseStudyUrl(document, xPaths, defaultLangIsoCode));
-            } catch (InvalidURIException e) {
-                log.warn("[{}] Some URLs in study {} couldn't be parsed: {}", repository.getCode(), headerElement.getStudyNumber().orElse(""), e.toString());
+
+            var parseStudyUrlResults = cmmStudyMapper.parseStudyUrl(document, xPaths, defaultLangIsoCode);
+            builder.studyUrl(parseStudyUrlResults.getResults());
+            if (!parseStudyUrlResults.getExceptions().isEmpty()) {
+                log.warn("[{}] Some URLs in study {} couldn't be parsed: {}",
+                    repository.getCode(),
+                    headerElement.getStudyNumber().orElse(""),
+                    parseStudyUrlResults.getExceptions().toString()
+                );
             }
+
             builder.abstractField(cmmStudyMapper.parseAbstract(document, xPaths, defaultLangIsoCode));
             builder.pidStudies(cmmStudyMapper.parsePidStudies(document, xPaths, defaultLangIsoCode));
             builder.creators(cmmStudyMapper.parseCreator(document, xPaths, defaultLangIsoCode));
@@ -136,14 +144,20 @@ public class RecordXMLParser {
             builder.typeOfSamplingProcedures(cmmStudyMapper.parseTypeOfSamplingProcedure(document, xPaths, defaultLangIsoCode));
             builder.samplingProcedureFreeTexts(cmmStudyMapper.parseSamplingProcedureFreeTexts(document, xPaths, defaultLangIsoCode));
             builder.typeOfModeOfCollections(cmmStudyMapper.parseTypeOfModeOfCollection(document, xPaths, defaultLangIsoCode));
-            try {
-                var dataCollectionPeriod = cmmStudyMapper.parseDataCollectionDates(document, xPaths);
-                dataCollectionPeriod.getStartDate().ifPresent(builder::dataCollectionPeriodStartdate);
-                dataCollectionPeriod.getEndDate().ifPresent(builder::dataCollectionPeriodEnddate);
-                builder.dataCollectionYear(dataCollectionPeriod.getDataCollectionYear());
-            } catch (DateNotParsedException e) {
-                log.warn("[{}] Some dates in study {} couldn't be parsed: {}", repository.getCode(), headerElement.getStudyNumber().orElse(""), e.toString());
+
+            var dataCollectionPeriodResults = cmmStudyMapper.parseDataCollectionDates(document, xPaths);
+            dataCollectionPeriodResults.getResults().getStartDate().ifPresent(builder::dataCollectionPeriodStartdate);
+            dataCollectionPeriodResults.getResults().getEndDate().ifPresent(builder::dataCollectionPeriodEnddate);
+            builder.dataCollectionYear(dataCollectionPeriodResults.getResults().getDataCollectionYear());
+            if (!dataCollectionPeriodResults.getExceptions().isEmpty()) {
+                // Parsing errors occurred, log here
+                log.warn("[{}] Some dates in study {} couldn't be parsed: {}",
+                    repository.getCode(),
+                    headerElement.getStudyNumber().orElse(""),
+                    dataCollectionPeriodResults.getExceptions().toString()
+                );
             }
+
             builder.dataCollectionFreeTexts(cmmStudyMapper.parseDataCollectionFreeTexts(document, xPaths, defaultLangIsoCode));
             try {
                 builder.universes(cmmStudyMapper.parseUniverses(document, xPaths, defaultLangIsoCode));

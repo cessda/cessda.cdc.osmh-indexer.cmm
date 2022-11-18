@@ -202,7 +202,5 @@ public class MicrometerMetrics implements Metrics {
     public void updateMetrics() throws IOException {
         updateTotalRecordsMetric();
         updateLanguageMetrics();
-        var allStudies = ingestService.getAllStudies("*");
-        updateEndpointsRecordsMetric(allStudies);
     }
 }

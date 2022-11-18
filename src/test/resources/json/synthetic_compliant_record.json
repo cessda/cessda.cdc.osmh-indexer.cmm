@@ -393,6 +393,13 @@
           "http://dx.doi.org/10.1080/03906701.2014.976950",
           "http://example.com/test-holding"
         ]
+      },
+      {
+        "title": "This should be present",
+        "holdings": [
+          "http://example.com/test-ext-link",
+          "http://dx.doi.org/10.1080/03906701.2014.976950"
+        ]
       }
     ]
   },

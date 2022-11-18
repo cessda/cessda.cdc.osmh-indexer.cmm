@@ -18,7 +18,6 @@ package eu.cessda.pasc.oci.parser;
 import eu.cessda.pasc.oci.DateNotParsedException;
 import eu.cessda.pasc.oci.TimeUtility;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
-import eu.cessda.pasc.oci.exception.InvalidURIException;
 import eu.cessda.pasc.oci.exception.OaiPmhException;
 import eu.cessda.pasc.oci.models.cmmstudy.*;
 import eu.cessda.pasc.oci.models.configurations.Repo;
@@ -35,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -314,22 +314,38 @@ public class CMMStudyMapper {
      * <p>
      * Xpath = {@link XPaths#getStudyURLDocDscrXPath()}
      * Xpath = {@link XPaths#getStudyURLStudyDscrXPath()}
-     *
-     * @throws InvalidURIException if the value of the "URI" contains a string that violates RFC 2396.
      */
-    Map<String, URI> parseStudyUrl(Document document, XPaths xPaths, String langCode) {
+    ParseResults<HashMap<String, URI>, List<URISyntaxException>> parseStudyUrl(Document document, XPaths xPaths, String langCode) {
+        var parsingExceptions = new ArrayList<URISyntaxException>();
+
         var stdyDscrElements = DocElementParser.getElements(document, xPaths.getStudyURLStudyDscrXPath(), xPaths.getOaiAndDdiNs());
-        var urlFromStdyDscr = docElementParser.getLanguageKeyValuePairs(stdyDscrElements, langCode, ParsingStrategies::uriStrategy);
+        var urlFromStdyDscr = docElementParser.getLanguageKeyValuePairs(stdyDscrElements, langCode, element -> {
+            try {
+                return ParsingStrategies.uriStrategy(element);
+            } catch (URISyntaxException e) {
+                parsingExceptions.add(e);
+                return Optional.empty();
+            }
+        });
 
         // If studyURLStudyDscrXPath defined, use that XPath as well.
-        return xPaths.getStudyURLDocDscrXPath().map(xpath -> {
+        var studyUrls= xPaths.getStudyURLDocDscrXPath().map(xpath -> {
             var docDscrElement = DocElementParser.getElements(document, xpath, xPaths.getOaiAndDdiNs());
-            var urlFromDocDscr = docElementParser.getLanguageKeyValuePairs(docDscrElement, langCode, ParsingStrategies::uriStrategy);
+            var urlFromDocDscr = docElementParser.getLanguageKeyValuePairs(docDscrElement, langCode, element -> {
+                try {
+                    return ParsingStrategies.uriStrategy(element);
+                } catch (URISyntaxException e) {
+                    parsingExceptions.add(e);
+                    return Optional.empty();
+                }
+            });
 
             // If absent, use the URL from studyDscr
             urlFromStdyDscr.forEach(urlFromDocDscr::putIfAbsent);
             return urlFromDocDscr;
         }).orElse(urlFromStdyDscr);
+
+        return new ParseResults<>(studyUrls, parsingExceptions);
     }
 
     /**
@@ -374,32 +390,43 @@ public class CMMStudyMapper {
      * Xpath = {@link XPaths#getDataCollectionPeriodsXPath()}
      * <p>
      * For Data Collection start and end date plus the four digit Year value as Data Collection Year
-     *
-     * @throws DateNotParsedException if a date string cannot be parsed.
      */
-    DataCollectionPeriod parseDataCollectionDates(Document doc, XPaths xPaths) throws DateNotParsedException {
+    ParseResults<DataCollectionPeriod, List<DateNotParsedException>> parseDataCollectionDates(Document doc, XPaths xPaths) {
         var dateAttrs = DocElementParser.getDateElementAttributesValueMap(doc, xPaths.getDataCollectionPeriodsXPath(), xPaths.getDdiNS());
 
         var dataCollectionPeriodBuilder = DataCollectionPeriod.builder();
 
+        var parseExceptions = new ArrayList<DateNotParsedException>(2);
+
         if (dateAttrs.containsKey(SINGLE_ATTR)) {
             final String singleDateValue = dateAttrs.get(SINGLE_ATTR);
             dataCollectionPeriodBuilder.startDate(singleDateValue);
-            var localDateTime = TimeUtility.getLocalDateTime(singleDateValue);
-            dataCollectionPeriodBuilder.dataCollectionYear(localDateTime.getYear());
+            try {
+                var localDateTime = TimeUtility.getLocalDateTime(singleDateValue);
+                dataCollectionPeriodBuilder.dataCollectionYear(localDateTime.getYear());
+            } catch (DateNotParsedException e) {
+                parseExceptions.add(e);
+            }
         } else {
             if (dateAttrs.containsKey(START_ATTR)) {
                 final String startDateValue = dateAttrs.get(START_ATTR);
                 dataCollectionPeriodBuilder.startDate(startDateValue);
-                var localDateTime = TimeUtility.getLocalDateTime(startDateValue);
-                dataCollectionPeriodBuilder.dataCollectionYear(localDateTime.getYear());
+                try {
+                    var localDateTime = TimeUtility.getLocalDateTime(startDateValue);
+                    dataCollectionPeriodBuilder.dataCollectionYear(localDateTime.getYear());
+                } catch (DateNotParsedException e) {
+                    parseExceptions.add(e);
+                }
             }
             if (dateAttrs.containsKey(END_ATTR)) {
                 dataCollectionPeriodBuilder.endDate(dateAttrs.get(END_ATTR));
             }
         }
 
-        return dataCollectionPeriodBuilder.build();
+        return new ParseResults<>(
+            dataCollectionPeriodBuilder.build(),
+            parseExceptions
+        );
     }
 
     /**
@@ -479,5 +506,11 @@ public class CMMStudyMapper {
         public Optional<String> getEndDate() {
             return Optional.ofNullable(endDate);
         }
+    }
+
+    @Value
+    static class ParseResults<T, E> {
+        T results;
+        E exceptions;
     }
 }
