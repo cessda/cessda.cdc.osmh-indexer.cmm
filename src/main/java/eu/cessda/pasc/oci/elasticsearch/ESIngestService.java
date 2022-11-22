@@ -81,77 +81,79 @@ public class ESIngestService implements IngestService {
     }
 
     @Override
-    public boolean bulkIndex(Collection<CMMStudyOfLanguage> languageCMMStudiesMap, String languageIsoCode) throws IOException {
+    public void bulkIndex(Collection<CMMStudyOfLanguage> languageCMMStudiesMap, String languageIsoCode) throws IndexingException {
         var indexName = String.format(INDEX_NAME_TEMPLATE, languageIsoCode);
+        
+        createIndex(indexName);
+    
+        log.debug("[{}] Indexing {} studies", indexName, languageCMMStudiesMap.size());
 
-        if (createIndex(indexName)) {
-            log.debug("[{}] Indexing {} studies", indexName, languageCMMStudiesMap.size());
+        var bulkIndexQuery = new BulkRequest();
 
-            var bulkIndexQuery = new BulkRequest();
+        for (var study : languageCMMStudiesMap) {
+            try {
+                var json = cmmStudyOfLanguageConverter.getWriter().writeValueAsBytes(study);
+                var indexRequest = Requests.indexRequest(indexName)
+                    .id(study.getId())
+                    .source(json, XContentType.JSON);
 
-            for (var study : languageCMMStudiesMap) {
-                try {
-                    var json = cmmStudyOfLanguageConverter.getWriter().writeValueAsBytes(study);
-                    var indexRequest = Requests.indexRequest(indexName)
-                        .id(study.getId())
-                        .source(json, XContentType.JSON);
+                bulkIndexQuery.add(indexRequest);
 
-                    bulkIndexQuery.add(indexRequest);
+                if (bulkIndexQuery.numberOfActions() == INDEX_COMMIT_SIZE) {
+                    log.trace("[{}] Bulk Indexing {} studies", indexName, INDEX_COMMIT_SIZE);
+                    indexBulkRequest(indexName, bulkIndexQuery);
 
-                    if (bulkIndexQuery.numberOfActions() == INDEX_COMMIT_SIZE) {
-                        log.trace("[{}] Bulk Indexing {} studies", indexName, INDEX_COMMIT_SIZE);
-                        indexBulkRequest(indexName, bulkIndexQuery);
-
-                        // Clear the bulk request
-                        bulkIndexQuery = new BulkRequest();
-                    }
-                } catch (JsonProcessingException e) {
-                    log.warn("[{}] Failed to convert {} into JSON: {}", indexName, study.getId(), e.toString());
+                    // Clear the bulk request
+                    bulkIndexQuery = new BulkRequest();
                 }
+            } catch (JsonProcessingException e) {
+                log.warn("[{}] Failed to convert {} into JSON: {}", indexName, study.getId(), e.toString());
             }
-
-            // Commit all remaining studies
-            if (bulkIndexQuery.numberOfActions() > 0) {
-                log.trace("[{}] Bulk Indexing {} studies", indexName, bulkIndexQuery.numberOfActions());
-                indexBulkRequest(indexName, bulkIndexQuery);
-            }
-
-            log.debug("[{}] Indexing completed.", indexName);
-            return true;
         }
 
-        return false;
+        // Commit all remaining studies
+        if (bulkIndexQuery.numberOfActions() > 0) {
+            log.trace("[{}] Bulk Indexing {} studies", indexName, bulkIndexQuery.numberOfActions());
+            indexBulkRequest(indexName, bulkIndexQuery);
+        }
+
+        log.debug("[{}] Indexing completed.", indexName);
     }
 
-    private void indexBulkRequest(String indexName, BulkRequest request) throws IOException {
-        var response = esClient.bulk(request, DEFAULT);
-        if (response.hasFailures()) {
-            for (var item : response.getItems()) {
-                if (item.isFailed() && item.getFailure().getCause().getMessage().contains("strict_dynamic_mapping_exception")) {
-                    // Attempt updating field mappings
-                    var updateMappingRequest = new PutMappingRequest(indexName)
-                        .source(ResourceHandler.getResourceAsString(MAPPINGS_JSON), XContentType.JSON);
-                    esClient.indices().putMapping(updateMappingRequest, DEFAULT);
+    private void indexBulkRequest(String indexName, BulkRequest request) throws IndexingException {
+        try {
+            var response = esClient.bulk(request, DEFAULT);
+            if (response.hasFailures()) {
+                for (var item : response.getItems()) {
+                    if (item.isFailed() && item.getFailure().getCause().getMessage().contains("strict_dynamic_mapping_exception")) {
+                        // Attempt updating field mappings
+                        var updateMappingRequest = new PutMappingRequest(indexName)
+                            .source(ResourceHandler.getResourceAsString(MAPPINGS_JSON), XContentType.JSON);
+                        esClient.indices().putMapping(updateMappingRequest, DEFAULT);
 
-                    // Retry indexing with updated mappings.
-                    response = esClient.bulk(request, DEFAULT);
-                    break;
+                        // Retry indexing with updated mappings.
+                        response = esClient.bulk(request, DEFAULT);
+                        break;
+                    }
+                }
+
+                if (response.hasFailures()) {
+                    log.warn("[{}] {}", indexName, response.buildFailureMessage());
                 }
             }
-
-            if (response.hasFailures()) {
-                log.warn("[{}] {}", indexName, response.buildFailureMessage());
-            }
+        } catch (ElasticsearchException | IOException e) {
+            throw new IndexingException(e);
         }
     }
 
     @Override
-    public void bulkDelete(Collection<CMMStudyOfLanguage> cmmStudiesToDelete, String languageIsoCode) throws IOException {
+    public void bulkDelete(Collection<CMMStudyOfLanguage> cmmStudiesToDelete, String languageIsoCode) throws IndexingException {
         // Set the index
         var indexName = String.format(INDEX_NAME_TEMPLATE, languageIsoCode);
 
         // Extract the ids from the studies, and add them to the delete query
-        var deleteBulkRequest = cmmStudiesToDelete.stream().map(CMMStudyOfLanguage::getId)
+        var deleteBulkRequest = cmmStudiesToDelete.stream()
+            .map(CMMStudyOfLanguage::getId)
             .map(id -> Requests.deleteRequest(indexName).id(id))
             .collect(BulkRequest::new, BulkRequest::add, (a,b) -> a.add(b.requests()));
 
@@ -264,15 +266,18 @@ public class ESIngestService implements IngestService {
     /**
      * Creates an index with the given name. If the index already exists, then no operation is performed.
      *
-     * @param indexName the name of the index to create
-     * @return {@code true} if the index was created or if the index already existed,
-     * {@code false} if an error occurred during index creation
+     * @param indexName the name of the index to create.
+     * @throws IndexingException if an error occurred during index creation.
      */
-    private boolean createIndex(String indexName) throws IOException {
+    private void createIndex(String indexName) throws IndexingException {
 
-        if (esClient.indices().exists(new GetIndexRequest(indexName), DEFAULT)) {
-            log.debug("[{}] index name already exists, Skipping creation.", indexName);
-            return true;
+        try {
+            if (esClient.indices().exists(new GetIndexRequest(indexName), DEFAULT)) {
+                log.debug("[{}] index name already exists, Skipping creation.", indexName);
+                return;
+            }
+        } catch (ElasticsearchException | IOException e) {
+            throw new IndexingException(e);
         }
 
         log.debug("[{}] index name does not exist and will be created", indexName);
@@ -290,8 +295,7 @@ public class ESIngestService implements IngestService {
             mappings = ResourceHandler.getResourceAsString(MAPPINGS_JSON);
 
         } catch (IOException e) {
-            log.error("[{}] Couldn't load settings for Elasticsearch: {}", indexName, e.toString());
-            return false;
+            throw new IndexCreationFailedException("Couldn't load settings for Elasticsearch", indexName, e);
         }
 
 
@@ -309,23 +313,16 @@ public class ESIngestService implements IngestService {
 
                 // Wait until the index is ready
                 esClient.indices().open(Requests.openIndexRequest(indexName), DEFAULT);
-
-                return true;
             } else {
-                log.error("[{}] Index creation failed!", indexName);
-                return false;
+                throw new IndexCreationFailedException(indexName);
             }
         } catch (ElasticsearchException e) {
-          if (e.getMessage().contains("resource_already_exists_exception")) {
-              // Index exists, continue
-              return true;
-          } else {
-              throw e;
-          }
+            // Check if the index already exists
+            if (!e.getMessage().contains("resource_already_exists_exception")) {
+                throw new IndexCreationFailedException(indexName, e);
+            }
         } catch (IOException e) {
-            log.error("[{}] Index creation failed: {}", indexName, e.toString());
-            return false;
+            throw new IndexCreationFailedException("Index creation failed", indexName, e);
         }
     }
-
 }

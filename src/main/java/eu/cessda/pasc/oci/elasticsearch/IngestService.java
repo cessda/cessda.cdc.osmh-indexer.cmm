@@ -35,10 +35,9 @@ public interface IngestService {
      *
      * @param languageCMMStudiesMap of records
      * @param languageIsoCode       index post-end token
-     * @return true If bulkIndexing was successful with no known error.
      * @throws org.elasticsearch.ElasticsearchException if an error occurs when indexing the studies to Elasticsearch.
      */
-    boolean bulkIndex(Collection<CMMStudyOfLanguage> languageCMMStudiesMap, String languageIsoCode) throws IOException;
+    void bulkIndex(Collection<CMMStudyOfLanguage> languageCMMStudiesMap, String languageIsoCode) throws IndexingException;
 
     /**
      * Delete the specified studies from all indices.
@@ -48,7 +47,7 @@ public interface IngestService {
      * @param languageIsoCode the language of the index to delete the studies from
      * @throws org.elasticsearch.ElasticsearchException if an error occurs connecting to Elasticsearch.
      */
-    void bulkDelete(Collection<CMMStudyOfLanguage> cmmStudiesToDelete, String languageIsoCode) throws IOException;
+    void bulkDelete(Collection<CMMStudyOfLanguage> cmmStudiesToDelete, String languageIsoCode) throws IndexingException;
 
     /**
      * Gets the total number of hits for the specified language. The language is in the same form as languages configured

@@ -117,8 +117,8 @@ public class CMMStudyOfLanguage {
     @JsonProperty("unitTypes")
     List<TermVocabAttributes> unitTypes;
 
-    @JsonProperty("universes")
-    List<Universe> universes;
+    @JsonProperty("universe")
+    Universe universe;
 
     // Internal metadata
     @JsonProperty("lastModified")

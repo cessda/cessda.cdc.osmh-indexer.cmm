@@ -434,7 +434,7 @@ public class CMMStudyMapper {
      * <p>
      * Xpath = {@link XPaths#getFileTxtLanguagesXPath() }
      *
-     * @return a set with all of the file languages
+     * @return a set with all the file languages
      */
     Set<String> parseFileLanguages(Document document, XPaths xPaths) {
 
@@ -455,16 +455,39 @@ public class CMMStudyMapper {
      *
      * @return a map with the key set to the language, and the value a list of universes found.
      */
-    Map<String, List<Universe>> parseUniverses(Document document, XPaths xPaths, String defaultLangIsoCode) {
+    @SuppressWarnings({"java:S1301", "java:S131"}) // Suppress false positives
+    Map<String, Universe> parseUniverses(Document document, XPaths xPaths, String defaultLangIsoCode) {
         var universeXPath = xPaths.getUniverseXPath();
         if (universeXPath.isPresent()) {
-            return docElementParser.extractMetadataObjectListForEachLang(
+            var extractedUniverses = docElementParser.extractMetadataObjectListForEachLang(
                 defaultLangIsoCode,
                 document,
                 universeXPath.orElseThrow(),
                 xPaths.getDdiNS(),
                 ParsingStrategies::universeStrategy
             );
+
+            var universes = new HashMap<String, Universe>();
+            for (var entry : extractedUniverses.entrySet()) {
+                var universe = universes.computeIfAbsent(entry.getKey(), k -> new Universe());
+
+                // Loop over all universe entries for each language
+                for(var extractedUniverse : entry.getValue()) {
+                    var universeContent = extractedUniverse.getValue();
+
+                    // Switch based on the type of clusion
+                    switch (extractedUniverse.getKey()) {
+                        case I:
+                            universe.setInclusion(universeContent);
+                            break;
+                        case E:
+                            universe.setExclusion(universeContent);
+                            break;
+                    }
+                }
+            }
+
+            return universes;
         } else {
             return Collections.emptyMap();
         }

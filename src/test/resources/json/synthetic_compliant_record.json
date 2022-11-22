@@ -367,19 +367,14 @@
       }
     ]
   },
-  "universes": {
-    "en": [
-      {
-        "content": "Persons who were second grade students in a school in Jyväskylä at the time of the first data collection in 1968 and who continued to participate in the longitudinal study and had belonged to extreme groups of social behaviour at ages 8 and 14. The sample was collected both from the town centre and suburbs.",
-        "clusion": "I"
-      }
-    ],
-    "fi": [
-      {
-        "content": "Otantahetkellä vuonna 1968 kansakoulun toisluokkalaiset keskisuomalaisen kaupungin oppilaat, jotka ovat edelleen mukana pitkittäistutkimuksessa ja kuuluivat 8- ja 14 -vuotiaana sosiaalisen käyttäytymisen ääriryhmiin.",
-        "clusion": "I"
-      }
-    ]
+  "universe": {
+    "en": {
+      "inclusion": "Persons who were second grade students in a school in Jyväskylä at the time of the first data collection in 1968 and who continued to participate in the longitudinal study and had belonged to extreme groups of social behaviour at ages 8 and 14. The sample was collected both from the town centre and suburbs.",
+      "exclusion": "Example excluded universe."
+    },
+    "fi": {
+      "inclusion": "Otantahetkellä vuonna 1968 kansakoulun toisluokkalaiset keskisuomalaisen kaupungin oppilaat, jotka ovat edelleen mukana pitkittäistutkimuksessa ja kuuluivat 8- ja 14 -vuotiaana sosiaalisen käyttäytymisen ääriryhmiin."
+    }
   },
   "relatedPublications": {
     "en": [

@@ -126,21 +126,21 @@
       }
     },
     "publisherFilter": {
-        "type": "nested",
-        "properties": {
-          "abbr": {
-            "type": "keyword",
-            "ignore_above": 256,
-            "index": false
-          },
-          "publisher": {
-            "type": "keyword",
-            "ignore_above": 256,
-            "copy_to": "publisherSearchField"
-          }
+      "type": "nested",
+      "properties": {
+        "abbr": {
+          "type": "keyword",
+          "ignore_above": 256,
+          "index": false
+        },
+        "publisher": {
+          "type": "keyword",
+          "ignore_above": 256,
+          "copy_to": "publisherSearchField"
         }
-      },
-      "publisherSearchField": {
+      }
+    },
+    "publisherSearchField": {
       "type": "text",
       "analyzer": "pasc_standard_analyzer"
     },
@@ -361,24 +361,19 @@
       "type": "text",
       "analyzer": "pasc_standard_analyzer"
     },
-    "universes": {
-      "type": "nested",
+    "universe": {
       "properties": {
-        "content": {
+        "inclusion": {
           "type": "text",
           "analyzer": "pasc_standard_analyzer",
-          "term_vector": "with_positions_offsets",
-          "copy_to": "universeSearchField"
+          "term_vector": "with_positions_offsets"
         },
-        "clusion": {
-          "type": "keyword",
-          "ignore_above": 256
+        "exclusion": {
+          "type": "text",
+          "analyzer": "pasc_standard_analyzer",
+          "term_vector": "with_positions_offsets"
         }
       }
-    },
-    "universeSearchField": {
-      "type": "text",
-      "analyzer": "pasc_standard_analyzer"
     },
     "relatedPublications": {
       "type": "nested",
