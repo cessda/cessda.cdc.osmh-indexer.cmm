@@ -25,9 +25,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -46,11 +43,13 @@ public class PipelineUtilities {
      * @param baseDirectory the base directory to search from.
      * @return a list of all discovered repositories.
      */
-    public List<Repo> discoverRepositories(Path baseDirectory) {
+    @SuppressWarnings("resource") // closed by calling method
+    public Stream<Repo> discoverRepositories(Path baseDirectory) {
         if (baseDirectory != null) {
-            try (var directoryStream = Files.find(baseDirectory, Integer.MAX_VALUE,
-                (path, attributes) -> attributes.isRegularFile() && path.getFileName().toString().equals("pipeline.json")
-            )) {
+            try {
+                var directoryStream = Files.find(baseDirectory, Integer.MAX_VALUE,
+                    (path, attributes) -> attributes.isRegularFile() && path.getFileName().toString().equals("pipeline.json")
+                );
                 return directoryStream.flatMap(json -> {
                     try (var inputStream = Files.newInputStream(json)) {
                         PipelineMetadata sharedModel = repositoryModelObjectReader.readValue(inputStream);
@@ -67,14 +66,14 @@ public class PipelineUtilities {
                         // Add the repo object to the stream
                         return Stream.of(repo);
                     } catch (IOException e) {
-                        log.error("Failed to load pipeline definition \"{}\": {}", json, e.toString());
+                        log.error("Failed to load pipeline definition from \"{}\": {}", json, e.toString());
                         return Stream.empty();
                     }
-                }).collect(Collectors.toUnmodifiableList());
+                });
             } catch (IOException e) {
                 log.error("Error occurred when loading repositories: {}", e.toString());
             }
         }
-        return Collections.emptyList();
+        return Stream.empty();
     }
 }

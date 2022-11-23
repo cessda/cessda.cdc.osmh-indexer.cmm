@@ -80,14 +80,12 @@ public class IndexerRunner {
             // Load explicitly configured repositories
             var repos = configurationProperties.getEndpoints().getRepos();
 
-            // Discover repositories by attempting to find pipeline.json instances if a base directory is configured
-            var repoParsedFromJson = pipelineUtilities.discoverRepositories(configurationProperties.getBaseDirectory());
-
             // Store the MDC so that it can be used in the running thread
             var contextMap = MDC.getCopyOfContextMap();
 
-            try {
-                var futures = Stream.concat(repoParsedFromJson.stream(), repos.stream())
+            // Discover repositories by attempting to find pipeline.json instances if a base directory is configured
+            try (var repoParsedFromJson = pipelineUtilities.discoverRepositories(configurationProperties.getBaseDirectory())) {
+                var futures = Stream.concat(repoParsedFromJson, repos.stream())
                     .map(repo -> runAsync(() -> indexRepository(repo, lastModifiedDateTime, contextMap))
                         .exceptionally(e -> {
                             log.error("[{}]: Unexpected error occurred when harvesting!", repo.getCode(), e);
