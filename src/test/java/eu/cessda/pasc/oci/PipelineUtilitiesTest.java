@@ -24,24 +24,25 @@ import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class PipelineUtilitiesTest {
+class PipelineUtilitiesTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final PipelineUtilities pipelineUtilities = new PipelineUtilities(objectMapper);
 
     @Test
-    public void shouldDiscoverRepositories() {
+    void shouldDiscoverRepositories() {
         var pipeline = Path.of("src/test/resources/pipeline");
         var discoveredRepositories = pipelineUtilities.discoverRepositories(pipeline);
 
         // Should discover 2 repositories, ignoring the invalid definition.
-        assertThat(discoveredRepositories).hasSize(2);
-        assertThat(discoveredRepositories).map(Repo::getCode).containsOnly("APIS", "UniData");
-        assertThat(discoveredRepositories).map(Repo::getHandler).containsOnly("DDI_2_5");
+        var repositoryAssert = assertThat(discoveredRepositories);
+        repositoryAssert.hasSize(2);
+        repositoryAssert.map(Repo::getCode).containsOnly("APIS", "UniData");
+        repositoryAssert.map(Repo::getHandler).containsOnly("DDI_2_5");
     }
 
     @Test
-    public void shouldReturnEmptyListIfNoRepositoriesWereDiscovered() {
+    void shouldReturnEmptyListIfNoRepositoriesWereDiscovered() {
         // This is a directory that contains XML files, but no pipeline definitions.
         var xmlDirectory = Path.of("src/test/resources/xml/ddi_2_5");
         var discoveredRepositories = pipelineUtilities.discoverRepositories(xmlDirectory);
@@ -51,7 +52,7 @@ public class PipelineUtilitiesTest {
     }
 
     @Test
-    public void shouldThrowIfAnIOErrorOccurs() {
+    void shouldThrowIfAnIOErrorOccurs() {
         // Define a directory that doesn't exist
         var nonExistentDirectory = Path.of("this/directory/does/not/exist");
         assertThat(Files.exists(nonExistentDirectory)).isFalse();
