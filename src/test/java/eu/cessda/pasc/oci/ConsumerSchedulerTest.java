@@ -18,6 +18,7 @@ package eu.cessda.pasc.oci;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
+import eu.cessda.pasc.oci.elasticsearch.IndexingException;
 import eu.cessda.pasc.oci.elasticsearch.IngestService;
 import eu.cessda.pasc.oci.exception.IndexerException;
 import eu.cessda.pasc.oci.metrics.MicrometerMetrics;
@@ -77,13 +78,12 @@ public class ConsumerSchedulerTest {
     }
 
     @Test
-    public void shouldHarvestAndIngestAllMetadata() throws IOException, IndexerException {
+    public void shouldHarvestAndIngestAllMetadata() throws IOException, IndexerException, IndexingException {
         // mock for our record headers
         var harvesterConsumerService = mockRecordRequests();
         var debuggingJMXBean = mockDebuggingJMXBean();
 
         // mock for ES bulking
-        when(esIndexer.bulkIndex(anyList(), anyString())).thenReturn(true);
         when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
 
         // Mock requests for indexed repository content
@@ -100,14 +100,13 @@ public class ConsumerSchedulerTest {
     }
 
     @Test
-    public void shouldHarvestAndIngestAllMetadataForWeeklyRun() throws IOException, IndexerException {
+    public void shouldHarvestAndIngestAllMetadataForWeeklyRun() throws IOException, IndexerException, IndexingException {
 
         // mock for our record headers
         var harvesterConsumerService = mockRecordRequests();
         var debuggingJMXBean = mockDebuggingJMXBean();
 
         // mock for ES bulking
-        when(esIndexer.bulkIndex(anyList(), anyString())).thenReturn(true);
         when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
         when(esIndexer.getStudy(Mockito.eq("UKDS__998"), Mockito.anyString())).thenReturn(Optional.of(getCmmStudyOfLanguageCodeEnX1().get(0)));
 
@@ -168,7 +167,7 @@ public class ConsumerSchedulerTest {
         return indexerConsumerService;
     }
 
-    private void thenVerifyFullRun(DebuggingJMXBean debuggingJMXBean) throws IOException, IndexerException {
+    private void thenVerifyFullRun(DebuggingJMXBean debuggingJMXBean) throws IOException, IndexerException, IndexingException {
         verify(debuggingJMXBean, times(1)).printElasticSearchInfo();
         verifyNoMoreInteractions(debuggingJMXBean);
 
@@ -198,7 +197,7 @@ public class ConsumerSchedulerTest {
     }
 
     @Test
-    public void shouldDoIncrementalHarvestAndIngestionOfNewerRecordsOnly() throws IOException, IndexerException {
+    public void shouldDoIncrementalHarvestAndIngestionOfNewerRecordsOnly() throws IOException, IndexerException, IndexingException {
         // MOCKS ---------------------------------------------------------------------------------------------------------
         var debuggingJMXBean = mockDebuggingJMXBean();
         // mock for our record headers
@@ -220,7 +219,6 @@ public class ConsumerSchedulerTest {
         }
 
         // mock for ES methods
-        when(esIndexer.bulkIndex(anyList(), anyString())).thenReturn(true);
         when(esIndexer.getMostRecentLastModified()).thenReturn(Optional.of(LocalDateTime.parse("2018-02-20T07:48:38")));
         when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
         when(esIndexer.getStudy(Mockito.eq("UKDS__999"), Mockito.anyString())).thenReturn(Optional.of(getCmmStudyOfLanguageCodeEnX1().get(0)));
@@ -261,13 +259,13 @@ public class ConsumerSchedulerTest {
     }
 
     @Test
-    public void shouldHandleElasticsearchExceptions() throws IOException, IndexerException {
+    public void shouldHandleElasticsearchExceptions() throws IOException, IndexerException, IndexingException {
         // mock for our record headers
         var harvesterConsumerService = mockRecordRequests();
         var debuggingJMXBean = mockDebuggingJMXBean();
 
         // mock for ES bulking
-        when(esIndexer.bulkIndex(anyList(), anyString())).thenThrow(new ElasticsearchException("Mocked"));
+        doThrow(new ElasticsearchException("Mocked")).when(esIndexer).bulkIndex(anyList(), anyString());
         when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
 
         // Given
@@ -286,13 +284,13 @@ public class ConsumerSchedulerTest {
     }
 
     @Test
-    public void shouldHandleIOExceptions() throws IOException, IndexerException {
+    public void shouldHandleIOExceptions() throws IOException, IndexerException, IndexingException {
         // mock for our record headers
         var harvesterConsumerService = mockRecordRequests();
         var debuggingJMXBean = mockDebuggingJMXBean();
 
         // mock for ES bulking
-        when(esIndexer.bulkIndex(anyList(), anyString())).thenThrow(IOException.class);
+        doThrow(IndexingException.class).when(esIndexer).bulkIndex(anyList(), anyString());
         when(esIndexer.getTotalHitCount("*")).thenThrow(IOException.class);
         when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
 

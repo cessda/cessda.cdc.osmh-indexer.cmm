@@ -16,6 +16,7 @@
 package eu.cessda.pasc.oci;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
+import eu.cessda.pasc.oci.elasticsearch.IndexingException;
 import eu.cessda.pasc.oci.elasticsearch.IngestService;
 import eu.cessda.pasc.oci.metrics.Metrics;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -130,7 +132,7 @@ public class IndexerRunner {
                 try (var langClosable = MDC.putCloseable(LoggingConstants.LANG_CODE, entry.getKey())) {
                     indexRecords(repo, entry.getKey(), entry.getValue());
                 } catch (ElasticsearchException e) {
-                    log.error("[{}({})] Error communicating with Elasticsearch!: {}", repo.getCode(), entry.getKey(), e.toString());
+                    log.error("[{}({})] Error communicating with Elasticsearch!", repo.getCode(), entry.getKey(), e);
                 }
             }
             log.info("[{}] Repo finished, took {} seconds",
@@ -158,9 +160,15 @@ public class IndexerRunner {
             // Discover studies to delete, we do this by creating a HashSet of ids and then comparing what's in the database
             var studyIds = cmmStudies.stream().map(CMMStudyOfLanguage::getId).collect(Collectors.toCollection(HashSet::new));
             var studiesToDelete = new ArrayList<CMMStudyOfLanguage>();
-            for (var presentStudy : ingestService.getStudiesByRepository(repo.getCode(), langIsoCode)) {
-                if (!studyIds.contains(presentStudy.getId())) {
-                    studiesToDelete.add(presentStudy);
+            try {
+                for (var presentStudy : ingestService.getStudiesByRepository(repo.getCode(), langIsoCode)) {
+                    if (!studyIds.contains(presentStudy.getId())) {
+                        studiesToDelete.add(presentStudy);
+                    }
+                }
+            } catch (ElasticsearchException | UncheckedIOException e) {
+                if (!(e instanceof ElasticsearchException) || !e.getMessage().contains("index_not_found_exception")) {
+                    log.warn("[{}({})] Couldn't retrieve existing studies for deletions: {}", repo.getCode(), langIsoCode, e.toString());
                 }
             }
 
@@ -169,19 +177,22 @@ public class IndexerRunner {
 
             // Perform indexing and deletions
             try {
-                if (ingestService.bulkIndex(cmmStudies, langIsoCode)) {
-                    ingestService.bulkDelete(studiesToDelete, langIsoCode);
-                    log.info("[{}({})] Indexing succeeded: [{}] studies created, [{}] studies deleted, [{}] studies updated.",
-                        repo.getCode(),
-                        langIsoCode,
-                        value("created_cmm_studies", studiesUpdated.studiesCreated),
-                        value("deleted_cmm_studies", studiesUpdated.studiesDeleted),
-                        value("updated_cmm_studies", studiesUpdated.studiesUpdated));
-                } else {
-                    log.error("[{}({})] Indexing failed!", repo.getCode(), langIsoCode);
-                }
-            } catch (IOException e) {
-                log.error("[{}({})] Indexing failed: {}", repo.getCode(), langIsoCode, e.toString());
+                ingestService.bulkIndex(cmmStudies, langIsoCode);
+                ingestService.bulkDelete(studiesToDelete, langIsoCode);
+                log.info("[{}({})] Indexing succeeded: [{}] studies created, [{}] studies deleted, [{}] studies updated.",
+                    value(LoggingConstants.REPO_NAME, repo.getCode()),
+                    value(LoggingConstants.LANG_CODE, langIsoCode),
+                    value("created_cmm_studies", studiesUpdated.studiesCreated),
+                    value("deleted_cmm_studies", studiesUpdated.studiesDeleted),
+                    value("updated_cmm_studies", studiesUpdated.studiesUpdated)
+                );
+            } catch (IndexingException e) {
+                log.error("[{}({})] Indexing failed: {}: {}",
+                    value(LoggingConstants.REPO_NAME, repo.getCode()),
+                    value(LoggingConstants.LANG_CODE, langIsoCode),
+                    value(LoggingConstants.EXCEPTION_NAME, e.getClass().getName()),
+                    value(LoggingConstants.REASON, e.getMessage())
+                );
             }
         }
     }

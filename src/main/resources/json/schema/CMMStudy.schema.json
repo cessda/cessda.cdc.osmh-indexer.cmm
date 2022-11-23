@@ -450,32 +450,24 @@
       "additionalProperties": false,
       "description": "Analysis Units for this CMMStudy in potentially multiple languages."
     },
-    "universes": {
+    "universe": {
       "type": "object",
       "description": "The universes that the study belongs to. This may be present in multiple languages.",
       "patternProperties": {
         "^[a-z]{2}$": {
-          "type": "array",
-          "items": [
-            {
-              "type": "object",
-              "description": "A universes instance",
-              "properties": {
-                "content": {
-                  "type": "string"
-                },
-                "clusion": {
-                  "type": "string",
-                  "description": "Specifies whether the universe is included (I) or excluded (E).",
-                  "enum": [
-                    "I",
-                    "E"
-                  ]
-                }
-              },
-              "additionalProperties": false
+          "type": "object",
+          "description": "A universe instance.",
+          "properties": {
+            "inclusion": {
+              "description": "The included group of this universe.",
+              "type": "string"
+            },
+            "exclusion": {
+              "type": "string",
+              "description": "The excluded group of this universe."
             }
-          ]
+          },
+          "additionalProperties": false
         }
       }
     }

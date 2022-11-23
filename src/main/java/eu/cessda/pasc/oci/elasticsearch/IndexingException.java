@@ -13,24 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.models.cmmstudy;
+package eu.cessda.pasc.oci.elasticsearch;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Value;
+public class IndexingException extends Exception {
+    private static final long serialVersionUID = 7423147835862189418L;
 
-import java.net.URI;
-import java.util.List;
+    IndexingException(String message) {
+        super(message);
+    }
 
-@Value
-public class RelatedPublication {
-    /**
-     * The title of the related publication.
-     */
-    @JsonProperty("title")
-    String title;
-    /**
-     * The URI of the holdings of the related publication.
-     */
-    @JsonProperty("holdings")
-    List<URI> holdings;
+    IndexingException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    IndexingException(Throwable cause) {
+        super(cause);
+    }
 }

@@ -25,6 +25,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static eu.cessda.pasc.oci.parser.DocElementParser.getAttributeValue;
@@ -200,7 +201,9 @@ class ParsingStrategies {
      */
     static Optional<RelatedPublication> relatedPublicationsStrategy(Element element, Namespace namespace) {
 
-        var relatedPublication = new RelatedPublication();
+        // Result variables
+        String title = null;
+        var holdings = new ArrayList<URI>();
 
         // Determine whether the element has a citation in it
         var citation = ofNullable(element.getChild("citation", namespace));
@@ -215,18 +218,18 @@ class ParsingStrategies {
                     // filter out invalid URIs
                     return null;
                 }
-            }).ifPresent(t -> relatedPublication.getHoldings().add(t));
+            }).ifPresent(holdings::add);
 
         // Parse the holdings in the citation if present
         if (citation.isPresent()) {
-            var uris = parseHoldingsURI(citation.get(), namespace);
-            relatedPublication.getHoldings().addAll(uris);
+            var uris = parseHoldingsURI(citation.orElseThrow(), namespace);
+            holdings.addAll(uris);
         }
 
         // Try to extract text from the relPubl element
         var elementText = element.getTextTrim();
         if (!elementText.isBlank()) {
-            relatedPublication.setTitle(elementText);
+            title = elementText;
         } else {
             final Optional<Element> titleElement;
 
@@ -242,13 +245,15 @@ class ParsingStrategies {
             }
 
             // Extract the text from the element
-            titleElement.map(Element::getTextTrim)
-                .filter(s -> !s.isBlank())
-                .ifPresent(relatedPublication::setTitle);
+            var optionalTitle = titleElement.map(Element::getTextTrim).filter(s -> !s.isBlank());
+            if (optionalTitle.isPresent()) {
+                title = optionalTitle.orElseThrow();
+            }
         }
 
         // Only return if the title is set
-        if (relatedPublication.getTitle() != null) {
+        if (title != null) {
+            var relatedPublication = new RelatedPublication(title, holdings);
             return Optional.of(relatedPublication);
         } else {
             return Optional.empty();
@@ -286,24 +291,29 @@ class ParsingStrategies {
         return candidate.replace("\n", "").trim();
     }
 
-    static Optional<Universe> universeStrategy(Element element) {
-        var universe = new Universe();
+    /**
+     * Parse the universe element. The clusion defaults to I if not present in the source element.
+     * @param element the element to parse.
+     * @return a {@link Map.Entry} with the key set to the clusion status and the value set to the content of the element.
+     */
+    static Optional<Map.Entry<Universe.Clusion, String>> universeStrategy(Element element) {
 
         // Set the text content
         var content = element.getTextTrim();
-
-        universe.setContent(content);
 
         // Set the inclusion/exclusion status if defined, defaults to inclusion if not defined
         var clusion = element.getAttributeValue("clusion");
         if (clusion != null) {
             try {
-                universe.setClusion(Universe.Clusion.valueOf(clusion));
+                var clusionValue = Universe.Clusion.valueOf(clusion);
+                return Optional.of(Map.entry(clusionValue, content));
             } catch (IllegalArgumentException e) {
                 throw new InvalidUniverseException(clusion, e);
             }
+        } else {
+            // Clusion not defined in the source element, default to an inclusion
+            // See https://ddialliance.org/Specification/DDI-Codebook/2.5/XMLSchema/field_level_documentation_files/schemas/codebook_xsd/elements/universe.html
+            return Optional.of(Map.entry(Universe.Clusion.I, content));
         }
-
-        return Optional.of(universe);
     }
 }

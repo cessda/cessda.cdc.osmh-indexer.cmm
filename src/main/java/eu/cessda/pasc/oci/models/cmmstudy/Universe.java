@@ -15,6 +15,7 @@
  */
 package eu.cessda.pasc.oci.models.cmmstudy;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -30,19 +31,20 @@ import lombok.Data;
  * </pre>
  */
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Universe {
 
     /**
-     * The main content of the universe element.
+     * The inclusion of this universe.
      */
-    @JsonProperty("content")
-    String content;
+    @JsonProperty("inclusion")
+    String inclusion;
 
     /**
-     * Marks whether this universe is included or excluded. This defaults to an inclusion.
+     * The exclusion of this universe. This field is optional.
      */
-    @JsonProperty("clusion")
-    Clusion clusion = Clusion.I;
+    @JsonProperty("exclusion")
+    String exclusion;
 
     /**
      * Is the universe included or excluded.

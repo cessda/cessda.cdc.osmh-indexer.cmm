@@ -160,7 +160,7 @@ public class RecordXMLParser {
 
             builder.dataCollectionFreeTexts(cmmStudyMapper.parseDataCollectionFreeTexts(document, xPaths, defaultLangIsoCode));
             try {
-                builder.universes(cmmStudyMapper.parseUniverses(document, xPaths, defaultLangIsoCode));
+                builder.universe(cmmStudyMapper.parseUniverses(document, xPaths, defaultLangIsoCode));
             } catch (InvalidUniverseException e) {
                 log.warn("[{}] Some universes in study {} couldn't be parsed: {}", repository.getCode(), headerElement.getStudyNumber().orElse(""), e.toString());
             }
