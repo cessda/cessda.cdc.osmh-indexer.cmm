@@ -13,11 +13,24 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 - *Fixed (for any bug fixes)*
 - *Security (in case of vulnerabilities)*
 
+## [3.2.0] - 2022-12-07
+
+### Additions
+
+- Parse multipart language codes such as en-GB ([#219](https://bitbucket.org/cessda/cessda.cdc.versions/issues/219))
+- Parse `relPubl` DDI elements into related publications entries ([#471](https://bitbucket.org/cessda/cessda.cdc.versions/issues/471))
+- Delete studies from the Elasticsearch index if the source XML is no longer present ([#486](https://bitbucket.org/cessda/cessda.cdc.versions/issues/486))
+- Parse `universe` DDI elements ([#499](https://bitbucket.org/cessda/cessda.cdc.versions/issues/499))
+
+### Changes
+
+- Optimise the loading of repository configurations to avoid delays while repositories are being discovered ([#409](https://bitbucket.org/cessda/cessda.cdc.versions/issues/409))
+
 ## [3.0.2] - 2022-09-06
 
 ### Changes
 
-- Update Elasticsearch to v7 ([#429](https://bitbucket.org/cessda/cessda.cdc.versions/issues/429))
+- Update Elasticsearch to version 7 ([#429](https://bitbucket.org/cessda/cessda.cdc.versions/issues/429))
 
 ## [3.0.0] - 2022-06-07
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6577776.svg)](https://doi.org/10.5281/zenodo.6577776)
