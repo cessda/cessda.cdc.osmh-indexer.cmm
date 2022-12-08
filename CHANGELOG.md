@@ -15,6 +15,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 ## [3.2.0] - 2022-12-08
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7413641.svg)](https://doi.org/10.5281/zenodo.7413641)
+
 ### Additions
 
 - Parse multipart language codes such as en-GB ([#219](https://bitbucket.org/cessda/cessda.cdc.versions/issues/219))
@@ -33,6 +35,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 - Update Elasticsearch to version 7 ([#429](https://bitbucket.org/cessda/cessda.cdc.versions/issues/429))
 
 ## [3.0.0] - 2022-06-07
+
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6577776.svg)](https://doi.org/10.5281/zenodo.6577776)
 
 ### Additions
