@@ -54,7 +54,7 @@
 
     <properties>
         <buildNumber>SNAPSHOT</buildNumber>
-        <revision>3.0.2-${buildNumber}</revision>
+        <revision>3.2.0-${buildNumber}</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
