@@ -15,7 +15,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 ## [3.2.0] - 2022-12-08
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7413641.svg)](https://doi.org/10.5281/zenodo.7413641)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7414076.svg)](https://doi.org/10.5281/zenodo.7414076)
 
 ### Additions
 
