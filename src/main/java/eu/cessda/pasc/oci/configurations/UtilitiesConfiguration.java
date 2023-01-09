@@ -17,8 +17,6 @@ package eu.cessda.pasc.oci.configurations;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.mizosoft.methanol.Methanol;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -56,10 +54,5 @@ public class UtilitiesConfiguration {
             .requestTimeout(Duration.ofMillis(appConfigurationProperties.getRestTemplateProps().getReadTimeout()))
             .followRedirects(HttpClient.Redirect.NORMAL)
             .build();
-    }
-
-    @Bean
-    public MeterRegistry meterRegistry() {
-        return new SimpleMeterRegistry();
     }
 }
