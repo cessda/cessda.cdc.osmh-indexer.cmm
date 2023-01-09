@@ -18,7 +18,6 @@ package eu.cessda.pasc.oci;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.elasticsearch.IndexingException;
 import eu.cessda.pasc.oci.elasticsearch.IngestService;
-import eu.cessda.pasc.oci.metrics.Metrics;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.Value;
@@ -51,20 +50,17 @@ public class IndexerRunner {
     private final IndexerConsumerService indexer;
     private final PipelineUtilities pipelineUtilities;
     private final IngestService ingestService;
-    private final Metrics metrics;
 
     private final AtomicBoolean indexerRunning = new AtomicBoolean(false);
 
     public IndexerRunner(AppConfigurationProperties configurationProperties,
                          IndexerConsumerService localHarvesterConsumerService,
                          PipelineUtilities pipelineUtilities,
-                         IngestService ingestService,
-                         Metrics metrics) {
+                         IngestService ingestService) {
         this.configurationProperties = configurationProperties;
         this.indexer = localHarvesterConsumerService;
         this.pipelineUtilities = pipelineUtilities;
         this.ingestService = ingestService;
-        this.metrics = metrics;
     }
 
 
@@ -97,7 +93,6 @@ public class IndexerRunner {
 
                 log.info("Harvest finished. Summary of the current state:");
                 log.info("Total number of records: {}", value("total_cmm_studies", ingestService.getTotalHitCount("*")));
-                metrics.updateMetrics();
             } catch (IOException e) {
                 log.error("IO Error when getting the total number of records: {}", e.toString());
             } finally {
