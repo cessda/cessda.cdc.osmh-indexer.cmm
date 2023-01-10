@@ -94,7 +94,7 @@ public class IndexerConsumerService {
      * @param lastModifiedDate to filter headers on, can be null.
      * @return a list of records retrieved from the remote repository.
      */
-    @SuppressWarnings({"resource", "UnstableApiUsage"}) // The stream will always be closed
+    @SuppressWarnings({"resource", "StreamResourceLeak", "UnstableApiUsage"}) // The stream will always be closed
     public Map<String, List<CMMStudyOfLanguage>> getRecords(Repo repo, LocalDateTime lastModifiedDate) {
         log.debug("[{}] Parsing record headers.", repo.getCode());
 

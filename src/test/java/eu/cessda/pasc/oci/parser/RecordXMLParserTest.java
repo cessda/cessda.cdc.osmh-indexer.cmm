@@ -58,6 +58,7 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
  *
  * @author moses AT doraventures DOT com
  */
+@SuppressWarnings("DirectInvocationOnMock")
 @Slf4j
 public class RecordXMLParserTest {
 

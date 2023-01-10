@@ -20,13 +20,13 @@ import eu.cessda.pasc.oci.elasticsearch.IndexingException;
 import eu.cessda.pasc.oci.elasticsearch.IngestService;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.configurations.Repo;
+import jakarta.annotation.PreDestroy;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.Duration;

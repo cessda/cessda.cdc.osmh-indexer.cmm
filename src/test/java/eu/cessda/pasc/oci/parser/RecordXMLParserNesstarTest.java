@@ -45,6 +45,7 @@ import static org.assertj.core.api.BDDAssertions.then;
 import static org.mockito.BDDMockito.given;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
+@SuppressWarnings("DirectInvocationOnMock")
 public class RecordXMLParserNesstarTest {
     private static final String STUDY_IDENTIFIER = "http://fors-getdata.unil.ch:80/obj/fStudy/ch.sidos.ddi.468.7773";
 
