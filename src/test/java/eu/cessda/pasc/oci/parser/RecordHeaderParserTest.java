@@ -52,6 +52,7 @@ import static org.mockito.Mockito.doReturn;
  *
  * @author moses AT doraventures DOT com
  */
+@SuppressWarnings("DirectInvocationOnMock")
 public class RecordHeaderParserTest {
 
     private final HttpClient httpClient = Mockito.mock(HttpClient.class);

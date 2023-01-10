@@ -29,6 +29,7 @@ import static org.mockito.Mockito.*;
 /**
  * @author moses AT doraventures DOT com
  */
+@SuppressWarnings("DirectInvocationOnMock")
 public class StatusServiceTest {
 
   private final AppConfigurationProperties appConfigurationProperties = new AppConfigurationProperties();
