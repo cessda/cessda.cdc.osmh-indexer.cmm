@@ -63,6 +63,7 @@ public class HTTPException extends IOException {
      */
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     @Value
+    @SuppressWarnings("ArrayToString")
     public static class ExternalResponse implements Serializable {
         @Serial
         private static final long serialVersionUID = -7110617275735794989L;
