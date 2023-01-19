@@ -17,9 +17,12 @@ package eu.cessda.pasc.oci.exception;
 
 import eu.cessda.pasc.oci.models.cmmstudy.Universe;
 
+import java.io.Serial;
 import java.util.Arrays;
 
 public class InvalidUniverseException extends RuntimeException {
+
+    @Serial
     private static final long serialVersionUID = 8948529259968345480L;
 
     /**

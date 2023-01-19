@@ -19,6 +19,7 @@ import lombok.*;
 import org.jdom2.Namespace;
 
 import javax.annotation.Nullable;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Optional;
 
@@ -30,6 +31,7 @@ import java.util.Optional;
 @Getter
 @ToString
 public final class XPaths implements Serializable {
+    @Serial
     private static final long serialVersionUID = -6226660931460780008L;
 
     @NonNull

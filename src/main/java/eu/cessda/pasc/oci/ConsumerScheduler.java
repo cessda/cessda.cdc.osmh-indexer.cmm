@@ -128,10 +128,7 @@ public class ConsumerScheduler {
 
     private OffsetDateTime logStartStatus(final String runDescription) throws IOException {
         final var startTime = OffsetDateTime.now(ZoneId.systemDefault());
-        log.info("[{}] Consume and Ingest All SPs Repos: \n" +
-                "Started at [{}]\n" +
-                "Current state before run:\n" +
-                "{}",
+        log.info("[{}] Consume and Ingest All SPs Repos: \nStarted at [{}]\nCurrent state before run:\n{}",
             runDescription, startTime,
             debuggingJMXBean.printElasticSearchInfo());
         return startTime;
@@ -139,9 +136,7 @@ public class ConsumerScheduler {
 
     private void logEndStatus(final OffsetDateTime startTime, final String runDescription) {
         final var endTime = OffsetDateTime.now(ZoneId.systemDefault());
-        log.info("[{}] Consume and Ingest All SPs Repos:\n" +
-                "Ended at: [{}]\n" +
-                "Duration: [{}] seconds",
+        log.info("[{}] Consume and Ingest All SPs Repos:\nEnded at: [{}]\nDuration: [{}] seconds",
             runDescription,
             endTime,
             value("job_duration", Duration.between(startTime, endTime).getSeconds())

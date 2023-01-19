@@ -21,6 +21,7 @@ import lombok.NonNull;
 import lombok.Value;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 
@@ -33,6 +34,7 @@ import java.nio.charset.StandardCharsets;
  */
 public class HTTPException extends IOException {
 
+    @Serial
     private static final long serialVersionUID = 928798312826959273L;
 
     private final ExternalResponse externalResponse;
@@ -61,13 +63,15 @@ public class HTTPException extends IOException {
      */
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     @Value
+    @SuppressWarnings("ArrayToString")
     public static class ExternalResponse implements Serializable {
+        @Serial
         private static final long serialVersionUID = -7110617275735794989L;
 
         /**
          * The body of the response.
          */
-        @NonNull byte[] body;
+        byte @NonNull [] body;
         /**
          * The status code of the response.
          */

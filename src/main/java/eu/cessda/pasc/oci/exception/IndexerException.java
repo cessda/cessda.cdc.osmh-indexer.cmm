@@ -15,6 +15,8 @@
  */
 package eu.cessda.pasc.oci.exception;
 
+import java.io.Serial;
+
 /**
  * Exception for problems that prevent proper harvesting.
  *
@@ -22,6 +24,7 @@ package eu.cessda.pasc.oci.exception;
  */
 public class IndexerException extends Exception {
 
+    @Serial
     private static final long serialVersionUID = -1848837478104997356L;
 
     /**

@@ -15,6 +15,7 @@
  */
 package eu.cessda.pasc.oci;
 
+import java.io.Serial;
 import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -25,6 +26,7 @@ import java.util.List;
  */
 public class DateNotParsedException extends Exception {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String dateString;
