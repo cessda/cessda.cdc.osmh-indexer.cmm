@@ -200,7 +200,7 @@
           "analyzer": "pasc_index_autocomplete_analyzer",
           "search_analyzer": "pasc_standard_analyzer",
           "term_vector": "with_positions_offsets",
-          "copy_to": "keywordsSearchField"
+          "copy_to": [ "keywordsSearchField", "keywordsKeywordField" ]
         },
         "vocab": {
           "type": "keyword",
@@ -217,6 +217,10 @@
     "keywordsSearchField": {
       "type": "text",
       "analyzer": "pasc_standard_analyzer"
+    },
+    "keywordsKeywordField": {
+      "type": "keyword",
+      "ignore_above": 256
     },
     "typeOfModeOfCollections": {
       "type": "nested",

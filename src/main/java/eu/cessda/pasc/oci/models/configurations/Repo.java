@@ -17,6 +17,7 @@ package eu.cessda.pasc.oci.models.configurations;
 
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.net.URI;
 import java.nio.file.Path;
@@ -29,6 +30,7 @@ import java.nio.file.Path;
 @Data
 public class Repo implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 2L;
 
     /**

@@ -83,7 +83,7 @@ public class CMMStudyMapper {
      * Actual path used: /record/header/identifier
      *
      * @param document the document to parse
-     * @return true if record is active
+     * @return the parsed {@link HeaderElement}
      * @throws OaiPmhException if the document contains an {@code <error>} element
      */
     HeaderElement parseHeaderElement(Document document) throws OaiPmhException {
@@ -477,12 +477,8 @@ public class CMMStudyMapper {
 
                     // Switch based on the type of clusion
                     switch (extractedUniverse.getKey()) {
-                        case I:
-                            universe.setInclusion(universeContent);
-                            break;
-                        case E:
-                            universe.setExclusion(universeContent);
-                            break;
+                        case I -> universe.setInclusion(universeContent);
+                        case E -> universe.setExclusion(universeContent);
                     }
                 }
             }

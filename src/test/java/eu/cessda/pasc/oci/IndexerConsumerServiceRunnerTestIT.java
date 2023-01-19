@@ -31,7 +31,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.HashMap;
-import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Manual Consumer test class this can be used to explore end to end behavior of this consumer and to some extend some
@@ -70,9 +70,11 @@ public class IndexerConsumerServiceRunnerTestIT {
             countReport.put(repo.getCode(), processAndVerify(repo));
         }
 
-        log.info("\n#############################" +
-            "\nPrinting Report for all repos" +
-            "\n#############################");
+        log.info("""
+
+            #############################
+            Printing Report for all repos
+            #############################""");
         countReport.forEach((repo, headerCount) -> log.info("Header count for {}: [{}]", repo, headerCount));
         int sum = countReport.values().stream().reduce(0, Integer::sum);
         log.info("Total Count: [{}]", sum);
@@ -93,9 +95,9 @@ public class IndexerConsumerServiceRunnerTestIT {
                 log.info(String.valueOf(record));
                 return record;
             } catch (IndexerException e) {
-                return null;
+                return Optional.empty();
             }
-        }).filter(Objects::nonNull).findAny().orElseThrow(); // If no records can be retrieved, fail the test
+        }).filter(Optional::isPresent).findAny().orElseThrow(); // If no records can be retrieved, fail the test
 
         return recordHeaders.size();
     }

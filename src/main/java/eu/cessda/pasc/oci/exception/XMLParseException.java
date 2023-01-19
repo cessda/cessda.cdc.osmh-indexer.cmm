@@ -17,6 +17,7 @@ package eu.cessda.pasc.oci.exception;
 
 import lombok.Getter;
 
+import java.io.Serial;
 import java.net.URI;
 
 /**
@@ -25,6 +26,7 @@ import java.net.URI;
 @Getter
 public class XMLParseException extends IndexerException {
 
+    @Serial
     private static final long serialVersionUID = -1280955307589066817L;
 
     private final URI xmlSource;

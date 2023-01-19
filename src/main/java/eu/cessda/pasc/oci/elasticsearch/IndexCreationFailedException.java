@@ -15,7 +15,11 @@
  */
 package eu.cessda.pasc.oci.elasticsearch;
 
+import java.io.Serial;
+
 public class IndexCreationFailedException extends IndexingException {
+
+    @Serial
     private static final long serialVersionUID = 291787204525296576L;
 
     private final String indexName;

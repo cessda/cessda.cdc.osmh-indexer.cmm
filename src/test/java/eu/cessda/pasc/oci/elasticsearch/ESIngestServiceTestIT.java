@@ -311,7 +311,7 @@ public class ESIngestServiceTestIT {
     }
 
     @Test
-    public void shouldLogFailedIndexOperations() throws IOException, IndexingException {
+    public void shouldLogFailedIndexOperations() throws IOException {
         // Setup
         List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
         var cmmStudyOfLanguageConverterSpy = Mockito.spy(this.cmmStudyOfLanguageConverter);
@@ -357,6 +357,7 @@ public class ESIngestServiceTestIT {
     }
 
     @Test
+    @SuppressWarnings("java:S2699") // false positive
     public void shouldReturnAllStudiesBelongingToARepository() throws IOException, IndexingException {
         // Setup
         List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();

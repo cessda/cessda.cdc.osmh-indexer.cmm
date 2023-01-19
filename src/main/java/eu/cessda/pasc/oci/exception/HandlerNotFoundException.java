@@ -18,12 +18,15 @@ package eu.cessda.pasc.oci.exception;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.Getter;
 
+import java.io.Serial;
+
 /**
  * Represents that a repository's handler was not configured.
  */
 @Getter
 public class HandlerNotFoundException extends IllegalStateException {
 
+    @Serial
     private static final long serialVersionUID = 229579898689610309L;
 
     /**
