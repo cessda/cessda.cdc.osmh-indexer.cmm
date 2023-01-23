@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright © 2017-2021 CESSDA ERIC (support@cessda.eu)
+    Copyright © 2017-2023 CESSDA ERIC (support@cessda.eu)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -293,7 +293,7 @@
                     <properties>
                         <owner>CESSDA ERIC</owner>
                         <email>support@cessda.eu</email>
-                        <year>2017-2021</year>
+                        <year>2017-2023</year>
                     </properties>
                     <excludes>
                         <exclude>mvnw*</exclude>
