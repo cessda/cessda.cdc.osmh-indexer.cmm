@@ -28,17 +28,18 @@
     <description>
         Fetches CMM Metadata using internal or remote repository handlers. Part of the OSMH harvester.
     </description>
-    <url>https://bitbucket.org/cessda/cessda.cdc.versions</url>
+    <url>https://github.com/cessda/cessda.cdc.versions</url>
     <organization>
         <name>CESSDA ERIC</name>
         <url>https://www.cessda.eu/</url>
     </organization>
     <scm>
-        <url>https://bitbucket.org/cessda/cessda.cdc.osmh-indexer.cmm</url>
+        <url>https://github.com/cessda/cessda.cdc.osmh-indexer.cmm</url>
+        <connection>scm:git:https://github.com/cessda/cessda.cdc.osmh-indexer.cmm.git</connection>
     </scm>
     <issueManagement>
-        <system>Bitbucket</system>
-        <url>https://bitbucket.org/cessda/cessda.cdc.version2/issues?status=new&amp;status=open</url>
+        <system>GitHub</system>
+        <url>https://github.com/cessda/cessda.cdc.versions/issues</url>
     </issueManagement>
     <ciManagement>
         <url>https://jenkins.cessda.eu/job/cessda.cdc.osmh-indexer.cmm/</url>

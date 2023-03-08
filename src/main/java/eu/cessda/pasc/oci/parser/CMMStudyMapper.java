@@ -298,7 +298,7 @@ public class CMMStudyMapper {
 
         Map<String, String> titles = parseLanguageContentOfElement(document, langCode, xPaths.getTitleXPath(), false, xPaths.getOaiAndDdiNs());
 
-        // https://bitbucket.org/cessda/cessda.cdc.version2/issues/135
+        // https://github.com/cessda/cessda.cdc.versions/issues/135
         if (!titles.isEmpty()) {
             Map<String, String> parTitles = parseLanguageContentOfElement(document, langCode, xPaths.getParTitleXPath(), false, xPaths.getOaiAndDdiNs());
             parTitles.forEach(titles::putIfAbsent);  // parTitl lang must not be same as or override titl lang

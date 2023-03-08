@@ -28,7 +28,7 @@ pipeline {
     }
 
 	stages {
-		// Building on master
+		// Building on main
 		stage('Pull SDK Docker Image') {
 		    agent {
 		        docker {
@@ -43,16 +43,16 @@ pipeline {
                             sh "./mvnw clean install -DbuildNumber=${env.BUILD_NUMBER}"
                         }
                     }
-                    when { branch 'master' }
+                    when { branch 'main' }
                 }
-                // Not running on master - test only (for PRs and integration branches)
+                // Not running on main - test only (for PRs and integration branches)
                 stage('Test Project') {
                     steps {
                         withMaven {
                             sh './mvnw clean verify'
                         }
                     }
-                    when { not { branch 'master' } }
+                    when { not { branch 'main' } }
                 }
                 stage('Record Issues') {
                     steps {
@@ -70,7 +70,7 @@ pipeline {
 							waitForQualityGate abortPipeline: true
 						}
                     }
-                    when { branch 'master' }
+                    when { branch 'main' }
                 }
             }
         }
@@ -82,15 +82,15 @@ pipeline {
                 }
                 sh "gcloud container images add-tag ${image_tag} ${docker_repo}/${product_name}-${module_name}:${env.BRANCH_NAME}-latest"
             }
-            when { branch 'master' }
+            when { branch 'main' }
 		}
 		stage('Check Requirements and Deployments') {
 			steps {
 				dir('./infrastructure/gcp/') {
-					build job: 'cessda.cdc.deploy/master', parameters: [string(name: 'osmh_indexer_image_tag', value: "${env.BRANCH_NAME}-${env.BUILD_NUMBER}")], wait: false
+					build job: 'cessda.cdc.deploy/main', parameters: [string(name: 'osmh_indexer_image_tag', value: "${env.BRANCH_NAME}-${env.BUILD_NUMBER}")], wait: false
 				}
 			}
-            when { branch 'master' }
+            when { branch 'main' }
 		}
 	}
 }

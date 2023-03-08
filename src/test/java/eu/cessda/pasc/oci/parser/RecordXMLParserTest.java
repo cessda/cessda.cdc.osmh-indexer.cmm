@@ -202,7 +202,7 @@ public class RecordXMLParserTest {
         validateCMMStudyResultAgainstSchema(record.get());
     }
 
-    @Test // https://bitbucket.org/cessda/cessda.cdc.version2/issues/135
+    @Test // https://github.com/cessda/cessda.cdc.versions/issues/135
     @SuppressWarnings("PreferJavaTimeOverload")
     public void shouldReturnCMMStudyRecordWithOutParTitleWhenThereIsALangDifferentFromDefault() throws IOException, ProcessingException, JSONException, IndexerException {
 

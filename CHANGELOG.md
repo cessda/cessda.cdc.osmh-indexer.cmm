@@ -19,20 +19,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 ### Additions
 
-- Parse multipart language codes such as en-GB ([#219](https://bitbucket.org/cessda/cessda.cdc.versions/issues/219))
-- Parse `relPubl` DDI elements into related publications entries ([#471](https://bitbucket.org/cessda/cessda.cdc.versions/issues/471))
-- Delete studies from the Elasticsearch index if the source XML is no longer present ([#486](https://bitbucket.org/cessda/cessda.cdc.versions/issues/486))
-- Parse `universe` DDI elements ([#499](https://bitbucket.org/cessda/cessda.cdc.versions/issues/499))
+- Parse multipart language codes such as en-GB ([#219](https://github.com/cessda/cessda.cdc.versions/issues/219))
+- Parse `relPubl` DDI elements into related publications entries ([#471](https://github.com/cessda/cessda.cdc.versions/issues/471))
+- Delete studies from the Elasticsearch index if the source XML is no longer present ([#486](https://github.com/cessda/cessda.cdc.versions/issues/486))
+- Parse `universe` DDI elements ([#499](https://github.com/cessda/cessda.cdc.versions/issues/499))
 
 ### Changes
 
-- Optimise the loading of repository configurations to avoid delays while repositories are being discovered ([#409](https://bitbucket.org/cessda/cessda.cdc.versions/issues/409))
+- Optimise the loading of repository configurations to avoid delays while repositories are being discovered ([#409](https://github.com/cessda/cessda.cdc.versions/issues/409))
 
 ## [3.0.2] - 2022-09-06
 
 ### Changes
 
-- Update Elasticsearch to version 7 ([#429](https://bitbucket.org/cessda/cessda.cdc.versions/issues/429))
+- Update Elasticsearch to version 7 ([#429](https://github.com/cessda/cessda.cdc.versions/issues/429))
 
 ## [3.0.0] - 2022-06-07
 
@@ -40,62 +40,62 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 ### Additions
 
-- Filter out invalid URLs from the study URL field ([#390](https://bitbucket.org/cessda/cessda.cdc.versions/issues/390))
-- Add a publisherFilter field ([#430](https://bitbucket.org/cessda/cessda.cdc.versions/issues/430))
+- Filter out invalid URLs from the study URL field ([#390](https://github.com/cessda/cessda.cdc.versions/issues/390))
+- Add a publisherFilter field ([#430](https://github.com/cessda/cessda.cdc.versions/issues/430))
 
 ### Changes
 
-- Updated Elasticsearch imports ([#269](https://bitbucket.org/cessda/cessda.cdc.versions/issues/269))
-- Generate identifiers based on the CDC identifier specification ([#386](https://bitbucket.org/cessda/cessda.cdc.versions/issues/386))
-- Convert the indexer into a command line application that can be run as a scheduled task ([#392](https://bitbucket.org/cessda/cessda.cdc.versions/issues/392))
-- Add support for defining repositories using a pipeline.json file. Update ReadMe file accordingly ([#409](https://bitbucket.org/cessda/cessda.cdc.versions/issues/409))
-- Refactor the indexer, simplify configuration ([#428](https://bitbucket.org/cessda/cessda.cdc.versions/issues/428))
+- Updated Elasticsearch imports ([#269](https://github.com/cessda/cessda.cdc.versions/issues/269))
+- Generate identifiers based on the CDC identifier specification ([#386](https://github.com/cessda/cessda.cdc.versions/issues/386))
+- Convert the indexer into a command line application that can be run as a scheduled task ([#392](https://github.com/cessda/cessda.cdc.versions/issues/392))
+- Add support for defining repositories using a pipeline.json file. Update ReadMe file accordingly ([#409](https://github.com/cessda/cessda.cdc.versions/issues/409))
+- Refactor the indexer, simplify configuration ([#428](https://github.com/cessda/cessda.cdc.versions/issues/428))
 
 ### Removed
 
-- Remove Spring Data Elasticsearch as a dependency, use the Elasticsearch client directly ([#405](https://bitbucket.org/cessda/cessda.cdc.versions/issues/405))
+- Remove Spring Data Elasticsearch as a dependency, use the Elasticsearch client directly ([#405](https://github.com/cessda/cessda.cdc.versions/issues/405))
 
 ## [2.5.0] - 2021-11-25
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5710021.svg)](https://doi.org/10.5281/zenodo.5710021)
 
 ### Additions
 
-- Added support for indexing a repository from a folder on disk ([#146](https://bitbucket.org/cessda/cessda.cdc.versions/issues/146))
-- Add support for Year-Month dates to Elasticsearch ([#352](https://bitbucket.org/cessda/cessda.cdc.versions/issues/352))
+- Added support for indexing a repository from a folder on disk ([#146](https://github.com/cessda/cessda.cdc.versions/issues/146))
+- Add support for Year-Month dates to Elasticsearch ([#352](https://github.com/cessda/cessda.cdc.versions/issues/352))
 
 ### Changes
 
-- Updated UniData's Endpoint ([#366](https://bitbucket.org/cessda/cessda.cdc.versions/issues/366))
-- Updated OpenJDK to 17 ([#269](https://bitbucket.org/cessda/cessda.cdc.versions/issues/269))
-- Removed usages of Spring Data Elasticsearch and replaced them with direct use of the Elasticsearch client ([#146](https://bitbucket.org/cessda/cessda.cdc.versions/issues/146))
+- Updated UniData's Endpoint ([#366](https://github.com/cessda/cessda.cdc.versions/issues/366))
+- Updated OpenJDK to 17 ([#269](https://github.com/cessda/cessda.cdc.versions/issues/269))
+- Removed usages of Spring Data Elasticsearch and replaced them with direct use of the Elasticsearch client ([#146](https://github.com/cessda/cessda.cdc.versions/issues/146))
 
 ### Fixes
 
-- Fixed the metadata prefix always being null [#385](https://bitbucket.org/cessda/cessda.cdc.versions/issues/385))
-- Fixed some code smells identified by SonarQube ([#369](https://bitbucket.org/cessda/cessda.cdc.versions/issues/369))
-- Fixed `ElasticsearchSet` throwing an `ArrayIndexOutOfBoundsException` when accessing an Elasticsearch scroll that does not have a scroll ID ([#INDEXER-2](https://bitbucket.org/cessda/cessda.cdc.osmh-indexer.cmm/issues/2))
+- Fixed the metadata prefix always being null [#385](https://github.com/cessda/cessda.cdc.versions/issues/385))
+- Fixed some code smells identified by SonarQube ([#369](https://github.com/cessda/cessda.cdc.versions/issues/369))
+- Fixed `ElasticsearchSet` throwing an `ArrayIndexOutOfBoundsException` when accessing an Elasticsearch scroll that does not have a scroll ID ([#INDEXER-2](https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/issues/2))
 
 ## [2.4.0] - 2021-06-23
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5017358.svg)](https://doi.org/10.5281/zenodo.5017358)
 
 ### Additions
 
-- Log the time it takes to harvest each repository ([#296](https://bitbucket.org/cessda/cessda.cdc.versions/issues/296))
-- Use the autocomplete analyser in Elasticsearch for the abstract, country and term fields ([#285](https://bitbucket.org/cessda/cessda.cdc.versions/issues/285))
+- Log the time it takes to harvest each repository ([#296](https://github.com/cessda/cessda.cdc.versions/issues/296))
+- Use the autocomplete analyser in Elasticsearch for the abstract, country and term fields ([#285](https://github.com/cessda/cessda.cdc.versions/issues/285))
 
 ### Changes
 
-- Update GESIS' repository endpoint URL ([#303](https://bitbucket.org/cessda/cessda.cdc.versions/issues/303))
-- Update SoDaNet's repository endpoint URL ([#277](https://bitbucket.org/cessda/cessda.cdc.versions/issues/277))
-- Support Elasticsearch 6.8, migrate to the Elasticsearch REST client and remove the Transport Client ([#312](https://bitbucket.org/cessda/cessda.cdc.versions/issues/312))
+- Update GESIS' repository endpoint URL ([#303](https://github.com/cessda/cessda.cdc.versions/issues/303))
+- Update SoDaNet's repository endpoint URL ([#277](https://github.com/cessda/cessda.cdc.versions/issues/277))
+- Support Elasticsearch 6.8, migrate to the Elasticsearch REST client and remove the Transport Client ([#312](https://github.com/cessda/cessda.cdc.versions/issues/312))
     - This allows the indexer to connect to secured Elasticsearch clusters
-- Update Spring Boot to 2.2.13([#312](https://bitbucket.org/cessda/cessda.cdc.versions/issues/312))
-- Disable dynamic Elasticsearch mapping ([#312](https://bitbucket.org/cessda/cessda.cdc.versions/issues/312))
-- Add support for Elasticsearch security ([#321](https://bitbucket.org/cessda/cessda.cdc.versions/issues/321))
+- Update Spring Boot to 2.2.13([#312](https://github.com/cessda/cessda.cdc.versions/issues/312))
+- Disable dynamic Elasticsearch mapping ([#312](https://github.com/cessda/cessda.cdc.versions/issues/312))
+- Add support for Elasticsearch security ([#321](https://github.com/cessda/cessda.cdc.versions/issues/321))
 
 ### Fixes
 
-- Fix nested fields in Elasticsearch not being searchable ([#335](https://bitbucket.org/cessda/cessda.cdc.versions/issues/335))
+- Fix nested fields in Elasticsearch not being searchable ([#335](https://github.com/cessda/cessda.cdc.versions/issues/335))
 
 ## [2.3.1] - 2021-02-11
 
@@ -103,12 +103,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 ### Additions
 
-- Add ADP to the list of harvested endpoints ([#201](https://bitbucket.org/cessda/cessda.cdc.versions/issues/201))
+- Add ADP to the list of harvested endpoints ([#201](https://github.com/cessda/cessda.cdc.versions/issues/201))
 
 ### Changes
 
-- Included DANS twice with different metadata parameters to pick up English and Dutch study versions ([#280](https://bitbucket.org/cessda/cessda.cdc.versions/issues/280))
-- Improved the debug logging of studies dropped for having no languages with the minimum required fields ([#278](https://bitbucket.org/cessda/cessda.cdc.versions/issues/278))
+- Included DANS twice with different metadata parameters to pick up English and Dutch study versions ([#280](https://github.com/cessda/cessda.cdc.versions/issues/280))
+- Improved the debug logging of studies dropped for having no languages with the minimum required fields ([#278](https://github.com/cessda/cessda.cdc.versions/issues/278))
 
 ## [2.3.0] - 2021-02-09
 
@@ -116,47 +116,47 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 ### Additions
 
-- Add HTTP compression to the repository handler ([#167](https://bitbucket.org/cessda/cessda.cdc.versions/issues/167))
-- Add Code of Conduct file ([#174](https://bitbucket.org/cessda/cessda.cdc.versions/issues/174))
-- Add new PROGEDO endpoint ([#177](https://bitbucket.org/cessda/cessda.cdc.versions/issues/177))
-- Harvest each repository endpoint with a dedicated thread ([#178](https://bitbucket.org/cessda/cessda.cdc.versions/issues/178), [#225](https://bitbucket.org/cessda/cessda.cdc.versions/issues/225))
-- Add SODA endpoint ([#190](https://bitbucket.org/cessda/cessda.cdc.versions/issues/190))
-- Add option to set default language as part of endpoint specification ([#192](https://bitbucket.org/cessda/cessda.cdc.versions/issues/192))
-- Add more details to 'Configured Repos' log output ([#195](https://bitbucket.org/cessda/cessda.cdc.versions/issues/195))
-- Add code as an additional field in the indexer model ([#199](https://bitbucket.org/cessda/cessda.cdc.versions/issues/199))
-- Add ADP Kuha2 Endpoint ([#201](https://bitbucket.org/cessda/cessda.cdc.versions/issues/201))
-- Add stopwords for Hungarian and Portuguese language analysers ([#204](https://bitbucket.org/cessda/cessda.cdc.versions/issues/204))
-- Improve the logging of remote repository handlers ([#207](https://bitbucket.org/cessda/cessda.cdc.versions/issues/207))
-- Implement a country filter so that only countries with ISO country codes are accepted ([#214](https://bitbucket.org/cessda/cessda.cdc.versions/issues/214))
-- Delete inactive records from Elasticsearch ([#217](https://bitbucket.org/cessda/cessda.cdc.versions/issues/217))
-- Add a `run_type` variable to the logs to distinguish different types of harvester runs ([#227](https://bitbucket.org/cessda/cessda.cdc.versions/issues/227))
+- Add HTTP compression to the repository handler ([#167](https://github.com/cessda/cessda.cdc.versions/issues/167))
+- Add Code of Conduct file ([#174](https://github.com/cessda/cessda.cdc.versions/issues/174))
+- Add new PROGEDO endpoint ([#177](https://github.com/cessda/cessda.cdc.versions/issues/177))
+- Harvest each repository endpoint with a dedicated thread ([#178](https://github.com/cessda/cessda.cdc.versions/issues/178), [#225](https://github.com/cessda/cessda.cdc.versions/issues/225))
+- Add SODA endpoint ([#190](https://github.com/cessda/cessda.cdc.versions/issues/190))
+- Add option to set default language as part of endpoint specification ([#192](https://github.com/cessda/cessda.cdc.versions/issues/192))
+- Add more details to 'Configured Repos' log output ([#195](https://github.com/cessda/cessda.cdc.versions/issues/195))
+- Add code as an additional field in the indexer model ([#199](https://github.com/cessda/cessda.cdc.versions/issues/199))
+- Add ADP Kuha2 Endpoint ([#201](https://github.com/cessda/cessda.cdc.versions/issues/201))
+- Add stopwords for Hungarian and Portuguese language analysers ([#204](https://github.com/cessda/cessda.cdc.versions/issues/204))
+- Improve the logging of remote repository handlers ([#207](https://github.com/cessda/cessda.cdc.versions/issues/207))
+- Implement a country filter so that only countries with ISO country codes are accepted ([#214](https://github.com/cessda/cessda.cdc.versions/issues/214))
+- Delete inactive records from Elasticsearch ([#217](https://github.com/cessda/cessda.cdc.versions/issues/217))
+- Add a `run_type` variable to the logs to distinguish different types of harvester runs ([#227](https://github.com/cessda/cessda.cdc.versions/issues/227))
 
 ### Changes
 
-- Remove "not available" if no PID agency is present ([#156](https://bitbucket.org/cessda/cessda.cdc.versions/issues/156))
-- Revise XML Schema Definition to ensure compliance with system implementation ([#59](https://bitbucket.org/cessda/cessda.cdc.versions/issues/59))
-- Search Optimisation ([#131](https://bitbucket.org/cessda/cessda.cdc.versions/issues/131))
-- Remove (not available) if no PID agency ([#156](https://bitbucket.org/cessda/cessda.cdc.versions/issues/156))
-- Modify Harvester to output Required logs ([#159](https://bitbucket.org/cessda/cessda.cdc.versions/issues/159))
-- Disable access to external XML entities in the repository handlers ([#176](https://bitbucket.org/cessda/cessda.cdc.versions/issues/176))
-- Log statistics for created, deleted and updated studies ([#181](https://bitbucket.org/cessda/cessda.cdc.versions/issues/181))
-- Cleaning Publisher filter ([#183](https://bitbucket.org/cessda/cessda.cdc.versions/issues/183))
-- Update Elasticsearch to 5.6 ([#188](https://bitbucket.org/cessda/cessda.cdc.versions/issues/188))
-- Support Spring Boot Admin 2 for metrics and remote management ([#191](https://bitbucket.org/cessda/cessda.cdc.versions/issues/191), [#211](https://bitbucket.org/cessda/cessda.cdc.versions/issues/211))
-- Add more details to 'Configured Repos' log output ([#194](https://bitbucket.org/cessda/cessda.cdc.versions/issues/194))
-- Change SODA publisher name ([#197](https://bitbucket.org/cessda/cessda.cdc.versions/issues/197))
-- Update SND set spec ([#200](https://bitbucket.org/cessda/cessda.cdc.versions/issues/200))
-- Refine the list of fields to be indexed ([#238](https://bitbucket.org/cessda/cessda.cdc.versions/issues/238))
-- Map `langAvailableIn` as a keyword, so that it can be used for sorting and filtering ([#241](https://bitbucket.org/cessda/cessda.cdc.versions/issues/241))
-- Add a search field for country metadata ([#252](https://bitbucket.org/cessda/cessda.cdc.versions/issues/252))
+- Remove "not available" if no PID agency is present ([#156](https://github.com/cessda/cessda.cdc.versions/issues/156))
+- Revise XML Schema Definition to ensure compliance with system implementation ([#59](https://github.com/cessda/cessda.cdc.versions/issues/59))
+- Search Optimisation ([#131](https://github.com/cessda/cessda.cdc.versions/issues/131))
+- Remove (not available) if no PID agency ([#156](https://github.com/cessda/cessda.cdc.versions/issues/156))
+- Modify Harvester to output Required logs ([#159](https://github.com/cessda/cessda.cdc.versions/issues/159))
+- Disable access to external XML entities in the repository handlers ([#176](https://github.com/cessda/cessda.cdc.versions/issues/176))
+- Log statistics for created, deleted and updated studies ([#181](https://github.com/cessda/cessda.cdc.versions/issues/181))
+- Cleaning Publisher filter ([#183](https://github.com/cessda/cessda.cdc.versions/issues/183))
+- Update Elasticsearch to 5.6 ([#188](https://github.com/cessda/cessda.cdc.versions/issues/188))
+- Support Spring Boot Admin 2 for metrics and remote management ([#191](https://github.com/cessda/cessda.cdc.versions/issues/191), [#211](https://github.com/cessda/cessda.cdc.versions/issues/211))
+- Add more details to 'Configured Repos' log output ([#194](https://github.com/cessda/cessda.cdc.versions/issues/194))
+- Change SODA publisher name ([#197](https://github.com/cessda/cessda.cdc.versions/issues/197))
+- Update SND set spec ([#200](https://github.com/cessda/cessda.cdc.versions/issues/200))
+- Refine the list of fields to be indexed ([#238](https://github.com/cessda/cessda.cdc.versions/issues/238))
+- Map `langAvailableIn` as a keyword, so that it can be used for sorting and filtering ([#241](https://github.com/cessda/cessda.cdc.versions/issues/241))
+- Add a search field for country metadata ([#252](https://github.com/cessda/cessda.cdc.versions/issues/252))
 
 ### Fixes
 
-- Set the study url field from any language before replacing it with the language specific element ([#142](https://bitbucket.org/cessda/cessda.cdc.versions/issues/142))
-- Fix alphabetical sorting issues caused by not normalising upper and lower case letters ([#171](https://bitbucket.org/cessda/cessda.cdc.versions/issues/171))
-- Fix rejection reason not showing in the logs ([#184](https://bitbucket.org/cessda/cessda.cdc.versions/issues/184))
-- Cleanup code ([#203](https://bitbucket.org/cessda/cessda.cdc.versions/issues/203))
-- Fix title ascending/descending sort options not functioning ([#209](https://bitbucket.org/cessda/cessda.cdc.versions/issues/209))
+- Set the study url field from any language before replacing it with the language specific element ([#142](https://github.com/cessda/cessda.cdc.versions/issues/142))
+- Fix alphabetical sorting issues caused by not normalising upper and lower case letters ([#171](https://github.com/cessda/cessda.cdc.versions/issues/171))
+- Fix rejection reason not showing in the logs ([#184](https://github.com/cessda/cessda.cdc.versions/issues/184))
+- Cleanup code ([#203](https://github.com/cessda/cessda.cdc.versions/issues/203))
+- Fix title ascending/descending sort options not functioning ([#209](https://github.com/cessda/cessda.cdc.versions/issues/209))
 
 ## [2.2.1] - 2020-05-04
 
@@ -164,7 +164,7 @@ OSMH Consumer Indexer - [10.5281/zenodo.3786356](https://zenodo.org/record/37863
 
 ### Added
 
-- new GESIS endpoint ([#162](https://bitbucket.org/cessda/cessda.cdc.versions/issues/162))
+- new GESIS endpoint ([#162](https://github.com/cessda/cessda.cdc.versions/issues/162))
 - file appender
 - format error log message for successful indexing
 - implemented correlation id using MDC.putClosable
@@ -173,7 +173,7 @@ OSMH Consumer Indexer - [10.5281/zenodo.3786356](https://zenodo.org/record/37863
 
 ### Changed
 
-- changed GESIS endpoint from HTTP to HTTPS ([#162](https://bitbucket.org/cessda/cessda.cdc.versions/issues/162))
+- changed GESIS endpoint from HTTP to HTTPS ([#162](https://github.com/cessda/cessda.cdc.versions/issues/162))
 - use Java Time APIs for the PerfRequestSyncInterceptor stopwatch
 - increased test coverage
 - updated SonarQube scanner to 3.7.0
@@ -189,13 +189,13 @@ OSMH Consumer Indexer - [10.5281/zenodo.3786356](https://zenodo.org/record/37863
 - refactored exception handling to avoid catching RuntimeException and a cast
 - print the config in StatusService.printPaSCHandlerOaiPmhConfig() directly
 - change behaviour when Study PID Agency is not specified. Before: '10.5279/DK-SA-DDA-868 (not available)'.
-    After: '10.5279/DK-SA-DDA-868 (Agency not available)' ([#156](https://bitbucket.org/cessda/cessda.cdc.versions/issues/156))
+    After: '10.5279/DK-SA-DDA-868 (Agency not available)' ([#156](https://github.com/cessda/cessda.cdc.versions/issues/156))
 - log queries at the info level
 - moved recursion out of the try-with-resources block to reduce resource consumption
 - reformatted the message when the record headers could not be parsed (because the parser could have failed at any point and left the InputStream in an inconsistent state)
 - use input streams instead of strings (avoids a double copy)
 - renamed `dev` profile to `gcp`
-- improved logging to help determine quality of harvested metadata ([#191](https://bitbucket.org/cessda/cessda.cdc.versions/issues/91))
+- improved logging to help determine quality of harvested metadata ([#191](https://github.com/cessda/cessda.cdc.versions/issues/91))
 
 ### Deprecated
 
