@@ -15,7 +15,7 @@
 #
 
 # OpenJDK Base Container
-FROM openjdk:17
+FROM openjdk:18
 
 # Container Information
 LABEL maintainer='CESSDA-ERIC "support@cessda.eu"'
