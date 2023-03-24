@@ -109,8 +109,8 @@ public class LanguageExtractor {
             .dataCollectionPeriodStartdate(cmmStudy.getDataCollectionPeriodStartdate())
             .dataCollectionPeriodEnddate(cmmStudy.getDataCollectionPeriodEnddate())
             .dataCollectionYear(cmmStudy.getDataCollectionYear())
-            .langAvailableIn(Set.copyOf(availableLanguages))
-            .studyXmlSourceUrl(cmmStudy.getStudyXmlSourceUrl());
+            .langAvailableIn(Set.copyOf(availableLanguages));
+        Optional.ofNullable(cmmStudy.getStudyXmlSourceUrl()).ifPresent(url -> builder.studyXmlSourceUrl(url.toString()));
 
 
         // #430: Set the publisher filter based on the source repository.

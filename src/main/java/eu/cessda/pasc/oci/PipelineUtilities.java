@@ -56,12 +56,13 @@ public class PipelineUtilities {
 
                         // Convert the shared model to a Repo object
                         var repo = new Repo();
-                        repo.setUrl(sharedModel.getUrl());
-                        repo.setCode(sharedModel.getCode());
-                        repo.setName(sharedModel.getName());
-                        repo.setHandler(sharedModel.getDdiVersion());
+                        repo.setUrl(sharedModel.url());
+                        repo.setCode(sharedModel.code());
+                        repo.setName(sharedModel.name());
+                        repo.setHandler(sharedModel.ddiVersion());
                         repo.setPath(json.getParent());
-                        repo.setDefaultLanguage(sharedModel.getDefaultLanguage());
+                        repo.setDefaultLanguage(sharedModel.defaultLanguage());
+                        repo.setPreferredMetadataParam(sharedModel.metadataPrefix());
 
                         // Add the repo object to the stream
                         return Stream.of(repo);

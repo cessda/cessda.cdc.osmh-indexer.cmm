@@ -15,25 +15,21 @@
  */
 package eu.cessda.pasc.oci.models;
 
-import lombok.Builder;
-import lombok.Value;
+import lombok.NonNull;
+import org.jdom2.Document;
 
-/**
- * Represents an OAI-PMH header.
- *
- * @author moses AT doraventures DOT com
- * @see <a href="http://www.openarchives.org/OAI/openarchivesprotocol.html#Record">http://www.openarchives.org/OAI/openarchivesprotocol.html#Record</a>
- */
-@Builder
-@Value
-public class RecordHeader {
+import javax.annotation.Nullable;
+import java.net.URI;
+import java.util.List;
 
-    String lastModified;
-    String type;
-    String recordType;
-    String identifier;
+public record Request(@Nullable URI baseURL, @NonNull List<Record> records) {
     /**
-     * Deletion status on the remote repository
+     * Create a synthetic request the given documents root element set as the metadata holder.
      */
-    boolean deleted;
+    public static Request createSyntheticRequest(Document document) {
+        return new Request(
+            null,
+            List.of(new Record(null, document))
+        );
+    }
 }

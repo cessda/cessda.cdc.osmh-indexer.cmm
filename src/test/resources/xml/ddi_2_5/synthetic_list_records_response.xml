@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+    <responseDate>2018-02-05T11:16:22Z</responseDate>
+    <request identifier="2305" verb="ListRecords">http://services.fsd.uta.fi/v0/oai</request>
+    <ListRecords>
+        <record>
+            <header>
+                <identifier>2305</identifier>
+                <datestamp>2017-11-17T08:08:11Z</datestamp>
+                <setSpec>language:fi</setSpec>
+                <setSpec>language:en</setSpec>
+                <setSpec>study_groups:laku</setSpec>
+            </header>
+            <metadata>
+                <codeBook xmlns="ddi:codebook:2_5" version="2.5" xsi:schemaLocation="ddi:codebook:2_5 http://www.ddialliance.org/Specification/DDI-Codebook/2.5/XMLSchema/codebook.xsd">
+                    <docDscr>
+                        <citation>
+                            <titlStmt>
+                                <titl/>
+                            </titlStmt>
+                            <prodStmt>
+                                <!--Compliant examples -->
+                                <producer xml:lang="fi" abbr="FSD">Yhteiskuntatieteellinen tietoarkisto</producer>
+                                <producer xml:lang="en" abbr="FSD">Finnish Social Science Data Archive</producer>
+                                <!--FSD example: Should extract all there is here -->
+                                <producer xml:lang="se">Samhällsdatablad</producer>
+                                <copyright xml:lang="en">Finnish Social Science Data Archive</copyright>
+                                <copyright xml:lang="fi">Yhteiskuntatieteellinen tietoarkisto</copyright>
+                            </prodStmt>
+                            <!-- One of two possible location for study url-->
+                            <holdings URI="http://urn.fi/urn:nbn:fi:fsd:T-FSD3052" xml:lang="fi"/>
+                            <holdings URI="http://doi.org/10.5255/UKDA-SN-7615-2" xml:lang="en"/>
+                        </citation>
+                    </docDscr>
+                    <stdyDscr>
+                        <citation xml:lang="fi">
+                            <!-- One of two possible location for study url-->
+                            <holdings URI="http://urn.fi/urn:nbn:fi:fsd:T-FSD3052_stdyDscr" xml:lang="de"/>
+                            <holdings URI="http://doi.org/10.5255/UKDA-SN-7615-2_stdyDscr" xml:lang="se"/>
+                            <!-- Caution when duplicated! "en" was already declared above and only one will be taken-->
+                            <holdings URI="http://doi.org/10.5255/UKDA-SN-7615-2_stdyDscr2" xml:lang="en"/>
+                            <titlStmt>
+                                <titl xml:lang="fi">Lapsesta aikuiseksi: 14-vuotiaiden haastattelu 1974: tekstiaineisto.</titl>
+                                <parTitl xml:lang="fi">Lapsesta aikuiseksi: 14-vuotiaiden haastattelu 1974: tekstiaineisto</parTitl>
+                                <!-- Compliant UKDS examples -->
+                                <IDNo agency="UKDA">2305</IDNo>
+                                <IDNo agency="datacite">10.5255/UKDA-FAKE-2305-1</IDNo>
+                                <!-- FSD example: missing lang -->
+                                <IDNo>2305</IDNo>
+                            </titlStmt>
+                            <rspStmt>
+                                <AuthEnty affiliation="Jyväskylän yliopisto. Psykologian laitos" xml:lang="fi">Pulkkinen, Lea</AuthEnty>
+                                <AuthEnty affiliation="Jyväskylän Essex. Department of Psychology" xml:lang="fi">David Brook</AuthEnty>
+                            </rspStmt>
+                            <prodStmt>
+                            </prodStmt>
+                            <distStmt>
+                                <distDate date="1982-01-01T00:00:00Z">1982</distDate>
+                            </distStmt>
+                            <serStmt>
+                                <serName ID="laku" xml:lang="fi">Lapsesta aikuiseksi</serName>
+                            </serStmt>
+                            <verStmt>
+                                <version date="2008-02-08" xml:lang="fi"/>
+                            </verStmt>
+                        </citation>
+                        <citation xml:lang="en">
+                            <titlStmt>
+                                <titl xml:lang="en">Jyväskylä Longitudinal Study of Personality and Social Development (JYLS): Interviews of 14-Year-Olds 1974: Text Data.</titl>
+                                <parTitl xml:lang="en">Jyväskylä Longitudinal Study of Personality and Social Development (JYLS): Interviews of 14-Year-Olds 1974: Text Data</parTitl>
+                                <IDNo>2305</IDNo>
+                            </titlStmt>
+                            <rspStmt>
+                                <AuthEnty affiliation="University of Jyväskylä. Department of Psychology" xml:lang="en">En Pulkkinen, Lea</AuthEnty>
+                                <AuthEnty affiliation="University of Essex. Department of Psychology" xml:lang="en">David Brook</AuthEnty>
+                            </rspStmt>
+                            <prodStmt>
+                            </prodStmt>
+                            <distStmt>
+                            </distStmt>
+                            <serStmt>
+                                <serName ID="laku" xml:lang="en">Jyväskylä Longitudinal Study of Personality and Social Development (JYLS)</serName>
+                            </serStmt>
+                            <verStmt>
+                                <version date="2008-02-08" xml:lang="en"/>
+                            </verStmt>
+                        </citation>
+                        <stdyInfo>
+                            <subject>
+                                <!-- Compliant examples -->
+                                <keyword xml:lang="sv" ID="The Id" vocab="ELSST" vocabURI="http://sv.ac.sv">The Term</keyword>
+                                <keyword xml:lang="fi" ID="wxFAKE" vocab="CESSDA" vocabURI="http://fi.ac.fi">et Nationellt val</keyword>
+                                <!-- FSD example -->
+                                <keyword xml:lang="en" vocab="ELSST" ID="adolescents"/>
+                                <!-- UKDS example: Extracting with default language -->
+                                <keyword>1976</keyword>
+                                <keyword vocabURI="http://lod.data-archive.ac.uk/skoshasset/9e7cc815-90cb-4f96-b8ff-a0a44ab25ea9">BUDGETS</keyword>
+                                <!-- Compliant examples -->
+                                <topcClas xml:lang="en" vocab="ZA Category System" ID="This it the ID" vocabURI="https://oai.ukdataservice.ac.uk/Categories.htm">This is the Term</topcClas>
+                                <topcClas xml:lang="de" vocab="CESSDA Topic Classification" ID="Housing" vocabURI="https://dbk.gesis.org/madeup.htm">Wohnraum</topcClas>
+                                <topcClas xml:lang="de" vocab="CESSDA Topic Classification2" ID="Housing2" vocabURI="https://dbk.gesis.org/madeup2.htm">Wohnraum 2</topcClas>="psychology"/>
+                                <!-- Non-compliant examples (but should extract what is there) -->
+                                <!-- FSD NC example -->
+                                <topcClas xml:lang="fi" vocab="CESSDA" ID="nuoret"/>
+                                <!-- UKDS NC example: Extracting with default language -->
+                                <topcClas>Housing</topcClas>
+                            </subject>
+                            <abstract xml:lang="en">The data are part of the Jyväskylä Longitudinal Study of Personality and Social Development (JYLS), in which the same individuals have been followed over 30 years. At this research stage, the data were collected using peer nominations and teacher ratings (FSD2073), a parent interview (FSD2074), and a theme interview. This dataset contains the transcribed responses to the questions presented in the theme interview. No predetermined response categories were used. The recorded interviews were classified only afterwards, when it was possible to observe the whole range of responses. The interview topics covered family and parents, school and education, housing, identity, use of alcohol and smoking, free time activities, and hobbies.</abstract>
+                            <abstract xml:lang="fi">Haastattelu on osa Lapsesta aikuiseksi -tutkimusta, joka on jatkunut samojen henkilöiden seurantana yli 30 vuotta. Tämän tutkimusvaiheen tarkoituksena oli selvittää 14-vuotiaiden sosiaalista käyttäytymistä ja kasvuoloja. Tutkimusvaiheeseen kuuluivat myös toveri- ja opettaja-arvioinnit (FSD2073) sekä vanhemman haastattelu (FSD2074). Nuorten teemahaastatteluissa käsiteltiin mm. perhettä, asuntoa ja asuinympäristöä, koulunkäyntiä, minäkuvaa, päihteiden käyttöä, vapaa-ajanviettoa ja harrastuksia. Valmiita vastausluokkia ei käytetty. Nauhoitetut haastattelut luokiteltiin vasta jälkikäteen, kun nähtiin, minkälaista vaihtelua vastauksissa esiintyi. Ensin tiedusteltiin nuoren asumisoloja ja kysyttiin, keitä perheeseen kuuluu tai on kuulunut, miten hänen päivähoito oli pienenä järjestetty ja onko perheessä ollut apulaisia. Asunnon kokoa ja mielipidettä asuinympäristöstä selvitettiin. Koulunkäyntiin liittyen tiedusteltiin, kuinka pitkä nuoren koulumatka on ja miten hän sen kulkee. Lisäksi kysyttiin, pitääkö hän koulusta yleensä ja mistä aineista pitää eniten. Haastateltava kertoi, onko hän vaihtanut koulua, miltä se on tuntunut ja onko hänellä ollut läheistä opettajaa. Omaa koulumenestystä ja vanhempien suhtautumista siihen pyydettiin arvioimaan. Koulupinnauksesta esitettiin myös kysymyksiä. Edelleen selvitettiin, miten vanhemmat suhtautuvat koulutyöhön ja kertooko nuori kotona koulun tapahtumista. Haastateltavan kavereista, suunnitelmista peruskoulun jälkeen sekä vanhempien suhtautumisesta kavereiden valintaan ja seurusteluun kyseltiin. Niin ikään selvitettiin nuoren suhtautumista väkivaltaan ja vanhempien antamia ohjeita väkivallan suhteen. Haastateltavaa pyydettiin kuvailemaan omaa äitiään ja isäänsä ja kertomaan heidän työstään ja terveydestään. Pohdittiin, minkälaiset välit hänellä on vanhempiinsa ja kuinka usein he keskustelevat erilaisista asioista. Perheen ilmapiiriä kartoitettiin myös kysymällä, puuhasteleeko nuori jotain yhdessä vanhempien kanssa, syökö perhe ilta-ateriaa yhdessä ja onko isä tai äiti paljon poissa kotoa iltaisin. Lisäksi haastateltava kertoi, miten usein heillä on erimielisyyksiä, miten tottelemattomuudesta rankaistaan ja tietävätkö vanhemmat missä ja kenen kanssa hän viettää vapaa-aikaansa. Edelleen kyseltiin, mitä nuori harrastaa, onko hänellä kotiintuloaikoja ja mistä hän saa käyttörahansa. Tupakoinnista ja alkoholinkäytöstä esitettiin kysymyksiä. Haastatteluissa tietoa kerättiin myös ns. peilitekniikan avulla. Haastateltavaa pyydettiin kuvittelemaan, että hän on jo 65-vuotias eläkeläinen ja katselee elettyä elämäänsä taaksepäin. Häntä pyydettiin kertomaan esim. perheestään, avioliitostaan ja ammatistaan. Taustamuuttujana on haastateltavan sukupuoli.</abstract>
+                            <sumDscr>
+                                <nation xml:lang="en" abbr="FI">Finland</nation>
+                                <nation xml:lang="fr" abbr="FI">Finlande</nation>
+                                <nation xml:lang="fi" abbr="FI">Suomi</nation>
+                                <nation xml:lang="se" abbr="FI">finland</nation>
+                                <nation xml:lang="en" abbr="FR">France</nation>
+                                <nation xml:lang="fr" abbr="FR">la France</nation>
+                                <nation xml:lang="fi" abbr="FR">Ranska</nation>
+                                <nation xml:lang="se" abbr="FR">Frankrike</nation>
+                                <!-- Compliant examples -->
+                                <anlyUnit>DE: This is the term<concept xml:lang="de" vocab="DDI Analysis Unit">This is the id</concept></anlyUnit>
+                                <anlyUnit xml:lang="de">DE: This is the term. XML-lang on parent element wins<concept xml:lang="ignore this" vocab="DDI Analysis Unit">This is the id</concept></anlyUnit>
+                                <anlyUnit xml:lang="de">DE: This is the term. XML-lang on parent element wins regardless of missing XML-lang in concept  el<concept vocab="DDI Analysis Unit">This is the id</concept></anlyUnit>
+                                <anlyUnit>Made Up<concept xml:lang="en" vocab="DDI Made Up" vocabURI="https://dbk.gesis.org/madeup.htm">MadeUpUnit</concept></anlyUnit>
+                                <anlyUnit>Made Up 2<concept xml:lang="en" vocab="DDI Made Up 2" vocabURI="https://dbk.gesis.org/madeup2.htm">MadeUpUnit 2</concept></anlyUnit>
+                                <!-- UKDS example -->
+                                <anlyUnit>Institutions/organisations</anlyUnit>
+                                <universe xml:lang="en" clusion="I">Persons who were second grade students in a school in Jyväskylä at the time of the first data collection in 1968 and who continued to participate in the longitudinal study and had belonged to extreme groups of social behaviour at ages 8 and 14. The sample was collected both from the town centre and suburbs.</universe>
+                                <universe xml:lang="en" clusion="E">Example excluded universe.</universe>
+                                <universe xml:lang="fi" clusion="I">Otantahetkellä vuonna 1968 kansakoulun toisluokkalaiset keskisuomalaisen kaupungin oppilaat, jotka ovat edelleen mukana pitkittäistutkimuksessa ja kuuluivat 8- ja 14 -vuotiaana sosiaalisen käyttäytymisen ääriryhmiin.</universe>
+                                <!-- Invalid Data Collection FreeText - has no text content -->
+                                <collDate date="2010-09-20" event="start" />
+                                <!-- Valid ISO Date-->
+                                <collDate date="2018-10-21T00:00:00Z" event="end">End of October</collDate>
+                                <!-- Valid Data Collection FreeText description -->
+                                <collDate event="start">Spring 2018</collDate>
+                                <collDate event="end">Christmas 2018</collDate>
+                            </sumDscr>
+                        </stdyInfo>
+                        <method>
+                            <dataColl>
+                                <!-- 100% Compliance -->
+                                <timeMeth>DE: This is the term<concept xml:lang="de" vocab="DE: DDI Time Method 1" vocabURI="http://de-lod.data-archive.ac.uk" ID="fake" >DE: This is the Id</concept></timeMeth>
+                                <timeMeth xml:lang="fi">FI: This is the term. xml:lang in parent el wins over concept<concept xml:lang="FI: should ignore this" vocab="FI: DDI Time Method 1" vocabURI="http://fi-lod.data-archive.ac.uk" ID="fake" >FI: This is the Id</concept></timeMeth>
+                                <timeMeth xml:lang="fi">FI: This is the term. xml:lang in parent el wins over concept regardless<concept vocab="FI: DDI Time Method 1" vocabURI="http://fi-lod.data-archive.ac.uk" ID="fi-fake" >FI: This is the Id</concept></timeMeth>
+                                <!-- Suggested by PUG: Element value/term in "timeMethod" wins over "concept" -->
+                                <timeMeth>DE: Längsschnitt: Panel 2<concept xml:lang="de" vocab="DE: DDI Time Method 2">DE: Longitudinal.Panel 2</concept></timeMeth>
+                                <!-- UKDS example -->
+                                <timeMeth>Default-lang: Repeated cross-sectional study</timeMeth>
+                                <dataCollector>National Centre for Social Research</dataCollector>
+                                <!-- Compliant examples -->
+                                <sampProc>This is the term<concept xml:lang="en" ID="madeUp" vocab="DDI Sampling Procedure" vocabURI="urn:ddi-cv:SamplingProcedure:1.1">This is the id</concept></sampProc>
+                                <sampProc>This is the term 2<concept xml:lang="en" vocab="DDI Sampling Procedure" vocabURI="urn:ddi-cv:SamplingProcedure:1.1">Probability.Stratified 2</concept></sampProc>
+                                <sampProc xml:lang="en">This is the term. xml:lang in parent el wins over concept<concept xml:lang="should ignore this" vocab="DDI Sampling Procedure" vocabURI="urn:ddi-cv:SamplingProcedure:1.1">Probability.Stratified 2</concept></sampProc>
+                                <sampProc xml:lang="en">This is the term. xml:lang in parent el wins over concept regardless<concept vocab="DDI Sampling Procedure" vocabURI="urn:ddi-cv:SamplingProcedure:1.1">Probability.Stratified 2</concept></sampProc>
+                                <sampProc><concept xml:lang="fi" vocab="fi DDI Sampling Procedure" vocabURI="fi:urn:ddi-cv:SamplingProcedure:1.1">et Probability.Stratified</concept></sampProc>
+                                <!-- FSD example: if concept element is missing, this must not be extracted TypeOfSamplingProcedure -->
+                                <sampProc>Should ignore elements without a concept by TypeOfSamplingProcedures</sampProc>
+                                <!-- PUG examples: valid element for SamplingProcedure extraction -->
+                                <sampProc xml:lang="sv">Sannolikhetsurval: stratifierat urval</sampProc>
+                                <sampProc xml:lang="fr">Quelque chose</sampProc>
+                                <sampProc xml:lang="sv">Undersökningen bygger på program sända i SVT1, SVT2, SVT24, Barnkanalen, Kunskapskanalen, TV4, Sjuan, TV3, Kanal 5, TV6 och TV8 under 12 veckor 2015. Urvalet av veckor skedde obundet och slumpmässigt och stratifierades efter säsong.</sampProc>
+                                <deviat>6,708 cases</deviat>
+                                <!--Compliant -->
+                                <collMode>This is the Term<concept xml:lang="en" vocab="DDI Mode Of Collection" vocabURI="urn:ddi-cv:ModeOfCollection:3.0">This is the Id</concept></collMode>
+                                <collMode>This is the Term 2<concept xml:lang="en" vocab="DDI Mode Of Collection" vocabURI="urn:ddi-cv:ModeOfCollection:3.0">Interview.Survey-concept</concept></collMode>
+                                <collMode>Enquête téléphonique<concept xml:lang="fr" vocab="DDI Mode Of Collection" vocabURI="urn:ddi-cv:ModeOfCollection:3.0">Enquête téléphonique -concept</concept></collMode>
+                                <!-- FSD NC example -->
+                                <collMode>Face-to-face interview</collMode>
+                                <sources />
+                                <weight>Weighting used. See documentation for details.</weight>
+                                <cleanOps>B</cleanOps>
+                            </dataColl>
+                        </method>
+                        <dataAccs>
+                            <useStmt>
+                                <restrctn xml:lang="en">1 Restriction Text en</restrctn>
+                                <restrctn xml:lang="en">2 Restriction Text en</restrctn>
+                                <!-- This should be parsed as xml:lang="en" -->
+                                <restrctn xml:lang="en-GB">3 Restriction Text en-GB</restrctn>
+                                <restrctn xml:lang="fi">Restriction Text fi</restrctn>
+                                <conditions xml:lang="en">Conditions Text en</conditions>
+                                <specPerm xml:lang="en">SpecPerm Text en</specPerm>
+                                <specPerm xml:lang="fi">SpecPerm Text fi</specPerm>
+                            </useStmt>
+                            <setAvail>
+                                <avlStatus xml:lang="en">AvlStatus Text en</avlStatus>
+                                <avlStatus xml:lang="fi">AvlStatus Text fi</avlStatus>
+                            </setAvail>
+                        </dataAccs>
+                        <othrStdyMat>
+                            <!-- Examples of both formats of relPubl -->
+                            <relPubl xml:lang="en">Speight, S. Smith, R. and Lloyd, E. with Coshall, C. (2010) Families experiencing multiple disadvantage: their use of and views on childcare provision, Research Report No. DCSF-RR191, London: Department for Children, Schools and Families/National Centre for Social Research. ISBN 978 1 84775 628 2.</relPubl>
+                            <relPubl xml:lang="en">
+                                <citation>
+                                    <titlStmt>
+                                        <titl xml:lang="en">Arosio A. (2015). Parental divorce, cohabitation and the celebration of marriage in Italy. International Review of Sociology, 25(1), 166-179. doi:10.1080/03906701.2014.976950</titl>
+                                    </titlStmt>
+                                    <holdings URI="http://dx.doi.org/10.1080/03906701.2014.976950" xml:lang="en"/>
+                                    <holdings URI="http://example.com/test-holding"/>
+                                </citation>
+                            </relPubl>
+                            <!-- Example of a missing title -->
+                            <relPubl xml:lang="en">
+                                <citation>
+                                    <titlStmt/>
+                                </citation>
+                            </relPubl>
+                            <!-- Example to test precedence rules -->
+                            <relPubl xml:lang="en">
+                                This should be present
+                                <citation>
+                                    <titlStmt>
+                                        <titl xml:lang="en">This should not be present</titl>
+                                    </titlStmt>
+                                    <holdings URI="http://dx.doi.org/10.1080/03906701.2014.976950" xml:lang="en"/>
+                                </citation>
+                                <ExtLink URI="http://example.com/test-ext-link"/>
+                            </relPubl>
+                        </othrStdyMat>
+                    </stdyDscr>
+                    <fileDscr>
+                        <!-- Compliant examples -->
+                        <fileTxt xml:lang="aa"><fileName>daF2252.por</fileName></fileTxt>
+                        <fileTxt><fileName xml:lang="bb">daF2252.por</fileName></fileTxt>
+                        <!-- Made up -->
+                        <fileTxt><fileName xml:lang="bb"/></fileTxt>
+                        <fileTxt xml:lang="ee"/>
+                    </fileDscr>
+                </codeBook>
+            </metadata>
+        </record>
+        <record>
+            <header>
+                <identifier>oai:fsd.uta.fi:FSD3187</identifier>
+                <datestamp>2018-09-06T10:13:53Z</datestamp>
+                <setSpec>study_groups:kehy</setSpec><setSpec>language:en</setSpec><setSpec>language:fi</setSpec>
+            </header>
+            <metadata>
+                <codeBook xmlns="ddi:codebook:2_5" version="2.5" xsi:schemaLocation="ddi:codebook:2_5 http://www.ddialliance.org/Specification/DDI-Codebook/2.5/XMLSchema/codebook.xsd">
+                    <docDscr>
+                        <citation>
+                            <titlStmt><titl/></titlStmt>
+                            <prodStmt>
+                                <producer xml:lang="fi" abbr="FSD">Yhteiskuntatieteellinen tietoarkisto</producer><producer xml:lang="en" abbr="FSD">Finnish Social Science Data Archive</producer>
+                                <copyright xml:lang="fi">Yhteiskuntatieteellinen tietoarkisto</copyright><copyright xml:lang="en">Finnish Social Science Data Archive</copyright>
+                            </prodStmt>
+                            <holdings xml:lang="fi" URI="http://urn.fi/urn:nbn:fi:fsd:T-FSD3187" location="Yhteiskuntatieteellinen tietoarkisto FSD"/><holdings xml:lang="en" URI="http://urn.fi/urn:nbn:fi:fsd:T-FSD3187" location="Finnish Social Science Data Archive FSD"/>
+                        </citation>
+                    </docDscr>
+                    <stdyDscr>
+                        <citation xml:lang="en">
+                            <titlStmt>
+                                <titl xml:lang="en">Development Cooperation Survey 2017</titl>
+                                <parTitl xml:lang="en">Development Cooperation Survey 2017</parTitl>
+                                <IDNo xml:lang="en" agency="FSD">FSD3187</IDNo><IDNo xml:lang="en" agency="The National Library of Finland">urn:nbn:fi:fsd:T-FSD3187</IDNo>
+                            </titlStmt>
+                            <rspStmt>
+                                <AuthEnty xml:lang="en">Taloustutkimus</AuthEnty><AuthEnty xml:lang="en">Ministry for Foreign Affairs of Finland</AuthEnty>
+                            </rspStmt>
+                            <prodStmt>
+                                <prodDate xml:lang="en">2017-12-12</prodDate>
+                            </prodStmt>
+                            <distStmt>
+                                <distDate xml:lang="en" date="2017-12-12"/>
+                                <distrbtr abbr="FSD" URI="http://www.fsd.uta.fi/" xml:lang="en">Finnish Social Science Data Archive</distrbtr>
+                            </distStmt>
+                            <serStmt>
+                                <serName ID="kehy" xml:lang="en">Development Cooperation Surveys</serName>
+                            </serStmt>
+                            <verStmt>
+                                <version date="2017-09-21" xml:lang="en"/>
+                            </verStmt>
+                        </citation><citation xml:lang="fi">
+                        <titlStmt>
+                            <titl xml:lang="fi">Kehitysyhteistyötutkimus 2017</titl>
+                            <parTitl xml:lang="fi">Kehitysyhteistyötutkimus 2017</parTitl>
+                            <IDNo xml:lang="fi" agency="FSD">FSD3187</IDNo><IDNo xml:lang="fi" agency="Kansalliskirjasto">urn:nbn:fi:fsd:T-FSD3187</IDNo>
+                        </titlStmt>
+                        <rspStmt>
+                            <AuthEnty xml:lang="fi">Taloustutkimus</AuthEnty><AuthEnty xml:lang="fi">Ulkoasiainministeriö</AuthEnty>
+                        </rspStmt>
+                        <prodStmt>
+                            <prodDate xml:lang="fi">2017-10-26</prodDate>
+                        </prodStmt>
+                        <distStmt>
+                            <distDate xml:lang="fi" date="2017-10-26"/>
+                            <distrbtr abbr="FSD" URI="http://www.fsd.uta.fi/" xml:lang="fi">Yhteiskuntatieteellinen tietoarkisto</distrbtr>
+                        </distStmt>
+                        <serStmt>
+                            <serName ID="kehy" xml:lang="fi">Kehitysyhteistyötutkimukset</serName>
+                        </serStmt>
+                        <verStmt>
+                            <version date="2017-09-21" xml:lang="fi"/>
+                        </verStmt>
+                    </citation>
+                        <stdyInfo>
+                            <subject>
+                                <keyword xml:lang="fi" vocab="YSA" vocabURI="http://vesa.lib.helsinki.fi/" ID="kehitysyhteistyoe">kehitysyhteistyö</keyword><keyword xml:lang="fi" vocab="YSA" vocabURI="http://vesa.lib.helsinki.fi/" ID="kehityspolitiikka">kehityspolitiikka</keyword><keyword xml:lang="fi" vocab="YSA" vocabURI="http://vesa.lib.helsinki.fi/" ID="maeaeraerahat">määrärahat</keyword><keyword xml:lang="fi" vocab="YSA" vocabURI="http://vesa.lib.helsinki.fi/" ID="hyvinvointi">hyvinvointi</keyword><keyword xml:lang="fi" vocab="YSA" vocabURI="http://vesa.lib.helsinki.fi/" ID="kestaevae_kehitys">kestävä kehitys</keyword><keyword xml:lang="fi" vocab="YSA" vocabURI="http://vesa.lib.helsinki.fi/" ID="avustustoiminta">avustustoiminta</keyword><keyword xml:lang="fi" vocab="YSA" vocabURI="http://vesa.lib.helsinki.fi/" ID="kansainvaelinen_yhteistyoe">kansainvälinen yhteistyö</keyword><keyword xml:lang="fi" vocab="YSA" vocabURI="http://vesa.lib.helsinki.fi/" ID="kehitysmaat">kehitysmaat</keyword><keyword xml:lang="fi" vocab="YSA" vocabURI="http://vesa.lib.helsinki.fi/" ID="koeyhyys">köyhyys</keyword><keyword xml:lang="fi" vocab="YSA" vocabURI="http://vesa.lib.helsinki.fi/" ID="pakolaiset">pakolaiset</keyword><keyword xml:lang="fi" vocab="YSA" vocabURI="http://vesa.lib.helsinki.fi/" ID="katastrofiapu">katastrofiapu</keyword><keyword xml:lang="en" vocab="ELSST" ID="aid">aid</keyword><keyword xml:lang="en" vocab="ELSST" ID="developing_countries">developing countries</keyword><keyword xml:lang="en" vocab="ELSST" ID="development_aid_international">development aid (international)</keyword><keyword xml:lang="en" vocab="ELSST" ID="development_policy">development policy</keyword><keyword xml:lang="en" vocab="ELSST" ID="international_cooperation">international cooperation</keyword><keyword xml:lang="en" vocab="ELSST" ID="poverty">poverty</keyword><keyword xml:lang="en" vocab="ELSST" ID="public_expenditure">public expenditure</keyword><keyword xml:lang="en" vocab="ELSST" ID="refugees">refugees</keyword><keyword xml:lang="en" vocab="ELSST" ID="sustainable_development">sustainable development</keyword>
+                                <topcClas xml:lang="fi" vocab="OKM" vocabURI="http://www.yso.fi/onto/okm-tieteenala/conceptscheme" ID="yhteiskuntatieteet">yhteiskuntatieteet</topcClas><topcClas xml:lang="fi" vocab="CESSDA Topic Classification" ID="kansainvaelinen_politiikka_ja_jaerjestoet">kansainvälinen politiikka ja järjestöt</topcClas><topcClas xml:lang="en" vocab="OKM" vocabURI="http://www.yso.fi/onto/okm-tieteenala/conceptscheme" ID="social_sciences">social sciences</topcClas><topcClas xml:lang="en" vocab="CESSDA Topic Classification" ID="international_politics_and_organisations">international politics and organisations</topcClas>
+                            </subject>
+                            <abstract xml:lang="fi">Tutkimuksessa selvitettiin suomalaisten mielipiteitä kehitysyhteistyöstä. Tutkimuksen on toteuttanut Taloustutkimus Oy Ulkoasiainministeriön toimeksiannosta. Kysely on jatkoa vuodesta 2002 toteutetuille tutkimuksille. Kysymykset käsittelivät laajasti kehitysyhteistyötä ja kehityspolitiikkaa. Niillä kartoitettiin mm. kehitysyhteistyön kohdentumista ja tuloksia, kehitysyhteistyön määrärahoja sekä kehitysyhteistyöstä saatavaa tietoa ja omaa osallistumista kehitysyhteistyöhön. Osa kysymyksistä on ollut mukana vuosien ajan samanmuotoisina, jolloin mielipiteiden muutosta voidaan seurata. Taustamuuttujina ovat sukupuoli, ikä, talouden tyyppi, internetin käyttö, työelämään osallistuminen, ammatti, koulutus, siviilisääty, perheen eniten ansaitsevan henkilön ammatti/asema ja koulutus, perheen tuloluokka, asunnon tyyppi sekä aluemuuttujia.</abstract><abstract xml:lang="en">The survey charted Finnish opinions on and knowledge of the country's development cooperation, its importance, content, objectives, and allocation. Some questions focused on the UN's Sustainable Development Goals (Agenda 2030). The data were collected as part of Taloustutkimus's national CAPI Omnibus study. The respondents were asked what they thought development cooperation was, how important they regarded development cooperation to be, and to what extent they agreed with a number of statements relating to development cooperation (e.g. "Development cooperation increases Finland's international influence"). Familiarity with the UN's Sustainable Development Goals (Agenda 2030) was surveyed as well as views on the most important Sustainable Development Goals. Opinions on funding the private sector of developing countries were studied. Furthermore, thoughts on the significance of development cooperation in alleviating poverty and improving the lives of people in developing countries were investigated. The respondents were asked to choose two of the most important areas for advancing the rights and circumstances of girls and women. Regarding inequality, the respondents were asked how Finland could decrease global inequality. Views were studied on whether development cooperation could prevent refugee crisis from happening by helping people in their own country, and if Finland's development cooperation could help with preventing climate change. With regard to development cooperation by Finland, opinions were studied on the importance of Finnish humanitarian aid, the most important forms of development cooperation for Finland (e.g. bilateral, multilateral, cooperation through the EU), and to what causes should humanitarian aid primarily be directed to. The respondents' factual knowledge was charted by asking how much the respondents thought Finland was going to spend on development cooperation in 2017 (as percentage of the GNI and in euros). The respondents were asked whether Finland should increase or decrease the amount of funding allocated to development cooperation in light of the current economic situation. Some questions pertained to whether there was enough information available on development cooperation and developing countries, from which information sources the respondents had received information on these topics, and how reliable public authorities, voluntary/civic organisations and the media were as sources of such information. The respondents were also asked how they thought they could help the developing countries as individuals and how they had participated in helping the developing countries or people in those countries in the past year. Background variables included, among others, the respondent's age, gender, economic activity and occupational status, education, and marital status as well as economic activity/occupational status and education of the household head, household composition, ages of children living at home, gross annual income of the household, municipality size and type, major region (NUTS2) and region (NUTS3) of residence, type of accommodation, type of mobile phone, and Internet and social media use.</abstract>
+                            <sumDscr>
+                                <collDate xml:lang="fi" date="2017-05-12" event="start"/><collDate xml:lang="fi" date="2017-05-31" event="end"/><collDate xml:lang="en" date="2017-05-12" event="start"/><collDate xml:lang="en" date="2017-05-31" event="end"/>
+                                <nation xml:lang="fi" abbr="FI">Suomi</nation><nation xml:lang="en" abbr="FI">Finland</nation>
+                                <anlyUnit xml:lang="fi">Henkilö<concept>Individual</concept></anlyUnit><anlyUnit xml:lang="en">Individual<concept>Individual</concept></anlyUnit>
+                                <universe xml:lang="fi" clusion="I">Suomen 15 - 74-vuotias väestö</universe><universe xml:lang="fi" clusion="E">Ahvenanmaa</universe><universe xml:lang="en" clusion="I">Finnish people aged 15 - 74</universe><universe xml:lang="en" clusion="E">the Åland Islands</universe>
+                            </sumDscr>
+                        </stdyInfo>
+                        <method>
+                            <dataColl>
+                                <timeMeth xml:lang="fi">Pitkittäisaineisto: trendi/toistuva poikkileikkausaineisto<concept>Longitudinal.TrendRepeatedCrossSection</concept></timeMeth><timeMeth xml:lang="en">Longitudinal: Trend/Repeated cross-section<concept>Longitudinal.TrendRepeatedCrossSection</concept></timeMeth>
+                                <collMode xml:lang="fi">Kasvokkainen haastattelu: tietokoneavusteinen (CAPI tai CAMI)<concept/></collMode><collMode xml:lang="en">Face-to-face interview: Computer-assisted (CAPI/CAMI)<concept/></collMode>
+                            </dataColl>
+                        </method>
+                        <dataAccs>
+                            <useStmt>
+                                <restrctn xml:lang="fi">Aineisto on käytettävissä (B) tutkimukseen, opetukseen ja opiskeluun.</restrctn><restrctn xml:lang="en">The dataset is (B) available for research, teaching and study.</restrctn>
+                            </useStmt>
+                        </dataAccs>
+                        <othrStdyMat>
+                        </othrStdyMat>
+                    </stdyDscr>
+                    <fileDscr>
+                        <fileTxt>
+                            <fileName xml:lang="fi">daF3187.por</fileName>
+                        </fileTxt><fileTxt>
+                        <fileName xml:lang="en">daF3187e.por</fileName>
+                    </fileTxt>
+                    </fileDscr>
+                </codeBook>
+            </metadata>
+        </record>
+    </ListRecords>
+</OAI-PMH>

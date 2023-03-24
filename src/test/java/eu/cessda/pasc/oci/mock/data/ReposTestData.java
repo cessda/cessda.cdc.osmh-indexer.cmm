@@ -15,12 +15,16 @@
  */
 package eu.cessda.pasc.oci.mock.data;
 
+import eu.cessda.pasc.oci.ResourceHandler;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.models.configurations.Harvester;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.experimental.UtilityClass;
 
+import java.io.FileNotFoundException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -31,12 +35,17 @@ public class ReposTestData
 {
 
     public static Repo getUKDSRepo() {
-        Repo repo = new Repo();
-        repo.setCode("UKDS");
-        repo.setUrl(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
-        repo.setHandler("DDI_2_5");
-        repo.setPreferredMetadataParam("ddi");
-        return repo;
+        try {
+            Repo repo = new Repo();
+            repo.setCode("UKDS");
+            repo.setUrl(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
+            repo.setPath(Path.of(ResourceHandler.getResource("xml/ddi_2_5/").toURI()));
+            repo.setHandler("DDI_2_5");
+            repo.setPreferredMetadataParam("ddi");
+            return repo;
+        } catch (FileNotFoundException | URISyntaxException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     public static Repo getUKDSLanguageOverrideRepository() {

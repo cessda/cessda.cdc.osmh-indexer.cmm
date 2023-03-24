@@ -16,7 +16,6 @@
 package eu.cessda.pasc.oci.parser;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
-import eu.cessda.pasc.oci.exception.OaiPmhException;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -78,38 +77,6 @@ class DocElementParser {
     static List<Element> getElements(Document document, String xPathToElement, Namespace... namespaces) {
         XPathExpression<Element> expression = XPathFactory.instance().compile(xPathToElement, Filters.element(), null, namespaces);
         return expression.evaluate(document);
-    }
-
-    /**
-     * Checks if the record has an {@code <error>} element.
-     *
-     * @param document the document to map to.
-     * @throws OaiPmhException if an {@code <error>} element was present.
-     */
-    static void validateResponse(Document document) throws OaiPmhException {
-
-        final Optional<Element> optionalElement = getFirstElement(document, ERROR_PATH, OAI_NS);
-
-        if (optionalElement.isPresent()) {
-            final var element = optionalElement.get();
-            if (!element.getText().isEmpty()) {
-                throw new OaiPmhException(OaiPmhException.Code.valueOf(element.getAttributeValue(CODE_ATTR)), element.getText());
-            } else {
-                throw new OaiPmhException(OaiPmhException.Code.valueOf(element.getAttributeValue(CODE_ATTR)));
-            }
-        }
-    }
-
-    /**
-     * Gets the first {@link Element} that satisfies the XPath expression. If no elements are found, an empty {@link Optional} is returned
-     *
-     * @param document       the {@link Document} to parse.
-     * @param xPathToElement the XPath.
-     * @return The first {@link Element}, or an empty {@link Optional} if no elements were found.
-     */
-    static Optional<Element> getFirstElement(Document document, String xPathToElement, Namespace... namespaces) {
-        var elements = getElements(document, xPathToElement, namespaces);
-        return elements.stream().findFirst();
     }
 
     /**

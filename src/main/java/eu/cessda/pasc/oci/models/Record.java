@@ -15,47 +15,13 @@
  */
 package eu.cessda.pasc.oci.models;
 
-import lombok.NonNull;
-import lombok.Value;
-import org.jdom2.Document;
-
 import javax.annotation.Nullable;
-import java.net.URI;
 
 /**
  * Represents a record header that potentially has a document attached.
+ *
+ * @param recordHeader The record header.
+ * @param metadata     A parsed element.
  */
-@Value
-public class Record {
-    /**
-     * The record header.
-     */
-    @NonNull
-    RecordHeader recordHeader;
-
-    /**
-     * The request element.
-     */
-    @Nullable
-    Request request;
-
-    /**
-     * A parsed document.
-     */
-    @Nullable
-    Document document;
-
-    @Value
-    public static class Request {
-        /**
-         * The repository URL.
-         */
-        @NonNull
-        URI baseURL;
-        /**
-         * The metadata prefix.
-         */
-        @NonNull
-        String metadataPrefix;
-    }
+public record Record(@Nullable RecordHeader recordHeader, @Nullable org.jdom2.Document metadata) {
 }

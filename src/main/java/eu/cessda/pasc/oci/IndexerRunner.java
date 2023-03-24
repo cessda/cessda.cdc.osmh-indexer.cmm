@@ -82,7 +82,7 @@ public class IndexerRunner {
             // Discover repositories by attempting to find pipeline.json instances if a base directory is configured
             try (var repoParsedFromJson = pipelineUtilities.discoverRepositories(configurationProperties.getBaseDirectory())) {
                 var futures = Stream.concat(repoParsedFromJson, repos.stream())
-                    .map(repo -> runAsync(() -> indexRepository(repo, lastModifiedDateTime, contextMap))
+                    .map(repo -> runAsync(() -> indexRepository(repo, contextMap))
                         .exceptionally(e -> {
                             log.error("[{}]: Unexpected error occurred when harvesting!", repo.getCode(), e);
                             return null;
@@ -109,18 +109,17 @@ public class IndexerRunner {
      * Harvest an individual repository.
      *
      * @param repo                 the repository to harvest.
-     * @param lastModifiedDateTime the {@link LocalDateTime} to incrementally harvest from, can be {@code null}.
      * @param contextMap           the logging context map.
      */
     @SuppressWarnings("try")
-    private void indexRepository(Repo repo, LocalDateTime lastModifiedDateTime, Map<String, String> contextMap) {
+    private void indexRepository(Repo repo, Map<String, String> contextMap) {
         MDC.setContextMap(contextMap);
 
         // Set the MDC so that the record name is attached to all downstream logs
         try (var repoNameClosable = MDC.putCloseable(LoggingConstants.REPO_NAME, repo.getCode())) {
             var startTime = Instant.now();
             log.info("Processing Repo [{}]", repo);
-            var langStudies = indexer.getRecords(repo, lastModifiedDateTime);
+            var langStudies = indexer.getRecords(repo);
             for (var entry : langStudies.entrySet()) {
                 try (var langClosable = MDC.putCloseable(LoggingConstants.LANG_CODE, entry.getKey())) {
                     indexRecords(repo, entry.getKey(), entry.getValue());

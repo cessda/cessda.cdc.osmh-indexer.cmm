@@ -24,33 +24,26 @@ import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import eu.cessda.pasc.oci.ResourceHandler;
 import eu.cessda.pasc.oci.exception.IndexerException;
-import eu.cessda.pasc.oci.exception.OaiPmhException;
-import eu.cessda.pasc.oci.http.HttpClient;
+import eu.cessda.pasc.oci.exception.XMLParseException;
 import eu.cessda.pasc.oci.mock.data.ReposTestData;
-import eu.cessda.pasc.oci.models.Record;
-import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.extern.slf4j.Slf4j;
-import org.jdom2.JDOMException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
 import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.api.BDDAssertions.then;
-import static org.mockito.BDDMockito.given;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 /**
@@ -58,41 +51,31 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
  *
  * @author moses AT doraventures DOT com
  */
-@SuppressWarnings("DirectInvocationOnMock")
 @Slf4j
 public class RecordXMLParserTest {
 
     private final CMMStudyConverter cmmConverter = new CMMStudyConverter();
-    private final HttpClient httpClient = Mockito.mock(HttpClient.class);
-    private final Repo repo;
-    private final URI fullRecordUrl;
+    private final Repo repo = ReposTestData.getUKDSRepo();
     private final CMMStudyMapper cmmStudyMapper = new CMMStudyMapper();
-    private final Record recordHeader;
 
     public RecordXMLParserTest() {
         // Needed because TimeUtility only works properly in UTC timezones
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-        repo = ReposTestData.getUKDSRepo();
-        var recordIdentifier = "http://my-example_url:80/obj/fStudy/ch.sidos.ddi.468.7773";
-        recordHeader = new Record(RecordHeader.builder().identifier(recordIdentifier).build(), null, null);
-        fullRecordUrl = URI.create(repo.getUrl() + "?verb=GetRecord&identifier=" + URLEncoder.encode(recordIdentifier, StandardCharsets.UTF_8) + "&metadataPrefix=ddi");
     }
 
     @Test
-    public void shouldReturnValidCMMStudyRecordFromAFullyComplaintCmmDdiRecord() throws IOException, ProcessingException, JSONException, IndexerException {
+    public void shouldReturnValidCMMStudyRecordFromAFullyComplaintCmmDdiRecord() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
         // Given
         var expectedJson = ResourceHandler.getResourceAsString("json/synthetic_compliant_record.json");
-        given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            ResourceHandler.getResourceAsStream("xml/ddi_2_5/synthetic_compliant_cmm.xml")
-        );
+        var recordXML = ResourceHandler.getResource("xml/ddi_2_5/synthetic_compliant_cmm.xml");
 
         // When
-        var result = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
+        var result = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
 
-        then(result).isPresent();
-        validateCMMStudyResultAgainstSchema(result.get());
+        then(result).hasSize(1);
+        validateCMMStudyResultAgainstSchema(result.get(0));
 
-        String actualJson = cmmConverter.toJsonString(result.get());
+        String actualJson = cmmConverter.toJsonString(result.get(0));
 
         // Check if the JSON generated differs from the expected source
         assertEquals(expectedJson, actualJson, true);
@@ -100,19 +83,17 @@ public class RecordXMLParserTest {
 
     @Test
     @SuppressWarnings("PreferJavaTimeOverload")
-    public void shouldHarvestedContentForLanguageSpecificDimensionFromElementWithCorrectXmlLangAttribute() throws IOException, IndexerException {
+    public void shouldHarvestedContentForLanguageSpecificDimensionFromElementWithCorrectXmlLangAttribute() throws IOException, IndexerException, URISyntaxException {
 
         // Given
-        given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            ResourceHandler.getResourceAsStream("xml/ddi_2_5/oai-fsd_uta_fi-FSD3187.xml")
-        );
+        var recordXML = ResourceHandler.getResource("xml/ddi_2_5/oai-fsd_uta_fi-FSD3187.xml");
 
         // When
-        var optionalResult = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
+        var optionalResult = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
 
-        then(optionalResult).isPresent();
+        then(optionalResult).hasSize(1);
 
-        var result = optionalResult.get();
+        var result = optionalResult.get(0);
 
         // Verifies timeMeth extraction
         then(result.getTypeOfTimeMethods().size()).isEqualTo(2);
@@ -126,36 +107,32 @@ public class RecordXMLParserTest {
     }
 
     @Test
-    public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord() throws IOException, ProcessingException, JSONException, IndexerException {
+    public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
 
         // Given
-        given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            ResourceHandler.getResourceAsStream("xml/ddi_2_5/ddi_record_1683.xml")
-        );
+        var recordXML = ResourceHandler.getResource("xml/ddi_2_5/ddi_record_1683.xml");
 
         // When
-        var record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
+        var record = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
 
         // Then
-        then(record).isPresent();
-        validateCMMStudyResultAgainstSchema(record.get());
+        then(record).hasSize(1);
+        validateCMMStudyResultAgainstSchema(record.get(0));
     }
 
     @Test
     @SuppressWarnings("PreferJavaTimeOverload")
-    public void shouldOnlyExtractSingleDateAsStartDateForRecordsWithASingleDateAttr() throws IOException, ProcessingException, JSONException, IndexerException {
+    public void shouldOnlyExtractSingleDateAsStartDateForRecordsWithASingleDateAttr() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
 
         // Given
-        given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            ResourceHandler.getResourceAsStream("xml/ddi_2_5/ddi_record_1683.xml")
-        );
+        var recordXML = ResourceHandler.getResource("xml/ddi_2_5/ddi_record_1683.xml");
 
         // When
-        var record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
-        then(record).isPresent();
-        validateCMMStudyResultAgainstSchema(record.get());
+        var record = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
+        then(record).hasSize(1);
+        validateCMMStudyResultAgainstSchema(record.get(0));
         final ObjectMapper mapper = new ObjectMapper();
-        String jsonString = cmmConverter.toJsonString(record.get());
+        String jsonString = cmmConverter.toJsonString(record.get(0));
         final JsonNode actualTree = mapper.readTree(jsonString);
 
         then(actualTree.get("dataCollectionPeriodStartdate").asText()).isEqualTo("1976-01-01T00:00:00Z");
@@ -164,17 +141,15 @@ public class RecordXMLParserTest {
     }
 
     @Test
-    public void shouldExtractDefaultLanguageFromCodebookXMLLagIfPresent() throws IOException, JSONException, IndexerException {
+    public void shouldExtractDefaultLanguageFromCodebookXMLLagIfPresent() throws IOException, JSONException, IndexerException, URISyntaxException {
 
         // Given
         String expectedCmmStudyJsonString = ResourceHandler.getResourceAsString("json/ddi_record_1683_with_codebookXmlLag.json");
-        given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            ResourceHandler.getResourceAsStream("xml/ddi_2_5/ddi_record_1683_with_codebookXmlLag.xml")
-        );
+        var recordXML = ResourceHandler.getResource("xml/ddi_2_5/ddi_record_1683_with_codebookXmlLag.xml");
 
         // When
-        var record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
-        String actualCmmStudyJsonString = cmmConverter.toJsonString(record.orElseThrow());
+        var record = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
+        String actualCmmStudyJsonString = cmmConverter.toJsonString(record.get(0));
 
         // then
         assertEquals(expectedCmmStudyJsonString, actualCmmStudyJsonString, false);
@@ -182,91 +157,82 @@ public class RecordXMLParserTest {
 
     @Test
     @SuppressWarnings("PreferJavaTimeOverload")
-    public void shouldReturnCMMStudyRecordWithRepeatedAbstractConcatenated() throws IOException, ProcessingException, JSONException, IndexerException {
+    public void shouldReturnCMMStudyRecordWithRepeatedAbstractConcatenated() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
 
         Map<String, String> expectedAbstract = new HashMap<>();
         expectedAbstract.put("de", "de de");
         expectedAbstract.put("fi", "Haastattelu<br>Jyväskylä");
         expectedAbstract.put("en", "1. The data<br>2. The datafiles");
 
-        given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            ResourceHandler.getResourceAsStream("xml/ddi_2_5/ddi_record_2305_fsd_repeat_abstract.xml")
-        );
+        var recordXML = ResourceHandler.getResource("xml/ddi_2_5/ddi_record_2305_fsd_repeat_abstract.xml");
 
         // When
-        var record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
+        var record = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
 
-        then(record).isPresent();
-        then(record.get().getAbstractField().size()).isEqualTo(3);
-        then(record.get().getAbstractField()).isEqualTo(expectedAbstract);
-        validateCMMStudyResultAgainstSchema(record.get());
+        then(record).hasSize(1);
+        then(record.get(0).getAbstractField().size()).isEqualTo(3);
+        then(record.get(0).getAbstractField()).isEqualTo(expectedAbstract);
+        validateCMMStudyResultAgainstSchema(record.get(0));
     }
 
     @Test // https://github.com/cessda/cessda.cdc.versions/issues/135
     @SuppressWarnings("PreferJavaTimeOverload")
-    public void shouldReturnCMMStudyRecordWithOutParTitleWhenThereIsALangDifferentFromDefault() throws IOException, ProcessingException, JSONException, IndexerException {
+    public void shouldReturnCMMStudyRecordWithOutParTitleWhenThereIsALangDifferentFromDefault() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
 
         Map<String, String> expectedTitle = new HashMap<>();
         expectedTitle.put("en", "Machinery of Government, 1976-1977");
         expectedTitle.put("no", "2 - Et Machinery of Government, 1976-1977");
         expectedTitle.put("yy", "Enquête sociale européenne");
 
-        given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            ResourceHandler.getResourceAsStream("xml/ddi_2_5/ddi_record_1683.xml")
-        );
+        var recordXML = ResourceHandler.getResource("xml/ddi_2_5/ddi_record_1683.xml");
 
         // When
-        var record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
+        var record = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
 
-        then(record).isPresent();
-        then(record.get().getTitleStudy().size()).isEqualTo(3);
-        then(record.get().getTitleStudy()).isEqualTo(expectedTitle);
-        validateCMMStudyResultAgainstSchema(record.get());
+        then(record).hasSize(1);
+        then(record.get(0).getTitleStudy().size()).isEqualTo(3);
+        then(record.get(0).getTitleStudy()).isEqualTo(expectedTitle);
+        validateCMMStudyResultAgainstSchema(record.get(0));
     }
 
     @Test()
-    public void shouldReturnEmptyOptionalFromOaiPmhDDI2_5MetadataRecord_MarkedAsNotActive() throws IOException, IndexerException {
+    public void shouldReturnEmptyOptionalFromOaiPmhDDI2_5MetadataRecord_MarkedAsNotActive() throws IOException, IndexerException, URISyntaxException {
 
         // Given
-        given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            ResourceHandler.getResourceAsStream("xml/ddi_2_5/ddi_record_1031_deleted.xml")
-        );
+        var recordXML = ResourceHandler.getResource("xml/ddi_2_5/ddi_record_1031_deleted.xml");
 
         // When
-        var record = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
+        var record = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
 
         // Then
         then(record).isEmpty();
     }
 
-    @Test(expected = OaiPmhException.class)
-    public void shouldThrowExceptionForRecordWithErrorElement() throws IOException, IndexerException {
+    @Test
+    public void shouldThrowExceptionForRecordWithErrorElement() throws IOException, IndexerException, URISyntaxException {
 
         // Given
-        given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            ResourceHandler.getResourceAsStream("xml/ddi_2_5/ddi_record_WithError.xml")
-        );
+        var recordXML = ResourceHandler.getResource("xml/ddi_2_5/ddi_record_WithError.xml");
 
         // When
-        new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
+        var record = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
 
-        // Then an exception is thrown.
+        // Then
+        then(record).isEmpty();
     }
 
     @Test
-    public void shouldExtractAllRequiredCMMFieldsForAGivenAUKDSRecord() throws IOException, ProcessingException, JSONException, IndexerException {
+    public void shouldExtractAllRequiredCMMFieldsForAGivenAUKDSRecord() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
 
         // Given
-        given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            ResourceHandler.getResourceAsStream("xml/ddi_2_5/ddi_record_ukds_example.xml")
-        );
+        var recordXML = ResourceHandler.getResource("xml/ddi_2_5/ddi_record_ukds_example.xml");
 
         // When
-        var result = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, recordHeader);
+        var result = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
 
-        then(result).isPresent();
-        validateCMMStudyResultAgainstSchema(result.get());
-        assertThatCmmRequiredFieldsAreExtracted(result.get());
+        then(result).hasSize(1);
+        validateCMMStudyResultAgainstSchema(result.get(0));
+        assertThatCmmRequiredFieldsAreExtracted(result.get(0));
     }
 
     private void validateCMMStudyResultAgainstSchema(CMMStudy record) throws IOException, ProcessingException, JSONException {
@@ -300,38 +266,41 @@ public class RecordXMLParserTest {
     }
 
     @Test
-    public void shouldOverrideGlobalLanguageDefaultIfAPerRepositoryOverrideIsSpecified() throws IOException, ProcessingException, JSONException, IndexerException {
+    public void shouldOverrideGlobalLanguageDefaultIfAPerRepositoryOverrideIsSpecified() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
 
         var repository = ReposTestData.getUKDSLanguageOverrideRepository();
 
         // Given
-        given(httpClient.getInputStream(fullRecordUrl)).willReturn(
-            ResourceHandler.getResourceAsStream("xml/ddi_2_5/ddi_record_ukds_example.xml")
-        );
+        var recordXML = ResourceHandler.getResource("xml/ddi_2_5/ddi_record_ukds_example.xml");
 
         // When
-        var result = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repository, recordHeader);
+        var result = new RecordXMLParser(cmmStudyMapper).getRecord(repository, Path.of(recordXML.toURI()));
 
-        then(result).isPresent();
-        validateCMMStudyResultAgainstSchema(result.get());
+        then(result).hasSize(1);
+        validateCMMStudyResultAgainstSchema(result.get(0));
 
         // Assert the language is as expected
-        Assert.assertNotNull(result.get().getTitleStudy().get("zz"));
+        Assert.assertNotNull(result.get(0).getTitleStudy().get("zz"));
     }
 
     @Test
-    public void shouldUseAlreadyParsedDocumentIfPresent() throws IOException, JDOMException, JSONException, ProcessingException, IndexerException {
+    public void shouldReturnMultipleCMMStudyInstancesIfMultipleRecordsArePresent() throws IOException, JSONException, ProcessingException, URISyntaxException, XMLParseException {
         // Given
-        var document = OaiPmhHelpers.getSaxBuilder().build(ResourceHandler.getResourceAsStream("xml/ddi_2_5/ddi_record_ukds_example.xml"));
-
-        var header = new Record(recordHeader.getRecordHeader(), new Record.Request(repo.getUrl(), "ddi"), document);
+        var recordXML = ResourceHandler.getResource("xml/ddi_2_5/synthetic_list_records_response.xml");
+        var expectedJson = ResourceHandler.getResourceAsString("json/synthetic_compliant_record.json");
 
         // When
-        var result = new RecordXMLParser(cmmStudyMapper, httpClient).getRecord(repo, header);
+        var result = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
 
-        then(result).isPresent();
-        validateCMMStudyResultAgainstSchema(result.get());
+        then(result).hasSize(2);
 
-        then(result.get().getStudyXmlSourceUrl()).isEqualTo("https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=GetRecord&identifier=http%3A%2F%2Fmy-example_url%3A80%2Fobj%2FfStudy%2Fch.sidos.ddi.468.7773&metadataPrefix=ddi");
+        for (var study : result) {
+            validateCMMStudyResultAgainstSchema(study);
+        }
+
+        var actualJson = cmmConverter.toJsonString(result.get(0));
+
+        // Check if the JSON for the first study differs from the expected source
+        assertEquals(expectedJson, actualJson, true);
     }
 }

@@ -39,6 +39,7 @@ public class OaiPmhConstants {
     static final String DATESTAMP_ELEMENT = "datestamp";
     static final String SET_SPEC_ELEMENT = "setSpec";
     static final String HEADER_ELEMENT = "//oai:header";
+    static final String RECORD_ELEMENT = "//oai:record";
     static final String RESUMPTION_TOKEN_ELEMENT = "//oai:resumptionToken";
     static final String REQUEST_ELEMENT = "//oai:request";
     static final String DELETED = "deleted";
