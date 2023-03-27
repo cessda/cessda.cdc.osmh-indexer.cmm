@@ -23,10 +23,6 @@ elasticsearch:
   host: 127.0.0.1
   numberOfShards: 2
   numberOfReplicas: 0
-restTemplateProps:
-  connTimeout: 10000 # increased from 5 seconds to 10 seconds to deal with slower Nesstar repos
-  connRequestTimeout: 5000 # 5 seconds
-  readTimeout: 180000 # increased from 120 seconds to 180 seconds to deal with slower Nesstar repos
 oaiPmh:
   metadataParsingDefaultLang:
     active: true

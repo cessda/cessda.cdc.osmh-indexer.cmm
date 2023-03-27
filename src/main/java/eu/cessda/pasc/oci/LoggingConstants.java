@@ -23,8 +23,6 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class LoggingConstants {
     public static final String STUDY_ID = "study_id";
-    public static final String OAI_ERROR_CODE = "oai_error_code";
-    public static final String OAI_ERROR_MESSAGE = "oai_error_message";
     public static final String REPO_NAME = "repo_name";
     public static final String LANG_CODE = "lang_code";
     public static final String REASON = "rejection_reason";

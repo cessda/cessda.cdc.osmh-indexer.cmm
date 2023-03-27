@@ -20,8 +20,6 @@ import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jmx.export.annotation.ManagedOperation;
-import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -35,7 +33,6 @@ import static org.elasticsearch.client.RequestOptions.DEFAULT;
  * @author moses AT doraventures DOT com
  */
 @Component
-@ManagedResource
 @Slf4j
 public class DebuggingJMXBean {
 
@@ -46,7 +43,6 @@ public class DebuggingJMXBean {
     this.elasticsearchClient = elasticsearchClient;
   }
 
-  @ManagedOperation(description = "Prints to log the Elasticsearch server state.")
   public String printElasticSearchInfo() throws IOException {
       var asMap = elasticsearchClient.cluster().getSettings(new ClusterGetSettingsRequest(), DEFAULT).getPersistentSettings().getAsGroups();
       String elasticsearchInfo = "Elasticsearch Client Settings: [\n" + asMap.entrySet().stream()

@@ -18,7 +18,6 @@ package eu.cessda.pasc.oci;
 import eu.cessda.pasc.oci.exception.IndexerException;
 import eu.cessda.pasc.oci.exception.XMLParseException;
 import eu.cessda.pasc.oci.mock.data.ReposTestData;
-import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.parser.RecordXMLParser;
 import org.junit.Assert;
@@ -27,12 +26,9 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.nio.file.Path;
-import java.time.LocalDateTime;
 
 import static eu.cessda.pasc.oci.mock.data.ReposTestData.getUKDSRepo;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 
@@ -76,29 +72,6 @@ public class IndexerConsumerServiceTest {
         // Then
         var record = indexerConsumerService.getRecord(UKDS_REPO, Path.of("."));
         Assert.assertTrue(record.isEmpty());
-    }
-
-    @Test
-    public void shouldWarnOnNotParsableDate() {
-        var header = RecordHeader.builder().lastModified("Not a date").build();
-
-        // When
-        var records = IndexerConsumerService.filterRecord(header.getLastModified(), LocalDateTime.now());
-
-        // Then the record should be filtered
-        assertFalse(records);
-    }
-
-    @Test
-    public void shouldNotFilterOnNullLastModifiedDate() {
-        // Construct an object to be used for identity purposes
-        var header = RecordHeader.builder().lastModified(LocalDateTime.now().toString()).build();
-
-        // When
-        var records = IndexerConsumerService.filterRecord(header.getLastModified(), null);
-
-        // Then the same object should be returned
-        assertTrue(records);
     }
 
     @Test

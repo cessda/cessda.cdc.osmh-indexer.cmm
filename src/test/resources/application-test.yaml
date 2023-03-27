@@ -15,11 +15,6 @@ spring:
   main:
     banner-mode: "off"
   config.activate.on-profile: test
-logging:
-  level:
-    eu.cessda.pasc.oci.service.helpers.LanguageDocumentExtractor: DEBUG
-    eu.cessda.pasc.oci.repository.DaoBaseImpl: TRACE
-    eu.cessda.pasc.oci.service.helpers.DebuggingJMXBean: DEBUG
 endpoints:
   supportedRecordTypes:
     - Study
@@ -41,10 +36,6 @@ endpoints:
       preferredMetadataParam: ddi
       code: 'UKDS'
       handler: 'OAI-PMH'
-  delay:
-    # For tests, the delay should be effectively disabled
-    initial: '315360000000'
-    fixed: '315360000000'
 elasticsearch:
   # Because tests clear Elasticsearch after completion make sure that we don't run against live clusters
   clustername: test

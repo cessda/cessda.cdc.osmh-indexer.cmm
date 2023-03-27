@@ -35,6 +35,7 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -302,5 +303,14 @@ public class RecordXMLParserTest {
 
         // Check if the JSON for the first study differs from the expected source
         assertEquals(expectedJson, actualJson, true);
+    }
+
+    @Test(expected = XMLParseException.class)
+    public void shouldThrowIfAnIOErrorOccurs() throws FileNotFoundException, URISyntaxException, XMLParseException {
+        // Given
+        var invalidXML = ResourceHandler.getResource("xml/invalid-xml");
+
+        // Expect parsing to fail
+        new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(invalidXML.toURI()));
     }
 }

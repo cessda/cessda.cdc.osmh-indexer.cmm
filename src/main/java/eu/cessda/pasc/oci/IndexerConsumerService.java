@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -56,29 +55,6 @@ public class IndexerConsumerService {
     }
 
     /**
-     * Filter records that are newer than the specified last modified date.
-     * <p/>
-     * If ingestedLastModifiedDate is null no filtering will be performed and the returned list will have the same contents as unfilteredRecordHeaders.
-     *
-     * @param lastModifiedString an unfiltered record header.
-     * @param ingestedLastModifiedDate the last modified date to filter by, can be null.
-     * @return {@code true} if lastModifiedString is greater than ingestedLastModifiedDate, {@code false} otherwise
-     */
-    protected static boolean filterRecord(String lastModifiedString, LocalDateTime ingestedLastModifiedDate) {
-        return ingestedLastModifiedDate == null || isHeaderTimeGreater(lastModifiedString, ingestedLastModifiedDate);
-    }
-
-    private static boolean isHeaderTimeGreater(String recordLastModified, LocalDateTime lastModifiedDate) {
-        try {
-            var currentHeaderLastModified = TimeUtility.getLocalDateTime(recordLastModified);
-            return currentHeaderLastModified.isAfter(lastModifiedDate);
-        } catch (DateNotParsedException e) {
-            log.warn("Could not parse lastModifiedDate. Filtering out from list: {}", e.toString());
-            return false;
-        }
-    }
-
-    /**
      * Queries the remote repository for records.
      *
      * @param repo             the repository to query.
@@ -86,13 +62,12 @@ public class IndexerConsumerService {
      */
     @SuppressWarnings("UnstableApiUsage")
     public Map<String, List<CMMStudyOfLanguage>> getRecords(Repo repo) {
-        log.debug("[{}] Parsing record headers.", repo.getCode());
+        log.debug("[{}] Parsing records.", repo.getCode());
 
         /*
          * Repositories are indexed from their path. Because previous versions of the indexer supported
          * harvesting using URLs, we still need to check that a path is defined.
          */
-
         if (repo.getPath() == null) {
             throw new IllegalArgumentException("Repo " + repo.getCode() + " has no path defined");
         }
@@ -101,7 +76,6 @@ public class IndexerConsumerService {
             // Find XML files in the source directory.
             attributes.isRegularFile() && getFileExtension(path.toString()).equals("xml")
         )) {
-            // Find XML files in the source directory.
             var studies = new AtomicInteger();
 
             var studiesByLanguage = stream.flatMap(path -> getRecord(repo, path).stream())

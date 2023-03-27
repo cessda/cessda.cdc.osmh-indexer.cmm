@@ -16,14 +16,9 @@
 package eu.cessda.pasc.oci.configurations;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.mizosoft.methanol.Methanol;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.net.http.HttpClient;
-import java.time.Duration;
 
 /**
  * Extra Util configuration
@@ -33,26 +28,8 @@ import java.time.Duration;
 @Configuration
 @Slf4j
 public class UtilitiesConfiguration {
-
-    private final AppConfigurationProperties appConfigurationProperties;
-
-    @Autowired
-    public UtilitiesConfiguration(AppConfigurationProperties appConfigurationProperties) {
-        this.appConfigurationProperties = appConfigurationProperties;
-    }
-
     @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper();
-    }
-
-    @Bean
-    public HttpClient httpClient() {
-        return Methanol.newBuilder()
-            .autoAcceptEncoding(true)
-            .connectTimeout(Duration.ofMillis(appConfigurationProperties.getRestTemplateProps().getConnTimeout()))
-            .requestTimeout(Duration.ofMillis(appConfigurationProperties.getRestTemplateProps().getReadTimeout()))
-            .followRedirects(HttpClient.Redirect.NORMAL)
-            .build();
     }
 }

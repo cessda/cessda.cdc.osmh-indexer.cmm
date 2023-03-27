@@ -56,7 +56,7 @@ public class OCIApplication {
         @SuppressWarnings({"java:S1181", "java:S2696"}) // This is a top level error handler
         public void run(String... args) {
             try {
-                consumerScheduler.fullHarvestAndIngestionAllConfiguredSPsReposRecords();
+                consumerScheduler.runIndexer();
             } catch (Throwable e) {
                 // Log all application errors, then exit with a non-zero exit code
                 log.error("Fatal exception thrown!", e);

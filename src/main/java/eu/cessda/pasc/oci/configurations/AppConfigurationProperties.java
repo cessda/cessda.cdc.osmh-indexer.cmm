@@ -17,7 +17,6 @@ package eu.cessda.pasc.oci.configurations;
 
 import eu.cessda.pasc.oci.models.configurations.Harvester;
 import eu.cessda.pasc.oci.models.configurations.Repo;
-import eu.cessda.pasc.oci.models.configurations.RestTemplateProps;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
@@ -44,7 +43,6 @@ import java.util.Map;
 public class AppConfigurationProperties {
 
     private Endpoints endpoints = new Endpoints();
-    private RestTemplateProps restTemplateProps = new RestTemplateProps();
     private List<String> languages = List.of("cs", "da", "de", "el", "en", "et", "fi", "fr", "hu", "it", "nl", "no", "pt", "sk", "sl", "sr", "sv");
     private OaiPmh oaiPmh = new OaiPmh();
     private Path baseDirectory = null;
