@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -38,7 +39,7 @@ class PipelineUtilitiesTest {
         var repositoryAssert = assertThat(discoveredRepositories);
         repositoryAssert.hasSize(2);
         repositoryAssert.map(Repo::getCode).containsOnly("APIS", "UniData");
-        repositoryAssert.map(Repo::getHandler).containsOnly("DDI_2_5");
+        repositoryAssert.map(Repo::getPreferredMetadataParam).containsAnyElementsOf(List.of("ddi_c", "oai_ddi25"));
     }
 
     @Test

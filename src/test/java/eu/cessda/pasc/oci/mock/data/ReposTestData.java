@@ -40,7 +40,6 @@ public class ReposTestData
             repo.setCode("UKDS");
             repo.setUrl(URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider"));
             repo.setPath(Path.of(ResourceHandler.getResource("xml/ddi_2_5/").toURI()));
-            repo.setHandler("DDI_2_5");
             repo.setPreferredMetadataParam("ddi");
             return repo;
         } catch (FileNotFoundException | URISyntaxException e) {
@@ -58,7 +57,6 @@ public class ReposTestData
         Repo repo = new Repo();
         repo.setCode("GESIS");
         repo.setUrl(URI.create("https://dbkapps.gesis.org/dbkoai3"));
-        repo.setHandler("DDI_2_5");
         return repo;
     }
 
@@ -68,7 +66,6 @@ public class ReposTestData
         repo.setCode("FSD");
         repo.setPreferredMetadataParam("oai_ddi25");
         repo.setSetSpec("study_groups:energia");
-        repo.setHandler("DDI_2_5");
         return repo;
     }
 
@@ -77,7 +74,6 @@ public class ReposTestData
         repo.setUrl(URI.create("https://oai-pmh.nsd.no/oai-pmh"));
         repo.setCode("NSD");
         repo.setPreferredMetadataParam("oai_ddi");
-        repo.setHandler("NESSTAR");
         return repo;
     }
 

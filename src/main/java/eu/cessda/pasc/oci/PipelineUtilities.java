@@ -48,7 +48,7 @@ public class PipelineUtilities {
         if (baseDirectory != null) {
             try {
                 var directoryStream = Files.find(baseDirectory, Integer.MAX_VALUE,
-                    (path, attributes) -> attributes.isRegularFile() && path.getFileName().toString().equals("pipeline.json")
+                    (path, attributes) -> attributes.isRegularFile() && path.getFileName().equals(Path.of("pipeline.json"))
                 );
                 return directoryStream.flatMap(json -> {
                     try (var inputStream = Files.newInputStream(json)) {
@@ -59,7 +59,6 @@ public class PipelineUtilities {
                         repo.setUrl(sharedModel.url());
                         repo.setCode(sharedModel.code());
                         repo.setName(sharedModel.name());
-                        repo.setHandler(sharedModel.ddiVersion());
                         repo.setPath(json.getParent());
                         repo.setDefaultLanguage(sharedModel.defaultLanguage());
                         repo.setPreferredMetadataParam(sharedModel.metadataPrefix());
