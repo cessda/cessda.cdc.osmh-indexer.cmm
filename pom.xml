@@ -16,12 +16,11 @@
     limitations under the License.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.cessda.pasc</groupId>
     <artifactId>pasc-oci</artifactId>
-    <version>${revision}</version>
+    <version>3.2.1</version>
     <packaging>jar</packaging>
 
     <name>CESSDA Data Catalogue OSMH Indexer</name>
@@ -36,7 +35,8 @@
     <scm>
         <url>https://github.com/cessda/cessda.cdc.osmh-indexer.cmm</url>
         <connection>scm:git:https://github.com/cessda/cessda.cdc.osmh-indexer.cmm.git</connection>
-    </scm>
+      <tag>3.2.1</tag>
+  </scm>
     <issueManagement>
         <system>GitHub</system>
         <url>https://github.com/cessda/cessda.cdc.versions/issues</url>
@@ -50,7 +50,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.0.5</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath /> <!-- lookup parent from repository -->
     </parent>
 
     <properties>
