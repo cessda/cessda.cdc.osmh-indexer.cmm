@@ -21,10 +21,8 @@ import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.elasticsearch.IndexingException;
 import eu.cessda.pasc.oci.elasticsearch.IngestService;
 import eu.cessda.pasc.oci.exception.IndexerException;
-import eu.cessda.pasc.oci.models.Record;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.configurations.Repo;
-import eu.cessda.pasc.oci.parser.RecordHeaderParser;
 import eu.cessda.pasc.oci.parser.RecordXMLParser;
 import eu.cessda.pasc.oci.service.DebuggingJMXBean;
 import org.elasticsearch.ElasticsearchException;
@@ -32,9 +30,8 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.nio.file.Path;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,7 +53,6 @@ public class ConsumerSchedulerTest {
     private final PipelineUtilities pipelineUtilities = mock(PipelineUtilities.class);
     private final LanguageExtractor extractor = new LanguageExtractor(appConfigurationProperties);
     private final RecordXMLParser recordXMLParser = mock(RecordXMLParser.class);
-    private final RecordHeaderParser recordHeaderParser = mock(RecordHeaderParser.class);
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final CollectionType RECORD_HEADER_LIST = objectMapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class);
@@ -89,10 +85,10 @@ public class ConsumerSchedulerTest {
 
         // Given
         var harvesterRunner = new IndexerRunner(appConfigurationProperties, harvesterConsumerService, pipelineUtilities, esIndexer);
-        var scheduler = new ConsumerScheduler(debuggingJMXBean, esIndexer, harvesterRunner);
+        var scheduler = new ConsumerScheduler(debuggingJMXBean, harvesterRunner);
 
         // When
-        scheduler.fullHarvestAndIngestionAllConfiguredSPsReposRecords();
+        scheduler.runIndexer();
 
         thenVerifyFullRun(debuggingJMXBean);
     }
@@ -110,10 +106,10 @@ public class ConsumerSchedulerTest {
 
         // Given
         var harvesterRunner = new IndexerRunner(appConfigurationProperties, harvesterConsumerService, pipelineUtilities, esIndexer);
-        var scheduler = new ConsumerScheduler(debuggingJMXBean, esIndexer, harvesterRunner);
+        var scheduler = new ConsumerScheduler(debuggingJMXBean, harvesterRunner);
 
         // When
-        scheduler.weeklyFullHarvestAndIngestionAllConfiguredSPsReposRecords();
+        scheduler.runIndexer();
 
         thenVerifyFullRun(debuggingJMXBean);
     }
@@ -125,15 +121,15 @@ public class ConsumerSchedulerTest {
 
         // Throw a non-specific exception
         var indexerConsumerService = mock(IndexerConsumerService.class);
-        when(indexerConsumerService.getRecords(any(Repo.class), any()))
+        when(indexerConsumerService.getRecords(any(Repo.class)))
             .thenThrow(RuntimeException.class);
 
         // Given
         var harvesterRunner = new IndexerRunner(appConfigurationProperties, indexerConsumerService, pipelineUtilities, esIndexer);
-        var scheduler = new ConsumerScheduler(debuggingJMXBean, esIndexer, harvesterRunner);
+        var scheduler = new ConsumerScheduler(debuggingJMXBean, harvesterRunner);
 
         // When
-        scheduler.fullHarvestAndIngestionAllConfiguredSPsReposRecords();
+        scheduler.runIndexer();
 
         // Verify hit counts were obtained
         verify(esIndexer).getTotalHitCount("*");
@@ -147,19 +143,16 @@ public class ConsumerSchedulerTest {
      */
     private IndexerConsumerService mockRecordRequests() throws IOException, IndexerException {
 
-        var indexerConsumerService = new IndexerConsumerService(extractor, recordHeaderParser, recordXMLParser);
+        var indexerConsumerService = new IndexerConsumerService(extractor, recordXMLParser);
         var recordHeaders = objectMapper.<List<RecordHeader>>readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE, RECORD_HEADER_LIST);
-
-        // Mock requests for the repository headers
-        when(recordHeaderParser.getRecordHeaders(any(Repo.class))).thenReturn(recordHeaders);
 
         // mock record requests from each header
         var ukdsRepo = getUKDSRepo();
         for (var recordHeader : recordHeaders) {
             when(recordXMLParser.getRecord(
-                ukdsRepo,
-                new Record(recordHeader, new Record.Request(ukdsRepo.getUrl(), ukdsRepo.getPreferredMetadataParam()),null)
-            )).thenReturn(Optional.of(getSyntheticCmmStudy(recordHeader.getIdentifier())));
+                eq(ukdsRepo),
+                any(Path.class)
+            )).thenReturn(List.of(getSyntheticCmmStudy(recordHeader.getIdentifier())));
         }
 
         return indexerConsumerService;
@@ -174,85 +167,20 @@ public class ConsumerSchedulerTest {
         verify(appConfigurationProperties, atLeastOnce()).getBaseDirectory();
         verifyNoMoreInteractions(appConfigurationProperties);
 
-        verify(recordHeaderParser, times(1)).getRecordHeaders(any(Repo.class));
-        verifyNoMoreInteractions(recordHeaderParser);
-
-        verify(recordXMLParser, times(2)).getRecord(any(Repo.class), any(Record.class));
+        verify(recordXMLParser, times(9)).getRecord(any(Repo.class), any(Path.class));
         verifyNoMoreInteractions(recordXMLParser);
 
         // No bulk attempt should have been made for "sv" as it does not have the minimum valid cmm fields
         // 'en', 'fi', 'de' has all minimum fields
-        verify(esIndexer, times(3)).bulkIndex(anyList(), anyString());
-        verify(esIndexer, times(3)).bulkDelete(anyList(), anyString());
+        verify(esIndexer, times(3)).bulkIndex(anyList(), matches("(en|fi|de)"));
+        verify(esIndexer, times(3)).bulkDelete(anyList(), matches("(en|fi|de)"));
 
         // Called for deletions
         verify(esIndexer, times(3)).getStudiesByRepository(anyString(), anyString());
 
         // Called for logging purposes
-        verify(esIndexer, times(6)).getStudy(Mockito.anyString(), Mockito.anyString());
+        verify(esIndexer, times(27)).getStudy(Mockito.anyString(), Mockito.anyString());
         verify(esIndexer, times(1)).getTotalHitCount("*");
-        verifyNoMoreInteractions(esIndexer);
-    }
-
-    @Test
-    public void shouldDoIncrementalHarvestAndIngestionOfNewerRecordsOnly() throws IOException, IndexerException, IndexingException {
-        // MOCKS ---------------------------------------------------------------------------------------------------------
-        var debuggingJMXBean = mockDebuggingJMXBean();
-        // mock for our record headers
-        var indexerConsumerService = new IndexerConsumerService(extractor, recordHeaderParser, recordXMLParser);
-        var recordHeaderList = objectMapper.<List<RecordHeader>>readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE, RECORD_HEADER_LIST);
-        var recordHeaderListIncrement = objectMapper.<List<RecordHeader>>readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE_WITH_INCREMENT, RECORD_HEADER_LIST);
-
-        when(recordHeaderParser.getRecordHeaders(any(Repo.class)))
-            .thenReturn(recordHeaderList) // First call
-            .thenReturn(recordHeaderListIncrement); // Second call / Incremental run
-
-        // mock record requests from each header, a set is used so that each header is only registered once
-        var allRecordHeaders = new HashSet<>(recordHeaderList);
-        allRecordHeaders.addAll(recordHeaderListIncrement);
-        var ukdsRepo = getUKDSRepo();
-        for (var recordHeader : allRecordHeaders) {
-            when(recordXMLParser.getRecord(ukdsRepo, new Record(recordHeader, new Record.Request(ukdsRepo.getUrl(), ukdsRepo.getPreferredMetadataParam()),null)))
-                .thenReturn(Optional.of(getSyntheticCmmStudy(recordHeader.getIdentifier())));
-        }
-
-        // mock for ES methods
-        when(esIndexer.getMostRecentLastModified()).thenReturn(Optional.of(LocalDateTime.parse("2018-02-20T07:48:38")));
-        when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
-        when(esIndexer.getStudy(Mockito.eq("UKDS__999"), Mockito.anyString())).thenReturn(Optional.of(getCmmStudyOfLanguageCodeEnX1().get(0)));
-
-        // Given
-        var harvesterRunner = new IndexerRunner(appConfigurationProperties, indexerConsumerService, pipelineUtilities, esIndexer);
-        var scheduler = new ConsumerScheduler(debuggingJMXBean, esIndexer, harvesterRunner);
-
-        // When
-        scheduler.fullHarvestAndIngestionAllConfiguredSPsReposRecords();
-        scheduler.dailyIncrementalHarvestAndIngestionAllConfiguredSPsReposRecords();
-
-        verify(debuggingJMXBean, times(2)).printElasticSearchInfo();
-        verifyNoMoreInteractions(debuggingJMXBean);
-
-        verify(appConfigurationProperties, times(2)).getEndpoints();
-        verify(appConfigurationProperties, atLeastOnce()).getLanguages();
-        verify(appConfigurationProperties, times(2)).getBaseDirectory();
-        verifyNoMoreInteractions(appConfigurationProperties);
-
-        verify(recordHeaderParser, times(2)).getRecordHeaders(any(Repo.class));
-        verifyNoMoreInteractions(recordHeaderParser);
-
-        // Expects 5 GetRecord call 2 from Full run and 3 from incremental run (minuses old lastModified record)
-        verify(recordXMLParser, times(5)).getRecord(any(Repo.class), any(Record.class));
-        verifyNoMoreInteractions(recordXMLParser);
-
-        verify(esIndexer, times(1)).getMostRecentLastModified(); // Call by incremental run to get LastModified
-        // No bulk attempt should have been made for "sv" as we don't have any records for "sv". We do for 'en', 'fi', 'de'
-        verify(esIndexer, times(6)).bulkIndex(anyList(), anyString());
-        verify(esIndexer, times(6)).bulkDelete(anyList(), anyString());
-
-        // Called for logging purposes
-        verify(esIndexer, atLeastOnce()).getStudy(Mockito.anyString(), Mockito.anyString());
-        verify(esIndexer, times(2)).getTotalHitCount("*");
-        verify(esIndexer, times(6)).getStudiesByRepository(anyString(), anyString());
         verifyNoMoreInteractions(esIndexer);
     }
 
@@ -268,13 +196,13 @@ public class ConsumerSchedulerTest {
 
         // Given
         var harvesterRunner = new IndexerRunner(appConfigurationProperties, harvesterConsumerService, pipelineUtilities, esIndexer);
-        var scheduler = new ConsumerScheduler(debuggingJMXBean, esIndexer, harvesterRunner);
+        var scheduler = new ConsumerScheduler(debuggingJMXBean, harvesterRunner);
 
         // When
-        scheduler.weeklyFullHarvestAndIngestionAllConfiguredSPsReposRecords();
+        scheduler.runIndexer();
 
         // Verify that the mock was called
-        verify(esIndexer, times(6)).getStudy(Mockito.anyString(), Mockito.anyString());
+        verify(esIndexer, times(27)).getStudy(Mockito.anyString(), Mockito.anyString());
         verify(esIndexer, times(1)).getTotalHitCount("*");
         verify(esIndexer, times(3)).bulkIndex(anyList(), anyString());
         verify(esIndexer, times(3)).getStudiesByRepository(anyString(), anyString());
@@ -294,13 +222,13 @@ public class ConsumerSchedulerTest {
 
         // Given
         var harvesterRunner = new IndexerRunner(appConfigurationProperties, harvesterConsumerService, pipelineUtilities, esIndexer);
-        var scheduler = new ConsumerScheduler(debuggingJMXBean, esIndexer, harvesterRunner);
+        var scheduler = new ConsumerScheduler(debuggingJMXBean, harvesterRunner);
 
         // When
-        scheduler.weeklyFullHarvestAndIngestionAllConfiguredSPsReposRecords();
+        scheduler.runIndexer();
 
         // Verify that the mock was called
-        verify(esIndexer, times(6)).getStudy(Mockito.anyString(), Mockito.anyString());
+        verify(esIndexer, times(27)).getStudy(Mockito.anyString(), Mockito.anyString());
         verify(esIndexer, times(1)).getTotalHitCount("*");
         verify(esIndexer, times(3)).bulkIndex(anyList(), anyString());
         verify(esIndexer, times(3)).getStudiesByRepository(anyString(), anyString());

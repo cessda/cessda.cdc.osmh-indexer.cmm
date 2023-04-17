@@ -16,34 +16,26 @@
 package eu.cessda.pasc.oci.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Value;
 
 import java.net.URI;
 
 /**
  * Model for metadata passed in the CESSDA metadata pipeline.
+ *
+ * @param code            The identifier of the repository.
+ * @param name            The friendly name of the repository.
+ * @param defaultLanguage The default language to use when a metadata record does not specify a language.
+ * @param url             the base URL of the repository.
+ * @param metadataPrefix  The {@code metadataPrefix} that was retrieved.
+ * @param ddiVersion      the DDI version harvested from the remote repository.
  */
-@Value
 @JsonIgnoreProperties(ignoreUnknown = true) // Some parts of the JSON are not relevant to the indexer
-public class PipelineMetadata {
-    /**
-     * The identifier of the repository.
-     */
-    String code;
-    /**
-     * The friendly name of the repository.
-     */
-    String name;
-    /**
-     * The default language to use when a metadata record does not specify a language.
-     */
-    String defaultLanguage;
-    /**
-     * the base URL of the repository.
-     */
-    URI url;
-    /**
-     * the DDI version harvested from the remote repository.
-     */
-    String ddiVersion;
+public record PipelineMetadata(
+    String code,
+    String name,
+    String defaultLanguage,
+    URI url,
+    String metadataPrefix,
+    String ddiVersion
+) {
 }

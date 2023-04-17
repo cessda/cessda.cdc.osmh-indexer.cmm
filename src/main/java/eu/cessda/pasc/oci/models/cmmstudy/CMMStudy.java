@@ -119,7 +119,7 @@ public class CMMStudy {
     String lastModified;
 
     @JsonProperty("studyXmlSourceUrl")
-    String studyXmlSourceUrl;
+    URI studyXmlSourceUrl;
 
     @JsonProperty("repositoryUrl")
     URI repositoryUrl;

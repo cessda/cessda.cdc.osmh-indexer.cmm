@@ -15,9 +15,6 @@
  */
 package eu.cessda.pasc.oci.models;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Builder;
 import lombok.Value;
 
@@ -27,29 +24,16 @@ import lombok.Value;
  * @author moses AT doraventures DOT com
  * @see <a href="http://www.openarchives.org/OAI/openarchivesprotocol.html#Record">http://www.openarchives.org/OAI/openarchivesprotocol.html#Record</a>
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-    "lastModified",
-    "type",
-    "recordType",
-    "identifier",
-    "deleted"
-})
 @Builder
 @Value
 public class RecordHeader {
 
-    @JsonProperty("lastModified")
     String lastModified;
-    @JsonProperty("type")
     String type;
-    @JsonProperty("recordType")
     String recordType;
-    @JsonProperty("identifier")
     String identifier;
     /**
      * Deletion status on the remote repository
      */
-    @JsonProperty("deleted")
     boolean deleted;
 }

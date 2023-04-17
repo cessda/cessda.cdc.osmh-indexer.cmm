@@ -20,6 +20,7 @@ import lombok.experimental.UtilityClass;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -30,6 +31,24 @@ import java.nio.charset.StandardCharsets;
 @UtilityClass
 public class ResourceHandler {
     /**
+     * Load the specified resource and return it as an {@link URL}.
+     *
+     * @param fileName the resource to load.
+     * @throws FileNotFoundException if the resource could not be found,
+     *                               the resource is in a package that is not opened unconditionally,
+     *                               or access to the resource is denied by the security manager.
+     */
+    public static URL getResource(String fileName) throws FileNotFoundException {
+        // Get the resource URL
+        var resource = ResourceHandler.class.getClassLoader().getResource(fileName);
+
+        if (resource == null) {
+            throw new FileNotFoundException(fileName + " could not be found");
+        }
+        return resource;
+    }
+
+    /**
      * Load the specified resource and return it as an {@link InputStream}.
      *
      * @param fileName the resource to load.
@@ -39,14 +58,7 @@ public class ResourceHandler {
      * @throws IOException           if an IO error occurs.
      */
     public static InputStream getResourceAsStream(String fileName) throws IOException {
-
-        // Get the resource URL
-        var resource = ResourceHandler.class.getClassLoader().getResource(fileName);
-
-        if (resource == null) {
-            throw new FileNotFoundException(fileName + " could not be found");
-        }
-
+        URL resource = getResource(fileName);
         return resource.openStream();
     }
 

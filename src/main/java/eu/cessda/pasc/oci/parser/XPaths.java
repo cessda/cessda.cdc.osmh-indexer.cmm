@@ -21,6 +21,7 @@ import org.jdom2.Namespace;
 import javax.annotation.Nullable;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -35,8 +36,7 @@ public final class XPaths implements Serializable {
     private static final long serialVersionUID = -6226660931460780008L;
 
     @NonNull
-    private final Namespace ddiNS;
-    private final Namespace[] oaiAndDdiNs;
+    private final Namespace namespace;
     // Codebook Paths
     private final String recordDefaultLanguage;
     private final String yearOfPubXPath;
@@ -83,14 +83,11 @@ public final class XPaths implements Serializable {
         return Optional.ofNullable(universeXPath);
     }
 
-    private static final Namespace DDI_NS = Namespace.getNamespace("ddi", "ddi:codebook:2_5");
-
     /**
      * XPaths needed to extract metadata from DDI 2.5 documents.
      */
     public static final XPaths DDI_2_5_XPATHS = XPaths.builder()
-        .ddiNS(DDI_NS)
-        .oaiAndDdiNs(new Namespace[]{OaiPmhConstants.OAI_NS, DDI_NS})
+        .namespace(Namespace.getNamespace("ddi", "ddi:codebook:2_5"))
         .abstractXPath("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:abstract")
         .titleXPath("//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:titl")
         .parTitleXPath("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:parTitl")
@@ -117,14 +114,11 @@ public final class XPaths implements Serializable {
         .universeXPath("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:universe")
         .build();
 
-    private static final Namespace NESSTAR_DDI_NS = Namespace.getNamespace("ddi", "http://www.icpsr.umich.edu/DDI");
-
     /**
      * XPaths needed to extract metadata from NESSTAR flavoured DDI 1.2.2 documents.
      */
     public static final XPaths NESSTAR_XPATHS = XPaths.builder()
-        .ddiNS(NESSTAR_DDI_NS)
-        .oaiAndDdiNs(new Namespace[]{OaiPmhConstants.OAI_NS, NESSTAR_DDI_NS})
+        .namespace(Namespace.getNamespace("ddi", "http://www.icpsr.umich.edu/DDI"))
         .recordDefaultLanguage("//ddi:codeBook/@xml-lang") // Nesstar with "-"
         // Closest for Nesstar based on CMM mapping doc but the above existing one for ddi2.5 seems to be present in Nesstar
         .yearOfPubXPath("//ddi:codeBook/stdyDscr/citation/distStmt/distDate[1]/@date")
@@ -151,4 +145,23 @@ public final class XPaths implements Serializable {
         .relatedPublicationsXPath("//ddi:codeBook/stdyDscr/othrStdyMat/relPubl")
         .universeXPath("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/universe")
         .build();
+
+    /**
+     * Mapping of XML namespaces to XPaths
+     */
+    private static final Map<Namespace, XPaths> XPATH_MAP = Map.ofEntries(
+        Map.entry(DDI_2_5_XPATHS.getNamespace(), DDI_2_5_XPATHS),
+        Map.entry(NESSTAR_XPATHS.getNamespace(), NESSTAR_XPATHS)
+    );
+
+    /**
+     * Get the XPaths for a given XML namespace
+     */
+    public static XPaths getXPaths(Namespace namespace) {
+        var xpaths = XPATH_MAP.get(namespace);
+        if (xpaths == null) {
+            throw new IllegalArgumentException("XML namespace \"" + namespace.getURI() + "\" not supported");
+        }
+        return xpaths;
+    }
 }

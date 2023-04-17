@@ -13,19 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.models.configurations;
+package eu.cessda.pasc.oci.models;
 
-import lombok.Data;
+import lombok.NonNull;
+import org.jdom2.Document;
 
-/**
- * RestTemplate Properties configuration model
- *
- * @author moses AT doraventures DOT com
- */
-@Data
-public class RestTemplateProps {
+import javax.annotation.Nullable;
+import java.net.URI;
+import java.util.List;
 
-    private int connTimeout;
-    private int readTimeout;
-    private boolean verifySSL;
+public record Request(@Nullable URI baseURL, @NonNull List<Record> records) {
+    /**
+     * Create a synthetic request the given documents root element set as the metadata holder.
+     */
+    public static Request createSyntheticRequest(Document document) {
+        return new Request(
+            null,
+            List.of(new Record(null, document))
+        );
+    }
 }

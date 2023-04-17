@@ -31,6 +31,6 @@ public class InvalidUniverseException extends RuntimeException {
      * @param cause the exception that caused this exception.
      */
     public InvalidUniverseException(String invalidClusion, IllegalArgumentException cause) {
-        super("[" + invalidClusion + "] is not a valid clusion - valid values: " + Arrays.toString(Universe.Clusion.values()), cause);
+        super("[" + invalidClusion + "] is not a valid inclusion/exclusion - valid values: " + Arrays.toString(Universe.Clusion.values()), cause);
     }
 }

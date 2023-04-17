@@ -53,7 +53,7 @@ public class OaiPmhHelpersTest {
             "&metadataPrefix=" + fsdEndpoint.getPreferredMetadataParam());
 
         // When
-        URI builtUrl = buildGetStudyFullUrl(fsdEndpoint, STUDY_IDENTIFIER);
+        URI builtUrl = buildGetStudyFullUrl(fsdEndpoint.getUrl(), STUDY_IDENTIFIER, fsdEndpoint.getPreferredMetadataParam());
 
         then(builtUrl).isEqualTo(expectedReqUrl);
     }
@@ -69,24 +69,8 @@ public class OaiPmhHelpersTest {
             "&metadataPrefix=" + ukdsEndpoint.getPreferredMetadataParam());
 
         // When
-        URI builtUrl = buildGetStudyFullUrl(ukdsEndpoint, STUDY_IDENTIFIER);
+        URI builtUrl = buildGetStudyFullUrl(ukdsEndpoint.getUrl(), STUDY_IDENTIFIER, ukdsEndpoint.getPreferredMetadataParam());
 
         then(builtUrl).isEqualTo(expectedReqUrl);
-    }
-
-    @Test
-    public void shouldAppendListRecordParams() {
-        // Given
-        Repo fsdEndpoint = appConfigurationProperties.getEndpoints().getRepos()
-            .stream().filter(repo -> repo.getCode().equals("FSD")).findAny().orElseThrow();
-
-        var expectedReqUrl = URI.create("http://services.fsd.uta.fi/v0/oai?verb=ListIdentifiers" +
-            "&metadataPrefix=" + fsdEndpoint.getPreferredMetadataParam() +
-            "&set=" + fsdEndpoint.getSetSpec());
-
-        // When
-        var listRecordParams = OaiPmhHelpers.appendListRecordParams(fsdEndpoint);
-
-        then(listRecordParams).isEqualTo(expectedReqUrl);
     }
 }

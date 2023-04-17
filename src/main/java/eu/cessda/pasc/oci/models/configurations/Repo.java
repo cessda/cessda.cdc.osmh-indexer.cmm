@@ -50,10 +50,6 @@ public class Repo implements Serializable {
      */
     private String name;
     /**
-     * The repository handler.
-     */
-    private String handler;
-    /**
      * The {@code metadataPrefix} of the metadata format to be retrieved from the repository.
      *
      * @see <a href="http://www.openarchives.org/OAI/openarchivesprotocol.html#MetadataNamespaces">http://www.openarchives.org/OAI/openarchivesprotocol.html#MetadataNamespaces</a>

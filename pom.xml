@@ -300,16 +300,14 @@
                         <exclude>mvnw*</exclude>
                         <exclude>.mvn/**</exclude>
                         <exclude>.*</exclude>
-                        <exclude>Jenkinsfile</exclude>
                         <exclude>LICENSE.txt</exclude>
-                        <exclude>**/README</exclude>
                         <exclude>**/.m2/**</exclude>
                         <exclude>lombok.config</exclude>
                         <exclude>src/test/resources/**</exclude>
-                        <exclude>src/main/resources/**</exclude>
                     </excludes>
                     <mapping>
                         <java>PHP</java>
+                        <Jenkinsfile>PHP</Jenkinsfile>
                     </mapping>
                 </configuration>
                 <executions>

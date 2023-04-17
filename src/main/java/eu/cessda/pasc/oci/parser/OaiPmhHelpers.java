@@ -15,11 +15,9 @@
  */
 package eu.cessda.pasc.oci.parser;
 
-import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.jdom2.input.SAXBuilder;
 
 import javax.xml.XMLConstants;
@@ -47,36 +45,14 @@ public class OaiPmhHelpers {
         return saxBuilder;
     });
 
-    public static URI buildGetStudyFullUrl(@NonNull Repo repo, @NonNull String studyIdentifier) throws URISyntaxException {
-        return buildGetStudyFullUrl(repo.getUrl(), studyIdentifier, repo.getPreferredMetadataParam());
-    }
-
     public static URI buildGetStudyFullUrl(@NonNull URI repoUrl, @NonNull String studyIdentifier, @NonNull String metadataPrefix) throws URISyntaxException {
-        return new URI(String.format(
-            "%s?%s=%s&%s=%s&%s=%s", repoUrl,
-            VERB_PARAM_KEY, GET_RECORD_VALUE, // verb=GetRecord
-            IDENTIFIER_PARAM_KEY, URLEncoder.encode(studyIdentifier, StandardCharsets.UTF_8), //&identifier=1683
-            METADATA_PREFIX_PARAM_KEY, URLEncoder.encode(metadataPrefix, StandardCharsets.UTF_8) //&metadataPrefix=ddi
-        ));
-    }
-
-    public static URI appendListRecordParams(@NonNull Repo repoConfig) {
-        if (StringUtils.isBlank(repoConfig.getSetSpec())) {
-            return URI.create(String.format("%s?%s=%s&%s=%s", repoConfig.getUrl(),
-                VERB_PARAM_KEY, LIST_IDENTIFIERS_VALUE, // verb=ListIdentifier
-                METADATA_PREFIX_PARAM_KEY, repoConfig.getPreferredMetadataParam())); //&metadataPrefix=ddi
-        } else {
-            return URI.create(String.format("%s?%s=%s&%s=%s&%s=%s", repoConfig.getUrl(),
-                VERB_PARAM_KEY, LIST_IDENTIFIERS_VALUE, // verb=ListIdentifier
-                METADATA_PREFIX_PARAM_KEY, repoConfig.getPreferredMetadataParam(), //&metadataPrefix=ddi
-                SET_SPEC_PARAM_KEY, repoConfig.getSetSpec())); //&set=my:set
-        }
-    }
-
-    public static URI appendListRecordResumptionToken(@NonNull URI baseRepoUrl, @NonNull String resumptionToken) {
-        return URI.create(String.format("%s?%s=%s&%s=%s", baseRepoUrl,
-            VERB_PARAM_KEY, LIST_IDENTIFIERS_VALUE, // verb=ListIdentifier
-            RESUMPTION_TOKEN_KEY, URLEncoder.encode(resumptionToken, StandardCharsets.UTF_8)) // &resumptionToken=0001/500....
+        return new URI(repoUrl +
+            // verb=GetRecord
+            "?" + VERB_PARAM_KEY + "=" + GET_RECORD_VALUE +
+            //&identifier=1683
+            "&" + IDENTIFIER_PARAM_KEY + "=" + URLEncoder.encode(studyIdentifier, StandardCharsets.UTF_8) +
+            //&metadataPrefix=ddi
+            "&" + METADATA_PREFIX_PARAM_KEY + "=" + URLEncoder.encode(metadataPrefix, StandardCharsets.UTF_8)
         );
     }
 
