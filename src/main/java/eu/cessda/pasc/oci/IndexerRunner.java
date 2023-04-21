@@ -15,6 +15,7 @@
  */
 package eu.cessda.pasc.oci;
 
+import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.elasticsearch.IndexingException;
 import eu.cessda.pasc.oci.elasticsearch.IngestService;
@@ -23,7 +24,6 @@ import eu.cessda.pasc.oci.models.configurations.Repo;
 import jakarta.annotation.PreDestroy;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.ElasticsearchException;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -67,10 +66,9 @@ public class IndexerRunner {
     /**
      * Starts the harvest.
      *
-     * @param lastModifiedDateTime the {@link LocalDateTime} to incrementally harvest from, set to {@code null} to perform a full harvest.
      * @throws IllegalStateException if a harvest is already running.
      */
-    public void executeHarvestAndIngest(LocalDateTime lastModifiedDateTime) {
+    public void executeHarvestAndIngest() {
         if (!indexerRunning.getAndSet(true)) {
 
             // Load explicitly configured repositories

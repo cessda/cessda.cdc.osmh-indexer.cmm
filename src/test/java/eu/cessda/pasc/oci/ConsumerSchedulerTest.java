@@ -15,6 +15,7 @@
  */
 package eu.cessda.pasc.oci;
 
+import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
@@ -25,7 +26,6 @@ import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.parser.RecordXMLParser;
 import eu.cessda.pasc.oci.service.DebuggingJMXBean;
-import org.elasticsearch.ElasticsearchException;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -191,7 +191,7 @@ public class ConsumerSchedulerTest {
         var debuggingJMXBean = mockDebuggingJMXBean();
 
         // mock for ES bulking
-        doThrow(new ElasticsearchException("Mocked")).when(esIndexer).bulkIndex(anyList(), anyString());
+        doThrow(ElasticsearchException.class).when(esIndexer).bulkIndex(anyList(), anyString());
         when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
 
         // Given

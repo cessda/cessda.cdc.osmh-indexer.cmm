@@ -15,17 +15,15 @@
  */
 package eu.cessda.pasc.oci.service;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.cluster.GetClusterSettingsRequest;
+import co.elastic.clients.elasticsearch.cluster.HealthRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
-import org.elasticsearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
-import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.stream.Collectors;
-
-import static org.elasticsearch.client.RequestOptions.DEFAULT;
 
 /**
  * Bean for JMX debugging
@@ -36,25 +34,25 @@ import static org.elasticsearch.client.RequestOptions.DEFAULT;
 @Slf4j
 public class DebuggingJMXBean {
 
-  private final RestHighLevelClient elasticsearchClient;
+  private final ElasticsearchClient elasticsearchClient;
 
   @Autowired
-  public DebuggingJMXBean(RestHighLevelClient elasticsearchClient) {
+  public DebuggingJMXBean(ElasticsearchClient elasticsearchClient) {
     this.elasticsearchClient = elasticsearchClient;
   }
 
   public String printElasticSearchInfo() throws IOException {
-      var asMap = elasticsearchClient.cluster().getSettings(new ClusterGetSettingsRequest(), DEFAULT).getPersistentSettings().getAsGroups();
+      var asMap = elasticsearchClient.cluster().getSettings(GetClusterSettingsRequest.of(g -> g)).persistent();
       String elasticsearchInfo = "Elasticsearch Client Settings: [\n" + asMap.entrySet().stream()
           .map(entry -> "\t" + entry.getKey() + "=" + entry.getValue() + "\n")
           .collect(Collectors.joining()) + "]";
 
-      var healths = elasticsearchClient.cluster().health(new ClusterHealthRequest(), DEFAULT);
+      var healths = elasticsearchClient.cluster().health(HealthRequest.of(h -> h));
 
       elasticsearchInfo += "\nElasticsearch Cluster Details:\n" +
-          "\tCluster Name [" + healths.getClusterName() + "]" +
-          "\tNumberOfDataNodes [" + healths.getNumberOfDataNodes() + "]" +
-          "\tNumberOfNodes [" + healths.getNumberOfNodes() + "]";
+          "\tCluster Name [" + healths.clusterName() + "]" +
+          "\tNumberOfDataNodes [" + healths.numberOfDataNodes() + "]" +
+          "\tNumberOfNodes [" + healths.numberOfNodes() + "]";
       return elasticsearchInfo;
   }
 }
