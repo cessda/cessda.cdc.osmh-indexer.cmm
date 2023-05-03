@@ -15,6 +15,7 @@
  */
 package eu.cessda.pasc.oci.configurations;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
@@ -27,7 +28,8 @@ public class ElasticsearchConfigurationTest {
             "localhost",
             9200,
             null,
-            null
+            null,
+            new ObjectMapper()
         );
     }
 

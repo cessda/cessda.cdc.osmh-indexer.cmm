@@ -15,21 +15,19 @@
  */
 package eu.cessda.pasc.oci.elasticsearch;
 
-import com.fasterxml.jackson.databind.ObjectReader;
-import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.search.*;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.client.core.CountRequest;
-import org.elasticsearch.core.TimeValue;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.Time;
+import co.elastic.clients.elasticsearch.core.ClearScrollRequest;
+import co.elastic.clients.elasticsearch.core.CountRequest;
+import co.elastic.clients.elasticsearch.core.ScrollRequest;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.search.ResponseBody;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.AbstractSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.concurrent.TimeUnit;
-
-import static org.elasticsearch.client.RequestOptions.DEFAULT;
 
 /**
  * An implementation of the set interface that supports iterating over an Elasticsearch scroll.
@@ -43,21 +41,21 @@ public class ElasticsearchSet<T> extends AbstractSet<T> {
     /**
      * Scroll timeout
      */
-    private static final TimeValue timeout = new TimeValue(60, TimeUnit.SECONDS);
+    private static final Time SCROLL_TIMEOUT = new Time.Builder().time("1m").build();
     private final SearchRequest searchRequest;
-    private final ObjectReader objectReader;
-    private final RestHighLevelClient client;
+    private final Class<T> clazz;
+    private final ElasticsearchClient client;
 
     /**
      * Constructs a new Elasticsearch Set that will contain the results of the given search query.
-     * @param searchRequest the search request to execute.
+     * @param searchRequestBuilder the search request to execute, the builder will become unusable afterwards.
      * @param client the Elasticsearch Client to use.
-     * @param objectReader the object reader to use to deserialize the JSON.
+     * @param clazz the class to deserialize to.
      */
-    ElasticsearchSet(SearchRequest searchRequest, RestHighLevelClient client, ObjectReader objectReader) {
-        this.searchRequest = searchRequest;
+    ElasticsearchSet(SearchRequest.Builder searchRequestBuilder, ElasticsearchClient client, Class<T> clazz) {
+        this.searchRequest = searchRequestBuilder.scroll(SCROLL_TIMEOUT).build();
         this.client = client;
-        this.objectReader = objectReader;
+        this.clazz = clazz;
     }
 
     /**
@@ -82,8 +80,8 @@ public class ElasticsearchSet<T> extends AbstractSet<T> {
     @Override
     public int size() {
         try {
-            var countRequest = new CountRequest(searchRequest.indices(), searchRequest.source().query());
-            long totalHits = client.count(countRequest, DEFAULT).getCount();
+            var countRequest = new CountRequest.Builder().index(searchRequest.index()).query(searchRequest.query()).build();
+            long totalHits = client.count(countRequest).count();
             return totalHits < Integer.MAX_VALUE ? (int) totalHits : Integer.MAX_VALUE;
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -95,11 +93,11 @@ public class ElasticsearchSet<T> extends AbstractSet<T> {
      */
     private class ElasticsearchIterator implements Iterator<T> {
 
-        private SearchResponse response;
+        private ResponseBody<T> response;
         private int currentIndex;
 
         private ElasticsearchIterator() throws IOException {
-            response = client.search(searchRequest.scroll(timeout), DEFAULT);
+            response = client.search(searchRequest, clazz);
             currentIndex = 0;
         }
 
@@ -110,50 +108,38 @@ public class ElasticsearchSet<T> extends AbstractSet<T> {
          */
         @Override
         public boolean hasNext() {
-            if (currentIndex >= response.getHits().getHits().length) {
+            if (currentIndex >= response.hits().hits().size()) {
                 // Reached the end of the current scroll, collect the next scroll if available.
                 try {
-                    response = client.scroll(new SearchScrollRequest(response.getScrollId()).scroll(timeout), DEFAULT);
+                    var scrollRequest = new ScrollRequest.Builder().scrollId(response.scrollId()).scroll(SCROLL_TIMEOUT).build();
+                    response = client.scroll(scrollRequest, clazz);
                     currentIndex = 0; // Only reset the index once an update has been retrieved.
                 } catch (IOException e) {
                     throw new UncheckedIOException(e);
                 }
             }
-            var hasNext = response.getHits().getHits().length > 0;
+            var hasNext = !response.hits().hits().isEmpty();
             if (!hasNext) {
                 // If no more results are available, clear the scroll context
-                var clearScrollRequest = new ClearScrollRequest();
-                clearScrollRequest.addScrollId(response.getScrollId());
-                client.clearScrollAsync(clearScrollRequest, DEFAULT, new ActionListener<>() {
-                    @Override
-                    public void onResponse(ClearScrollResponse clearScrollResponse) {
-                        // ignored
-                    }
+                var clearScrollRequest = new ClearScrollRequest.Builder()
+                    .scrollId(response.scrollId())
+                    .build();
 
-                    @Override
-                    public void onFailure(Exception e) {
-                        // ignored
-                    }
-                });
+                try {
+                    client.clearScroll(clearScrollRequest);
+                } catch (IOException e) {
+                    // ignored - clearing the scroll is for tidyness reasons
+                }
             }
             return hasNext;
         }
 
-        /**
-         * {@inheritDoc}
-         *
-         * @throws UncheckedIOException if an IO error occurs when decoding the JSON.
-         */
         @Override
         public T next() {
             if (!hasNext()) {
                 throw new NoSuchElementException("End of scroll reached");
             }
-            try {
-                return objectReader.readValue(response.getHits().getHits()[currentIndex++].getSourceRef().streamInput());
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
+            return response.hits().hits().get(currentIndex++).source();
         }
     }
 }

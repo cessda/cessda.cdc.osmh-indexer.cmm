@@ -68,7 +68,7 @@ public class ConsumerScheduler {
                 debuggingJMXBean.printElasticSearchInfo()
             );
 
-            indexerRunner.executeHarvestAndIngest(null);
+            indexerRunner.executeHarvestAndIngest();
 
             final var endTime = OffsetDateTime.now(ZoneId.systemDefault());
             log.info("[{}] Consume and Ingest All SPs Repos:\nEnded at: [{}]\nDuration: [{}] seconds",
