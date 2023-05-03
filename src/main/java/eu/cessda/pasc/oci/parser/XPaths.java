@@ -15,6 +15,7 @@
  */
 package eu.cessda.pasc.oci.parser;
 
+import eu.cessda.pasc.oci.exception.UnsupportedXMLNamespaceException;
 import lombok.*;
 import org.jdom2.Namespace;
 
@@ -156,11 +157,13 @@ public final class XPaths implements Serializable {
 
     /**
      * Get the XPaths for a given XML namespace
+     *
+     * @throws UnsupportedXMLNamespaceException if the namespace is unsupported
      */
     public static XPaths getXPaths(Namespace namespace) {
         var xpaths = XPATH_MAP.get(namespace);
         if (xpaths == null) {
-            throw new IllegalArgumentException("XML namespace \"" + namespace.getURI() + "\" not supported");
+            throw new UnsupportedXMLNamespaceException(namespace);
         }
         return xpaths;
     }
