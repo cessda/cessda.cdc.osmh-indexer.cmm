@@ -16,6 +16,7 @@
 package eu.cessda.pasc.oci.elasticsearch;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch._types.FieldSort;
 import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.SortOrder;
@@ -89,7 +90,11 @@ public class ESIngestServiceTestIT {
      */
     @After
     public void tearDown() throws IOException {
-        elasticsearchClient.indices().delete(DeleteIndexRequest.of(d -> d.index("_all")));
+        try {
+            elasticsearchClient.indices().delete(DeleteIndexRequest.of(d -> d.index(INDEX_NAME)));
+        } catch (ElasticsearchException e) {
+            // ignore all Elasticsearch Exceptions
+        }
     }
 
     @Test

@@ -16,6 +16,7 @@
 package eu.cessda.pasc.oci.parser;
 
 import eu.cessda.pasc.oci.exception.InvalidUniverseException;
+import eu.cessda.pasc.oci.exception.UnsupportedXMLNamespaceException;
 import eu.cessda.pasc.oci.exception.XMLParseException;
 import eu.cessda.pasc.oci.models.Record;
 import eu.cessda.pasc.oci.models.RecordHeader;
@@ -26,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.jdom2.Namespace;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +39,9 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.io.Files.getNameWithoutExtension;
 
@@ -50,6 +55,7 @@ import static com.google.common.io.Files.getNameWithoutExtension;
 public class RecordXMLParser {
 
     private final CMMStudyMapper cmmStudyMapper;
+    Set<Map.Entry<String, Namespace>> suppressedNamespaceWarnings = null;
 
     @Autowired
     public RecordXMLParser(CMMStudyMapper cmmStudyMapper) {
@@ -135,10 +141,27 @@ public class RecordXMLParser {
                 // Marked as deleted, don't store
                 continue;
             }
-            cmmStudies.add(mapDDIRecordToCMMStudy(repo, request, record, path));
+            try {
+                var cmmStudy = mapDDIRecordToCMMStudy(repo, request, record, path);
+                cmmStudies.add(cmmStudy);
+            } catch (UnsupportedXMLNamespaceException e) {
+                logUnsupportedNamespace(repo, record, e);
+            }
         }
 
         return cmmStudies;
+    }
+
+    private void logUnsupportedNamespace(Repo repo, Record record, UnsupportedXMLNamespaceException e) {
+        // Only initialise if required
+        if (suppressedNamespaceWarnings == null) {
+            suppressedNamespaceWarnings = ConcurrentHashMap.newKeySet();
+        }
+        if (suppressedNamespaceWarnings.add(Map.entry(repo.getCode(), e.getNamespace()))) {
+            // Only log on first encounter with this namespace
+            var recordIdentifier = record.recordHeader() != null ? record.recordHeader().getIdentifier() : null;
+            log.warn("[{}]: {} cannot be parsed: {}. Further reports for this namespace have been suppressed.", repo.getCode(), recordIdentifier, e.getMessage());
+        }
     }
 
     private Request parseRecord(Repo repo, Path path, Document document) {

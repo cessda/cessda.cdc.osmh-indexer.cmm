@@ -66,6 +66,7 @@
 
         <!-- Dependency versions -->
         <lombok.version>1.18.26</lombok.version>
+        <elasticsearch.version>8.7.1</elasticsearch.version>
     </properties>
 
     <dependencies>
@@ -80,7 +81,7 @@
         <dependency>
             <groupId>co.elastic.clients</groupId>
             <artifactId>elasticsearch-java</artifactId>
-            <version>7.17.9</version>
+            <version>${elasticsearch.version}</version>
         </dependency>
 
         <!-- Logging -->
@@ -339,9 +340,13 @@
                 <artifactId>elasticsearch-maven-plugin</artifactId>
                 <version>6.26</version>
                 <configuration>
-                    <version>7.17.1</version>
+                    <version>${elasticsearch.version}</version>
                     <httpPort>9250</httpPort>
                     <transportPort>9350</transportPort>
+                    <autoCreateIndex>false</autoCreateIndex>
+                    <environmentVariables>
+                        <ES_JAVA_OPTS>-Xms512m -Xmx512m</ES_JAVA_OPTS>
+                    </environmentVariables>
                 </configuration>
                 <executions>
                     <execution>
