@@ -65,7 +65,7 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
 
         <!-- Dependency versions -->
-        <lombok.version>1.18.26</lombok.version>
+        <lombok.version>1.18.28</lombok.version>
         <elasticsearch.version>8.8.1</elasticsearch.version>
     </properties>
 
