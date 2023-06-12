@@ -144,7 +144,7 @@ public class ESIngestServiceTestIT {
         );
 
         // And state is as expected
-        assert response.hits().total() != null;
+        then(response.hits().total()).isNotNull();
         then(response.hits().total().value()).isEqualTo(3);
         then(response.hits().hits().get(0).id()).isEqualTo("UK-Data-Service__2305");
         then(response.hits().hits().get(1).id()).isEqualTo("UK-Data-Service__999");
@@ -347,7 +347,7 @@ public class ESIngestServiceTestIT {
             CMMStudyOfLanguage.class
         );
 
-        assert response.hits().total() != null;
+        then(response.hits().total()).isNotNull();
         then(response.hits().total().value()).isEqualTo(2); // Should be two studies
         then(response.hits().hits().stream().map(Hit::id)) // Should not contain the deleted study
             .containsExactlyInAnyOrder(studyOfLanguages.get(1).getId(), studyOfLanguages.get(2).getId());
