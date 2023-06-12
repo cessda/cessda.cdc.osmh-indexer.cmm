@@ -54,7 +54,7 @@ class ParsingStrategies {
      */
     static Optional<Country> countryStrategy(Element element) {
         var builder = Country.builder();
-        builder.elementText(cleanCharacterReturns(element.getText()));
+        builder.elementText(cleanReturnCharacters(element.getText()));
         getAttributeValue(element, ABBR_ATTR).ifPresent(builder::isoCode);
         return Optional.of(builder.build());
     }
@@ -112,7 +112,7 @@ class ParsingStrategies {
     static Publisher publisherStrategy(Element element) {
         return Publisher.builder()
             .abbreviation(getAttributeValue(element, ABBR_ATTR).orElse(PUBLISHER_NOT_AVAIL))
-            .name(cleanCharacterReturns(element.getText()))
+            .name(cleanReturnCharacters(element.getText()))
             .build();
     }
 
@@ -120,7 +120,7 @@ class ParsingStrategies {
         var conceptVal = ofNullable(element.getChild(CONCEPT_EL, namespace)).orElse(new Element(EMPTY_EL));
 
         var builder = TermVocabAttributes.builder();
-        builder.term(cleanCharacterReturns(element.getText()));
+        builder.term(cleanReturnCharacters(element.getText()));
         if (hasControlledValue) {
             builder.vocab(getAttributeValue(conceptVal, VOCAB_ATTR).orElse(""))
                 .vocabUri(getAttributeValue(conceptVal, VOCAB_URI_ATTR).orElse(""))
@@ -287,7 +287,7 @@ class ParsingStrategies {
     /**
      * Remove return characters (i.e. {@code \n}) from the string.
      */
-    static String cleanCharacterReturns(String candidate) {
+    static String cleanReturnCharacters(String candidate) {
         return candidate.replace("\n", "").trim();
     }
 
