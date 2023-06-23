@@ -62,10 +62,6 @@ public class RecordXMLParser {
         this.cmmStudyMapper = cmmStudyMapper;
     }
 
-    // Messaging and Exceptions
-    private static final String RECORD_HEADER = "RecordHeader";
-    private static final String STUDY = "Study";
-
     /**
      * Load an XML document from the given path.
      * @param path the path to the XML document.
@@ -79,10 +75,10 @@ public class RecordXMLParser {
         }
     }
 
+    @SuppressWarnings({"java:S131", "java:S1301"}) // There is no need to take action for other element names
     private RecordHeader parseRecordHeader(Element headerElement) {
 
         var recordHeaderBuilder = RecordHeader.builder();
-        recordHeaderBuilder.recordType(RECORD_HEADER);
 
         // Check if the record is deleted
         if (headerElement.hasAttributes()) {
@@ -93,25 +89,14 @@ public class RecordXMLParser {
         // Parse the elements of the header
         var childElements = headerElement.getChildren();
         for (var child : childElements) {
-            final String currentHeaderElementValue;
             switch (child.getName()) {
                 case OaiPmhConstants.IDENTIFIER_ELEMENT -> {
-                    currentHeaderElementValue = child.getText();
-                    recordHeaderBuilder.identifier(currentHeaderElementValue);
+                    String identifier = child.getText();
+                    recordHeaderBuilder.identifier(identifier);
                 }
                 case OaiPmhConstants.DATESTAMP_ELEMENT -> {
-                    currentHeaderElementValue = child.getText();
-                    recordHeaderBuilder.lastModified(currentHeaderElementValue);
-                }
-                case OaiPmhConstants.SET_SPEC_ELEMENT ->
-                    // Note:
-                    // 1 There might be multiple SetSpec: https://www.oaforum.org/tutorial/english/page3.htm#section7
-                    // 2 Depending on feedback from John Shepherdson set record type based on the SetSpec
-                    // For instance for UKDA - DataCollections = Study
-                    // For now we assume all setSpec are a Study as UKDA endpoint repo only holds Studies, SAME for others?
-                    recordHeaderBuilder.type(STUDY);
-                default -> {
-                    // nothing to do
+                    String lastModified = child.getText();
+                    recordHeaderBuilder.lastModified(lastModified);
                 }
             }
         }
@@ -137,7 +122,7 @@ public class RecordXMLParser {
 
         for (var record : request.records()) {
             // Short-Circuit. We carry on to parse beyond the headers only if the record is active.
-            if ((record.recordHeader() != null && record.recordHeader().isDeleted())) {
+            if ((record.recordHeader() != null && record.recordHeader().deleted())) {
                 // Marked as deleted, don't store
                 continue;
             }
@@ -159,7 +144,7 @@ public class RecordXMLParser {
         }
         if (suppressedNamespaceWarnings.add(Map.entry(repo.getCode(), e.getNamespace()))) {
             // Only log on first encounter with this namespace
-            var recordIdentifier = record.recordHeader() != null ? record.recordHeader().getIdentifier() : null;
+            var recordIdentifier = record.recordHeader() != null ? record.recordHeader().identifier() : null;
             log.warn("[{}]: {} cannot be parsed: {}. Further reports for this namespace have been suppressed.", repo.getCode(), recordIdentifier, e.getMessage());
         }
     }
@@ -222,8 +207,8 @@ public class RecordXMLParser {
         String lastModified;
         if (record.recordHeader() != null) {
             // A header was present, extract values
-            studyNumber = record.recordHeader().getIdentifier();
-            lastModified = record.recordHeader().getLastModified();
+            studyNumber = record.recordHeader().identifier();
+            lastModified = record.recordHeader().lastModified();
         } else {
             // Derive the study number from the file name
             studyNumber = getNameWithoutExtension(path.toString());

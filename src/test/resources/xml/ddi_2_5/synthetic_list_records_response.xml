@@ -330,5 +330,14 @@
                 </codeBook>
             </metadata>
         </record>
+        <record>
+            <header>
+                <identifier>unsupported-namespace</identifier>
+                <datestamp>2008-02-08</datestamp>
+            </header>
+            <metadata>
+                <unsupported xmlns="unsupported"/>
+            </metadata>
+        </record>
     </ListRecords>
 </OAI-PMH>

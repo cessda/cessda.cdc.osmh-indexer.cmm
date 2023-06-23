@@ -16,24 +16,18 @@
 package eu.cessda.pasc.oci.models;
 
 import lombok.Builder;
-import lombok.Value;
 
 /**
  * Represents an OAI-PMH header.
  *
+ * @param deleted Deletion status on the remote repository
  * @author moses AT doraventures DOT com
  * @see <a href="http://www.openarchives.org/OAI/openarchivesprotocol.html#Record">http://www.openarchives.org/OAI/openarchivesprotocol.html#Record</a>
  */
 @Builder
-@Value
-public class RecordHeader {
-
-    String lastModified;
-    String type;
-    String recordType;
-    String identifier;
-    /**
-     * Deletion status on the remote repository
-     */
-    boolean deleted;
+public record RecordHeader(
+    String lastModified,
+    String identifier,
+    boolean deleted
+) {
 }
