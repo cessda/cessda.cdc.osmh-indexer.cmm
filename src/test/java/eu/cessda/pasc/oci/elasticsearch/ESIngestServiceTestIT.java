@@ -16,14 +16,15 @@
 package eu.cessda.pasc.oci.elasticsearch;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.ElasticsearchException;
-import co.elastic.clients.elasticsearch._types.FieldSort;
-import co.elastic.clients.elasticsearch._types.SortOptions;
-import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.*;
 import co.elastic.clients.elasticsearch._types.query_dsl.IdsQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MatchAllQuery;
+import co.elastic.clients.elasticsearch.core.BulkRequest;
+import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.GetRequest;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
+import co.elastic.clients.elasticsearch.core.bulk.OperationType;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.indices.DeleteIndexRequest;
 import co.elastic.clients.elasticsearch.indices.RefreshRequest;
@@ -55,8 +56,7 @@ import static org.assertj.core.api.BDDAssertions.then;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.*;
 
 
 /**
@@ -123,6 +123,45 @@ public class ESIngestServiceTestIT {
         // Verify that the document is considered equal
         var actual = response.hits().hits().get(0).source();
         then(actual).isEqualTo(expected);
+    }
+
+    @Test
+    public void shouldHandleErrorsWhenIndexing() throws IOException, IndexingException {
+        ElasticsearchClient mockClient = spy(elasticsearchClient);
+
+        // Given
+        List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX1();
+        ESIngestService ingestService = new ESIngestService(mockClient, esConfigProp);
+
+
+        var bulkItem = new BulkResponseItem.Builder()
+            .index(INDEX_NAME)
+            .error(new ErrorCause.Builder().type("mocked_error").build())
+            .operationType(OperationType.Index)
+            .status(400)
+            .build();
+
+        var mappingError = new BulkResponseItem.Builder()
+            .index(INDEX_NAME)
+            .error(new ErrorCause.Builder().type("strict_dynamic_mapping_exception").build())
+            .operationType(OperationType.Index)
+            .status(400)
+            .build();
+
+        // Create the mock response
+        var mockResponse = new BulkResponse.Builder()
+            .errors(true)
+            .items(List.of(bulkItem, mappingError))
+            .took(0)
+            .build();
+
+        doReturn(mockResponse).when(mockClient).bulk(any(BulkRequest.class));
+
+        // When
+        ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
+
+        // Then
+        then(ingestService.getAllStudies("*")).isEmpty();
     }
 
     @Test
