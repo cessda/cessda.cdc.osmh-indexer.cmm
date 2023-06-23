@@ -53,10 +53,11 @@ class ParsingStrategies {
      * @return an Optional {@link Country}.
      */
     static Optional<Country> countryStrategy(Element element) {
-        var builder = Country.builder();
-        builder.elementText(cleanCharacterReturns(element.getText()));
-        getAttributeValue(element, ABBR_ATTR).ifPresent(builder::isoCode);
-        return Optional.of(builder.build());
+        var country = new Country(
+            getAttributeValue(element, ABBR_ATTR).orElse(null),
+            cleanCharacterReturns(element.getText()), null
+        );
+        return Optional.of(country);
     }
 
     /**
@@ -69,9 +70,11 @@ class ParsingStrategies {
      * @return an Optional {@link Pid}.
      */
     static Optional<Pid> pidStrategy(Element element) {
-        var agencyBuilder = Pid.builder().elementText(element.getText());
-        getAttributeValue(element, AGENCY_ATTR).ifPresent(agencyBuilder::agency);
-        return Optional.of(agencyBuilder.build());
+        var pid = new Pid(
+            getAttributeValue(element, AGENCY_ATTR).orElse(null),
+            element.getText()
+        );
+        return Optional.of(pid);
     }
 
     /**
@@ -110,27 +113,37 @@ class ParsingStrategies {
      * @return a {@link Publisher}.
      */
     static Publisher publisherStrategy(Element element) {
-        return Publisher.builder()
-            .abbreviation(getAttributeValue(element, ABBR_ATTR).orElse(PUBLISHER_NOT_AVAIL))
-            .name(cleanCharacterReturns(element.getText()))
-            .build();
+        return new Publisher(
+            getAttributeValue(element, ABBR_ATTR).orElse(PUBLISHER_NOT_AVAIL),
+            cleanCharacterReturns(element.getText())
+        );
     }
 
     static Optional<TermVocabAttributes> termVocabAttributeStrategy(Element element, Namespace namespace, boolean hasControlledValue) {
-        var conceptVal = ofNullable(element.getChild(CONCEPT_EL, namespace)).orElse(new Element(EMPTY_EL));
+        // The term always comes from the original element
+        var term = cleanCharacterReturns(element.getText());
 
-        var builder = TermVocabAttributes.builder();
-        builder.term(cleanCharacterReturns(element.getText()));
+        // If hasControlledValue is true extract the identifier from the element text,
+        // otherwise lookup the id from the ID_ATTR attribute
+        Element vocabElement;
+        String id;
         if (hasControlledValue) {
-            builder.vocab(getAttributeValue(conceptVal, VOCAB_ATTR).orElse(""))
-                .vocabUri(getAttributeValue(conceptVal, VOCAB_URI_ATTR).orElse(""))
-                .id(conceptVal.getText());
+            // Try to find a concept element
+            vocabElement = ofNullable(element.getChild(CONCEPT_EL, namespace)).orElse(new Element(EMPTY_EL));
+            id = vocabElement.getText();
         } else {
-            builder.vocab(getAttributeValue(element, VOCAB_ATTR).orElse(""))
-                .vocabUri(getAttributeValue(element, VOCAB_URI_ATTR).orElse(""))
-                .id(getAttributeValue(element, ID_ATTR).orElse(""));
+            // Use the original element as the source of the vocabulary
+            vocabElement = element;
+            id = getAttributeValue(element, ID_ATTR).orElse("");
         }
-        return Optional.of(builder.build());
+
+        var termVocab = new TermVocabAttributes(
+            getAttributeValue(vocabElement, VOCAB_ATTR).orElse(""),
+            getAttributeValue(vocabElement, VOCAB_URI_ATTR).orElse(""),
+            id,
+            term
+        );
+        return Optional.of(termVocab);
     }
 
     /**
@@ -150,21 +163,19 @@ class ParsingStrategies {
         }
     }
 
-    static Optional<VocabAttributes> samplingTermVocabAttributeStrategy(Element element, Namespace namespace, boolean hasControlledValue) {
+    static Optional<VocabAttributes> samplingTermVocabAttributeStrategy(Element element, Namespace namespace) {
         //PUG req. only process if element has a <concept>
-        return ofNullable(element.getChild(CONCEPT_EL, namespace)).map(conceptVal -> {
-            var builder = VocabAttributes.builder();
-            if (hasControlledValue) {
-                builder.vocab(getAttributeValue(conceptVal, VOCAB_ATTR).orElse(""))
-                    .vocabUri(getAttributeValue(conceptVal, VOCAB_URI_ATTR).orElse(""))
-                    .id(conceptVal.getText());
-            } else {
-                builder.vocab(getAttributeValue(element, VOCAB_ATTR).orElse(""))
-                    .vocabUri(getAttributeValue(element, VOCAB_URI_ATTR).orElse(""))
-                    .id(getAttributeValue(element, ID_ATTR).orElse(""));
-            }
-            return builder.build();
-        });
+        var conceptVal = element.getChild(CONCEPT_EL, namespace);
+        if (conceptVal != null) {
+            var vocabAttributes = new VocabAttributes(
+                getAttributeValue(conceptVal, VOCAB_ATTR).orElse(""),
+                getAttributeValue(conceptVal, VOCAB_URI_ATTR).orElse(""),
+                conceptVal.getText()
+            );
+            return Optional.of(vocabAttributes);
+        } else {
+            return Optional.empty();
+        }
     }
 
     /**
@@ -179,10 +190,11 @@ class ParsingStrategies {
     static Optional<DataCollectionFreeText> dataCollFreeTextStrategy(Element element) {
         // #243: Extract in all cases - previously if the @date attribute was present extraction was skipped
         if (!element.getText().isEmpty()) {
-            var builder = DataCollectionFreeText.builder()
-                .elementText(element.getText());
-            getAttributeValue(element, EVENT_ATTR).ifPresent(builder::event);
-            return Optional.of(builder.build());
+            var dataCollectionFreeText = new DataCollectionFreeText(
+                element.getText(),
+                getAttributeValue(element, EVENT_ATTR).orElse(null)
+            );
+            return Optional.of(dataCollectionFreeText);
         }
 
         return Optional.empty();

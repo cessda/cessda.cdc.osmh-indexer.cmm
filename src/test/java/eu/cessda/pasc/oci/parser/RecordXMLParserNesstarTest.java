@@ -126,10 +126,10 @@ public class RecordXMLParserNesstarTest {
         var record = new RecordXMLParser(cmmStudyMapper).getRecord(nesstarRepo, Path.of(expectedCmmStudyJsonString.toURI())).get(0);
 
         // Then
-        then(record.getTitleStudy().containsKey("xy")).isTrue();
-        then(record.getAbstractField().containsKey("xy")).isTrue();
-        then(record.getKeywords().containsKey("xy")).isTrue();
-        then(record.getDataAccessFreeTexts().containsKey("xy")).isTrue();
+        then(record.titleStudy().containsKey("xy")).isTrue();
+        then(record.abstractField().containsKey("xy")).isTrue();
+        then(record.keywords().containsKey("xy")).isTrue();
+        then(record.dataAccessFreeTexts().containsKey("xy")).isTrue();
     }
 
     @Test
@@ -145,8 +145,8 @@ public class RecordXMLParserNesstarTest {
 
         // Then
         then(record).hasSize(1);
-        then(record.get(0).getAbstractField().size()).isEqualTo(4);
-        then(record.get(0).getAbstractField()).isEqualTo(expectedAbstract);
+        then(record.get(0).abstractField().size()).isEqualTo(4);
+        then(record.get(0).abstractField()).isEqualTo(expectedAbstract);
         validateCMMStudyResultAgainstSchema(record.get(0));
     }
 
@@ -164,8 +164,8 @@ public class RecordXMLParserNesstarTest {
 
         // Then
         then(record).hasSize(1);
-        then(record.get(0).getTitleStudy().size()).isEqualTo(2);
-        then(record.get(0).getTitleStudy()).isEqualTo(expectedTitle);
+        then(record.get(0).titleStudy().size()).isEqualTo(2);
+        then(record.get(0).titleStudy()).isEqualTo(expectedTitle);
         validateCMMStudyResultAgainstSchema(record.get(0));
     }
 
@@ -254,6 +254,6 @@ public class RecordXMLParserNesstarTest {
         validateCMMStudyResultAgainstSchema(result.get(0));
 
         // Assert the language is as expected
-        Assert.assertNotNull(result.get(0).getTitleStudy().get("zz"));
+        Assert.assertNotNull(result.get(0).titleStudy().get("zz"));
     }
 }

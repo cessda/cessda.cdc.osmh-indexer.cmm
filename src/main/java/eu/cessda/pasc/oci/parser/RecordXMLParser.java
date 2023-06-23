@@ -36,7 +36,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -225,9 +225,15 @@ public class RecordXMLParser {
             studyNumber = record.recordHeader().getIdentifier();
             lastModified = record.recordHeader().getLastModified();
         } else {
-            // Derive the study number from the file name, set last modified to the current time
+            // Derive the study number from the file name
             studyNumber = getNameWithoutExtension(path.toString());
-            lastModified = LocalDateTime.now().toString();
+            try {
+                // Set last modified to the file modified time if the header is not present or invalid
+                lastModified = Files.getLastModifiedTime(path).toString();
+            } catch (IOException e) {
+                // Fallback - use the current time
+                lastModified = OffsetDateTime.now().toString();
+            }
         }
 
         builder.studyNumber(studyNumber);

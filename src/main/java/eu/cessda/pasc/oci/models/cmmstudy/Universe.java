@@ -17,7 +17,6 @@ package eu.cessda.pasc.oci.models.cmmstudy;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
 
 /**
  * The group of persons or other elements that are the object of research and to which any analytic results refer.
@@ -29,25 +28,17 @@ import lombok.Data;
  * <universe clusion="E">Individuals younger than 15 and older than 19 years of age.</universe>
  * }
  * </pre>
+ *
+ * @param inclusion The inclusion of this universe.
+ * @param exclusion The exclusion of this universe. This field is optional.
  */
-@Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Universe {
-
-    /**
-     * The inclusion of this universe.
-     */
-    @JsonProperty("inclusion")
-    String inclusion;
-
-    /**
-     * The exclusion of this universe. This field is optional.
-     */
-    @JsonProperty("exclusion")
-    String exclusion;
-
+public record Universe(
+    @JsonProperty("inclusion") String inclusion,
+    @JsonProperty("exclusion") String exclusion
+) {
     /**
      * Is the universe included or excluded.
      */
-    public enum Clusion { I, E }
+    public enum Clusion {I, E}
 }

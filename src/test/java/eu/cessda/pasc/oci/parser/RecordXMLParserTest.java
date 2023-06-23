@@ -97,14 +97,14 @@ public class RecordXMLParserTest {
         var result = optionalResult.get(0);
 
         // Verifies timeMeth extraction
-        then(result.getTypeOfTimeMethods().size()).isEqualTo(2);
-        then(result.getTypeOfTimeMethods().get("fi").get(0).getTerm()).isEqualTo("Pitkittäisaineisto: trendi/toistuva poikkileikkausaineisto");
-        then(result.getTypeOfTimeMethods().get("en").get(0).getTerm()).isEqualTo("Longitudinal: Trend/Repeated cross-section");
+        then(result.typeOfTimeMethods().size()).isEqualTo(2);
+        then(result.typeOfTimeMethods().get("fi").get(0).term()).isEqualTo("Pitkittäisaineisto: trendi/toistuva poikkileikkausaineisto");
+        then(result.typeOfTimeMethods().get("en").get(0).term()).isEqualTo("Longitudinal: Trend/Repeated cross-section");
 
         // Verifies unitTypes extraction
-        then(result.getUnitTypes().size()).isEqualTo(2);
-        then(result.getUnitTypes().get("fi").get(0).getTerm()).isEqualTo("Henkilö");
-        then(result.getUnitTypes().get("en").get(0).getTerm()).isEqualTo("Individual");
+        then(result.unitTypes().size()).isEqualTo(2);
+        then(result.unitTypes().get("fi").get(0).term()).isEqualTo("Henkilö");
+        then(result.unitTypes().get("en").get(0).term()).isEqualTo("Individual");
     }
 
     @Test
@@ -171,8 +171,8 @@ public class RecordXMLParserTest {
         var record = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
 
         then(record).hasSize(1);
-        then(record.get(0).getAbstractField().size()).isEqualTo(3);
-        then(record.get(0).getAbstractField()).isEqualTo(expectedAbstract);
+        then(record.get(0).abstractField().size()).isEqualTo(3);
+        then(record.get(0).abstractField()).isEqualTo(expectedAbstract);
         validateCMMStudyResultAgainstSchema(record.get(0));
     }
 
@@ -191,8 +191,8 @@ public class RecordXMLParserTest {
         var record = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
 
         then(record).hasSize(1);
-        then(record.get(0).getTitleStudy().size()).isEqualTo(3);
-        then(record.get(0).getTitleStudy()).isEqualTo(expectedTitle);
+        then(record.get(0).titleStudy().size()).isEqualTo(3);
+        then(record.get(0).titleStudy()).isEqualTo(expectedTitle);
         validateCMMStudyResultAgainstSchema(record.get(0));
     }
 
@@ -281,7 +281,7 @@ public class RecordXMLParserTest {
         validateCMMStudyResultAgainstSchema(result.get(0));
 
         // Assert the language is as expected
-        Assert.assertNotNull(result.get(0).getTitleStudy().get("zz"));
+        Assert.assertNotNull(result.get(0).titleStudy().get("zz"));
     }
 
     @Test

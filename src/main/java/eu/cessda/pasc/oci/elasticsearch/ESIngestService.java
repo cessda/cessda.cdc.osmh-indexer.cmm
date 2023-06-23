@@ -92,7 +92,7 @@ public class ESIngestService implements IngestService {
         for (var study : languageCMMStudiesMap) {
             var indexRequest = new IndexOperation.Builder<CMMStudyOfLanguage>()
                 .index(indexName)
-                .id(study.getId())
+                .id(study.id())
                 .document(study)
                 .build();
 
@@ -158,7 +158,7 @@ public class ESIngestService implements IngestService {
 
         // Extract the ids from the studies, and add them to the delete query
         var deleteRequests = cmmStudiesToDelete.stream()
-            .map(CMMStudyOfLanguage::getId)
+            .map(CMMStudyOfLanguage::id)
             .map(id -> new DeleteOperation.Builder().index(indexName).id(id).build())
             .map(BulkOperation::new)
             .toList();
@@ -263,10 +263,10 @@ public class ESIngestService implements IngestService {
         }
 
         try {
-            var localDateTime = TimeUtility.getLocalDateTime(study.getLastModified());
+            var localDateTime = TimeUtility.getLocalDateTime(study.lastModified());
             return Optional.of(localDateTime.withHour(0).withMinute(0).withSecond(0).withNano(0));
         } catch (DateNotParsedException e) {
-            log.error("[{}] lastModified field is not a valid ISO date: {}", study.getId(), e.toString());
+            log.error("[{}] lastModified field is not a valid ISO date: {}", study.id(), e.toString());
             return Optional.empty();
         }
     }

@@ -17,8 +17,6 @@ package eu.cessda.pasc.oci.models.cmmstudy;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Value;
 
 /**
  * DataCollectionFreeText pojo to hold
@@ -27,13 +25,9 @@ import lombok.Value;
  *
  * @author moses AT doraventures DOT com
  */
-@Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Value
-public class DataCollectionFreeText {
-
-    @JsonProperty("dataCollectionFreeText")
-    String elementText;
-    @JsonProperty("event")
-    String event;
+public record DataCollectionFreeText(
+    @JsonProperty("dataCollectionFreeText") String elementText,
+    @JsonProperty("event") String event
+) {
 }

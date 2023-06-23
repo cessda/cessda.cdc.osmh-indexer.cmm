@@ -113,7 +113,7 @@ public class ESIngestServiceTestIT {
         // Then
         elasticsearchClient.indices().refresh(RefreshRequest.of(r -> r.index(INDEX_NAME)));
         var response = elasticsearchClient.search(
-            SearchRequest.of(s -> s.index(INDEX_NAME).query(IdsQuery.of(i -> i.values(expected.getId()))._toQuery())),
+            SearchRequest.of(s -> s.index(INDEX_NAME).query(IdsQuery.of(i -> i.values(expected.id()))._toQuery())),
             CMMStudyOfLanguage.class
         );
 
@@ -254,7 +254,7 @@ public class ESIngestServiceTestIT {
 
         // Then - check if all studies are present
         for (var expectedStudy : studyOfLanguages) {
-            var study = ingestService.getStudy(expectedStudy.getId(), LANGUAGE_ISO_CODE);
+            var study = ingestService.getStudy(expectedStudy.id(), LANGUAGE_ISO_CODE);
             assertEquals(expectedStudy, study.orElseThrow());
         }
     }
@@ -299,7 +299,7 @@ public class ESIngestServiceTestIT {
         var expectedStudy = studyOfLanguages.get(0);
 
         // Then
-        var study = ingestService.getStudy(expectedStudy.getId(), LANGUAGE_ISO_CODE);
+        var study = ingestService.getStudy(expectedStudy.id(), LANGUAGE_ISO_CODE);
 
         Assert.assertEquals(Optional.empty(), study);
     }
@@ -335,7 +335,7 @@ public class ESIngestServiceTestIT {
         // Then - the study should not be present, but other studies should be
         elasticsearchClient.indices().refresh(RefreshRequest.of(r -> r.index(INDEX_NAME)));
         assertFalse(elasticsearchClient.get(
-            GetRequest.of(g -> g.index(INDEX_NAME).id(studyToDelete.get(0).getId())), Void.class
+            GetRequest.of(g -> g.index(INDEX_NAME).id(studyToDelete.get(0).id())), Void.class
         ).found());
 
         var response = elasticsearchClient.search(
@@ -350,7 +350,7 @@ public class ESIngestServiceTestIT {
         then(response.hits().total()).isNotNull();
         then(response.hits().total().value()).isEqualTo(2); // Should be two studies
         then(response.hits().hits().stream().map(Hit::id)) // Should not contain the deleted study
-            .containsExactlyInAnyOrder(studyOfLanguages.get(1).getId(), studyOfLanguages.get(2).getId());
+            .containsExactlyInAnyOrder(studyOfLanguages.get(1).id(), studyOfLanguages.get(2).id());
     }
 
     @Test
@@ -371,7 +371,7 @@ public class ESIngestServiceTestIT {
         elasticsearchClient.indices().refresh(RefreshRequest.of(r -> r.index(INDEX_NAME)));
 
         // Given
-        var repoCode = studyOfLanguages.get(0).getCode();
+        var repoCode = studyOfLanguages.get(0).code();
 
         // Expect 3 studies to be returned
         var studies = ingestService.getStudiesByRepository(repoCode, LANGUAGE_ISO_CODE);

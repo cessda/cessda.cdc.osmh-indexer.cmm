@@ -15,8 +15,6 @@
  */
 package eu.cessda.pasc.oci.models.cmmstudy;
 
-import lombok.Builder;
-import lombok.Value;
 
 /**
  * VocabAttributes pojo to hold the control vocab attributes of element:
@@ -28,10 +26,5 @@ import lombok.Value;
  *
  * @author moses AT doraventures DOT com
  */
-@Builder
-@Value
-public class VocabAttributes {
-    String vocab;
-    String vocabUri;
-    String id;
+public record VocabAttributes(String vocab, String vocabUri, String id) {
 }
