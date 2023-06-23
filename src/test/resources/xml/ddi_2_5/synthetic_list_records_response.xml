@@ -339,5 +339,14 @@
                 <unsupported xmlns="unsupported"/>
             </metadata>
         </record>
+        <record>
+            <header>
+                <identifier>unsupported-namespace-2</identifier>
+                <datestamp>2008-02-09</datestamp>
+            </header>
+            <metadata>
+                <unsupported xmlns="unsupported"/>
+            </metadata>
+        </record>
     </ListRecords>
 </OAI-PMH>
