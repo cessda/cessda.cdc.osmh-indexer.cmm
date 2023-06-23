@@ -161,7 +161,7 @@ public class ESIngestServiceTestIT {
         ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
 
         // Then
-        then(ingestService.getAllStudies("*")).isEmpty();
+        then(ingestService.getTotalHitCount("*")).isZero();
     }
 
     @Test
