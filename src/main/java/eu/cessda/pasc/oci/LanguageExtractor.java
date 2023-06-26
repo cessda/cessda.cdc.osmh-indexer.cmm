@@ -19,6 +19,7 @@ import com.neovisionaries.i18n.CountryCode;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
+import eu.cessda.pasc.oci.models.cmmstudy.Country;
 import eu.cessda.pasc.oci.models.cmmstudy.Publisher;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.extern.slf4j.Slf4j;
@@ -65,7 +66,7 @@ public class LanguageExtractor {
                 langCode -> getCmmStudyOfLanguage(cmmStudy, langCode, validLanguages, repository)
             ));
         } else {
-            log.debug("[{}] No valid languages for study [{}]", repository.getCode(), cmmStudy.getStudyNumber());
+            log.debug("[{}] No valid languages for study [{}]", repository.getCode(), cmmStudy.studyNumber());
             return Collections.emptyMap();
         }
     }
@@ -82,76 +83,76 @@ public class LanguageExtractor {
     boolean isValidCMMStudyForLang(CMMStudy cmmStudy, String languageIsoCode) {
         // the CMM record must meet the minimum CMM Fields requirements for given Lang Iso Code
         // It must have a title, an abstract field, a study number and a publisher
-        return (cmmStudy.getTitleStudy() != null) && (cmmStudy.getTitleStudy().get(languageIsoCode) != null) &&
-            (cmmStudy.getAbstractField() != null) && (cmmStudy.getAbstractField().get(languageIsoCode) != null) &&
-            (cmmStudy.getStudyNumber() != null) && !cmmStudy.getStudyNumber().isEmpty() &&
-            (cmmStudy.getPublisher() != null) && (cmmStudy.getPublisher().get(languageIsoCode) != null);
+        return (cmmStudy.titleStudy() != null) && (cmmStudy.titleStudy().get(languageIsoCode) != null) &&
+            (cmmStudy.abstractField() != null) && (cmmStudy.abstractField().get(languageIsoCode) != null) &&
+            (cmmStudy.studyNumber() != null) && !cmmStudy.studyNumber().isEmpty() &&
+            (cmmStudy.publisher() != null) && (cmmStudy.publisher().get(languageIsoCode) != null);
     }
 
     private CMMStudyOfLanguage getCmmStudyOfLanguage(CMMStudy cmmStudy, String lang, Collection<String> availableLanguages, Repo repository) {
 
-        log.trace("[{}] Extracting CMMStudyOfLanguage for study [{}], language [{}]", repository.getCode(), cmmStudy.getStudyNumber(), lang);
+        log.trace("[{}] Extracting CMMStudyOfLanguage for study [{}], language [{}]", repository.getCode(), cmmStudy.studyNumber(), lang);
 
         CMMStudyOfLanguage.CMMStudyOfLanguageBuilder builder = CMMStudyOfLanguage.builder();
 
         // Identifier generation -
-        var id = cmmStudy.getRepositoryUrl() + "-" + cmmStudy.getStudyNumber();
+        var id = cmmStudy.repositoryUrl() + "-" + cmmStudy.studyNumber();
         var hashedId = DigestUtils.sha256Hex(id.getBytes(StandardCharsets.UTF_8));
 
         // Language neutral specific field extraction
         // UK Data Service = UK-Data-Service__
         builder.id(hashedId)
             .code(repository.getCode())
-            .studyNumber(cmmStudy.getStudyNumber())
-            .lastModified(cmmStudy.getLastModified())
-            .publicationYear(cmmStudy.getPublicationYear())
-            .fileLanguages(cmmStudy.getFileLanguages())
-            .dataCollectionPeriodStartdate(cmmStudy.getDataCollectionPeriodStartdate())
-            .dataCollectionPeriodEnddate(cmmStudy.getDataCollectionPeriodEnddate())
-            .dataCollectionYear(cmmStudy.getDataCollectionYear())
+            .studyNumber(cmmStudy.studyNumber())
+            .lastModified(cmmStudy.lastModified())
+            .publicationYear(cmmStudy.publicationYear())
+            .fileLanguages(cmmStudy.fileLanguages())
+            .dataCollectionPeriodStartdate(cmmStudy.dataCollectionPeriodStartdate())
+            .dataCollectionPeriodEnddate(cmmStudy.dataCollectionPeriodEnddate())
+            .dataCollectionYear(cmmStudy.dataCollectionYear())
             .langAvailableIn(Set.copyOf(availableLanguages));
-        Optional.ofNullable(cmmStudy.getStudyXmlSourceUrl()).ifPresent(url -> builder.studyXmlSourceUrl(url.toString()));
+        Optional.ofNullable(cmmStudy.studyXmlSourceUrl()).ifPresent(url -> builder.studyXmlSourceUrl(url.toString()));
 
 
         // #430: Set the publisher filter based on the source repository.
-        builder.publisherFilter(Publisher.builder().name(repository.getName()).abbreviation(repository.getCode()).build());
+        builder.publisherFilter(new Publisher(repository.getCode(), repository.getName()));
 
         // Language specific field extraction
-        Optional.ofNullable(cmmStudy.getTitleStudy()).map(map -> map.get(lang)).ifPresent(builder::titleStudy);
-        Optional.ofNullable(cmmStudy.getAbstractField()).map(map -> map.get(lang)).ifPresent(builder::abstractField);
-        Optional.ofNullable(cmmStudy.getKeywords()).map(map -> map.get(lang)).ifPresent(builder::keywords);
-        Optional.ofNullable(cmmStudy.getClassifications()).map(map -> map.get(lang)).ifPresent(builder::classifications);
-        Optional.ofNullable(cmmStudy.getTypeOfTimeMethods()).map(map -> map.get(lang)).ifPresent(builder::typeOfTimeMethods);
-        var countries = Optional.ofNullable(cmmStudy.getStudyAreaCountries())
+        Optional.ofNullable(cmmStudy.titleStudy()).map(map -> map.get(lang)).ifPresent(builder::titleStudy);
+        Optional.ofNullable(cmmStudy.abstractField()).map(map -> map.get(lang)).ifPresent(builder::abstractField);
+        Optional.ofNullable(cmmStudy.keywords()).map(map -> map.get(lang)).ifPresent(builder::keywords);
+        Optional.ofNullable(cmmStudy.classifications()).map(map -> map.get(lang)).ifPresent(builder::classifications);
+        Optional.ofNullable(cmmStudy.typeOfTimeMethods()).map(map -> map.get(lang)).ifPresent(builder::typeOfTimeMethods);
+        var countries = Optional.ofNullable(cmmStudy.studyAreaCountries())
             .map(map -> map.get(lang)).stream().flatMap(Collection::stream)
             // If the ISO code is not valid, then the optional will be empty
-            .map(country -> Optional.ofNullable(CountryCode.getByCode(country.getIsoCode()))
+            .map(country -> Optional.ofNullable(CountryCode.getByCode(country.isoCode()))
                 .map(CountryCode::getName)
-                .map(country::withSearchField)
+                .map(countryName -> new Country(country.isoCode(), country.elementText(), countryName))
                 .orElse(country)
-            ).collect(Collectors.toList());
+            ).toList();
         builder.studyAreaCountries(countries);
-        Optional.ofNullable(cmmStudy.getUnitTypes()).map(map -> map.get(lang)).ifPresent(builder::unitTypes);
-        Optional.ofNullable(cmmStudy.getPidStudies()).map(map -> map.get(lang)).ifPresent(builder::pidStudies);
-        Optional.ofNullable(cmmStudy.getCreators()).map(map -> map.get(lang)).ifPresent(builder::creators);
-        Optional.ofNullable(cmmStudy.getTypeOfSamplingProcedures()).map(map -> map.get(lang)).ifPresent(builder::typeOfSamplingProcedures);
-        Optional.ofNullable(cmmStudy.getSamplingProcedureFreeTexts()).map(map -> map.get(lang)).ifPresent(builder::samplingProcedureFreeTexts);
-        Optional.ofNullable(cmmStudy.getTypeOfModeOfCollections()).map(map -> map.get(lang)).ifPresent(builder::typeOfModeOfCollections);
-        Optional.ofNullable(cmmStudy.getTitleStudy()).map(map -> map.get(lang)).ifPresent(builder::titleStudy);
-        Optional.ofNullable(cmmStudy.getDataCollectionFreeTexts()).map(map -> map.get(lang)).ifPresent(builder::dataCollectionFreeTexts);
-        Optional.ofNullable(cmmStudy.getDataAccessFreeTexts()).map(map -> map.get(lang)).ifPresent(builder::dataAccessFreeTexts);
-        Optional.ofNullable(cmmStudy.getPublisher()).map(map -> map.get(lang)).ifPresent(builder::publisher);
-        Optional.ofNullable(cmmStudy.getUniverse()).map(map -> map.get(lang)).ifPresent(builder::universe);
+        Optional.ofNullable(cmmStudy.unitTypes()).map(map -> map.get(lang)).ifPresent(builder::unitTypes);
+        Optional.ofNullable(cmmStudy.pidStudies()).map(map -> map.get(lang)).ifPresent(builder::pidStudies);
+        Optional.ofNullable(cmmStudy.creators()).map(map -> map.get(lang)).ifPresent(builder::creators);
+        Optional.ofNullable(cmmStudy.typeOfSamplingProcedures()).map(map -> map.get(lang)).ifPresent(builder::typeOfSamplingProcedures);
+        Optional.ofNullable(cmmStudy.samplingProcedureFreeTexts()).map(map -> map.get(lang)).ifPresent(builder::samplingProcedureFreeTexts);
+        Optional.ofNullable(cmmStudy.typeOfModeOfCollections()).map(map -> map.get(lang)).ifPresent(builder::typeOfModeOfCollections);
+        Optional.ofNullable(cmmStudy.titleStudy()).map(map -> map.get(lang)).ifPresent(builder::titleStudy);
+        Optional.ofNullable(cmmStudy.dataCollectionFreeTexts()).map(map -> map.get(lang)).ifPresent(builder::dataCollectionFreeTexts);
+        Optional.ofNullable(cmmStudy.dataAccessFreeTexts()).map(map -> map.get(lang)).ifPresent(builder::dataAccessFreeTexts);
+        Optional.ofNullable(cmmStudy.publisher()).map(map -> map.get(lang)).ifPresent(builder::publisher);
+        Optional.ofNullable(cmmStudy.universe()).map(map -> map.get(lang)).ifPresent(builder::universe);
 
         // #502 - Use any language to set related publications, override with language specific field if presenet
-        Optional.ofNullable(cmmStudy.getRelatedPublications()).flatMap(map -> map.values().stream().filter(Objects::nonNull).findAny()).ifPresent(builder::relatedPublications);
-        Optional.ofNullable(cmmStudy.getRelatedPublications()).map(map -> map.get(lang)).ifPresent(builder::relatedPublications);
+        Optional.ofNullable(cmmStudy.relatedPublications()).flatMap(map -> map.values().stream().filter(Objects::nonNull).findAny()).ifPresent(builder::relatedPublications);
+        Optional.ofNullable(cmmStudy.relatedPublications()).map(map -> map.get(lang)).ifPresent(builder::relatedPublications);
 
         // #142 - Use any language to set the study url field
-        Optional.ofNullable(cmmStudy.getStudyUrl()).flatMap(map -> map.values().stream().filter(Objects::nonNull).findAny()).ifPresent(builder::studyUrl);
+        Optional.ofNullable(cmmStudy.studyUrl()).flatMap(map -> map.values().stream().filter(Objects::nonNull).findAny()).ifPresent(builder::studyUrl);
 
         // Override with the language specific variant
-        Optional.ofNullable(cmmStudy.getStudyUrl()).map(map -> map.get(lang)).ifPresent(builder::studyUrl);
+        Optional.ofNullable(cmmStudy.studyUrl()).map(map -> map.get(lang)).ifPresent(builder::studyUrl);
 
         return builder.build();
     }

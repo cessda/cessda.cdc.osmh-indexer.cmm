@@ -18,9 +18,7 @@ package eu.cessda.pasc.oci.models.cmmstudy;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Value;
 import lombok.With;
 
 import java.net.URI;
@@ -31,96 +29,40 @@ import java.util.Set;
 /**
  * Model representing a CMMStudy. Used to deserialize documents from json.
  *
+ * @param lastModified Internal metadata
  * @author moses AT doraventures DOT com
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties({ "isActive" })
-@AllArgsConstructor
+@JsonIgnoreProperties({"isActive"})
 @Builder
-@Value
 @With
-@SuppressWarnings("ReferenceEquality")
-public class CMMStudy {
-
-    @JsonProperty("abstract")
-    Map<String, String> abstractField;
-
-    @JsonProperty("classifications")
-    Map<String, List<TermVocabAttributes>> classifications;
-
-    @JsonProperty("creators")
-    Map<String, List<String>> creators;
-
-    @JsonProperty("dataAccessFreeTexts")
-    Map<String, List<String>> dataAccessFreeTexts;
-
-    @JsonProperty("dataCollectionPeriodStartdate")
-    String dataCollectionPeriodStartdate;
-
-    @JsonProperty("dataCollectionPeriodEnddate")
-    String dataCollectionPeriodEnddate;
-
-    @JsonProperty("dataCollectionYear")
-    int dataCollectionYear;
-
-    @JsonProperty("dataCollectionFreeTexts")
-    Map<String, List<DataCollectionFreeText>> dataCollectionFreeTexts;
-
-    @JsonProperty("fileLanguages")
-    Set<String> fileLanguages;
-
-    @JsonProperty("keywords")
-    Map<String, List<TermVocabAttributes>> keywords;
-
-    @JsonProperty("pidStudies")
-    Map<String, List<Pid>> pidStudies;
-
-    @JsonProperty("publicationYear")
-    String publicationYear;
-
-    @JsonProperty("publisher")
-    Map<String, Publisher> publisher;
-
-    @JsonProperty("relatedPublications")
-    Map<String, List<RelatedPublication>> relatedPublications;
-
-    @JsonProperty("samplingProcedureFreeTexts")
-    Map<String, List<String>> samplingProcedureFreeTexts;
-
-    @JsonProperty("studyAreaCountries")
-    Map<String, List<Country>> studyAreaCountries;
-
-    @JsonProperty("studyNumber")
-    String studyNumber;
-
-    @JsonProperty("studyUrl")
-    Map<String, URI> studyUrl;
-
-    @JsonProperty("typeOfModeOfCollections")
-    Map<String, List<TermVocabAttributes>> typeOfModeOfCollections;
-
-    @JsonProperty("titleStudy")
-    Map<String, String> titleStudy;
-
-    @JsonProperty("typeOfTimeMethods")
-    Map<String, List<TermVocabAttributes>> typeOfTimeMethods;
-
-    @JsonProperty("typeOfSamplingProcedures")
-    Map<String, List<VocabAttributes>> typeOfSamplingProcedures;
-
-    @JsonProperty("unitTypes")
-    Map<String, List<TermVocabAttributes>> unitTypes;
-
-    @JsonProperty("universe")
-    Map<String, Universe> universe;
-
-    // Internal metadata
-    @JsonProperty("lastModified")
-    String lastModified;
-
-    @JsonProperty("studyXmlSourceUrl")
-    URI studyXmlSourceUrl;
-
-    @JsonProperty("repositoryUrl")
-    URI repositoryUrl;
+public record CMMStudy(
+    @JsonProperty("abstract") Map<String, String> abstractField,
+    @JsonProperty("classifications") Map<String, List<TermVocabAttributes>> classifications,
+    @JsonProperty("creators") Map<String, List<String>> creators,
+    @JsonProperty("dataAccessFreeTexts") Map<String, List<String>> dataAccessFreeTexts,
+    @JsonProperty("dataCollectionPeriodStartdate") String dataCollectionPeriodStartdate,
+    @JsonProperty("dataCollectionPeriodEnddate") String dataCollectionPeriodEnddate,
+    @JsonProperty("dataCollectionYear") int dataCollectionYear,
+    @JsonProperty("dataCollectionFreeTexts") Map<String, List<DataCollectionFreeText>> dataCollectionFreeTexts,
+    @JsonProperty("fileLanguages") Set<String> fileLanguages,
+    @JsonProperty("keywords") Map<String, List<TermVocabAttributes>> keywords,
+    @JsonProperty("pidStudies") Map<String, List<Pid>> pidStudies,
+    @JsonProperty("publicationYear") String publicationYear,
+    @JsonProperty("publisher") Map<String, Publisher> publisher,
+    @JsonProperty("relatedPublications") Map<String, List<RelatedPublication>> relatedPublications,
+    @JsonProperty("samplingProcedureFreeTexts") Map<String, List<String>> samplingProcedureFreeTexts,
+    @JsonProperty("studyAreaCountries") Map<String, List<Country>> studyAreaCountries,
+    @JsonProperty("studyNumber") String studyNumber,
+    @JsonProperty("studyUrl") Map<String, URI> studyUrl,
+    @JsonProperty("typeOfModeOfCollections") Map<String, List<TermVocabAttributes>> typeOfModeOfCollections,
+    @JsonProperty("titleStudy") Map<String, String> titleStudy,
+    @JsonProperty("typeOfTimeMethods") Map<String, List<TermVocabAttributes>> typeOfTimeMethods,
+    @JsonProperty("typeOfSamplingProcedures") Map<String, List<VocabAttributes>> typeOfSamplingProcedures,
+    @JsonProperty("unitTypes") Map<String, List<TermVocabAttributes>> unitTypes,
+    @JsonProperty("universe") Map<String, Universe> universe,
+    @JsonProperty("lastModified") String lastModified,
+    @JsonProperty("studyXmlSourceUrl") URI studyXmlSourceUrl,
+    @JsonProperty("repositoryUrl") URI repositoryUrl
+) {
 }

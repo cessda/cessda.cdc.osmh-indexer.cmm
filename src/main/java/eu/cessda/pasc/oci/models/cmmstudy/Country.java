@@ -17,9 +17,6 @@ package eu.cessda.pasc.oci.models.cmmstudy;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Value;
-import lombok.With;
 
 /**
  * Country pojo to hold
@@ -27,28 +24,16 @@ import lombok.With;
  * - "country": "The name of the country in a given Language"
  * - "searchField": "The name of the country to use in the search filter."
  *
+ * @param isoCode     ISO country code.
+ * @param elementText The name of the country as present in the metadata.
+ * @param searchField The name of the country to use in the search filter.
+ *                    This is derived from the ISO country code and is always in English.
  * @author moses AT doraventures DOT com
  */
-@Builder
-@Value
-@With
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@SuppressWarnings("ReferenceEquality")
-public class Country {
-    /**
-     * ISO country code.
-     */
-    @JsonProperty("abbr")
-    String isoCode;
-    /**
-     * The name of the country to use in the search filter.
-     * This is derived from the ISO country code and is always in English.
-     */
-    @JsonProperty("searchField")
-    String searchField;
-    /**
-     * The name of the country as present in the metadata.
-     */
-    @JsonProperty("country")
-    String elementText;
+public record Country(
+    @JsonProperty("abbr") String isoCode,
+    @JsonProperty("country") String elementText,
+    @JsonProperty("searchField") String searchField
+) {
 }

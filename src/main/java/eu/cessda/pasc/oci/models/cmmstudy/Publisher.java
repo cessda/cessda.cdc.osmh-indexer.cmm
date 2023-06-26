@@ -16,23 +16,15 @@
 package eu.cessda.pasc.oci.models.cmmstudy;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Value;
 
 /**
  * Publisher pojo to hold
  * - "abbr": "Control Value(CV) for institution abbreviation.",
  * - "publisher": "e.g The Social Science Data Archive"
- *
+ * <p>
  * Publisher value can be in multiple language translations.
  *
  * @author moses AT doraventures DOT com
  */
-@Builder
-@Value
-public class Publisher {
-    @JsonProperty("abbr")
-    String abbreviation;
-    @JsonProperty("publisher")
-    String name;
+public record Publisher(@JsonProperty("abbr") String abbreviation, @JsonProperty("publisher") String name) {
 }

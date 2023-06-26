@@ -141,7 +141,7 @@ public class LanguageExtractorTest {
 
         assertThat(cmmStudyOfLanguage.keySet()).containsExactlyInAnyOrder("en", "fi", "de");
         cmmStudyOfLanguage.values().forEach(cmmStudyOfLanguages ->
-            assertThat(cmmStudyOfLanguages.getLangAvailableIn()).containsExactlyInAnyOrder("en", "fi", "de")
+            assertThat(cmmStudyOfLanguages.langAvailableIn()).containsExactlyInAnyOrder("en", "fi", "de")
         );
     }
 
@@ -162,7 +162,7 @@ public class LanguageExtractorTest {
 
         // Given
         final CMMStudy cmmStudyWithNoAvailableLangSet = RecordTestData.getSyntheticCmmStudy();
-        cmmStudyWithNoAvailableLangSet.getTitleStudy().remove("en");
+        cmmStudyWithNoAvailableLangSet.titleStudy().remove("en");
 
         // When
         var cmmStudyOfLanguage = languageExtractor.extractFromStudy(cmmStudyWithNoAvailableLangSet, ReposTestData.getUKDSRepo());
@@ -170,7 +170,7 @@ public class LanguageExtractorTest {
         assertThat(cmmStudyOfLanguage.keySet()).doesNotContain("en");
         assertThat(cmmStudyOfLanguage.keySet()).containsExactlyInAnyOrder("fi", "de");
         cmmStudyOfLanguage.values().forEach(cmmStudyOfLanguages ->
-            assertThat(cmmStudyOfLanguages.getLangAvailableIn()).containsExactlyInAnyOrder("fi", "de")
+            assertThat(cmmStudyOfLanguages.langAvailableIn()).containsExactlyInAnyOrder("fi", "de")
         );
     }
 
@@ -179,7 +179,7 @@ public class LanguageExtractorTest {
 
         // Given
         final CMMStudy cmmStudyWithNoAvailableLangSet = RecordTestData.getSyntheticCmmStudy();
-        cmmStudyWithNoAvailableLangSet.getAbstractField().remove("fi");
+        cmmStudyWithNoAvailableLangSet.abstractField().remove("fi");
 
         // When
         var cmmStudyOfLanguage = languageExtractor.extractFromStudy(cmmStudyWithNoAvailableLangSet, ReposTestData.getUKDSRepo());
@@ -187,7 +187,7 @@ public class LanguageExtractorTest {
         assertThat(cmmStudyOfLanguage.keySet()).doesNotContain("fi");
         assertThat(cmmStudyOfLanguage.keySet()).containsExactlyInAnyOrder("en", "de");
         cmmStudyOfLanguage.values().forEach(cmmStudyOfLanguages ->
-            assertThat(cmmStudyOfLanguages.getLangAvailableIn()).containsExactlyInAnyOrder("en", "de")
+            assertThat(cmmStudyOfLanguages.langAvailableIn()).containsExactlyInAnyOrder("en", "de")
         );
     }
 
@@ -196,7 +196,7 @@ public class LanguageExtractorTest {
 
         // Given
         final CMMStudy cmmStudyWithNoAvailableLangSet = RecordTestData.getSyntheticCmmStudy();
-        cmmStudyWithNoAvailableLangSet.getPublisher().remove("de");
+        cmmStudyWithNoAvailableLangSet.publisher().remove("de");
 
         // When
         var cmmStudyOfLanguage = languageExtractor.extractFromStudy(cmmStudyWithNoAvailableLangSet, ReposTestData.getUKDSRepo());
@@ -204,7 +204,7 @@ public class LanguageExtractorTest {
         assertThat(cmmStudyOfLanguage.keySet()).doesNotContain("de");
         assertThat(cmmStudyOfLanguage.keySet()).containsExactlyInAnyOrder("en", "fi");
         cmmStudyOfLanguage.values().forEach(cmmStudyOfLanguages ->
-            assertThat(cmmStudyOfLanguages.getLangAvailableIn()).containsExactlyInAnyOrder("en", "fi")
+            assertThat(cmmStudyOfLanguages.langAvailableIn()).containsExactlyInAnyOrder("en", "fi")
         );
     }
 }

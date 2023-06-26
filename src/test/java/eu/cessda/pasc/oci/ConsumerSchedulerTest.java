@@ -152,7 +152,7 @@ public class ConsumerSchedulerTest {
             when(recordXMLParser.getRecord(
                 eq(ukdsRepo),
                 any(Path.class)
-            )).thenReturn(List.of(getSyntheticCmmStudy(recordHeader.getIdentifier())));
+            )).thenReturn(List.of(getSyntheticCmmStudy(recordHeader.identifier())));
         }
 
         return indexerConsumerService;

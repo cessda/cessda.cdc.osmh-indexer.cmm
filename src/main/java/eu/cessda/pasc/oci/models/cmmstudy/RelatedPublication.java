@@ -16,21 +16,16 @@
 package eu.cessda.pasc.oci.models.cmmstudy;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Value;
 
 import java.net.URI;
 import java.util.List;
 
-@Value
-public class RelatedPublication {
-    /**
-     * The title of the related publication.
-     */
-    @JsonProperty("title")
-    String title;
-    /**
-     * The URI of the holdings of the related publication.
-     */
-    @JsonProperty("holdings")
-    List<URI> holdings;
+/**
+ * @param title    The title of the related publication.
+ * @param holdings The URI of the holdings of the related publication.
+ */
+public record RelatedPublication(
+    @JsonProperty("title") String title,
+    @JsonProperty("holdings") List<URI> holdings
+) {
 }

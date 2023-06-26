@@ -16,14 +16,15 @@
 package eu.cessda.pasc.oci.elasticsearch;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.ElasticsearchException;
-import co.elastic.clients.elasticsearch._types.FieldSort;
-import co.elastic.clients.elasticsearch._types.SortOptions;
-import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.*;
 import co.elastic.clients.elasticsearch._types.query_dsl.IdsQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MatchAllQuery;
+import co.elastic.clients.elasticsearch.core.BulkRequest;
+import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.GetRequest;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
+import co.elastic.clients.elasticsearch.core.bulk.OperationType;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.indices.DeleteIndexRequest;
 import co.elastic.clients.elasticsearch.indices.RefreshRequest;
@@ -55,8 +56,7 @@ import static org.assertj.core.api.BDDAssertions.then;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.*;
 
 
 /**
@@ -113,7 +113,7 @@ public class ESIngestServiceTestIT {
         // Then
         elasticsearchClient.indices().refresh(RefreshRequest.of(r -> r.index(INDEX_NAME)));
         var response = elasticsearchClient.search(
-            SearchRequest.of(s -> s.index(INDEX_NAME).query(IdsQuery.of(i -> i.values(expected.getId()))._toQuery())),
+            SearchRequest.of(s -> s.index(INDEX_NAME).query(IdsQuery.of(i -> i.values(expected.id()))._toQuery())),
             CMMStudyOfLanguage.class
         );
 
@@ -123,6 +123,45 @@ public class ESIngestServiceTestIT {
         // Verify that the document is considered equal
         var actual = response.hits().hits().get(0).source();
         then(actual).isEqualTo(expected);
+    }
+
+    @Test
+    public void shouldHandleErrorsWhenIndexing() throws IOException, IndexingException {
+        ElasticsearchClient mockClient = spy(elasticsearchClient);
+
+        // Given
+        List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX1();
+        ESIngestService ingestService = new ESIngestService(mockClient, esConfigProp);
+
+
+        var bulkItem = new BulkResponseItem.Builder()
+            .index(INDEX_NAME)
+            .error(new ErrorCause.Builder().type("mocked_error").build())
+            .operationType(OperationType.Index)
+            .status(400)
+            .build();
+
+        var mappingError = new BulkResponseItem.Builder()
+            .index(INDEX_NAME)
+            .error(new ErrorCause.Builder().type("strict_dynamic_mapping_exception").build())
+            .operationType(OperationType.Index)
+            .status(400)
+            .build();
+
+        // Create the mock response
+        var mockResponse = new BulkResponse.Builder()
+            .errors(true)
+            .items(List.of(bulkItem, mappingError))
+            .took(0)
+            .build();
+
+        doReturn(mockResponse).when(mockClient).bulk(any(BulkRequest.class));
+
+        // When
+        ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
+
+        // Then
+        then(ingestService.getTotalHitCount("*")).isZero();
     }
 
     @Test
@@ -254,7 +293,7 @@ public class ESIngestServiceTestIT {
 
         // Then - check if all studies are present
         for (var expectedStudy : studyOfLanguages) {
-            var study = ingestService.getStudy(expectedStudy.getId(), LANGUAGE_ISO_CODE);
+            var study = ingestService.getStudy(expectedStudy.id(), LANGUAGE_ISO_CODE);
             assertEquals(expectedStudy, study.orElseThrow());
         }
     }
@@ -299,7 +338,7 @@ public class ESIngestServiceTestIT {
         var expectedStudy = studyOfLanguages.get(0);
 
         // Then
-        var study = ingestService.getStudy(expectedStudy.getId(), LANGUAGE_ISO_CODE);
+        var study = ingestService.getStudy(expectedStudy.id(), LANGUAGE_ISO_CODE);
 
         Assert.assertEquals(Optional.empty(), study);
     }
@@ -335,7 +374,7 @@ public class ESIngestServiceTestIT {
         // Then - the study should not be present, but other studies should be
         elasticsearchClient.indices().refresh(RefreshRequest.of(r -> r.index(INDEX_NAME)));
         assertFalse(elasticsearchClient.get(
-            GetRequest.of(g -> g.index(INDEX_NAME).id(studyToDelete.get(0).getId())), Void.class
+            GetRequest.of(g -> g.index(INDEX_NAME).id(studyToDelete.get(0).id())), Void.class
         ).found());
 
         var response = elasticsearchClient.search(
@@ -350,7 +389,7 @@ public class ESIngestServiceTestIT {
         then(response.hits().total()).isNotNull();
         then(response.hits().total().value()).isEqualTo(2); // Should be two studies
         then(response.hits().hits().stream().map(Hit::id)) // Should not contain the deleted study
-            .containsExactlyInAnyOrder(studyOfLanguages.get(1).getId(), studyOfLanguages.get(2).getId());
+            .containsExactlyInAnyOrder(studyOfLanguages.get(1).id(), studyOfLanguages.get(2).id());
     }
 
     @Test
@@ -371,7 +410,7 @@ public class ESIngestServiceTestIT {
         elasticsearchClient.indices().refresh(RefreshRequest.of(r -> r.index(INDEX_NAME)));
 
         // Given
-        var repoCode = studyOfLanguages.get(0).getCode();
+        var repoCode = studyOfLanguages.get(0).code();
 
         // Expect 3 studies to be returned
         var studies = ingestService.getStudiesByRepository(repoCode, LANGUAGE_ISO_CODE);

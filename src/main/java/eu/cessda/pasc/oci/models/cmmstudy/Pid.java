@@ -17,8 +17,6 @@ package eu.cessda.pasc.oci.models.cmmstudy;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Value;
 
 /**
  * Pid - Study Persistent Identifier pojo to hold
@@ -29,17 +27,14 @@ import lombok.Value;
  *  "agency": "the agency of the pid in <Finnish>",
  *  "pid": "The pid"
  * }
- *}
+ * }
  * </pre>
  *
  * @author moses AT doraventures DOT com
  */
-@Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Value
-public class Pid {
-    @JsonProperty("agency")
-    String agency;
-    @JsonProperty("pid")
-    String elementText;
+public record Pid(
+    @JsonProperty("agency") String agency,
+    @JsonProperty("pid") String elementText
+) {
 }

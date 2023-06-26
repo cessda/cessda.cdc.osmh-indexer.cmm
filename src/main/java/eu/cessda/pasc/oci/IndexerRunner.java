@@ -148,11 +148,11 @@ public class IndexerRunner {
             log.info("[{}({})] Indexing...", repo.getCode(), langIsoCode);
 
             // Discover studies to delete, we do this by creating a HashSet of ids and then comparing what's in the database
-            var studyIds = cmmStudies.stream().map(CMMStudyOfLanguage::getId).collect(Collectors.toCollection(HashSet::new));
+            var studyIds = cmmStudies.stream().map(CMMStudyOfLanguage::id).collect(Collectors.toCollection(HashSet::new));
             var studiesToDelete = new ArrayList<CMMStudyOfLanguage>();
             try {
                 for (var presentStudy : ingestService.getStudiesByRepository(repo.getCode(), langIsoCode)) {
-                    if (!studyIds.contains(presentStudy.getId())) {
+                    if (!studyIds.contains(presentStudy.id())) {
                         studiesToDelete.add(presentStudy);
                     }
                 }
@@ -199,7 +199,7 @@ public class IndexerRunner {
         var studiesCreated = new AtomicInteger(0);
         var studiesUpdated = new AtomicInteger(0);
 
-        cmmStudies.parallelStream().forEach(localStudy -> ingestService.getStudy(localStudy.getId(), language)
+        cmmStudies.parallelStream().forEach(localStudy -> ingestService.getStudy(localStudy.id(), language)
             .ifPresentOrElse(study -> {
                 if (!localStudy.equals(study)) {
                     // The study has been updated

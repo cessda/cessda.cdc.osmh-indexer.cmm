@@ -199,7 +199,7 @@ public class CMMStudyMapper {
     Map<String, List<VocabAttributes>> parseTypeOfSamplingProcedure(Document doc, XPaths xPaths, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
             defaultLangIsoCode, doc, xPaths.getSamplingXPath(), xPaths.getNamespace(),
-            element -> samplingTermVocabAttributeStrategy(element, xPaths.getNamespace(), true)
+            element -> samplingTermVocabAttributeStrategy(element, xPaths.getNamespace())
         );
     }
 
@@ -420,18 +420,26 @@ public class CMMStudyMapper {
 
             var universes = new HashMap<String, Universe>();
             for (var entry : extractedUniverses.entrySet()) {
-                var universe = universes.computeIfAbsent(entry.getKey(), k -> new Universe());
-
-                // Loop over all universe entries for each language
-                for(var extractedUniverse : entry.getValue()) {
-                    var universeContent = extractedUniverse.getValue();
-
-                    // Switch based on the type of clusion
-                    switch (extractedUniverse.getKey()) {
-                        case I -> universe.setInclusion(universeContent);
-                        case E -> universe.setExclusion(universeContent);
+                universes.compute(entry.getKey(), (k, universe) -> {
+                    if (universe == null) {
+                        // Empty universe to be copied in the switch expression
+                        universe = new Universe(null, null);
                     }
-                }
+
+                    // Loop over all universe entries for each language
+                    for (var extractedUniverse : entry.getValue()) {
+                        var content = extractedUniverse.getValue();
+
+                        // Switch based on whether the universe is included or excluded,
+                        // copying in any previous inclusions or exclusions
+                        universe = switch (extractedUniverse.getKey()) {
+                            case I -> new Universe(content, universe.exclusion());
+                            case E -> new Universe(universe.inclusion(), content);
+                        };
+                    }
+
+                    return universe;
+                });
             }
 
             return universes;

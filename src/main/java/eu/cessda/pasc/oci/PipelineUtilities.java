@@ -43,7 +43,7 @@ public class PipelineUtilities {
      * @param baseDirectory the base directory to search from.
      * @return a list of all discovered repositories.
      */
-    @SuppressWarnings("resource") // closed by calling method
+    @SuppressWarnings({"resource", "StreamResourceLeak"}) // closed by calling method
     public Stream<Repo> discoverRepositories(Path baseDirectory) {
         if (baseDirectory != null) {
             try {
