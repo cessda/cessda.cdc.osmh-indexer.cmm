@@ -35,8 +35,7 @@
     <scm>
         <url>https://github.com/cessda/cessda.cdc.osmh-indexer.cmm</url>
         <connection>scm:git:https://github.com/cessda/cessda.cdc.osmh-indexer.cmm.git</connection>
-      <tag>HEAD</tag>
-  </scm>
+    </scm>
     <issueManagement>
         <system>GitHub</system>
         <url>https://github.com/cessda/cessda.cdc.versions/issues</url>

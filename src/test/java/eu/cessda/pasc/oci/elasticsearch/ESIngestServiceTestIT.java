@@ -28,17 +28,14 @@ import co.elastic.clients.elasticsearch.core.bulk.OperationType;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.indices.DeleteIndexRequest;
 import co.elastic.clients.elasticsearch.indices.RefreshRequest;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.cessda.pasc.oci.configurations.ESConfigurationProperties;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
-import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -51,7 +48,6 @@ import java.util.*;
 
 import static eu.cessda.pasc.oci.mock.data.RecordTestData.getCmmStudyOfLanguageCodeEnX1;
 import static eu.cessda.pasc.oci.mock.data.RecordTestData.getCmmStudyOfLanguageCodeEnX3;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -82,8 +78,6 @@ public class ESIngestServiceTestIT {
 
     @Autowired
     private ElasticsearchClient elasticsearchClient;
-
-    private final CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter = new CMMStudyOfLanguageConverter();
 
     /**
      * Reset Elasticsearch after each test
@@ -341,22 +335,6 @@ public class ESIngestServiceTestIT {
         var study = ingestService.getStudy(expectedStudy.id(), LANGUAGE_ISO_CODE);
 
         Assert.assertEquals(Optional.empty(), study);
-    }
-
-    @Test
-    public void shouldLogFailedIndexOperations() throws IOException {
-        // Setup
-        List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
-        var cmmStudyOfLanguageConverterSpy = spy(this.cmmStudyOfLanguageConverter);
-        var objectWriterSpy = spy(this.cmmStudyOfLanguageConverter.getWriter());
-        ESIngestService ingestService = new ESIngestService(elasticsearchClient, esConfigProp);
-
-        // Given
-        Mockito.doReturn(objectWriterSpy).when(cmmStudyOfLanguageConverterSpy).getWriter();
-        doThrow(JsonProcessingException.class).when(objectWriterSpy).writeValueAsBytes(any(CMMStudyOfLanguage.class));
-
-        // Then - indexing should report true as Elasticsearch was accessible
-        assertThatCode(() -> ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE)).doesNotThrowAnyException();
     }
 
     @Test

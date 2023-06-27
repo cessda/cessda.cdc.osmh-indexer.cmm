@@ -27,7 +27,6 @@ import eu.cessda.pasc.oci.exception.IndexerException;
 import eu.cessda.pasc.oci.exception.XMLParseException;
 import eu.cessda.pasc.oci.mock.data.ReposTestData;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
-import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
@@ -55,8 +54,10 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 @Slf4j
 public class RecordXMLParserTest {
 
-    private final CMMStudyConverter cmmConverter = new CMMStudyConverter();
     private final Repo repo = ReposTestData.getUKDSRepo();
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    // Class under test
     private final CMMStudyMapper cmmStudyMapper = new CMMStudyMapper();
 
     public RecordXMLParserTest() {
@@ -76,7 +77,7 @@ public class RecordXMLParserTest {
         then(result).hasSize(1);
         validateCMMStudyResultAgainstSchema(result.get(0));
 
-        String actualJson = cmmConverter.toJsonString(result.get(0));
+        String actualJson = objectMapper.writeValueAsString(result.get(0));
 
         // Check if the JSON generated differs from the expected source
         assertEquals(expectedJson, actualJson, true);
@@ -133,7 +134,7 @@ public class RecordXMLParserTest {
         then(record).hasSize(1);
         validateCMMStudyResultAgainstSchema(record.get(0));
         final ObjectMapper mapper = new ObjectMapper();
-        String jsonString = cmmConverter.toJsonString(record.get(0));
+        String jsonString = objectMapper.writeValueAsString(record.get(0));
         final JsonNode actualTree = mapper.readTree(jsonString);
 
         then(actualTree.get("dataCollectionPeriodStartdate").asText()).isEqualTo("1976-01-01T00:00:00Z");
@@ -150,7 +151,7 @@ public class RecordXMLParserTest {
 
         // When
         var record = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
-        String actualCmmStudyJsonString = cmmConverter.toJsonString(record.get(0));
+        String actualCmmStudyJsonString = objectMapper.writeValueAsString(record.get(0));
 
         // then
         assertEquals(expectedCmmStudyJsonString, actualCmmStudyJsonString, false);
@@ -237,7 +238,7 @@ public class RecordXMLParserTest {
     }
 
     private void validateCMMStudyResultAgainstSchema(CMMStudy record) throws IOException, ProcessingException, JSONException {
-        String jsonString = cmmConverter.toJsonString(record);
+        String jsonString = objectMapper.writeValueAsString(record);
         JSONObject json = new JSONObject(jsonString);
         log.debug("RETRIEVED STUDY JSON: \n" + json.toString(4));
 
@@ -253,7 +254,7 @@ public class RecordXMLParserTest {
     private void assertThatCmmRequiredFieldsAreExtracted(CMMStudy record) throws IOException, JSONException {
 
         final ObjectMapper mapper = new ObjectMapper();
-        String jsonString = cmmConverter.toJsonString(record);
+        String jsonString = objectMapper.writeValueAsString(record);
         String expectedJson = ResourceHandler.getResourceAsString("json/ddi_record_ukds_example_extracted.json");
         final JsonNode actualTree = mapper.readTree(jsonString);
         final JsonNode expectedTree = mapper.readTree(expectedJson);
@@ -299,7 +300,7 @@ public class RecordXMLParserTest {
             validateCMMStudyResultAgainstSchema(study);
         }
 
-        var actualJson = cmmConverter.toJsonString(result.get(0));
+        var actualJson = objectMapper.writeValueAsString(result.get(0));
 
         // Check if the JSON for the first study differs from the expected source
         assertEquals(expectedJson, actualJson, true);
