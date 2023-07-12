@@ -56,9 +56,12 @@ public class LanguageExtractor {
      * @return an unmodifiable {@link Map} with extracted documents for each language ISO code
      */
     public Map<String, CMMStudyOfLanguage> extractFromStudy(CMMStudy cmmStudy, Repo repository) {
-        var validLanguages = appConfigurationProperties.getLanguages().stream()
-            .filter(langCode -> isValidCMMStudyForLang(cmmStudy, langCode))
-            .collect(Collectors.toList());
+        var validLanguages = new ArrayList<String>(appConfigurationProperties.languages().size());
+        for (var language : appConfigurationProperties.languages()) {
+            if (isValidCMMStudyForLang(cmmStudy, language)) {
+                validLanguages.add(language);
+            }
+        }
 
         if (!validLanguages.isEmpty()) {
             return validLanguages.stream().collect(Collectors.toUnmodifiableMap(

@@ -32,7 +32,7 @@ import static org.mockito.Mockito.*;
 @SuppressWarnings("DirectInvocationOnMock")
 public class StatusServiceTest {
 
-  private final AppConfigurationProperties appConfigurationProperties = new AppConfigurationProperties();
+  private final AppConfigurationProperties appConfigurationProperties = new AppConfigurationProperties(null, null, null, null);
 
   @Test
   public void shouldPrintOutConfiguration() throws JsonProcessingException {

@@ -92,27 +92,27 @@ public class ReposTestData
     }
 
     public static AppConfigurationProperties.Endpoints getSingleEndpoint() {
-        var endpoints = new AppConfigurationProperties.Endpoints();
-        endpoints.setRepos(List.of(getUKDSRepo()));
-        endpoints.setHarvesters(Map.ofEntries(
-            entry("DDI_2_5", getOaiPmhHarvester()),
-            entry("NESSTAR", getNesstarHarvester())
-        ));
-        return endpoints;
+        return new AppConfigurationProperties.Endpoints(
+            Map.ofEntries(
+                entry("DDI_2_5", getOaiPmhHarvester()),
+                entry("NESSTAR", getNesstarHarvester())
+            ),
+            List.of(getUKDSRepo())
+        );
     }
 
     public static AppConfigurationProperties.Endpoints getEndpoints() {
-        var endpoints = new AppConfigurationProperties.Endpoints();
-        endpoints.setRepos(List.of(
-            getUKDSRepo(),
-            getGesisEnRepo(),
-            getFSDRepo()
-        ));
-        endpoints.setHarvesters(Map.ofEntries(
-            entry("DDI_2_5", getOaiPmhHarvester()),
-            entry("NESSTAR", getNesstarHarvester())
-        ));
-        return endpoints;
+        return new AppConfigurationProperties.Endpoints(
+            Map.ofEntries(
+                entry("DDI_2_5", getOaiPmhHarvester()),
+                entry("NESSTAR", getNesstarHarvester())
+            ),
+            List.of(
+                getUKDSRepo(),
+                getGesisEnRepo(),
+                getFSDRepo()
+            )
+        );
     }
 
     public static List<String> getListOfLanguages() {

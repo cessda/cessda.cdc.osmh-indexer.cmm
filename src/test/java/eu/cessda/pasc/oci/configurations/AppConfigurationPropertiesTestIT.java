@@ -39,7 +39,7 @@ public class AppConfigurationPropertiesTestIT extends AbstractSpringTestProfileC
 
   @Test
   public void shouldReturnConfigurationsForOSMHHandler() {
-    List<Repo> repos = appConfigurationProperties.getEndpoints().getRepos();
+    List<Repo> repos = appConfigurationProperties.endpoints().repos();
     then(repos).isNotNull();
     then(repos).hasAtLeastOneElementOfType(Repo.class);
   }

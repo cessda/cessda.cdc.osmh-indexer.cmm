@@ -22,7 +22,6 @@ import eu.cessda.pasc.oci.elasticsearch.IngestService;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.configurations.Repo;
 import jakarta.annotation.PreDestroy;
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
@@ -72,13 +71,13 @@ public class IndexerRunner {
         if (!indexerRunning.getAndSet(true)) {
 
             // Load explicitly configured repositories
-            var repos = configurationProperties.getEndpoints().getRepos();
+            var repos = configurationProperties.endpoints().repos();
 
             // Store the MDC so that it can be used in the running thread
             var contextMap = MDC.getCopyOfContextMap();
 
             // Discover repositories by attempting to find pipeline.json instances if a base directory is configured
-            try (var repoParsedFromJson = pipelineUtilities.discoverRepositories(configurationProperties.getBaseDirectory())) {
+            try (var repoParsedFromJson = pipelineUtilities.discoverRepositories(configurationProperties.baseDirectory())) {
                 var futures = Stream.concat(repoParsedFromJson, repos.stream())
                     .map(repo -> runAsync(() -> indexRepository(repo, contextMap))
                         .exceptionally(e -> {
@@ -214,12 +213,11 @@ public class IndexerRunner {
         return new UpdatedStudies(studiesCreated.get(), studiesToDelete, studiesUpdated.get());
     }
 
-
-    @Value
-    private static class UpdatedStudies {
-        int studiesCreated;
-        int studiesDeleted;
-        int studiesUpdated;
+    private record UpdatedStudies(
+        int studiesCreated,
+        int studiesDeleted,
+        int studiesUpdated
+    ) {
     }
 
     @PreDestroy

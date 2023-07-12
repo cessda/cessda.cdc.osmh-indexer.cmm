@@ -52,20 +52,21 @@ public class CMMStudyMapper {
     private final DocElementParser docElementParser;
 
     public CMMStudyMapper() {
-        oaiPmh = new AppConfigurationProperties.OaiPmh();
-        var defaultLangSettings = new AppConfigurationProperties.OaiPmh.MetadataParsingDefaultLang();
-        defaultLangSettings.setActive(true);
-        defaultLangSettings.setLang("en");
-        oaiPmh.setMetadataParsingDefaultLang(defaultLangSettings);
-        oaiPmh.setConcatRepeatedElements(true);
-        oaiPmh.setConcatSeparator("<br>");
-        docElementParser = new DocElementParser(oaiPmh);
+        this.oaiPmh = new AppConfigurationProperties.OaiPmh(
+            new AppConfigurationProperties.MetadataParsingDefaultLang(
+                true,
+                "en"
+            ),
+            true,
+            "<br>"
+        );
+        this.docElementParser = new DocElementParser(this.oaiPmh);
     }
 
     @Autowired
     public CMMStudyMapper(DocElementParser docElementParser, AppConfigurationProperties appConfigurationProperties) {
         this.docElementParser = docElementParser;
-        this.oaiPmh = appConfigurationProperties.getOaiPmh();
+        this.oaiPmh = appConfigurationProperties.oaiPmh();
     }
 
     /**
@@ -87,7 +88,7 @@ public class CMMStudyMapper {
         } else if (repository.getDefaultLanguage() != null) {
             return repository.getDefaultLanguage();
         } else {
-            return oaiPmh.getMetadataParsingDefaultLang().getLang();
+            return oaiPmh.metadataParsingDefaultLang().lang();
         }
     }
 

@@ -38,15 +38,14 @@ public class OaiPmhHelpersTest {
     private final AppConfigurationProperties appConfigurationProperties;
 
     public OaiPmhHelpersTest() {
-        appConfigurationProperties = new AppConfigurationProperties();
-        appConfigurationProperties.setEndpoints(ReposTestData.getEndpoints());
+        appConfigurationProperties = new AppConfigurationProperties(null, ReposTestData.getEndpoints(), null, null);
     }
 
     @Test
     public void shouldAppendMetaDataPrefixForGivenFSD() throws URISyntaxException {
 
         // Given
-        Repo fsdEndpoint = appConfigurationProperties.getEndpoints().getRepos()
+        Repo fsdEndpoint = appConfigurationProperties.endpoints().repos()
             .stream().filter(repo -> repo.getCode().equals("FSD")).findAny().orElseThrow();
 
         var expectedReqUrl = URI.create("http://services.fsd.uta.fi/v0/oai?verb=GetRecord&identifier=" + STUDY_IDENTIFIER +
@@ -62,7 +61,7 @@ public class OaiPmhHelpersTest {
     public void shouldAppendMetaDataPrefixForGivenUKDS() throws URISyntaxException {
 
         // Given
-        Repo ukdsEndpoint = appConfigurationProperties.getEndpoints().getRepos()
+        Repo ukdsEndpoint = appConfigurationProperties.endpoints().repos()
                 .stream().filter(repo -> repo.getCode().equals("UKDS")).findAny().orElseThrow();
 
         var expectedReqUrl = URI.create("https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=GetRecord&identifier=" + STUDY_IDENTIFIER +

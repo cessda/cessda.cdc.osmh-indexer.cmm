@@ -50,8 +50,6 @@ import static eu.cessda.pasc.oci.mock.data.RecordTestData.getCmmStudyOfLanguageC
 import static eu.cessda.pasc.oci.mock.data.RecordTestData.getCmmStudyOfLanguageCodeEnX3;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 

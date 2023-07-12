@@ -18,16 +18,12 @@ package eu.cessda.pasc.oci.configurations;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * Loads Configurations from application*.yml specifically for elasticsearch
  *
  * @author moses AT doraventures DOT com
  */
-@Configuration
-@EnableConfigurationProperties
 @ConfigurationProperties(prefix = "elasticsearch")
 @Getter
 @Setter

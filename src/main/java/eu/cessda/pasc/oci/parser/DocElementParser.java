@@ -53,7 +53,7 @@ class DocElementParser {
 
     @Autowired
     private DocElementParser(AppConfigurationProperties appConfigurationProperties) {
-        this.oaiPmh = appConfigurationProperties.getOaiPmh();
+        this.oaiPmh = appConfigurationProperties.oaiPmh();
     }
 
     /**
@@ -135,7 +135,7 @@ class DocElementParser {
      */
     static List<String> getAttributeValues(Document document, String elementXpath, Namespace... namespaces) {
         List<Attribute> attributes = getAttributes(document, elementXpath, namespaces);
-        return attributes.stream().map(Attribute::getValue).collect(Collectors.toList());
+        return attributes.stream().map(Attribute::getValue).toList();
     }
 
     /**
@@ -184,8 +184,8 @@ class DocElementParser {
 
     private void putElementInMap(Map<String, String> titlesMap, String langCode, String elementText, boolean isConcatenating) {
         // Concatenate if configured
-        if (isConcatenating && oaiPmh.isConcatRepeatedElements() && titlesMap.containsKey(langCode)) {
-            elementText = titlesMap.get(langCode) + oaiPmh.getConcatSeparator() + elementText;
+        if (isConcatenating && oaiPmh.concatRepeatedElements() && titlesMap.containsKey(langCode)) {
+            elementText = titlesMap.get(langCode) + oaiPmh.concatSeparator() + elementText;
         }
         titlesMap.put(langCode, elementText);
     }
@@ -209,7 +209,7 @@ class DocElementParser {
             } else {
                 return Optional.of(langValue);
             }
-        } else if (oaiPmh.getMetadataParsingDefaultLang().isActive()) {
+        } else if (oaiPmh.metadataParsingDefaultLang().active()) {
             return Optional.of(defaultLangIsoCode);
         }
 
@@ -253,7 +253,7 @@ class DocElementParser {
                     titlesMap.put(langAttribute.getValue(), extractedValue);
                 } else {
                     // If defaulting lang is not configured skip, the language is not known
-                    if (oaiPmh.getMetadataParsingDefaultLang().isActive()) {
+                    if (oaiPmh.metadataParsingDefaultLang().active()) {
                         titlesMap.put(langCode, extractedValue);
                     }
                 }
@@ -286,7 +286,7 @@ class DocElementParser {
                 putElementInMap(titlesMap, langAttribute.getValue(), textExtractionStrategy.apply(element), isConcatenating);
             } else {
                 // If defaulting lang is not configured skip, the language is not known
-                if (oaiPmh.getMetadataParsingDefaultLang().isActive()) {
+                if (oaiPmh.metadataParsingDefaultLang().active()) {
                     putElementInMap(titlesMap, langCode, textExtractionStrategy.apply(element), isConcatenating);
                 }
             }
