@@ -30,7 +30,6 @@ oaiPmh:
   metadataParsingDefaultLang:
     active: true
     lang: 'en'
-  concatRepeatedElements: true
   concatSeparator: "<br>"
 ---
 # For debugging

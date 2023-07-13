@@ -184,7 +184,7 @@ class DocElementParser {
 
     private void putElementInMap(Map<String, String> titlesMap, String langCode, String elementText, boolean isConcatenating) {
         // Concatenate if configured
-        if (isConcatenating && oaiPmh.concatRepeatedElements() && titlesMap.containsKey(langCode)) {
+        if (isConcatenating && oaiPmh.concatSeparator() != null && titlesMap.containsKey(langCode)) {
             elementText = titlesMap.get(langCode) + oaiPmh.concatSeparator() + elementText;
         }
         titlesMap.put(langCode, elementText);

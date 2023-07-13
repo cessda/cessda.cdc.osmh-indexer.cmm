@@ -17,10 +17,10 @@ package eu.cessda.pasc.oci;
 
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
+import eu.cessda.pasc.oci.configurations.Repo;
 import eu.cessda.pasc.oci.elasticsearch.IndexingException;
 import eu.cessda.pasc.oci.elasticsearch.IngestService;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
-import eu.cessda.pasc.oci.models.configurations.Repo;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -74,7 +74,7 @@ public class IndexerRunner {
         if (!indexerRunning.getAndSet(true)) {
 
             // Load explicitly configured repositories
-            var repos = configurationProperties.endpoints().repos();
+            var repos = configurationProperties.repos();
 
             // Store the MDC so that it can be used in the running thread
             var contextMap = MDC.getCopyOfContextMap();
@@ -93,7 +93,7 @@ public class IndexerRunner {
                     .map(repo -> runAsync(() -> {
                             MDC.setContextMap(contextMap);
                             // Set the MDC so that the record name is attached to all downstream logs
-                            try (var repoNameClosable = MDC.putCloseable(LoggingConstants.REPO_NAME, repo.getCode())) {
+                            try (var repoNameClosable = MDC.putCloseable(LoggingConstants.REPO_NAME, repo.code())) {
                                 indexRepository(repo);
                             } finally {
                                 // Reset the MDC
@@ -102,7 +102,7 @@ public class IndexerRunner {
                         })
                         .exceptionally(e -> {
                             // Handle exceptional completion here, this allows failures to be logged as soon as possible
-                            log.error("[{}]: Unexpected error occurred when harvesting!", repo.getCode(), e);
+                            log.error("[{}]: Unexpected error occurred when harvesting!", repo.code(), e);
                             return null;
                         })
                     ).toArray(CompletableFuture[]::new);
@@ -139,11 +139,11 @@ public class IndexerRunner {
             try (var langClosable = MDC.putCloseable(LoggingConstants.LANG_CODE, entry.getKey())) {
                 indexRecords(repo, entry.getKey(), entry.getValue());
             } catch (ElasticsearchException e) {
-                log.error("[{}({})] Error communicating with Elasticsearch!", repo.getCode(), entry.getKey(), e);
+                log.error("[{}({})] Error communicating with Elasticsearch!", repo.code(), entry.getKey(), e);
             }
         }
         log.info("[{}] Repo finished, took {} seconds",
-            repo.getCode(),
+            repo.code(),
             value("repository_duration", Duration.between(startTime, Instant.now()).getSeconds())
         );
     }
@@ -158,20 +158,20 @@ public class IndexerRunner {
      */
     private void indexRecords(Repo repo, String langIsoCode, List<CMMStudyOfLanguage> cmmStudies) {
         if (indexerRunning.get() && !cmmStudies.isEmpty()) {
-            log.info("[{}({})] Indexing...", repo.getCode(), langIsoCode);
+            log.info("[{}({})] Indexing...", repo.code(), langIsoCode);
 
             // Discover studies to delete, we do this by creating a HashSet of ids and then comparing what's in the database
             var studyIds = cmmStudies.stream().map(CMMStudyOfLanguage::id).collect(Collectors.toCollection(HashSet::new));
             var studiesToDelete = new ArrayList<CMMStudyOfLanguage>();
             try {
-                for (var presentStudy : ingestService.getStudiesByRepository(repo.getCode(), langIsoCode)) {
+                for (var presentStudy : ingestService.getStudiesByRepository(repo.code(), langIsoCode)) {
                     if (!studyIds.contains(presentStudy.id())) {
                         studiesToDelete.add(presentStudy);
                     }
                 }
             } catch (ElasticsearchException | UncheckedIOException e) {
                 if (!(e instanceof ElasticsearchException) || !e.getMessage().contains("index_not_found_exception")) {
-                    log.warn("[{}({})] Couldn't retrieve existing studies for deletions: {}", repo.getCode(), langIsoCode, e.toString());
+                    log.warn("[{}({})] Couldn't retrieve existing studies for deletions: {}", repo.code(), langIsoCode, e.toString());
                 }
             }
 
@@ -183,7 +183,7 @@ public class IndexerRunner {
                 ingestService.bulkIndex(cmmStudies, langIsoCode);
                 ingestService.bulkDelete(studiesToDelete, langIsoCode);
                 log.info("[{}({})] Indexing succeeded: {} studies created, {} studies deleted, {} studies updated.",
-                    value(LoggingConstants.REPO_NAME, repo.getCode()),
+                    value(LoggingConstants.REPO_NAME, repo.code()),
                     value(LoggingConstants.LANG_CODE, langIsoCode),
                     value("created_cmm_studies", studiesUpdated.studiesCreated),
                     value("deleted_cmm_studies", studiesUpdated.studiesDeleted),
@@ -191,7 +191,7 @@ public class IndexerRunner {
                 );
             } catch (IndexingException e) {
                 log.error("[{}({})] Indexing failed: {}: {}",
-                    value(LoggingConstants.REPO_NAME, repo.getCode()),
+                    value(LoggingConstants.REPO_NAME, repo.code()),
                     value(LoggingConstants.LANG_CODE, langIsoCode),
                     value(LoggingConstants.EXCEPTION_NAME, e.getClass().getName()),
                     value(LoggingConstants.REASON, e.getMessage())

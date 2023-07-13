@@ -20,10 +20,10 @@ import com.github.fge.jackson.JsonLoader;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import eu.cessda.pasc.oci.ResourceHandler;
+import eu.cessda.pasc.oci.configurations.Repo;
 import eu.cessda.pasc.oci.exception.IndexerException;
 import eu.cessda.pasc.oci.mock.data.ReposTestData;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
-import eu.cessda.pasc.oci.models.configurations.Repo;
 import org.json.JSONException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -243,8 +243,16 @@ public class RecordXMLParserNesstarTest {
         // Given
         var recordXML = ResourceHandler.getResource("xml/nesstar/synthetic_compliant_cmm_nesstar_no_language.xml");
 
-        var langRepo = ReposTestData.getNSDRepo();
-        langRepo.setDefaultLanguage("zz");
+        var nsdRepo = ReposTestData.getNSDRepo();
+        var langRepo = new Repo(
+            nsdRepo.url(),
+            nsdRepo.path(),
+            nsdRepo.code(),
+            nsdRepo.name(),
+            nsdRepo.preferredMetadataParam(),
+            nsdRepo.setSpec(),
+            "zz"
+        );
 
         // When
         var result = new RecordXMLParser(cmmStudyMapper).getRecord(langRepo, Path.of(recordXML.toURI()));

@@ -17,8 +17,8 @@ package eu.cessda.pasc.oci;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import eu.cessda.pasc.oci.configurations.Repo;
 import eu.cessda.pasc.oci.models.PipelineMetadata;
-import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -54,13 +54,15 @@ public class PipelineUtilities {
                     PipelineMetadata sharedModel = repositoryModelObjectReader.readValue(inputStream);
 
                     // Convert the shared model to a Repo object
-                    var repo = new Repo();
-                    repo.setUrl(sharedModel.url());
-                    repo.setCode(sharedModel.code());
-                    repo.setName(sharedModel.name());
-                    repo.setPath(json.getParent());
-                    repo.setDefaultLanguage(sharedModel.defaultLanguage());
-                    repo.setPreferredMetadataParam(sharedModel.metadataPrefix());
+                    var repo = new Repo(
+                        sharedModel.url(),
+                        json.getParent(),
+                        sharedModel.code(),
+                        sharedModel.name(),
+                        sharedModel.metadataPrefix(),
+                        null,
+                        sharedModel.defaultLanguage()
+                    );
 
                     // Add the repo object to the stream
                     return Stream.of(repo);

@@ -15,10 +15,10 @@
  */
 package eu.cessda.pasc.oci;
 
+import eu.cessda.pasc.oci.configurations.Repo;
 import eu.cessda.pasc.oci.exception.XMLParseException;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
-import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.parser.RecordXMLParser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,17 +63,17 @@ public class IndexerConsumerService {
      */
     @SuppressWarnings("UnstableApiUsage")
     public Map<String, List<CMMStudyOfLanguage>> getRecords(Repo repo) {
-        log.debug("[{}] Parsing records.", repo.getCode());
+        log.debug("[{}] Parsing records.", repo.code());
 
         /*
          * Repositories are indexed from their path. Because previous versions of the indexer supported
          * harvesting using URLs, we still need to check that a path is defined.
          */
-        if (repo.getPath() == null) {
-            throw new IllegalArgumentException("Repo " + repo.getCode() + " has no path defined");
+        if (repo.path() == null) {
+            throw new IllegalArgumentException("Repo " + repo.code() + " has no path defined");
         }
 
-        try (var stream = Files.find(repo.getPath(), 1, (path, attributes) ->
+        try (var stream = Files.find(repo.path(), 1, (path, attributes) ->
             // Find XML files in the source directory.
             attributes.isRegularFile() && getFileExtension(path.toString()).equals("xml")
         )) {
@@ -97,14 +97,14 @@ public class IndexerConsumerService {
                 .collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
 
             log.info("[{}] Retrieved {} studies.",
-                value(LoggingConstants.REPO_NAME, repo.getCode()),
+                value(LoggingConstants.REPO_NAME, repo.code()),
                 value("present_cmm_record", studies.get())
             );
 
             return studiesByLanguage;
         } catch (IOException e) {
             log.error(LIST_RECORD_HEADERS_FAILED_WITH_MESSAGE,
-                value(LoggingConstants.REPO_NAME, repo.getCode()),
+                value(LoggingConstants.REPO_NAME, repo.code()),
                 value(LoggingConstants.EXCEPTION_NAME, e.getClass().getName()),
                 value(LoggingConstants.REASON, e.getMessage())
             );
@@ -123,7 +123,7 @@ public class IndexerConsumerService {
             return recordXMLParser.getRecord(repo, path);
         } catch (XMLParseException e) {
             log.warn(FAILED_TO_GET_STUDY_ID_WITH_MESSAGE,
-                value(LoggingConstants.REPO_NAME, repo.getCode()),
+                value(LoggingConstants.REPO_NAME, repo.code()),
                 value(LoggingConstants.STUDY_ID, path),
                 value(LoggingConstants.EXCEPTION_NAME, e.getClass().getName()),
                 value(LoggingConstants.REASON, e.getMessage())

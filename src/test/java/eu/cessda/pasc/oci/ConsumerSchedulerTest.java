@@ -19,11 +19,11 @@ import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
+import eu.cessda.pasc.oci.configurations.Repo;
 import eu.cessda.pasc.oci.elasticsearch.IndexingException;
 import eu.cessda.pasc.oci.elasticsearch.IngestService;
 import eu.cessda.pasc.oci.exception.IndexerException;
 import eu.cessda.pasc.oci.models.RecordHeader;
-import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.parser.RecordXMLParser;
 import eu.cessda.pasc.oci.service.DebuggingJMXBean;
 import org.junit.Test;
@@ -49,10 +49,8 @@ import static org.mockito.Mockito.*;
 public class ConsumerSchedulerTest {
     // mock for debug logging
     private final AppConfigurationProperties appConfigurationProperties = new AppConfigurationProperties(
-        List.of("cs", "da", "de", "el", "en", "et", "fi", "fr", "hu", "it", "nl", "no", "pt", "sk", "sl", "sr", "sv"),
-        getSingleEndpoint(),
-        null,
-        null
+            null, List.of("cs", "da", "de", "el", "en", "et", "fi", "fr", "hu", "it", "nl", "no", "pt", "sk", "sl", "sr", "sv"),
+            null, getSingleEndpoint()
     );
     private final IngestService esIndexer = mock(IngestService.class);
     private final PipelineUtilities pipelineUtilities = mock(PipelineUtilities.class);

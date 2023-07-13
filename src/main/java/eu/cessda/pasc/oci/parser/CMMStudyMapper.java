@@ -18,8 +18,8 @@ package eu.cessda.pasc.oci.parser;
 import eu.cessda.pasc.oci.DateNotParsedException;
 import eu.cessda.pasc.oci.TimeUtility;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
+import eu.cessda.pasc.oci.configurations.Repo;
 import eu.cessda.pasc.oci.models.cmmstudy.*;
-import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.Builder;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +57,6 @@ public class CMMStudyMapper {
                 true,
                 "en"
             ),
-            true,
             "<br>"
         );
         this.docElementParser = new DocElementParser(this.oaiPmh);
@@ -85,8 +84,8 @@ public class CMMStudyMapper {
         if (codeBookLang.isPresent() && !codeBookLang.get().getValue().trim().isEmpty()) {
             return codeBookLang.get().getValue().trim();
             // #192 - Per repository override of the default language
-        } else if (repository.getDefaultLanguage() != null) {
-            return repository.getDefaultLanguage();
+        } else if (repository.defaultLanguage() != null) {
+            return repository.defaultLanguage();
         } else {
             return oaiPmh.metadataParsingDefaultLang().lang();
         }
@@ -443,7 +442,7 @@ public class CMMStudyMapper {
                 });
             }
 
-            return universes;
+            return Collections.unmodifiableMap(universes);
         } else {
             return Collections.emptyMap();
         }

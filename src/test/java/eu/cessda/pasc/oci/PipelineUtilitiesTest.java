@@ -16,7 +16,7 @@
 package eu.cessda.pasc.oci;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.cessda.pasc.oci.models.configurations.Repo;
+import eu.cessda.pasc.oci.configurations.Repo;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Files;
@@ -38,8 +38,8 @@ class PipelineUtilitiesTest {
         // Should discover 2 repositories, ignoring the invalid definition.
         var repositoryAssert = assertThat(discoveredRepositories);
         repositoryAssert.hasSize(2);
-        repositoryAssert.map(Repo::getCode).containsOnly("APIS", "UniData");
-        repositoryAssert.map(Repo::getPreferredMetadataParam).containsAnyElementsOf(List.of("ddi_c", "oai_ddi25"));
+        repositoryAssert.map(Repo::code).containsOnly("APIS", "UniData");
+        repositoryAssert.map(Repo::preferredMetadataParam).containsAnyElementsOf(List.of("ddi_c", "oai_ddi25"));
     }
 
     @Test
