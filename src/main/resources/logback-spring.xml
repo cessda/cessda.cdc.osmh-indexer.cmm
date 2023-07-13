@@ -20,6 +20,7 @@
     <springProperty name="jsonEnabled" source="logging.json.enabled" defaultValue="false"/>
     <if condition='p("jsonEnabled").equals("true")'>
         <then>
+            <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
             <appender name="jsonConsoleAppender" class="ch.qos.logback.core.ConsoleAppender">
                 <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
             </appender>

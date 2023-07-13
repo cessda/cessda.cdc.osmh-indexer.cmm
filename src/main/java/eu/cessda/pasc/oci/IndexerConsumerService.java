@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -78,7 +79,12 @@ public class IndexerConsumerService {
         )) {
             var studies = new AtomicInteger();
 
-            var studiesByLanguage = stream.flatMap(path -> getRecord(repo, path).stream())
+            // Parse the XML asynchronously
+            var futures = stream.map(path -> CompletableFuture.supplyAsync(() -> getRecord(repo, path))).toList();
+
+            var studiesByLanguage = futures.stream()
+                .map(CompletableFuture::join) // Wait for the XML to be parsed
+                .flatMap(List::stream) // Extract the individual studies from the parsed XML
                 .flatMap(cmmStudy -> {
                     // Extract language specific variants of the record
                     var extractedStudies = languageExtractor.extractFromStudy(cmmStudy, repo);
@@ -87,9 +93,10 @@ public class IndexerConsumerService {
                     }
                     return extractedStudies.entrySet().stream();
                 })
+                // Group the language specific studies by language
                 .collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
 
-            log.info("[{}] Retrieved [{}] studies.",
+            log.info("[{}] Retrieved {} studies.",
                 value(LoggingConstants.REPO_NAME, repo.getCode()),
                 value("present_cmm_record", studies.get())
             );

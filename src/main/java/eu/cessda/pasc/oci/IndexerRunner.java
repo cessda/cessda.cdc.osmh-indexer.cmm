@@ -30,7 +30,10 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -77,21 +80,41 @@ public class IndexerRunner {
             var contextMap = MDC.getCopyOfContextMap();
 
             // Discover repositories by attempting to find pipeline.json instances if a base directory is configured
-            try (var repoParsedFromJson = pipelineUtilities.discoverRepositories(configurationProperties.baseDirectory())) {
-                var futures = Stream.concat(repoParsedFromJson, repos.stream())
-                    .map(repo -> runAsync(() -> indexRepository(repo, contextMap))
+            Stream<Repo> repoStream;
+            if (configurationProperties.baseDirectory() != null) {
+                var discoverRepositories = pipelineUtilities.discoverRepositories(configurationProperties.baseDirectory());
+                repoStream = Stream.concat(discoverRepositories, repos.stream());
+            } else {
+                repoStream = repos.stream();
+            }
+
+            try (repoStream) {
+                var futures = repoStream
+                    .map(repo -> runAsync(() -> {
+                            MDC.setContextMap(contextMap);
+                            // Set the MDC so that the record name is attached to all downstream logs
+                            try (var repoNameClosable = MDC.putCloseable(LoggingConstants.REPO_NAME, repo.getCode())) {
+                                indexRepository(repo);
+                            } finally {
+                                // Reset the MDC
+                                MDC.clear();
+                            }
+                        })
                         .exceptionally(e -> {
+                            // Handle exceptional completion here, this allows failures to be logged as soon as possible
                             log.error("[{}]: Unexpected error occurred when harvesting!", repo.getCode(), e);
                             return null;
                         })
                     ).toArray(CompletableFuture[]::new);
 
+                // Wait until all indexing futures have completed
                 CompletableFuture.allOf(futures).join();
 
-                log.info("Harvest finished. Summary of the current state:");
-                log.info("Total number of records: {}", value("total_cmm_studies", ingestService.getTotalHitCount("*")));
+                log.info("Indexing finished. Summary of the current state:\nTotal number of records: {}",
+                    value("total_cmm_studies", ingestService.getTotalHitCount("*"))
+                );
             } catch (IOException e) {
-                log.error("IO Error when getting the total number of records: {}", e.toString());
+                log.warn("Indexing finished. An IO error occurred when getting the total number of records: {}", e.toString());
             } finally {
                 // Ensure that the running state is always set to false even if an exception is thrown
                 indexerRunning.set(false);
@@ -106,32 +129,23 @@ public class IndexerRunner {
      * Harvest an individual repository.
      *
      * @param repo                 the repository to harvest.
-     * @param contextMap           the logging context map.
      */
     @SuppressWarnings("try")
-    private void indexRepository(Repo repo, Map<String, String> contextMap) {
-        MDC.setContextMap(contextMap);
-
-        // Set the MDC so that the record name is attached to all downstream logs
-        try (var repoNameClosable = MDC.putCloseable(LoggingConstants.REPO_NAME, repo.getCode())) {
-            var startTime = Instant.now();
-            log.info("Processing Repo [{}]", repo);
-            var langStudies = indexer.getRecords(repo);
-            for (var entry : langStudies.entrySet()) {
-                try (var langClosable = MDC.putCloseable(LoggingConstants.LANG_CODE, entry.getKey())) {
-                    indexRecords(repo, entry.getKey(), entry.getValue());
-                } catch (ElasticsearchException e) {
-                    log.error("[{}({})] Error communicating with Elasticsearch!", repo.getCode(), entry.getKey(), e);
-                }
+    private void indexRepository(Repo repo) {
+        var startTime = Instant.now();
+        log.info("Processing Repo [{}]", repo);
+        var langStudies = indexer.getRecords(repo);
+        for (var entry : langStudies.entrySet()) {
+            try (var langClosable = MDC.putCloseable(LoggingConstants.LANG_CODE, entry.getKey())) {
+                indexRecords(repo, entry.getKey(), entry.getValue());
+            } catch (ElasticsearchException e) {
+                log.error("[{}({})] Error communicating with Elasticsearch!", repo.getCode(), entry.getKey(), e);
             }
-            log.info("[{}] Repo finished, took {} seconds",
-                repo.getCode(),
-                value("repository_duration", Duration.between(startTime, Instant.now()).getSeconds())
-            );
-        } finally {
-            // Reset the MDC
-            MDC.clear();
         }
+        log.info("[{}] Repo finished, took {} seconds",
+            repo.getCode(),
+            value("repository_duration", Duration.between(startTime, Instant.now()).getSeconds())
+        );
     }
 
 
@@ -168,7 +182,7 @@ public class IndexerRunner {
             try {
                 ingestService.bulkIndex(cmmStudies, langIsoCode);
                 ingestService.bulkDelete(studiesToDelete, langIsoCode);
-                log.info("[{}({})] Indexing succeeded: [{}] studies created, [{}] studies deleted, [{}] studies updated.",
+                log.info("[{}({})] Indexing succeeded: {} studies created, {} studies deleted, {} studies updated.",
                     value(LoggingConstants.REPO_NAME, repo.getCode()),
                     value(LoggingConstants.LANG_CODE, langIsoCode),
                     value("created_cmm_studies", studiesUpdated.studiesCreated),

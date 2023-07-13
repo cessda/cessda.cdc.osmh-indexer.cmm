@@ -16,10 +16,7 @@
 package eu.cessda.pasc.oci.elasticsearch;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.ElasticsearchException;
-import co.elastic.clients.elasticsearch._types.ErrorCause;
-import co.elastic.clients.elasticsearch._types.FieldSort;
-import co.elastic.clients.elasticsearch._types.SortOptions;
+import co.elastic.clients.elasticsearch._types.*;
 import co.elastic.clients.elasticsearch._types.mapping.TypeMapping;
 import co.elastic.clients.elasticsearch._types.query_dsl.MatchAllQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
@@ -240,7 +237,7 @@ public class ESIngestService implements IngestService {
 
         var request = new SearchRequest.Builder().size(1).sort(
             new SortOptions.Builder().field(
-                new FieldSort.Builder().field(LAST_MODIFIED_FIELD).order(co.elastic.clients.elasticsearch._types.SortOrder.Desc).build()
+                new FieldSort.Builder().field(LAST_MODIFIED_FIELD).order(SortOrder.Desc).build()
             ).build()
         ).build();
 

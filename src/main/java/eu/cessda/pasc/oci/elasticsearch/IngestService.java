@@ -88,10 +88,7 @@ public interface IngestService {
     Optional<CMMStudyOfLanguage> getStudy(String id, String language);
 
     /**
-     * Gets the most recent lastModified date from the cluster across all indices eg pattern (cmmstudy_*)
-     * <p>
-     * Ingestion to indices can range between minutes to 6hrs meaning this dateTime stamp returned
-     * might be off in minutes/hours for some indices therefore this timeStamp should be adjusted according before use.
+     * Gets the most recent lastModified date from the cluster across all {@code cmmstudy} indices.
      *
      * @return LocalDateTime. The exact most recent lastModified dateTime from the cluster for the index pattern.
      */
