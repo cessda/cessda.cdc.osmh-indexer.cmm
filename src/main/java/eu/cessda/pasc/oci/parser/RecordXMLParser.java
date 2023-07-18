@@ -15,6 +15,7 @@
  */
 package eu.cessda.pasc.oci.parser;
 
+import eu.cessda.pasc.oci.configurations.Repo;
 import eu.cessda.pasc.oci.exception.InvalidUniverseException;
 import eu.cessda.pasc.oci.exception.UnsupportedXMLNamespaceException;
 import eu.cessda.pasc.oci.exception.XMLParseException;
@@ -22,7 +23,6 @@ import eu.cessda.pasc.oci.models.Record;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.Request;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
-import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.extern.slf4j.Slf4j;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -142,10 +142,10 @@ public class RecordXMLParser {
         if (suppressedNamespaceWarnings == null) {
             suppressedNamespaceWarnings = ConcurrentHashMap.newKeySet();
         }
-        if (suppressedNamespaceWarnings.add(Map.entry(repo.getCode(), e.getNamespace()))) {
+        if (suppressedNamespaceWarnings.add(Map.entry(repo.code(), e.getNamespace()))) {
             // Only log on first encounter with this namespace
             var recordIdentifier = record.recordHeader() != null ? record.recordHeader().identifier() : null;
-            log.warn("[{}]: {} cannot be parsed: {}. Further reports for this namespace have been suppressed.", repo.getCode(), recordIdentifier, e.getMessage());
+            log.warn("[{}]: {} cannot be parsed: {}. Further reports for this namespace have been suppressed.", repo.code(), recordIdentifier, e.getMessage());
         }
     }
 
@@ -160,7 +160,7 @@ public class RecordXMLParser {
             try {
                 baseURL = new URI(elem.getTextTrim());
             } catch (URISyntaxException e) {
-                log.warn("{}: {}: {} could not be parsed as a URL: {}", repo.getCode(), path, elem.getText(), e.toString());
+                log.warn("{}: {}: {} could not be parsed as a URL: {}", repo.code(), path, elem.getText(), e.toString());
             }
             
             // Find all records, iterate through them
@@ -237,7 +237,7 @@ public class RecordXMLParser {
             builder.studyUrl(parseStudyUrlResults.results());
             if (!parseStudyUrlResults.exceptions().isEmpty()) {
                 log.warn("[{}] Some URLs in study {} couldn't be parsed: {}",
-                    repository.getCode(),
+                    repository.code(),
                     studyNumber,
                     parseStudyUrlResults.exceptions()
                 );
@@ -266,7 +266,7 @@ public class RecordXMLParser {
             if (!dataCollectionPeriodResults.exceptions().isEmpty()) {
                 // Parsing errors occurred, log here
                 log.warn("[{}] Some dates in study {} couldn't be parsed: {}",
-                    repository.getCode(),
+                    repository.code(),
                     studyNumber,
                     dataCollectionPeriodResults.exceptions()
                 );
@@ -276,7 +276,7 @@ public class RecordXMLParser {
             try {
                 builder.universe(cmmStudyMapper.parseUniverses(metadata, xPaths, defaultLangIsoCode));
             } catch (InvalidUniverseException e) {
-                log.warn("[{}] Some universes in study {} couldn't be parsed: {}", repository.getCode(), studyNumber, e.toString());
+                log.warn("[{}] Some universes in study {} couldn't be parsed: {}", repository.code(), studyNumber, e.toString());
             }
             builder.relatedPublications(cmmStudyMapper.parseRelatedPublications(metadata, xPaths, defaultLangIsoCode));
         }
@@ -285,15 +285,15 @@ public class RecordXMLParser {
         if (request.baseURL() != null) {
             repositoryUrl = request.baseURL();
         } else {
-            repositoryUrl = repository.getUrl();
+            repositoryUrl = repository.url();
         }
         builder.repositoryUrl(repositoryUrl);
 
         try {
             //should retrieve from header, if present
-            builder.studyXmlSourceUrl(OaiPmhHelpers.buildGetStudyFullUrl(repository.getUrl(), studyNumber, repository.getPreferredMetadataParam()));
+            builder.studyXmlSourceUrl(OaiPmhHelpers.buildGetStudyFullUrl(repository.url(), studyNumber, repository.preferredMetadataParam()));
         } catch (URISyntaxException e) {
-            log.warn("[{}] Study URL for {} couldn't be parsed: {}", repository.getCode(), studyNumber, e.toString());
+            log.warn("[{}] Study URL for {} couldn't be parsed: {}", repository.code(), studyNumber, e.toString());
         }
 
         return builder.build();

@@ -15,10 +15,10 @@
  */
 package eu.cessda.pasc.oci;
 
+import eu.cessda.pasc.oci.configurations.Repo;
 import eu.cessda.pasc.oci.exception.IndexerException;
 import eu.cessda.pasc.oci.exception.XMLParseException;
 import eu.cessda.pasc.oci.mock.data.ReposTestData;
-import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.parser.RecordXMLParser;
 import org.junit.Assert;
 import org.junit.Before;
@@ -75,11 +75,9 @@ public class IndexerConsumerServiceTest {
     }
 
     @Test
-    public void shouldThrowIfAURLAndAPathIsNotConfigured() {
+    public void shouldThrowIfAPathIsNotConfigured() {
         // Given
-        var ukdsEndpoint  = ReposTestData.getUKDSRepo();
-        ukdsEndpoint.setUrl(null);
-        ukdsEndpoint.setPath(null);
+        var ukdsEndpoint  = ReposTestData.getGesisEnRepo();
 
         // When
         assertThatThrownBy(() -> indexerConsumerService.getRecords(ukdsEndpoint))

@@ -15,11 +15,10 @@
  */
 package eu.cessda.pasc.oci.mock.data;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.cessda.pasc.oci.ResourceHandler;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
-import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
-import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguageConverter;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -46,8 +45,7 @@ public final class RecordTestData {
   }
 ]""";
 
-    private static final CMMStudyConverter cmmStudyConverter = new CMMStudyConverter();
-    private static final CMMStudyOfLanguageConverter cmmStudyOfLanguageConverter = new CMMStudyOfLanguageConverter();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static List<CMMStudy> getASingleSyntheticCMMStudyAsList() {
         List<CMMStudy> cmmStudies = new ArrayList<>(1);
@@ -72,21 +70,21 @@ public final class RecordTestData {
 
     public static List<CMMStudyOfLanguage> getCmmStudyOfLanguageCodeEnX1() throws IOException {
         String syntheticCMMStudyOfLanguageEn = getSyntheticCMMStudyOfLanguageEn();
-        var cmmStudyOfLanguage = cmmStudyOfLanguageConverter.fromJsonString(syntheticCMMStudyOfLanguageEn);
+        var cmmStudyOfLanguage = objectMapper.readValue(syntheticCMMStudyOfLanguageEn, CMMStudyOfLanguage.class);
         return Collections.singletonList(cmmStudyOfLanguage);
     }
 
     public static List<CMMStudyOfLanguage> getCmmStudyOfLanguageCodeEnX3() throws IOException {
         var studyOfLanguages = new ArrayList<CMMStudyOfLanguage>(3);
         String syntheticCMMStudyOfLanguageEn = getSyntheticCMMStudyOfLanguageEn();
-        studyOfLanguages.add(cmmStudyOfLanguageConverter.fromJsonString(syntheticCMMStudyOfLanguageEn));
+        studyOfLanguages.add(objectMapper.readValue(syntheticCMMStudyOfLanguageEn, CMMStudyOfLanguage.class));
 
-        CMMStudyOfLanguage cmmStudyOfLanguage2 = cmmStudyOfLanguageConverter.fromJsonString(syntheticCMMStudyOfLanguageEn)
+        CMMStudyOfLanguage cmmStudyOfLanguage2 = objectMapper.readValue(syntheticCMMStudyOfLanguageEn, CMMStudyOfLanguage.class)
             .withId("UK-Data-Service__999")
             .withLastModified("2017-11-15T08:08:11Z");
         studyOfLanguages.add(cmmStudyOfLanguage2);
 
-        CMMStudyOfLanguage cmmStudyOfLanguage3 = cmmStudyOfLanguageConverter.fromJsonString(syntheticCMMStudyOfLanguageEn)
+        CMMStudyOfLanguage cmmStudyOfLanguage3 = objectMapper.readValue(syntheticCMMStudyOfLanguageEn, CMMStudyOfLanguage.class)
             .withId("UK-Data-Service__1000")
             .withLastModified("2017-04-05");
         studyOfLanguages.add(cmmStudyOfLanguage3);
@@ -96,12 +94,12 @@ public final class RecordTestData {
 
     public static CMMStudy getSyntheticCmmStudy() throws IOException {
         var cmmStudyStream = ResourceHandler.getResourceAsStream("synthetic_compliant_record.json");
-        return cmmStudyConverter.fromJsonStream(cmmStudyStream);
+        return objectMapper.readValue(cmmStudyStream, CMMStudy.class);
     }
 
     private static CMMStudy getDeletedCmmStudy() throws IOException {
         var cmmStudyStream = ResourceHandler.getResourceAsStream("record_ukds_1031_deleted.json");
-        return cmmStudyConverter.fromJsonStream(cmmStudyStream);
+        return objectMapper.readValue(cmmStudyStream, CMMStudy.class);
     }
 
     public static CMMStudy getSyntheticCmmStudy(String identifier) throws IOException {

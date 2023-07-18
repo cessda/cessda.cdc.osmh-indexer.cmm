@@ -30,7 +30,6 @@ oaiPmh:
   metadataParsingDefaultLang:
     active: true
     lang: 'en'
-  concatRepeatedElements: true
   concatSeparator: "<br>"
 ---
 # For debugging
@@ -41,9 +40,3 @@ logging:
     ROOT: INFO
     eu.cessda.pasc.oci: DEBUG
     eu.cessda.pasc.oci.repository: INFO
-endpoints:
-  repos:
-    - url: https://www.adp.fdv.uni-lj.si/v0/oai
-      preferredMetadataParam: oai_ddi25
-      code: 'ADP'
-      handler: 'DDI_2_5'

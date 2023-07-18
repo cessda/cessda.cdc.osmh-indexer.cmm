@@ -17,11 +17,11 @@ package eu.cessda.pasc.oci;
 
 import com.neovisionaries.i18n.CountryCode;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
+import eu.cessda.pasc.oci.configurations.Repo;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.Country;
 import eu.cessda.pasc.oci.models.cmmstudy.Publisher;
-import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,9 +56,12 @@ public class LanguageExtractor {
      * @return an unmodifiable {@link Map} with extracted documents for each language ISO code
      */
     public Map<String, CMMStudyOfLanguage> extractFromStudy(CMMStudy cmmStudy, Repo repository) {
-        var validLanguages = appConfigurationProperties.getLanguages().stream()
-            .filter(langCode -> isValidCMMStudyForLang(cmmStudy, langCode))
-            .collect(Collectors.toList());
+        var validLanguages = new ArrayList<String>(appConfigurationProperties.languages().size());
+        for (var language : appConfigurationProperties.languages()) {
+            if (isValidCMMStudyForLang(cmmStudy, language)) {
+                validLanguages.add(language);
+            }
+        }
 
         if (!validLanguages.isEmpty()) {
             return validLanguages.stream().collect(Collectors.toUnmodifiableMap(
@@ -66,7 +69,7 @@ public class LanguageExtractor {
                 langCode -> getCmmStudyOfLanguage(cmmStudy, langCode, validLanguages, repository)
             ));
         } else {
-            log.debug("[{}] No valid languages for study [{}]", repository.getCode(), cmmStudy.studyNumber());
+            log.debug("[{}] No valid languages for study [{}]", repository.code(), cmmStudy.studyNumber());
             return Collections.emptyMap();
         }
     }
@@ -91,7 +94,7 @@ public class LanguageExtractor {
 
     private CMMStudyOfLanguage getCmmStudyOfLanguage(CMMStudy cmmStudy, String lang, Collection<String> availableLanguages, Repo repository) {
 
-        log.trace("[{}] Extracting CMMStudyOfLanguage for study [{}], language [{}]", repository.getCode(), cmmStudy.studyNumber(), lang);
+        log.trace("[{}] Extracting CMMStudyOfLanguage for study [{}], language [{}]", repository.code(), cmmStudy.studyNumber(), lang);
 
         CMMStudyOfLanguage.CMMStudyOfLanguageBuilder builder = CMMStudyOfLanguage.builder();
 
@@ -102,7 +105,7 @@ public class LanguageExtractor {
         // Language neutral specific field extraction
         // UK Data Service = UK-Data-Service__
         builder.id(hashedId)
-            .code(repository.getCode())
+            .code(repository.code())
             .studyNumber(cmmStudy.studyNumber())
             .lastModified(cmmStudy.lastModified())
             .publicationYear(cmmStudy.publicationYear())
@@ -115,7 +118,7 @@ public class LanguageExtractor {
 
 
         // #430: Set the publisher filter based on the source repository.
-        builder.publisherFilter(new Publisher(repository.getCode(), repository.getName()));
+        builder.publisherFilter(new Publisher(repository.code(), repository.name()));
 
         // Language specific field extraction
         Optional.ofNullable(cmmStudy.titleStudy()).map(map -> map.get(lang)).ifPresent(builder::titleStudy);

@@ -15,6 +15,7 @@
  */
 package eu.cessda.pasc.oci.elasticsearch;
 
+import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 
 import java.io.IOException;
@@ -35,7 +36,7 @@ public interface IngestService {
      *
      * @param languageCMMStudiesMap of records
      * @param languageIsoCode       index post-end token
-     * @throws org.elasticsearch.ElasticsearchException if an error occurs when indexing the studies to Elasticsearch.
+     * @throws IndexingException if an error occurs when indexing the studies to Elasticsearch.
      */
     void bulkIndex(Collection<CMMStudyOfLanguage> languageCMMStudiesMap, String languageIsoCode) throws IndexingException;
 
@@ -43,9 +44,10 @@ public interface IngestService {
      * Delete the specified studies from all indices.
      * <p>
      * No language option is needed as deletions occur at the study level, not per language.
+     *
      * @param cmmStudiesToDelete the collection of studies to delete
-     * @param languageIsoCode the language of the index to delete the studies from
-     * @throws org.elasticsearch.ElasticsearchException if an error occurs connecting to Elasticsearch.
+     * @param languageIsoCode    the language of the index to delete the studies from
+     * @throws IndexingException if an error occurs connecting to Elasticsearch.
      */
     void bulkDelete(Collection<CMMStudyOfLanguage> cmmStudiesToDelete, String languageIsoCode) throws IndexingException;
 
@@ -54,8 +56,8 @@ public interface IngestService {
      * in application.yml.
      *
      * @param language the language to get the total hits from. Use * to get the hits for all languages.
-     * @throws org.elasticsearch.index.IndexNotFoundException if a corresponding index is not found.
-     * @throws org.elasticsearch.ElasticsearchException       if an error occurs connecting to Elasticsearch.
+     * @throws ElasticsearchException if a corresponding index is not found.
+     * @throws IOException            if an error occurs connecting to Elasticsearch.
      */
     long getTotalHitCount(String language) throws IOException;
 
@@ -71,7 +73,7 @@ public interface IngestService {
      * Gets a set of all studies from a specific repository for a given language.
      *
      * @param repository the code of the repository.
-     * @param language the language of the index to search in. Use * to search all indexes.
+     * @param language   the language of the index to search in. Use * to search all indexes.
      */
     Set<CMMStudyOfLanguage> getStudiesByRepository(String repository, String language);
 
@@ -86,10 +88,7 @@ public interface IngestService {
     Optional<CMMStudyOfLanguage> getStudy(String id, String language);
 
     /**
-     * Gets the most recent lastModified date from the cluster across all indices eg pattern (cmmstudy_*)
-     * <p>
-     * Ingestion to indices can range between minutes to 6hrs meaning this dateTime stamp returned
-     * might be off in minutes/hours for some indices therefore this timeStamp should be adjusted according before use.
+     * Gets the most recent lastModified date from the cluster across all {@code cmmstudy} indices.
      *
      * @return LocalDateTime. The exact most recent lastModified dateTime from the cluster for the index pattern.
      */

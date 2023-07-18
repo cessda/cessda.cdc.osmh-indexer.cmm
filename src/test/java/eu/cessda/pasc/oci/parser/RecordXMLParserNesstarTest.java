@@ -20,11 +20,10 @@ import com.github.fge.jackson.JsonLoader;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import eu.cessda.pasc.oci.ResourceHandler;
+import eu.cessda.pasc.oci.configurations.Repo;
 import eu.cessda.pasc.oci.exception.IndexerException;
 import eu.cessda.pasc.oci.mock.data.ReposTestData;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
-import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyConverter;
-import eu.cessda.pasc.oci.models.configurations.Repo;
 import org.json.JSONException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -43,7 +42,7 @@ public class RecordXMLParserNesstarTest {
     private final Repo nesstarRepo = ReposTestData.getNSDRepo();
 
     private final CMMStudyMapper cmmStudyMapper = new CMMStudyMapper();
-    private final CMMStudyConverter cmmConverter = new CMMStudyConverter();
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final ObjectMapper mapper = new ObjectMapper();
 
     private static HashMap<String, String> getAbstractFixture() {
@@ -75,7 +74,7 @@ public class RecordXMLParserNesstarTest {
         then(result).hasSize(1);
         validateCMMStudyResultAgainstSchema(result.get(0));
 
-        var actualJson = cmmConverter.toJsonString(result.get(0));
+        var actualJson = objectMapper.writeValueAsString(result.get(0));
         var expectedJson = ResourceHandler.getResourceAsString("json/synthetic_compliant_record_nesstar.json");
 
         // Compare the generated JSON to the expected result
@@ -107,7 +106,7 @@ public class RecordXMLParserNesstarTest {
         var record = new RecordXMLParser(cmmStudyMapper).getRecord(nesstarRepo, Path.of(recordXML.toURI()));
         then(record).hasSize(1);
         validateCMMStudyResultAgainstSchema(record.get(0));
-        var jsonString = cmmConverter.toJsonString(record.get(0));
+        var jsonString = objectMapper.writeValueAsString(record.get(0));
         var actualTree = mapper.readTree(jsonString);
 
         // Then
@@ -212,7 +211,7 @@ public class RecordXMLParserNesstarTest {
     }
 
     private void validateCMMStudyResultAgainstSchema(CMMStudy record) throws IOException, ProcessingException {
-        var jsonString = cmmConverter.toJsonString(record);
+        var jsonString = objectMapper.writeValueAsString(record);
 
         var jsonNodeRecord = JsonLoader.fromString(jsonString);
         var schema = JsonSchemaFactory.byDefault().getJsonSchema("resource:/json/schema/CMMStudy.schema.json");
@@ -225,7 +224,7 @@ public class RecordXMLParserNesstarTest {
 
     private void assertThatCmmRequiredFieldsAreExtracted(CMMStudy record) throws JSONException, IOException {
 
-        var jsonString = cmmConverter.toJsonString(record);
+        var jsonString = objectMapper.writeValueAsString(record);
         var expectedJson = ResourceHandler.getResourceAsString("json/synthetic_compliant_record_nesstar.json");
         final var actualTree = mapper.readTree(jsonString);
         final var expectedTree = mapper.readTree(expectedJson);
@@ -244,8 +243,16 @@ public class RecordXMLParserNesstarTest {
         // Given
         var recordXML = ResourceHandler.getResource("xml/nesstar/synthetic_compliant_cmm_nesstar_no_language.xml");
 
-        var langRepo = ReposTestData.getNSDRepo();
-        langRepo.setDefaultLanguage("zz");
+        var nsdRepo = ReposTestData.getNSDRepo();
+        var langRepo = new Repo(
+            nsdRepo.url(),
+            nsdRepo.path(),
+            nsdRepo.code(),
+            nsdRepo.name(),
+            nsdRepo.preferredMetadataParam(),
+            nsdRepo.setSpec(),
+            "zz"
+        );
 
         // When
         var result = new RecordXMLParser(cmmStudyMapper).getRecord(langRepo, Path.of(recordXML.toURI()));

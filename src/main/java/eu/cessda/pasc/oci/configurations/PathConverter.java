@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.models.configurations;
+package eu.cessda.pasc.oci.configurations;
 
-import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Component;
 
-import java.net.URI;
+import java.nio.file.Path;
 
-/**
- * Harvester Configurations
- *
- * @author moses AT doraventures DOT com
- */
-@Data
-public class Harvester {
-  private URI url;
-  private String version;
+@Component
+@ConfigurationPropertiesBinding
+public class PathConverter implements Converter<String, Path> {
+    @Override
+    public Path convert(@NonNull String s) {
+        return Path.of(s).normalize();
+    }
 }

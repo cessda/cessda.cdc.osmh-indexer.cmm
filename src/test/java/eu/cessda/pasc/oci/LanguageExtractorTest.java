@@ -21,7 +21,6 @@ import eu.cessda.pasc.oci.mock.data.ReposTestData;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,8 +42,7 @@ public class LanguageExtractorTest {
     private final LanguageExtractor languageExtractor;
 
     public LanguageExtractorTest() {
-        var appConfigurationProperties = Mockito.mock(AppConfigurationProperties.class);
-        Mockito.when(appConfigurationProperties.getLanguages()).thenReturn(ReposTestData.getListOfLanguages());
+        var appConfigurationProperties = new AppConfigurationProperties(null, ReposTestData.getListOfLanguages(), null, null);
         languageExtractor = new LanguageExtractor(appConfigurationProperties);
     }
 

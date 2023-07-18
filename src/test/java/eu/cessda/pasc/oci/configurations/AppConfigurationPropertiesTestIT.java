@@ -16,7 +16,6 @@
 package eu.cessda.pasc.oci.configurations;
 
 import eu.cessda.pasc.oci.AbstractSpringTestProfileContext;
-import eu.cessda.pasc.oci.models.configurations.Repo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +38,7 @@ public class AppConfigurationPropertiesTestIT extends AbstractSpringTestProfileC
 
   @Test
   public void shouldReturnConfigurationsForOSMHHandler() {
-    List<Repo> repos = appConfigurationProperties.getEndpoints().getRepos();
+    List<Repo> repos = appConfigurationProperties.repos();
     then(repos).isNotNull();
     then(repos).hasAtLeastOneElementOfType(Repo.class);
   }

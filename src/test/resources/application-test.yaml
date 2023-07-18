@@ -15,27 +15,20 @@ spring:
   main:
     banner-mode: "off"
   config.activate.on-profile: test
-endpoints:
-  supportedRecordTypes:
-    - Study
-    - StudyGroup
-    - Variable
-    - Question
-    - CMM
-  repos:
-    - url: https://data2.aussda.at/oai/
-      preferredMetadataParam: oai_ddi
-      code: 'AUSSDA'
-      handler: 'OAI-PMH'
-    - url: http://services.fsd.uta.fi/v0/oai
-      preferredMetadataParam: oai_ddi25
-      setSpec: study_groups:energia
-      code: 'FSD'
-      handler: 'OAI-PMH'
-    - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
-      preferredMetadataParam: ddi
-      code: 'UKDS'
-      handler: 'OAI-PMH'
+repos:
+  - url: https://data2.aussda.at/oai/
+    preferredMetadataParam: oai_ddi
+    code: 'AUSSDA'
+    handler: 'OAI-PMH'
+  - url: http://services.fsd.uta.fi/v0/oai
+    preferredMetadataParam: oai_ddi25
+    setSpec: study_groups:energia
+    code: 'FSD'
+    handler: 'OAI-PMH'
+  - url: https://oai.ukdataservice.ac.uk:8443/oai/provider
+    preferredMetadataParam: ddi
+    code: 'UKDS'
+    handler: 'OAI-PMH'
 elasticsearch:
   # Because tests clear Elasticsearch after completion make sure that we don't run against live clusters
   clustername: test

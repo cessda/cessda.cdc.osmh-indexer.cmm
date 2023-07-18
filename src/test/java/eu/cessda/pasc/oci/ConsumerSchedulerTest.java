@@ -19,11 +19,11 @@ import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
+import eu.cessda.pasc.oci.configurations.Repo;
 import eu.cessda.pasc.oci.elasticsearch.IndexingException;
 import eu.cessda.pasc.oci.elasticsearch.IngestService;
 import eu.cessda.pasc.oci.exception.IndexerException;
 import eu.cessda.pasc.oci.models.RecordHeader;
-import eu.cessda.pasc.oci.models.configurations.Repo;
 import eu.cessda.pasc.oci.parser.RecordXMLParser;
 import eu.cessda.pasc.oci.service.DebuggingJMXBean;
 import org.junit.Test;
@@ -48,7 +48,10 @@ import static org.mockito.Mockito.*;
  */
 public class ConsumerSchedulerTest {
     // mock for debug logging
-    private final AppConfigurationProperties appConfigurationProperties = mock(AppConfigurationProperties.class);
+    private final AppConfigurationProperties appConfigurationProperties = new AppConfigurationProperties(
+            null, List.of("cs", "da", "de", "el", "en", "et", "fi", "fr", "hu", "it", "nl", "no", "pt", "sk", "sl", "sr", "sv"),
+            null, getSingleEndpoint()
+    );
     private final IngestService esIndexer = mock(IngestService.class);
     private final PipelineUtilities pipelineUtilities = mock(PipelineUtilities.class);
     private final LanguageExtractor extractor = new LanguageExtractor(appConfigurationProperties);
@@ -56,12 +59,6 @@ public class ConsumerSchedulerTest {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final CollectionType RECORD_HEADER_LIST = objectMapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class);
-
-    public ConsumerSchedulerTest() {
-        // mock for configuration of our repos
-        when(appConfigurationProperties.getEndpoints()).thenReturn(getSingleEndpoint());
-        when(appConfigurationProperties.getLanguages()).thenReturn(List.of("cs", "da", "de", "el", "en", "et", "fi", "fr", "hu", "it", "nl", "no", "pt", "sk", "sl", "sr", "sv"));
-    }
 
     private DebuggingJMXBean mockDebuggingJMXBean() throws IOException {
         var debuggingJMXBean = mock(DebuggingJMXBean.class);
@@ -161,11 +158,6 @@ public class ConsumerSchedulerTest {
     private void thenVerifyFullRun(DebuggingJMXBean debuggingJMXBean) throws IOException, IndexerException, IndexingException {
         verify(debuggingJMXBean, times(1)).printElasticSearchInfo();
         verifyNoMoreInteractions(debuggingJMXBean);
-
-        verify(appConfigurationProperties, times(1)).getEndpoints();
-        verify(appConfigurationProperties, atLeastOnce()).getLanguages();
-        verify(appConfigurationProperties, atLeastOnce()).getBaseDirectory();
-        verifyNoMoreInteractions(appConfigurationProperties);
 
         verify(recordXMLParser, times(9)).getRecord(any(Repo.class), any(Path.class));
         verifyNoMoreInteractions(recordXMLParser);

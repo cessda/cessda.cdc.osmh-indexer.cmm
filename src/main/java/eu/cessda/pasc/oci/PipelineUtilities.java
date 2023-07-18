@@ -17,8 +17,8 @@ package eu.cessda.pasc.oci;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import eu.cessda.pasc.oci.configurations.Repo;
 import eu.cessda.pasc.oci.models.PipelineMetadata;
-import eu.cessda.pasc.oci.models.configurations.Repo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -45,34 +45,34 @@ public class PipelineUtilities {
      */
     @SuppressWarnings({"resource", "StreamResourceLeak"}) // closed by calling method
     public Stream<Repo> discoverRepositories(Path baseDirectory) {
-        if (baseDirectory != null) {
-            try {
-                var directoryStream = Files.find(baseDirectory, Integer.MAX_VALUE,
-                    (path, attributes) -> attributes.isRegularFile() && path.getFileName().equals(Path.of("pipeline.json"))
-                );
-                return directoryStream.flatMap(json -> {
-                    try (var inputStream = Files.newInputStream(json)) {
-                        PipelineMetadata sharedModel = repositoryModelObjectReader.readValue(inputStream);
+        try {
+            var directoryStream = Files.find(baseDirectory, Integer.MAX_VALUE,
+                (path, attributes) -> attributes.isRegularFile() && path.getFileName().equals(Path.of("pipeline.json"))
+            );
+            return directoryStream.flatMap(json -> {
+                try (var inputStream = Files.newInputStream(json)) {
+                    PipelineMetadata sharedModel = repositoryModelObjectReader.readValue(inputStream);
 
-                        // Convert the shared model to a Repo object
-                        var repo = new Repo();
-                        repo.setUrl(sharedModel.url());
-                        repo.setCode(sharedModel.code());
-                        repo.setName(sharedModel.name());
-                        repo.setPath(json.getParent());
-                        repo.setDefaultLanguage(sharedModel.defaultLanguage());
-                        repo.setPreferredMetadataParam(sharedModel.metadataPrefix());
+                    // Convert the shared model to a Repo object
+                    var repo = new Repo(
+                        sharedModel.url(),
+                        json.getParent(),
+                        sharedModel.code(),
+                        sharedModel.name(),
+                        sharedModel.metadataPrefix(),
+                        null,
+                        sharedModel.defaultLanguage()
+                    );
 
-                        // Add the repo object to the stream
-                        return Stream.of(repo);
-                    } catch (IOException e) {
-                        log.error("Failed to load pipeline definition from \"{}\": {}", json, e.toString());
-                        return Stream.empty();
-                    }
-                });
-            } catch (IOException e) {
-                log.error("Error occurred when loading repositories: {}", e.toString());
-            }
+                    // Add the repo object to the stream
+                    return Stream.of(repo);
+                } catch (IOException e) {
+                    log.error("Failed to load pipeline definition from \"{}\": {}", json, e.toString());
+                    return Stream.empty();
+                }
+            });
+        } catch (IOException e) {
+            log.error("Error occurred when loading repositories: {}", e.toString());
         }
         return Stream.empty();
     }

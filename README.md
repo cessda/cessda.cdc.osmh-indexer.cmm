@@ -74,10 +74,10 @@ The application loads configuration in this order as defined by the Spring Boot 
 * application-[dev,local,prod].yml
     * dev, local and prod refer to Spring profiles
         * A Spring profile can be specified by the command line `--spring.profiles.active` or the environment variable `SPRING_PROFILES_ACTIVE`
-    * See <https://docs.spring.io/spring-boot/docs/3.0.x/reference/html/features.html#features.profiles> for more details
+    * See <https://docs.spring.io/spring-boot/docs/3.1.x/reference/html/features.html#features.profiles> for more details
 * application.yml
 
-See <https://docs.spring.io/spring-boot/docs/3.0.x/reference/html/features.html#features.external-config> for detailed documentation.
+See <https://docs.spring.io/spring-boot/docs/3.1.x/reference/html/features.html#features.external-config> for detailed documentation.
 
 ### At Runtime
 
@@ -87,7 +87,17 @@ If the application is registered at a [Spring Boot Admin server](https://github.
 
 ## Configuring the indexer
 
-The OSMH harvester has many settings that change the behaviour of the harvest. These settings are defined under the `osmhConsumer` and `osmhhandler` keys in `application.yml`.
+The OSMH indexer has many settings that change the behaviour of the indexing process.
+
+| Property                                 | Type       | Description                                                                                                    |
+|------------------------------------------|------------|----------------------------------------------------------------------------------------------------------------|
+| `baseDirectory`                          | Path       | Directory to look for `pipeline.json` repository definitions.                                                  |
+| `languages`                              | Languages  | Configure which languages Elasticsearch indices will be created for.                                           |
+| `repos`                                  | List<Repo> | Manually configured repository definitions.                                                                    |
+| `oaiPmh.concatSeparator`                 | String     | The string to use to concatenate repeated elements, concatenation is disabled if `null`.                       |
+| `oaiPmh.metadataParsingDefaultLang.lang` | String     | The language to fall back to if `@xml:lang` is not present. Individual repositories can override this setting. |
+
+
 
 ### Elasticsearch Properties
 
@@ -134,17 +144,14 @@ endpoints:
       defaultLanguage: pt
 ```
 
-The URL is the OAI-PMH endpoint.
-
-The code is the short name of the repository and acts as a unique identifier. This is a mandatory field.
-
-The name is the friendly name of the repository. This is an optional parameter and will be replaced with the code if the name is not present.
-
-The path is the location where the XML source files for the repository are present.
-
-The preferred metadata parameter sets the `metadataPrefix` parameter and is used when generating source URLs.
-
-The default language is used to set a language on a metadata record that doesn't have a language specified in the record itself. This is an optional field and defaults to `osmhConsumer.oaiPmh.metadataParsingDefaultLang.lang` if not set. This setting is only considered if `osmhConsumer.oaiPmh.metadataParsingDefaultLang.active` is set to `true`.
+| Property                 | Type   | Description                                                                                                                                                                                                                                  |
+|--------------------------|--------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `url`                    | URI    | Location of the OAI-PMH endpoint.                                                                                                                                                                                                            |
+| `code`                   | String | Short name of the repository, acts as a unique identifier. This is a mandatory field.                                                                                                                                                        |
+| `name`                   | String | The friendly name of the repository, displayed in the user interface. This falls back to using `code` if `null.                                                                                                                              |
+| `path`                   | Path   | Location of the XML source files to be indexed. This is a mandatory parameter.                                                                                                                                                               |
+| `preferredMetadataParam` | String | The metadata prefix used when harvesting from the OAI-PMH repository.                                                                                                                                                                        |
+| `defaultLanguage`        | String | Used to set a language on an element that doesn't have `@xml:lang` defined. Defaults to `oaiPmh.metadataParsingDefaultLang.lang` if not set. This setting is only considered if `oaiPmh.metadataParsingDefaultLang.active` is set to `true`. |
 
 ## Built With
 

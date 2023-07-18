@@ -36,7 +36,6 @@ import java.util.Set;
 @JsonIgnoreProperties({"isActive"})
 @Builder
 @With
-@SuppressWarnings("ReferenceEquality")
 public record CMMStudyOfLanguage(
     String id,
     @JsonProperty("abstract") String abstractField,

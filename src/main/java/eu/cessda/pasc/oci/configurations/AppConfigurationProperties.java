@@ -15,56 +15,38 @@
  */
 package eu.cessda.pasc.oci.configurations;
 
-import eu.cessda.pasc.oci.models.configurations.Harvester;
-import eu.cessda.pasc.oci.models.configurations.Repo;
-import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 /**
  * Loads Default Configurations from application*.yml
  *
  * @author moses AT doraventures DOT com
  */
-@Configuration
-@EnableConfigurationProperties
 @ConfigurationProperties
-@Data
-public class AppConfigurationProperties {
+public record AppConfigurationProperties(
+    Path baseDirectory,
+    List<String> languages,
+    OaiPmh oaiPmh,
+    List<Repo> repos
+) {
 
-    private Endpoints endpoints = new Endpoints();
-    private List<String> languages = List.of("cs", "da", "de", "el", "en", "et", "fi", "fr", "hu", "it", "nl", "no", "pt", "sk", "sl", "sr", "sv");
-    private OaiPmh oaiPmh = new OaiPmh();
-    private Path baseDirectory = null;
+    private static final List<String> DEFAULT_LANGUAGES = List.of("cs", "da", "de", "el", "en", "et", "fi", "fr", "hu", "it", "nl", "no", "pt", "sk", "sl", "sr", "sv");
 
-    @Component
-    @ConfigurationPropertiesBinding
-    public static class PathConverter implements Converter<String, Path> {
-        @Override
-        public Path convert(@NonNull String s) {
-            return Path.of(s).normalize();
+    public AppConfigurationProperties(Path baseDirectory, List<String> languages, OaiPmh oaiPmh, List<Repo> repos) {
+        this.repos = Objects.requireNonNullElseGet(repos, Collections::emptyList);
+        this.oaiPmh = Objects.requireNonNullElseGet(oaiPmh, OaiPmh::new);
+        this.baseDirectory = baseDirectory;
+
+        if (languages == null || languages.isEmpty()) {
+            this.languages = DEFAULT_LANGUAGES;
+        } else {
+            this.languages = languages;
         }
-    }
-
-    /**
-     * Endpoints configuration model
-     *
-     * @author moses AT doraventures DOT com
-     */
-    @Data
-    public static class Endpoints {
-        private Map<String, Harvester> harvesters = Collections.emptyMap();
-        private List<Repo> repos = Collections.emptyList();
     }
 
     /**
@@ -72,22 +54,26 @@ public class AppConfigurationProperties {
      *
      * @author moses AT doraventures DOT com
      */
-    @Data
-    public static class OaiPmh {
-      private MetadataParsingDefaultLang metadataParsingDefaultLang;
-      private boolean concatRepeatedElements;
-      private String concatSeparator;
+    public record OaiPmh(
+        MetadataParsingDefaultLang metadataParsingDefaultLang,
+        String concatSeparator
+    ) {
+        private OaiPmh() {
+            this(new MetadataParsingDefaultLang(), null);
+        }
+    }
 
-        /**
-         * Defaults for parsing metadata fields with no xml:lang specified,
-         * where lang is extracted content is to be mapped against a lang
-         *
-         * @author moses AT doraventures DOT com
-         */
-        @Data
-        public static class MetadataParsingDefaultLang {
-          private boolean active;
-          private String lang;
+    /**
+     * Defaults for parsing metadata fields with no xml:lang specified,
+     * where lang is extracted content is to be mapped against a lang
+     *
+     * @param active whether to fall back to a default language if xml:lang is not specified.
+     * @param lang   the language to default to.
+     * @author moses AT doraventures DOT com
+     */
+    public record MetadataParsingDefaultLang(boolean active, String lang) {
+        private MetadataParsingDefaultLang() {
+            this(false, null);
         }
     }
 }
