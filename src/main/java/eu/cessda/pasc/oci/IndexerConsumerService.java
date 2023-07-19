@@ -50,7 +50,7 @@ public class IndexerConsumerService {
     protected static final String LIST_RECORD_HEADERS_FAILED_WITH_MESSAGE = LIST_RECORD_HEADERS_FAILED + ": {}";
     protected static final String FAILED_TO_GET_STUDY_ID_WITH_MESSAGE = FAILED_TO_GET_STUDY_ID + ": {}";
 
-    private final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    private final ExecutorService executor = Executors.newWorkStealingPool();
 
     private final RecordXMLParser recordXMLParser;
     private final LanguageExtractor languageExtractor;
