@@ -35,8 +35,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -53,8 +51,6 @@ public class IndexerRunner {
     private final IndexerConsumerService indexer;
     private final PipelineUtilities pipelineUtilities;
     private final IngestService ingestService;
-
-    private final ExecutorService executor = Executors.newFixedThreadPool(2);
 
     private final AtomicBoolean indexerRunning = new AtomicBoolean(false);
 
@@ -103,7 +99,7 @@ public class IndexerRunner {
                                 // Reset the MDC
                                 MDC.clear();
                             }
-                        }, executor)
+                        })
                         .exceptionally(e -> {
                             // Handle exceptional completion here, this allows failures to be logged as soon as possible
                             log.error("[{}]: Unexpected error occurred when harvesting!", repo.code(), e);
@@ -243,6 +239,5 @@ public class IndexerRunner {
         if (indexerRunning.getAndSet(false)) {
             log.info("Indexing cancelled");
         }
-        executor.shutdownNow();
     }
 }
