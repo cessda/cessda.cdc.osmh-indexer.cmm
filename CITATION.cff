@@ -18,18 +18,12 @@
 # Visit https://bit.ly/cffinit to generate yours today!
 
 cff-version: 1.2.0
-title: CESSDA Vocabulary Service
+title: CDC Consumer Indexer 
 message: >-
   If you use this software, please cite it using the
   metadata from this file.
 type: software
 authors:
-  - given-names: Sigit
-    family-names: Nugraha
-    affiliation: >-
-      GESIS – Leibniz Institute for the Social
-      Sciences
-    email: sigit.nugraha@gesis.org
   - given-names: Matthew
     family-names: Morris
     email: matthew.morris@cessda.eu
