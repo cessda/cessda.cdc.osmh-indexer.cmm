@@ -204,9 +204,7 @@ public class ESIngestService implements IngestService {
 
             var source = response.source();
 
-            if (source != null) {
-                return Optional.of(source);
-            }
+            return Optional.ofNullable(source);
         } catch (ElasticsearchException e) {
             // This is expected when the index is not available
             if (e.status() == 404) {

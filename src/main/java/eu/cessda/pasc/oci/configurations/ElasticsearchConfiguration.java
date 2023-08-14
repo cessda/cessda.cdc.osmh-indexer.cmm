@@ -19,18 +19,16 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.elasticsearch.client.RestClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.io.IOException;
 
 /**
  * Extra Util configuration
@@ -39,7 +37,7 @@ import java.io.IOException;
  */
 @Configuration
 @Slf4j
-public class ElasticsearchConfiguration implements AutoCloseable   {
+public class ElasticsearchConfiguration {
 
     private final String esHost;
     private final int esHttpPort;
@@ -47,8 +45,7 @@ public class ElasticsearchConfiguration implements AutoCloseable   {
     private final String esPassword;
     private final ObjectMapper objectMapper;
 
-    private ElasticsearchClient elasticsearchClient;
-
+    @Autowired
     public ElasticsearchConfiguration(
         @Value("${elasticsearch.host:localhost}") String esHost,
         @Value("${elasticsearch.httpPort:9200}") int esHttpPort,
@@ -64,39 +61,25 @@ public class ElasticsearchConfiguration implements AutoCloseable   {
     }
 
     @Bean
-    public ElasticsearchClient elasticsearchClient() {
-        if (elasticsearchClient == null) {
+    public RestClientTransport elasticsearchTransport() {
+        var esHosts = new HttpHost(esHost, esHttpPort, "http");
+        final var restClientBuilder = RestClient.builder(esHosts);
 
-            var esHosts = new HttpHost(esHost, esHttpPort, "http");
-            final var restClientBuilder = RestClient.builder(esHosts);
-
-            if (esUsername != null && esPassword != null) {
-                // Set HTTP credentials
-                var credentialsProvider = new BasicCredentialsProvider();
-                credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(esUsername, esPassword));
-                restClientBuilder.setHttpClientConfigCallback(httpClientBuilder ->
-                    httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider)
-                );
-            }
-
-            var restClient = restClientBuilder.build();
-            var transport = new RestClientTransport(restClient , new JacksonJsonpMapper(objectMapper));
-
-            elasticsearchClient = new ElasticsearchClient(transport);
+        if (esUsername != null && esPassword != null) {
+            // Set HTTP credentials
+            var credentialsProvider = new BasicCredentialsProvider();
+            credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(esUsername, esPassword));
+            restClientBuilder.setHttpClientConfigCallback(httpClientBuilder ->
+                httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider)
+            );
         }
-        return elasticsearchClient;
+
+        var restClient = restClientBuilder.build();
+        return new RestClientTransport(restClient , new JacksonJsonpMapper(objectMapper));
     }
 
-    @Override
-    @PreDestroy
-    public void close() {
-        if (elasticsearchClient != null) {
-            try {
-                elasticsearchClient._transport().close();
-            } catch (IOException e) {
-                log.debug("Error occurred when closing ES client", e);
-            }
-            elasticsearchClient = null;
-        }
+    @Bean
+    public ElasticsearchClient elasticsearchClient(RestClientTransport transport) {
+        return new ElasticsearchClient(transport);
     }
 }
