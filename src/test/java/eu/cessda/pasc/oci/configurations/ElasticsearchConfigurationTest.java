@@ -19,7 +19,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
 
 public class ElasticsearchConfigurationTest {
 
@@ -37,26 +36,10 @@ public class ElasticsearchConfigurationTest {
     public void shouldCreateElasticsearchRestClient() {
         // Given
         var elasticsearchConfiguration = getElasticsearchConfiguration();
-        var client = elasticsearchConfiguration.elasticsearchClient();
+        var transport = elasticsearchConfiguration.elasticsearchTransport();
+        var client = elasticsearchConfiguration.elasticsearchClient(transport);
 
         // Then
         assertNotNull(client);
-
-        // Close
-        elasticsearchConfiguration.close();
-        elasticsearchConfiguration.close(); // Should not throw on repeated calls
-    }
-
-    @Test
-    public void shouldReturnExistingElasticsearchRestClient() {
-        try (var elasticsearchConfiguration = getElasticsearchConfiguration()) {
-
-            // Given
-            var firstESClient = elasticsearchConfiguration.elasticsearchClient();
-            var secondESClient = elasticsearchConfiguration.elasticsearchClient();
-
-            // Then
-            assertSame(firstESClient, secondESClient);
-        }
     }
 }
