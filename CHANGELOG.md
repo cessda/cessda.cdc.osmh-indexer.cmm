@@ -15,16 +15,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 ## [3.4.0] - 2023-08-29
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8277076.svg)](https://doi.org/10.5281/zenodo.8277076)
+
 ### Changed
 
 - Replaced the deprecated Elasticsearch `RestHighLevelClient` with the new Elasticsearch client ([#539](https://github.com/cessda/cessda.cdc.versions/issues/539))
-  - See https://www.elastic.co/guide/en/elasticsearch/client/java-api-client/8.7/migrate-hlrc.html for details on what's changed between the old and new clients
+  - See https://www.elastic.co/guide/en/elasticsearch/client/java-api-client/8.7/migrate-hlrc.html for details on what has changed between the old and new clients
 - Converted all the models to Java records ([PR-25](https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/pull/25))
 - Refactor the indexing pipeline so that each XML is parsed asynchronously ([PR-28](https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/pull/28))
 
 ### Removed
 
-- Removed the ability to harvest OAI-PMH endpoints ([#533]((https://github.com/cessda/cessda.cdc.versions/issues/533))
+- Removed the ability to harvest OAI-PMH endpoints ([#533]((https://github.com/cessda/cessda.cdc.versions/issues/533)))
 
 ## [3.2.0] - 2022-12-08
 
