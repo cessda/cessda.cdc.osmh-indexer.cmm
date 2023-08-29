@@ -20,7 +20,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.cessda.pasc</groupId>
     <artifactId>pasc-oci</artifactId>
-    <version>3.4.0-SNAPSHOT</version>
+    <version>3.4.0</version>
     <packaging>jar</packaging>
 
     <name>CESSDA Data Catalogue OSMH Indexer</name>
@@ -35,7 +35,8 @@
     <scm>
         <url>https://github.com/cessda/cessda.cdc.osmh-indexer.cmm</url>
         <connection>scm:git:https://github.com/cessda/cessda.cdc.osmh-indexer.cmm.git</connection>
-    </scm>
+      <tag>3.4.0</tag>
+  </scm>
     <issueManagement>
         <system>GitHub</system>
         <url>https://github.com/cessda/cessda.cdc.versions/issues</url>
