@@ -45,6 +45,8 @@ public final class XPaths implements Serializable {
     private final String titleXPath;
     private final String parTitleXPath;
     @Nullable
+    private final String dataAccessUrlXPath;
+    @Nullable
     private final String studyURLDocDscrXPath;
     private final String studyURLStudyDscrXPath;
     private final String pidStudyXPath;
@@ -96,6 +98,7 @@ public final class XPaths implements Serializable {
         .studyURLStudyDscrXPath("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:holdings")
         .pidStudyXPath("//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo")
         .creatorsXPath("//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty")
+        .dataAccessUrlXPath("//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:specPerm")
         .dataRestrctnXPath("//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:restrctn")
         .dataCollectionPeriodsXPath("//ddi:codeBook//ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate")
         .yearOfPubXPath("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:distDate[1]/@date")

@@ -243,6 +243,16 @@ public class RecordXMLParser {
                 );
             }
 
+            var parseDataAccessURIResults = cmmStudyMapper.parseDataAccessURI(metadata, xPaths, defaultLangIsoCode);
+            builder.dataAccessUrl(parseDataAccessURIResults.results());
+            if (!parseDataAccessURIResults.exceptions().isEmpty()) {
+                log.warn("[{}] Some URLs in study {} couldn't be parsed: {}",
+                    repository.code(),
+                    studyNumber,
+                    parseDataAccessURIResults.exceptions()
+                );
+            }
+
             builder.abstractField(cmmStudyMapper.parseAbstract(metadata, xPaths, defaultLangIsoCode));
             builder.pidStudies(cmmStudyMapper.parsePidStudies(metadata, xPaths, defaultLangIsoCode));
             builder.creators(cmmStudyMapper.parseCreator(metadata, xPaths, defaultLangIsoCode));

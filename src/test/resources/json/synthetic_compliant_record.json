@@ -198,6 +198,9 @@
       "3 Restriction Text en-GB"
     ]
   },
+  "dataAccessUrl": {
+    "en": "http://localhost/specPerm-test-link"
+  },
   "classifications": {
     "de": [
       {

@@ -455,6 +455,26 @@ public class CMMStudyMapper {
         );
     }
 
+    ParseResults<HashMap<String, URI>, ArrayList<URISyntaxException>> parseDataAccessURI(Document document, XPaths xPaths, String defaultLangIsoCode) {
+        var parsingExceptions = new ArrayList<URISyntaxException>();
+
+        var elements = DocElementParser.getElements(document, xPaths.getDataAccessUrlXPath(), xPaths.getNamespace());
+
+        var parsingUri = docElementParser.getLanguageKeyValuePairs(
+            elements, defaultLangIsoCode,
+            element -> {
+                try {
+                    return uriStrategy(element);
+                } catch (URISyntaxException e) {
+                    parsingExceptions.add(e);
+                    return Optional.empty();
+                }
+            }
+        );
+
+        return new ParseResults<>(parsingUri, parsingExceptions);
+    }
+
     @Value
     public static class HeaderElement {
         String studyNumber;

@@ -47,6 +47,7 @@ public record CMMStudyOfLanguage(
     @JsonProperty("dataCollectionYear") int dataCollectionYear,
     @JsonProperty("dataCollectionFreeTexts") List<DataCollectionFreeText> dataCollectionFreeTexts,
     @JsonProperty("dataAccessFreeTexts") List<String> dataAccessFreeTexts,
+    @JsonProperty("dataAccessUrl") URI dataAccessUrl,
     @JsonProperty("fileLanguages") Set<String> fileLanguages,
     @JsonProperty("keywords") List<TermVocabAttributes> keywords,
     @JsonProperty("pidStudies") List<Pid> pidStudies,
