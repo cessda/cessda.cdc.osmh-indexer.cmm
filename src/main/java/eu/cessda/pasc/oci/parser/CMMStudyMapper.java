@@ -455,24 +455,27 @@ public class CMMStudyMapper {
         );
     }
 
-    ParseResults<HashMap<String, URI>, ArrayList<URISyntaxException>> parseDataAccessURI(Document document, XPaths xPaths, String defaultLangIsoCode) {
-        var parsingExceptions = new ArrayList<URISyntaxException>();
+    ParseResults<Map<String, URI>, List<URISyntaxException>> parseDataAccessURI(Document document, XPaths xPaths, String defaultLangIsoCode) {
+        if (xPaths.getDataAccessUrlXPath().isPresent()) {
+            var parsingExceptions = new ArrayList<URISyntaxException>();
+            var elements = DocElementParser.getElements(document, xPaths.getDataAccessUrlXPath().get(), xPaths.getNamespace());
 
-        var elements = DocElementParser.getElements(document, xPaths.getDataAccessUrlXPath(), xPaths.getNamespace());
-
-        var parsingUri = docElementParser.getLanguageKeyValuePairs(
-            elements, defaultLangIsoCode,
-            element -> {
-                try {
-                    return uriStrategy(element);
-                } catch (URISyntaxException e) {
-                    parsingExceptions.add(e);
-                    return Optional.empty();
+            var parsingUri = docElementParser.getLanguageKeyValuePairs(
+                elements, defaultLangIsoCode,
+                element -> {
+                    try {
+                        return uriStrategy(element);
+                    } catch (URISyntaxException e) {
+                        parsingExceptions.add(e);
+                        return Optional.empty();
+                    }
                 }
-            }
-        );
+            );
 
-        return new ParseResults<>(parsingUri, parsingExceptions);
+            return new ParseResults<>(parsingUri, parsingExceptions);
+        } else {
+            return new ParseResults<>(Collections.emptyMap(), Collections.emptyList());
+        }
     }
 
     @Value

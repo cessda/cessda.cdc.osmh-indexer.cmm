@@ -70,8 +70,8 @@ public final class XPaths implements Serializable {
     @Nullable
     private final String universeXPath;
 
-    public Optional<String> getStudyURLDocDscrXPath() {
-        return Optional.ofNullable(studyURLDocDscrXPath);
+    public Optional<String> getDataAccessUrlXPath() {
+        return Optional.ofNullable(dataAccessUrlXPath);
     }
 
     public Optional<String> getFileTxtLanguagesXPath() {
@@ -80,6 +80,10 @@ public final class XPaths implements Serializable {
 
     public Optional<String> getFilenameLanguagesXPath() {
         return Optional.ofNullable(filenameLanguagesXPath);
+    }
+
+    public Optional<String> getStudyURLDocDscrXPath() {
+        return Optional.ofNullable(studyURLDocDscrXPath);
     }
 
     public Optional<String> getUniverseXPath() {
