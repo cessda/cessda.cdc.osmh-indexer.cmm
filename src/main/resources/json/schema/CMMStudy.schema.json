@@ -110,7 +110,7 @@
     },
     "dataAccessFreeTexts": {
       "type": "object",
-      "description": "A Collection of Data Access Free Texts descriptions for data collection. In potentially translated in multiple languages",
+      "description": "A Collection of Data Access Free Texts descriptions for data collection, potentially translated in multiple languages",
       "patternProperties": {
         "^[a-z]{2}$": {
           "type": "array",
@@ -125,9 +125,18 @@
       },
       "additionalProperties": false
     },
+    "dataAccessUrl": {
+      "type": "object",
+      "description": "A URL where a user can navigate to access the data behind this study.",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "string"
+        }
+      }
+    },
     "dataCollectionFreeTexts": {
       "type": "object",
-      "description": "A collection of data collection FreeTexts Dates in Potentially many languages",
+      "description": "A collection of data collection FreeTexts Dates, potentially translated in multiple languages",
       "patternProperties": {
         "^[a-z]{2}$": {
           "type": "array",

@@ -147,15 +147,17 @@ public class LanguageExtractor {
         Optional.ofNullable(cmmStudy.publisher()).map(map -> map.get(lang)).ifPresent(builder::publisher);
         Optional.ofNullable(cmmStudy.universe()).map(map -> map.get(lang)).ifPresent(builder::universe);
 
-        // #502 - Use any language to set related publications, override with language specific field if presenet
+        // #502 - Use any language to set related publications, override with language specific field if present
         Optional.ofNullable(cmmStudy.relatedPublications()).flatMap(map -> map.values().stream().filter(Objects::nonNull).findAny()).ifPresent(builder::relatedPublications);
         Optional.ofNullable(cmmStudy.relatedPublications()).map(map -> map.get(lang)).ifPresent(builder::relatedPublications);
 
-        // #142 - Use any language to set the study url field
+        // #142 - Use any language to set the study url and data access url field
         Optional.ofNullable(cmmStudy.studyUrl()).flatMap(map -> map.values().stream().filter(Objects::nonNull).findAny()).ifPresent(builder::studyUrl);
+        Optional.ofNullable(cmmStudy.dataAccessUrl()).flatMap(map -> map.values().stream().filter(Objects::nonNull).findAny()).ifPresent(builder::studyUrl);
 
         // Override with the language specific variant
         Optional.ofNullable(cmmStudy.studyUrl()).map(map -> map.get(lang)).ifPresent(builder::studyUrl);
+        Optional.ofNullable(cmmStudy.dataAccessUrl()).map(map -> map.get(lang)).ifPresent(builder::dataAccessUrl);
 
         return builder.build();
     }

@@ -179,7 +179,7 @@
                                 <restrctn xml:lang="en-GB">3 Restriction Text en-GB</restrctn>
                                 <restrctn xml:lang="fi">Restriction Text fi</restrctn>
                                 <conditions xml:lang="en">Conditions Text en</conditions>
-                                <specPerm xml:lang="en">SpecPerm Text en</specPerm>
+                                <specPerm URI="http://localhost/specPerm-test-link" xml:lang="en">SpecPerm Text en</specPerm>
                                 <specPerm xml:lang="fi">SpecPerm Text fi</specPerm>
                             </useStmt>
                             <setAvail>

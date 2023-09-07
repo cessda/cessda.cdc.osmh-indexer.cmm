@@ -41,6 +41,7 @@ public record CMMStudy(
     @JsonProperty("classifications") Map<String, List<TermVocabAttributes>> classifications,
     @JsonProperty("creators") Map<String, List<String>> creators,
     @JsonProperty("dataAccessFreeTexts") Map<String, List<String>> dataAccessFreeTexts,
+    @JsonProperty("dataAccessUrl") Map<String, URI> dataAccessUrl,
     @JsonProperty("dataCollectionPeriodStartdate") String dataCollectionPeriodStartdate,
     @JsonProperty("dataCollectionPeriodEnddate") String dataCollectionPeriodEnddate,
     @JsonProperty("dataCollectionYear") int dataCollectionYear,

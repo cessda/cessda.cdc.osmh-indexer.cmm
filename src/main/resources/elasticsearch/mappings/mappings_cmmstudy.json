@@ -33,6 +33,10 @@
       "analyzer": "pasc_standard_analyzer",
       "term_vector": "with_positions_offsets"
     },
+    "dataAccessUrl": {
+      "type": "keyword",
+      "ignore_above": 512
+    },
     "dataCollectionFreeTexts": {
       "type": "nested",
       "properties": {
