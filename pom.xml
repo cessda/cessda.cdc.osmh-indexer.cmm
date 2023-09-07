@@ -334,7 +334,6 @@
                     </to>
                     <container>
                         <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
-                        <ports>9902</ports>
                     </container>
                 </configuration>
             </plugin>
