@@ -456,9 +456,10 @@ public class CMMStudyMapper {
     }
 
     ParseResults<Map<String, URI>, List<URISyntaxException>> parseDataAccessURI(Document document, XPaths xPaths, String defaultLangIsoCode) {
-        if (xPaths.getDataAccessUrlXPath().isPresent()) {
+        var dataAccessUrlXPath = xPaths.getDataAccessUrlXPath();
+        if (dataAccessUrlXPath.isPresent()) {
             var parsingExceptions = new ArrayList<URISyntaxException>();
-            var elements = DocElementParser.getElements(document, xPaths.getDataAccessUrlXPath().get(), xPaths.getNamespace());
+            var elements = DocElementParser.getElements(document, dataAccessUrlXPath.get(), xPaths.getNamespace());
 
             var parsingUri = docElementParser.getLanguageKeyValuePairs(
                 elements, defaultLangIsoCode,
