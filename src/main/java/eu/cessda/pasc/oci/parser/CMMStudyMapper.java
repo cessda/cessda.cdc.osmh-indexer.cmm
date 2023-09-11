@@ -63,7 +63,7 @@ public class CMMStudyMapper {
     }
 
     @Autowired
-    public CMMStudyMapper(DocElementParser docElementParser, AppConfigurationProperties appConfigurationProperties) {
+    CMMStudyMapper(DocElementParser docElementParser, AppConfigurationProperties appConfigurationProperties) {
         this.docElementParser = docElementParser;
         this.oaiPmh = appConfigurationProperties.oaiPmh();
     }
@@ -122,7 +122,7 @@ public class CMMStudyMapper {
     /**
      * Parses PID Study(s) from:
      * <p>
-     * Xpath = {@link XPaths#getCreatorsXPath()}  }
+     * Xpath = {@link XPaths#getCreatorsXPath()}
      */
     Map<String, List<String>> parseCreator(Document document, XPaths xPaths, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
@@ -157,7 +157,7 @@ public class CMMStudyMapper {
     /**
      * Parses Type Of Time Method(s) from:
      * <p>
-     * Xpath = {@link XPaths#getTypeOfTimeMethodXPath()}  }
+     * Xpath = {@link XPaths#getTypeOfTimeMethodXPath()}
      */
     Map<String, List<TermVocabAttributes>> parseTypeOfTimeMethod(Document doc, XPaths xPaths, String defaultLangIsoCode) {
 
