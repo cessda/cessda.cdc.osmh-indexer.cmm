@@ -204,7 +204,13 @@
           "analyzer": "pasc_index_autocomplete_analyzer",
           "search_analyzer": "pasc_standard_analyzer",
           "term_vector": "with_positions_offsets",
-          "copy_to": [ "keywordsSearchField", "keywordsKeywordField" ]
+          "copy_to": [ "keywordsSearchField", "keywordsKeywordField" ],
+          "fields": {
+            "raw": {
+              "type": "keyword",
+              "normalizer": "case_insensitive_normalizer"
+            }
+          }
         },
         "vocab": {
           "type": "keyword",
@@ -351,7 +357,13 @@
         "term": {
           "type": "keyword",
           "ignore_above": 256,
-          "copy_to": "classificationsSearchField"
+          "copy_to": "classificationsSearchField",
+          "fields": {
+            "raw": {
+              "type": "keyword",
+              "normalizer": "case_insensitive_normalizer"
+            }
+          }
         },
         "vocab": {
           "type": "keyword",
