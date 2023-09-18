@@ -65,7 +65,7 @@
 
         <!-- Dependency versions -->
         <lombok.version>1.18.28</lombok.version>
-        <elasticsearch.version>8.9.2</elasticsearch.version>
+        <elasticsearch.version>8.10.0</elasticsearch.version>
     </properties>
 
     <dependencies>
