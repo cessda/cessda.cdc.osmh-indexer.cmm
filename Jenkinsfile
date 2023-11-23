@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 pipeline {
-	options {
-		buildDiscarder logRotator(artifactNumToKeepStr: '5', numToKeepStr: '20')
-	}
 
 	environment {
 		product_name = "cdc"
 		module_name = "osmh-indexer"
-		image_tag = "${docker_repo}/${product_name}-${module_name}:${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
+		image_tag = "${DOCKER_ARTIFACT_REGISTRY}/${product_name}-${module_name}:${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
 	}
 
     agent {
@@ -77,11 +74,11 @@ pipeline {
         }
 		stage('Build and Push Docker image') {
             steps {
-                sh 'gcloud auth configure-docker'
+                sh "gcloud auth configure-docker ${ARTIFACT_REGISTRY_HOST}"
                 withMaven {
                     sh "./mvnw jib:build -Dimage=${image_tag}"
                 }
-                sh "gcloud container images add-tag ${image_tag} ${docker_repo}/${product_name}-${module_name}:${env.BRANCH_NAME}-latest"
+                sh "gcloud container images add-tag ${image_tag} ${DOCKER_ARTIFACT_REGISTRY}/${product_name}-${module_name}:${env.BRANCH_NAME}-latest"
             }
             when { branch 'main' }
 		}
