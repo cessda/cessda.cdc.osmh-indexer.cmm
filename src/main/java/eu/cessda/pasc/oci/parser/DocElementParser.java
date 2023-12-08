@@ -141,22 +141,22 @@ class DocElementParser {
     /**
      * Extracts metadata from the given {@link Document}, using the given parser strategy {@link Function}.
      * <p>
-     * This method performs per-language extraction using the semantics of {@link DocElementParser#parseLanguageCode(Element, String, Namespace)},
+     * This method performs per-language extraction using the semantics of {@link #parseLanguageCode(Element, String)},
      * and returns all elements that are present.
      *
+     * @param <T>                the type returned by the parser strategy.
      * @param defaultLangIsoCode the language to fall back to if the elements do not have a {@value OaiPmhConstants#LANG_ATTR} attribute.
      * @param document           the {@link Document} to parse.
      * @param xPath              the XPath to search.
-     * @param namespace the namespace to search.
      * @param parserStrategy     the strategy to apply to each element.
-     * @param <T>                the type returned by the parser strategy.
+     * @param namespace          the namespace to search.
      * @return a {@link Map} with the key set to the language, and the value a {@link List} of {@link T}.
      */
-    <T> Map<String, List<T>> extractMetadataObjectListForEachLang(String defaultLangIsoCode, Document document, String xPath, Namespace namespace, Function<Element, Optional<T>> parserStrategy) {
+    <T> Map<String, List<T>> extractMetadataObjectListForEachLang(String defaultLangIsoCode, Document document, String xPath, Function<Element, Optional<T>> parserStrategy, Namespace... namespace) {
         var elements = getElements(document, xPath, namespace);
         return elements.stream().flatMap(element ->
             parserStrategy.apply(element).flatMap(parsedMetadataPojoValue ->
-                parseLanguageCode(element, defaultLangIsoCode, namespace).map(lang -> Map.entry(lang, parsedMetadataPojoValue))
+                parseLanguageCode(element, defaultLangIsoCode).map(lang -> Map.entry(lang, parsedMetadataPojoValue))
             ).stream()
         ).collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
     }
@@ -164,20 +164,20 @@ class DocElementParser {
     /**
      * Extracts metadata from the given {@link Document}, using the given parser strategy {@link Function}.
      * <p>
-     * This method performs per-language extraction using the semantics of {@link DocElementParser#parseLanguageCode(Element, String, Namespace)}.
+     * This method performs per-language extraction using the semantics of {@link #parseLanguageCode(Element, String)}.
      * If multiple values with the same language key are encountered, the last encountered is returned.
      *
+     * @param <T>                the type returned by the parser strategy.
      * @param defaultLangIsoCode the language to fall back to if the elements do not have a {@value OaiPmhConstants#LANG_ATTR} attribute.
      * @param document           the {@link Document} to parse.
      * @param xPath              the XPath to search.
-     * @param namespace the namespace to search.
      * @param parserStrategy     the strategy to apply to each element.
-     * @param <T>                the type returned by the parser strategy.
+     * @param namespace          the namespace to search.
      * @return a {@link HashMap} with the key set to the language.
      */
-    <T> HashMap<String, T> extractMetadataObjectForEachLang(String defaultLangIsoCode, Document document, String xPath, Namespace namespace, Function<Element, T> parserStrategy) {
+    <T> HashMap<String, T> extractMetadataObjectForEachLang(String defaultLangIsoCode, Document document, String xPath, Function<Element, T> parserStrategy, Namespace... namespace) {
         var elements = getElements(document, xPath, namespace);
-        return elements.stream().flatMap(element -> parseLanguageCode(element, defaultLangIsoCode, namespace).map(lang -> Map.entry(lang, parserStrategy.apply(element))).stream())
+        return elements.stream().flatMap(element -> parseLanguageCode(element, defaultLangIsoCode).map(lang -> Map.entry(lang, parserStrategy.apply(element))).stream())
             // If multiple values with the same key are returned, the last value wins
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> b, HashMap::new));
     }
@@ -190,11 +190,11 @@ class DocElementParser {
         titlesMap.put(langCode, elementText);
     }
 
-    private Optional<String> parseLanguageCode(Element element, String defaultLangIsoCode, Namespace ddiNamespace) {
+    private Optional<String> parseLanguageCode(Element element, String defaultLangIsoCode) {
 
         var langAttr = getLangAttribute(element);
         if (langAttr == null) {
-            var concept = element.getChild("concept", ddiNamespace);
+            var concept = element.getChild("concept", element.getNamespace());
             if (concept != null) {
                 langAttr = getLangAttribute(concept);
             }

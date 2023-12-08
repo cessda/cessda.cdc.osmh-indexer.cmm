@@ -119,7 +119,7 @@ class ParsingStrategies {
         );
     }
 
-    static Optional<TermVocabAttributes> termVocabAttributeStrategy(Element element, Namespace namespace, boolean hasControlledValue) {
+    static Optional<TermVocabAttributes> termVocabAttributeStrategy(Element element, boolean hasControlledValue) {
         // The term always comes from the original element
         var term = cleanCharacterReturns(element.getText());
 
@@ -129,7 +129,7 @@ class ParsingStrategies {
         String id;
         if (hasControlledValue) {
             // Try to find a concept element
-            vocabElement = ofNullable(element.getChild(CONCEPT_EL, namespace)).orElse(new Element(EMPTY_EL));
+            vocabElement = ofNullable(element.getChild(CONCEPT_EL, element.getNamespace())).orElse(new Element(EMPTY_EL));
             id = vocabElement.getText();
         } else {
             // Use the original element as the source of the vocabulary
@@ -163,9 +163,9 @@ class ParsingStrategies {
         }
     }
 
-    static Optional<VocabAttributes> samplingTermVocabAttributeStrategy(Element element, Namespace namespace) {
+    static Optional<VocabAttributes> samplingTermVocabAttributeStrategy(Element element) {
         //PUG req. only process if element has a <concept>
-        var conceptVal = element.getChild(CONCEPT_EL, namespace);
+        var conceptVal = element.getChild(CONCEPT_EL, element.getNamespace());
         if (conceptVal != null) {
             var vocabAttributes = new VocabAttributes(
                 getAttributeValue(conceptVal, VOCAB_ATTR).orElse(""),
@@ -208,10 +208,10 @@ class ParsingStrategies {
      * {@code titl} element is blank then the method attempts to extract directly from the element.
      * If a title cannot be extracted, an empty {@link Optional} is returned.
      * @param element the {@link Element} to parse.
-     * @param namespace the DDI {@link Namespace}.
      * @return a {@link RelatedPublication}, or an empty {@link Optional} if a title cannot be extracted.
      */
-    static Optional<RelatedPublication> relatedPublicationsStrategy(Element element, Namespace namespace) {
+    static Optional<RelatedPublication> relatedPublicationsStrategy(Element element) {
+        var namespace = element.getNamespace();
 
         // Result variables
         String title = null;
