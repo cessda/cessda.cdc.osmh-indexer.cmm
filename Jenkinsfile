@@ -78,7 +78,7 @@ pipeline {
                 withMaven {
                     sh "./mvnw jib:build -Dimage=${image_tag}"
                 }
-                sh "gcloud container images add-tag ${image_tag} ${DOCKER_ARTIFACT_REGISTRY}/${product_name}-${module_name}:${env.BRANCH_NAME}-latest"
+                sh "gcloud artifacts docker tags add ${image_tag} ${DOCKER_ARTIFACT_REGISTRY}/${product_name}-${module_name}:${env.BRANCH_NAME}-latest"
             }
             when { branch 'main' }
 		}

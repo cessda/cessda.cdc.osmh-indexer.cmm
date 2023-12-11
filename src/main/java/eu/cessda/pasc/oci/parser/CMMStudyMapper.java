@@ -37,7 +37,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static eu.cessda.pasc.oci.parser.OaiPmhConstants.*;
-import static eu.cessda.pasc.oci.parser.ParsingStrategies.*;
+import static eu.cessda.pasc.oci.parser.ParsingStrategies.termVocabAttributeStrategy;
+import static eu.cessda.pasc.oci.parser.ParsingStrategies.uriStrategy;
 
 /**
  * Responsible for Mapping oai-pmh fields to a CMMStudy
@@ -98,7 +99,7 @@ public class CMMStudyMapper {
      */
     Map<String, List<Pid>> parsePidStudies(Document document, XPaths xPaths, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, document, xPaths.getPidStudyXPath(), xPaths.getNamespace(), ParsingStrategies::pidStrategy);
+            defaultLangIsoCode, document, xPaths.getPidStudyXPath(), ParsingStrategies::pidStrategy, xPaths.getNamespace());
     }
 
     /**
@@ -126,7 +127,7 @@ public class CMMStudyMapper {
      */
     Map<String, List<String>> parseCreator(Document document, XPaths xPaths, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, document, xPaths.getCreatorsXPath(), xPaths.getNamespace(), ParsingStrategies::creatorStrategy
+            defaultLangIsoCode, document, xPaths.getCreatorsXPath(), ParsingStrategies::creatorStrategy, xPaths.getNamespace()
         );
     }
 
@@ -137,8 +138,7 @@ public class CMMStudyMapper {
      */
     Map<String, List<TermVocabAttributes>> parseClassifications(Document doc, XPaths xPaths, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, doc, xPaths.getClassificationsXPath(), xPaths.getNamespace(),
-            element -> termVocabAttributeStrategy(element, xPaths.getNamespace(), false)
+            defaultLangIsoCode, doc, xPaths.getClassificationsXPath(), element -> termVocabAttributeStrategy(element, false), xPaths.getNamespace()
         );
     }
 
@@ -149,8 +149,7 @@ public class CMMStudyMapper {
      */
     Map<String, List<TermVocabAttributes>> parseKeywords(Document doc, XPaths xPaths, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, doc, xPaths.getKeywordsXPath(), xPaths.getNamespace(),
-            element -> termVocabAttributeStrategy(element, xPaths.getNamespace(), false)
+            defaultLangIsoCode, doc, xPaths.getKeywordsXPath(), element -> termVocabAttributeStrategy(element, false), xPaths.getNamespace()
         );
     }
 
@@ -162,8 +161,7 @@ public class CMMStudyMapper {
     Map<String, List<TermVocabAttributes>> parseTypeOfTimeMethod(Document doc, XPaths xPaths, String defaultLangIsoCode) {
 
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, doc, xPaths.getTypeOfTimeMethodXPath(), xPaths.getNamespace(),
-            element -> termVocabAttributeStrategy(element, xPaths.getNamespace(),true)
+            defaultLangIsoCode, doc, xPaths.getTypeOfTimeMethodXPath(), element -> termVocabAttributeStrategy(element, true), xPaths.getNamespace()
         );
     }
 
@@ -174,8 +172,7 @@ public class CMMStudyMapper {
      */
     Map<String, List<TermVocabAttributes>> parseTypeOfModeOfCollection(Document doc, XPaths xPaths, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, doc, xPaths.getTypeOfModeOfCollectionXPath(), xPaths.getNamespace(),
-            element -> termVocabAttributeStrategy(element, xPaths.getNamespace(), true)
+            defaultLangIsoCode, doc, xPaths.getTypeOfModeOfCollectionXPath(), element -> termVocabAttributeStrategy(element, true), xPaths.getNamespace()
         );
     }
 
@@ -186,8 +183,7 @@ public class CMMStudyMapper {
      */
     Map<String, List<TermVocabAttributes>> parseUnitTypes(Document document, XPaths xPaths, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, document, xPaths.getUnitTypeXPath(), xPaths.getNamespace(),
-            element -> termVocabAttributeStrategy(element, xPaths.getNamespace(), true)
+            defaultLangIsoCode, document, xPaths.getUnitTypeXPath(), element -> termVocabAttributeStrategy(element, true), xPaths.getNamespace()
         );
     }
 
@@ -198,8 +194,7 @@ public class CMMStudyMapper {
      */
     Map<String, List<VocabAttributes>> parseTypeOfSamplingProcedure(Document doc, XPaths xPaths, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, doc, xPaths.getSamplingXPath(), xPaths.getNamespace(),
-            element -> samplingTermVocabAttributeStrategy(element, xPaths.getNamespace())
+            defaultLangIsoCode, doc, xPaths.getSamplingXPath(), ParsingStrategies::samplingTermVocabAttributeStrategy, xPaths.getNamespace()
         );
     }
 
@@ -210,8 +205,7 @@ public class CMMStudyMapper {
      */
     Map<String, List<Country>> parseStudyAreaCountries(Document document, XPaths xPaths, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, document, xPaths.getStudyAreaCountriesXPath(), xPaths.getNamespace(),
-            ParsingStrategies::countryStrategy
+            defaultLangIsoCode, document, xPaths.getStudyAreaCountriesXPath(), ParsingStrategies::countryStrategy, xPaths.getNamespace()
         );
     }
 
@@ -223,13 +217,17 @@ public class CMMStudyMapper {
      */
     Map<String, Publisher> parsePublisher(Document document, XPaths xPaths, String defaultLang) {
         var producerPathMap = docElementParser.extractMetadataObjectForEachLang(
-            defaultLang, document, xPaths.getPublisherXPath(), xPaths.getNamespace(),
-            ParsingStrategies::publisherStrategy
+            defaultLang, document, xPaths.getPublisherXPath(), ParsingStrategies::publisherStrategy, xPaths.getNamespace()
         );
-        var distrPathMap = docElementParser.extractMetadataObjectForEachLang(
-            defaultLang, document, xPaths.getDistributorXPath(), xPaths.getNamespace(),
-            ParsingStrategies::publisherStrategy
-        );
+
+        Map<String, Publisher> distrPathMap;
+        if (xPaths.getDistributorXPath() != null) {
+            distrPathMap = docElementParser.extractMetadataObjectForEachLang(
+                defaultLang, document, xPaths.getDistributorXPath(), ParsingStrategies::publisherStrategy, xPaths.getNamespace()
+            );
+        } else {
+            distrPathMap = Collections.emptyMap();
+        }
 
         distrPathMap.forEach((k, v) -> producerPathMap.merge(k, v, (docDscrValue, stdyDscrValue) -> docDscrValue));
         return producerPathMap;
@@ -250,7 +248,7 @@ public class CMMStudyMapper {
         Map<String, String> titles = parseLanguageContentOfElement(document, langCode, xPaths.getTitleXPath(), false, xPaths.getNamespace());
 
         // https://github.com/cessda/cessda.cdc.versions/issues/135
-        if (!titles.isEmpty()) {
+        if (xPaths.getParTitleXPath() != null && !titles.isEmpty()) {
             Map<String, String> parTitles = parseLanguageContentOfElement(document, langCode, xPaths.getParTitleXPath(), false, xPaths.getNamespace());
             parTitles.forEach(titles::putIfAbsent);  // parTitl lang must not be same as or override titl lang
 
@@ -306,8 +304,7 @@ public class CMMStudyMapper {
      */
     Map<String, List<String>> parseSamplingProcedureFreeTexts(Document doc, XPaths xPaths, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, doc, xPaths.getSamplingXPath(), xPaths.getNamespace(),
-            ParsingStrategies::nullableElementValueStrategy
+            defaultLangIsoCode, doc, xPaths.getSamplingXPath(), ParsingStrategies::nullableElementValueStrategy, xPaths.getNamespace()
         );
     }
 
@@ -318,8 +315,7 @@ public class CMMStudyMapper {
      */
     Map<String, List<String>> parseDataAccessFreeText(Document doc, XPaths xPaths, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, doc, xPaths.getDataRestrctnXPath(), xPaths.getNamespace(),
-            ParsingStrategies::nullableElementValueStrategy
+            defaultLangIsoCode, doc, xPaths.getDataRestrctnXPath(), ParsingStrategies::nullableElementValueStrategy, xPaths.getNamespace()
         );
     }
 
@@ -330,8 +326,7 @@ public class CMMStudyMapper {
      */
     Map<String, List<DataCollectionFreeText>> parseDataCollectionFreeTexts(Document document, XPaths xPaths, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, document, xPaths.getDataCollectionPeriodsXPath(), xPaths.getNamespace(),
-            ParsingStrategies::dataCollFreeTextStrategy
+            defaultLangIsoCode, document, xPaths.getDataCollectionPeriodsXPath(), ParsingStrategies::dataCollFreeTextStrategy, xPaths.getNamespace()
         );
     }
 
@@ -414,8 +409,7 @@ public class CMMStudyMapper {
                 defaultLangIsoCode,
                 document,
                 universeXPath.orElseThrow(),
-                xPaths.getNamespace(),
-                ParsingStrategies::universeStrategy
+                ParsingStrategies::universeStrategy, xPaths.getNamespace()
             );
 
             var universes = new HashMap<String, Universe>();
@@ -450,8 +444,7 @@ public class CMMStudyMapper {
 
     Map<String, List<RelatedPublication>> parseRelatedPublications(Document document, XPaths xPaths, String defaultLangIsoCode) {
         return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, document, xPaths.getRelatedPublicationsXPath(), xPaths.getNamespace(),
-            element -> relatedPublicationsStrategy(element, xPaths.getNamespace())
+            defaultLangIsoCode, document, xPaths.getRelatedPublicationsXPath(), ParsingStrategies::relatedPublicationsStrategy, xPaths.getNamespace()
         );
     }
 

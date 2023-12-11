@@ -25,6 +25,8 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Optional;
 
+import static java.util.Map.entry;
+
 /**
  * XPath constants used to extract metadata from DDI XML documents.
  */
@@ -32,12 +34,13 @@ import java.util.Optional;
 @EqualsAndHashCode
 @Getter
 @ToString
+@With
 public final class XPaths implements Serializable {
     @Serial
     private static final long serialVersionUID = -6226660931460780008L;
 
     @NonNull
-    private final Namespace namespace;
+    private final Namespace[] namespace;
     // Codebook Paths
     private final String recordDefaultLanguage;
     private final String yearOfPubXPath;
@@ -91,69 +94,20 @@ public final class XPaths implements Serializable {
     }
 
     /**
-     * XPaths needed to extract metadata from DDI 3.3 documents.
-     */
-    public static final XPaths DDI_3_3_XPATHS = XPaths.builder()
-        .namespace(Namespace.getNamespace("ddi", "ddi:instance:3_3"))
-        // Abstract
-        .abstractXPath("//ddi:DDIInstance/s:StudyUnit/r:Abstract/r:Content")
-        // Study title
-        .titleXPath("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:Title/r:String")
-        // Study title (in additional languages)
-        .parTitleXPath("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:Title/r:String")
-        // 'Access study' link (when @typeOfUserID attribute is "URLServiceProvider")
-        .studyURLDocDscrXPath("//ddi:DDIInstance/s:StudyUnit/r:UserID")
-        // URL of the study description page at the SP website (when @typeOfUserID attribute is "URLServiceProvider")
-        .studyURLStudyDscrXPath("//ddi:DDIInstance/s:StudyUnit/r:UserID")
-        // Study number/PID (when @typeOfUserID attribute is "StudyNumber")
-        .pidStudyXPath("//ddi:DDIInstance/s:StudyUnit/r:UserID")
-        // Study number/PID 
-        .pidStudyXPath("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:InternationalIdentifier/r:IdentifierContent")
-        // Creator/PI
-        .creatorsXPath("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:Creator/r:CreatorReference")
-        // Terms of data access
-        .dataAccessUrlXPath("//ddi:DDIInstance/s:StudyUnit/a:Archive/a:ArchiveSpecific/a:Item/a:Access/r:Description/r:Content")
-        // Terms of data access
-        .dataRestrctnXPath("//ddi:DDIInstance/s:StudyUnit/a:Archive/a:ArchiveSpecific/a:Item/a:Access/r:Description/r:Content")
-        // Data collection period
-        .dataCollectionPeriodsXPath("//ddi:DDIInstance/s:StudyUnit/d:DataCollection/d:CollectionEvent/d:CollectionSituation/r:Description/r:Content")
-        // Publication year
-        .yearOfPubXPath("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:PublicationDate/r:SimpleDate")
-        // Topics
-        .classificationsXPath("//ddi:DDIInstance/s:StudyUnit/r:Coverage/r:TopicalCoverage/r:Subject")
-        // Keywords
-        .keywordsXPath("//ddi:DDIInstance/s:StudyUnit/r:Coverage/r:TopicalCoverage/r:Keyword")
-        // Time dimension
-        .typeOfTimeMethodXPath("//ddi:DDIInstance/s:StudyUnit/d:DataCollection/d:Methodology/d:TimeMethod/r:Description/r:Content")
-        // Country
-        .studyAreaCountriesXPath("//ddi:DDIInstance/s:StudyUnit/r:Coverage/r:SpatialCoverage/r:Description/r:Content")
-        // Analysis unit (descriptive)
-        .unitTypeXPath("//ddi:DDIInstance/s:StudyUnit/r:AnalysisUnitsCovered")
-        // Publisher
-        .publisherXPath("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:Publisher/r:PublisherReference")
-        // Publisher Reference (Institution)
-        .distributorXPath("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:Publisher/r:PublisherReference/r:URN")
-        // Language of data file(s)
-        .fileTxtLanguagesXPath("//ddi:DDIInstance/r:ResourcePackage/pi:PhysicalInstance/r:Citation/r:Language")
-        // Language-specific name of file
-        .filenameLanguagesXPath("//ddi:DDIInstance/g:ResourcePackage/pi:PhysicalInstance/r:Citation/r:Title/r:String")
-        // Sampling procedure (descriptive)
-        .samplingXPath("//ddi:DDIInstance/s:StudyUnit/d:DataCollection/d:Methodology/d:SamplingProcedure/r:Description/r:Content")
-        // Data collection mode (descriptive)
-        .typeOfModeOfCollectionXPath("//ddi:DDIInstance/s:StudyUnit/d:DataCollection/d:CollectionEvent/d:ModeOfCollection/r:Description/r:Content")
-        // Related publication (PID)
-        .relatedPublicationsXPath("//ddi:DDIInstance/s:StudyUnit/r:OtherMaterial/r:Citation/r:InternationalIdentifier/r:IdentifierContent")
-        // Study description language
-        .recordDefaultLanguage("//ddi:DDIInstance/@xml:lang")
-        // Description of population
-        .universeXPath("//ddi:DDIInstance/s:StudyUnit/c:ConceptualComponent/c:UniverseScheme/")
-        .build();
-
-    /**
      * XPaths needed to extract metadata from DDI 3.2 documents.
      */
+    // TODO: Add parsing implementation to this file
     public static final XPaths DDI_3_2_XPATHS = XPaths.builder()
-        .namespace(Namespace.getNamespace("ddi", "ddi:instance:3_2"))
+        .namespace(new Namespace[]{
+            Namespace.getNamespace("ddi", "ddi:instance:3_2"),
+            Namespace.getNamespace("a", "ddi:archive:3_2"),
+            Namespace.getNamespace("c", "ddi:conceptualcomponent:3_2"),
+            Namespace.getNamespace("d","ddi:datacollection:3_2"),
+            Namespace.getNamespace("g", "ddi:group:3_2"),
+            Namespace.getNamespace("pi", "ddi:physicalinstance:3_2"),
+            Namespace.getNamespace("r", "ddi:reusable:3_2"),
+            Namespace.getNamespace("s", "ddi:studyunit:3_2")
+        })
         // Abstract
         .abstractXPath("//ddi:DDIInstance/s:StudyUnit/r:Abstract/r:Content")
         // Study title
@@ -164,12 +118,12 @@ public final class XPaths implements Serializable {
         .studyURLDocDscrXPath("//ddi:DDIInstance/s:StudyUnit/r:UserID")
         // URL of the study description page at the SP website (when @typeOfUserID attribute is "URLServiceProvider")
         .studyURLStudyDscrXPath("//ddi:DDIInstance/s:StudyUnit/r:UserID")
-        // Study number/PID (when @typeOfUserID attribute is "StudyNumber")
-        .pidStudyXPath("//ddi:DDIInstance/s:StudyUnit/r:UserID")
+        // Study number/PID (when @typeOfUserID attribute is "StudyNumber") - TODO: Implement parsing for this
+        //.pidStudyXPath("//ddi:DDIInstance/s:StudyUnit/r:UserID")
         // Study number/PID 
         .pidStudyXPath("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:InternationalIdentifier/r:IdentifierContent")
         // Creator/PI
-        .creatorsXPath("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:Creator/r:CreatorReference")
+        .creatorsXPath("//ddi:DDIInstance/r:Citation/r:Creator/r:CreatorName/r:String")
         // Terms of data access
         .dataAccessUrlXPath("//ddi:DDIInstance/s:StudyUnit/a:Archive/a:ArchiveSpecific/a:Item/a:Access/r:Description/r:Content")
         // Terms of data access
@@ -204,15 +158,31 @@ public final class XPaths implements Serializable {
         .relatedPublicationsXPath("//ddi:DDIInstance/s:StudyUnit/r:OtherMaterial/r:Citation/r:InternationalIdentifier/r:IdentifierContent")
         // Study description language
         .recordDefaultLanguage("//ddi:DDIInstance/@xml:lang")
-        // Description of population
-        .universeXPath("//ddi:DDIInstance/s:StudyUnit/c:ConceptualComponent/c:UniverseScheme/")
+        // Description of population - TODO: Implement inclusion/exclusion
+        .universeXPath("//ddi:DDIInstance/s:StudyUnit/c:ConceptualComponent/c:UniverseScheme")
         .build();
+
+    /**
+     * XPaths needed to extract metadata from DDI 3.3 documents.
+     */
+    public static final XPaths DDI_3_3_XPATHS = DDI_3_2_XPATHS
+        .withNamespace(new Namespace[]{
+            Namespace.getNamespace("ddi", "ddi:instance:3_3"),
+            Namespace.getNamespace("a", "ddi:archive:3_3"),
+            Namespace.getNamespace("c", "ddi:conceptualcomponent:3_3"),
+            Namespace.getNamespace("d","ddi:datacollection:3_3"),
+            Namespace.getNamespace("g", "ddi:group:3_3"),
+            Namespace.getNamespace("pi", "ddi:physicalinstance:3_3"),
+            Namespace.getNamespace("r", "ddi:reusable:3_3"),
+            Namespace.getNamespace("s", "ddi:studyunit:3_3")
+        });
+
 
     /**
      * XPaths needed to extract metadata from DDI 2.5 documents.
      */
     public static final XPaths DDI_2_5_XPATHS = XPaths.builder()
-        .namespace(Namespace.getNamespace("ddi", "ddi:codebook:2_5"))
+        .namespace(new Namespace[]{ Namespace.getNamespace("ddi", "ddi:codebook:2_5") })
         // Abstract
         .abstractXPath("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:abstract")
         // Study title
@@ -269,7 +239,7 @@ public final class XPaths implements Serializable {
      * XPaths needed to extract metadata from NESSTAR flavoured DDI 1.2.2 documents.
      */
     public static final XPaths NESSTAR_XPATHS = XPaths.builder()
-        .namespace(Namespace.getNamespace("ddi", "http://www.icpsr.umich.edu/DDI"))
+        .namespace(new Namespace[]{ Namespace.getNamespace("ddi", "http://www.icpsr.umich.edu/DDI") })
         .recordDefaultLanguage("//ddi:codeBook/@xml-lang") // Nesstar with "-"
         // Closest for Nesstar based on CMM mapping doc but the above existing one for ddi2.5 seems to be present in Nesstar
         .yearOfPubXPath("//ddi:codeBook/stdyDscr/citation/distStmt/distDate[1]/@date")
@@ -301,10 +271,10 @@ public final class XPaths implements Serializable {
      * Mapping of XML namespaces to XPaths
      */
     private static final Map<Namespace, XPaths> XPATH_MAP = Map.ofEntries(
-        Map.entry(DDI_3_3_XPATHS.getNamespace(), DDI_3_3_XPATHS),
-        Map.entry(DDI_3_2_XPATHS.getNamespace(), DDI_3_2_XPATHS),
-        Map.entry(DDI_2_5_XPATHS.getNamespace(), DDI_2_5_XPATHS),
-        Map.entry(NESSTAR_XPATHS.getNamespace(), NESSTAR_XPATHS)
+        entry(DDI_3_3_XPATHS.getNamespace()[0], DDI_3_3_XPATHS),
+        entry(DDI_3_2_XPATHS.getNamespace()[0], DDI_3_2_XPATHS),
+        entry(DDI_2_5_XPATHS.getNamespace()[0], DDI_2_5_XPATHS),
+        entry(NESSTAR_XPATHS.getNamespace()[0], NESSTAR_XPATHS)
     );
 
     /**

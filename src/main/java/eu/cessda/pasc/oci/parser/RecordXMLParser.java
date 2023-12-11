@@ -65,7 +65,7 @@ public class RecordXMLParser {
     /**
      * Load an XML document from the given path.
      * @param path the path to the XML document.
-     * @throws XMLParseException if the document could not be parsed, or an IO error occured.
+     * @throws XMLParseException if the document could not be parsed, or an IO error occurred.
      */
     private Document getDocument(Path path) throws XMLParseException {
         try (var inputStream = Files.newInputStream(path)) {

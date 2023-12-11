@@ -1,0 +1,134 @@
+{
+  "abstract": {
+    "en": "Attitude of the political leadership (members of parliament) in the USA to other nations and problems in world politics.",
+    "de": "Einstellung der politischen Führungsschicht (Parlamentsmitglieder) in den USA zu anderen Nationen und weltpolitischen Problemen."
+  },
+  "classifications": {
+    "de": [
+      {
+        "vocabUri": "",
+        "vocab": "",
+        "term": "Politische Fragen (Issues)",
+        "id": ""
+      },
+      {
+        "vocabUri": "",
+        "vocab": "",
+        "term": "Internationale Politik und Internationale Organisationen",
+        "id": ""
+      },
+      {
+        "vocabUri": "",
+        "vocab": "",
+        "term": "Konflikte, Sicherheit und Frieden",
+        "id": ""
+      }
+    ],
+    "en": [
+      {
+        "vocabUri": "",
+        "vocab": "",
+        "term": "Political Issues",
+        "id": ""
+      },
+      {
+        "vocabUri": "",
+        "vocab": "",
+        "term": "International politics and organisations",
+        "id": ""
+      },
+      {
+        "vocabUri": "",
+        "vocab": "",
+        "term": "Conflict, security and peace",
+        "id": ""
+      }
+    ]
+  },
+  "creators": {
+    "en": [
+      "GESIS - Leibniz Institute for the Social Sciences"
+    ],
+    "de": [
+      "GESIS - Leibniz Institut für Sozialwissenschaften"
+    ]
+  },
+  "dataAccessFreeTexts": {
+    "en": [
+      "Data and documents are only released for academic research and teaching after the data depositor's written authorization."
+    ],
+    "de": [
+      "Daten und Dokumente sind für die akademische Forschung und Lehre nur nach schriftlicher Genehmigung des Datengebers zugänglich."
+    ]
+  },
+  "dataAccessUrl": {
+  },
+  "dataCollectionFreeTexts": {
+  },
+  "dataCollectionYear": 0,
+  "fileLanguages": [
+  ],
+  "keywords": {
+  },
+  "lastModified": "2023-12-06T13:30:08.8725293Z",
+  "pidStudies": {
+    "en": [
+      {
+        "pid": "doi:10.4232/1.0004"
+      }
+    ]
+  },
+  "publisher": {
+    "en": {
+      "abbr": "Publisher not specified",
+      "publisher": ""
+    }
+  },
+  "relatedPublications": {
+  },
+  "repositoryUrl": "http://dbkapps.gesis.org/dbkoai/oai.asp",
+  "samplingProcedureFreeTexts": {
+    "en": [
+      "Quota sample"
+    ],
+    "de": [
+      "Quotenauswahl"
+    ]
+  },
+  "studyAreaCountries": {
+  },
+  "studyNumber": "oai:dbk.gesis.org:DBK/ZA0004",
+  "studyUrl": {
+  },
+  "studyXmlSourceUrl": "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=GetRecord&identifier=oai%3Adbk.gesis.org%3ADBK%2FZA0004&metadataPrefix=ddi",
+  "titleStudy": {
+    "en": "International Outlooks of Political Leaders (USA)",
+    "de": "International Outlooks of Political Leaders (USA)"
+  },
+  "typeOfModeOfCollections": {
+    "en": [
+      {
+        "vocabUri": "",
+        "vocab": "",
+        "term": "Oral survey with standardized questionnaire",
+        "id": ""
+      }
+    ],
+    "de": [
+      {
+        "vocabUri": "",
+        "vocab": "",
+        "term": "Mündliche Befragung mit standardisiertem Fragebogen",
+        "id": ""
+      }
+    ]
+  },
+  "typeOfSamplingProcedures": {
+  },
+  "typeOfTimeMethods": {
+  },
+  "unitTypes": {
+  },
+  "universe": {
+  }
+}
