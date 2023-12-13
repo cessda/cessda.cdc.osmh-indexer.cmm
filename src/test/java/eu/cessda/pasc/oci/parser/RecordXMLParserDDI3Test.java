@@ -64,7 +64,7 @@ public class RecordXMLParserDDI3Test {
     public void shouldReturnValidCMMStudyRecordFromAFullyComplaintCmmDdiRecord() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
         // Given
         var expectedJson = ResourceHandler.getResourceAsString("json/synthetic_compliant_record_ddi_3.json");
-        var recordXML = ResourceHandler.getResource("xml/ddi_3_2/synthetic_compliant_cmm_ddi3.xml");
+        var recordXML = ResourceHandler.getResource("xml/ddi_3_2/synthetic_compliant_cmm_ddi3_2.xml");
 
         // When
         var result = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));

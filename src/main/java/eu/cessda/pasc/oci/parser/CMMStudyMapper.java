@@ -23,7 +23,6 @@ import eu.cessda.pasc.oci.models.cmmstudy.*;
 import lombok.Builder;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
@@ -33,6 +32,7 @@ import org.springframework.stereotype.Component;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -98,8 +98,24 @@ public class CMMStudyMapper {
      * Xpath = {@link XPaths#getPidStudyXPath()}
      */
     Map<String, List<Pid>> parsePidStudies(Document document, XPaths xPaths, String defaultLangIsoCode) {
-        return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, document, xPaths.getPidStudyXPath(), ParsingStrategies::pidStrategy, xPaths.getNamespace());
+        var pids = xPaths.getPidStudyXPath().resolve(document, xPaths.getNamespace());
+        return mapNullLanguage(pids, defaultLangIsoCode, (a, b) -> { a.addAll(b); return a; });
+    }
+
+    /**
+     * Map {@code} null keys (i.e. elements missing {@code xml:lang}) to the default language,
+     * or remove them if default language mapping is disabled.
+     *
+     * @param langMap            the map.
+     * @param defaultLangIsoCode the language to map to.
+     * @param mergeOperator      the operation to run on merge conflicts
+     */
+    private <T> Map<String, T> mapNullLanguage(Map<String, T> langMap, String defaultLangIsoCode, BinaryOperator<T> mergeOperator) {
+        var nullLanguageContent = langMap.remove(null);
+        if (nullLanguageContent != null && oaiPmh.metadataParsingDefaultLang().active()) {
+            langMap.merge(defaultLangIsoCode, nullLanguageContent, mergeOperator);
+        }
+        return langMap;
     }
 
     /**
@@ -117,7 +133,7 @@ public class CMMStudyMapper {
      * Xpath = {@link XPaths#getYearOfPubXPath()}
      */
     Optional<String> parseYrOfPublication(Document document, XPaths xPaths) {
-        return DocElementParser.getFirstAttribute(document, xPaths.getYearOfPubXPath(), xPaths.getNamespace()).map(Attribute::getValue);
+        return xPaths.getYearOfPubXPath().resolve(document, xPaths.getNamespace());
     }
 
     /**
@@ -137,9 +153,7 @@ public class CMMStudyMapper {
      * Xpath = {@link XPaths#getClassificationsXPath()}
      */
     Map<String, List<TermVocabAttributes>> parseClassifications(Document doc, XPaths xPaths, String defaultLangIsoCode) {
-        return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, doc, xPaths.getClassificationsXPath(), element -> termVocabAttributeStrategy(element, false), xPaths.getNamespace()
-        );
+        return mapNullLanguage(xPaths.getClassificationsXPath().resolve(doc, xPaths.getNamespace()), defaultLangIsoCode, (a, b) -> { a.addAll(b); return a; });
     }
 
     /**
@@ -405,12 +419,7 @@ public class CMMStudyMapper {
     Map<String, Universe> parseUniverses(Document document, XPaths xPaths, String defaultLangIsoCode) {
         var universeXPath = xPaths.getUniverseXPath();
         if (universeXPath.isPresent()) {
-            var extractedUniverses = docElementParser.extractMetadataObjectListForEachLang(
-                defaultLangIsoCode,
-                document,
-                universeXPath.orElseThrow(),
-                ParsingStrategies::universeStrategy, xPaths.getNamespace()
-            );
+            var extractedUniverses = mapNullLanguage(universeXPath.get().resolve(document, xPaths.getNamespace()), defaultLangIsoCode, (a, b) -> { a.addAll(b); return a; });
 
             var universes = new HashMap<String, Universe>();
             for (var entry : extractedUniverses.entrySet()) {
@@ -422,11 +431,11 @@ public class CMMStudyMapper {
 
                     // Loop over all universe entries for each language
                     for (var extractedUniverse : entry.getValue()) {
-                        var content = extractedUniverse.getValue();
+                        var content = extractedUniverse.content();
 
                         // Switch based on whether the universe is included or excluded,
                         // copying in any previous inclusions or exclusions
-                        universe = switch (extractedUniverse.getKey()) {
+                        universe = switch (extractedUniverse.clusion()) {
                             case I -> new Universe(content, universe.exclusion());
                             case E -> new Universe(universe.inclusion(), content);
                         };

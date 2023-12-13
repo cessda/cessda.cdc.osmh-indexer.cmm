@@ -221,7 +221,7 @@ class DocElementParser {
      * @param element the element to parse.
      * @return the attribute, or {@code null} if the attribute cannot be found.
      */
-    private static Attribute getLangAttribute(Element element) {
+    static Attribute getLangAttribute(Element element) {
         var langAttr = element.getAttribute(LANG_ATTR, XML_NAMESPACE);
         if (langAttr != null) {
             return langAttr;

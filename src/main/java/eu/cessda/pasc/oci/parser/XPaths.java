@@ -16,16 +16,23 @@
 package eu.cessda.pasc.oci.parser;
 
 import eu.cessda.pasc.oci.exception.UnsupportedXMLNamespaceException;
+import eu.cessda.pasc.oci.models.cmmstudy.Pid;
+import eu.cessda.pasc.oci.models.cmmstudy.TermVocabAttributes;
 import lombok.*;
+import org.jdom2.Attribute;
+import org.jdom2.Element;
 import org.jdom2.Namespace;
 
 import javax.annotation.Nullable;
-import java.io.Serial;
-import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static eu.cessda.pasc.oci.parser.XMLMapper.extractMetadataObjectListForEachLang;
+import static eu.cessda.pasc.oci.parser.XMLMapper.getFirstEntry;
 import static java.util.Map.entry;
+import static org.jdom2.filter.Filters.attribute;
+import static org.jdom2.filter.Filters.element;
 
 /**
  * XPath constants used to extract metadata from DDI XML documents.
@@ -35,15 +42,13 @@ import static java.util.Map.entry;
 @Getter
 @ToString
 @With
-public final class XPaths implements Serializable {
-    @Serial
-    private static final long serialVersionUID = -6226660931460780008L;
+public final class XPaths {
 
     @NonNull
     private final Namespace[] namespace;
     // Codebook Paths
     private final String recordDefaultLanguage;
-    private final String yearOfPubXPath;
+    private final XMLMapper<?, Optional<String>> yearOfPubXPath;
     private final String abstractXPath;
     private final String titleXPath;
     private final String parTitleXPath;
@@ -52,11 +57,11 @@ public final class XPaths implements Serializable {
     @Nullable
     private final String studyURLDocDscrXPath;
     private final String studyURLStudyDscrXPath;
-    private final String pidStudyXPath;
+    private final XMLMapper<?, Map<String, List<Pid>>> pidStudyXPath;
     private final String creatorsXPath;
     private final String dataRestrctnXPath;
     private final String dataCollectionPeriodsXPath;
-    private final String classificationsXPath;
+    private final XMLMapper<?, Map<String, List<TermVocabAttributes>>> classificationsXPath;
     private final String keywordsXPath;
     private final String typeOfTimeMethodXPath;
     private final String studyAreaCountriesXPath;
@@ -71,7 +76,7 @@ public final class XPaths implements Serializable {
     private final String typeOfModeOfCollectionXPath;
     private final String relatedPublicationsXPath;
     @Nullable
-    private final String universeXPath;
+    private final XMLMapper<Element, Map<String, List<UniverseElement>>> universeXPath;
 
     public Optional<String> getDataAccessUrlXPath() {
         return Optional.ofNullable(dataAccessUrlXPath);
@@ -89,14 +94,13 @@ public final class XPaths implements Serializable {
         return Optional.ofNullable(studyURLDocDscrXPath);
     }
 
-    public Optional<String> getUniverseXPath() {
+    public Optional<XMLMapper<Element, Map<String, List<UniverseElement>>>> getUniverseXPath() {
         return Optional.ofNullable(universeXPath);
     }
 
     /**
      * XPaths needed to extract metadata from DDI 3.2 documents.
      */
-    // TODO: Add parsing implementation to this file
     public static final XPaths DDI_3_2_XPATHS = XPaths.builder()
         .namespace(new Namespace[]{
             Namespace.getNamespace("ddi", "ddi:instance:3_2"),
@@ -120,8 +124,8 @@ public final class XPaths implements Serializable {
         .studyURLStudyDscrXPath("//ddi:DDIInstance/s:StudyUnit/r:UserID")
         // Study number/PID (when @typeOfUserID attribute is "StudyNumber") - TODO: Implement parsing for this
         //.pidStudyXPath("//ddi:DDIInstance/s:StudyUnit/r:UserID")
-        // Study number/PID 
-        .pidStudyXPath("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:InternationalIdentifier/r:IdentifierContent")
+        // Study number/PID
+        .pidStudyXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:InternationalIdentifier", element(), extractMetadataObjectListForEachLang(ParsingStrategies::pidLifecycleStrategy)))
         // Creator/PI
         .creatorsXPath("//ddi:DDIInstance/r:Citation/r:Creator/r:CreatorName/r:String")
         // Terms of data access
@@ -131,9 +135,9 @@ public final class XPaths implements Serializable {
         // Data collection period
         .dataCollectionPeriodsXPath("//ddi:DDIInstance/s:StudyUnit/d:DataCollection/d:CollectionEvent/d:CollectionSituation/r:Description/r:Content")
         // Publication year
-        .yearOfPubXPath("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:PublicationDate/r:SimpleDate")
+        .yearOfPubXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:PublicationDate/r:SimpleDate", element(), getFirstEntry(Element::getText)))
         // Topics
-        .classificationsXPath("//ddi:DDIInstance/s:StudyUnit/r:Coverage/r:TopicalCoverage/r:Subject")
+        .classificationsXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Coverage/r:TopicalCoverage/r:Subject", element(), extractMetadataObjectListForEachLang(ParsingStrategies::termVocabAttributeLifecycleStrategy)))
         // Keywords
         .keywordsXPath("//ddi:DDIInstance/s:StudyUnit/r:Coverage/r:TopicalCoverage/r:Keyword")
         // Time dimension
@@ -158,8 +162,8 @@ public final class XPaths implements Serializable {
         .relatedPublicationsXPath("//ddi:DDIInstance/s:StudyUnit/r:OtherMaterial/r:Citation/r:InternationalIdentifier/r:IdentifierContent")
         // Study description language
         .recordDefaultLanguage("//ddi:DDIInstance/@xml:lang")
-        // Description of population - TODO: Implement inclusion/exclusion
-        .universeXPath("//ddi:DDIInstance/s:StudyUnit/c:ConceptualComponent/c:UniverseScheme")
+        // Description of population
+        .universeXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/c:ConceptualComponent/c:UniverseScheme/c:Universe", element(), ParsingStrategies::universeLifecycleStrategy))
         .build();
 
     /**
@@ -194,7 +198,7 @@ public final class XPaths implements Serializable {
         // URL of the study description page at the SP website
         .studyURLStudyDscrXPath("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:holdings")
         // Study number/PID
-        .pidStudyXPath("//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo")
+        .pidStudyXPath(new XMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo", element(), extractMetadataObjectListForEachLang(ParsingStrategies::pidStrategy)))
         // Creator
         .creatorsXPath("//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty")
         // Terms of data access
@@ -204,9 +208,9 @@ public final class XPaths implements Serializable {
         // Data collection period
         .dataCollectionPeriodsXPath("//ddi:codeBook//ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate")
         // Publication year
-        .yearOfPubXPath("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:distDate[1]/@date")
+        .yearOfPubXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:distDate[1]/@date", attribute(), getFirstEntry(Attribute::getValue)))
         // Topics
-        .classificationsXPath("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:subject/ddi:topcClas")
+        .classificationsXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:subject/ddi:topcClas", element(), extractMetadataObjectListForEachLang(element -> ParsingStrategies.termVocabAttributeStrategy(element, false))))
         // Keywords
         .keywordsXPath("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:subject/ddi:keyword")
         // Time dimension
@@ -232,7 +236,7 @@ public final class XPaths implements Serializable {
         // Study description language
         .recordDefaultLanguage("//ddi:codeBook/@xml:lang")
         // Description of population
-        .universeXPath("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:universe")
+        .universeXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:universe", element(), extractMetadataObjectListForEachLang(ParsingStrategies::universeStrategy)))
         .build();
 
     /**
@@ -242,7 +246,7 @@ public final class XPaths implements Serializable {
         .namespace(new Namespace[]{ Namespace.getNamespace("ddi", "http://www.icpsr.umich.edu/DDI") })
         .recordDefaultLanguage("//ddi:codeBook/@xml-lang") // Nesstar with "-"
         // Closest for Nesstar based on CMM mapping doc but the above existing one for ddi2.5 seems to be present in Nesstar
-        .yearOfPubXPath("//ddi:codeBook/stdyDscr/citation/distStmt/distDate[1]/@date")
+        .yearOfPubXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/citation/distStmt/distDate[1]/@date", attribute(), getFirstEntry(Attribute::getValue)))
         .abstractXPath("//ddi:codeBook/stdyDscr/stdyInfo/abstract")
         .titleXPath("//ddi:codeBook/stdyDscr/citation/titlStmt/titl")
         .parTitleXPath("//ddi:codeBook/stdyDscr/citation/titlStmt/parTitl")
@@ -250,11 +254,11 @@ public final class XPaths implements Serializable {
         // PID path missing for most nesstar repos. Available in FORS but:
         //  -No agency
         //  -Only element freetext value.
-        .pidStudyXPath("//ddi:codeBook/stdyDscr/citation/titlStmt/IDNo") // use @agency instead?
+        .pidStudyXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/citation/titlStmt/IDNo", element(), extractMetadataObjectListForEachLang(ParsingStrategies::pidStrategy))) // use @agency instead?
         .creatorsXPath("//ddi:codeBook/stdyDscr/citation/rspStmt/AuthEnty")
         .dataRestrctnXPath("//ddi:codeBook/stdyDscr/dataAccs/useStmt/restrctn")
         .dataCollectionPeriodsXPath("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/collDate")
-        .classificationsXPath("//ddi:codeBook/stdyDscr/stdyInfo/subject/topcClas")
+        .classificationsXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/subject/topcClas", element(), extractMetadataObjectListForEachLang(element -> ParsingStrategies.termVocabAttributeStrategy(element, false))))
         .keywordsXPath("//ddi:codeBook/stdyDscr/stdyInfo/subject/keyword")
         .typeOfTimeMethodXPath("//ddi:codeBook/stdyDscr/method/dataColl/timeMeth")
         .studyAreaCountriesXPath("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/nation")
@@ -264,7 +268,7 @@ public final class XPaths implements Serializable {
         .samplingXPath("//ddi:codeBook/stdyDscr/method/dataColl/sampProc")
         .typeOfModeOfCollectionXPath("//ddi:codeBook/stdyDscr/method/dataColl/collMode")
         .relatedPublicationsXPath("//ddi:codeBook/stdyDscr/othrStdyMat/relPubl")
-        .universeXPath("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/universe")
+        .universeXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/universe", element(), extractMetadataObjectListForEachLang(ParsingStrategies::universeStrategy)))
         .build();
 
     /**

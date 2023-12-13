@@ -17,16 +17,13 @@ package eu.cessda.pasc.oci.parser;
 
 import eu.cessda.pasc.oci.exception.InvalidUniverseException;
 import eu.cessda.pasc.oci.models.cmmstudy.*;
-import lombok.experimental.UtilityClass;
+import lombok.NonNull;
+import org.jdom2.DataConversionException;
 import org.jdom2.Element;
-import org.jdom2.Namespace;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static eu.cessda.pasc.oci.parser.DocElementParser.getAttributeValue;
 import static eu.cessda.pasc.oci.parser.OaiPmhConstants.*;
@@ -37,12 +34,12 @@ import static java.util.Optional.ofNullable;
  *
  * @author moses AT doraventures DOT com
  */
-@UtilityClass
-class ParsingStrategies {
+class ParsingStrategies{
 
     // Metadata handling
     private static final String EMPTY_EL = "empty";
     private static final String PUBLISHER_NOT_AVAIL = "Publisher not specified";
+
 
     /**
      * Constructs a {@link Country} using the given element.
@@ -75,6 +72,35 @@ class ParsingStrategies {
             element.getText()
         );
         return Optional.of(pid);
+    }
+
+    /**
+     * Constructs a {@link Pid} using the given element.
+     * @param element the {@link Element} to parse.
+     * @return an Optional {@link Pid}.
+     */
+    static Optional<Pid> pidLifecycleStrategy(Element element) {
+        String agency = null;
+        String identifier = null;
+
+        for (var child : element.getChildren()) {
+            // Only search in the same namespace context as the parent element
+            if (!child.getNamespace().equals(element.getNamespace())) {
+                continue;
+            }
+
+            switch (child.getName()) {
+                case "ManagingAgency" -> agency = child.getText();
+                case "IdentifierContent" -> identifier = child.getText();
+            }
+        }
+
+        // Only return a PID if an identifier is found
+        if (identifier != null) {
+            return Optional.of(new Pid(agency, identifier));
+        } else {
+            return Optional.empty();
+        }
     }
 
     /**
@@ -144,6 +170,22 @@ class ParsingStrategies {
             term
         );
         return Optional.of(termVocab);
+    }
+
+    @NonNull
+    static Optional<TermVocabAttributes> termVocabAttributeLifecycleStrategy(Element element) {
+        String vocab = "";
+        String vocabUri = "";
+
+        var term = element.getText();
+        for (var attr : element.getAttributes()) {
+            switch (attr.getName()) {
+                case "codeListName" -> vocab = attr.getValue();
+                case "codeListURN" -> vocabUri = attr.getValue();
+            }
+        }
+
+        return Optional.of(new TermVocabAttributes(vocab, vocabUri, "", term));
     }
 
     /**
@@ -234,7 +276,7 @@ class ParsingStrategies {
 
         // Parse the holdings in the citation if present
         if (citation.isPresent()) {
-            var uris = parseHoldingsURI(citation.orElseThrow(), namespace);
+            var uris = parseHoldingsURI(citation.orElseThrow());
             holdings.addAll(uris);
         }
 
@@ -276,8 +318,8 @@ class ParsingStrategies {
      * Parse the URIs of the holdings of a citation.
      * @return a list of URIs of the holdings of a citation.
      */
-    private static List<URI> parseHoldingsURI(Element citation, Namespace namespace) {
-        var holdingsElements = citation.getChildren("holdings", namespace);
+    private static List<URI> parseHoldingsURI(Element citation) {
+        var holdingsElements = citation.getChildren("holdings", citation.getNamespace());
         var holdingsURIList = new ArrayList<URI>(holdingsElements.size());
 
         for (var holdings : holdingsElements) {
@@ -308,7 +350,7 @@ class ParsingStrategies {
      * @param element the element to parse.
      * @return a {@link Map.Entry} with the key set to the clusion status and the value set to the content of the element.
      */
-    static Optional<Map.Entry<Universe.Clusion, String>> universeStrategy(Element element) {
+    static Optional<UniverseElement> universeStrategy(Element element) {
 
         // Set the text content
         var content = element.getTextTrim();
@@ -318,14 +360,69 @@ class ParsingStrategies {
         if (clusion != null) {
             try {
                 var clusionValue = Universe.Clusion.valueOf(clusion);
-                return Optional.of(Map.entry(clusionValue, content));
+                return Optional.of(new UniverseElement(clusionValue, content));
             } catch (IllegalArgumentException e) {
                 throw new InvalidUniverseException(clusion, e);
             }
         } else {
             // Clusion not defined in the source element, default to an inclusion
             // See https://ddialliance.org/Specification/DDI-Codebook/2.5/XMLSchema/field_level_documentation_files/schemas/codebook_xsd/elements/universe.html
-            return Optional.of(Map.entry(Universe.Clusion.I, content));
+            return Optional.of(new UniverseElement(Universe.Clusion.I, content));
         }
+    }
+
+    /**
+     * Parse the universe element. The clusion defaults to I if the source element doesn't specify its inclusivity.
+     * @param elements the elements to parse.
+     * @return a {@link Map} the language as the key and a list of universes as the value.
+     */
+    @NonNull
+    static Map<String, List<UniverseElement>> universeLifecycleStrategy(List<Element> elements) {
+        var map = new HashMap<String, List<UniverseElement>>();
+
+        for (var universeElement : elements) {
+            var inclusionStatus = parseInclusionStatus(universeElement);
+
+            // Language specific content is stored in sub-elements which needs to be flattened
+            for (var otherMaterial : universeElement.getChildren()) {
+                if (!otherMaterial.getName().equals("Description")) {
+                    continue;
+                }
+
+                for (var contentElement : otherMaterial.getChildren()) {
+                    if (!contentElement.getName().equals("Content")) {
+                        continue;
+                    }
+
+                    map.computeIfAbsent(
+                        XMLMapper.getLangOfElement(contentElement), k -> new ArrayList<>()
+                    ).add(
+                        new UniverseElement(inclusionStatus, contentElement.getText())
+                    );
+                }
+            }
+        }
+
+        return map;
+    }
+
+    @NonNull
+    private static Universe.Clusion parseInclusionStatus(Element universeElement) {
+        for (var attr :  universeElement.getAttributes()) {
+            // Search for the isInclusive attribute
+            if (!attr.getName().equals("isInclusive")) {
+                continue;
+            }
+
+            try {
+                if (!attr.getBooleanValue()) {
+                    return Universe.Clusion.E;
+                }
+            } catch (DataConversionException ex) {
+                // conversion failed, default to inclusion
+            }
+        }
+
+        return Universe.Clusion.I;
     }
 }

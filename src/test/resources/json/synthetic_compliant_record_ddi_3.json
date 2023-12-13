@@ -7,19 +7,19 @@
     "de": [
       {
         "vocabUri": "",
-        "vocab": "",
+        "vocab": "ZA-Kategorien",
         "term": "Politische Fragen (Issues)",
         "id": ""
       },
       {
-        "vocabUri": "",
-        "vocab": "",
+        "vocabUri": "https://vocabularies.cessda.eu/urn/urn:ddi:int.cessda.cv:TopicClassification:4.2.2",
+        "vocab": "CESSDA Topic Classification",
         "term": "Internationale Politik und Internationale Organisationen",
         "id": ""
       },
       {
-        "vocabUri": "",
-        "vocab": "",
+        "vocabUri": "https://vocabularies.cessda.eu/urn/urn:ddi:int.cessda.cv:TopicClassification:4.2.2",
+        "vocab": "CESSDA Topic Classification",
         "term": "Konflikte, Sicherheit und Frieden",
         "id": ""
       }
@@ -27,19 +27,19 @@
     "en": [
       {
         "vocabUri": "",
-        "vocab": "",
+        "vocab": "ZA-Categories",
         "term": "Political Issues",
         "id": ""
       },
       {
-        "vocabUri": "",
-        "vocab": "",
+        "vocabUri": "https://vocabularies.cessda.eu/urn/urn:ddi:int.cessda.cv:TopicClassification:4.2.2",
+        "vocab": "CESSDA Topic Classification",
         "term": "International politics and organisations",
         "id": ""
       },
       {
-        "vocabUri": "",
-        "vocab": "",
+        "vocabUri": "https://vocabularies.cessda.eu/urn/urn:ddi:int.cessda.cv:TopicClassification:4.2.2",
+        "vocab": "CESSDA Topic Classification",
         "term": "Conflict, security and peace",
         "id": ""
       }
@@ -74,6 +74,7 @@
   "pidStudies": {
     "en": [
       {
+        "agency": "DOI",
         "pid": "doi:10.4232/1.0004"
       }
     ]
@@ -84,6 +85,7 @@
       "publisher": ""
     }
   },
+  "publicationYear": "1964",
   "relatedPublications": {
   },
   "repositoryUrl": "http://dbkapps.gesis.org/dbkoai/oai.asp",
@@ -130,5 +132,11 @@
   "unitTypes": {
   },
   "universe": {
+    "de": {
+      "inclusion": "Kongressmitglieder (Senat und Repräsentantenhaus)"
+    },
+    "en": {
+      "inclusion": "Members of congress (Senate and House of Representatives)."
+    }
   }
 }

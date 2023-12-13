@@ -2,11 +2,17 @@
 <!-- $Workfile: oai.asp $ $Revision: 15 $ $Date: 2/23/04 5:30p $ -->
 <!-- $Workfile: functions.inc $ $Revision: 14 $ $Date: 2/17/16 5:30p $ -->
 <?xml-stylesheet type='text/xsl' href='./oai2html.xsl' ?>
-<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns:ddi="ddi:instance:3_2" xmlns:s="ddi:studyunit:3_2"
-         xmlns:pi="ddi:physicalinstance:3_2" xmlns:c="ddi:conceptualcomponent:3_2"
-         xmlns:l="ddi:logicalproduct:3_2" xmlns:r="ddi:reusable:3_2" xmlns:d="ddi:datacollection:3_2"
-         xmlns:a="ddi:archive:3_2" xmlns:dc="http://purl.org/dc/terms/"
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ddi="ddi:instance:3_2"
+         xmlns:s="ddi:studyunit:3_2"
+         xmlns:pi="ddi:physicalinstance:3_2"
+         xmlns:c="ddi:conceptualcomponent:3_2"
+         xmlns:l="ddi:logicalproduct:3_2"
+         xmlns:r="ddi:reusable:3_2"
+         xmlns:d="ddi:datacollection:3_2"
+         xmlns:a="ddi:archive:3_2"
+         xmlns:dc="http://purl.org/dc/terms/"
          xmlns:g="ddi:group:3_2"
          xsi:schemaLocation="ddi:instance:3_2 http://www.ddialliance.org/Specification/DDI-Lifecycle/3.2/XMLSchema/instance.xsd
          http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
@@ -127,21 +133,6 @@
                 </a:OrganizationIdentification>
             </a:Organization>
         </a:OrganizationScheme>
-        <c:UniverseScheme>
-            <r:Agency>de.gesis</r:Agency>
-            <r:ID>ZA0004_UniSch</r:ID>
-            <r:Version>1.0.0</r:Version>
-            <c:Universe>
-                <r:Agency>de.gesis</r:Agency>
-                <r:ID>ZA0004_Uni1</r:ID>
-                <r:Version>1.0.0</r:Version>
-                <r:Description>
-                    <r:Content xml:lang="en">Members of congress (Senate and House of Representatives).
-                    </r:Content>
-                    <r:Content xml:lang="de">Kongressmitglieder (Senat und Repräsentantenhaus)</r:Content>
-                </r:Description>
-            </c:Universe>
-        </c:UniverseScheme>
         <c:GeographicLocationScheme>
             <r:Agency>de.gesis</r:Agency>
             <r:ID>ZA0004_GeoLocSch</r:ID>
@@ -234,12 +225,6 @@
             <r:Content xml:lang="en">Attitude of the political leadership (members of parliament) in the USA to other nations and problems in world politics.</r:Content>
             <r:Content xml:lang="de">Einstellung der politischen Führungsschicht (Parlamentsmitglieder) in den USA zu anderen Nationen und weltpolitischen Problemen.</r:Content>
         </r:Abstract>
-        <r:UniverseReference>
-            <r:Agency>de.gesis</r:Agency>
-            <r:ID>ZA0004_Uni1</r:ID>
-            <r:Version>1.0.0</r:Version>
-            <r:TypeOfObject>Universe</r:TypeOfObject>
-        </r:UniverseReference>
         <r:Coverage>
             <r:TopicalCoverage>
                 <r:Agency>de.gesis</r:Agency>
@@ -247,10 +232,10 @@
                 <r:Version>1.0.0</r:Version>
                 <r:Subject xml:lang="en" codeListAgencyName="de.gesis" codeListName="ZA-Categories">Political Issues</r:Subject>
                 <r:Subject xml:lang="de" codeListAgencyName="de.gesis" codeListName="ZA-Kategorien">Politische Fragen (Issues)</r:Subject>
-                <r:Subject xml:lang="en" codeListAgencyName="cessda" codeListName="CESSDA Topic Classification">International politics and organisations</r:Subject>
-                <r:Subject xml:lang="de" codeListAgencyName="cessda" codeListName="CESSDA Topic Classification">Internationale Politik und Internationale Organisationen</r:Subject>
-                <r:Subject xml:lang="en" codeListAgencyName="cessda" codeListName="CESSDA Topic Classification">Conflict, security and peace</r:Subject>
-                <r:Subject xml:lang="de" codeListAgencyName="cessda" codeListName="CESSDA Topic Classification">Konflikte, Sicherheit und Frieden</r:Subject>
+                <r:Subject xml:lang="en" codeListAgencyName="cessda" codeListName="CESSDA Topic Classification" codeListURN="https://vocabularies.cessda.eu/urn/urn:ddi:int.cessda.cv:TopicClassification:4.2.2">International politics and organisations</r:Subject>
+                <r:Subject xml:lang="de" codeListAgencyName="cessda" codeListName="CESSDA Topic Classification" codeListURN="https://vocabularies.cessda.eu/urn/urn:ddi:int.cessda.cv:TopicClassification:4.2.2">Internationale Politik und Internationale Organisationen</r:Subject>
+                <r:Subject xml:lang="en" codeListAgencyName="cessda" codeListName="CESSDA Topic Classification" codeListURN="https://vocabularies.cessda.eu/urn/urn:ddi:int.cessda.cv:TopicClassification:4.2.2">Conflict, security and peace</r:Subject>
+                <r:Subject xml:lang="de" codeListAgencyName="cessda" codeListName="CESSDA Topic Classification" codeListURN="https://vocabularies.cessda.eu/urn/urn:ddi:int.cessda.cv:TopicClassification:4.2.2">Konflikte, Sicherheit und Frieden</r:Subject>
             </r:TopicalCoverage>
             <r:SpatialCoverage>
                 <r:Agency>de.gesis</r:Agency>
@@ -305,6 +290,25 @@
             </r:Citation>
             <r:ExternalURLReference>https://dbk.gesis.org/dbksearch/download.asp?id=54968</r:ExternalURLReference>
         </r:OtherMaterial>
+        <c:ConceptualComponent>
+            <r:Agency>de.gesis</r:Agency>
+            <r:ID>ZA0004h</r:ID>
+            <r:Version>1.0.0</r:Version>
+            <c:UniverseScheme>
+                <r:Agency>de.gesis</r:Agency>
+                <r:ID>ZA0004_UniSch</r:ID>
+                <r:Version>1.0.0</r:Version>
+                <c:Universe>
+                    <r:Agency>de.gesis</r:Agency>
+                    <r:ID>ZA0004_Uni1</r:ID>
+                    <r:Version>1.0.0</r:Version>
+                    <r:Description>
+                        <r:Content xml:lang="en">Members of congress (Senate and House of Representatives).</r:Content>
+                        <r:Content xml:lang="de">Kongressmitglieder (Senat und Repräsentantenhaus)</r:Content>
+                    </r:Description>
+                </c:Universe>
+            </c:UniverseScheme>
+        </c:ConceptualComponent>
         <d:DataCollection>
             <r:Agency>de.gesis</r:Agency>
             <r:ID>ZA0004_DatCol</r:ID>
