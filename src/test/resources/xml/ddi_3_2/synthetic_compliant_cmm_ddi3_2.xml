@@ -34,12 +34,8 @@
     <r:Version>1.0.0</r:Version>
     <r:Citation>
         <r:Title>
-            <r:String xml:lang="en">DDI3.2 study level documentation for study ZA0004 International Outlooks of
-                Political Leaders (USA)
-            </r:String>
-            <r:String xml:lang="de">DDI3.2 Dokumentation auf Studienebene für Studie ZA0004 International Outlooks of
-                Political Leaders (USA)
-            </r:String>
+            <r:String xml:lang="en">DDI3.2 study level documentation for study ZA0004 International Outlooks of Political Leaders (USA)</r:String>
+            <r:String xml:lang="de">DDI3.2 Dokumentation auf Studienebene für Studie ZA0004 International Outlooks of Political Leaders (USA)</r:String>
         </r:Title>
         <r:Creator>
             <r:CreatorName>
@@ -127,8 +123,7 @@
                 <r:Version>1.0.0</r:Version>
                 <a:OrganizationIdentification>
                     <a:OrganizationName>
-                        <r:String>Institute for International Social Research, Princeton, N.J.
-                        </r:String>
+                        <r:String>Institute for International Social Research, Princeton, N.J.</r:String>
                     </a:OrganizationName>
                 </a:OrganizationIdentification>
             </a:Organization>
@@ -184,12 +179,8 @@
                 <r:String xml:lang="de">Weitere Hinweise</r:String>
             </r:Header>
             <r:NoteContent>
-                <r:Content xml:lang="en">The study is part of an international comparative investigation (see
-                    ZA Study Nos. 0005 to 0010).
-                </r:Content>
-                <r:Content xml:lang="de">Die Studie ist Teil einer international vergleichenden Untersuchung
-                    (vgl. ZA-Studien-Nrn. 0005 bis 0010).
-                </r:Content>
+                <r:Content xml:lang="en">The study is part of an international comparative investigation (see ZA Study Nos. 0005 to 0010).</r:Content>
+                <r:Content xml:lang="de">Die Studie ist Teil einer international vergleichenden Untersuchung (vgl. ZA-Studien-Nrn. 0005 bis 0010).</r:Content>
             </r:NoteContent>
         </r:Note>
         <r:Citation>
@@ -263,8 +254,7 @@
             <r:Agency>de.gesis</r:Agency>
             <r:ID>ZA0004_Mat4</r:ID>
             <r:Version>1.0.0</r:Version>
-            <r:TypeOfMaterial codeListAgencyName="gesis" codeListName="GesisTypeOfMaterial">OriginalLiterature
-            </r:TypeOfMaterial>
+            <r:TypeOfMaterial codeListAgencyName="gesis" codeListName="GesisTypeOfMaterial">OriginalLiterature</r:TypeOfMaterial>
             <r:Description>
                 <r:Content>Free, Lloyd A.:
                     Six Allies And A Neutral.
@@ -362,8 +352,7 @@
             <r:ID>ZA0004_LogPro</r:ID>
             <r:Version>1.0.0</r:Version>
             <r:Note>
-                <r:TypeOfNote codeListName="GesisTypeOfNote" codeListAgencyName="Gesis" codeListURN="">Software
-                </r:TypeOfNote>
+                <r:TypeOfNote codeListName="GesisTypeOfNote" codeListAgencyName="Gesis" codeListURN="">Software</r:TypeOfNote>
                 <r:Relationship>
                     <r:RelatedToReference>
                         <r:Agency>de.gesis</r:Agency>
@@ -378,9 +367,7 @@
                 </r:NoteContent>
             </r:Note>
             <r:Note>
-                <r:TypeOfNote codeListName="GesisTypeOfNote" codeListAgencyName="Gesis" codeListURN="">
-                    VariableQuantity
-                </r:TypeOfNote>
+                <r:TypeOfNote codeListName="GesisTypeOfNote" codeListAgencyName="Gesis" codeListURN="">VariableQuantity</r:TypeOfNote>
                 <r:Relationship>
                     <r:RelatedToReference>
                         <r:Agency>de.gesis</r:Agency>
@@ -444,34 +431,31 @@
                         <r:TypeOfObject>Organization</r:TypeOfObject>
                     </r:AgencyOrganizationReference>
                     <r:Description>
-                        <r:Content><![CDATA[
- Selection of DDI 3.2 Elements and Attributes used by DBK for DDI3.2 Export 
- The original DDI 3.2 Schema can be found at http://www.ddialliance.org/Specification/DDI-Lifecycle/3.2/XMLSchema/ 
- A copy of the DDI 3.2 Schema can be found at http://dbkapps.gesis.org/DDI/3_2 
-                                         
- Documentation of the metadata schema:                 
- Akdeniz, Esra, And Wolfgang Zenk-Möltgen. 2017:       
- DDI-Lifecycle im Datenarchiv. Das Metadatenschema     
- für die Dokumentation in verschiedenen                
- Softwaresystemen.GESIS Papers 2017/02.                
- http://nbn-resolving.de/urn:nbn:de:0168-ssoar-50354-9 
- https://dbk.gesis.org/ddi/DDI-LimDAS/                 
-                                                       
-                                         
- created by W. Zenk-Möltgen, 2019-07-25  
- from DBK                   
- DDI3.2 export format                    
-                                         
- DBK 2.2 to DDI 3.2 Export - 2.8.5       
-                                         
-]]>
+                        <r:Content>
+ Selection of DDI 3.2 Elements and Attributes used by DBK for DDI3.2 Export
+ The original DDI 3.2 Schema can be found at http://www.ddialliance.org/Specification/DDI-Lifecycle/3.2/XMLSchema/
+ A copy of the DDI 3.2 Schema can be found at http://dbkapps.gesis.org/DDI/3_2
+
+ Documentation of the metadata schema:
+ Akdeniz, Esra, And Wolfgang Zenk-Möltgen. 2017:
+ DDI-Lifecycle im Datenarchiv. Das Metadatenschema
+ für die Dokumentation in verschiedenen
+ Softwaresystemen.GESIS Papers 2017/02.
+ http://nbn-resolving.de/urn:nbn:de:0168-ssoar-50354-9
+ https://dbk.gesis.org/ddi/DDI-LimDAS/
+
+
+ created by W. Zenk-Möltgen, 2019-07-25
+ from DBK
+ DDI3.2 export format
+
+ DBK 2.2 to DDI 3.2 Export - 2.8.5
                         </r:Content>
                     </r:Description>
                 </r:LifecycleEvent>
             </r:LifecycleInformation>
         </a:Archive>
     </s:StudyUnit>
-
 </ddi:DDIInstance>
 </metadata>
 </record>

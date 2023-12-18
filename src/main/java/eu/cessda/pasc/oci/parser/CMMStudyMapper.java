@@ -24,8 +24,6 @@ import lombok.Builder;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -38,7 +36,6 @@ import java.util.stream.Stream;
 
 import static eu.cessda.pasc.oci.parser.OaiPmhConstants.*;
 import static eu.cessda.pasc.oci.parser.ParsingStrategies.termVocabAttributeStrategy;
-import static eu.cessda.pasc.oci.parser.ParsingStrategies.uriStrategy;
 
 /**
  * Responsible for Mapping oai-pmh fields to a CMMStudy
@@ -105,6 +102,20 @@ public class CMMStudyMapper {
     /**
      * Map {@code} null keys (i.e. elements missing {@code xml:lang}) to the default language,
      * or remove them if default language mapping is disabled.
+     * <p>
+     * If both the default language and {@code null} entries exist, the default language entries
+     * will override the {@code null} entries.
+     *
+     * @param langMap            the map.
+     * @param defaultLangIsoCode the language to map to.
+     */
+    private <T> Map<String, T> mapNullLanguage(Map<String, T> langMap, String defaultLangIsoCode) {
+        return mapNullLanguage(langMap, defaultLangIsoCode, (a, b) -> a);
+    }
+
+    /**
+     * Map {@code} null keys (i.e. elements missing {@code xml:lang}) to the default language,
+     * or remove them if default language mapping is disabled.
      *
      * @param langMap            the map.
      * @param defaultLangIsoCode the language to map to.
@@ -124,7 +135,8 @@ public class CMMStudyMapper {
      * Xpath = {@link XPaths#getAbstractXPath() }
      */
     Map<String, String> parseAbstract(Document document, XPaths xPaths, String langCode) {
-        return parseLanguageContentOfElement(document, langCode, xPaths.getAbstractXPath(), true, xPaths.getNamespace());
+        var unmappedAbstracts = xPaths.getAbstractXPath().resolve(document, xPaths.getNamespace());
+        return mapNullLanguage(unmappedAbstracts, langCode);
     }
 
     /**
@@ -153,7 +165,8 @@ public class CMMStudyMapper {
      * Xpath = {@link XPaths#getClassificationsXPath()}
      */
     Map<String, List<TermVocabAttributes>> parseClassifications(Document doc, XPaths xPaths, String defaultLangIsoCode) {
-        return mapNullLanguage(xPaths.getClassificationsXPath().resolve(doc, xPaths.getNamespace()), defaultLangIsoCode, (a, b) -> { a.addAll(b); return a; });
+        var unmappedXPaths = xPaths.getClassificationsXPath().resolve(doc, xPaths.getNamespace());
+        return mapNullLanguage(unmappedXPaths, defaultLangIsoCode, (a, b) -> { a.addAll(b); return a; });
     }
 
     /**
@@ -173,7 +186,6 @@ public class CMMStudyMapper {
      * Xpath = {@link XPaths#getTypeOfTimeMethodXPath()}
      */
     Map<String, List<TermVocabAttributes>> parseTypeOfTimeMethod(Document doc, XPaths xPaths, String defaultLangIsoCode) {
-
         return docElementParser.extractMetadataObjectListForEachLang(
             defaultLangIsoCode, doc, xPaths.getTypeOfTimeMethodXPath(), element -> termVocabAttributeStrategy(element, true), xPaths.getNamespace()
         );
@@ -234,22 +246,14 @@ public class CMMStudyMapper {
             defaultLang, document, xPaths.getPublisherXPath(), ParsingStrategies::publisherStrategy, xPaths.getNamespace()
         );
 
-        Map<String, Publisher> distrPathMap;
         if (xPaths.getDistributorXPath() != null) {
-            distrPathMap = docElementParser.extractMetadataObjectForEachLang(
-                defaultLang, document, xPaths.getDistributorXPath(), ParsingStrategies::publisherStrategy, xPaths.getNamespace()
+            Map<String, Publisher> distrPathMap = docElementParser.extractMetadataObjectForEachLang(
+                    defaultLang, document, xPaths.getDistributorXPath(), ParsingStrategies::publisherStrategy, xPaths.getNamespace()
             );
-        } else {
-            distrPathMap = Collections.emptyMap();
+            distrPathMap.forEach(producerPathMap::putIfAbsent);
         }
 
-        distrPathMap.forEach((k, v) -> producerPathMap.merge(k, v, (docDscrValue, stdyDscrValue) -> docDscrValue));
         return producerPathMap;
-    }
-
-    Map<String, String> parseLanguageContentOfElement(Document document, String langCode, String titleXpath, boolean isConcatenating, Namespace... namespaces) {
-        var elements = DocElementParser.getElements(document, titleXpath, namespaces);
-        return docElementParser.getLanguageKeyValuePairs(elements, isConcatenating, langCode, Element::getText);
     }
 
     /**
@@ -258,18 +262,19 @@ public class CMMStudyMapper {
      * Xpath = {@link XPaths#getTitleXPath()} and {@link XPaths#getParTitleXPath()}
      */
     Map<String, String> parseStudyTitle(Document document, XPaths xPaths, String langCode) {
-
-        Map<String, String> titles = parseLanguageContentOfElement(document, langCode, xPaths.getTitleXPath(), false, xPaths.getNamespace());
+        Map<String, String> titles = mapNullLanguage(xPaths.getTitleXPath().resolve(document, xPaths.getNamespace()), langCode);
 
         // https://github.com/cessda/cessda.cdc.versions/issues/135
-        if (xPaths.getParTitleXPath() != null && !titles.isEmpty()) {
-            Map<String, String> parTitles = parseLanguageContentOfElement(document, langCode, xPaths.getParTitleXPath(), false, xPaths.getNamespace());
+        var xpathOptional = xPaths.getParTitleXPath();
+        if (xpathOptional.isPresent() && !titles.isEmpty()) {
+            var parTitles = mapNullLanguage(xpathOptional.get().resolve(document, xPaths.getNamespace()), langCode);
             parTitles.forEach(titles::putIfAbsent);  // parTitl lang must not be same as or override titl lang
 
             // Remove return characters from the values
             titles.replaceAll((key, value) -> ParsingStrategies.cleanCharacterReturns(value));
         }
-        return titles;
+
+        return mapNullLanguage(titles, langCode);
     }
 
     /**
@@ -279,36 +284,41 @@ public class CMMStudyMapper {
      * Xpath = {@link XPaths#getStudyURLStudyDscrXPath()}
      */
     ParseResults<HashMap<String, URI>, List<URISyntaxException>> parseStudyUrl(Document document, XPaths xPaths, String langCode) {
+
+        var studyURLs = new HashMap<String, URI>();
         var parsingExceptions = new ArrayList<URISyntaxException>();
 
-        var stdyDscrElements = DocElementParser.getElements(document, xPaths.getStudyURLStudyDscrXPath(), xPaths.getNamespace());
-        var urlFromStdyDscr = docElementParser.getLanguageKeyValuePairs(stdyDscrElements, langCode, element -> {
-            try {
-                return ParsingStrategies.uriStrategy(element);
-            } catch (URISyntaxException e) {
-                parsingExceptions.add(e);
-                return Optional.empty();
+        // If studyURLStudyDscrXPath defined, use that XPath as well.
+        xPaths.getStudyURLDocDscrXPath().ifPresent(xpath -> {
+            var docUriStrings = mapNullLanguage(xpath.resolve(document, xPaths.getNamespace()), langCode);
+
+            for (var uriStrings : docUriStrings.entrySet()) {
+                for (var uriString : uriStrings.getValue()) {
+                    try {
+                        studyURLs.put(uriStrings.getKey(), new URI(uriString));
+                        break;
+                    } catch(URISyntaxException e){
+                        parsingExceptions.add(e);
+                    }
+                }
             }
         });
 
-        // If studyURLStudyDscrXPath defined, use that XPath as well.
-        var studyUrls= xPaths.getStudyURLDocDscrXPath().map(xpath -> {
-            var docDscrElement = DocElementParser.getElements(document, xpath, xPaths.getNamespace());
-            var urlFromDocDscr = docElementParser.getLanguageKeyValuePairs(docDscrElement, langCode, element -> {
-                try {
-                    return ParsingStrategies.uriStrategy(element);
-                } catch (URISyntaxException e) {
-                    parsingExceptions.add(e);
-                    return Optional.empty();
+        var studyUriStrings = mapNullLanguage(xPaths.getStudyURLStudyDscrXPath().resolve(document, xPaths.getNamespace()), langCode);
+        for (var uriStrings : studyUriStrings.entrySet()) {
+            studyURLs.computeIfAbsent(uriStrings.getKey(), k -> {
+                for (var uriString : uriStrings.getValue()) {
+                    try {
+                        return new URI(uriString);
+                    } catch (URISyntaxException e) {
+                        parsingExceptions.add(e);
+                    }
                 }
+                return null;
             });
+        }
 
-            // If absent, use the URL from studyDscr
-            urlFromStdyDscr.forEach(urlFromDocDscr::putIfAbsent);
-            return urlFromDocDscr;
-        }).orElse(urlFromStdyDscr);
-
-        return new ParseResults<>(studyUrls, parsingExceptions);
+        return new ParseResults<>(studyURLs, parsingExceptions);
     }
 
     /**
@@ -328,9 +338,8 @@ public class CMMStudyMapper {
      * Xpath = {@link XPaths#getDataRestrctnXPath()}
      */
     Map<String, List<String>> parseDataAccessFreeText(Document doc, XPaths xPaths, String defaultLangIsoCode) {
-        return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, doc, xPaths.getDataRestrctnXPath(), ParsingStrategies::nullableElementValueStrategy, xPaths.getNamespace()
-        );
+        var unmappedDataAccessTexts = xPaths.getDataRestrctnXPath().resolve(doc, xPaths.getNamespace());
+        return mapNullLanguage(unmappedDataAccessTexts, defaultLangIsoCode);
     }
 
     /**
@@ -461,19 +470,19 @@ public class CMMStudyMapper {
         var dataAccessUrlXPath = xPaths.getDataAccessUrlXPath();
         if (dataAccessUrlXPath.isPresent()) {
             var parsingExceptions = new ArrayList<URISyntaxException>();
-            var elements = DocElementParser.getElements(document, dataAccessUrlXPath.get(), xPaths.getNamespace());
+            var urlStrings = mapNullLanguage(dataAccessUrlXPath.get().resolve(document, xPaths.getNamespace()), defaultLangIsoCode);
+            var parsingUri = new HashMap<String, URI>(urlStrings.size());
 
-            var parsingUri = docElementParser.getLanguageKeyValuePairs(
-                elements, defaultLangIsoCode,
-                element -> {
+            for (var s : urlStrings.entrySet()) {
+                for (var u : s.getValue()) {
                     try {
-                        return uriStrategy(element);
+                        parsingUri.put(s.getKey(), new URI(u));
+                        break;
                     } catch (URISyntaxException e) {
                         parsingExceptions.add(e);
-                        return Optional.empty();
                     }
                 }
-            );
+            }
 
             return new ParseResults<>(parsingUri, parsingExceptions);
         } else {

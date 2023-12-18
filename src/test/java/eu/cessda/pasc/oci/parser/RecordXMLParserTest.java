@@ -252,12 +252,9 @@ public class RecordXMLParserTest {
     }
 
     private void assertThatCmmRequiredFieldsAreExtracted(CMMStudy record) throws IOException, JSONException {
-
-        final ObjectMapper mapper = new ObjectMapper();
-        String jsonString = objectMapper.writeValueAsString(record);
-        String expectedJson = ResourceHandler.getResourceAsString("json/ddi_record_ukds_example_extracted.json");
-        final JsonNode actualTree = mapper.readTree(jsonString);
-        final JsonNode expectedTree = mapper.readTree(expectedJson);
+        var expectedJson = ResourceHandler.getResource("json/ddi_record_ukds_example_extracted.json");
+        final JsonNode actualTree = objectMapper.valueToTree(record);
+        final JsonNode expectedTree = objectMapper.readTree(expectedJson);
 
         // CMM Model Schema required fields
         assertEquals(expectedTree.get("abstract").toString(), actualTree.get("abstract").toString(), true);

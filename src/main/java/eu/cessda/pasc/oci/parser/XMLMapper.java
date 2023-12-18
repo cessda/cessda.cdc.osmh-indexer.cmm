@@ -18,37 +18,90 @@ package eu.cessda.pasc.oci.parser;
 import lombok.NonNull;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
-import org.jdom2.filter.Filter;
+import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 
 import java.util.*;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
 
-public class XMLMapper<T, R> {
+public class XMLMapper<T> {
     private final String xPath;
-    private final Filter<T> type;
-    private final Function<List<T>, R> mappingFunction;
+    private final Function<List<Element>, T> mappingFunction;
 
-    XMLMapper(String xpath, Filter<T> type, Function<List<T>, R> mappingFunction) {
+    XMLMapper(String xpath, Function<List<Element>, T> mappingFunction) {
         this.xPath = xpath;
-        this.type = type;
         this.mappingFunction = mappingFunction;
     }
 
-    public R resolve(Object context, Namespace... namespace) {
-        XPathExpression<T> expression = XPathFactory.instance().compile(xPath, type, null, namespace);
+    public T resolve(Object context, Namespace... namespace) {
+        XPathExpression<Element> expression = XPathFactory.instance().compile(xPath, Filters.element(), null, namespace);
         var result = expression.evaluate(context);
         return mappingFunction.apply(result);
     }
 
+    /**
+     * Gets the content of the {@code xml:lang} attribute of the given element. If the language code
+     * contains a region (i.e. de-DE) the region is stripped.
+     *
+     * @param element the element to parse.
+     * @return the language, or {@code null} if the {@code xml:lang} attribute was not present.
+     */
     static String getLangOfElement(Element element) {
         var langAttr = DocElementParser.getLangAttribute(element);
         if (langAttr != null) {
-            return langAttr.getValue();
+            // If a language-region tag is present, i.e. en-GB, only keep the first part
+            var langValue = langAttr.getValue();
+            var dashIndex = langValue.indexOf('-');
+            if (dashIndex != -1) {
+                return langValue.substring(0, dashIndex);
+            } else {
+                return langValue;
+            }
         } else {
             return null;
         }
+    }
+
+    @NonNull
+    static <T> Function<List<Element>, Map<String, T>> parseLanguageContentOfElement(Function<Element, T> mappingFunction) {
+        return parseLanguageContentOfElement(mappingFunction, (a, b) -> b);
+    }
+
+    @NonNull
+    static <T> Function<List<Element>, Map<String, T>> parseLanguageContentOfElement(Function<Element, T> mappingFunction, BinaryOperator<T> mergeFunction) {
+        return elementList -> {
+            var langMap = new HashMap<String, T>();
+
+            for (var element : elementList) {
+                var lang = getLangOfElement(element);
+                var content = mappingFunction.apply(element);
+                langMap.merge(lang, content, mergeFunction);
+            }
+
+            return langMap;
+        };
+    }
+
+    @NonNull
+    static <T> Function<List<Element>, Map<String, T>> parseLanguageOptContentOfElement(Function<Element, Optional<T>> mappingFunction) {
+        return parseLanguageOptContentOfElement(mappingFunction, (a, b) -> b);
+    }
+
+    @NonNull
+    static <T> Function<List<Element>, Map<String, T>> parseLanguageOptContentOfElement(Function<Element, Optional<T>> mappingFunction, BinaryOperator<T> mergeFunction) {
+        return elementList -> {
+            var langMap = new HashMap<String, T>();
+
+            for (var element : elementList) {
+                var lang = getLangOfElement(element);
+                var content = mappingFunction.apply(element);
+                content.ifPresent(t -> langMap.merge(lang, t, mergeFunction));
+            }
+
+            return langMap;
+        };
     }
 
     /**

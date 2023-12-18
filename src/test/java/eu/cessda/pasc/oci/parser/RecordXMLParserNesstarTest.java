@@ -125,10 +125,10 @@ public class RecordXMLParserNesstarTest {
         var record = new RecordXMLParser(cmmStudyMapper).getRecord(nesstarRepo, Path.of(expectedCmmStudyJsonString.toURI())).get(0);
 
         // Then
-        then(record.titleStudy().containsKey("xy")).isTrue();
-        then(record.abstractField().containsKey("xy")).isTrue();
-        then(record.keywords().containsKey("xy")).isTrue();
-        then(record.dataAccessFreeTexts().containsKey("xy")).isTrue();
+        then(record.titleStudy()).containsKey("xy");
+        then(record.abstractField()).containsKey("xy");
+        then(record.keywords()).containsKey("xy");
+        then(record.dataAccessFreeTexts()).containsKey("xy");
     }
 
     @Test

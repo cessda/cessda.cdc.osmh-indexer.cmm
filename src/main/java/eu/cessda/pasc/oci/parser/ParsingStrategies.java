@@ -21,6 +21,7 @@ import lombok.NonNull;
 import org.jdom2.DataConversionException;
 import org.jdom2.Element;
 
+import javax.annotation.Nullable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -104,13 +105,13 @@ class ParsingStrategies{
     }
 
     /**
-     * Returns an {@link Optional} representing the text of the given element if the element text is not empty,
+     * Returns an {@link Optional} representing the text of the given element if the element text is not blank,
      * otherwise returns an empty optional.
      *
      * @param element the {@link Element} to parse.
      */
     static Optional<String> nullableElementValueStrategy(Element element) {
-        String value = element.getText();
+        String value = element.getTextTrim();
         return value.isEmpty() ? Optional.empty() : Optional.of(value);
     }
 
@@ -189,17 +190,15 @@ class ParsingStrategies{
     }
 
     /**
-     * Parses the value of the {@value OaiPmhConstants#URI_ATTR} attribute as a {@link URI}.
+     * Parses the value of the {@value OaiPmhConstants#URI_ATTR} attribute.
      *
      * @param element the {@link Element} to parse.
-     * @return the value of the attribute as a {@link URI}, or {@link Optional#empty()} if the attribute was not present.
-     * @throws URISyntaxException if the value of the {@value OaiPmhConstants#URI_ATTR} contains a string that violates RFC 2396.
+     * @return the value of the attribute, or {@link Optional#empty()} if the attribute was not present.
      */
-    static Optional<URI> uriStrategy(Element element) throws URISyntaxException {
-        var uriString = element.getAttributeValue(URI_ATTR);
-        if (uriString != null) {
-            // Trim the URI before constructing.
-            return Optional.of(new URI(uriString.trim()));
+    static Optional<String> uriStrategy(Element element) {
+        var uriAttr = element.getAttribute(URI_ATTR);
+        if (uriAttr != null) {
+            return Optional.of(uriAttr.getValue());
         } else {
             return Optional.empty();
         }
@@ -425,4 +424,15 @@ class ParsingStrategies{
 
         return Universe.Clusion.I;
     }
+
+    @Nullable
+    static String dateStrategy(Element element) {
+        for (var attribute : element.getAttributes()) {
+            if (attribute.getName().equals("date")) {
+                return attribute.getValue();
+            }
+        }
+        return null;
+    }
+
 }

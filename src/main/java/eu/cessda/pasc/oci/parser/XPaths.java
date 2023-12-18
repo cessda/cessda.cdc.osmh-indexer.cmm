@@ -19,7 +19,6 @@ import eu.cessda.pasc.oci.exception.UnsupportedXMLNamespaceException;
 import eu.cessda.pasc.oci.models.cmmstudy.Pid;
 import eu.cessda.pasc.oci.models.cmmstudy.TermVocabAttributes;
 import lombok.*;
-import org.jdom2.Attribute;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 
@@ -28,11 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static eu.cessda.pasc.oci.parser.XMLMapper.extractMetadataObjectListForEachLang;
-import static eu.cessda.pasc.oci.parser.XMLMapper.getFirstEntry;
+import static eu.cessda.pasc.oci.parser.XMLMapper.*;
 import static java.util.Map.entry;
-import static org.jdom2.filter.Filters.attribute;
-import static org.jdom2.filter.Filters.element;
 
 /**
  * XPath constants used to extract metadata from DDI XML documents.
@@ -48,20 +44,21 @@ public final class XPaths {
     private final Namespace[] namespace;
     // Codebook Paths
     private final String recordDefaultLanguage;
-    private final XMLMapper<?, Optional<String>> yearOfPubXPath;
-    private final String abstractXPath;
-    private final String titleXPath;
-    private final String parTitleXPath;
+    private final XMLMapper<Optional<String>> yearOfPubXPath;
+    private final XMLMapper<Map<String, String>> abstractXPath;
+    private final XMLMapper<Map<String, String>> titleXPath;
     @Nullable
-    private final String dataAccessUrlXPath;
+    private final XMLMapper<Map<String, String>> parTitleXPath;
     @Nullable
-    private final String studyURLDocDscrXPath;
-    private final String studyURLStudyDscrXPath;
-    private final XMLMapper<?, Map<String, List<Pid>>> pidStudyXPath;
+    private final XMLMapper<Map<String, List<String>>> dataAccessUrlXPath;
+    @Nullable
+    private final XMLMapper<Map<String, List<String>>> studyURLDocDscrXPath;
+    private final XMLMapper<Map<String, List<String>>> studyURLStudyDscrXPath;
+    private final XMLMapper<Map<String, List<Pid>>> pidStudyXPath;
     private final String creatorsXPath;
-    private final String dataRestrctnXPath;
+    private final XMLMapper<Map<String, List<String>>> dataRestrctnXPath;
     private final String dataCollectionPeriodsXPath;
-    private final XMLMapper<?, Map<String, List<TermVocabAttributes>>> classificationsXPath;
+    private final XMLMapper<Map<String, List<TermVocabAttributes>>> classificationsXPath;
     private final String keywordsXPath;
     private final String typeOfTimeMethodXPath;
     private final String studyAreaCountriesXPath;
@@ -76,9 +73,13 @@ public final class XPaths {
     private final String typeOfModeOfCollectionXPath;
     private final String relatedPublicationsXPath;
     @Nullable
-    private final XMLMapper<Element, Map<String, List<UniverseElement>>> universeXPath;
+    private final XMLMapper<Map<String, List<UniverseElement>>> universeXPath;
 
-    public Optional<String> getDataAccessUrlXPath() {
+    public Optional<XMLMapper<Map<String, String>>> getParTitleXPath() {
+        return Optional.ofNullable(parTitleXPath);
+    }
+
+    public Optional<XMLMapper<Map<String, List<String>>>> getDataAccessUrlXPath() {
         return Optional.ofNullable(dataAccessUrlXPath);
     }
 
@@ -90,11 +91,11 @@ public final class XPaths {
         return Optional.ofNullable(filenameLanguagesXPath);
     }
 
-    public Optional<String> getStudyURLDocDscrXPath() {
+    public Optional<XMLMapper<Map<String, List<String>>>> getStudyURLDocDscrXPath() {
         return Optional.ofNullable(studyURLDocDscrXPath);
     }
 
-    public Optional<XMLMapper<Element, Map<String, List<UniverseElement>>>> getUniverseXPath() {
+    public Optional<XMLMapper<Map<String, List<UniverseElement>>>> getUniverseXPath() {
         return Optional.ofNullable(universeXPath);
     }
 
@@ -113,31 +114,27 @@ public final class XPaths {
             Namespace.getNamespace("s", "ddi:studyunit:3_2")
         })
         // Abstract
-        .abstractXPath("//ddi:DDIInstance/s:StudyUnit/r:Abstract/r:Content")
+        .abstractXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Abstract/r:Content", parseLanguageContentOfElement(Element::getTextTrim)))
         // Study title
-        .titleXPath("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:Title/r:String")
-        // Study title (in additional languages)
-        .parTitleXPath("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:Title/r:String")
+        .titleXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:Title/r:String", parseLanguageContentOfElement(Element::getTextTrim)))
         // 'Access study' link (when @typeOfUserID attribute is "URLServiceProvider")
-        .studyURLDocDscrXPath("//ddi:DDIInstance/s:StudyUnit/r:UserID")
+        .studyURLDocDscrXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:UserID", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
         // URL of the study description page at the SP website (when @typeOfUserID attribute is "URLServiceProvider")
-        .studyURLStudyDscrXPath("//ddi:DDIInstance/s:StudyUnit/r:UserID")
+        .studyURLStudyDscrXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:UserID", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
         // Study number/PID (when @typeOfUserID attribute is "StudyNumber") - TODO: Implement parsing for this
         //.pidStudyXPath("//ddi:DDIInstance/s:StudyUnit/r:UserID")
         // Study number/PID
-        .pidStudyXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:InternationalIdentifier", element(), extractMetadataObjectListForEachLang(ParsingStrategies::pidLifecycleStrategy)))
+        .pidStudyXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:InternationalIdentifier", extractMetadataObjectListForEachLang(ParsingStrategies::pidLifecycleStrategy)))
         // Creator/PI
         .creatorsXPath("//ddi:DDIInstance/r:Citation/r:Creator/r:CreatorName/r:String")
         // Terms of data access
-        .dataAccessUrlXPath("//ddi:DDIInstance/s:StudyUnit/a:Archive/a:ArchiveSpecific/a:Item/a:Access/r:Description/r:Content")
-        // Terms of data access
-        .dataRestrctnXPath("//ddi:DDIInstance/s:StudyUnit/a:Archive/a:ArchiveSpecific/a:Item/a:Access/r:Description/r:Content")
+        .dataRestrctnXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/a:Archive/a:ArchiveSpecific/a:Item/a:Access/r:Description/r:Content", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy)))
         // Data collection period
         .dataCollectionPeriodsXPath("//ddi:DDIInstance/s:StudyUnit/d:DataCollection/d:CollectionEvent/d:CollectionSituation/r:Description/r:Content")
         // Publication year
-        .yearOfPubXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:PublicationDate/r:SimpleDate", element(), getFirstEntry(Element::getText)))
+        .yearOfPubXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:PublicationDate/r:SimpleDate", getFirstEntry(Element::getTextTrim)))
         // Topics
-        .classificationsXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Coverage/r:TopicalCoverage/r:Subject", element(), extractMetadataObjectListForEachLang(ParsingStrategies::termVocabAttributeLifecycleStrategy)))
+        .classificationsXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Coverage/r:TopicalCoverage/r:Subject", extractMetadataObjectListForEachLang(ParsingStrategies::termVocabAttributeLifecycleStrategy)))
         // Keywords
         .keywordsXPath("//ddi:DDIInstance/s:StudyUnit/r:Coverage/r:TopicalCoverage/r:Keyword")
         // Time dimension
@@ -163,7 +160,7 @@ public final class XPaths {
         // Study description language
         .recordDefaultLanguage("//ddi:DDIInstance/@xml:lang")
         // Description of population
-        .universeXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/c:ConceptualComponent/c:UniverseScheme/c:Universe", element(), ParsingStrategies::universeLifecycleStrategy))
+        .universeXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/c:ConceptualComponent/c:UniverseScheme/c:Universe", ParsingStrategies::universeLifecycleStrategy))
         .build();
 
     /**
@@ -188,29 +185,29 @@ public final class XPaths {
     public static final XPaths DDI_2_5_XPATHS = XPaths.builder()
         .namespace(new Namespace[]{ Namespace.getNamespace("ddi", "ddi:codebook:2_5") })
         // Abstract
-        .abstractXPath("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:abstract")
+        .abstractXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:abstract", parseLanguageContentOfElement(Element::getTextTrim, (a, b) -> a + "<br>" + b)))
         // Study title
-        .titleXPath("//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:titl")
+        .titleXPath(new XMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:titl", parseLanguageContentOfElement(Element::getTextTrim)))
         // Study title (in additional languages)
-        .parTitleXPath("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:parTitl")
+        .parTitleXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:parTitl", parseLanguageContentOfElement(Element::getTextTrim)))
         // 'Access study' link
-        .studyURLDocDscrXPath("//ddi:codeBook/ddi:docDscr/ddi:citation/ddi:holdings")
+        .studyURLDocDscrXPath(new XMLMapper<>("//ddi:codeBook/ddi:docDscr/ddi:citation/ddi:holdings", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
         // URL of the study description page at the SP website
-        .studyURLStudyDscrXPath("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:holdings")
+        .studyURLStudyDscrXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:holdings", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
         // Study number/PID
-        .pidStudyXPath(new XMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo", element(), extractMetadataObjectListForEachLang(ParsingStrategies::pidStrategy)))
+        .pidStudyXPath(new XMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo", extractMetadataObjectListForEachLang(ParsingStrategies::pidStrategy)))
         // Creator
         .creatorsXPath("//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty")
         // Terms of data access
-        .dataAccessUrlXPath("//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:specPerm")
+        .dataAccessUrlXPath(new XMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:specPerm", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
         // Terms of data access
-        .dataRestrctnXPath("//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:restrctn")
+        .dataRestrctnXPath(new XMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:restrctn", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy)))
         // Data collection period
         .dataCollectionPeriodsXPath("//ddi:codeBook//ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate")
         // Publication year
-        .yearOfPubXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:distDate[1]/@date", attribute(), getFirstEntry(Attribute::getValue)))
+        .yearOfPubXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:distDate[1]", getFirstEntry(ParsingStrategies::dateStrategy)))
         // Topics
-        .classificationsXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:subject/ddi:topcClas", element(), extractMetadataObjectListForEachLang(element -> ParsingStrategies.termVocabAttributeStrategy(element, false))))
+        .classificationsXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:subject/ddi:topcClas", extractMetadataObjectListForEachLang(element -> ParsingStrategies.termVocabAttributeStrategy(element, false))))
         // Keywords
         .keywordsXPath("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:subject/ddi:keyword")
         // Time dimension
@@ -236,7 +233,7 @@ public final class XPaths {
         // Study description language
         .recordDefaultLanguage("//ddi:codeBook/@xml:lang")
         // Description of population
-        .universeXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:universe", element(), extractMetadataObjectListForEachLang(ParsingStrategies::universeStrategy)))
+        .universeXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:universe", extractMetadataObjectListForEachLang(ParsingStrategies::universeStrategy)))
         .build();
 
     /**
@@ -246,19 +243,19 @@ public final class XPaths {
         .namespace(new Namespace[]{ Namespace.getNamespace("ddi", "http://www.icpsr.umich.edu/DDI") })
         .recordDefaultLanguage("//ddi:codeBook/@xml-lang") // Nesstar with "-"
         // Closest for Nesstar based on CMM mapping doc but the above existing one for ddi2.5 seems to be present in Nesstar
-        .yearOfPubXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/citation/distStmt/distDate[1]/@date", attribute(), getFirstEntry(Attribute::getValue)))
-        .abstractXPath("//ddi:codeBook/stdyDscr/stdyInfo/abstract")
-        .titleXPath("//ddi:codeBook/stdyDscr/citation/titlStmt/titl")
-        .parTitleXPath("//ddi:codeBook/stdyDscr/citation/titlStmt/parTitl")
-        .studyURLStudyDscrXPath("//ddi:codeBook/stdyDscr/dataAccs/setAvail/accsPlac")
+        .yearOfPubXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/citation/distStmt/distDate[1]", getFirstEntry(ParsingStrategies::dateStrategy)))
+        .abstractXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/abstract", parseLanguageContentOfElement(Element::getTextTrim, (a, b) -> a + "<br>" + b)))
+        .titleXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/citation/titlStmt/titl", parseLanguageContentOfElement(Element::getTextTrim)))
+        .parTitleXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/citation/titlStmt/parTitl", parseLanguageContentOfElement(Element::getTextTrim)))
+        .studyURLStudyDscrXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/dataAccs/setAvail/accsPlac", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
         // PID path missing for most nesstar repos. Available in FORS but:
         //  -No agency
         //  -Only element freetext value.
-        .pidStudyXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/citation/titlStmt/IDNo", element(), extractMetadataObjectListForEachLang(ParsingStrategies::pidStrategy))) // use @agency instead?
+        .pidStudyXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/citation/titlStmt/IDNo", extractMetadataObjectListForEachLang(ParsingStrategies::pidStrategy))) // use @agency instead?
         .creatorsXPath("//ddi:codeBook/stdyDscr/citation/rspStmt/AuthEnty")
-        .dataRestrctnXPath("//ddi:codeBook/stdyDscr/dataAccs/useStmt/restrctn")
+        .dataRestrctnXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/dataAccs/useStmt/restrctn", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy)))
         .dataCollectionPeriodsXPath("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/collDate")
-        .classificationsXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/subject/topcClas", element(), extractMetadataObjectListForEachLang(element -> ParsingStrategies.termVocabAttributeStrategy(element, false))))
+        .classificationsXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/subject/topcClas", extractMetadataObjectListForEachLang(element -> ParsingStrategies.termVocabAttributeStrategy(element, false))))
         .keywordsXPath("//ddi:codeBook/stdyDscr/stdyInfo/subject/keyword")
         .typeOfTimeMethodXPath("//ddi:codeBook/stdyDscr/method/dataColl/timeMeth")
         .studyAreaCountriesXPath("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/nation")
@@ -268,7 +265,7 @@ public final class XPaths {
         .samplingXPath("//ddi:codeBook/stdyDscr/method/dataColl/sampProc")
         .typeOfModeOfCollectionXPath("//ddi:codeBook/stdyDscr/method/dataColl/collMode")
         .relatedPublicationsXPath("//ddi:codeBook/stdyDscr/othrStdyMat/relPubl")
-        .universeXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/universe", element(), extractMetadataObjectListForEachLang(ParsingStrategies::universeStrategy)))
+        .universeXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/universe", extractMetadataObjectListForEachLang(ParsingStrategies::universeStrategy)))
         .build();
 
     /**
