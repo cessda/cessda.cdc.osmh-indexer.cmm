@@ -21,6 +21,7 @@ import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.configurations.Repo;
 import eu.cessda.pasc.oci.models.cmmstudy.*;
 import lombok.Builder;
+import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.jdom2.Document;
@@ -90,13 +91,11 @@ public class CMMStudyMapper {
     }
 
     /**
-     * Parses PID Study(s) from:
-     * <p>
-     * Xpath = {@link XPaths#getPidStudyXPath()}
+     * Merge the given lists into a single list. The source lists are not modified.
      */
-    Map<String, List<Pid>> parsePidStudies(Document document, XPaths xPaths, String defaultLangIsoCode) {
-        var pids = xPaths.getPidStudyXPath().resolve(document, xPaths.getNamespace());
-        return mapNullLanguage(pids, defaultLangIsoCode, (a, b) -> { a.addAll(b); return a; });
+    @NonNull
+    private static <T> List<T> mergeLists(List<T> a, List<T> b) {
+        return Stream.concat(a.stream(), b.stream()).toList();
     }
 
     /**
@@ -151,12 +150,21 @@ public class CMMStudyMapper {
     /**
      * Parses PID Study(s) from:
      * <p>
+     * Xpath = {@link XPaths#getPidStudyXPath()}
+     */
+    Map<String, List<Pid>> parsePidStudies(Document document, XPaths xPaths, String defaultLangIsoCode) {
+        var pids = xPaths.getPidStudyXPath().resolve(document, xPaths.getNamespace());
+        return mapNullLanguage(pids, defaultLangIsoCode, CMMStudyMapper::mergeLists);
+    }
+
+    /**
+     * Parses PID Study(s) from:
+     * <p>
      * Xpath = {@link XPaths#getCreatorsXPath()}
      */
     Map<String, List<String>> parseCreator(Document document, XPaths xPaths, String defaultLangIsoCode) {
-        return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, document, xPaths.getCreatorsXPath(), ParsingStrategies::creatorStrategy, xPaths.getNamespace()
-        );
+        var unmappedCreators = xPaths.getCreatorsXPath().resolve(document, xPaths.getNamespace());
+        return mapNullLanguage(unmappedCreators, defaultLangIsoCode, CMMStudyMapper::mergeLists);
     }
 
     /**
@@ -166,7 +174,7 @@ public class CMMStudyMapper {
      */
     Map<String, List<TermVocabAttributes>> parseClassifications(Document doc, XPaths xPaths, String defaultLangIsoCode) {
         var unmappedXPaths = xPaths.getClassificationsXPath().resolve(doc, xPaths.getNamespace());
-        return mapNullLanguage(unmappedXPaths, defaultLangIsoCode, (a, b) -> { a.addAll(b); return a; });
+        return mapNullLanguage(unmappedXPaths, defaultLangIsoCode, CMMStudyMapper::mergeLists);
     }
 
     /**

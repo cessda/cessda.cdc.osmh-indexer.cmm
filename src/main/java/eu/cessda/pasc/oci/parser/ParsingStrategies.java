@@ -28,6 +28,7 @@ import java.util.*;
 
 import static eu.cessda.pasc.oci.parser.DocElementParser.getAttributeValue;
 import static eu.cessda.pasc.oci.parser.OaiPmhConstants.*;
+import static eu.cessda.pasc.oci.parser.XMLMapper.getLangOfElement;
 import static java.util.Optional.ofNullable;
 
 /**
@@ -124,9 +125,17 @@ class ParsingStrategies{
      * @param element the {@link Element} to parse.
      */
     static Optional<String> creatorStrategy(Element element) {
-        return getAttributeValue(element, CREATOR_AFFILIATION_ATTR)
-            .map(valueString -> (element.getText() + " (" + valueString + ")"))
-            .or(() -> Optional.of(element.getText()));
+
+        var creator = element.getTextTrim();
+        var affiliation = getAttributeValue(element, CREATOR_AFFILIATION_ATTR);
+
+        if (affiliation.isPresent()) {
+            return Optional.of(creator + " (" + affiliation.get() + ")");
+        } else if (!creator.isEmpty()) {
+            return Optional.of(creator);
+        } else {
+            return Optional.empty();
+        }
     }
 
     /**
@@ -435,4 +444,39 @@ class ParsingStrategies{
         return null;
     }
 
+    @NonNull
+    static HashMap<String, List<String>> creatorsLifecycleStrategy(List<Element> elements) {
+        var creatorsMap = new HashMap<String, List<String>>();
+
+        for (var element : elements) {
+
+            // Attempt to parse the affiliation attribute
+            String affiliation = null;
+            for (var attr : element.getAttributes()) {
+                if (attr.getName().equals("affiliation")) {
+                    affiliation = attr.getValue();
+                }
+            }
+
+            for (var child : element.getChildren()) {
+                if (!child.getName().equals("String")) {
+                    continue;
+                }
+
+                // Extract the creator name and language
+                var creator = child.getTextTrim();
+                var lang = getLangOfElement(child);
+
+                if (creator != null) {
+                    if (affiliation != null) {
+                        creator += " (" + affiliation + ")";
+                    }
+
+                    creatorsMap.computeIfAbsent(lang, k -> new ArrayList<>()).add(creator);
+                }
+            }
+        }
+
+        return creatorsMap;
+    }
 }

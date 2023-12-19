@@ -38,7 +38,7 @@
             <r:String xml:lang="de">DDI3.2 Dokumentation auf Studienebene für Studie ZA0004 International Outlooks of Political Leaders (USA)</r:String>
         </r:Title>
         <r:Creator>
-            <r:CreatorName>
+            <r:CreatorName affiliation="GESIS">
                 <r:String xml:lang="en">GESIS - Leibniz Institute for the Social Sciences</r:String>
                 <r:String xml:lang="de">GESIS - Leibniz Institut für Sozialwissenschaften</r:String>
             </r:CreatorName>
