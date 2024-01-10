@@ -81,8 +81,12 @@
   },
   "publisher": {
     "en": {
+      "abbr": "GESIS",
+      "publisher": "GESIS - Leibniz Institute for the Social Sciences"
+    },
+    "de": {
       "abbr": "Publisher not specified",
-      "publisher": ""
+      "publisher": "GESIS - Leibniz Institut für Sozialwissenschaften"
     }
   },
   "publicationYear": "1964",

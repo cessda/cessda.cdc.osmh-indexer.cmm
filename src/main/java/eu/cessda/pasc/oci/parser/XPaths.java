@@ -17,15 +17,15 @@ package eu.cessda.pasc.oci.parser;
 
 import eu.cessda.pasc.oci.exception.UnsupportedXMLNamespaceException;
 import eu.cessda.pasc.oci.models.cmmstudy.Pid;
+import eu.cessda.pasc.oci.models.cmmstudy.Publisher;
 import eu.cessda.pasc.oci.models.cmmstudy.TermVocabAttributes;
 import lombok.*;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 
 import javax.annotation.Nullable;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Stream;
 
 import static eu.cessda.pasc.oci.parser.XMLMapper.*;
 import static java.util.Map.entry;
@@ -55,18 +55,40 @@ public final class XPaths {
     private final XMLMapper<Map<String, List<String>>> studyURLDocDscrXPath;
     private final XMLMapper<Map<String, List<String>>> studyURLStudyDscrXPath;
     private final XMLMapper<Map<String, List<Pid>>> pidStudyXPath;
+    private final XMLMapper<Map<String, List<String>>> dataRestrctnXPath;
+    private final String dataCollectionPeriodsXPath;
+    private final XMLMapper<Map<String, List<TermVocabAttributes>>> classificationsXPath;
+    private final String keywordsXPath;
+    private final String typeOfTimeMethodXPath;
+    private final String studyAreaCountriesXPath;
+    private final String unitTypeXPath;
+    private final XMLMapper<Map<String, Publisher>> publisherXPath;
+    private final String distributorXPath;
+    @Nullable
+    private final String fileTxtLanguagesXPath;
+    @Nullable
+    private final String filenameLanguagesXPath;
+    private final String samplingXPath;
+    private final String typeOfModeOfCollectionXPath;
+    private final String relatedPublicationsXPath;
+    @Nullable
+    private final XMLMapper<Map<String, List<UniverseElement>>> universeXPath;
+
+    private static final Namespace DDI_3_2_REUSABLE = Namespace.getNamespace("r", "ddi:reusable:3_2");
+    private static final Namespace DDI_3_2_ARCHIVE = Namespace.getNamespace("a", "ddi:archive:3_2");
+
     /**
      * XPaths needed to extract metadata from DDI 3.2 documents.
      */
     public static final XPaths DDI_3_2_XPATHS = XPaths.builder()
         .namespace(new Namespace[]{
             Namespace.getNamespace("ddi", "ddi:instance:3_2"),
-            Namespace.getNamespace("a", "ddi:archive:3_2"),
+            DDI_3_2_ARCHIVE,
             Namespace.getNamespace("c", "ddi:conceptualcomponent:3_2"),
             Namespace.getNamespace("d","ddi:datacollection:3_2"),
             Namespace.getNamespace("g", "ddi:group:3_2"),
             Namespace.getNamespace("pi", "ddi:physicalinstance:3_2"),
-            Namespace.getNamespace("r", "ddi:reusable:3_2"),
+            DDI_3_2_REUSABLE,
             Namespace.getNamespace("s", "ddi:studyunit:3_2")
         })
         // Abstract
@@ -100,7 +122,22 @@ public final class XPaths {
         // Analysis unit
         .unitTypeXPath("//ddi:DDIInstance/s:StudyUnit/r:AnalysisUnitsCovered")
         // Publisher
-        .publisherXPath("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:Publisher/r:PublisherReference")
+        .publisherXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:Publisher/r:PublisherReference", e -> {
+
+            for (var element : e) {
+                var referencedElement = resolveReference(element);
+                var publisherMapOpt = referencedElement.map(r -> switch (r.type()) {
+                    case "Individual" -> Collections.<String, Publisher>emptyMap(); // TODO: implement
+                    case "Organization" -> organizationStrategy(r.element());
+                    default -> Collections.<String, Publisher>emptyMap();
+                });
+                if (publisherMapOpt.isPresent()) {
+                    return publisherMapOpt.get();
+                }
+            }
+
+            return Collections.emptyMap();
+        }))
         // Publisher Reference (Institution)
         .distributorXPath("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:Publisher/r:PublisherReference/r:URN")
         // Language of data file(s)
@@ -118,24 +155,64 @@ public final class XPaths {
         // Description of population
         .universeXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/c:ConceptualComponent/c:UniverseScheme/c:Universe", ParsingStrategies::universeLifecycleStrategy))
         .build();
-    private final XMLMapper<Map<String, List<String>>> dataRestrctnXPath;
-    private final String dataCollectionPeriodsXPath;
-    private final XMLMapper<Map<String, List<TermVocabAttributes>>> classificationsXPath;
-    private final String keywordsXPath;
-    private final String typeOfTimeMethodXPath;
-    private final String studyAreaCountriesXPath;
-    private final String unitTypeXPath;
-    private final String publisherXPath;
-    private final String distributorXPath;
-    @Nullable
-    private final String fileTxtLanguagesXPath;
-    @Nullable
-    private final String filenameLanguagesXPath;
-    private final String samplingXPath;
-    private final String typeOfModeOfCollectionXPath;
-    private final String relatedPublicationsXPath;
-    @Nullable
-    private final XMLMapper<Map<String, List<UniverseElement>>> universeXPath;
+
+//    private static Map<String, Publisher> individualStrategy(Element element) {
+//        var identification = element.getChild("IndividualIdentification", DDI_3_2_ARCHIVE);
+//        if (identification == null) {
+//            return Collections.emptyMap();
+//        }
+//
+//        var names = identification.getChildren("IndividualName", DDI_3_2_ARCHIVE);
+//        for (var name : names) {
+//            var isPreferred = name.getAttribute("isPreferred", DDI_3_2_ARCHIVE);
+//
+//            // Use the full name if present
+//            var fullName = name.getChildren("FullName", DDI_3_2_REUSABLE);
+//            if (fullName != null) {
+//                //
+//            }
+//        }
+//    }
+
+    @NonNull
+    private static Map<String, Publisher> organizationStrategy(Element element) {
+        var identification = element.getChild("OrganizationIdentification", DDI_3_2_ARCHIVE);
+        if (identification == null) {
+            return Collections.emptyMap();
+        }
+
+        var name = identification.getChild("OrganizationName", DDI_3_2_ARCHIVE);
+        if (name == null) {
+            return Collections.emptyMap();
+        }
+
+        var nameStrElem = name.getChildren("String", DDI_3_2_REUSABLE);
+        var nameMap = new HashMap<String, String>();
+        for (var s : nameStrElem) {
+            var lang = getLangOfElement(s);
+            var t = s.getTextTrim();
+            nameMap.put(lang, t);
+        }
+
+        var abbreviation = name.getChild("Abbreviation", DDI_3_2_REUSABLE);
+        var abbrStrElem = abbreviation.getChildren("String", DDI_3_2_REUSABLE);
+        var abbrMap = new HashMap<String, String>();
+        for (var a : abbrStrElem) {
+            var lang = getLangOfElement(a);
+            var t = a.getTextTrim();
+            abbrMap.put(lang, t);
+        }
+
+        // Merge name and abbreviation maps
+        var publisherMap = new HashMap<String, Publisher>();
+        Stream.concat(nameMap.keySet().stream(), abbrMap.keySet().stream()).distinct().forEach(key ->
+            publisherMap.put(key, new Publisher(abbrMap.getOrDefault(key, PUBLISHER_NOT_AVAIL), nameMap.getOrDefault(key, "")))
+        );
+
+        return publisherMap;
+    }
+
+    private static final String PUBLISHER_NOT_AVAIL = "Publisher not specified";
 
     public Optional<XMLMapper<Map<String, String>>> getParTitleXPath() {
         return Optional.ofNullable(parTitleXPath);
@@ -198,7 +275,7 @@ public final class XPaths {
         // Analysis unit
         .unitTypeXPath("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:anlyUnit")
         // Publisher name/Contributor
-        .publisherXPath("//ddi:codeBook/ddi:docDscr/ddi:citation/ddi:prodStmt/ddi:producer")
+        .publisherXPath(new XMLMapper<>("//ddi:codeBook/ddi:docDscr/ddi:citation/ddi:prodStmt/ddi:producer", parseLanguageContentOfElement(ParsingStrategies::publisherStrategy)))
         // Publisher
         .distributorXPath("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:distrbtr")
         // Language of data file(s)
@@ -255,7 +332,7 @@ public final class XPaths {
         .typeOfTimeMethodXPath("//ddi:codeBook/stdyDscr/method/dataColl/timeMeth")
         .studyAreaCountriesXPath("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/nation")
         .unitTypeXPath("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/anlyUnit")
-        .publisherXPath("//ddi:codeBook/docDscr/citation/prodStmt/producer")
+        .publisherXPath(new XMLMapper<>("//ddi:codeBook/docDscr/citation/prodStmt/producer", parseLanguageContentOfElement(ParsingStrategies::publisherStrategy)))
         .distributorXPath("//ddi:codeBook/stdyDscr/citation/distStmt/distrbtr")
         .samplingXPath("//ddi:codeBook/stdyDscr/method/dataColl/sampProc")
         .typeOfModeOfCollectionXPath("//ddi:codeBook/stdyDscr/method/dataColl/collMode")

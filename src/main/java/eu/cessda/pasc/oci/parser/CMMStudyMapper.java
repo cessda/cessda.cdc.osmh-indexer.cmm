@@ -250,9 +250,7 @@ public class CMMStudyMapper {
      * Xpath = {@link XPaths#getDistributorXPath()}
      */
     Map<String, Publisher> parsePublisher(Document document, XPaths xPaths, String defaultLang) {
-        var producerPathMap = docElementParser.extractMetadataObjectForEachLang(
-            defaultLang, document, xPaths.getPublisherXPath(), ParsingStrategies::publisherStrategy, xPaths.getNamespace()
-        );
+        var producerPathMap = mapNullLanguage(xPaths.getPublisherXPath().resolve(document, xPaths.getNamespace()), defaultLang);
 
         if (xPaths.getDistributorXPath() != null) {
             Map<String, Publisher> distrPathMap = docElementParser.extractMetadataObjectForEachLang(

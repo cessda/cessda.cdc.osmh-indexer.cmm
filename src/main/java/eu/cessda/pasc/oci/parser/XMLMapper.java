@@ -16,6 +16,7 @@
 package eu.cessda.pasc.oci.parser;
 
 import lombok.NonNull;
+import org.jdom2.DataConversionException;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.filter.Filters;
@@ -139,5 +140,69 @@ public class XMLMapper<T> {
     @NonNull
     static <T, R> Function<List<T>, Optional<R>> getFirstEntry(Function<T, R> elementMapper) {
         return elements -> elements.stream().findFirst().map(elementMapper);
+    }
+
+    /**
+     * Resolves a reference in a DDI Lifecycle document.
+     *
+     * @param element the reference to resolve.
+     * @return the resolved Element, or an empty Optional if the reference cannot be resolved.
+     */
+    static Optional<ResolvedReference> resolveReference(Element element) {
+        String id = null;
+        String agency = null;
+        String version = null;
+        String typeOfObject = null;
+
+        // Is the reference external?
+        for (var attribute : element.getAttributes()) {
+            try {
+                if (attribute.getName().equals("isExternal") && attribute.getBooleanValue()) {
+                    return Optional.empty();
+                }
+            } catch (DataConversionException e) {
+                // ignore, treat as false
+            }
+        }
+
+        // Extract all child element details
+        for (var child : element.getChildren()) {
+            switch (child.getName()) {
+                case "Agency" -> agency = child.getTextTrim();
+                case "ID" -> id = child.getTextTrim();
+                case "Version" -> version = child.getTextTrim();
+                case "TypeOfObject" -> typeOfObject = child.getTextTrim();
+            }
+        }
+
+        // Attempt to search for elements that match the reference
+        var document = element.getDocument();
+
+        var filter = Filters.element(typeOfObject, Namespace.getNamespace("ddi:archive:3_2"));
+
+        for(var object : document.getDescendants(filter)) {
+            boolean agencyMatches = false;
+            boolean idMatches = false;
+            boolean versionMatches = false;
+
+            for (var child : object.getChildren()) {
+                switch (child.getName()) {
+                    case "Agency" -> agencyMatches = child.getTextTrim().equals(agency);
+                    case "ID" -> idMatches = child.getTextTrim().equals(id);
+                    case "Version" -> versionMatches = child.getTextTrim().equals(version);
+                }
+            }
+
+            boolean allMatch = agencyMatches && idMatches && versionMatches;
+
+            if (allMatch) {
+                return Optional.of(new ResolvedReference(typeOfObject, object));
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    record ResolvedReference(String type, Element element) {
     }
 }

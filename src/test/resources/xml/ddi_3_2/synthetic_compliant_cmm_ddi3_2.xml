@@ -90,6 +90,9 @@
                     <a:OrganizationName>
                         <r:String xml:lang="en">GESIS - Leibniz Institute for the Social Sciences</r:String>
                         <r:String xml:lang="de">GESIS - Leibniz Institut für Sozialwissenschaften</r:String>
+                        <r:Abbreviation>
+                            <r:String xml:lang="en">GESIS</r:String>
+                        </r:Abbreviation>
                     </a:OrganizationName>
                 </a:OrganizationIdentification>
             </a:Organization>
