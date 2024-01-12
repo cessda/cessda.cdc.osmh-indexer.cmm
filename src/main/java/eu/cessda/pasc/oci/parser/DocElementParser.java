@@ -101,16 +101,20 @@ class DocElementParser {
      * </ul>
      * Currently there is no requirement to extract dates of event per language.
      *
-     * @param document     the {@link Document} to parse.
-     * @param elementXpath the XPath to search.
+     * @param elements the elements to extract attributes from.
      * @return a {@link Map} with the keys set to the {@value OaiPmhConstants#EVENT_ATTR} and the values set to the date values.
      */
-    static Map<String, String> getDateElementAttributesValueMap(Document document, String elementXpath, Namespace... namespaces) {
-        var elements = getElements(document, elementXpath, namespaces);
-        return elements.stream()
-            .filter(element -> getAttributeValue(element, DATE_ATTR).isPresent()) //PUG requirement: we only care about those with @date CV
-            .filter(element -> element.getAttributeValue(EVENT_ATTR) != null)
-            .collect(Collectors.toMap(element -> element.getAttributeValue(EVENT_ATTR), element -> element.getAttributeValue(DATE_ATTR), (a, b) -> a));
+    static Map<String, String> getDateElementAttributesValueMap(List<Element> elements) {
+        //PUG requirement: we only care about those with @date CV
+        Map<String, String> map = new HashMap<>();
+        for (var element : elements) {
+            var eventAttr = getAttributeValue(element, EVENT_ATTR);
+            var dateAttr = getAttributeValue(element, DATE_ATTR);
+            if (dateAttr.isPresent() && eventAttr.isPresent()) {
+                map.putIfAbsent(eventAttr.get(), dateAttr.get());
+            }
+        }
+        return map;
     }
 
     /**

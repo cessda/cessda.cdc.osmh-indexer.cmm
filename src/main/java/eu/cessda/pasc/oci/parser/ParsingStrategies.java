@@ -15,6 +15,8 @@
  */
 package eu.cessda.pasc.oci.parser;
 
+import eu.cessda.pasc.oci.DateNotParsedException;
+import eu.cessda.pasc.oci.TimeUtility;
 import eu.cessda.pasc.oci.exception.InvalidUniverseException;
 import eu.cessda.pasc.oci.models.cmmstudy.*;
 import lombok.NonNull;
@@ -478,5 +480,93 @@ class ParsingStrategies{
         }
 
         return creatorsMap;
+    }
+
+    @NonNull
+    static CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateNotParsedException>> dataCollectionPeriodsStrategy(List<Element> elementList) {
+        var dateAttrs = DocElementParser.getDateElementAttributesValueMap(elementList);
+
+        var dataCollectionPeriodBuilder = CMMStudyMapper.DataCollectionPeriod.builder();
+
+        var parseExceptions = new ArrayList<DateNotParsedException>(2);
+
+        if (dateAttrs.containsKey(SINGLE_ATTR)) {
+            final String singleDateValue = dateAttrs.get(SINGLE_ATTR);
+            dataCollectionPeriodBuilder.startDate(singleDateValue);
+            try {
+                var localDateTime = TimeUtility.getLocalDateTime(singleDateValue);
+                dataCollectionPeriodBuilder.dataCollectionYear(localDateTime.getYear());
+            } catch (DateNotParsedException e) {
+                parseExceptions.add(e);
+            }
+        } else {
+            if (dateAttrs.containsKey(START_ATTR)) {
+                final String startDateValue = dateAttrs.get(START_ATTR);
+                dataCollectionPeriodBuilder.startDate(startDateValue);
+                try {
+                    var localDateTime = TimeUtility.getLocalDateTime(startDateValue);
+                    dataCollectionPeriodBuilder.dataCollectionYear(localDateTime.getYear());
+                } catch (DateNotParsedException e) {
+                    parseExceptions.add(e);
+                }
+            }
+            if (dateAttrs.containsKey(END_ATTR)) {
+                dataCollectionPeriodBuilder.endDate(dateAttrs.get(END_ATTR));
+            }
+        }
+
+        // Parse free texts
+        var freeTexts = XMLMapper.extractMetadataObjectListForEachLang(ParsingStrategies::dataCollFreeTextStrategy).apply(elementList);
+        dataCollectionPeriodBuilder.freeTexts(freeTexts);
+
+        return new CMMStudyMapper.ParseResults<>(
+            dataCollectionPeriodBuilder.build(),
+            parseExceptions
+        );
+    }
+
+    @NonNull
+    static CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateNotParsedException>> dataCollectionPeriodsLifecycleStrategy(Element dataCollectionDate) {
+        String startDate = null;
+        String endDate = null;
+        String singleDate = null;
+
+        for (var child : dataCollectionDate.getChildren()) {
+            switch (child.getName()) {
+                case "StartDate" -> startDate = child.getTextTrim();
+                case "EndDate" -> endDate = child.getTextTrim();
+                case "SimpleDate" -> singleDate = child.getTextTrim();
+            }
+        }
+
+        var parseExceptions = new ArrayList<DateNotParsedException>();
+
+        // Derive the data collection year
+        Integer year = null;
+        if (singleDate != null) {
+            try {
+                var localDateTime = TimeUtility.getLocalDateTime(singleDate);
+                year = localDateTime.getYear();
+            } catch (DateNotParsedException e) {
+                parseExceptions.add(e);
+            }
+        }
+
+        if (year == null && startDate != null) {
+            try {
+                var localDateTime = TimeUtility.getLocalDateTime(startDate);
+                year = localDateTime.getYear();
+            } catch (DateNotParsedException e) {
+                parseExceptions.add(e);
+            }
+        }
+
+        // Default to 0 if the year cannot be parsed
+        if (year == null) {
+            year = 0;
+        }
+
+        var dataCollectionPeriod = new CMMStudyMapper.DataCollectionPeriod(startDate, year, endDate, Collections.emptyMap());
+        return new CMMStudyMapper.ParseResults<>(dataCollectionPeriod, parseExceptions);
     }
 }

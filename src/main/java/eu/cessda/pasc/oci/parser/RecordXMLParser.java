@@ -269,7 +269,7 @@ public class RecordXMLParser {
             builder.samplingProcedureFreeTexts(cmmStudyMapper.parseSamplingProcedureFreeTexts(metadata, xPaths, defaultLangIsoCode));
             builder.typeOfModeOfCollections(cmmStudyMapper.parseTypeOfModeOfCollection(metadata, xPaths, defaultLangIsoCode));
 
-            var dataCollectionPeriodResults = cmmStudyMapper.parseDataCollectionDates(metadata, xPaths);
+            var dataCollectionPeriodResults = cmmStudyMapper.parseDataCollectionDates(metadata, xPaths, defaultLangIsoCode);
             dataCollectionPeriodResults.results().getStartDate().ifPresent(builder::dataCollectionPeriodStartdate);
             dataCollectionPeriodResults.results().getEndDate().ifPresent(builder::dataCollectionPeriodEnddate);
             builder.dataCollectionYear(dataCollectionPeriodResults.results().getDataCollectionYear());
@@ -281,8 +281,8 @@ public class RecordXMLParser {
                     dataCollectionPeriodResults.exceptions()
                 );
             }
+            builder.dataCollectionFreeTexts(dataCollectionPeriodResults.results().getFreeTexts());
 
-            builder.dataCollectionFreeTexts(cmmStudyMapper.parseDataCollectionFreeTexts(metadata, xPaths, defaultLangIsoCode));
             try {
                 builder.universe(cmmStudyMapper.parseUniverses(metadata, xPaths, defaultLangIsoCode));
             } catch (InvalidUniverseException e) {

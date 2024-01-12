@@ -325,6 +325,7 @@
                 <r:ID>ZA0004_ColEve</r:ID>
                 <r:Version>1.0.0</r:Version>
                 <d:DataCollectorOrganizationReference>
+                    <r:URN>urn:ddi:de.gesis:ZA0004_Org_DC:1.0.0</r:URN>
                     <r:Agency>de.gesis</r:Agency>
                     <r:ID>ZA0004_Org_DC</r:ID>
                     <r:Version>1.0.0</r:Version>

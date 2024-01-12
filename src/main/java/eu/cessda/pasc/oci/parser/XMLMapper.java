@@ -16,7 +16,6 @@
 package eu.cessda.pasc.oci.parser;
 
 import lombok.NonNull;
-import org.jdom2.DataConversionException;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.filter.Filters;
@@ -26,6 +25,9 @@ import org.jdom2.xpath.XPathFactory;
 import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
+
+import static eu.cessda.pasc.oci.parser.XPaths.DDI_3_2_ARCHIVE;
+import static eu.cessda.pasc.oci.parser.XPaths.DDI_3_2_REUSABLE;
 
 public class XMLMapper<T> {
     private final String xPath;
@@ -149,44 +151,58 @@ public class XMLMapper<T> {
      * @return the resolved Element, or an empty Optional if the reference cannot be resolved.
      */
     static Optional<ResolvedReference> resolveReference(Element element) {
+        String urn = null;
+
         String id = null;
         String agency = null;
         String version = null;
+
         String typeOfObject = null;
 
         // Is the reference external?
-        for (var attribute : element.getAttributes()) {
-            try {
-                if (attribute.getName().equals("isExternal") && attribute.getBooleanValue()) {
-                    return Optional.empty();
-                }
-            } catch (DataConversionException e) {
-                // ignore, treat as false
-            }
+        var externalAttribute = element.getAttributeValue("isExternal", DDI_3_2_REUSABLE);
+        if ("true".equals(externalAttribute)) {
+            // External references are not implemented yet
+            return Optional.empty();
         }
 
         // Extract all child element details
         for (var child : element.getChildren()) {
+            if (!child.getNamespace().equals(DDI_3_2_REUSABLE)) {
+                continue;
+            }
+
             switch (child.getName()) {
                 case "Agency" -> agency = child.getTextTrim();
                 case "ID" -> id = child.getTextTrim();
                 case "Version" -> version = child.getTextTrim();
+                case "URN" -> urn = child.getTextTrim();
                 case "TypeOfObject" -> typeOfObject = child.getTextTrim();
             }
         }
 
-        // Attempt to search for elements that match the reference
+        // Attempt to search for elements in the document that match the reference
         var document = element.getDocument();
+        var filter = Filters.element(typeOfObject, DDI_3_2_ARCHIVE);
 
-        var filter = Filters.element(typeOfObject, Namespace.getNamespace("ddi:archive:3_2"));
+        for (var object : document.getDescendants(filter)) {
 
-        for(var object : document.getDescendants(filter)) {
             boolean agencyMatches = false;
             boolean idMatches = false;
             boolean versionMatches = false;
 
             for (var child : object.getChildren()) {
+                if (!child.getNamespace().equals(DDI_3_2_REUSABLE)) {
+                    continue;
+                }
+
                 switch (child.getName()) {
+                    case "URN" -> {
+                        // If the URN matches, return directly
+                        if (child.getTextTrim().equals(urn)) {
+                            return Optional.of(new ResolvedReference(typeOfObject, object));
+                        }
+                    }
                     case "Agency" -> agencyMatches = child.getTextTrim().equals(agency);
                     case "ID" -> idMatches = child.getTextTrim().equals(id);
                     case "Version" -> versionMatches = child.getTextTrim().equals(version);
@@ -203,6 +219,12 @@ public class XMLMapper<T> {
         return Optional.empty();
     }
 
+    /**
+     * A resolved DDI 3 reference.
+     *
+     * @param type the type of element.
+     * @param element the element.
+     */
     record ResolvedReference(String type, Element element) {
     }
 }

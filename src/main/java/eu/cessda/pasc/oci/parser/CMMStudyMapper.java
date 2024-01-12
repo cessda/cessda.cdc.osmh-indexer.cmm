@@ -16,7 +16,6 @@
 package eu.cessda.pasc.oci.parser;
 
 import eu.cessda.pasc.oci.DateNotParsedException;
-import eu.cessda.pasc.oci.TimeUtility;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.configurations.Repo;
 import eu.cessda.pasc.oci.models.cmmstudy.*;
@@ -35,7 +34,6 @@ import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static eu.cessda.pasc.oci.parser.OaiPmhConstants.*;
 import static eu.cessda.pasc.oci.parser.ParsingStrategies.termVocabAttributeStrategy;
 
 /**
@@ -349,59 +347,21 @@ public class CMMStudyMapper {
     }
 
     /**
-     * Parses area Countries covered by a study:
-     * <p>
-     * Xpath = {@link XPaths#getDataCollectionPeriodsXPath()}
-     */
-    Map<String, List<DataCollectionFreeText>> parseDataCollectionFreeTexts(Document document, XPaths xPaths, String defaultLangIsoCode) {
-        return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, document, xPaths.getDataCollectionPeriodsXPath(), ParsingStrategies::dataCollFreeTextStrategy, xPaths.getNamespace()
-        );
-    }
-
-    /**
      * Parses Data Collection Period dates from:
      * <p>
      * Xpath = {@link XPaths#getDataCollectionPeriodsXPath()}
      * <p>
      * For Data Collection start and end date plus the four digit Year value as Data Collection Year
      */
-    ParseResults<DataCollectionPeriod, List<DateNotParsedException>> parseDataCollectionDates(Document doc, XPaths xPaths) {
-        var dateAttrs = DocElementParser.getDateElementAttributesValueMap(doc, xPaths.getDataCollectionPeriodsXPath(), xPaths.getNamespace());
-
-        var dataCollectionPeriodBuilder = DataCollectionPeriod.builder();
-
-        var parseExceptions = new ArrayList<DateNotParsedException>(2);
-
-        if (dateAttrs.containsKey(SINGLE_ATTR)) {
-            final String singleDateValue = dateAttrs.get(SINGLE_ATTR);
-            dataCollectionPeriodBuilder.startDate(singleDateValue);
-            try {
-                var localDateTime = TimeUtility.getLocalDateTime(singleDateValue);
-                dataCollectionPeriodBuilder.dataCollectionYear(localDateTime.getYear());
-            } catch (DateNotParsedException e) {
-                parseExceptions.add(e);
-            }
-        } else {
-            if (dateAttrs.containsKey(START_ATTR)) {
-                final String startDateValue = dateAttrs.get(START_ATTR);
-                dataCollectionPeriodBuilder.startDate(startDateValue);
-                try {
-                    var localDateTime = TimeUtility.getLocalDateTime(startDateValue);
-                    dataCollectionPeriodBuilder.dataCollectionYear(localDateTime.getYear());
-                } catch (DateNotParsedException e) {
-                    parseExceptions.add(e);
-                }
-            }
-            if (dateAttrs.containsKey(END_ATTR)) {
-                dataCollectionPeriodBuilder.endDate(dateAttrs.get(END_ATTR));
-            }
-        }
-
-        return new ParseResults<>(
-            dataCollectionPeriodBuilder.build(),
-            parseExceptions
+    ParseResults<DataCollectionPeriod, List<DateNotParsedException>> parseDataCollectionDates(Document doc, XPaths xPaths, String defaultLangIsoCode) {
+        var parseResults = xPaths.getDataCollectionPeriodsXPath().resolve(doc, xPaths.getNamespace());
+        var mappedResults = new DataCollectionPeriod(
+            parseResults.results().startDate,
+            parseResults.results().dataCollectionYear,
+            parseResults.results().endDate,
+            mapNullLanguage(parseResults.results().freeTexts, defaultLangIsoCode)
         );
+        return new ParseResults<>(mappedResults, parseResults.exceptions);
     }
 
     /**
@@ -517,6 +477,7 @@ public class CMMStudyMapper {
         String startDate;
         int dataCollectionYear;
         String endDate;
+        Map<String, List<DataCollectionFreeText>> freeTexts;
 
         public Optional<String> getStartDate() {
             return Optional.ofNullable(startDate);

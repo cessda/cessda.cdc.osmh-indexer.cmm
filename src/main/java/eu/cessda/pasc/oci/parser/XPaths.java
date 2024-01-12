@@ -15,6 +15,7 @@
  */
 package eu.cessda.pasc.oci.parser;
 
+import eu.cessda.pasc.oci.DateNotParsedException;
 import eu.cessda.pasc.oci.exception.UnsupportedXMLNamespaceException;
 import eu.cessda.pasc.oci.models.cmmstudy.Pid;
 import eu.cessda.pasc.oci.models.cmmstudy.Publisher;
@@ -56,7 +57,7 @@ public final class XPaths {
     private final XMLMapper<Map<String, List<String>>> studyURLStudyDscrXPath;
     private final XMLMapper<Map<String, List<Pid>>> pidStudyXPath;
     private final XMLMapper<Map<String, List<String>>> dataRestrctnXPath;
-    private final String dataCollectionPeriodsXPath;
+    private final XMLMapper<CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateNotParsedException>>> dataCollectionPeriodsXPath;
     private final XMLMapper<Map<String, List<TermVocabAttributes>>> classificationsXPath;
     private final String keywordsXPath;
     private final String typeOfTimeMethodXPath;
@@ -74,8 +75,8 @@ public final class XPaths {
     @Nullable
     private final XMLMapper<Map<String, List<UniverseElement>>> universeXPath;
 
-    private static final Namespace DDI_3_2_REUSABLE = Namespace.getNamespace("r", "ddi:reusable:3_2");
-    private static final Namespace DDI_3_2_ARCHIVE = Namespace.getNamespace("a", "ddi:archive:3_2");
+    static final Namespace DDI_3_2_REUSABLE = Namespace.getNamespace("r", "ddi:reusable:3_2");
+    static final Namespace DDI_3_2_ARCHIVE = Namespace.getNamespace("a", "ddi:archive:3_2");
 
     /**
      * XPaths needed to extract metadata from DDI 3.2 documents.
@@ -108,7 +109,19 @@ public final class XPaths {
         // Terms of data access
         .dataRestrctnXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/a:Archive/a:ArchiveSpecific/a:Item/a:Access/r:Description/r:Content", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy)))
         // Data collection period
-        .dataCollectionPeriodsXPath("//ddi:DDIInstance/s:StudyUnit/d:DataCollection/d:CollectionEvent/d:CollectionSituation/r:Description/r:Content")
+        .dataCollectionPeriodsXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/d:DataCollection/d:CollectionEvent/d:DataCollectionDate", elementList -> {
+            // Determine if any results were found
+            var iterator = elementList.iterator();
+            if (!iterator.hasNext()) {
+                return new CMMStudyMapper.ParseResults<>(
+                    new CMMStudyMapper.DataCollectionPeriod(null, 0, null, Collections.emptyMap()),
+                    Collections.emptyList()
+                );
+            }
+
+            var dataCollectionDate = iterator.next();
+            return ParsingStrategies.dataCollectionPeriodsLifecycleStrategy(dataCollectionDate);
+        }))
         // Publication year
         .yearOfPubXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:PublicationDate/r:SimpleDate", getFirstEntry(Element::getTextTrim)))
         // Topics
@@ -156,7 +169,7 @@ public final class XPaths {
         .universeXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/c:ConceptualComponent/c:UniverseScheme/c:Universe", ParsingStrategies::universeLifecycleStrategy))
         .build();
 
-//    private static Map<String, Publisher> individualStrategy(Element element) {
+    //    private static Map<String, Publisher> individualStrategy(Element element) {
 //        var identification = element.getChild("IndividualIdentification", DDI_3_2_ARCHIVE);
 //        if (identification == null) {
 //            return Collections.emptyMap();
@@ -181,26 +194,35 @@ public final class XPaths {
             return Collections.emptyMap();
         }
 
-        var name = identification.getChild("OrganizationName", DDI_3_2_ARCHIVE);
-        if (name == null) {
+        var organizationName = identification.getChild("OrganizationName", DDI_3_2_ARCHIVE);
+        if (organizationName == null) {
             return Collections.emptyMap();
         }
 
-        var nameStrElem = name.getChildren("String", DDI_3_2_REUSABLE);
-        var nameMap = new HashMap<String, String>();
-        for (var s : nameStrElem) {
-            var lang = getLangOfElement(s);
-            var t = s.getTextTrim();
-            nameMap.put(lang, t);
-        }
 
-        var abbreviation = name.getChild("Abbreviation", DDI_3_2_REUSABLE);
-        var abbrStrElem = abbreviation.getChildren("String", DDI_3_2_REUSABLE);
+        var nameMap = new HashMap<String, String>();
         var abbrMap = new HashMap<String, String>();
-        for (var a : abbrStrElem) {
-            var lang = getLangOfElement(a);
-            var t = a.getTextTrim();
-            abbrMap.put(lang, t);
+
+        for (var child : organizationName.getChildren()) {
+            if (!child.getNamespace().equals(DDI_3_2_REUSABLE)) {
+                continue;
+            }
+
+            switch (child.getName()) {
+                case "String" -> {
+                    var lang = getLangOfElement(child);
+                    var t = child.getTextTrim();
+                    nameMap.put(lang, t);
+                }
+                case "Abbreviation" -> {
+                    var abbrStrElem = child.getChildren("String", DDI_3_2_REUSABLE);
+                    for (var a : abbrStrElem) {
+                        var lang = getLangOfElement(a);
+                        var t = a.getTextTrim();
+                        abbrMap.put(lang, t);
+                    }
+                }
+            }
         }
 
         // Merge name and abbreviation maps
@@ -261,7 +283,7 @@ public final class XPaths {
         // Terms of data access
         .dataRestrctnXPath(new XMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:restrctn", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy)))
         // Data collection period
-        .dataCollectionPeriodsXPath("//ddi:codeBook//ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate")
+        .dataCollectionPeriodsXPath(new XMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate", ParsingStrategies::dataCollectionPeriodsStrategy))
         // Publication year
         .yearOfPubXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:distDate[1]", getFirstEntry(ParsingStrategies::dateStrategy)))
         // Topics
@@ -326,7 +348,7 @@ public final class XPaths {
         .pidStudyXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/citation/titlStmt/IDNo", extractMetadataObjectListForEachLang(ParsingStrategies::pidStrategy))) // use @agency instead?
         .creatorsXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/citation/rspStmt/AuthEnty", extractMetadataObjectListForEachLang(ParsingStrategies::creatorStrategy)))
         .dataRestrctnXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/dataAccs/useStmt/restrctn", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy)))
-        .dataCollectionPeriodsXPath("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/collDate")
+        .dataCollectionPeriodsXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/collDate", ParsingStrategies::dataCollectionPeriodsStrategy))
         .classificationsXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/subject/topcClas", extractMetadataObjectListForEachLang(element -> ParsingStrategies.termVocabAttributeStrategy(element, false))))
         .keywordsXPath("//ddi:codeBook/stdyDscr/stdyInfo/subject/keyword")
         .typeOfTimeMethodXPath("//ddi:codeBook/stdyDscr/method/dataColl/timeMeth")
