@@ -67,6 +67,19 @@ public class XMLMapper<T> {
         }
     }
 
+    static String parseConceptLanguageCode(Element element) {
+
+        var lang = getLangOfElement(element);
+        if (lang == null) {
+            var concept = element.getChild("concept", element.getNamespace());
+            if (concept != null) {
+                lang = getLangOfElement(concept);
+            }
+        }
+
+        return lang;
+    }
+
     @NonNull
     static <T> Function<List<Element>, Map<String, T>> parseLanguageContentOfElement(Function<Element, T> mappingFunction) {
         return parseLanguageContentOfElement(mappingFunction, (a, b) -> b);

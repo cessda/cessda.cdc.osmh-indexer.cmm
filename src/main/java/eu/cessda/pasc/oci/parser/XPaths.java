@@ -59,8 +59,8 @@ public final class XPaths {
     private final XMLMapper<Map<String, List<String>>> dataRestrctnXPath;
     private final XMLMapper<CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateNotParsedException>>> dataCollectionPeriodsXPath;
     private final XMLMapper<Map<String, List<TermVocabAttributes>>> classificationsXPath;
-    private final String keywordsXPath;
-    private final String typeOfTimeMethodXPath;
+    private final XMLMapper<Map<String, List<TermVocabAttributes>>> keywordsXPath;
+    private final XMLMapper<Map<String, List<TermVocabAttributes>>> typeOfTimeMethodXPath;
     private final String studyAreaCountriesXPath;
     private final String unitTypeXPath;
     private final XMLMapper<Map<String, Publisher>> publisherXPath;
@@ -112,24 +112,25 @@ public final class XPaths {
         .dataCollectionPeriodsXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/d:DataCollection/d:CollectionEvent/d:DataCollectionDate", elementList -> {
             // Determine if any results were found
             var iterator = elementList.iterator();
-            if (!iterator.hasNext()) {
+            if (iterator.hasNext()) {
+                var dataCollectionDate = iterator.next();
+                return ParsingStrategies.dataCollectionPeriodsLifecycleStrategy(dataCollectionDate);
+            } else {
+                // Return an empty object
                 return new CMMStudyMapper.ParseResults<>(
-                    new CMMStudyMapper.DataCollectionPeriod(null, 0, null, Collections.emptyMap()),
-                    Collections.emptyList()
+                        new CMMStudyMapper.DataCollectionPeriod(null, 0, null, Collections.emptyMap()),
+                        Collections.emptyList()
                 );
             }
-
-            var dataCollectionDate = iterator.next();
-            return ParsingStrategies.dataCollectionPeriodsLifecycleStrategy(dataCollectionDate);
         }))
         // Publication year
         .yearOfPubXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:PublicationDate/r:SimpleDate", getFirstEntry(Element::getTextTrim)))
         // Topics
         .classificationsXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Coverage/r:TopicalCoverage/r:Subject", extractMetadataObjectListForEachLang(ParsingStrategies::termVocabAttributeLifecycleStrategy)))
         // Keywords
-        .keywordsXPath("//ddi:DDIInstance/s:StudyUnit/r:Coverage/r:TopicalCoverage/r:Keyword")
+        .keywordsXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Coverage/r:TopicalCoverage/r:Keyword", extractMetadataObjectListForEachLang(ParsingStrategies::termVocabAttributeLifecycleStrategy)))
         // Time dimension
-        .typeOfTimeMethodXPath("//ddi:DDIInstance/s:StudyUnit/d:DataCollection/d:Methodology/d:TimeMethod/r:Description/r:Content")
+        .typeOfTimeMethodXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/d:DataCollection/d:Methodology/d:TimeMethod/d:TypeOfTimeMethod", extractMetadataObjectListForEachLang(ParsingStrategies::termVocabAttributeLifecycleStrategy)))
         // Country
         .studyAreaCountriesXPath("//ddi:DDIInstance/s:StudyUnit/r:Coverage/r:SpatialCoverage/r:Description/r:Content")
         // Analysis unit
@@ -289,9 +290,9 @@ public final class XPaths {
         // Topics
         .classificationsXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:subject/ddi:topcClas", extractMetadataObjectListForEachLang(element -> ParsingStrategies.termVocabAttributeStrategy(element, false))))
         // Keywords
-        .keywordsXPath("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:subject/ddi:keyword")
+        .keywordsXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:subject/ddi:keyword", extractMetadataObjectListForEachLang(element -> ParsingStrategies.termVocabAttributeStrategy(element, false))))
         // Time dimension
-        .typeOfTimeMethodXPath("//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:timeMeth")
+        .typeOfTimeMethodXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:timeMeth", ParsingStrategies::conceptStrategy))
         // Country
         .studyAreaCountriesXPath("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:nation")
         // Analysis unit
@@ -350,8 +351,8 @@ public final class XPaths {
         .dataRestrctnXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/dataAccs/useStmt/restrctn", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy)))
         .dataCollectionPeriodsXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/collDate", ParsingStrategies::dataCollectionPeriodsStrategy))
         .classificationsXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/subject/topcClas", extractMetadataObjectListForEachLang(element -> ParsingStrategies.termVocabAttributeStrategy(element, false))))
-        .keywordsXPath("//ddi:codeBook/stdyDscr/stdyInfo/subject/keyword")
-        .typeOfTimeMethodXPath("//ddi:codeBook/stdyDscr/method/dataColl/timeMeth")
+        .keywordsXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/subject/keyword", extractMetadataObjectListForEachLang(element -> ParsingStrategies.termVocabAttributeStrategy(element, false))))
+        .typeOfTimeMethodXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/method/dataColl/timeMeth", ParsingStrategies::conceptStrategy))
         .studyAreaCountriesXPath("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/nation")
         .unitTypeXPath("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/anlyUnit")
         .publisherXPath(new XMLMapper<>("//ddi:codeBook/docDscr/citation/prodStmt/producer", parseLanguageContentOfElement(ParsingStrategies::publisherStrategy)))
@@ -361,6 +362,7 @@ public final class XPaths {
         .relatedPublicationsXPath("//ddi:codeBook/stdyDscr/othrStdyMat/relPubl")
         .universeXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/universe", extractMetadataObjectListForEachLang(ParsingStrategies::universeStrategy)))
         .build();
+
     private final XMLMapper<Map<String, List<String>>> creatorsXPath;
 
     /**

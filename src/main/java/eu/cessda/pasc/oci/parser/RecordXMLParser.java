@@ -39,7 +39,6 @@ import java.nio.file.Path;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -55,7 +54,7 @@ import static com.google.common.io.Files.getNameWithoutExtension;
 public class RecordXMLParser {
 
     private final CMMStudyMapper cmmStudyMapper;
-    Set<Map.Entry<String, Namespace>> suppressedNamespaceWarnings = null;
+    private Set<Namespace> suppressedNamespaceWarnings = null;
 
     @Autowired
     public RecordXMLParser(CMMStudyMapper cmmStudyMapper) {
@@ -130,22 +129,22 @@ public class RecordXMLParser {
                 var cmmStudy = mapDDIRecordToCMMStudy(repo, request, record, path);
                 cmmStudies.add(cmmStudy);
             } catch (UnsupportedXMLNamespaceException e) {
-                logUnsupportedNamespace(repo, record, e);
+                var recordIdentifier = record.recordHeader() != null ? record.recordHeader().identifier() : null;
+                logUnsupportedNamespace(repo.code(), recordIdentifier, e);
             }
         }
 
         return cmmStudies;
     }
 
-    private void logUnsupportedNamespace(Repo repo, Record record, UnsupportedXMLNamespaceException e) {
+    private void logUnsupportedNamespace(String code, String recordIdentifier, UnsupportedXMLNamespaceException e) {
         // Only initialise if required
         if (suppressedNamespaceWarnings == null) {
             suppressedNamespaceWarnings = ConcurrentHashMap.newKeySet();
         }
-        if (suppressedNamespaceWarnings.add(Map.entry(repo.code(), e.getNamespace()))) {
+        if (suppressedNamespaceWarnings.add(e.getNamespace())) {
             // Only log on first encounter with this namespace
-            var recordIdentifier = record.recordHeader() != null ? record.recordHeader().identifier() : null;
-            log.warn("[{}]: {} cannot be parsed: {}. Further reports for this namespace have been suppressed.", repo.code(), recordIdentifier, e.getMessage());
+            log.warn("[{}]: {} cannot be parsed: {}. Further reports for this namespace have been suppressed.", code, recordIdentifier, e.getMessage());
         }
     }
 

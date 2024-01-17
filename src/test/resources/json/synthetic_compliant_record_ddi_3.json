@@ -71,6 +71,14 @@
   "fileLanguages": [
   ],
   "keywords": {
+    "en": [
+      {
+        "vocabUri": "https://elsst.cessda.eu/id/",
+        "vocab": "ELSST",
+        "term": "POLITICAL ISSUES",
+        "id": ""
+      }
+    ]
   },
   "lastModified": "2023-12-06T13:30:08.8725293Z",
   "pidStudies": {
@@ -134,6 +142,14 @@
   "typeOfSamplingProcedures": {
   },
   "typeOfTimeMethods": {
+    "en": [
+      {
+        "vocabUri": "urn:ddi:int.ddi.cv:TimeMethod:1.2.3",
+        "vocab": "TimeMethod",
+        "term": "Longitudinal",
+        "id": ""
+      }
+    ]
   },
   "unitTypes": {
   },

@@ -230,6 +230,7 @@
                 <r:Subject xml:lang="de" codeListAgencyName="cessda" codeListName="CESSDA Topic Classification" codeListURN="https://vocabularies.cessda.eu/urn/urn:ddi:int.cessda.cv:TopicClassification:4.2.2">Internationale Politik und Internationale Organisationen</r:Subject>
                 <r:Subject xml:lang="en" codeListAgencyName="cessda" codeListName="CESSDA Topic Classification" codeListURN="https://vocabularies.cessda.eu/urn/urn:ddi:int.cessda.cv:TopicClassification:4.2.2">Conflict, security and peace</r:Subject>
                 <r:Subject xml:lang="de" codeListAgencyName="cessda" codeListName="CESSDA Topic Classification" codeListURN="https://vocabularies.cessda.eu/urn/urn:ddi:int.cessda.cv:TopicClassification:4.2.2">Konflikte, Sicherheit und Frieden</r:Subject>
+                <r:Keyword xml:lang="en" codeListAgencyName="cessda" codeListName="ELSST" codeListURN="https://elsst.cessda.eu/id/">POLITICAL ISSUES</r:Keyword>
             </r:TopicalCoverage>
             <r:SpatialCoverage>
                 <r:Agency>de.gesis</r:Agency>
@@ -310,6 +311,12 @@
                 <r:Agency>de.gesis</r:Agency>
                 <r:ID>ZA0004_Met</r:ID>
                 <r:Version>1.0.0</r:Version>
+                <d:TimeMethod>
+                    <r:Agency>de.gesis</r:Agency>
+                    <r:ID>ZA0004_TimeMethod</r:ID>
+                    <r:Version>1.0.0</r:Version>
+                    <d:TypeOfTimeMethod codeListAgencyName="DDI Alliance" codeListName="TimeMethod" codeListURN="urn:ddi:int.ddi.cv:TimeMethod:1.2.3">Longitudinal</d:TypeOfTimeMethod>
+                </d:TimeMethod>
                 <d:SamplingProcedure>
                     <r:Agency>de.gesis</r:Agency>
                     <r:ID>ZA0004_SamPro</r:ID>

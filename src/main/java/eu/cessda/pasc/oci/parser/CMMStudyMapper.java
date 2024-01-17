@@ -181,9 +181,8 @@ public class CMMStudyMapper {
      * Xpath = {@link XPaths#getKeywordsXPath()}
      */
     Map<String, List<TermVocabAttributes>> parseKeywords(Document doc, XPaths xPaths, String defaultLangIsoCode) {
-        return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, doc, xPaths.getKeywordsXPath(), element -> termVocabAttributeStrategy(element, false), xPaths.getNamespace()
-        );
+        var unmappedXPaths = xPaths.getKeywordsXPath().resolve(doc, xPaths.getNamespace());
+        return mapNullLanguage(unmappedXPaths, defaultLangIsoCode, CMMStudyMapper::mergeLists);
     }
 
     /**
@@ -192,9 +191,8 @@ public class CMMStudyMapper {
      * Xpath = {@link XPaths#getTypeOfTimeMethodXPath()}
      */
     Map<String, List<TermVocabAttributes>> parseTypeOfTimeMethod(Document doc, XPaths xPaths, String defaultLangIsoCode) {
-        return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, doc, xPaths.getTypeOfTimeMethodXPath(), element -> termVocabAttributeStrategy(element, true), xPaths.getNamespace()
-        );
+        var unmappedXPaths = xPaths.getTypeOfTimeMethodXPath().resolve(doc, xPaths.getNamespace());
+        return mapNullLanguage(unmappedXPaths, defaultLangIsoCode, CMMStudyMapper::mergeLists);
     }
 
     /**

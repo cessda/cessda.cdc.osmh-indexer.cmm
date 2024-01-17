@@ -16,6 +16,7 @@
 package eu.cessda.pasc.oci.parser;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
+import lombok.NonNull;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -186,14 +187,6 @@ class DocElementParser {
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> b, HashMap::new));
     }
 
-    private void putElementInMap(Map<String, String> titlesMap, String langCode, String elementText, boolean isConcatenating) {
-        // Concatenate if configured
-        if (isConcatenating && oaiPmh.concatSeparator() != null && titlesMap.containsKey(langCode)) {
-            elementText = titlesMap.get(langCode) + oaiPmh.concatSeparator() + elementText;
-        }
-        titlesMap.put(langCode, elementText);
-    }
-
     private Optional<String> parseLanguageCode(Element element, String defaultLangIsoCode) {
 
         var langAttr = getLangAttribute(element);
@@ -220,6 +213,18 @@ class DocElementParser {
         return Optional.empty();
     }
 
+    @NonNull
+    static Optional<String> parseLanguageCode(Attribute langAttr) {
+        // If a language-region tag is present, i.e. en-GB, only keep the first part
+        var langValue = langAttr.getValue();
+        var dashIndex = langValue.indexOf('-');
+        if (dashIndex != -1) {
+            return Optional.of(langValue.substring(0, dashIndex));
+        } else {
+            return Optional.of(langValue);
+        }
+    }
+
     /**
      * Attempt to find the {@code xml:lang} attribute in the given element.
      * @param element the element to parse.
@@ -235,66 +240,4 @@ class DocElementParser {
         }
     }
 
-    /**
-     * Parses value of given {@link Element} for every given xml@lang attributed.
-     * <p>
-     * If no lang is found attempts to default to a configured xml@lang.
-     * <p>
-     * If configuration is set to not default to a given lang, effect is this element is not extracted.
-     *
-     * @param elements               a list of {@link Element}s to parse.
-     * @param langCode               the default language to use if an element does not have a {@value OaiPmhConstants#LANG_ATTR} attribute.
-     * @param extractionStrategy the extraction strategy to apply.
-     */
-    <T> HashMap<String, T> getLanguageKeyValuePairs(List<Element> elements, String langCode, Function<Element, Optional<T>> extractionStrategy) {
-
-        var titlesMap = new HashMap<String, T>();
-        for (var element : elements) {
-
-            var langAttribute = element.getAttribute(LANG_ATTR, XML_NAMESPACE);
-            extractionStrategy.apply(element).ifPresent(extractedValue -> {
-                if (langAttribute != null) {
-                    titlesMap.put(langAttribute.getValue(), extractedValue);
-                } else {
-                    // If defaulting lang is not configured skip, the language is not known
-                    if (oaiPmh.metadataParsingDefaultLang().active()) {
-                        titlesMap.put(langCode, extractedValue);
-                    }
-                }
-            });
-        }
-        return titlesMap;
-    }
-
-    /**
-     * Parses value of given {@link Element} for every given xml@lang attributed.
-     * <p>
-     * If no lang is found attempts to default to a configured xml@lang.
-     * <p>
-     * If configuration is set to not default to a given lang, effect is this element is not extracted.
-     *
-     * @param elements               a list of {@link Element}s to parse.
-     * @param isConcatenating        if true, concatenate multiple {@link Element}s of the same language
-     * @param langCode               the default language to use if an element does not have a {@value OaiPmhConstants#LANG_ATTR} attribute.
-     * @param textExtractionStrategy the text extraction strategy to apply.
-     */
-    HashMap<String, String> getLanguageKeyValuePairs(List<Element> elements, boolean isConcatenating, String langCode,
-                                                 Function<Element, String> textExtractionStrategy) {
-
-        var titlesMap = new HashMap<String, String>();
-        for (Element element : elements) {
-
-            var langAttribute = element.getAttribute(LANG_ATTR, XML_NAMESPACE);
-
-            if (langAttribute != null ) {
-                putElementInMap(titlesMap, langAttribute.getValue(), textExtractionStrategy.apply(element), isConcatenating);
-            } else {
-                // If defaulting lang is not configured skip, the language is not known
-                if (oaiPmh.metadataParsingDefaultLang().active()) {
-                    putElementInMap(titlesMap, langCode, textExtractionStrategy.apply(element), isConcatenating);
-                }
-            }
-        }
-        return titlesMap;
-    }
 }

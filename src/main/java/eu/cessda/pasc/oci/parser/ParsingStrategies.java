@@ -569,4 +569,17 @@ class ParsingStrategies{
         var dataCollectionPeriod = new CMMStudyMapper.DataCollectionPeriod(startDate, year, endDate, Collections.emptyMap());
         return new CMMStudyMapper.ParseResults<>(dataCollectionPeriod, parseExceptions);
     }
+
+    @NonNull
+    static HashMap<String, List<TermVocabAttributes>> conceptStrategy(List<Element> elementList) {
+        var map = new HashMap<String, List<TermVocabAttributes>>();
+
+        for (var element : elementList) {
+            termVocabAttributeStrategy(element, true).ifPresent(mappedElement ->
+                map.computeIfAbsent(XMLMapper.parseConceptLanguageCode(element), k -> new ArrayList<>()).add(mappedElement)
+            );
+        }
+
+        return map;
+    }
 }
