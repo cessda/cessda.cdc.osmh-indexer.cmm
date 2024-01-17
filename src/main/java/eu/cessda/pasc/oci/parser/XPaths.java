@@ -26,7 +26,6 @@ import org.jdom2.Namespace;
 
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.stream.Stream;
 
 import static eu.cessda.pasc.oci.parser.XMLMapper.*;
 import static java.util.Map.entry;
@@ -109,20 +108,12 @@ public final class XPaths {
         // Terms of data access
         .dataRestrctnXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/a:Archive/a:ArchiveSpecific/a:Item/a:Access/r:Description/r:Content", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy)))
         // Data collection period
-        .dataCollectionPeriodsXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/d:DataCollection/d:CollectionEvent/d:DataCollectionDate", elementList -> {
-            // Determine if any results were found
-            var iterator = elementList.iterator();
-            if (iterator.hasNext()) {
-                var dataCollectionDate = iterator.next();
-                return ParsingStrategies.dataCollectionPeriodsLifecycleStrategy(dataCollectionDate);
-            } else {
-                // Return an empty object
-                return new CMMStudyMapper.ParseResults<>(
-                        new CMMStudyMapper.DataCollectionPeriod(null, 0, null, Collections.emptyMap()),
-                        Collections.emptyList()
-                );
-            }
-        }))
+        .dataCollectionPeriodsXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/d:DataCollection/d:CollectionEvent/d:DataCollectionDate", elementList -> getFirstEntry(ParsingStrategies::dataCollectionPeriodsLifecycleStrategy).apply(elementList).orElse(
+            new CMMStudyMapper.ParseResults<>(
+                new CMMStudyMapper.DataCollectionPeriod(null, 0, null, Collections.emptyMap()),
+                Collections.emptyList()
+            )
+        )))
         // Publication year
         .yearOfPubXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:PublicationDate/r:SimpleDate", getFirstEntry(Element::getTextTrim)))
         // Topics
@@ -136,14 +127,14 @@ public final class XPaths {
         // Analysis unit
         .unitTypeXPath("//ddi:DDIInstance/s:StudyUnit/r:AnalysisUnitsCovered")
         // Publisher
-        .publisherXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:Publisher/r:PublisherReference", e -> {
+        .publisherXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:Publisher/r:PublisherReference", elementList -> {
 
-            for (var element : e) {
+            for (var element : elementList) {
                 var referencedElement = resolveReference(element);
-                var publisherMapOpt = referencedElement.map(r -> switch (r.type()) {
-                    case "Individual" -> Collections.<String, Publisher>emptyMap(); // TODO: implement
-                    case "Organization" -> organizationStrategy(r.element());
-                    default -> Collections.<String, Publisher>emptyMap();
+                var publisherMapOpt = referencedElement.flatMap(r -> switch (r.type()) {
+                    case "Individual" -> Optional.of(individualStrategy(r.element()));
+                    case "Organization" -> Optional.of(ParsingStrategies.organizationStrategy(r.element()));
+                    default -> Optional.empty();
                 });
                 if (publisherMapOpt.isPresent()) {
                     return publisherMapOpt.get();
@@ -170,72 +161,38 @@ public final class XPaths {
         .universeXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/c:ConceptualComponent/c:UniverseScheme/c:Universe", ParsingStrategies::universeLifecycleStrategy))
         .build();
 
-    //    private static Map<String, Publisher> individualStrategy(Element element) {
-//        var identification = element.getChild("IndividualIdentification", DDI_3_2_ARCHIVE);
-//        if (identification == null) {
-//            return Collections.emptyMap();
-//        }
-//
-//        var names = identification.getChildren("IndividualName", DDI_3_2_ARCHIVE);
-//        for (var name : names) {
-//            var isPreferred = name.getAttribute("isPreferred", DDI_3_2_ARCHIVE);
-//
-//            // Use the full name if present
-//            var fullName = name.getChildren("FullName", DDI_3_2_REUSABLE);
-//            if (fullName != null) {
-//                //
-//            }
-//        }
-//    }
-
-    @NonNull
-    private static Map<String, Publisher> organizationStrategy(Element element) {
-        var identification = element.getChild("OrganizationIdentification", DDI_3_2_ARCHIVE);
+    private static Map<String, Publisher> individualStrategy(Element element) {
+        var identification = element.getChild("IndividualIdentification", DDI_3_2_ARCHIVE);
         if (identification == null) {
             return Collections.emptyMap();
         }
 
-        var organizationName = identification.getChild("OrganizationName", DDI_3_2_ARCHIVE);
-        if (organizationName == null) {
-            return Collections.emptyMap();
-        }
+        var map = new HashMap<String, Publisher>();
 
+        var names = identification.getChildren("IndividualName", DDI_3_2_ARCHIVE);
+        for (var name : names) {
 
-        var nameMap = new HashMap<String, String>();
-        var abbrMap = new HashMap<String, String>();
+            var isPreferred = name.getAttributeValue("isPreferred", DDI_3_2_ARCHIVE);
 
-        for (var child : organizationName.getChildren()) {
-            if (!child.getNamespace().equals(DDI_3_2_REUSABLE)) {
-                continue;
-            }
+            // Use the full name if present
+            var fullName = name.getChild("FullName", DDI_3_2_REUSABLE);
+            if (fullName != null) {
+                var string = fullName.getChild("String", DDI_3_2_REUSABLE);
+                if (string != null) {
+                    var lang = getLangOfElement(string);
+                    var publisher = new Publisher("", string.getTextTrim());
 
-            switch (child.getName()) {
-                case "String" -> {
-                    var lang = getLangOfElement(child);
-                    var t = child.getTextTrim();
-                    nameMap.put(lang, t);
-                }
-                case "Abbreviation" -> {
-                    var abbrStrElem = child.getChildren("String", DDI_3_2_REUSABLE);
-                    for (var a : abbrStrElem) {
-                        var lang = getLangOfElement(a);
-                        var t = a.getTextTrim();
-                        abbrMap.put(lang, t);
+                    if (Boolean.parseBoolean(isPreferred)) {
+                        map.put(lang, publisher);
+                    } else {
+                        map.putIfAbsent(lang, publisher);
                     }
                 }
             }
         }
 
-        // Merge name and abbreviation maps
-        var publisherMap = new HashMap<String, Publisher>();
-        Stream.concat(nameMap.keySet().stream(), abbrMap.keySet().stream()).distinct().forEach(key ->
-            publisherMap.put(key, new Publisher(abbrMap.getOrDefault(key, PUBLISHER_NOT_AVAIL), nameMap.getOrDefault(key, "")))
-        );
-
-        return publisherMap;
+        return map;
     }
-
-    private static final String PUBLISHER_NOT_AVAIL = "Publisher not specified";
 
     public Optional<XMLMapper<Map<String, String>>> getParTitleXPath() {
         return Optional.ofNullable(parTitleXPath);

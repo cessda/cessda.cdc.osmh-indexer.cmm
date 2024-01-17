@@ -27,6 +27,7 @@ import javax.annotation.Nullable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static eu.cessda.pasc.oci.parser.DocElementParser.getAttributeValue;
 import static eu.cessda.pasc.oci.parser.OaiPmhConstants.*;
@@ -43,6 +44,7 @@ class ParsingStrategies{
     // Metadata handling
     private static final String EMPTY_EL = "empty";
     private static final String PUBLISHER_NOT_AVAIL = "Publisher not specified";
+    private static final String STRING = "String";
 
 
     /**
@@ -461,7 +463,7 @@ class ParsingStrategies{
             }
 
             for (var child : element.getChildren()) {
-                if (!child.getName().equals("String")) {
+                if (!child.getName().equals(STRING)) {
                     continue;
                 }
 
@@ -581,5 +583,52 @@ class ParsingStrategies{
         }
 
         return map;
+    }
+
+    @NonNull
+    static Map<String, Publisher> organizationStrategy(Element element) {
+        var identification = element.getChild("OrganizationIdentification", XPaths.DDI_3_2_ARCHIVE);
+        if (identification == null) {
+            return Collections.emptyMap();
+        }
+
+        var organizationName = identification.getChild("OrganizationName", XPaths.DDI_3_2_ARCHIVE);
+        if (organizationName == null) {
+            return Collections.emptyMap();
+        }
+
+
+        var nameMap = new HashMap<String, String>();
+        var abbrMap = new HashMap<String, String>();
+
+        for (var child : organizationName.getChildren()) {
+            if (!child.getNamespace().equals(XPaths.DDI_3_2_REUSABLE)) {
+                continue;
+            }
+
+            switch (child.getName()) {
+                case STRING -> {
+                    var lang = getLangOfElement(child);
+                    var t = child.getTextTrim();
+                    nameMap.put(lang, t);
+                }
+                case "Abbreviation" -> {
+                    var abbrStrElem = child.getChildren(STRING, XPaths.DDI_3_2_REUSABLE);
+                    for (var a : abbrStrElem) {
+                        var lang = getLangOfElement(a);
+                        var t = a.getTextTrim();
+                        abbrMap.put(lang, t);
+                    }
+                }
+            }
+        }
+
+        // Merge name and abbreviation maps
+        var publisherMap = new HashMap<String, Publisher>();
+        Stream.concat(nameMap.keySet().stream(), abbrMap.keySet().stream()).distinct().forEach(key ->
+            publisherMap.put(key, new Publisher(abbrMap.getOrDefault(key, PUBLISHER_NOT_AVAIL), nameMap.getOrDefault(key, "")))
+        );
+
+        return publisherMap;
     }
 }
