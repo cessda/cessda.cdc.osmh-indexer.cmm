@@ -112,6 +112,14 @@
     ]
   },
   "studyAreaCountries": {
+    "de": [{
+      "abbr": "US",
+      "country": "Vereinigte Staaten von Amerika"
+    }],
+    "en": [{
+      "abbr": "US",
+      "country": "United States of America"
+    }]
   },
   "studyNumber": "oai:dbk.gesis.org:DBK/ZA0004",
   "studyUrl": {

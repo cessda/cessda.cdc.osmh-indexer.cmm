@@ -26,9 +26,6 @@ import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 
-import static eu.cessda.pasc.oci.parser.XPaths.DDI_3_2_ARCHIVE;
-import static eu.cessda.pasc.oci.parser.XPaths.DDI_3_2_REUSABLE;
-
 public class XMLMapper<T> {
     private final String xPath;
     private final Function<List<Element>, T> mappingFunction;
@@ -173,7 +170,7 @@ public class XMLMapper<T> {
         String typeOfObject = null;
 
         // Is the reference external?
-        var externalAttribute = element.getAttributeValue("isExternal", DDI_3_2_REUSABLE);
+        var externalAttribute = element.getAttributeValue("isExternal", (Namespace) null);
         if ("true".equals(externalAttribute)) {
             // External references are not implemented yet
             return Optional.empty();
@@ -181,10 +178,6 @@ public class XMLMapper<T> {
 
         // Extract all child element details
         for (var child : element.getChildren()) {
-            if (!child.getNamespace().equals(DDI_3_2_REUSABLE)) {
-                continue;
-            }
-
             switch (child.getName()) {
                 case "Agency" -> agency = child.getTextTrim();
                 case "ID" -> id = child.getTextTrim();
@@ -196,7 +189,7 @@ public class XMLMapper<T> {
 
         // Attempt to search for elements in the document that match the reference
         var document = element.getDocument();
-        var filter = Filters.element(typeOfObject, DDI_3_2_ARCHIVE);
+        var filter = Filters.element(typeOfObject, null);
 
         for (var object : document.getDescendants(filter)) {
 
@@ -205,10 +198,6 @@ public class XMLMapper<T> {
             boolean versionMatches = false;
 
             for (var child : object.getChildren()) {
-                if (!child.getNamespace().equals(DDI_3_2_REUSABLE)) {
-                    continue;
-                }
-
                 switch (child.getName()) {
                     case "URN" -> {
                         // If the URN matches, return directly

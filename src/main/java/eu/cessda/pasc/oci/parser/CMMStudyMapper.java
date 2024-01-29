@@ -234,9 +234,8 @@ public class CMMStudyMapper {
      * Xpath = {@link XPaths#getStudyAreaCountriesXPath()}
      */
     Map<String, List<Country>> parseStudyAreaCountries(Document document, XPaths xPaths, String defaultLangIsoCode) {
-        return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, document, xPaths.getStudyAreaCountriesXPath(), ParsingStrategies::countryStrategy, xPaths.getNamespace()
-        );
+        var unmappedXPaths = xPaths.getStudyAreaCountriesXPath().resolve(document, xPaths.getNamespace());
+        return mapNullLanguage(unmappedXPaths, defaultLangIsoCode, CMMStudyMapper::mergeLists);
     }
 
     /**

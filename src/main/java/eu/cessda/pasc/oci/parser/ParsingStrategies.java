@@ -22,6 +22,7 @@ import eu.cessda.pasc.oci.models.cmmstudy.*;
 import lombok.NonNull;
 import org.jdom2.DataConversionException;
 import org.jdom2.Element;
+import org.jdom2.Namespace;
 
 import javax.annotation.Nullable;
 import java.net.URI;
@@ -58,7 +59,7 @@ class ParsingStrategies{
     static Optional<Country> countryStrategy(Element element) {
         var country = new Country(
             getAttributeValue(element, ABBR_ATTR).orElse(null),
-            cleanCharacterReturns(element.getText()), null
+            cleanCharacterReturns(element.getText())
         );
         return Optional.of(country);
     }
@@ -587,12 +588,12 @@ class ParsingStrategies{
 
     @NonNull
     static Map<String, Publisher> organizationStrategy(Element element) {
-        var identification = element.getChild("OrganizationIdentification", XPaths.DDI_3_2_ARCHIVE);
+        var identification = element.getChild("OrganizationIdentification", null);
         if (identification == null) {
             return Collections.emptyMap();
         }
 
-        var organizationName = identification.getChild("OrganizationName", XPaths.DDI_3_2_ARCHIVE);
+        var organizationName = identification.getChild("OrganizationName", null);
         if (organizationName == null) {
             return Collections.emptyMap();
         }
@@ -602,9 +603,6 @@ class ParsingStrategies{
         var abbrMap = new HashMap<String, String>();
 
         for (var child : organizationName.getChildren()) {
-            if (!child.getNamespace().equals(XPaths.DDI_3_2_REUSABLE)) {
-                continue;
-            }
 
             switch (child.getName()) {
                 case STRING -> {
@@ -613,8 +611,8 @@ class ParsingStrategies{
                     nameMap.put(lang, t);
                 }
                 case "Abbreviation" -> {
-                    var abbrStrElem = child.getChildren(STRING, XPaths.DDI_3_2_REUSABLE);
-                    for (var a : abbrStrElem) {
+                    var abbrStrElems = child.getChildren(STRING, null);
+                    for (var a : abbrStrElems) {
                         var lang = getLangOfElement(a);
                         var t = a.getTextTrim();
                         abbrMap.put(lang, t);
@@ -630,5 +628,80 @@ class ParsingStrategies{
         );
 
         return publisherMap;
+    }
+
+    static Map<String, Country> geographicReferenceStrategy(Element geographicReference) {
+        var countryMap = new HashMap<String, Country>();
+
+        var locationValue = geographicReference.getChild("LocationValue", null);
+        if (locationValue != null) {
+
+            var nameMap = new HashMap<String, String>();
+
+            String code = null;
+
+            for (var child : locationValue.getChildren()) {
+                switch (child.getName()) {
+                    case "GeographicLocationIdentifier" -> {
+                        // Extract the location code
+                        var locIdentifier = locationValue.getChild("GeographicLocationIdentifier", null);
+                        if (locIdentifier != null) {
+                            var geographicCode = locIdentifier.getChild("GeographicCode", null);
+                            if (geographicCode != null) {
+                                code = geographicCode.getTextTrim();
+                            }
+                        }
+                    }
+                    case "LocationValueName" -> {
+                        for (var string : child.getChildren(STRING, null)) {
+                            var countryString = string.getTextTrim();
+                            var lang = getLangOfElement(string);
+                            nameMap.put(lang, countryString);
+                        }
+                    }
+                }
+            }
+
+            for (var entry : nameMap.entrySet()) {
+                var lang = entry.getKey();
+                var country = new Country(code, entry.getValue());
+                countryMap.put(lang, country);
+            }
+        }
+
+        return countryMap;
+    }
+
+    static Map<String, Publisher> individualStrategy(Element element) {
+        var identification = element.getChild("IndividualIdentification", null);
+        if (identification == null) {
+            return Collections.emptyMap();
+        }
+
+        var map = new HashMap<String, Publisher>();
+
+        var names = identification.getChildren("IndividualName", null);
+        for (var name : names) {
+
+            var isPreferred = name.getAttributeValue("isPreferred", (Namespace) null);
+
+            // Use the full name if present
+            var fullName = name.getChild("FullName", null);
+            if (fullName != null) {
+                var string = fullName.getChild("String", null);
+                if (string != null) {
+                    var lang = getLangOfElement(string);
+                    var publisher = new Publisher("", string.getTextTrim());
+
+                    if (Boolean.parseBoolean(isPreferred)) {
+                        map.put(lang, publisher);
+                    } else {
+                        map.putIfAbsent(lang, publisher);
+                    }
+                }
+            }
+        }
+
+        return map;
     }
 }

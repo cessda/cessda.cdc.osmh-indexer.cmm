@@ -17,6 +17,7 @@ package eu.cessda.pasc.oci.parser;
 
 import eu.cessda.pasc.oci.DateNotParsedException;
 import eu.cessda.pasc.oci.exception.UnsupportedXMLNamespaceException;
+import eu.cessda.pasc.oci.models.cmmstudy.Country;
 import eu.cessda.pasc.oci.models.cmmstudy.Pid;
 import eu.cessda.pasc.oci.models.cmmstudy.Publisher;
 import eu.cessda.pasc.oci.models.cmmstudy.TermVocabAttributes;
@@ -60,7 +61,7 @@ public final class XPaths {
     private final XMLMapper<Map<String, List<TermVocabAttributes>>> classificationsXPath;
     private final XMLMapper<Map<String, List<TermVocabAttributes>>> keywordsXPath;
     private final XMLMapper<Map<String, List<TermVocabAttributes>>> typeOfTimeMethodXPath;
-    private final String studyAreaCountriesXPath;
+    private final XMLMapper<Map<String, List<Country>>> studyAreaCountriesXPath;
     private final String unitTypeXPath;
     private final XMLMapper<Map<String, Publisher>> publisherXPath;
     private final String distributorXPath;
@@ -74,21 +75,18 @@ public final class XPaths {
     @Nullable
     private final XMLMapper<Map<String, List<UniverseElement>>> universeXPath;
 
-    static final Namespace DDI_3_2_REUSABLE = Namespace.getNamespace("r", "ddi:reusable:3_2");
-    static final Namespace DDI_3_2_ARCHIVE = Namespace.getNamespace("a", "ddi:archive:3_2");
-
     /**
      * XPaths needed to extract metadata from DDI 3.2 documents.
      */
     public static final XPaths DDI_3_2_XPATHS = XPaths.builder()
         .namespace(new Namespace[]{
             Namespace.getNamespace("ddi", "ddi:instance:3_2"),
-            DDI_3_2_ARCHIVE,
+            Namespace.getNamespace("a", "ddi:archive:3_2"),
             Namespace.getNamespace("c", "ddi:conceptualcomponent:3_2"),
             Namespace.getNamespace("d","ddi:datacollection:3_2"),
             Namespace.getNamespace("g", "ddi:group:3_2"),
             Namespace.getNamespace("pi", "ddi:physicalinstance:3_2"),
-            DDI_3_2_REUSABLE,
+            Namespace.getNamespace("r", "ddi:reusable:3_2"),
             Namespace.getNamespace("s", "ddi:studyunit:3_2")
         })
         // Abstract
@@ -123,7 +121,17 @@ public final class XPaths {
         // Time dimension
         .typeOfTimeMethodXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/d:DataCollection/d:Methodology/d:TimeMethod/d:TypeOfTimeMethod", extractMetadataObjectListForEachLang(ParsingStrategies::termVocabAttributeLifecycleStrategy)))
         // Country
-        .studyAreaCountriesXPath("//ddi:DDIInstance/s:StudyUnit/r:Coverage/r:SpatialCoverage/r:Description/r:Content")
+        .studyAreaCountriesXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Coverage/r:SpatialCoverage/r:GeographicLocationReference", elementList -> {
+            var countryListMap = new HashMap<String, List<Country>>();
+            for (var element : elementList) {
+              resolveReference(element).ifPresent(referencedElement -> {
+                  var geographicReference = referencedElement.element();
+                  var countryMap = ParsingStrategies.geographicReferenceStrategy(geographicReference);
+                  countryMap.forEach((key, value) -> countryListMap.computeIfAbsent(key, k -> new ArrayList<>()).add(value));
+              });
+            }
+            return countryListMap;
+        }))
         // Analysis unit
         .unitTypeXPath("//ddi:DDIInstance/s:StudyUnit/r:AnalysisUnitsCovered")
         // Publisher
@@ -132,7 +140,7 @@ public final class XPaths {
             for (var element : elementList) {
                 var referencedElement = resolveReference(element);
                 var publisherMapOpt = referencedElement.flatMap(r -> switch (r.type()) {
-                    case "Individual" -> Optional.of(individualStrategy(r.element()));
+                    case "Individual" -> Optional.of(ParsingStrategies.individualStrategy(r.element()));
                     case "Organization" -> Optional.of(ParsingStrategies.organizationStrategy(r.element()));
                     default -> Optional.empty();
                 });
@@ -160,39 +168,6 @@ public final class XPaths {
         // Description of population
         .universeXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/c:ConceptualComponent/c:UniverseScheme/c:Universe", ParsingStrategies::universeLifecycleStrategy))
         .build();
-
-    private static Map<String, Publisher> individualStrategy(Element element) {
-        var identification = element.getChild("IndividualIdentification", DDI_3_2_ARCHIVE);
-        if (identification == null) {
-            return Collections.emptyMap();
-        }
-
-        var map = new HashMap<String, Publisher>();
-
-        var names = identification.getChildren("IndividualName", DDI_3_2_ARCHIVE);
-        for (var name : names) {
-
-            var isPreferred = name.getAttributeValue("isPreferred", DDI_3_2_ARCHIVE);
-
-            // Use the full name if present
-            var fullName = name.getChild("FullName", DDI_3_2_REUSABLE);
-            if (fullName != null) {
-                var string = fullName.getChild("String", DDI_3_2_REUSABLE);
-                if (string != null) {
-                    var lang = getLangOfElement(string);
-                    var publisher = new Publisher("", string.getTextTrim());
-
-                    if (Boolean.parseBoolean(isPreferred)) {
-                        map.put(lang, publisher);
-                    } else {
-                        map.putIfAbsent(lang, publisher);
-                    }
-                }
-            }
-        }
-
-        return map;
-    }
 
     public Optional<XMLMapper<Map<String, String>>> getParTitleXPath() {
         return Optional.ofNullable(parTitleXPath);
@@ -251,7 +226,7 @@ public final class XPaths {
         // Time dimension
         .typeOfTimeMethodXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:timeMeth", ParsingStrategies::conceptStrategy))
         // Country
-        .studyAreaCountriesXPath("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:nation")
+        .studyAreaCountriesXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:nation", extractMetadataObjectListForEachLang(ParsingStrategies::countryStrategy)))
         // Analysis unit
         .unitTypeXPath("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:anlyUnit")
         // Publisher name/Contributor
@@ -310,7 +285,7 @@ public final class XPaths {
         .classificationsXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/subject/topcClas", extractMetadataObjectListForEachLang(element -> ParsingStrategies.termVocabAttributeStrategy(element, false))))
         .keywordsXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/subject/keyword", extractMetadataObjectListForEachLang(element -> ParsingStrategies.termVocabAttributeStrategy(element, false))))
         .typeOfTimeMethodXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/method/dataColl/timeMeth", ParsingStrategies::conceptStrategy))
-        .studyAreaCountriesXPath("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/nation")
+        .studyAreaCountriesXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/nation", extractMetadataObjectListForEachLang(ParsingStrategies::countryStrategy)))
         .unitTypeXPath("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/anlyUnit")
         .publisherXPath(new XMLMapper<>("//ddi:codeBook/docDscr/citation/prodStmt/producer", parseLanguageContentOfElement(ParsingStrategies::publisherStrategy)))
         .distributorXPath("//ddi:codeBook/stdyDscr/citation/distStmt/distrbtr")
