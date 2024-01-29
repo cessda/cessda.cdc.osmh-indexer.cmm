@@ -152,8 +152,6 @@ public final class XPaths {
 
             return Collections.emptyMap();
         }))
-        // Publisher Reference (Institution)
-        .distributorXPath("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:Publisher/r:PublisherReference/r:URN")
         // Language of data file(s)
         .fileTxtLanguagesXPath("//ddi:DDIInstance/r:ResourcePackage/pi:PhysicalInstance/r:Citation/r:Language")
         // Language-specific name of file
