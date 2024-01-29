@@ -28,6 +28,7 @@ import org.jdom2.Namespace;
 import javax.annotation.Nullable;
 import java.util.*;
 
+import static eu.cessda.pasc.oci.parser.ParsingStrategies.termVocabAttributeStrategy;
 import static eu.cessda.pasc.oci.parser.XMLMapper.*;
 import static java.util.Map.entry;
 
@@ -62,7 +63,7 @@ public final class XPaths {
     private final XMLMapper<Map<String, List<TermVocabAttributes>>> keywordsXPath;
     private final XMLMapper<Map<String, List<TermVocabAttributes>>> typeOfTimeMethodXPath;
     private final XMLMapper<Map<String, List<Country>>> studyAreaCountriesXPath;
-    private final String unitTypeXPath;
+    private final XMLMapper<Map<String, List<TermVocabAttributes>>> unitTypeXPath;
     private final XMLMapper<Map<String, Publisher>> publisherXPath;
     private final String distributorXPath;
     @Nullable
@@ -133,7 +134,7 @@ public final class XPaths {
             return countryListMap;
         }))
         // Analysis unit
-        .unitTypeXPath("//ddi:DDIInstance/s:StudyUnit/r:AnalysisUnitsCovered")
+        .unitTypeXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:AnalysisUnit", ParsingStrategies::analysisUnitStrategy))
         // Publisher
         .publisherXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:Publisher/r:PublisherReference", elementList -> {
 
@@ -228,7 +229,7 @@ public final class XPaths {
         // Country
         .studyAreaCountriesXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:nation", extractMetadataObjectListForEachLang(ParsingStrategies::countryStrategy)))
         // Analysis unit
-        .unitTypeXPath("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:anlyUnit")
+        .unitTypeXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:anlyUnit", ParsingStrategies::conceptStrategy))
         // Publisher name/Contributor
         .publisherXPath(new XMLMapper<>("//ddi:codeBook/ddi:docDscr/ddi:citation/ddi:prodStmt/ddi:producer", parseLanguageContentOfElement(ParsingStrategies::publisherStrategy)))
         // Publisher
@@ -286,7 +287,7 @@ public final class XPaths {
         .keywordsXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/subject/keyword", extractMetadataObjectListForEachLang(element -> ParsingStrategies.termVocabAttributeStrategy(element, false))))
         .typeOfTimeMethodXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/method/dataColl/timeMeth", ParsingStrategies::conceptStrategy))
         .studyAreaCountriesXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/nation", extractMetadataObjectListForEachLang(ParsingStrategies::countryStrategy)))
-        .unitTypeXPath("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/anlyUnit")
+        .unitTypeXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/anlyUnit", extractMetadataObjectListForEachLang(element -> termVocabAttributeStrategy(element, true))))
         .publisherXPath(new XMLMapper<>("//ddi:codeBook/docDscr/citation/prodStmt/producer", parseLanguageContentOfElement(ParsingStrategies::publisherStrategy)))
         .distributorXPath("//ddi:codeBook/stdyDscr/citation/distStmt/distrbtr")
         .samplingXPath("//ddi:codeBook/stdyDscr/method/dataColl/sampProc")

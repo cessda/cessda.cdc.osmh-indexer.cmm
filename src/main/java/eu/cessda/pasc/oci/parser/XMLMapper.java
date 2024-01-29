@@ -46,7 +46,7 @@ public class XMLMapper<T> {
      * contains a region (i.e. de-DE) the region is stripped.
      *
      * @param element the element to parse.
-     * @return the language, or {@code null} if the {@code xml:lang} attribute was not present.
+     * @return the language, or an empty string if the {@code xml:lang} attribute was not present.
      */
     static String getLangOfElement(Element element) {
         var langAttr = DocElementParser.getLangAttribute(element);
@@ -60,14 +60,14 @@ public class XMLMapper<T> {
                 return langValue;
             }
         } else {
-            return null;
+            return "";
         }
     }
 
     static String parseConceptLanguageCode(Element element) {
 
         var lang = getLangOfElement(element);
-        if (lang == null) {
+        if (lang.isEmpty()) {
             var concept = element.getChild("concept", element.getNamespace());
             if (concept != null) {
                 lang = getLangOfElement(concept);
@@ -121,7 +121,7 @@ public class XMLMapper<T> {
      * Extracts metadata from the given list of {@link Element}s, using the given parser strategy {@link Function}.
      * <p>
      * This uses {@link DocElementParser#getLangAttribute(Element)} to extract the language of the elements. If no
-     * language information is found then the elements are added under the {@code null} key.
+     * language information is found then the elements are added under the {@code ""} key.
      *
      * @param <T>                the type returned by the parser strategy.
      * @param elementExtractor     the strategy to apply to each element.

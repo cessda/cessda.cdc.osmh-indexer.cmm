@@ -119,11 +119,19 @@ public class CMMStudyMapper {
      * @param mergeOperator      the operation to run on merge conflicts
      */
     private <T> Map<String, T> mapNullLanguage(Map<String, T> langMap, String defaultLangIsoCode, BinaryOperator<T> mergeOperator) {
-        var nullLanguageContent = langMap.remove(null);
-        if (nullLanguageContent != null && oaiPmh.metadataParsingDefaultLang().active()) {
-            langMap.merge(defaultLangIsoCode, nullLanguageContent, mergeOperator);
+        var hasEmptyLangContent = langMap.containsKey("");
+        if (hasEmptyLangContent && oaiPmh.metadataParsingDefaultLang().active()) {
+            // Create a new map to store the result in
+            var newMap = new HashMap<>(langMap);
+
+            // Extract the empty value and merge with the default language value
+            var emptyLangContentValue = newMap.remove("");
+            newMap.merge(defaultLangIsoCode, emptyLangContentValue, mergeOperator);
+
+            return newMap;
+        } else {
+            return langMap;
         }
-        return langMap;
     }
 
     /**
@@ -212,9 +220,8 @@ public class CMMStudyMapper {
      * Xpath = {@link XPaths#getUnitTypeXPath()}
      */
     Map<String, List<TermVocabAttributes>> parseUnitTypes(Document document, XPaths xPaths, String defaultLangIsoCode) {
-        return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, document, xPaths.getUnitTypeXPath(), element -> termVocabAttributeStrategy(element, true), xPaths.getNamespace()
-        );
+        var unmappedXPaths = xPaths.getUnitTypeXPath().resolve(document, xPaths.getNamespace());
+        return mapNullLanguage(unmappedXPaths, defaultLangIsoCode, CMMStudyMapper::mergeLists);
     }
 
     /**

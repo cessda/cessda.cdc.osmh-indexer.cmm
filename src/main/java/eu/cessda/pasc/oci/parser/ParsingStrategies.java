@@ -704,4 +704,13 @@ class ParsingStrategies{
 
         return map;
     }
+
+    @NonNull
+    static Map<String, List<TermVocabAttributes>> analysisUnitStrategy(List<Element> elementList) {
+        var termList = new ArrayList<TermVocabAttributes>(elementList.size());
+        for (var element : elementList) {
+            termVocabAttributeLifecycleStrategy(element).ifPresent(termList::add);
+        }
+        return Map.of("", termList);
+    }
 }

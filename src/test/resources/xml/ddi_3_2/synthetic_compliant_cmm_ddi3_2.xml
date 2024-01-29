@@ -254,6 +254,7 @@
                 </r:ReferenceDate>
             </r:TemporalCoverage>
         </r:Coverage>
+        <r:AnalysisUnit codeListAgencyName="DDI Alliance" codeListName="AnalysisUnit" codeListURN="urn:ddi:int.ddi.cv:AnalysisUnit:2.1.3">Individual</r:AnalysisUnit>
         <r:OtherMaterial>
             <r:Agency>de.gesis</r:Agency>
             <r:ID>ZA0004_Mat4</r:ID>
