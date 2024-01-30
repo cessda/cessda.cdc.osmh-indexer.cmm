@@ -13,15 +13,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 - *Fixed (for any bug fixes)*
 - *Security (in case of vulnerabilities)*
 
-## [3.4.1] - 2023-09-26
+## [3.5.0] - 2023-01-30
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10580661.svg)](https://doi.org/10.5281/zenodo.10580661)
 
 ### Added
 
 - Parse `dataAccessUrl` from `useStmt`/`specPerm` ([#606](https://github.com/cessda/cessda.cdc.versions/issues/606))
+- Added XPaths for DDI 3.x documents ([#622](https://github.com/cessda/cessda.cdc.versions/issues/622))
+- Implemented basic parsing of DDI 3.x documents ([#625](https://github.com/cessda/cessda.cdc.versions/issues/625))
 
 ### Changed
 
-- Edit mappings to normalise the classifications and keywords fields ([#609](https://github.com/cessda/cessda.cdc.versions/issues/609))
+- Edited mappings to normalise the classifications and keywords fields ([#609](https://github.com/cessda/cessda.cdc.versions/issues/609))
 
 ## [3.4.0] - 2023-08-29
 
@@ -248,7 +252,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 - verify SSL
 - removed the option to disable HTTPS verification
 
-[3.4.1]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/3.4.1
+[3.5.0]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/3.5.0
 [3.4.0]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/3.4.0
 [3.2.1]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/3.2.1
 [3.2.0]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/3.2.0
