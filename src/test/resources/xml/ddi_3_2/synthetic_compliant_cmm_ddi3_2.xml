@@ -192,6 +192,10 @@
                 <r:String xml:lang="de">International Outlooks of Political Leaders (USA)</r:String>
             </r:Title>
             <r:Creator>
+                <r:CreatorName affiliation="GESIS">
+                    <r:String xml:lang="en">Institute for International Social Research, Princeton, N.J.</r:String>
+                    <r:String xml:lang="de">Creator de</r:String>
+                </r:CreatorName>
                 <r:CreatorReference>
                     <r:Agency>de.gesis</r:Agency>
                     <r:ID>ZA0004_Org_Cre1</r:ID>

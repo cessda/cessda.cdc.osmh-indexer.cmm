@@ -47,10 +47,10 @@
   },
   "creators": {
     "en": [
-      "GESIS - Leibniz Institute for the Social Sciences (GESIS)"
+      "Institute for International Social Research, Princeton, N.J. (GESIS)"
     ],
     "de": [
-      "GESIS - Leibniz Institut für Sozialwissenschaften (GESIS)"
+      "Creator de (GESIS)"
     ]
   },
   "dataAccessFreeTexts": {
@@ -95,7 +95,7 @@
       "publisher": "GESIS - Leibniz Institute for the Social Sciences"
     },
     "de": {
-      "abbr": "Publisher not specified",
+      "abbr": "",
       "publisher": "GESIS - Leibniz Institut für Sozialwissenschaften"
     }
   },

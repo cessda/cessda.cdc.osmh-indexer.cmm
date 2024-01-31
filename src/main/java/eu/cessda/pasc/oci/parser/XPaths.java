@@ -102,8 +102,8 @@ public final class XPaths {
         //.pidStudyXPath("//ddi:DDIInstance/s:StudyUnit/r:UserID")
         // Study number/PID
         .pidStudyXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:InternationalIdentifier", extractMetadataObjectListForEachLang(ParsingStrategies::pidLifecycleStrategy)))
-        // Creator/PI - TODO: resolve reference in StudyUnit
-        .creatorsXPath(new XMLMapper<>("//ddi:DDIInstance/r:Citation/r:Creator/r:CreatorName", ParsingStrategies::creatorsLifecycleStrategy))
+        // Creator/PI
+        .creatorsXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:Creator", ParsingStrategies::creatorsStrategy))
         // Terms of data access
         .dataRestrctnXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/a:Archive/a:ArchiveSpecific/a:Item/a:Access/r:Description/r:Content", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy)))
         // Data collection period

@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 import static eu.cessda.pasc.oci.parser.DocElementParser.getAttributeValue;
 import static eu.cessda.pasc.oci.parser.OaiPmhConstants.*;
 import static eu.cessda.pasc.oci.parser.XMLMapper.getLangOfElement;
+import static eu.cessda.pasc.oci.parser.XMLMapper.resolveReference;
 import static java.util.Optional.ofNullable;
 
 /**
@@ -450,35 +451,28 @@ class ParsingStrategies{
     }
 
     @NonNull
-    static HashMap<String, List<String>> creatorsLifecycleStrategy(List<Element> elements) {
-        var creatorsMap = new HashMap<String, List<String>>();
+    static HashMap<String, String> creatorsLifecycleStrategy(Element element) {
+        var creatorsMap = new HashMap<String, String>();
 
-        for (var element : elements) {
-
-            // Attempt to parse the affiliation attribute
-            String affiliation = null;
-            for (var attr : element.getAttributes()) {
-                if (attr.getName().equals("affiliation")) {
-                    affiliation = attr.getValue();
-                }
+        // Attempt to parse the affiliation attribute
+        String affiliation = null;
+        for (var attr : element.getAttributes()) {
+            if (attr.getName().equals("affiliation")) {
+                affiliation = attr.getValue();
             }
+        }
 
-            for (var child : element.getChildren()) {
-                if (!child.getName().equals(STRING)) {
-                    continue;
+        for (var child : element.getChildren(STRING, null)) {
+            // Extract the creator name and language
+            var creator = child.getTextTrim();
+            var lang = getLangOfElement(child);
+
+            if (creator != null) {
+                if (affiliation != null) {
+                    creator += " (" + affiliation + ")";
                 }
 
-                // Extract the creator name and language
-                var creator = child.getTextTrim();
-                var lang = getLangOfElement(child);
-
-                if (creator != null) {
-                    if (affiliation != null) {
-                        creator += " (" + affiliation + ")";
-                    }
-
-                    creatorsMap.computeIfAbsent(lang, k -> new ArrayList<>()).add(creator);
-                }
+                creatorsMap.put(lang, creator);
             }
         }
 
@@ -624,7 +618,7 @@ class ParsingStrategies{
         // Merge name and abbreviation maps
         var publisherMap = new HashMap<String, Publisher>();
         Stream.concat(nameMap.keySet().stream(), abbrMap.keySet().stream()).distinct().forEach(key ->
-            publisherMap.put(key, new Publisher(abbrMap.getOrDefault(key, PUBLISHER_NOT_AVAIL), nameMap.getOrDefault(key, "")))
+            publisherMap.put(key, new Publisher(abbrMap.getOrDefault(key, ""), nameMap.getOrDefault(key, "")))
         );
 
         return publisherMap;
@@ -712,5 +706,42 @@ class ParsingStrategies{
             termVocabAttributeLifecycleStrategy(element).ifPresent(termList::add);
         }
         return Map.of("", termList);
+    }
+
+    @NonNull
+    static HashMap<String, List<String>> creatorsStrategy(List<Element> creatorElements) {
+        var creatorsMap = new HashMap<String, List<String>>();
+
+        for (var element : creatorElements) {
+
+            var creatorNameElement = element.getChild("CreatorName", null);
+            var creatorReferenceElement = element.getChild("CreatorReference", null);
+
+            if (creatorNameElement != null) {
+                creatorsLifecycleStrategy(creatorNameElement).forEach((lang, creator) ->
+                    creatorsMap.computeIfAbsent(lang, l -> new ArrayList<>()).add(creator)
+                );
+            } else if (creatorReferenceElement != null) {
+                var referencedElement = resolveReference(creatorReferenceElement);
+                var publisherMapOpt = referencedElement.flatMap(r -> switch (r.type()) {
+                    case "Individual" -> Optional.of(individualStrategy(r.element()));
+                    case "Organization" -> Optional.of(organizationStrategy(r.element()));
+                    default -> Optional.empty();
+                });
+
+                publisherMapOpt.ifPresent(m -> m.forEach((key, v) -> {
+                    String name;
+                    if (v.abbreviation().isEmpty()) {
+                        name = v.name();
+                    } else {
+                        name = v.name() + " (" + v.abbreviation() + ")";
+                    }
+
+                    creatorsMap.computeIfAbsent(key, k -> new ArrayList<>()).add(name);
+                }));
+            }
+        }
+
+        return creatorsMap;
     }
 }
