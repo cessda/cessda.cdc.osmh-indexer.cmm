@@ -65,12 +65,13 @@ public final class XPaths {
     private final XMLMapper<Map<String, List<Country>>> studyAreaCountriesXPath;
     private final XMLMapper<Map<String, List<TermVocabAttributes>>> unitTypeXPath;
     private final XMLMapper<Map<String, Publisher>> publisherXPath;
+    @Nullable
     private final String distributorXPath;
     @Nullable
     private final String fileTxtLanguagesXPath;
     @Nullable
     private final String filenameLanguagesXPath;
-    private final String samplingXPath;
+    private final XMLMapper<Map<String, List<TermVocabAttributes>>> samplingXPath;
     private final String typeOfModeOfCollectionXPath;
     private final String relatedPublicationsXPath;
     @Nullable
@@ -157,7 +158,7 @@ public final class XPaths {
         // Language-specific name of file
         .filenameLanguagesXPath("//ddi:DDIInstance/g:ResourcePackage/pi:PhysicalInstance/r:Citation/r:Title/r:String")
         // Sampling procedure
-        .samplingXPath("//ddi:DDIInstance/s:StudyUnit/d:DataCollection/d:Methodology/d:SamplingProcedure/r:Description/r:Content")
+        .samplingXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/d:DataCollection/d:Methodology/d:SamplingProcedure", ParsingStrategies::samplingProceduresLifecycleStrategy))
         // Data collection mode
         .typeOfModeOfCollectionXPath("//ddi:DDIInstance/s:StudyUnit/d:DataCollection/d:CollectionEvent/d:ModeOfCollection/r:Description/r:Content")
         // PID of Related publication
@@ -223,11 +224,11 @@ public final class XPaths {
         // Keywords
         .keywordsXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:subject/ddi:keyword", extractMetadataObjectListForEachLang(element -> ParsingStrategies.termVocabAttributeStrategy(element, false))))
         // Time dimension
-        .typeOfTimeMethodXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:timeMeth", ParsingStrategies::conceptStrategy))
+        .typeOfTimeMethodXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:timeMeth", elementList -> ParsingStrategies.conceptStrategy(elementList, e -> ParsingStrategies.termVocabAttributeStrategy(e, true))))
         // Country
         .studyAreaCountriesXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:nation", extractMetadataObjectListForEachLang(ParsingStrategies::countryStrategy)))
         // Analysis unit
-        .unitTypeXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:anlyUnit", ParsingStrategies::conceptStrategy))
+        .unitTypeXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:anlyUnit", elementList -> ParsingStrategies.conceptStrategy(elementList, ParsingStrategies::samplingTermVocabAttributeStrategy)))
         // Publisher name/Contributor
         .publisherXPath(new XMLMapper<>("//ddi:codeBook/ddi:docDscr/ddi:citation/ddi:prodStmt/ddi:producer", parseLanguageContentOfElement(ParsingStrategies::publisherStrategy)))
         // Publisher
@@ -237,7 +238,7 @@ public final class XPaths {
         // Language-specific name of file
         .filenameLanguagesXPath("//ddi:codeBook/ddi:fileDscr/ddi:fileTxt/ddi:fileName/@xml:lang")
         // Sampling procedure
-        .samplingXPath("//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:sampProc")
+        .samplingXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:sampProc", elementList -> ParsingStrategies.conceptStrategy(elementList, ParsingStrategies::samplingTermVocabAttributeStrategy)))
         // Data collection mode
         .typeOfModeOfCollectionXPath("//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:collMode")
         // Related publication
@@ -283,12 +284,12 @@ public final class XPaths {
         .dataCollectionPeriodsXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/collDate", ParsingStrategies::dataCollectionPeriodsStrategy))
         .classificationsXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/subject/topcClas", extractMetadataObjectListForEachLang(element -> ParsingStrategies.termVocabAttributeStrategy(element, false))))
         .keywordsXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/subject/keyword", extractMetadataObjectListForEachLang(element -> ParsingStrategies.termVocabAttributeStrategy(element, false))))
-        .typeOfTimeMethodXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/method/dataColl/timeMeth", ParsingStrategies::conceptStrategy))
+        .typeOfTimeMethodXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/method/dataColl/timeMeth", elementList -> ParsingStrategies.conceptStrategy(elementList, e -> ParsingStrategies.termVocabAttributeStrategy(e, true))))
         .studyAreaCountriesXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/nation", extractMetadataObjectListForEachLang(ParsingStrategies::countryStrategy)))
         .unitTypeXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/anlyUnit", extractMetadataObjectListForEachLang(element -> termVocabAttributeStrategy(element, true))))
         .publisherXPath(new XMLMapper<>("//ddi:codeBook/docDscr/citation/prodStmt/producer", parseLanguageContentOfElement(ParsingStrategies::publisherStrategy)))
         .distributorXPath("//ddi:codeBook/stdyDscr/citation/distStmt/distrbtr")
-        .samplingXPath("//ddi:codeBook/stdyDscr/method/dataColl/sampProc")
+        .samplingXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/method/dataColl/sampProc", elementList -> ParsingStrategies.conceptStrategy(elementList, ParsingStrategies::samplingTermVocabAttributeStrategy)))
         .typeOfModeOfCollectionXPath("//ddi:codeBook/stdyDscr/method/dataColl/collMode")
         .relatedPublicationsXPath("//ddi:codeBook/stdyDscr/othrStdyMat/relPubl")
         .universeXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/universe", extractMetadataObjectListForEachLang(ParsingStrategies::universeStrategy)))

@@ -28,12 +28,12 @@ import javax.annotation.Nullable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static eu.cessda.pasc.oci.parser.DocElementParser.getAttributeValue;
 import static eu.cessda.pasc.oci.parser.OaiPmhConstants.*;
-import static eu.cessda.pasc.oci.parser.XMLMapper.getLangOfElement;
-import static eu.cessda.pasc.oci.parser.XMLMapper.resolveReference;
+import static eu.cessda.pasc.oci.parser.XMLMapper.*;
 import static java.util.Optional.ofNullable;
 
 /**
@@ -219,16 +219,21 @@ class ParsingStrategies{
         }
     }
 
-    static Optional<VocabAttributes> samplingTermVocabAttributeStrategy(Element element) {
+    static Optional<TermVocabAttributes> samplingTermVocabAttributeStrategy(Element element) {
+        var term = element.getTextTrim();
+
         //PUG req. only process if element has a <concept>
         var conceptVal = element.getChild(CONCEPT_EL, element.getNamespace());
         if (conceptVal != null) {
-            var vocabAttributes = new VocabAttributes(
+            var vocabAttributes = new TermVocabAttributes(
                 getAttributeValue(conceptVal, VOCAB_ATTR).orElse(""),
                 getAttributeValue(conceptVal, VOCAB_URI_ATTR).orElse(""),
-                conceptVal.getText()
+                conceptVal.getText(),
+                term
             );
             return Optional.of(vocabAttributes);
+        } else if (!term.isEmpty()) {
+            return Optional.of(new TermVocabAttributes("", "", "", term));
         } else {
             return Optional.empty();
         }
@@ -568,11 +573,11 @@ class ParsingStrategies{
     }
 
     @NonNull
-    static HashMap<String, List<TermVocabAttributes>> conceptStrategy(List<Element> elementList) {
+    static HashMap<String, List<TermVocabAttributes>> conceptStrategy(List<Element> elementList, Function<Element, Optional<TermVocabAttributes>> mappingFunction) {
         var map = new HashMap<String, List<TermVocabAttributes>>();
 
         for (var element : elementList) {
-            termVocabAttributeStrategy(element, true).ifPresent(mappedElement ->
+            mappingFunction.apply(element).ifPresent(mappedElement ->
                 map.computeIfAbsent(XMLMapper.parseConceptLanguageCode(element), k -> new ArrayList<>()).add(mappedElement)
             );
         }
@@ -682,7 +687,7 @@ class ParsingStrategies{
             // Use the full name if present
             var fullName = name.getChild("FullName", null);
             if (fullName != null) {
-                var string = fullName.getChild("String", null);
+                var string = fullName.getChild(STRING, null);
                 if (string != null) {
                     var lang = getLangOfElement(string);
                     var publisher = new Publisher("", string.getTextTrim());
@@ -743,5 +748,50 @@ class ParsingStrategies{
         }
 
         return creatorsMap;
+    }
+
+    @NonNull
+    static HashMap<String, List<TermVocabAttributes>> samplingProceduresLifecycleStrategy(List<Element> elementList) {
+        var mergedMap = new HashMap<String, List<TermVocabAttributes>>();
+
+        for (var element : elementList) {
+            Optional<TermVocabAttributes> termVocabAttributes = Optional.empty();
+            Map<String, List<String>> langMap = Collections.emptyMap();
+
+            for (var child : element.getChildren()) {
+                String childName = child.getName();
+                if (childName.equals("Description")) {
+                    // Extract text
+                    var contentElements = child.getChildren();
+                    langMap = extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy).apply(contentElements);
+                } else if (childName.equals("TypeOfSamplingProcedure")) {
+                    // Extract controlled vocabulary information
+                    termVocabAttributes = termVocabAttributeLifecycleStrategy(child);
+                }
+            }
+
+            // Merge CV information with descriptions
+            for (var entry : langMap.entrySet()) {
+                var vocabAttributesList = new ArrayList<TermVocabAttributes>();
+
+                for (var term : entry.getValue()) {
+                    if (termVocabAttributes.isPresent()) {
+                        var vocabAttributes = termVocabAttributes.get();
+                        vocabAttributesList.add(new TermVocabAttributes(vocabAttributes.vocab(), vocabAttributes.vocabUri(), vocabAttributes.id(), term));
+                    } else {
+                        vocabAttributesList.add(new TermVocabAttributes("", "", "", term));
+                    }
+                }
+
+                mergedMap.merge(entry.getKey(), vocabAttributesList, (a, b) -> { a.addAll(b); return a; });
+            }
+
+            // If no descriptions are present, derive the text from the TypeOfSamplingProcedure element
+            if (langMap.isEmpty() && termVocabAttributes.isPresent()) {
+                mergedMap.computeIfAbsent("", k -> new ArrayList<>()).add(termVocabAttributes.get());
+            }
+        }
+
+        return mergedMap;
     }
 }

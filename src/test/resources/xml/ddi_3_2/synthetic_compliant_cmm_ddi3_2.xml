@@ -326,6 +326,7 @@
                     <r:Agency>de.gesis</r:Agency>
                     <r:ID>ZA0004_SamPro</r:ID>
                     <r:Version>1.0.0</r:Version>
+                    <d:TypeOfSamplingProcedure codeListAgencyName="DDI Alliance" codeListURN="urn:ddi:int.ddi.cv:SamplingProcedure:1.1.4">Quota sample</d:TypeOfSamplingProcedure>
                     <r:Description>
                         <r:Content xml:lang="en">Quota sample</r:Content>
                         <r:Content xml:lang="de">Quotenauswahl</r:Content>

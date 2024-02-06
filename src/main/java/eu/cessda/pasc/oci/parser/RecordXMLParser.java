@@ -23,6 +23,9 @@ import eu.cessda.pasc.oci.models.Record;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.Request;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
+import eu.cessda.pasc.oci.models.cmmstudy.TermVocabAttributes;
+import eu.cessda.pasc.oci.models.cmmstudy.VocabAttributes;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -37,9 +40,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.io.Files.getNameWithoutExtension;
@@ -161,12 +162,12 @@ public class RecordXMLParser {
             } catch (URISyntaxException e) {
                 log.warn("{}: {}: {} could not be parsed as a URL: {}", repo.code(), path, elem.getText(), e.toString());
             }
-            
+
             // Find all records, iterate through them
             var elements = DocElementParser.getElements(document, OaiPmhConstants.RECORD_ELEMENT, OaiPmhConstants.OAI_NS);
 
             var recordList = new ArrayList<Record>();
-            
+
             for (var recordElement : elements) {
                 var headerElement = recordElement.getChild("header", OaiPmhConstants.OAI_NS);
                 var header = parseRecordHeader(headerElement);
@@ -181,7 +182,7 @@ public class RecordXMLParser {
                 }
                 recordList.add(new Record(header, metadataDocument));
             }
-            
+
             return new Request(baseURL, recordList);
         } else {
             // OAI response not at the root of the document, create a synthetic request
@@ -264,8 +265,10 @@ public class RecordXMLParser {
             builder.publisher(cmmStudyMapper.parsePublisher(metadata, xPaths, defaultLangIsoCode));
             cmmStudyMapper.parseYrOfPublication(metadata, xPaths).ifPresent(builder::publicationYear);
             builder.fileLanguages(cmmStudyMapper.parseFileLanguages(metadata, xPaths));
-            builder.typeOfSamplingProcedures(cmmStudyMapper.parseTypeOfSamplingProcedure(metadata, xPaths, defaultLangIsoCode));
-            builder.samplingProcedureFreeTexts(cmmStudyMapper.parseSamplingProcedureFreeTexts(metadata, xPaths, defaultLangIsoCode));
+            var samplingProcedures = cmmStudyMapper.parseTypeOfSamplingProcedure(metadata, xPaths, defaultLangIsoCode);
+            var result = extractSamplingProcedures(samplingProcedures);
+            builder.typeOfSamplingProcedures(result.vocabAttributes());
+            builder.samplingProcedureFreeTexts(result.terms());
             builder.typeOfModeOfCollections(cmmStudyMapper.parseTypeOfModeOfCollection(metadata, xPaths, defaultLangIsoCode));
 
             var dataCollectionPeriodResults = cmmStudyMapper.parseDataCollectionDates(metadata, xPaths, defaultLangIsoCode);
@@ -306,5 +309,43 @@ public class RecordXMLParser {
         }
 
         return builder.build();
+    }
+
+    @NonNull
+    private static SamplingProcedures extractSamplingProcedures(Map<String, List<TermVocabAttributes>> samplingProcedures) {
+        var vocab = new HashMap<String, List<VocabAttributes>>();
+        var sampTerm = new HashMap<String, List<String>>();
+
+        samplingProcedures.forEach((lang, termVocabAttributesList) -> {
+            // Create separate lists
+            var va = new ArrayList<VocabAttributes>(termVocabAttributesList.size());
+            var ft = new ArrayList<String>(termVocabAttributesList.size());
+
+            // Copy content to the lists
+            for (var vocAttr : termVocabAttributesList) {
+                if (!vocAttr.id().isEmpty()) {
+                    va.add(new VocabAttributes(vocAttr.vocab(), vocAttr.vocabUri(), vocAttr.id()));
+                }
+                if (!vocAttr.term().isEmpty()) {
+                    ft.add(vocAttr.term());
+                }
+            }
+
+            // Put the lists with the separated content in the maps
+            if (!va.isEmpty()) {
+                vocab.put(lang, va);
+            }
+            if (!ft.isEmpty()) {
+                sampTerm.put(lang, ft);
+            }
+        });
+
+        return new SamplingProcedures(vocab, sampTerm);
+    }
+
+    private record SamplingProcedures(
+        Map<String, List<VocabAttributes>> vocabAttributes,
+        Map<String, List<String>> terms
+    ) {
     }
 }

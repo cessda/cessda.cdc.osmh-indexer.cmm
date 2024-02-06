@@ -229,10 +229,9 @@ public class CMMStudyMapper {
      * <p>
      * Xpath = {@link XPaths#getSamplingXPath()}
      */
-    Map<String, List<VocabAttributes>> parseTypeOfSamplingProcedure(Document doc, XPaths xPaths, String defaultLangIsoCode) {
-        return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, doc, xPaths.getSamplingXPath(), ParsingStrategies::samplingTermVocabAttributeStrategy, xPaths.getNamespace()
-        );
+    Map<String, List<TermVocabAttributes>> parseTypeOfSamplingProcedure(Document doc, XPaths xPaths, String defaultLangIsoCode) {
+        var unmappedXPaths = xPaths.getSamplingXPath().resolve(doc, xPaths.getNamespace());
+        return mapNullLanguage(unmappedXPaths, defaultLangIsoCode, CMMStudyMapper::mergeLists);
     }
 
     /**
@@ -327,17 +326,6 @@ public class CMMStudyMapper {
         }
 
         return new ParseResults<>(studyURLs, parsingExceptions);
-    }
-
-    /**
-     * Parses Sampling Procedure(s) from:
-     * <p>
-     * Xpath = {@link XPaths#getSamplingXPath()}
-     */
-    Map<String, List<String>> parseSamplingProcedureFreeTexts(Document doc, XPaths xPaths, String defaultLangIsoCode) {
-        return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, doc, xPaths.getSamplingXPath(), ParsingStrategies::nullableElementValueStrategy, xPaths.getNamespace()
-        );
     }
 
     /**
