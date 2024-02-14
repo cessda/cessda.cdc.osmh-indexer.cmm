@@ -125,17 +125,17 @@ public class RecordXMLParser {
 
         var cmmStudies = new ArrayList<CMMStudy>();
 
-        for (var record : request.records()) {
+        for (var recordObj : request.records()) {
             // Short-Circuit. We carry on to parse beyond the headers only if the record is active.
-            if ((record.recordHeader() != null && record.recordHeader().deleted())) {
+            if ((recordObj.recordHeader() != null && recordObj.recordHeader().deleted())) {
                 // Marked as deleted, don't store
                 continue;
             }
             try {
-                var cmmStudy = mapDDIRecordToCMMStudy(repo, request, record, path);
+                var cmmStudy = mapDDIRecordToCMMStudy(repo, request, recordObj, path);
                 cmmStudies.add(cmmStudy);
             } catch (UnsupportedXMLNamespaceException e) {
-                var recordIdentifier = record.recordHeader() != null ? record.recordHeader().identifier() : null;
+                var recordIdentifier = recordObj.recordHeader() != null ? recordObj.recordHeader().identifier() : null;
                 logUnsupportedNamespace(repo.code(), recordIdentifier, e);
             }
         }
@@ -200,20 +200,20 @@ public class RecordXMLParser {
      *
      * @param repository the source repository.
      * @param request the request element from the OAI-PMH response.
-     * @param record   the {@link Record} to convert.
+     * @param recordObj   the {@link Record} to convert.
      * @param path the path of the source XML.
      */
-    @SuppressWarnings("UnstableApiUsage")
-    private CMMStudy mapDDIRecordToCMMStudy(Repo repository, Request request, Record record, Path path) {
+    @SuppressWarnings({"java:S3776", "UnstableApiUsage"})
+    private CMMStudy mapDDIRecordToCMMStudy(Repo repository, Request request, Record recordObj, Path path) {
 
         CMMStudy.CMMStudyBuilder builder = CMMStudy.builder();
 
         String studyNumber;
         String lastModified;
-        if (record.recordHeader() != null) {
+        if (recordObj.recordHeader() != null) {
             // A header was present, extract values
-            studyNumber = record.recordHeader().identifier();
-            lastModified = record.recordHeader().lastModified();
+            studyNumber = recordObj.recordHeader().identifier();
+            lastModified = recordObj.recordHeader().lastModified();
         } else {
             // Derive the study number from the file name
             studyNumber = getNameWithoutExtension(path.toString());
@@ -230,7 +230,7 @@ public class RecordXMLParser {
         builder.lastModified(lastModified);
 
         // Check if metadata is present, parse if it is
-        var metadata = record.metadata();
+        var metadata = recordObj.metadata();
         if (metadata != null) {
             // Get the XPaths required for the metadata
             var xPaths = XPaths.getXPaths(metadata.getRootElement().getNamespace());

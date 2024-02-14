@@ -218,6 +218,7 @@ class XMLMapper<T> {
      * @param element the reference to resolve.
      * @return the resolved Element, or an empty Optional if the reference cannot be resolved.
      */
+    @SuppressWarnings({"java:S131", "java:S3776"}) // Extracting parts of the method will increase complexity
     static Optional<ResolvedReference> resolveReference(Element element) {
         String urn = null;
 

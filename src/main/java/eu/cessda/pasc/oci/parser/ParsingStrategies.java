@@ -41,6 +41,9 @@ import static java.util.Optional.ofNullable;
  */
 class ParsingStrategies{
 
+    private ParsingStrategies() {
+    }
+
     // Metadata handling
     private static final String EMPTY_EL = "empty";
     private static final String PUBLISHER_NOT_AVAIL = "Publisher not specified";
@@ -85,6 +88,7 @@ class ParsingStrategies{
      * @param element the {@link Element} to parse.
      * @return an Optional {@link Pid}.
      */
+    @SuppressWarnings("java:S131")
     static Optional<Pid> pidLifecycleStrategy(Element element) {
         String agency = null;
         String identifier = null;
@@ -187,6 +191,7 @@ class ParsingStrategies{
     }
 
     @NonNull
+    @SuppressWarnings("java:S131")
     static Optional<TermVocabAttributes> termVocabAttributeLifecycleStrategy(Element element) {
         String vocab = "";
         String vocabUri = "";
@@ -511,6 +516,7 @@ class ParsingStrategies{
     }
 
     @NonNull
+    @SuppressWarnings("java:S131")
     static CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateNotParsedException>> dataCollectionPeriodsLifecycleStrategy(Element dataCollectionDate) {
         String startDate = null;
         String endDate = null;
@@ -569,6 +575,7 @@ class ParsingStrategies{
     }
 
     @NonNull
+    @SuppressWarnings("java:S131")
     static Map<String, Publisher> organizationStrategy(Element element) {
         var identification = element.getChild("OrganizationIdentification", null);
         if (identification == null) {
@@ -612,6 +619,7 @@ class ParsingStrategies{
         return Collections.unmodifiableMap(publisherMap);
     }
 
+    @SuppressWarnings({"java:S131", "java:S3776"})
     static Map<String, Country> geographicReferenceStrategy(Element geographicReference) {
         var countryMap = new HashMap<String, Country>();
 
@@ -749,6 +757,7 @@ class ParsingStrategies{
     }
 
     @NonNull
+    @SuppressWarnings({"java:S3776", "ExtractMethodRecommender"})
     private static Map<String, List<TermVocabAttributes>> controlledVocabularyStrategy(List<Element> elementList, String controlledVocabularyElement) {
         var mergedMap = new HashMap<String, List<TermVocabAttributes>>();
 
@@ -796,6 +805,7 @@ class ParsingStrategies{
     }
 
     @NonNull
+    @SuppressWarnings("java:S3776")
     static Map<String, List<RelatedPublication>> relatedPublicationLifecycleStrategy(List<Element> elementList) {
         var relPubLMap = new HashMap<String, List<RelatedPublication>>();
 

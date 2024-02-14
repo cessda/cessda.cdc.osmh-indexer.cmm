@@ -288,6 +288,7 @@ public class CMMStudyMapper {
      * Xpath = {@link XPaths#getStudyURLDocDscrXPath()}
      * Xpath = {@link XPaths#getStudyURLStudyDscrXPath()}
      */
+    @SuppressWarnings("java:S3776") // Extracting parts of the method will increase complexity
     ParseResults<Map<String, URI>, List<URISyntaxException>> parseStudyUrl(Document document, XPaths xPaths, String langCode) {
 
         var studyURLs = new HashMap<String, URI>();
