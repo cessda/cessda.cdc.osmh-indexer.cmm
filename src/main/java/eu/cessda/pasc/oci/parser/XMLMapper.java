@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2023 CESSDA ERIC (support@cessda.eu)
+ * Copyright © 2017-2024 CESSDA ERIC (support@cessda.eu)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package eu.cessda.pasc.oci.parser;
 
 import lombok.NonNull;
+import org.jdom2.Attribute;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.filter.Filters;
@@ -26,16 +27,61 @@ import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 
-public class XMLMapper<T> {
+import static eu.cessda.pasc.oci.parser.OaiPmhConstants.LANG_ATTR;
+import static org.jdom2.Namespace.XML_NAMESPACE;
+
+class XMLMapper<T> {
     private final String xPath;
     private final Function<List<Element>, T> mappingFunction;
 
-    XMLMapper(String xpath, Function<List<Element>, T> mappingFunction) {
-        this.xPath = xpath;
+    XMLMapper(String xPath, Function<List<Element>, T> mappingFunction) {
+        this.xPath = xPath;
         this.mappingFunction = mappingFunction;
     }
 
-    public T resolve(Object context, Namespace... namespace) {
+    @NonNull
+    static Set<String> getLanguagesOfElements(List<Element> elementList) {
+        var langauges = new HashSet<String>();
+        for (Element element : elementList) {
+            var lang = getLangOfElement(element);
+            langauges.add(lang);
+        }
+        return langauges;
+    }
+
+    @NonNull
+    static Set<String> getLanguageFromElements(List<Element> elementList) {
+        var languages = new HashSet<String>();
+        for (var e : elementList) {
+            var lang = e.getTextTrim();
+            languages.add(lang);
+        }
+        return languages;
+    }
+
+    /**
+     * Attempt to find the {@code xml:lang} attribute in the given element.
+     * @param element the element to parse.
+     * @return the attribute, or {@code null} if the attribute cannot be found.
+     */
+    private static Attribute getLangAttribute(Element element) {
+        var langAttr = element.getAttribute(LANG_ATTR, XML_NAMESPACE);
+        if (langAttr != null) {
+            return langAttr;
+        } else {
+            // Try to parse older DDI styles of the language
+            return element.getAttribute("xml-lang");
+        }
+    }
+
+    /**
+     * Resolves the given context object to an instance of T.
+     *
+     * @param context a XPath context to pass to {@link XPathExpression#evaluate(Object)}.
+     * @param namespace the XML namespaces to allow resolution of prefixes.
+     * @return an instance of {@link T}.
+     */
+    T resolve(Object context, Namespace... namespace) {
         XPathExpression<Element> expression = XPathFactory.instance().compile(xPath, Filters.element(), null, namespace);
         var result = expression.evaluate(context);
         return mappingFunction.apply(result);
@@ -49,7 +95,7 @@ public class XMLMapper<T> {
      * @return the language, or an empty string if the {@code xml:lang} attribute was not present.
      */
     static String getLangOfElement(Element element) {
-        var langAttr = DocElementParser.getLangAttribute(element);
+        var langAttr = getLangAttribute(element);
         if (langAttr != null) {
             // If a language-region tag is present, i.e. en-GB, only keep the first part
             var langValue = langAttr.getValue();
@@ -64,6 +110,16 @@ public class XMLMapper<T> {
         }
     }
 
+    /**
+     * Extract the language code of the given element or child {@code concept} elements
+     * if the parent element doesn't have a language code.
+     * <p>
+     * The language code is extracted from the {@code xml:lang} attribute using the
+     * semantics of {@link XMLMapper#getLangOfElement(Element)}.
+     *
+     * @param element the element to extract
+     * @return the language, or an empty string if the {@code xml:lang} attribute was not present.
+     */
     static String parseConceptLanguageCode(Element element) {
 
         var lang = getLangOfElement(element);
@@ -77,11 +133,33 @@ public class XMLMapper<T> {
         return lang;
     }
 
+    /**
+     * Returns a function that will extract language specific content from an {@link Element} list.
+     * <p>
+     * The language code is extracted from the {@code xml:lang} attribute using the
+     * semantics of {@link XMLMapper#getLangOfElement(Element)}.
+     * <p>
+     * If conflicts are found (i.e. multiple elements have content with the same {@code xml:lang},
+     * the last encountered element will be returned.
+     *
+     * @param mappingFunction the function to map an element to {@link T}.
+     * @param <T> the resulting type.
+     */
     @NonNull
     static <T> Function<List<Element>, Map<String, T>> parseLanguageContentOfElement(Function<Element, T> mappingFunction) {
         return parseLanguageContentOfElement(mappingFunction, (a, b) -> b);
     }
 
+    /**
+     * Returns a function that will extract language specific content from an {@link Element} list.
+     * <p>
+     * The language code is extracted from the {@code xml:lang} attribute using the
+     * semantics of {@link XMLMapper#getLangOfElement(Element)}.
+     *
+     * @param mappingFunction the function to map an element to {@link T}.
+     * @param mergeFunction the function to merge language specific content in case of conflicts.
+     * @param <T> the resulting type.
+     */
     @NonNull
     static <T> Function<List<Element>, Map<String, T>> parseLanguageContentOfElement(Function<Element, T> mappingFunction, BinaryOperator<T> mergeFunction) {
         return elementList -> {
@@ -97,30 +175,10 @@ public class XMLMapper<T> {
         };
     }
 
-    @NonNull
-    static <T> Function<List<Element>, Map<String, T>> parseLanguageOptContentOfElement(Function<Element, Optional<T>> mappingFunction) {
-        return parseLanguageOptContentOfElement(mappingFunction, (a, b) -> b);
-    }
-
-    @NonNull
-    static <T> Function<List<Element>, Map<String, T>> parseLanguageOptContentOfElement(Function<Element, Optional<T>> mappingFunction, BinaryOperator<T> mergeFunction) {
-        return elementList -> {
-            var langMap = new HashMap<String, T>();
-
-            for (var element : elementList) {
-                var lang = getLangOfElement(element);
-                var content = mappingFunction.apply(element);
-                content.ifPresent(t -> langMap.merge(lang, t, mergeFunction));
-            }
-
-            return langMap;
-        };
-    }
-
     /**
-     * Extracts metadata from the given list of {@link Element}s, using the given parser strategy {@link Function}.
+     * Extracts metadata from the given list of {@link Element}s, using the given element extractor {@link Function}.
      * <p>
-     * This uses {@link DocElementParser#getLangAttribute(Element)} to extract the language of the elements. If no
+     * This uses {@link XMLMapper#getLangOfElement(Element)} to extract the language of the elements. If no
      * language information is found then the elements are added under the {@code ""} key.
      *
      * @param <T>                the type returned by the parser strategy.

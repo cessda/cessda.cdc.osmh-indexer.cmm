@@ -31,6 +31,9 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
+import org.jdom2.filter.Filters;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,6 +56,8 @@ import static com.google.common.io.Files.getNameWithoutExtension;
 @Service
 @Slf4j
 public class RecordXMLParser {
+
+    private static final XPathExpression<Element> OAI_RECORD_EXPRESSION = XPathFactory.instance().compile(OaiPmhConstants.RECORD_ELEMENT, Filters.element(), null, OaiPmhConstants.OAI_NS);
 
     private final CMMStudyMapper cmmStudyMapper;
     private Set<Namespace> suppressedNamespaceWarnings = null;
@@ -164,7 +169,7 @@ public class RecordXMLParser {
             }
 
             // Find all records, iterate through them
-            var elements = DocElementParser.getElements(document, OaiPmhConstants.RECORD_ELEMENT, OaiPmhConstants.OAI_NS);
+            var elements = OAI_RECORD_EXPRESSION.evaluate(document);
 
             var recordList = new ArrayList<Record>();
 

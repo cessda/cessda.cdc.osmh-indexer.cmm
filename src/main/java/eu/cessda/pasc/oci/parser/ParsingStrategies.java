@@ -30,7 +30,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static eu.cessda.pasc.oci.parser.DocElementParser.getAttributeValue;
 import static eu.cessda.pasc.oci.parser.OaiPmhConstants.*;
 import static eu.cessda.pasc.oci.parser.XMLMapper.*;
 import static java.util.Optional.ofNullable;
@@ -440,7 +439,7 @@ class ParsingStrategies{
     }
 
     @NonNull
-    static HashMap<String, String> creatorsLifecycleStrategy(Element element) {
+    static Map<String, String> creatorsLifecycleStrategy(Element element) {
         var creatorsMap = new HashMap<String, String>();
 
         // Attempt to parse the affiliation attribute
@@ -470,7 +469,7 @@ class ParsingStrategies{
 
     @NonNull
     static CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateNotParsedException>> dataCollectionPeriodsStrategy(List<Element> elementList) {
-        var dateAttrs = DocElementParser.getDateElementAttributesValueMap(elementList);
+        var dateAttrs = getDateElementAttributesValueMap(elementList);
 
         var dataCollectionPeriodBuilder = CMMStudyMapper.DataCollectionPeriod.builder();
 
@@ -557,7 +556,7 @@ class ParsingStrategies{
     }
 
     @NonNull
-    static HashMap<String, List<TermVocabAttributes>> conceptStrategy(List<Element> elementList, Function<Element, Optional<TermVocabAttributes>> mappingFunction) {
+    static Map<String, List<TermVocabAttributes>> conceptStrategy(List<Element> elementList, Function<Element, Optional<TermVocabAttributes>> mappingFunction) {
         var map = new HashMap<String, List<TermVocabAttributes>>();
 
         for (var element : elementList) {
@@ -610,7 +609,7 @@ class ParsingStrategies{
             publisherMap.put(key, new Publisher(abbrMap.getOrDefault(key, ""), nameMap.getOrDefault(key, "")))
         );
 
-        return publisherMap;
+        return Collections.unmodifiableMap(publisherMap);
     }
 
     static Map<String, Country> geographicReferenceStrategy(Element geographicReference) {
@@ -685,7 +684,7 @@ class ParsingStrategies{
             }
         }
 
-        return map;
+        return Collections.unmodifiableMap(map);
     }
 
     @NonNull
@@ -698,7 +697,7 @@ class ParsingStrategies{
     }
 
     @NonNull
-    static HashMap<String, List<String>> creatorsStrategy(List<Element> creatorElements) {
+    static Map<String, List<String>> creatorsStrategy(List<Element> creatorElements) {
         var creatorsMap = new HashMap<String, List<String>>();
 
         for (var element : creatorElements) {
@@ -735,22 +734,22 @@ class ParsingStrategies{
     }
 
     @NonNull
-    static HashMap<String, List<TermVocabAttributes>> samplingProceduresLifecycleStrategy(List<Element> elementList) {
+    static Map<String, List<TermVocabAttributes>> samplingProceduresLifecycleStrategy(List<Element> elementList) {
         return controlledVocabularyStrategy(elementList, "TypeOfSamplingProcedure");
     }
 
     @NonNull
-    static HashMap<String, List<TermVocabAttributes>> typeOfModeOfCollectionLifecycleStrategy(List<Element> elementList) {
+    static Map<String, List<TermVocabAttributes>> typeOfModeOfCollectionLifecycleStrategy(List<Element> elementList) {
         return controlledVocabularyStrategy(elementList, "TypeOfModeOfCollection");
     }
 
     @NonNull
-    static HashMap<String, List<TermVocabAttributes>> typeOfTimeMethodLifecycleStrategy(List<Element> elementList) {
+    static Map<String, List<TermVocabAttributes>> typeOfTimeMethodLifecycleStrategy(List<Element> elementList) {
         return controlledVocabularyStrategy(elementList, "TypeOfTimeMethod");
     }
 
     @NonNull
-    private static HashMap<String, List<TermVocabAttributes>> controlledVocabularyStrategy(List<Element> elementList, String controlledVocabularyElement) {
+    private static Map<String, List<TermVocabAttributes>> controlledVocabularyStrategy(List<Element> elementList, String controlledVocabularyElement) {
         var mergedMap = new HashMap<String, List<TermVocabAttributes>>();
 
         for (var element : elementList) {
@@ -797,7 +796,7 @@ class ParsingStrategies{
     }
 
     @NonNull
-    static HashMap<String, List<RelatedPublication>> relatedPublicationLifecycleStrategy(List<Element> elementList) {
+    static Map<String, List<RelatedPublication>> relatedPublicationLifecycleStrategy(List<Element> elementList) {
         var relPubLMap = new HashMap<String, List<RelatedPublication>>();
 
         for (var element : elementList) {
@@ -831,5 +830,72 @@ class ParsingStrategies{
         }
 
         return relPubLMap;
+    }
+
+    @NonNull
+    static Map<String, List<Country>> geographicLocationStrategy(List<Element> elementList) {
+        var countryListMap = new HashMap<String, List<Country>>();
+        for (var element : elementList) {
+          resolveReference(element).ifPresent(referencedElement -> {
+              var geographicReference = referencedElement.element();
+              var countryMap = geographicReferenceStrategy(geographicReference);
+              countryMap.forEach((key, value) -> countryListMap.computeIfAbsent(key, k -> new ArrayList<>()).add(value));
+          });
+        }
+        return countryListMap;
+    }
+
+    @NonNull
+    static Map<String, Publisher> publisherReferenceStrategy(List<Element> elementList) {
+        for (var element : elementList) {
+            var referencedElement = resolveReference(element);
+            var publisherMapOpt = referencedElement.flatMap(r -> switch (r.type()) {
+                case "Individual" -> Optional.of(individualStrategy(r.element()));
+                case "Organization" -> Optional.of(organizationStrategy(r.element()));
+                default -> Optional.empty();
+            });
+            if (publisherMapOpt.isPresent()) {
+                return publisherMapOpt.get();
+            }
+        }
+
+        return Collections.emptyMap();
+    }
+
+    /**
+     * Returns the text content of the given attribute.
+     * If the attribute does not exist, an empty {@link Optional} will be returned.
+     *
+     * @param element the element to parse.
+     * @param idAttr  the attribute to return the text content of.
+     */
+    private static Optional<String> getAttributeValue(Element element, String idAttr) {
+        return ofNullable(element.getAttributeValue(idAttr));
+    }
+
+    /**
+     * Gets the date attribute from elements that have an {@value OaiPmhConstants#EVENT_ATTR} attribute.
+     * <p>
+     * If the same {@value OaiPmhConstants#EVENT_ATTR} type is defined for multiple languages the filter will only keep the first encountered.
+     * <ul>
+     *     <li>{@code <collDate xml:lang="en" date="2009-03-19" event="start"/> }</li>
+     *     <li><strike>{@code <collDate xml:lang="fi" date="2009-03-19" event="start"/> }</strike></li>
+     * </ul>
+     * Currently there is no requirement to extract dates of event per language.
+     *
+     * @param elements the elements to extract attributes from.
+     * @return a {@link Map} with the keys set to the {@value OaiPmhConstants#EVENT_ATTR} and the values set to the date values.
+     */
+    private static Map<String, String> getDateElementAttributesValueMap(List<Element> elements) {
+        //PUG requirement: we only care about those with @date CV
+        Map<String, String> map = new HashMap<>();
+        for (var element : elements) {
+            var eventAttr = getAttributeValue(element, EVENT_ATTR);
+            var dateAttr = getAttributeValue(element, DATE_ATTR);
+            if (dateAttr.isPresent() && eventAttr.isPresent()) {
+                map.putIfAbsent(eventAttr.get(), dateAttr.get());
+            }
+        }
+        return map;
     }
 }

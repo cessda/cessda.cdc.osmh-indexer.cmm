@@ -21,6 +21,8 @@ import java.net.URI;
 import java.util.List;
 
 /**
+ * Holds a related publication.
+ *
  * @param title    The title of the related publication.
  * @param holdings The URI of the holdings of the related publication.
  */

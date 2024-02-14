@@ -23,7 +23,11 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.jdom2.Attribute;
 import org.jdom2.Document;
+import org.jdom2.filter.Filters;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -44,7 +48,6 @@ import java.util.stream.Stream;
 public class CMMStudyMapper {
 
     private final AppConfigurationProperties.OaiPmh oaiPmh;
-    private final DocElementParser docElementParser;
 
     public CMMStudyMapper() {
         this.oaiPmh = new AppConfigurationProperties.OaiPmh(
@@ -54,12 +57,10 @@ public class CMMStudyMapper {
             ),
             "<br>"
         );
-        this.docElementParser = new DocElementParser(this.oaiPmh);
     }
 
     @Autowired
-    CMMStudyMapper(DocElementParser docElementParser, AppConfigurationProperties appConfigurationProperties) {
-        this.docElementParser = docElementParser;
+    CMMStudyMapper(AppConfigurationProperties appConfigurationProperties) {
         this.oaiPmh = appConfigurationProperties.oaiPmh();
     }
 
@@ -75,7 +76,9 @@ public class CMMStudyMapper {
      * @return the default language of the document.
      */
     String parseDefaultLanguage(Document document, Repo repository, XPaths xPaths) {
-        var codeBookLang = DocElementParser.getFirstAttribute(document, xPaths.getRecordDefaultLanguage(), xPaths.getNamespace());
+        XPathExpression<Attribute> expression = XPathFactory.instance().compile(xPaths.getRecordDefaultLanguage(), Filters.attribute(), null, xPaths.getNamespace());
+        var attributes = expression.evaluate(document);
+        var codeBookLang = attributes.stream().findFirst();
         if (codeBookLang.isPresent() && !codeBookLang.get().getValue().trim().isEmpty()) {
             return codeBookLang.get().getValue().trim();
             // #192 - Per repository override of the default language
@@ -251,9 +254,7 @@ public class CMMStudyMapper {
         var producerPathMap = mapNullLanguage(xPaths.getPublisherXPath().resolve(document, xPaths.getNamespace()), defaultLang);
 
         if (xPaths.getDistributorXPath() != null) {
-            Map<String, Publisher> distrPathMap = docElementParser.extractMetadataObjectForEachLang(
-                    defaultLang, document, xPaths.getDistributorXPath(), ParsingStrategies::publisherStrategy, xPaths.getNamespace()
-            );
+            var distrPathMap = mapNullLanguage(xPaths.getDistributorXPath().resolve(document, xPaths.getNamespace()), defaultLang);
             distrPathMap.forEach(producerPathMap::putIfAbsent);
         }
 
@@ -287,7 +288,7 @@ public class CMMStudyMapper {
      * Xpath = {@link XPaths#getStudyURLDocDscrXPath()}
      * Xpath = {@link XPaths#getStudyURLStudyDscrXPath()}
      */
-    ParseResults<HashMap<String, URI>, List<URISyntaxException>> parseStudyUrl(Document document, XPaths xPaths, String langCode) {
+    ParseResults<Map<String, URI>, List<URISyntaxException>> parseStudyUrl(Document document, XPaths xPaths, String langCode) {
 
         var studyURLs = new HashMap<String, URI>();
         var parsingExceptions = new ArrayList<URISyntaxException>();
@@ -363,13 +364,13 @@ public class CMMStudyMapper {
      */
     Set<String> parseFileLanguages(Document document, XPaths xPaths) {
 
-        var fileTxtAttrsStream = xPaths.getFileTxtLanguagesXPath().stream()
-            .flatMap(xpath -> DocElementParser.getAttributeValues(document, xpath, xPaths.getNamespace()).stream());
+        var fileTxtAttrsStream = xPaths.getFileTxtLanguagesXPath().stream();
+        var fileNameAttrsStream = xPaths.getFilenameLanguagesXPath().stream();
 
-        var fileNameAttrsStream = xPaths.getFilenameLanguagesXPath().stream()
-            .flatMap(xpath -> DocElementParser.getAttributeValues(document, xpath, xPaths.getNamespace()).stream());
-
-        return Stream.concat(fileTxtAttrsStream, fileNameAttrsStream).collect(Collectors.toSet());
+        return Stream.concat(fileTxtAttrsStream, fileNameAttrsStream)
+            .flatMap(xpath -> xpath.resolve(document, xPaths.getNamespace()).stream())
+            .filter(lang -> !lang.isEmpty())
+            .collect(Collectors.toSet());
     }
 
     /**
