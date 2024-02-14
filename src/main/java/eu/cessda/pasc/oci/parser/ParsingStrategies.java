@@ -20,7 +20,6 @@ import eu.cessda.pasc.oci.TimeUtility;
 import eu.cessda.pasc.oci.exception.InvalidUniverseException;
 import eu.cessda.pasc.oci.models.cmmstudy.*;
 import lombok.NonNull;
-import org.jdom2.DataConversionException;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 
@@ -403,16 +402,8 @@ class ParsingStrategies{
             var inclusionStatus = parseInclusionStatus(universeElement);
 
             // Language specific content is stored in sub-elements which needs to be flattened
-            for (var otherMaterial : universeElement.getChildren()) {
-                if (!otherMaterial.getName().equals("Description")) {
-                    continue;
-                }
-
-                for (var contentElement : otherMaterial.getChildren()) {
-                    if (!contentElement.getName().equals("Content")) {
-                        continue;
-                    }
-
+            for (var otherMaterial : universeElement.getChildren("Description", null)) {
+                for (var contentElement : otherMaterial.getChildren("Content", null)) {
                     map.computeIfAbsent(
                         XMLMapper.getLangOfElement(contentElement), k -> new ArrayList<>()
                     ).add(
@@ -427,22 +418,15 @@ class ParsingStrategies{
 
     @NonNull
     private static Universe.Clusion parseInclusionStatus(Element universeElement) {
-        for (var attr :  universeElement.getAttributes()) {
-            // Search for the isInclusive attribute
-            if (!attr.getName().equals("isInclusive")) {
-                continue;
-            }
+        // Search for the isInclusive attribute
+        var attr = universeElement.getAttribute("isInclusive", null);
 
-            try {
-                if (!attr.getBooleanValue()) {
-                    return Universe.Clusion.E;
-                }
-            } catch (DataConversionException ex) {
-                // conversion failed, default to inclusion
-            }
+        // Only "false" should cause the universe to be marked as an exclusion
+        if (attr != null && "false".equalsIgnoreCase(attr.getValue())) {
+            return Universe.Clusion.E;
+        } else {
+            return Universe.Clusion.I;
         }
-
-        return Universe.Clusion.I;
     }
 
     @Nullable
@@ -752,6 +736,21 @@ class ParsingStrategies{
 
     @NonNull
     static HashMap<String, List<TermVocabAttributes>> samplingProceduresLifecycleStrategy(List<Element> elementList) {
+        return controlledVocabularyStrategy(elementList, "TypeOfSamplingProcedure");
+    }
+
+    @NonNull
+    static HashMap<String, List<TermVocabAttributes>> typeOfModeOfCollectionLifecycleStrategy(List<Element> elementList) {
+        return controlledVocabularyStrategy(elementList, "TypeOfModeOfCollection");
+    }
+
+    @NonNull
+    static HashMap<String, List<TermVocabAttributes>> typeOfTimeMethodLifecycleStrategy(List<Element> elementList) {
+        return controlledVocabularyStrategy(elementList, "TypeOfTimeMethod");
+    }
+
+    @NonNull
+    private static HashMap<String, List<TermVocabAttributes>> controlledVocabularyStrategy(List<Element> elementList, String controlledVocabularyElement) {
         var mergedMap = new HashMap<String, List<TermVocabAttributes>>();
 
         for (var element : elementList) {
@@ -764,9 +763,11 @@ class ParsingStrategies{
                     // Extract text
                     var contentElements = child.getChildren();
                     langMap = extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy).apply(contentElements);
-                } else if (childName.equals("TypeOfSamplingProcedure")) {
-                    // Extract controlled vocabulary information
-                    termVocabAttributes = termVocabAttributeLifecycleStrategy(child);
+                } else {
+                    if (childName.equals(controlledVocabularyElement)) {
+                        // Extract controlled vocabulary information
+                        termVocabAttributes = termVocabAttributeLifecycleStrategy(child);
+                    }
                 }
             }
 
@@ -793,5 +794,42 @@ class ParsingStrategies{
         }
 
         return mergedMap;
+    }
+
+    @NonNull
+    static HashMap<String, List<RelatedPublication>> relatedPublicationLifecycleStrategy(List<Element> elementList) {
+        var relPubLMap = new HashMap<String, List<RelatedPublication>>();
+
+        for (var element : elementList) {
+
+            var uriList = new ArrayList<URI>();
+            var titleMap = new HashMap<String, String>();
+
+            // Extract the citation
+            var citation = element.getChild("Citation", null);
+            if (citation != null) {
+                for (var child : citation.getChildren()) {
+                    if (child.getName().equals("InternationalIdentifier")) {
+                        // Extract the URL of the identifier
+                        var identifierContext = child.getChild("IdentifierContent", null);
+                        uriList.add(URI.create(identifierContext.getTextTrim()));
+
+                    } else if (child.getName().equals("Title")) {
+                        // Extract the language-dependent title
+                        for (var string : child.getChildren(STRING, null)) {
+                            titleMap.put(getLangOfElement(string), string.getTextTrim());
+                        }
+                    }
+                }
+            }
+
+            titleMap.forEach((lang, title) -> {
+                // Merge the language dependent title with the list of URIs
+                var relPub = new RelatedPublication(title, uriList);
+                relPubLMap.computeIfAbsent(lang, k -> new ArrayList<>()).add(relPub);
+            });
+        }
+
+        return relPubLMap;
     }
 }

@@ -29,7 +29,6 @@ import eu.cessda.pasc.oci.mock.data.ReposTestData;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -78,13 +77,13 @@ public class RecordXMLParserDDI3Test {
         assertEquals(expectedJson, actualJson, true);
     }
 
-    private void validateCMMStudyResultAgainstSchema(CMMStudy record) throws IOException, ProcessingException, JSONException {
-        String jsonString = objectMapper.writeValueAsString(record);
-        JSONObject json = new JSONObject(jsonString);
-        log.debug("RETRIEVED STUDY JSON: \n" + json.toString(4));
+    private void validateCMMStudyResultAgainstSchema(CMMStudy record) throws IOException, ProcessingException {
+        String jsonString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(record);
+        log.debug("RETRIEVED STUDY JSON: \n" + jsonString);
 
+
+        JsonSchema schema = JsonSchemaFactory.byDefault().getJsonSchema("resource:/json/schema/CMMStudy.schema.json");
         JsonNode jsonNodeRecord = JsonLoader.fromString(jsonString);
-        final JsonSchema schema = JsonSchemaFactory.byDefault().getJsonSchema("resource:/json/schema/CMMStudy.schema.json");
 
         ProcessingReport validate = schema.validate(jsonNodeRecord);
         if (!validate.isSuccess()) {

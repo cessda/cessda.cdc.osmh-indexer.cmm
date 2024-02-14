@@ -34,8 +34,6 @@ import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static eu.cessda.pasc.oci.parser.ParsingStrategies.termVocabAttributeStrategy;
-
 /**
  * Responsible for Mapping oai-pmh fields to a CMMStudy
  *
@@ -209,9 +207,8 @@ public class CMMStudyMapper {
      * Xpath = {@link XPaths#getTypeOfModeOfCollectionXPath()}
      */
     Map<String, List<TermVocabAttributes>> parseTypeOfModeOfCollection(Document doc, XPaths xPaths, String defaultLangIsoCode) {
-        return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, doc, xPaths.getTypeOfModeOfCollectionXPath(), element -> termVocabAttributeStrategy(element, true), xPaths.getNamespace()
-        );
+        var unmappedXPaths = xPaths.getTypeOfModeOfCollectionXPath().resolve(doc, xPaths.getNamespace());
+        return mapNullLanguage(unmappedXPaths, defaultLangIsoCode, CMMStudyMapper::mergeLists);
     }
 
     /**
@@ -302,7 +299,8 @@ public class CMMStudyMapper {
             for (var uriStrings : docUriStrings.entrySet()) {
                 for (var uriString : uriStrings.getValue()) {
                     try {
-                        studyURLs.put(uriStrings.getKey(), new URI(uriString));
+                        var uri = new URI(uriString);
+                        studyURLs.put(uriStrings.getKey(), uri);
                         break;
                     } catch(URISyntaxException e){
                         parsingExceptions.add(e);
@@ -419,9 +417,8 @@ public class CMMStudyMapper {
     }
 
     Map<String, List<RelatedPublication>> parseRelatedPublications(Document document, XPaths xPaths, String defaultLangIsoCode) {
-        return docElementParser.extractMetadataObjectListForEachLang(
-            defaultLangIsoCode, document, xPaths.getRelatedPublicationsXPath(), ParsingStrategies::relatedPublicationsStrategy, xPaths.getNamespace()
-        );
+        var unmappedXPaths = xPaths.getRelatedPublicationsXPath().resolve(document, xPaths.getNamespace());
+        return mapNullLanguage(unmappedXPaths, defaultLangIsoCode);
     }
 
     ParseResults<Map<String, URI>, List<URISyntaxException>> parseDataAccessURI(Document document, XPaths xPaths, String defaultLangIsoCode) {

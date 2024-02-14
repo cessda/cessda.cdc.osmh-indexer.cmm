@@ -101,6 +101,14 @@
   },
   "publicationYear": "1964",
   "relatedPublications": {
+    "en": [{
+      "title": "ZA0004-10_q.pdf (Questionnaire)",
+      "holdings": []
+     }],
+    "de": [{
+      "title": "ZA0004-10_q.pdf (Fragebogen)",
+      "holdings": []
+    }]
   },
   "repositoryUrl": "http://dbkapps.gesis.org/dbkoai/oai.asp",
   "samplingProcedureFreeTexts": {
