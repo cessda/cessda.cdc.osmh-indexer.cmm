@@ -94,50 +94,50 @@ public final class XPaths {
             Namespace.getNamespace("s", "ddi:studyunit:3_2")
         })
         // Abstract
-        .abstractXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Abstract/r:Content", parseLanguageContentOfElement(Element::getTextTrim)))
+        .abstractXPath(new XMLMapper<>("//s:StudyUnit[1]/r:Abstract/r:Content", parseLanguageContentOfElement(Element::getTextTrim)))
         // Study title
-        .titleXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:Title/r:String", parseLanguageContentOfElement(Element::getTextTrim)))
+        .titleXPath(new XMLMapper<>("//s:StudyUnit[1]/r:Citation/r:Title/r:String", parseLanguageContentOfElement(Element::getTextTrim)))
         // 'Access study' link (when @typeOfUserID attribute is "URLServiceProvider")
-        .studyURLDocDscrXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:UserID", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
+        .studyURLDocDscrXPath(new XMLMapper<>("//s:StudyUnit[1]/r:UserID", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
         // URL of the study description page at the SP website (when @typeOfUserID attribute is "URLServiceProvider")
-        .studyURLStudyDscrXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:UserID", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
+        .studyURLStudyDscrXPath(new XMLMapper<>("//s:StudyUnit[1]/r:UserID", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
         // Study number/PID
-        .pidStudyXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:InternationalIdentifier", extractMetadataObjectListForEachLang(ParsingStrategies::pidLifecycleStrategy)))
+        .pidStudyXPath(new XMLMapper<>("//s:StudyUnit[1]/r:Citation/r:InternationalIdentifier", extractMetadataObjectListForEachLang(ParsingStrategies::pidLifecycleStrategy)))
         // Creator/PI
-        .creatorsXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:Creator", ParsingStrategies::creatorsStrategy))
+        .creatorsXPath(new XMLMapper<>("//s:StudyUnit[1]/r:Citation/r:Creator", ParsingStrategies::creatorsStrategy))
         // Terms of data access
-        .dataRestrctnXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/a:Archive/a:ArchiveSpecific/a:Item/a:Access/r:Description/r:Content", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy)))
+        .dataRestrctnXPath(new XMLMapper<>("//s:StudyUnit[1]/a:Archive/a:ArchiveSpecific/a:Item/a:Access/r:Description/r:Content", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy)))
         // Data collection period
-        .dataCollectionPeriodsXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/d:DataCollection/d:CollectionEvent/d:DataCollectionDate", elementList -> getFirstEntry(ParsingStrategies::dataCollectionPeriodsLifecycleStrategy).apply(elementList).orElse(EMPTY_PARSE_RESULTS)))
+        .dataCollectionPeriodsXPath(new XMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:CollectionEvent/d:DataCollectionDate", elementList -> getFirstEntry(ParsingStrategies::dataCollectionPeriodsLifecycleStrategy).apply(elementList).orElse(EMPTY_PARSE_RESULTS)))
         // Publication year
-        .yearOfPubXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:PublicationDate/r:SimpleDate", getFirstEntry(Element::getTextTrim)))
+        .yearOfPubXPath(new XMLMapper<>("//s:StudyUnit[1]/r:Citation/r:PublicationDate/r:SimpleDate", getFirstEntry(Element::getTextTrim)))
         // Topics
-        .classificationsXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Coverage/r:TopicalCoverage/r:Subject", extractMetadataObjectListForEachLang(ParsingStrategies::termVocabAttributeLifecycleStrategy)))
+        .classificationsXPath(new XMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:TopicalCoverage/r:Subject", extractMetadataObjectListForEachLang(ParsingStrategies::termVocabAttributeLifecycleStrategy)))
         // Keywords
-        .keywordsXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Coverage/r:TopicalCoverage/r:Keyword", extractMetadataObjectListForEachLang(ParsingStrategies::termVocabAttributeLifecycleStrategy)))
+        .keywordsXPath(new XMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:TopicalCoverage/r:Keyword", extractMetadataObjectListForEachLang(ParsingStrategies::termVocabAttributeLifecycleStrategy)))
         // Time dimension
-        .typeOfTimeMethodXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/d:DataCollection/d:Methodology/d:TimeMethod", ParsingStrategies::typeOfTimeMethodLifecycleStrategy))
+        .typeOfTimeMethodXPath(new XMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:Methodology/d:TimeMethod", ParsingStrategies::typeOfTimeMethodLifecycleStrategy))
         // Country
-        .studyAreaCountriesXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Coverage/r:SpatialCoverage/r:GeographicLocationReference", ParsingStrategies::geographicLocationStrategy))
+        .studyAreaCountriesXPath(new XMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:SpatialCoverage/r:GeographicLocationReference", ParsingStrategies::geographicLocationStrategy))
         // Analysis unit
-        .unitTypeXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:AnalysisUnit", ParsingStrategies::analysisUnitStrategy))
+        .unitTypeXPath(new XMLMapper<>("//s:StudyUnit[1]/r:AnalysisUnit", ParsingStrategies::analysisUnitStrategy))
         // Publisher
-        .publisherXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:Citation/r:Publisher/r:PublisherReference", ParsingStrategies::publisherReferenceStrategy))
+        .publisherXPath(new XMLMapper<>("//s:StudyUnit[1]/r:Citation/r:Publisher/r:PublisherReference", ParsingStrategies::publisherReferenceStrategy))
         // Language of data file(s)
-        .fileTxtLanguagesXPath(new XMLMapper<>( "//ddi:DDIInstance/r:ResourcePackage/pi:PhysicalInstance/r:Citation/r:Language", XMLMapper::getLanguageFromElements))
+        .fileTxtLanguagesXPath(new XMLMapper<>( "//ddi:DDIInstance/g:ResourcePackage/pi:PhysicalInstance/r:Citation/r:Language", XMLMapper::getLanguageFromElements))
         // Language-specific name of file
         .filenameLanguagesXPath(new XMLMapper<>("//ddi:DDIInstance/g:ResourcePackage/pi:PhysicalInstance/r:Citation/r:Title/r:String", XMLMapper::getLanguagesOfElements))
         // Sampling procedure
-        .samplingXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/d:DataCollection/d:Methodology/d:SamplingProcedure", ParsingStrategies::samplingProceduresLifecycleStrategy))
+        .samplingXPath(new XMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:Methodology/d:SamplingProcedure", ParsingStrategies::samplingProceduresLifecycleStrategy))
         // Data collection mode
-        .typeOfModeOfCollectionXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/d:DataCollection/d:CollectionEvent/d:ModeOfCollection", ParsingStrategies::typeOfModeOfCollectionLifecycleStrategy))
+        .typeOfModeOfCollectionXPath(new XMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:CollectionEvent/d:ModeOfCollection", ParsingStrategies::typeOfModeOfCollectionLifecycleStrategy))
         // PID of Related publication
-        .relatedPublicationsXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/r:OtherMaterial", ParsingStrategies::relatedPublicationLifecycleStrategy))
+        .relatedPublicationsXPath(new XMLMapper<>("//s:StudyUnit[1]/r:OtherMaterial", ParsingStrategies::relatedPublicationLifecycleStrategy))
         /// /r:Citation/r:InternationalIdentifier/r:IdentifierContent
         // Study description language
         .recordDefaultLanguage("//ddi:DDIInstance/@xml:lang")
         // Description of population
-        .universeXPath(new XMLMapper<>("//ddi:DDIInstance/s:StudyUnit/c:ConceptualComponent/c:UniverseScheme/c:Universe", ParsingStrategies::universeLifecycleStrategy))
+        .universeXPath(new XMLMapper<>("//s:StudyUnit[1]/c:ConceptualComponent/c:UniverseScheme/c:Universe", ParsingStrategies::universeLifecycleStrategy))
         .build();
 
     Optional<XMLMapper<Map<String, String>>> getParTitleXPath() {
