@@ -60,10 +60,28 @@ public class RecordXMLParserDDI3Test {
     }
 
     @Test
-    public void shouldReturnValidCMMStudyRecordFromAFullyComplaintCmmDdiRecord() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
+    public void shouldReturnValidCMMStudyRecordFromAFullyComplaintCmmDdi32Record() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
         // Given
         var expectedJson = ResourceHandler.getResourceAsString("json/synthetic_compliant_record_ddi_3.json");
         var recordXML = ResourceHandler.getResource("xml/ddi_3_2/synthetic_compliant_cmm_ddi3_2.xml");
+
+        // When
+        var result = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
+
+        then(result).hasSize(1);
+        validateCMMStudyResultAgainstSchema(result.get(0));
+
+        String actualJson = objectMapper.writeValueAsString(result.get(0));
+
+        // Check if the JSON generated differs from the expected source
+        assertEquals(expectedJson, actualJson, true);
+    }
+
+    @Test
+    public void shouldReturnValidCMMStudyRecordFromAFullyComplaintCmmDdi33Record() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
+        // Given
+        var expectedJson = ResourceHandler.getResourceAsString("json/synthetic_compliant_record_ddi_3.json");
+        var recordXML = ResourceHandler.getResource("xml/ddi_3_3/synthetic_compliant_cmm_ddi3_3.xml");
 
         // When
         var result = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));

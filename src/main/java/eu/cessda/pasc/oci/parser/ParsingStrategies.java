@@ -192,15 +192,17 @@ class ParsingStrategies{
 
     @NonNull
     @SuppressWarnings("java:S131")
-    static Optional<TermVocabAttributes> termVocabAttributeLifecycleStrategy(Element element) {
+    static Optional<TermVocabAttributes> termVocabAttributeLifecycleStrategy(Element element, TermVocabAttributeNames attrNames) {
         String vocab = "";
         String vocabUri = "";
 
         var term = element.getText();
         for (var attr : element.getAttributes()) {
-            switch (attr.getName()) {
-                case "codeListName" -> vocab = attr.getValue();
-                case "codeListURN" -> vocabUri = attr.getValue();
+            String attrName = attr.getName();
+            if (attrName.equals(attrNames.vocab())) {
+                vocab = attr.getValue();
+            } else if (attrName.equals(attrNames.vocabUri())) {
+                vocabUri = attr.getValue();
             }
         }
 
@@ -696,10 +698,10 @@ class ParsingStrategies{
     }
 
     @NonNull
-    static Map<String, List<TermVocabAttributes>> analysisUnitStrategy(List<Element> elementList) {
+    static Map<String, List<TermVocabAttributes>> analysisUnitStrategy(List<Element> elementList, TermVocabAttributeNames attrNames) {
         var termList = new ArrayList<TermVocabAttributes>(elementList.size());
         for (var element : elementList) {
-            termVocabAttributeLifecycleStrategy(element).ifPresent(termList::add);
+            termVocabAttributeLifecycleStrategy(element, attrNames).ifPresent(termList::add);
         }
         return Map.of("", termList);
     }
@@ -742,23 +744,23 @@ class ParsingStrategies{
     }
 
     @NonNull
-    static Map<String, List<TermVocabAttributes>> samplingProceduresLifecycleStrategy(List<Element> elementList) {
-        return controlledVocabularyStrategy(elementList, "TypeOfSamplingProcedure");
+    static Map<String, List<TermVocabAttributes>> samplingProceduresLifecycleStrategy(List<Element> elementList, TermVocabAttributeNames attrNames) {
+        return controlledVocabularyStrategy(elementList, "TypeOfSamplingProcedure", attrNames);
     }
 
     @NonNull
-    static Map<String, List<TermVocabAttributes>> typeOfModeOfCollectionLifecycleStrategy(List<Element> elementList) {
-        return controlledVocabularyStrategy(elementList, "TypeOfModeOfCollection");
+    static Map<String, List<TermVocabAttributes>> typeOfModeOfCollectionLifecycleStrategy(List<Element> elementList, TermVocabAttributeNames attrNames) {
+        return controlledVocabularyStrategy(elementList, "TypeOfModeOfCollection", attrNames);
     }
 
     @NonNull
-    static Map<String, List<TermVocabAttributes>> typeOfTimeMethodLifecycleStrategy(List<Element> elementList) {
-        return controlledVocabularyStrategy(elementList, "TypeOfTimeMethod");
+    static Map<String, List<TermVocabAttributes>> typeOfTimeMethodLifecycleStrategy(List<Element> elementList, TermVocabAttributeNames attrNames) {
+        return controlledVocabularyStrategy(elementList, "TypeOfTimeMethod", attrNames);
     }
 
     @NonNull
     @SuppressWarnings({"java:S3776", "ExtractMethodRecommender"})
-    private static Map<String, List<TermVocabAttributes>> controlledVocabularyStrategy(List<Element> elementList, String controlledVocabularyElement) {
+    private static Map<String, List<TermVocabAttributes>> controlledVocabularyStrategy(List<Element> elementList, String controlledVocabularyElement, TermVocabAttributeNames attrNames) {
         var mergedMap = new HashMap<String, List<TermVocabAttributes>>();
 
         for (var element : elementList) {
@@ -774,7 +776,7 @@ class ParsingStrategies{
                 } else {
                     if (childName.equals(controlledVocabularyElement)) {
                         // Extract controlled vocabulary information
-                        termVocabAttributes = termVocabAttributeLifecycleStrategy(child);
+                        termVocabAttributes = termVocabAttributeLifecycleStrategy(child, attrNames);
                     }
                 }
             }

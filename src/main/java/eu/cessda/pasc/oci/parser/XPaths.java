@@ -24,6 +24,7 @@ import org.jdom2.Namespace;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.Function;
 
 import static eu.cessda.pasc.oci.parser.ParsingStrategies.termVocabAttributeStrategy;
 import static eu.cessda.pasc.oci.parser.XMLMapper.*;
@@ -79,6 +80,11 @@ public final class XPaths {
         new CMMStudyMapper.DataCollectionPeriod(null, 0, null, Collections.emptyMap()),
         Collections.emptyList()
     );
+
+    private static final TermVocabAttributeNames DDI_3_2_ATTR_NAMES = new TermVocabAttributeNames("codeListName", "codeListURN");
+    private static final Function<Element, Optional<TermVocabAttributes>> TERM_VOCAB_ATTR_3_2_STRATEGY = (Element element) ->
+        ParsingStrategies.termVocabAttributeLifecycleStrategy(element, DDI_3_2_ATTR_NAMES);
+
     /**
      * XPaths needed to extract metadata from DDI 3.2 documents.
      */
@@ -112,15 +118,15 @@ public final class XPaths {
         // Publication year
         .yearOfPubXPath(new XMLMapper<>("//s:StudyUnit[1]/r:Citation/r:PublicationDate/r:SimpleDate", getFirstEntry(Element::getTextTrim)))
         // Topics
-        .classificationsXPath(new XMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:TopicalCoverage/r:Subject", extractMetadataObjectListForEachLang(ParsingStrategies::termVocabAttributeLifecycleStrategy)))
+        .classificationsXPath(new XMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:TopicalCoverage/r:Subject", extractMetadataObjectListForEachLang(TERM_VOCAB_ATTR_3_2_STRATEGY)))
         // Keywords
-        .keywordsXPath(new XMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:TopicalCoverage/r:Keyword", extractMetadataObjectListForEachLang(ParsingStrategies::termVocabAttributeLifecycleStrategy)))
+        .keywordsXPath(new XMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:TopicalCoverage/r:Keyword", extractMetadataObjectListForEachLang(TERM_VOCAB_ATTR_3_2_STRATEGY)))
         // Time dimension
-        .typeOfTimeMethodXPath(new XMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:Methodology/d:TimeMethod", ParsingStrategies::typeOfTimeMethodLifecycleStrategy))
+        .typeOfTimeMethodXPath(new XMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:Methodology/d:TimeMethod", (List<Element> elementList) -> ParsingStrategies.typeOfTimeMethodLifecycleStrategy(elementList, DDI_3_2_ATTR_NAMES)))
         // Country
         .studyAreaCountriesXPath(new XMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:SpatialCoverage/r:GeographicLocationReference", ParsingStrategies::geographicLocationStrategy))
         // Analysis unit
-        .unitTypeXPath(new XMLMapper<>("//s:StudyUnit[1]/r:AnalysisUnit", ParsingStrategies::analysisUnitStrategy))
+        .unitTypeXPath(new XMLMapper<>("//s:StudyUnit[1]/r:AnalysisUnit", (List<Element> elementList) -> ParsingStrategies.analysisUnitStrategy(elementList, DDI_3_2_ATTR_NAMES)))
         // Publisher
         .publisherXPath(new XMLMapper<>("//s:StudyUnit[1]/r:Citation/r:Publisher/r:PublisherReference", ParsingStrategies::publisherReferenceStrategy))
         // Language of data file(s)
@@ -128,9 +134,9 @@ public final class XPaths {
         // Language-specific name of file
         .filenameLanguagesXPath(new XMLMapper<>("//ddi:DDIInstance/g:ResourcePackage/pi:PhysicalInstance/r:Citation/r:Title/r:String", XMLMapper::getLanguagesOfElements))
         // Sampling procedure
-        .samplingXPath(new XMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:Methodology/d:SamplingProcedure", ParsingStrategies::samplingProceduresLifecycleStrategy))
+        .samplingXPath(new XMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:Methodology/d:SamplingProcedure", (List<Element> elementList) -> ParsingStrategies.samplingProceduresLifecycleStrategy(elementList, DDI_3_2_ATTR_NAMES)))
         // Data collection mode
-        .typeOfModeOfCollectionXPath(new XMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:CollectionEvent/d:ModeOfCollection", ParsingStrategies::typeOfModeOfCollectionLifecycleStrategy))
+        .typeOfModeOfCollectionXPath(new XMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:CollectionEvent/d:ModeOfCollection", (List<Element> elementList) -> ParsingStrategies.typeOfModeOfCollectionLifecycleStrategy(elementList, DDI_3_2_ATTR_NAMES)))
         // PID of Related publication
         .relatedPublicationsXPath(new XMLMapper<>("//s:StudyUnit[1]/r:OtherMaterial", ParsingStrategies::relatedPublicationLifecycleStrategy))
         /// /r:Citation/r:InternationalIdentifier/r:IdentifierContent
@@ -139,6 +145,40 @@ public final class XPaths {
         // Description of population
         .universeXPath(new XMLMapper<>("//s:StudyUnit[1]/c:ConceptualComponent/c:UniverseScheme/c:Universe", ParsingStrategies::universeLifecycleStrategy))
         .build();
+
+    private static final TermVocabAttributeNames DDI_3_3_ATTR_NAMES = new TermVocabAttributeNames("controlledVocabularyName", "controlledVocabularyURN");
+    private static final Function<Element, Optional<TermVocabAttributes>> TERM_VOCAB_ATTR_3_3_STRATEGY = (Element element) ->
+        ParsingStrategies.termVocabAttributeLifecycleStrategy(element, DDI_3_3_ATTR_NAMES);
+
+    /**
+     * XPaths needed to extract metadata from DDI 3.3 documents.
+     */
+    public static final XPaths DDI_3_3_XPATHS = DDI_3_2_XPATHS
+        .withNamespace(new Namespace[]{
+            Namespace.getNamespace("ddi", "ddi:instance:3_3"),
+            Namespace.getNamespace("a", "ddi:archive:3_3"),
+            Namespace.getNamespace("c", "ddi:conceptualcomponent:3_3"),
+            Namespace.getNamespace("d","ddi:datacollection:3_3"),
+            Namespace.getNamespace("g", "ddi:group:3_3"),
+            Namespace.getNamespace("pi", "ddi:physicalinstance:3_3"),
+            Namespace.getNamespace("r", "ddi:reusable:3_3"),
+            Namespace.getNamespace("s", "ddi:studyunit:3_3")
+        })
+        // PID of Related publication
+        .withRelatedPublicationsXPath(new XMLMapper<>("//s:StudyUnit[1]/r:OtherMaterialScheme/r:OtherMaterial", ParsingStrategies::relatedPublicationLifecycleStrategy))
+        // Topics
+        .withClassificationsXPath(new XMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:TopicalCoverage/r:Subject", extractMetadataObjectListForEachLang(TERM_VOCAB_ATTR_3_3_STRATEGY)))
+        // Keywords
+        .withKeywordsXPath(new XMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:TopicalCoverage/r:Keyword", extractMetadataObjectListForEachLang(TERM_VOCAB_ATTR_3_3_STRATEGY)))
+        // Time dimension
+        .withTypeOfTimeMethodXPath(new XMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:Methodology/d:TimeMethod", (List<Element> elementList) -> ParsingStrategies.typeOfTimeMethodLifecycleStrategy(elementList, DDI_3_3_ATTR_NAMES)))
+        // Analysis unit
+        .withUnitTypeXPath(new XMLMapper<>("//s:StudyUnit[1]/r:AnalysisUnit", (List<Element> elementList) -> ParsingStrategies.analysisUnitStrategy(elementList, DDI_3_3_ATTR_NAMES)))
+        // Sampling procedure
+        .withSamplingXPath(new XMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:Methodology/d:SamplingProcedure", (List<Element> elementList) -> ParsingStrategies.samplingProceduresLifecycleStrategy(elementList, DDI_3_3_ATTR_NAMES)))
+        // Data collection mode
+        .withTypeOfModeOfCollectionXPath(new XMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:CollectionEvent/d:ModeOfCollection", (List<Element> elementList) -> ParsingStrategies.typeOfModeOfCollectionLifecycleStrategy(elementList, DDI_3_3_ATTR_NAMES)));
+
 
     Optional<XMLMapper<Map<String, String>>> getParTitleXPath() {
         return Optional.ofNullable(parTitleXPath);
@@ -220,20 +260,6 @@ public final class XPaths {
         .universeXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:universe", extractMetadataObjectListForEachLang(ParsingStrategies::universeStrategy)))
         .build();
 
-    /**
-     * XPaths needed to extract metadata from DDI 3.3 documents.
-     */
-    public static final XPaths DDI_3_3_XPATHS = DDI_3_2_XPATHS
-        .withNamespace(new Namespace[]{
-            Namespace.getNamespace("ddi", "ddi:instance:3_3"),
-            Namespace.getNamespace("a", "ddi:archive:3_3"),
-            Namespace.getNamespace("c", "ddi:conceptualcomponent:3_3"),
-            Namespace.getNamespace("d","ddi:datacollection:3_3"),
-            Namespace.getNamespace("g", "ddi:group:3_3"),
-            Namespace.getNamespace("pi", "ddi:physicalinstance:3_3"),
-            Namespace.getNamespace("r", "ddi:reusable:3_3"),
-            Namespace.getNamespace("s", "ddi:studyunit:3_3")
-        });
     /**
      * XPaths needed to extract metadata from NESSTAR flavoured DDI 1.2.2 documents.
      */
