@@ -80,6 +80,12 @@ public class RecordXMLParser {
         }
     }
 
+    /**
+     * Parse an OAI-PMH record header element into a {@link RecordHeader} object.
+     *
+     * @param headerElement the element to parse.
+     * @return a record header.
+     */
     @SuppressWarnings({"java:S131", "java:S1301"}) // There is no need to take action for other element names
     private RecordHeader parseRecordHeader(Element headerElement) {
 
@@ -95,7 +101,7 @@ public class RecordXMLParser {
         var childElements = headerElement.getChildren();
         for (var child : childElements) {
             switch (child.getName()) {
-                case OaiPmhConstants.IDENTIFIER_ELEMENT -> {
+                case OaiPmhConstants.IDENTIFIER -> {
                     String identifier = child.getText();
                     recordHeaderBuilder.identifier(identifier);
                 }

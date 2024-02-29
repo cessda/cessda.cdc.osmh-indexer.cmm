@@ -30,15 +30,32 @@ import java.util.function.Function;
 import static eu.cessda.pasc.oci.parser.OaiPmhConstants.LANG_ATTR;
 import static org.jdom2.Namespace.XML_NAMESPACE;
 
+/**
+ * Maps elements found at a specified XPath using a provided mapping function.
+ *
+ * @param <T> the resulting type of the mapping function.
+ */
 class XMLMapper<T> {
     private final String xPath;
     private final Function<List<Element>, T> mappingFunction;
 
+    /**
+     * Constructs a new instance of the XMLMapper.
+     *
+     * @param xPath the XPath of the elements to map.
+     * @param mappingFunction the mapping function.
+     */
     XMLMapper(String xPath, Function<List<Element>, T> mappingFunction) {
         this.xPath = xPath;
         this.mappingFunction = mappingFunction;
     }
 
+    /**
+     * Returns the {@code xml:lang} attributes of the given elements.
+     *
+     * @param elementList the elements.
+     * @return a set of languages.
+     */
     @NonNull
     static Set<String> getLanguagesOfElements(List<Element> elementList) {
         var langauges = new HashSet<String>();
@@ -49,6 +66,12 @@ class XMLMapper<T> {
         return langauges;
     }
 
+    /**
+     * Returns a set of languages from the element's text contents.
+     *
+     * @param elementList the elements.
+     * @return a set of languages.
+     */
     @NonNull
     static Set<String> getLanguageFromElements(List<Element> elementList) {
         var languages = new HashSet<String>();

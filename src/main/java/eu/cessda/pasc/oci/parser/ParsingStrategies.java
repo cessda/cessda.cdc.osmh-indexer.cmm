@@ -163,6 +163,13 @@ class ParsingStrategies{
         );
     }
 
+    /**
+     * Parses a vocabulary term from the given element.
+     *
+     * @param element the element to parse.
+     * @param hasControlledValue whether to use a child {@value OaiPmhConstants#CONCEPT_EL} element to extract the vocabulary attributes.
+     * @return the term.
+     */
     static Optional<TermVocabAttributes> termVocabAttributeStrategy(Element element, boolean hasControlledValue) {
         // The term always comes from the original element
         var term = cleanCharacterReturns(element.getText());
@@ -190,6 +197,13 @@ class ParsingStrategies{
         return Optional.of(termVocab);
     }
 
+    /**
+     * Parses a vocabulary term from the given element.
+     *
+     * @param element the element to parse.
+     * @param attrNames the names of the attributes representing the vocab name and URI.
+     * @return the term.
+     */
     @NonNull
     @SuppressWarnings("java:S131")
     static Optional<TermVocabAttributes> termVocabAttributeLifecycleStrategy(Element element, TermVocabAttributeNames attrNames) {
@@ -224,6 +238,13 @@ class ParsingStrategies{
         }
     }
 
+    /**
+     * Parses a sampling vocabulary term from the given element. Vocabulary information is extracted from a
+     * descendant {@value OaiPmhConstants#CONCEPT_EL} element.
+     * @param element the element to parse.
+     * @return a term, or an empty optional if there was no descendant {@value OaiPmhConstants#CONCEPT_EL} element
+     * and the element text content was blank.
+     */
     static Optional<TermVocabAttributes> samplingTermVocabAttributeStrategy(Element element) {
         var term = element.getTextTrim();
 
@@ -422,6 +443,12 @@ class ParsingStrategies{
         return map;
     }
 
+    /**
+     * Parse the inclusion status of the given universe element using the {@code isInclusive} attribute.
+     *
+     * @param universeElement the element to parse
+     * @return the universe's inclusion status.
+     */
     @NonNull
     private static Universe.Clusion parseInclusionStatus(Element universeElement) {
         // Search for the isInclusive attribute
@@ -435,14 +462,20 @@ class ParsingStrategies{
         }
     }
 
+    /**
+     * Extract the value of the {@code date} attribute of the given element.
+     *
+     * @param element the element to parse.
+     * @return the value of the date attribute, or {@code null} if the attribute is not present.
+     */
     @Nullable
     static String dateStrategy(Element element) {
-        for (var attribute : element.getAttributes()) {
-            if (attribute.getName().equals("date")) {
-                return attribute.getValue();
-            }
+        var attribute = element.getAttribute("date", null);
+        if (attribute != null) {
+            return attribute.getValue();
+        } else {
+            return null;
         }
-        return null;
     }
 
     @NonNull
@@ -576,6 +609,12 @@ class ParsingStrategies{
         return map;
     }
 
+    /**
+     * Extract the creator/publisher from a DDI Lifecycle {@code Organization} element.
+     *
+     * @param element the element to parse.
+     * @return a map containing language specific version of the publisher.
+     */
     @NonNull
     @SuppressWarnings("java:S131")
     static Map<String, Publisher> organizationStrategy(Element element) {
@@ -621,6 +660,12 @@ class ParsingStrategies{
         return Collections.unmodifiableMap(publisherMap);
     }
 
+    /**
+     * Extract country information from a {@code GeographicReference} element
+     *
+     * @param geographicReference the element to parse.
+     * @return a map containing language specific versions of the country.
+     */
     @SuppressWarnings({"java:S131", "java:S3776"})
     static Map<String, Country> geographicReferenceStrategy(Element geographicReference) {
         var countryMap = new HashMap<String, Country>();
@@ -664,6 +709,12 @@ class ParsingStrategies{
         return countryMap;
     }
 
+    /**
+     * Extract the creator/publisher from a DDI Lifecycle {@code Individual} element.
+     *
+     * @param element the element to parse.
+     * @return a map containing language specific version of the publisher.
+     */
     static Map<String, Publisher> individualStrategy(Element element) {
         var identification = element.getChild("IndividualIdentification", null);
         if (identification == null) {
@@ -706,6 +757,12 @@ class ParsingStrategies{
         return Map.of("", termList);
     }
 
+    /**
+     * Parse DDI Lifecycle {@code Creator} elements.
+     *
+     * @param creatorElements a list of {@code Creator} elements.
+     * @return a map of creators per language.
+     */
     @NonNull
     static Map<String, List<String>> creatorsStrategy(List<Element> creatorElements) {
         var creatorsMap = new HashMap<String, List<String>>();
@@ -806,6 +863,12 @@ class ParsingStrategies{
         return mergedMap;
     }
 
+    /**
+     * Extract language specific lists of related publications.
+     *
+     * @param elementList the list of {@code OtherMaterial} elements to parse.
+     * @return a map of language specific related publication lists.
+     */
     @NonNull
     @SuppressWarnings("java:S3776")
     static Map<String, List<RelatedPublication>> relatedPublicationLifecycleStrategy(List<Element> elementList) {

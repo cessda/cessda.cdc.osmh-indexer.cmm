@@ -26,8 +26,6 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-import static eu.cessda.pasc.oci.parser.OaiPmhConstants.*;
-
 /**
  * Helper methods to deal with Oai-pmh protocol
  *
@@ -48,11 +46,11 @@ public class OaiPmhHelpers {
     public static URI buildGetStudyFullUrl(@NonNull URI repoUrl, @NonNull String studyIdentifier, @NonNull String metadataPrefix) throws URISyntaxException {
         return new URI(repoUrl +
             // verb=GetRecord
-            "?" + VERB_PARAM_KEY + "=" + GET_RECORD_VALUE +
+            "?verb=GetRecord" +
             //&identifier=1683
-            "&" + IDENTIFIER_PARAM_KEY + "=" + URLEncoder.encode(studyIdentifier, StandardCharsets.UTF_8) +
+            "&" + OaiPmhConstants.IDENTIFIER + "=" + URLEncoder.encode(studyIdentifier, StandardCharsets.UTF_8) +
             //&metadataPrefix=ddi
-            "&" + METADATA_PREFIX_PARAM_KEY + "=" + URLEncoder.encode(metadataPrefix, StandardCharsets.UTF_8)
+            "&metadataPrefix=" + URLEncoder.encode(metadataPrefix, StandardCharsets.UTF_8)
         );
     }
 
