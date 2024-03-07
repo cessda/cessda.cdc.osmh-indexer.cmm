@@ -13,21 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.models.cmmstudy;
+package eu.cessda.pasc.oci.parser;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.net.URI;
-import java.util.List;
-
-/**
- * Holds a related publication.
- *
- * @param title    The title of the related publication.
- * @param holdings The URI of the holdings of the related publication.
- */
-public record RelatedPublication(
-    @JsonProperty("title") String title,
-    @JsonProperty("holdings") List<URI> holdings
+record TermVocabAttributeNames(
+    String vocab,
+    String vocabUri
 ) {
 }

@@ -103,18 +103,18 @@
   },
   "creators": {
     "xy": [
-      "\nJoye, Dominique (resp.)\n (Service suisse d'information et d'archivage de données pour les sciences sociales - SIDOS)",
-      "\nSchöbi, Nicole\n (Service suisse d'information et d'archivage de données pour les sciences sociales - SIDOS)",
-      "\nKaenel, Céline\n (Service suisse d'information et d'archivage de données pour les sciences sociales - SIDOS)"
+      "Joye, Dominique (resp.) (Service suisse d'information et d'archivage de données pour les sciences sociales - SIDOS)",
+      "Schöbi, Nicole (Service suisse d'information et d'archivage de données pour les sciences sociales - SIDOS)",
+      "Kaenel, Céline (Service suisse d'information et d'archivage de données pour les sciences sociales - SIDOS)"
     ]
   },
   "samplingProcedureFreeTexts": {
     "xy": [
-      "\nSélection aléatoire à 3 phases:\n1) Tirage aléatoire de Sample points: 222 Sample Points ont été tirés aléatoirement après qu'ils aient été stratifiés selon les six régions suivantes:\n- Région lémanique (VD, VS, GE)\n- Espace Mittelland (BE, FR, SO, NE, JU)\n- Nordschweiz (ZH, BS, BL, AG)\n- Ostschweiz (GL, SH, AR, AI, SG, GR, TG)\n- Zentralschweiz (LU, UR, SZ, OW, NW, ZG)\n- Ticino (TI)\n2) Sélection aléatoire des ménages à partir du registre téléphonique;\n3) Tirage de la personne-cible au moyen de la méthode KISH.\n"
+      "Sélection aléatoire à 3 phases:\n1) Tirage aléatoire de Sample points: 222 Sample Points ont été tirés aléatoirement après qu'ils aient été stratifiés selon les six régions suivantes:\n- Région lémanique (VD, VS, GE)\n- Espace Mittelland (BE, FR, SO, NE, JU)\n- Nordschweiz (ZH, BS, BL, AG)\n- Ostschweiz (GL, SH, AR, AI, SG, GR, TG)\n- Zentralschweiz (LU, UR, SZ, OW, NW, ZG)\n- Ticino (TI)\n2) Sélection aléatoire des ménages à partir du registre téléphonique;\n3) Tirage de la personne-cible au moyen de la méthode KISH."
     ]
   },
   "abstract": {
-    "xy": "\nL'enquête \"European Social Survey\" (ESS, http://www.europeansocialsurvey.org) est une nouvelle enquête destinée à mesurer les attitudes et croyances des populations européennes et à expliquer les réactions aux changements des institutions en Europe. Pourquoi une nouvelle enquête ? D'abord pour attaquer des problématiques qui sont au coeur des préoccupations des chercheurs aujourd'hui. Par exemple, qu'est-ce que la citoyenneté aujourd'hui ? Comment les différents pays européens vivent-ils les questions posées par l'immigration ?\nCette enquête est aussi nouvelle  car elle vise des standards de qualité très élevés, et impose donc de nombreuses et sévères conditions méthodologiques, de telle sorte que les données soient vraiment comparables entre les pays. Plus de 20 pays ont participé à la deuxième édition qui s'est déroulée en automne 2004. La prochaine édition aura lieu en 2006, puisqu'il est prévu de réaliser une enquête ESS toutes les deux années.\n\nLa deuxième enquête ESS en Suisse fut réalisée par l'institut MIS Trend, mandaté par l'archive suisse pour les sciences sociales, le SIDOS (actuellement FORS : http://forscenter.ch/fr/ ). Le terrain s'est terminé fin février 2005, avec plus de 2000 personnes interrogées en Suisse.\n"
+    "xy": "L'enquête \"European Social Survey\" (ESS, http://www.europeansocialsurvey.org) est une nouvelle enquête destinée à mesurer les attitudes et croyances des populations européennes et à expliquer les réactions aux changements des institutions en Europe. Pourquoi une nouvelle enquête ? D'abord pour attaquer des problématiques qui sont au coeur des préoccupations des chercheurs aujourd'hui. Par exemple, qu'est-ce que la citoyenneté aujourd'hui ? Comment les différents pays européens vivent-ils les questions posées par l'immigration ?\nCette enquête est aussi nouvelle  car elle vise des standards de qualité très élevés, et impose donc de nombreuses et sévères conditions méthodologiques, de telle sorte que les données soient vraiment comparables entre les pays. Plus de 20 pays ont participé à la deuxième édition qui s'est déroulée en automne 2004. La prochaine édition aura lieu en 2006, puisqu'il est prévu de réaliser une enquête ESS toutes les deux années.\n\nLa deuxième enquête ESS en Suisse fut réalisée par l'institut MIS Trend, mandaté par l'archive suisse pour les sciences sociales, le SIDOS (actuellement FORS : http://forscenter.ch/fr/ ). Le terrain s'est terminé fin février 2005, avec plus de 2000 personnes interrogées en Suisse."
   },
   "studyAreaCountries": {
     "xy": [
@@ -141,7 +141,7 @@
   },
   "dataAccessFreeTexts": {
     "xy": [
-      "\nAucune\n"
+      "Aucune"
     ]
   },
   "classifications": {

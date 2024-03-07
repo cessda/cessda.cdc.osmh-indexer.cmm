@@ -23,11 +23,17 @@ import eu.cessda.pasc.oci.models.Record;
 import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.Request;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
+import eu.cessda.pasc.oci.models.cmmstudy.TermVocabAttributes;
+import eu.cessda.pasc.oci.models.cmmstudy.VocabAttributes;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
+import org.jdom2.filter.Filters;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,10 +43,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.io.Files.getNameWithoutExtension;
@@ -54,8 +57,10 @@ import static com.google.common.io.Files.getNameWithoutExtension;
 @Slf4j
 public class RecordXMLParser {
 
+    private static final XPathExpression<Element> OAI_RECORD_EXPRESSION = XPathFactory.instance().compile(OaiPmhConstants.RECORD_ELEMENT, Filters.element(), null, OaiPmhConstants.OAI_NS);
+
     private final CMMStudyMapper cmmStudyMapper;
-    Set<Map.Entry<String, Namespace>> suppressedNamespaceWarnings = null;
+    private Set<Namespace> suppressedNamespaceWarnings = null;
 
     @Autowired
     public RecordXMLParser(CMMStudyMapper cmmStudyMapper) {
@@ -75,6 +80,12 @@ public class RecordXMLParser {
         }
     }
 
+    /**
+     * Parse an OAI-PMH record header element into a {@link RecordHeader} object.
+     *
+     * @param headerElement the element to parse.
+     * @return a record header.
+     */
     @SuppressWarnings({"java:S131", "java:S1301"}) // There is no need to take action for other element names
     private RecordHeader parseRecordHeader(Element headerElement) {
 
@@ -90,7 +101,7 @@ public class RecordXMLParser {
         var childElements = headerElement.getChildren();
         for (var child : childElements) {
             switch (child.getName()) {
-                case OaiPmhConstants.IDENTIFIER_ELEMENT -> {
+                case OaiPmhConstants.IDENTIFIER -> {
                     String identifier = child.getText();
                     recordHeaderBuilder.identifier(identifier);
                 }
@@ -120,32 +131,32 @@ public class RecordXMLParser {
 
         var cmmStudies = new ArrayList<CMMStudy>();
 
-        for (var record : request.records()) {
+        for (var recordObj : request.records()) {
             // Short-Circuit. We carry on to parse beyond the headers only if the record is active.
-            if ((record.recordHeader() != null && record.recordHeader().deleted())) {
+            if ((recordObj.recordHeader() != null && recordObj.recordHeader().deleted())) {
                 // Marked as deleted, don't store
                 continue;
             }
             try {
-                var cmmStudy = mapDDIRecordToCMMStudy(repo, request, record, path);
+                var cmmStudy = mapDDIRecordToCMMStudy(repo, request, recordObj, path);
                 cmmStudies.add(cmmStudy);
             } catch (UnsupportedXMLNamespaceException e) {
-                logUnsupportedNamespace(repo, record, e);
+                var recordIdentifier = recordObj.recordHeader() != null ? recordObj.recordHeader().identifier() : null;
+                logUnsupportedNamespace(repo.code(), recordIdentifier, e);
             }
         }
 
         return cmmStudies;
     }
 
-    private void logUnsupportedNamespace(Repo repo, Record record, UnsupportedXMLNamespaceException e) {
+    private void logUnsupportedNamespace(String code, String recordIdentifier, UnsupportedXMLNamespaceException e) {
         // Only initialise if required
         if (suppressedNamespaceWarnings == null) {
             suppressedNamespaceWarnings = ConcurrentHashMap.newKeySet();
         }
-        if (suppressedNamespaceWarnings.add(Map.entry(repo.code(), e.getNamespace()))) {
+        if (suppressedNamespaceWarnings.add(e.getNamespace())) {
             // Only log on first encounter with this namespace
-            var recordIdentifier = record.recordHeader() != null ? record.recordHeader().identifier() : null;
-            log.warn("[{}]: {} cannot be parsed: {}. Further reports for this namespace have been suppressed.", repo.code(), recordIdentifier, e.getMessage());
+            log.warn("[{}]: {} cannot be parsed: {}. Further reports for this namespace have been suppressed.", code, recordIdentifier, e.getMessage());
         }
     }
 
@@ -162,12 +173,12 @@ public class RecordXMLParser {
             } catch (URISyntaxException e) {
                 log.warn("{}: {}: {} could not be parsed as a URL: {}", repo.code(), path, elem.getText(), e.toString());
             }
-            
+
             // Find all records, iterate through them
-            var elements = DocElementParser.getElements(document, OaiPmhConstants.RECORD_ELEMENT, OaiPmhConstants.OAI_NS);
+            var elements = OAI_RECORD_EXPRESSION.evaluate(document);
 
             var recordList = new ArrayList<Record>();
-            
+
             for (var recordElement : elements) {
                 var headerElement = recordElement.getChild("header", OaiPmhConstants.OAI_NS);
                 var header = parseRecordHeader(headerElement);
@@ -182,7 +193,7 @@ public class RecordXMLParser {
                 }
                 recordList.add(new Record(header, metadataDocument));
             }
-            
+
             return new Request(baseURL, recordList);
         } else {
             // OAI response not at the root of the document, create a synthetic request
@@ -195,20 +206,20 @@ public class RecordXMLParser {
      *
      * @param repository the source repository.
      * @param request the request element from the OAI-PMH response.
-     * @param record   the {@link Record} to convert.
+     * @param recordObj   the {@link Record} to convert.
      * @param path the path of the source XML.
      */
-    @SuppressWarnings("UnstableApiUsage")
-    private CMMStudy mapDDIRecordToCMMStudy(Repo repository, Request request, Record record, Path path) {
+    @SuppressWarnings({"java:S3776", "UnstableApiUsage"})
+    private CMMStudy mapDDIRecordToCMMStudy(Repo repository, Request request, Record recordObj, Path path) {
 
         CMMStudy.CMMStudyBuilder builder = CMMStudy.builder();
 
         String studyNumber;
         String lastModified;
-        if (record.recordHeader() != null) {
+        if (recordObj.recordHeader() != null) {
             // A header was present, extract values
-            studyNumber = record.recordHeader().identifier();
-            lastModified = record.recordHeader().lastModified();
+            studyNumber = recordObj.recordHeader().identifier();
+            lastModified = recordObj.recordHeader().lastModified();
         } else {
             // Derive the study number from the file name
             studyNumber = getNameWithoutExtension(path.toString());
@@ -225,7 +236,7 @@ public class RecordXMLParser {
         builder.lastModified(lastModified);
 
         // Check if metadata is present, parse if it is
-        var metadata = record.metadata();
+        var metadata = recordObj.metadata();
         if (metadata != null) {
             // Get the XPaths required for the metadata
             var xPaths = XPaths.getXPaths(metadata.getRootElement().getNamespace());
@@ -265,11 +276,13 @@ public class RecordXMLParser {
             builder.publisher(cmmStudyMapper.parsePublisher(metadata, xPaths, defaultLangIsoCode));
             cmmStudyMapper.parseYrOfPublication(metadata, xPaths).ifPresent(builder::publicationYear);
             builder.fileLanguages(cmmStudyMapper.parseFileLanguages(metadata, xPaths));
-            builder.typeOfSamplingProcedures(cmmStudyMapper.parseTypeOfSamplingProcedure(metadata, xPaths, defaultLangIsoCode));
-            builder.samplingProcedureFreeTexts(cmmStudyMapper.parseSamplingProcedureFreeTexts(metadata, xPaths, defaultLangIsoCode));
+            var samplingProcedures = cmmStudyMapper.parseTypeOfSamplingProcedure(metadata, xPaths, defaultLangIsoCode);
+            var result = extractSamplingProcedures(samplingProcedures);
+            builder.typeOfSamplingProcedures(result.vocabAttributes());
+            builder.samplingProcedureFreeTexts(result.terms());
             builder.typeOfModeOfCollections(cmmStudyMapper.parseTypeOfModeOfCollection(metadata, xPaths, defaultLangIsoCode));
 
-            var dataCollectionPeriodResults = cmmStudyMapper.parseDataCollectionDates(metadata, xPaths);
+            var dataCollectionPeriodResults = cmmStudyMapper.parseDataCollectionDates(metadata, xPaths, defaultLangIsoCode);
             dataCollectionPeriodResults.results().getStartDate().ifPresent(builder::dataCollectionPeriodStartdate);
             dataCollectionPeriodResults.results().getEndDate().ifPresent(builder::dataCollectionPeriodEnddate);
             builder.dataCollectionYear(dataCollectionPeriodResults.results().getDataCollectionYear());
@@ -281,8 +294,8 @@ public class RecordXMLParser {
                     dataCollectionPeriodResults.exceptions()
                 );
             }
+            builder.dataCollectionFreeTexts(dataCollectionPeriodResults.results().getFreeTexts());
 
-            builder.dataCollectionFreeTexts(cmmStudyMapper.parseDataCollectionFreeTexts(metadata, xPaths, defaultLangIsoCode));
             try {
                 builder.universe(cmmStudyMapper.parseUniverses(metadata, xPaths, defaultLangIsoCode));
             } catch (InvalidUniverseException e) {
@@ -307,5 +320,43 @@ public class RecordXMLParser {
         }
 
         return builder.build();
+    }
+
+    @NonNull
+    private static SamplingProcedures extractSamplingProcedures(Map<String, List<TermVocabAttributes>> samplingProcedures) {
+        var vocab = new HashMap<String, List<VocabAttributes>>();
+        var sampTerm = new HashMap<String, List<String>>();
+
+        samplingProcedures.forEach((lang, termVocabAttributesList) -> {
+            // Create separate lists
+            var va = new ArrayList<VocabAttributes>(termVocabAttributesList.size());
+            var ft = new ArrayList<String>(termVocabAttributesList.size());
+
+            // Copy content to the lists
+            for (var vocAttr : termVocabAttributesList) {
+                if (!vocAttr.id().isEmpty()) {
+                    va.add(new VocabAttributes(vocAttr.vocab(), vocAttr.vocabUri(), vocAttr.id()));
+                }
+                if (!vocAttr.term().isEmpty()) {
+                    ft.add(vocAttr.term());
+                }
+            }
+
+            // Put the lists with the separated content in the maps
+            if (!va.isEmpty()) {
+                vocab.put(lang, va);
+            }
+            if (!ft.isEmpty()) {
+                sampTerm.put(lang, ft);
+            }
+        });
+
+        return new SamplingProcedures(vocab, sampTerm);
+    }
+
+    private record SamplingProcedures(
+        Map<String, List<VocabAttributes>> vocabAttributes,
+        Map<String, List<String>> terms
+    ) {
     }
 }

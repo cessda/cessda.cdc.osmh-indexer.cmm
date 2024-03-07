@@ -7,19 +7,19 @@
     "de": [
       {
         "vocabUri": "",
-        "vocab": "",
+        "vocab": "ZA-Kategorien",
         "term": "Politische Fragen (Issues)",
         "id": ""
       },
       {
-        "vocabUri": "",
-        "vocab": "",
+        "vocabUri": "https://vocabularies.cessda.eu/urn/urn:ddi:int.cessda.cv:TopicClassification:4.2.2",
+        "vocab": "CESSDA Topic Classification",
         "term": "Internationale Politik und Internationale Organisationen",
         "id": ""
       },
       {
-        "vocabUri": "",
-        "vocab": "",
+        "vocabUri": "https://vocabularies.cessda.eu/urn/urn:ddi:int.cessda.cv:TopicClassification:4.2.2",
+        "vocab": "CESSDA Topic Classification",
         "term": "Konflikte, Sicherheit und Frieden",
         "id": ""
       }
@@ -27,19 +27,19 @@
     "en": [
       {
         "vocabUri": "",
-        "vocab": "",
+        "vocab": "ZA-Categories",
         "term": "Political Issues",
         "id": ""
       },
       {
-        "vocabUri": "",
-        "vocab": "",
+        "vocabUri": "https://vocabularies.cessda.eu/urn/urn:ddi:int.cessda.cv:TopicClassification:4.2.2",
+        "vocab": "CESSDA Topic Classification",
         "term": "International politics and organisations",
         "id": ""
       },
       {
-        "vocabUri": "",
-        "vocab": "",
+        "vocabUri": "https://vocabularies.cessda.eu/urn/urn:ddi:int.cessda.cv:TopicClassification:4.2.2",
+        "vocab": "CESSDA Topic Classification",
         "term": "Conflict, security and peace",
         "id": ""
       }
@@ -47,10 +47,10 @@
   },
   "creators": {
     "en": [
-      "GESIS - Leibniz Institute for the Social Sciences"
+      "Institute for International Social Research, Princeton, N.J. (GESIS)"
     ],
     "de": [
-      "GESIS - Leibniz Institut für Sozialwissenschaften"
+      "Creator de (GESIS)"
     ]
   },
   "dataAccessFreeTexts": {
@@ -65,26 +65,50 @@
   },
   "dataCollectionFreeTexts": {
   },
-  "dataCollectionYear": 0,
+  "dataCollectionYear": 1958,
+  "dataCollectionPeriodEnddate": "1958-04",
+  "dataCollectionPeriodStartdate": "1958-02",
   "fileLanguages": [
   ],
   "keywords": {
+    "en": [
+      {
+        "vocabUri": "https://elsst.cessda.eu/id/",
+        "vocab": "ELSST",
+        "term": "POLITICAL ISSUES",
+        "id": ""
+      }
+    ]
   },
   "lastModified": "2023-12-06T13:30:08.8725293Z",
   "pidStudies": {
     "en": [
       {
+        "agency": "DOI",
         "pid": "doi:10.4232/1.0004"
       }
     ]
   },
   "publisher": {
     "en": {
-      "abbr": "Publisher not specified",
-      "publisher": ""
+      "abbr": "GESIS",
+      "publisher": "GESIS - Leibniz Institute for the Social Sciences"
+    },
+    "de": {
+      "abbr": "",
+      "publisher": "GESIS - Leibniz Institut für Sozialwissenschaften"
     }
   },
+  "publicationYear": "1964",
   "relatedPublications": {
+    "en": [{
+      "title": "ZA0004-10_q.pdf (Questionnaire)",
+      "holdings": []
+     }],
+    "de": [{
+      "title": "ZA0004-10_q.pdf (Fragebogen)",
+      "holdings": []
+    }]
   },
   "repositoryUrl": "http://dbkapps.gesis.org/dbkoai/oai.asp",
   "samplingProcedureFreeTexts": {
@@ -96,6 +120,14 @@
     ]
   },
   "studyAreaCountries": {
+    "de": [{
+      "abbr": "US",
+      "country": "Vereinigte Staaten von Amerika"
+    }],
+    "en": [{
+      "abbr": "US",
+      "country": "United States of America"
+    }]
   },
   "studyNumber": "oai:dbk.gesis.org:DBK/ZA0004",
   "studyUrl": {
@@ -126,9 +158,29 @@
   "typeOfSamplingProcedures": {
   },
   "typeOfTimeMethods": {
+    "en": [
+      {
+        "vocabUri": "urn:ddi:int.ddi.cv:TimeMethod:1.2.3",
+        "vocab": "TimeMethod",
+        "term": "Longitudinal",
+        "id": ""
+      }
+    ]
   },
   "unitTypes": {
+    "en": [{
+      "vocabUri": "urn:ddi:int.ddi.cv:AnalysisUnit:2.1.3",
+      "vocab": "AnalysisUnit",
+      "term": "Individual",
+      "id": ""
+    }]
   },
   "universe": {
+    "de": {
+      "inclusion": "Kongressmitglieder (Senat und Repräsentantenhaus)"
+    },
+    "en": {
+      "inclusion": "Members of congress (Senate and House of Representatives)."
+    }
   }
 }

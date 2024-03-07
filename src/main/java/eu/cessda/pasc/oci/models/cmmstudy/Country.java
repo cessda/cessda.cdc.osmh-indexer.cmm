@@ -36,4 +36,7 @@ public record Country(
     @JsonProperty("country") String elementText,
     @JsonProperty("searchField") String searchField
 ) {
+    public Country(String isoCode, String elementText) {
+        this(isoCode, elementText, null);
+    }
 }
