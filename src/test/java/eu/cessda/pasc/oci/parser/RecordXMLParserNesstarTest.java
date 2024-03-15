@@ -37,6 +37,7 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
+@SuppressWarnings("NonApiType")
 public class RecordXMLParserNesstarTest {
 
     private final Repo nesstarRepo = ReposTestData.getNSDRepo();

@@ -31,6 +31,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static net.logstash.logback.argument.StructuredArguments.value;
+
 /**
  * Component responsible for extracting and mapping languages in which a given CMMStudy is available.
  * <p>
@@ -69,7 +71,7 @@ public class LanguageExtractor {
                 langCode -> getCmmStudyOfLanguage(cmmStudy, langCode, validLanguages, repository)
             ));
         } else {
-            log.debug("[{}] No valid languages for study [{}]", repository.code(), cmmStudy.studyNumber());
+            log.debug("[{}] No valid languages for study [{}]",  value(LoggingConstants.REPO_NAME, repository.code()), value(LoggingConstants.STUDY_ID,cmmStudy.studyNumber()));
             return Collections.emptyMap();
         }
     }
@@ -94,7 +96,11 @@ public class LanguageExtractor {
 
     private CMMStudyOfLanguage getCmmStudyOfLanguage(CMMStudy cmmStudy, String lang, Collection<String> availableLanguages, Repo repository) {
 
-        log.trace("[{}] Extracting CMMStudyOfLanguage for study [{}], language [{}]", repository.code(), cmmStudy.studyNumber(), lang);
+        log.trace("[{}] Extracting CMMStudyOfLanguage for study [{}], language [{}]",
+            value(LoggingConstants.REPO_NAME, repository.code()),
+            value(LoggingConstants.STUDY_ID, cmmStudy.studyNumber()),
+            value(LoggingConstants.LANG_CODE, lang)
+        );
 
         CMMStudyOfLanguage.CMMStudyOfLanguageBuilder builder = CMMStudyOfLanguage.builder();
 

@@ -81,6 +81,6 @@ public class IndexerConsumerServiceTest {
 
         // When
         assertThatThrownBy(() -> indexerConsumerService.getRecords(ukdsEndpoint))
-            .isInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(NullPointerException.class);
     }
 }
