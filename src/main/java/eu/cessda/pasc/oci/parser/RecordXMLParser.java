@@ -15,6 +15,7 @@
  */
 package eu.cessda.pasc.oci.parser;
 
+import eu.cessda.pasc.oci.LoggingConstants;
 import eu.cessda.pasc.oci.configurations.Repo;
 import eu.cessda.pasc.oci.exception.InvalidUniverseException;
 import eu.cessda.pasc.oci.exception.UnsupportedXMLNamespaceException;
@@ -43,10 +44,12 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.io.Files.getNameWithoutExtension;
+import static net.logstash.logback.argument.StructuredArguments.value;
 
 /**
  * Service Class responsible for querying the repository to fetch remote records.
@@ -156,7 +159,11 @@ public class RecordXMLParser {
         }
         if (suppressedNamespaceWarnings.add(e.getNamespace())) {
             // Only log on first encounter with this namespace
-            log.warn("[{}]: {} cannot be parsed: {}. Further reports for this namespace have been suppressed.", code, recordIdentifier, e.getMessage());
+            log.warn("[{}]: {} cannot be parsed: {}. Further reports for this namespace have been suppressed.",
+                value(LoggingConstants.REPO_NAME, code),
+                value(LoggingConstants.STUDY_ID, recordIdentifier),
+                e.getMessage()
+            );
         }
     }
 
@@ -167,11 +174,18 @@ public class RecordXMLParser {
             // Parse request element
             var elem = document.getRootElement().getChild("request", OaiPmhConstants.OAI_NS);
 
+            var uriString = elem.getTextTrim();
+
             URI baseURL = null;
             try {
-                baseURL = new URI(elem.getTextTrim());
+                baseURL = new URI(uriString);
             } catch (URISyntaxException e) {
-                log.warn("{}: {}: {} could not be parsed as a URL: {}", repo.code(), path, elem.getText(), e.toString());
+                log.warn("{}: {}: {} could not be parsed as a URL: {}",
+                    value(LoggingConstants.REPO_NAME, repo.code()),
+                    value(LoggingConstants.STUDY_ID, path),
+                    uriString,
+                    e.toString()
+                );
             }
 
             // Find all records, iterate through them
@@ -228,7 +242,7 @@ public class RecordXMLParser {
                 lastModified = Files.getLastModifiedTime(path).toString();
             } catch (IOException e) {
                 // Fallback - use the current time
-                lastModified = OffsetDateTime.now().toString();
+                lastModified = OffsetDateTime.now(ZoneId.systemDefault()).toString();
             }
         }
 
@@ -248,8 +262,8 @@ public class RecordXMLParser {
             builder.studyUrl(parseStudyUrlResults.results());
             if (!parseStudyUrlResults.exceptions().isEmpty()) {
                 log.warn("[{}] Some URLs in study {} couldn't be parsed: {}",
-                    repository.code(),
-                    studyNumber,
+                    value(LoggingConstants.REPO_NAME, repository.code()),
+                    value(LoggingConstants.STUDY_ID, studyNumber),
                     parseStudyUrlResults.exceptions()
                 );
             }
@@ -258,8 +272,8 @@ public class RecordXMLParser {
             builder.dataAccessUrl(parseDataAccessURIResults.results());
             if (!parseDataAccessURIResults.exceptions().isEmpty()) {
                 log.warn("[{}] Some URLs in study {} couldn't be parsed: {}",
-                    repository.code(),
-                    studyNumber,
+                    value(LoggingConstants.REPO_NAME, repository.code()),
+                    value(LoggingConstants.STUDY_ID, studyNumber),
                     parseDataAccessURIResults.exceptions()
                 );
             }
@@ -289,8 +303,8 @@ public class RecordXMLParser {
             if (!dataCollectionPeriodResults.exceptions().isEmpty()) {
                 // Parsing errors occurred, log here
                 log.warn("[{}] Some dates in study {} couldn't be parsed: {}",
-                    repository.code(),
-                    studyNumber,
+                    value(LoggingConstants.REPO_NAME, repository.code()),
+                    value(LoggingConstants.STUDY_ID, studyNumber),
                     dataCollectionPeriodResults.exceptions()
                 );
             }
@@ -299,7 +313,11 @@ public class RecordXMLParser {
             try {
                 builder.universe(cmmStudyMapper.parseUniverses(metadata, xPaths, defaultLangIsoCode));
             } catch (InvalidUniverseException e) {
-                log.warn("[{}] Some universes in study {} couldn't be parsed: {}", repository.code(), studyNumber, e.toString());
+                log.warn("[{}] Some universes in study {} couldn't be parsed: {}",
+                    value(LoggingConstants.REPO_NAME, repository.code()),
+                    value(LoggingConstants.STUDY_ID, studyNumber),
+                    e.toString()
+                );
             }
             builder.relatedPublications(cmmStudyMapper.parseRelatedPublications(metadata, xPaths, defaultLangIsoCode));
         }
@@ -316,7 +334,11 @@ public class RecordXMLParser {
             //should retrieve from header, if present
             builder.studyXmlSourceUrl(OaiPmhHelpers.buildGetStudyFullUrl(repository.url(), studyNumber, repository.preferredMetadataParam()));
         } catch (URISyntaxException e) {
-            log.warn("[{}] Study URL for {} couldn't be parsed: {}", repository.code(), studyNumber, e.toString());
+            log.warn("[{}] Study URL for {} couldn't be parsed: {}",
+                value(LoggingConstants.REPO_NAME, repository.code()),
+                value(LoggingConstants.STUDY_ID, studyNumber),
+                e.toString()
+            );
         }
 
         return builder.build();

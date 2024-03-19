@@ -38,6 +38,7 @@ import static java.util.Map.entry;
 @Getter(value = AccessLevel.PACKAGE)
 @ToString
 @With
+@SuppressWarnings("UnnecessaryLambda")
 public final class XPaths {
 
     @NonNull

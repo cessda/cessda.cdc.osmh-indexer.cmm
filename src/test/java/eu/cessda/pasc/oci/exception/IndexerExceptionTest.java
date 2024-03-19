@@ -18,6 +18,7 @@ package eu.cessda.pasc.oci.exception;
 import org.junit.Assert;
 import org.junit.Test;
 
+@SuppressWarnings("StaticAssignmentOfThrowable")
 public class IndexerExceptionTest {
 
     private static final Exception INNER_EXCEPTION = new Exception("Inner exception");

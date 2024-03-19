@@ -28,9 +28,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -51,7 +49,7 @@ public class IndexerConsumerService {
     protected static final String FAILED_TO_GET_STUDY_ID_WITH_MESSAGE = FAILED_TO_GET_STUDY_ID + ": {}";
 
     // Executor thread pool, ensure that at least 2 threads are available
-    private final ExecutorService executor = Executors.newFixedThreadPool(max(2, Runtime.getRuntime().availableProcessors()));
+    private final ExecutorService executor = Executors.newWorkStealingPool(max(2, Runtime.getRuntime().availableProcessors()));
 
     private final RecordXMLParser recordXMLParser;
     private final LanguageExtractor languageExtractor;
@@ -70,15 +68,13 @@ public class IndexerConsumerService {
      */
     @SuppressWarnings("UnstableApiUsage")
     public Map<String, List<CMMStudyOfLanguage>> getRecords(Repo repo) {
-        log.debug("[{}] Parsing records.", repo.code());
-
         /*
          * Repositories are indexed from their path. Because previous versions of the indexer supported
          * harvesting using URLs, we still need to check that a path is defined.
          */
-        if (repo.path() == null) {
-            throw new IllegalArgumentException("Repo " + repo.code() + " has no path defined");
-        }
+        Objects.requireNonNull(repo.path(), "Repo " + repo.code() + " has no path defined");
+
+        log.debug("[{}] Parsing records.", "Repo " + repo.code() + " has no path defined");
 
         try (var stream = Files.find(repo.path(), 1, (path, attributes) ->
             // Find XML files in the source directory.
@@ -87,19 +83,26 @@ public class IndexerConsumerService {
             var studies = new AtomicInteger();
 
             // Parse the XML asynchronously
-            var futures = stream.map(path -> CompletableFuture.supplyAsync(() -> getRecord(repo, path), executor)).toList();
+            var studiesByLanguage = stream.map(path -> CompletableFuture.supplyAsync(() -> {
+                // Extract the individual studies from the parsed XML
+                var records = getRecord(repo, path);
 
-            var studiesByLanguage = futures.stream()
-                .map(CompletableFuture::join) // Wait for the XML to be parsed
-                .flatMap(List::stream) // Extract the individual studies from the parsed XML
-                .flatMap(cmmStudy -> {
-                    // Extract language specific variants of the record
+                var studiesLangMap = new ArrayList<Map.Entry<String, CMMStudyOfLanguage>>();
+
+                // Collect all study entries into a list
+                for (var cmmStudy : records) {
                     var extractedStudies = languageExtractor.extractFromStudy(cmmStudy, repo);
                     if (!extractedStudies.isEmpty()) {
                         studies.getAndIncrement();
                     }
-                    return extractedStudies.entrySet().stream();
-                })
+                    studiesLangMap.addAll(extractedStudies.entrySet());
+                }
+
+                return studiesLangMap;
+            }, executor))
+                // Wait for the XML to be parsed
+                .map(CompletableFuture::join)
+                .flatMap(List::stream)
                 // Group the language specific studies by language
                 .collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
 

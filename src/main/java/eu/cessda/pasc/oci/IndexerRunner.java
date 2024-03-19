@@ -23,7 +23,6 @@ import eu.cessda.pasc.oci.elasticsearch.IngestService;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -41,6 +40,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.concurrent.CompletableFuture.runAsync;
+import static net.logstash.logback.argument.StructuredArguments.keyValue;
 import static net.logstash.logback.argument.StructuredArguments.value;
 
 @Component
@@ -76,9 +76,6 @@ public class IndexerRunner {
             // Load explicitly configured repositories
             var repos = configurationProperties.repos();
 
-            // Store the MDC so that it can be used in the running thread
-            var contextMap = MDC.getCopyOfContextMap();
-
             // Discover repositories by attempting to find pipeline.json instances if a base directory is configured
             Stream<Repo> repoStream;
             if (configurationProperties.baseDirectory() != null) {
@@ -89,20 +86,13 @@ public class IndexerRunner {
             }
 
             try (repoStream) {
-                var futures = repoStream
-                    .map(repo -> runAsync(() -> {
-                            MDC.setContextMap(contextMap);
-                            // Set the MDC so that the record name is attached to all downstream logs
-                            try (var repoNameClosable = MDC.putCloseable(LoggingConstants.REPO_NAME, repo.code())) {
-                                indexRepository(repo);
-                            } finally {
-                                // Reset the MDC
-                                MDC.clear();
-                            }
-                        })
-                        .exceptionally(e -> {
+                var futures = repoStream.map(repo ->
+                        runAsync(() ->
+                            // Index the repository in an asynchronous context
+                            indexRepository(repo)
+                        ).exceptionally(e -> {
                             // Handle exceptional completion here, this allows failures to be logged as soon as possible
-                            log.error("[{}]: Unexpected error occurred when harvesting!", repo.code(), e);
+                            log.error("[{}]: Unexpected error occurred when harvesting!", value(LoggingConstants.REPO_NAME, repo.code()), e);
                             return null;
                         })
                     ).toArray(CompletableFuture[]::new);
@@ -118,7 +108,6 @@ public class IndexerRunner {
             } finally {
                 // Ensure that the running state is always set to false even if an exception is thrown
                 indexerRunning.set(false);
-                MDC.setContextMap(contextMap);
             }
         } else {
             throw new IllegalStateException("Indexer is already running");
@@ -133,17 +122,18 @@ public class IndexerRunner {
     @SuppressWarnings("try")
     private void indexRepository(Repo repo) {
         var startTime = Instant.now();
-        log.info("Processing Repo [{}]", repo);
+        log.info("Processing Repo [{}]{}", repo, keyValue(LoggingConstants.REPO_NAME, repo.code(), ""));
         var langStudies = indexer.getRecords(repo);
         for (var entry : langStudies.entrySet()) {
-            try (var langClosable = MDC.putCloseable(LoggingConstants.LANG_CODE, entry.getKey())) {
-                indexRecords(repo, entry.getKey(), entry.getValue());
+            var lang = entry.getKey();
+            try {
+                indexRecords(repo, lang, entry.getValue());
             } catch (ElasticsearchException e) {
-                log.error("[{}({})] Error communicating with Elasticsearch!", repo.code(), entry.getKey(), e);
+                log.error("[{}({})] Error communicating with Elasticsearch!", value(LoggingConstants.REPO_NAME, repo.code()), value(LoggingConstants.LANG_CODE, lang), e);
             }
         }
         log.info("[{}] Repo finished, took {} seconds",
-            repo.code(),
+            value(LoggingConstants.REPO_NAME, repo.code()),
             value("repository_duration", Duration.between(startTime, Instant.now()).getSeconds())
         );
     }
@@ -171,7 +161,11 @@ public class IndexerRunner {
                 }
             } catch (ElasticsearchException | UncheckedIOException e) {
                 if (!(e instanceof ElasticsearchException) || !e.getMessage().contains("index_not_found_exception")) {
-                    log.warn("[{}({})] Couldn't retrieve existing studies for deletions: {}", repo.code(), langIsoCode, e.toString());
+                    log.warn("[{}({})] Couldn't retrieve existing studies for deletions: {}",
+                        value(LoggingConstants.REPO_NAME, repo.code()),
+                        value(LoggingConstants.LANG_CODE, langIsoCode),
+                        e.toString()
+                    );
                 }
             }
 
