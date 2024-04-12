@@ -447,6 +447,11 @@ public class CMMStudyMapper {
         }
     }
 
+    Map<String, List<Funding>> parseFunding(Document document, XPaths xPaths, String defaultLangIsoCode) {
+        var unmappedXPaths = xPaths.getFundingXPath().resolve(document, xPaths.getNamespace());
+        return mapNullLanguage(unmappedXPaths, defaultLangIsoCode);
+    }
+
     @Value
     public static class HeaderElement {
         String studyNumber;

@@ -74,6 +74,19 @@
       "type": "keyword",
       "ignore_above": 256
     },
+    "funding": {
+      "type": "nested",
+      "properties": {
+        "agency": {
+          "type": "keyword",
+          "ignore_above": 256
+        },
+        "grantNumber": {
+          "type": "keyword",
+          "ignore_above": 256
+        }
+      }
+    },
     "id": {
       "type": "keyword",
       "ignore_above": 256

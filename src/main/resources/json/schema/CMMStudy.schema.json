@@ -180,6 +180,30 @@
       },
       "description": "An array of File Languages (standardised ISO) for this CMMStudy."
     },
+    "funding": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "array",
+          "description": "An array of funding formation for this CMMStudy in this given ISO language code",
+          "items": [
+            {
+              "type": "object",
+              "description": "CMMStudy Funding Information",
+              "properties": {
+                "agency": {
+                  "type": "string"
+                },
+                "grantNumber": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      }
+    },
     "isActive": {
       "type": "boolean",
       "description": "Is the record marked as deleted. If record is deleted this = false.",

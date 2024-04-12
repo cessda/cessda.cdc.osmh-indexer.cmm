@@ -302,6 +302,7 @@ public class RecordXMLParser {
                 log.warn("[{}] Some universes in study {} couldn't be parsed: {}", repository.code(), studyNumber, e.toString());
             }
             builder.relatedPublications(cmmStudyMapper.parseRelatedPublications(metadata, xPaths, defaultLangIsoCode));
+            builder.funding(cmmStudyMapper.parseFunding(metadata, xPaths, defaultLangIsoCode));
         }
 
         URI repositoryUrl;

@@ -70,6 +70,20 @@
   "dataCollectionPeriodStartdate": "1958-02",
   "fileLanguages": [
   ],
+  "funding": {
+    "en": [
+      {
+        "agency": "GESIS - Leibniz Institute for the Social Sciences",
+        "grantNumber": "Grant Number"
+      }
+    ],
+    "de": [
+      {
+        "agency": "GESIS - Leibniz Institut für Sozialwissenschaften",
+        "grantNumber": "Grant Number"
+      }
+    ]
+  },
   "keywords": {
     "en": [
       {

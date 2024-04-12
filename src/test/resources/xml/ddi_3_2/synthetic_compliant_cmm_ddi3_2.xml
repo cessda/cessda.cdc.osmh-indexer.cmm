@@ -222,6 +222,18 @@
             <r:Content xml:lang="en">Attitude of the political leadership (members of parliament) in the USA to other nations and problems in world politics.</r:Content>
             <r:Content xml:lang="de">Einstellung der politischen Führungsschicht (Parlamentsmitglieder) in den USA zu anderen Nationen und weltpolitischen Problemen.</r:Content>
         </r:Abstract>
+        <r:FundingInformation>
+            <r:AgencyOrganizationReference>
+                <r:Agency>de.gesis</r:Agency>
+                <r:ID>ZA0004_Org_Pub1</r:ID>
+                <r:Version>1.0.0</r:Version>
+                <r:TypeOfObject>Organization</r:TypeOfObject>
+            </r:AgencyOrganizationReference>
+            <r:GrantNumber>Grant Number</r:GrantNumber>
+            <r:Description>
+                <r:Content>Description of funding</r:Content>
+            </r:Description>
+        </r:FundingInformation>
         <r:Coverage>
             <r:TopicalCoverage>
                 <r:Agency>de.gesis</r:Agency>
