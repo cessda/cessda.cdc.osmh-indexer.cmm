@@ -75,6 +75,7 @@
                                 <AuthEnty affiliation="University of Essex. Department of Psychology" xml:lang="en">David Brook</AuthEnty>
                             </rspStmt>
                             <prodStmt>
+                                <grantNo agency="Grant Agency">Grant Number</grantNo>
                             </prodStmt>
                             <distStmt>
                             </distStmt>

@@ -47,6 +47,7 @@ public record CMMStudy(
     @JsonProperty("dataCollectionYear") int dataCollectionYear,
     @JsonProperty("dataCollectionFreeTexts") Map<String, List<DataCollectionFreeText>> dataCollectionFreeTexts,
     @JsonProperty("fileLanguages") Set<String> fileLanguages,
+    @JsonProperty("funding") Map<String, List<Funding>> funding,
     @JsonProperty("keywords") Map<String, List<TermVocabAttributes>> keywords,
     @JsonProperty("pidStudies") Map<String, List<Pid>> pidStudies,
     @JsonProperty("publicationYear") String publicationYear,

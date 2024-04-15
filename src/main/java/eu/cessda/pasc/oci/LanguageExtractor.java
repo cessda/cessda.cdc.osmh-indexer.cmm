@@ -152,6 +152,7 @@ public class LanguageExtractor {
         Optional.ofNullable(cmmStudy.dataAccessFreeTexts()).map(map -> map.get(lang)).ifPresent(builder::dataAccessFreeTexts);
         Optional.ofNullable(cmmStudy.publisher()).map(map -> map.get(lang)).ifPresent(builder::publisher);
         Optional.ofNullable(cmmStudy.universe()).map(map -> map.get(lang)).ifPresent(builder::universe);
+        Optional.ofNullable(cmmStudy.funding()).map(map -> map.get(lang)).ifPresent(builder::funding);
 
         // #502 - Use any language to set related publications, override with language specific field if present
         Optional.ofNullable(cmmStudy.relatedPublications()).flatMap(map -> map.values().stream().filter(Objects::nonNull).findAny()).ifPresent(builder::relatedPublications);

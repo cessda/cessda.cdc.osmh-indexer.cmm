@@ -320,6 +320,7 @@ public class RecordXMLParser {
                 );
             }
             builder.relatedPublications(cmmStudyMapper.parseRelatedPublications(metadata, xPaths, defaultLangIsoCode));
+            builder.funding(cmmStudyMapper.parseFunding(metadata, xPaths, defaultLangIsoCode));
         }
 
         URI repositoryUrl;

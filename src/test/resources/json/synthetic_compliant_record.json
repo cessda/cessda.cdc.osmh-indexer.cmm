@@ -110,6 +110,14 @@
     "ee",
     "bb"
   ],
+  "funding":  {
+    "en": [
+      {
+        "agency": "Grant Agency",
+        "grantNumber": "Grant Number"
+      }
+    ]
+  },
   "samplingProcedureFreeTexts": {
     "sv": [
       "Sannolikhetsurval: stratifierat urval",

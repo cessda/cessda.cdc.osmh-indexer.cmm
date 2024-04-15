@@ -937,6 +937,19 @@ class ParsingStrategies{
         return Collections.emptyMap();
     }
 
+    @NonNull
+    static Optional<Funding> fundingStrategy(Element element) {
+        var grantNumber = nullableElementValueStrategy(element);
+        if (grantNumber.isPresent()) {
+            // Extract the agency from the "agency" attribute
+            var agency = getAttributeValue(element, AGENCY_ATTR).orElse(null);
+
+            return Optional.of(new Funding(grantNumber.get(), agency));
+        } else {
+            return Optional.empty();
+        }
+    }
+
     /**
      * Returns the text content of the given attribute.
      * If the attribute does not exist, an empty {@link Optional} will be returned.
@@ -956,11 +969,12 @@ class ParsingStrategies{
      *     <li>{@code <collDate xml:lang="en" date="2009-03-19" event="start"/> }</li>
      *     <li><strike>{@code <collDate xml:lang="fi" date="2009-03-19" event="start"/> }</strike></li>
      * </ul>
-     * Currently there is no requirement to extract dates of event per language.
+     * There is currently no requirement to extract dates of event per language.
      *
      * @param elements the elements to extract attributes from.
      * @return a {@link Map} with the keys set to the {@value OaiPmhConstants#EVENT_ATTR} and the values set to the date values.
      */
+    @NonNull
     private static Map<String, String> getDateElementAttributesValueMap(List<Element> elements) {
         //PUG requirement: we only care about those with @date CV
         Map<String, String> map = new HashMap<>();
@@ -972,5 +986,48 @@ class ParsingStrategies{
             }
         }
         return map;
+    }
+
+    /**
+     * Parse funding information from DDI Lifecycle {@code FundingInformation} element.
+     * <p>
+     * This method extracts the grant number and the organisation name from the {@code FundingInformation} element.
+     * @param elementList a list of {@code FundingInformation} elements.
+     * @return a map of language specific funding information.
+     */
+    @NonNull
+    static HashMap<String, List<Funding>> fundingLifecycleStrategy(List<Element> elementList) {
+        var fundingMap = new HashMap<String, List<Funding>>();
+
+        for (var element : elementList) {
+            String grantNumber = null;
+            Map<String, Publisher> orgLangMap = Collections.emptyMap();
+
+            for (var childElement : element.getChildren()) {
+                switch (childElement.getName()) {
+                    case "AgencyOrganizationReference":
+                        var resolvedReference = resolveReference(childElement);
+                        if (resolvedReference.isPresent()) {
+                            orgLangMap = organizationStrategy(resolvedReference.get().element());
+                        }
+                        break;
+                    case "GrantNumber":
+                        grantNumber = childElement.getTextTrim();
+                        break;
+                }
+            }
+
+            // Skip setting funding if the grant number is missing
+            if (grantNumber == null) {
+                continue;
+            }
+
+            for (var organization : orgLangMap.entrySet()) {
+                var funding = new Funding(grantNumber, organization.getValue().name());
+                fundingMap.computeIfAbsent(organization.getKey(), k -> new ArrayList<>()).add(funding);
+            }
+        }
+
+        return fundingMap;
     }
 }
