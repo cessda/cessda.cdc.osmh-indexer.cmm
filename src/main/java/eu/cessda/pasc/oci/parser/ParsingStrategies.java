@@ -587,11 +587,6 @@ class ParsingStrategies{
             }
         }
 
-        // Default to 0 if the year cannot be parsed
-        if (year == null) {
-            year = 0;
-        }
-
         var dataCollectionPeriod = new CMMStudyMapper.DataCollectionPeriod(startDate, year, endDate, Collections.emptyMap());
         return new CMMStudyMapper.ParseResults<>(dataCollectionPeriod, parseExceptions);
     }

@@ -237,6 +237,19 @@ public class RecordXMLParserTest {
         assertThatCmmRequiredFieldsAreExtracted(result.get(0));
     }
 
+    @Test
+    public void shouldHaveNullDataCollectionYearWhenRequiredFieldsAreNotPreset() throws FileNotFoundException, URISyntaxException, XMLParseException {
+
+        // Given
+        var recordXML = ResourceHandler.getResource("xml/ddi_2_5/ddi_record_ukds_example.xml");
+
+        // When
+        var result = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
+
+        then(result).hasSize(1);
+        then(result.get(0).dataCollectionYear()).isNull();
+    }
+
     private void validateCMMStudyResultAgainstSchema(CMMStudy record) throws IOException, ProcessingException, JSONException {
         String jsonString = objectMapper.writeValueAsString(record);
         JSONObject json = new JSONObject(jsonString);

@@ -44,7 +44,7 @@ public record CMMStudy(
     @JsonProperty("dataAccessUrl") Map<String, URI> dataAccessUrl,
     @JsonProperty("dataCollectionPeriodStartdate") String dataCollectionPeriodStartdate,
     @JsonProperty("dataCollectionPeriodEnddate") String dataCollectionPeriodEnddate,
-    @JsonProperty("dataCollectionYear") int dataCollectionYear,
+    @JsonProperty("dataCollectionYear") Integer dataCollectionYear,
     @JsonProperty("dataCollectionFreeTexts") Map<String, List<DataCollectionFreeText>> dataCollectionFreeTexts,
     @JsonProperty("fileLanguages") Set<String> fileLanguages,
     @JsonProperty("funding") Map<String, List<Funding>> funding,
