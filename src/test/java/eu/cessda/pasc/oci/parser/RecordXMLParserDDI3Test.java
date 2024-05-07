@@ -95,6 +95,24 @@ public class RecordXMLParserDDI3Test {
         assertEquals(expectedJson, actualJson, true);
     }
 
+    @Test
+    public void shouldReturnValidCMMStudyRecordFromAFullyFragmentRecord() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
+        // Given
+        var expectedJson = ResourceHandler.getResourceAsString("json/synthetic_compliant_record_ddi_3_fragments.json");
+        var recordXML = ResourceHandler.getResource("xml/ddi_3_3/compliant_fragments_cmm_ddi_3_3.xml");
+
+        // When
+        var result = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
+
+        then(result).hasSize(1);
+        validateCMMStudyResultAgainstSchema(result.get(0));
+
+        String actualJson = objectMapper.writeValueAsString(result.get(0));
+
+        // Check if the JSON generated differs from the expected source
+        assertEquals(expectedJson, actualJson, true);
+    }
+
     private void validateCMMStudyResultAgainstSchema(CMMStudy record) throws IOException, ProcessingException {
         String jsonString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(record);
         log.debug("RETRIEVED STUDY JSON: \n" + jsonString);
