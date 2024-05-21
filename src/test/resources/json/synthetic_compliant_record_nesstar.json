@@ -103,9 +103,18 @@
   },
   "creators": {
     "xy": [
-      "Joye, Dominique (resp.) (Service suisse d'information et d'archivage de données pour les sciences sociales - SIDOS)",
-      "Schöbi, Nicole (Service suisse d'information et d'archivage de données pour les sciences sociales - SIDOS)",
-      "Kaenel, Céline (Service suisse d'information et d'archivage de données pour les sciences sociales - SIDOS)"
+      {
+        "name": "Joye, Dominique (resp.)",
+        "affiliation": "Service suisse d'information et d'archivage de données pour les sciences sociales - SIDOS"
+      },
+      {
+        "name": "Schöbi, Nicole",
+        "affiliation": "Service suisse d'information et d'archivage de données pour les sciences sociales - SIDOS"
+      },
+      {
+        "name": "Kaenel, Céline",
+        "affiliation": "Service suisse d'information et d'archivage de données pour les sciences sociales - SIDOS"
+      }
     ]
   },
   "samplingProcedureFreeTexts": {

@@ -47,10 +47,24 @@
   },
   "creators": {
     "en": [
-      "Institute for International Social Research, Princeton, N.J. (GESIS)"
+      {
+        "name": "Synthetic ORCID",
+        "identifier": {
+          "id": "0000-0000-0000-0000",
+          "type": "ORCID",
+          "uri": "https://orcid.org/0000-0000-0000-0000"
+        }
+      }
     ],
     "de": [
-      "Creator de (GESIS)"
+      {
+        "name": "Synthetic ORCID de",
+        "identifier": {
+          "id": "0000-0000-0000-0000",
+          "type": "ORCID",
+          "uri": "https://orcid.org/0000-0000-0000-0000"
+        }
+      }
     ]
   },
   "dataAccessFreeTexts": {

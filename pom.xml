@@ -20,7 +20,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.cessda.pasc</groupId>
     <artifactId>pasc-oci</artifactId>
-    <version>3.5.0</version>
+    <version>4.0.0</version>
     <packaging>jar</packaging>
 
     <name>CESSDA Data Catalogue OSMH Indexer</name>
@@ -304,6 +304,7 @@
                         <exclude>mvnw*</exclude>
                         <exclude>.mvn/**</exclude>
                         <exclude>.*</exclude>
+                        <exclude>CITATION.cff</exclude>
                         <exclude>LICENSE.txt</exclude>
                         <exclude>**/.m2/**</exclude>
                         <exclude>lombok.config</exclude>
