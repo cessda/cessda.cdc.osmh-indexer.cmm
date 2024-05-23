@@ -202,7 +202,7 @@ public class RecordXMLParser {
                 var oaiMetadataElement = recordElement.getChild("metadata", OaiPmhConstants.OAI_NS);
                 if (oaiMetadataElement != null && !oaiMetadataElement.getChildren().isEmpty()) {
                     // Detach the metadata from its document and attach it to a new document
-                    var metadataElement = oaiMetadataElement.getChildren().get(0);
+                    var metadataElement = oaiMetadataElement.getChildren().getFirst();
                     metadataDocument = new Document(metadataElement.detach());
                 }
                 recordList.add(new Record(header, metadataDocument));

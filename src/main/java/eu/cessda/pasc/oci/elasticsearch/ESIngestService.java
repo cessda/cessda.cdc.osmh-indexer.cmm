@@ -251,7 +251,7 @@ public class ESIngestService implements IngestService {
 
         var hits = response.hits().hits();
         if (!hits.isEmpty()) {
-            study = hits.get(0).source();
+            study = hits.getFirst().source();
         }
         if (study == null) {
             return Optional.empty();

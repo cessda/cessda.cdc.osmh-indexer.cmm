@@ -97,7 +97,7 @@ public class ESIngestServiceTestIT {
         ESIngestService ingestService = new ESIngestService(elasticsearchClient, esConfigProp);
 
         // Set the id to a random UUID
-        var expected = studyOfLanguages.get(0);
+        var expected = studyOfLanguages.getFirst();
 
         // When
         ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
@@ -113,7 +113,7 @@ public class ESIngestServiceTestIT {
         then(response.hits().hits()).isNotEmpty();
 
         // Verify that the document is considered equal
-        var actual = response.hits().hits().get(0).source();
+        var actual = response.hits().hits().getFirst().source();
         then(actual).isEqualTo(expected);
     }
 
@@ -327,7 +327,7 @@ public class ESIngestServiceTestIT {
         // Given
         doThrow(IOException.class).when(elasticsearchClientSpy).get(any(co.elastic.clients.elasticsearch.core.GetRequest.class), eq(CMMStudyOfLanguage.class));
         ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
-        var expectedStudy = studyOfLanguages.get(0);
+        var expectedStudy = studyOfLanguages.getFirst();
 
         // Then
         var study = ingestService.getStudy(expectedStudy.id(), LANGUAGE_ISO_CODE);
@@ -344,13 +344,13 @@ public class ESIngestServiceTestIT {
         elasticsearchClient.indices().refresh(RefreshRequest.of(r -> r.index(INDEX_NAME)));
 
         // Given
-        var studyToDelete = Collections.singletonList(studyOfLanguages.get(0));
+        var studyToDelete = Collections.singletonList(studyOfLanguages.getFirst());
         ingestService.bulkDelete(studyToDelete, LANGUAGE_ISO_CODE);
 
         // Then - the study should not be present, but other studies should be
         elasticsearchClient.indices().refresh(RefreshRequest.of(r -> r.index(INDEX_NAME)));
         assertFalse(elasticsearchClient.get(
-            GetRequest.of(g -> g.index(INDEX_NAME).id(studyToDelete.get(0).id())), Void.class
+            GetRequest.of(g -> g.index(INDEX_NAME).id(studyToDelete.getFirst().id())), Void.class
         ).found());
 
         var response = elasticsearchClient.search(
@@ -375,7 +375,7 @@ public class ESIngestServiceTestIT {
         List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
 
         // Study with a different lang code
-        var studyWithDifferentRepoCode = getCmmStudyOfLanguageCodeEnX1().get(0)
+        var studyWithDifferentRepoCode = getCmmStudyOfLanguageCodeEnX1().getFirst()
             .withId(UUID.randomUUID().toString()).withCode("TEST");
 
         var studiesToIngest = new ArrayList<>(studyOfLanguages);
@@ -386,7 +386,7 @@ public class ESIngestServiceTestIT {
         elasticsearchClient.indices().refresh(RefreshRequest.of(r -> r.index(INDEX_NAME)));
 
         // Given
-        var repoCode = studyOfLanguages.get(0).code();
+        var repoCode = studyOfLanguages.getFirst().code();
 
         // Expect 3 studies to be returned
         var studies = ingestService.getStudiesByRepository(repoCode, LANGUAGE_ISO_CODE);

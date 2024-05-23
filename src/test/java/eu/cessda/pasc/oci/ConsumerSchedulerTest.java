@@ -99,7 +99,7 @@ public class ConsumerSchedulerTest {
 
         // mock for ES bulking
         when(esIndexer.getStudy(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.empty());
-        when(esIndexer.getStudy(Mockito.eq("UKDS__998"), Mockito.anyString())).thenReturn(Optional.of(getCmmStudyOfLanguageCodeEnX1().get(0)));
+        when(esIndexer.getStudy(Mockito.eq("UKDS__998"), Mockito.anyString())).thenReturn(Optional.of(getCmmStudyOfLanguageCodeEnX1().getFirst()));
 
         // Given
         var harvesterRunner = new IndexerRunner(appConfigurationProperties, harvesterConsumerService, pipelineUtilities, esIndexer);
