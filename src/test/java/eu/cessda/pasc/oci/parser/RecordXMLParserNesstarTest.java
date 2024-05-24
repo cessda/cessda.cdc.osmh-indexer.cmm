@@ -70,9 +70,9 @@ public class RecordXMLParserNesstarTest {
 
         // Then
         then(result).hasSize(1);
-        utils.validateCMMStudyResultAgainstSchema(result.get(0));
+        utils.validateCMMStudyResultAgainstSchema(result.getFirst());
 
-        var actualJson = objectMapper.writeValueAsString(result.get(0));
+        var actualJson = objectMapper.writeValueAsString(result.getFirst());
         var expectedJson = ResourceHandler.getResourceAsString("json/synthetic_compliant_record_nesstar.json");
 
         // Compare the generated JSON to the expected result
@@ -90,7 +90,7 @@ public class RecordXMLParserNesstarTest {
 
         // Then
         then(record).hasSize(1);
-        utils.validateCMMStudyResultAgainstSchema(record.get(0));
+        utils.validateCMMStudyResultAgainstSchema(record.getFirst());
     }
 
     @Test
@@ -103,8 +103,8 @@ public class RecordXMLParserNesstarTest {
         // When
         var record = new RecordXMLParser(cmmStudyMapper).getRecord(nesstarRepo, Path.of(recordXML.toURI()));
         then(record).hasSize(1);
-        utils.validateCMMStudyResultAgainstSchema(record.get(0));
-        var jsonString = objectMapper.writeValueAsString(record.get(0));
+        utils.validateCMMStudyResultAgainstSchema(record.getFirst());
+        var jsonString = objectMapper.writeValueAsString(record.getFirst());
         var actualTree = objectMapper.readTree(jsonString);
 
         // Then
@@ -120,7 +120,7 @@ public class RecordXMLParserNesstarTest {
         var expectedCmmStudyJsonString = ResourceHandler.getResource("xml/nesstar/synthetic_compliant_cmm_nesstar.xml");
 
         // When
-        var record = new RecordXMLParser(cmmStudyMapper).getRecord(nesstarRepo, Path.of(expectedCmmStudyJsonString.toURI())).get(0);
+        var record = new RecordXMLParser(cmmStudyMapper).getRecord(nesstarRepo, Path.of(expectedCmmStudyJsonString.toURI())).getFirst();
 
         // Then
         then(record.titleStudy()).containsKey("xy");
@@ -142,9 +142,9 @@ public class RecordXMLParserNesstarTest {
 
         // Then
         then(record).hasSize(1);
-        then(record.get(0).abstractField().size()).isEqualTo(4);
-        then(record.get(0).abstractField()).isEqualTo(expectedAbstract);
-        utils.validateCMMStudyResultAgainstSchema(record.get(0));
+        then(record.getFirst().abstractField().size()).isEqualTo(4);
+        then(record.getFirst().abstractField()).isEqualTo(expectedAbstract);
+        utils.validateCMMStudyResultAgainstSchema(record.getFirst());
     }
 
     @Test // https://github.com/cessda/cessda.cdc.versions/issues/135
@@ -161,9 +161,9 @@ public class RecordXMLParserNesstarTest {
 
         // Then
         then(record).hasSize(1);
-        then(record.get(0).titleStudy().size()).isEqualTo(2);
-        then(record.get(0).titleStudy()).isEqualTo(expectedTitle);
-        utils.validateCMMStudyResultAgainstSchema(record.get(0));
+        then(record.getFirst().titleStudy().size()).isEqualTo(2);
+        then(record.getFirst().titleStudy()).isEqualTo(expectedTitle);
+        utils.validateCMMStudyResultAgainstSchema(record.getFirst());
     }
 
     @Test()
@@ -204,8 +204,8 @@ public class RecordXMLParserNesstarTest {
 
         // Then
         then(result).hasSize(1);
-        utils.validateCMMStudyResultAgainstSchema(result.get(0));
-        assertThatCmmRequiredFieldsAreExtracted(result.get(0));
+        utils.validateCMMStudyResultAgainstSchema(result.getFirst());
+        assertThatCmmRequiredFieldsAreExtracted(result.getFirst());
     }
 
     private void assertThatCmmRequiredFieldsAreExtracted(CMMStudy record) throws JSONException, IOException {
@@ -244,9 +244,9 @@ public class RecordXMLParserNesstarTest {
         var result = new RecordXMLParser(cmmStudyMapper).getRecord(langRepo, Path.of(recordXML.toURI()));
 
         then(result).hasSize(1);
-        utils.validateCMMStudyResultAgainstSchema(result.get(0));
+        utils.validateCMMStudyResultAgainstSchema(result.getFirst());
 
         // Assert the language is as expected
-        Assert.assertNotNull(result.get(0).titleStudy().get("zz"));
+        Assert.assertNotNull(result.getFirst().titleStudy().get("zz"));
     }
 }

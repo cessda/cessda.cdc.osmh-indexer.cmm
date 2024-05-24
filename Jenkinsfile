@@ -28,11 +28,14 @@ pipeline {
 	stages {
 		// Building on main
 		stage('Pull SDK Docker Image') {
-		    agent {
-		        docker {
-                    image 'openjdk:17'
+            agent {
+                docker {
+                    image 'eclipse-temurin:21'
                     reuseNode true
                 }
+            }
+            environment {
+                HOME = "${WORKSPACE_TMP}"
             }
 		    stages {
                 stage('Build Project') {
@@ -84,9 +87,7 @@ pipeline {
 		}
 		stage('Check Requirements and Deployments') {
 			steps {
-				dir('./infrastructure/gcp/') {
-					build job: 'cessda.cdc.deploy/main', parameters: [string(name: 'osmh_indexer_image_tag', value: "${env.BRANCH_NAME}-${env.BUILD_NUMBER}")], wait: false
-				}
+                build job: 'cessda.cdc.deploy/main', parameters: [string(name: 'osmh_indexer_image_tag', value: "${env.BRANCH_NAME}-${env.BUILD_NUMBER}")], wait: false
 			}
             when { branch 'main' }
 		}

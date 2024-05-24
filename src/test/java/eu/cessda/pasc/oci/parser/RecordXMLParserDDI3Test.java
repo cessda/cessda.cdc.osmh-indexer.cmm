@@ -80,9 +80,9 @@ public class RecordXMLParserDDI3Test {
         var result = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
 
         then(result).hasSize(1);
-        utils.validateCMMStudyResultAgainstSchema(result.get(0));
+        utils.validateCMMStudyResultAgainstSchema(result.getFirst());
 
-        String actualJson = objectMapper.writeValueAsString(result.get(0));
+        String actualJson = objectMapper.writeValueAsString(result.getFirst());
 
         // Check if the JSON generated differs from the expected source
         assertEquals(expectedJson, actualJson, true);
