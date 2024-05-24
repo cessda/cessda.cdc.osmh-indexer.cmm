@@ -75,9 +75,9 @@ public class RecordXMLParserTest {
         var result = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
 
         then(result).hasSize(1);
-        validateCMMStudyResultAgainstSchema(result.get(0));
+        validateCMMStudyResultAgainstSchema(result.getFirst());
 
-        String actualJson = objectMapper.writeValueAsString(result.get(0));
+        String actualJson = objectMapper.writeValueAsString(result.getFirst());
 
         // Check if the JSON generated differs from the expected source
         assertEquals(expectedJson, actualJson, true);
@@ -95,17 +95,17 @@ public class RecordXMLParserTest {
 
         then(optionalResult).hasSize(1);
 
-        var result = optionalResult.get(0);
+        var result = optionalResult.getFirst();
 
         // Verifies timeMeth extraction
         then(result.typeOfTimeMethods().size()).isEqualTo(2);
-        then(result.typeOfTimeMethods().get("fi").get(0).term()).isEqualTo("Pitkittäisaineisto: trendi/toistuva poikkileikkausaineisto");
-        then(result.typeOfTimeMethods().get("en").get(0).term()).isEqualTo("Longitudinal: Trend/Repeated cross-section");
+        then(result.typeOfTimeMethods().get("fi").getFirst().term()).isEqualTo("Pitkittäisaineisto: trendi/toistuva poikkileikkausaineisto");
+        then(result.typeOfTimeMethods().get("en").getFirst().term()).isEqualTo("Longitudinal: Trend/Repeated cross-section");
 
         // Verifies unitTypes extraction
         then(result.unitTypes().size()).isEqualTo(2);
-        then(result.unitTypes().get("fi").get(0).term()).isEqualTo("Henkilö");
-        then(result.unitTypes().get("en").get(0).term()).isEqualTo("Individual");
+        then(result.unitTypes().get("fi").getFirst().term()).isEqualTo("Henkilö");
+        then(result.unitTypes().get("en").getFirst().term()).isEqualTo("Individual");
     }
 
     @Test
@@ -119,7 +119,7 @@ public class RecordXMLParserTest {
 
         // Then
         then(record).hasSize(1);
-        validateCMMStudyResultAgainstSchema(record.get(0));
+        validateCMMStudyResultAgainstSchema(record.getFirst());
     }
 
     @Test
@@ -132,9 +132,9 @@ public class RecordXMLParserTest {
         // When
         var record = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
         then(record).hasSize(1);
-        validateCMMStudyResultAgainstSchema(record.get(0));
+        validateCMMStudyResultAgainstSchema(record.getFirst());
         final ObjectMapper mapper = new ObjectMapper();
-        String jsonString = objectMapper.writeValueAsString(record.get(0));
+        String jsonString = objectMapper.writeValueAsString(record.getFirst());
         final JsonNode actualTree = mapper.readTree(jsonString);
 
         then(actualTree.get("dataCollectionPeriodStartdate").asText()).isEqualTo("1976-01-01T00:00:00Z");
@@ -151,7 +151,7 @@ public class RecordXMLParserTest {
 
         // When
         var record = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
-        String actualCmmStudyJsonString = objectMapper.writeValueAsString(record.get(0));
+        String actualCmmStudyJsonString = objectMapper.writeValueAsString(record.getFirst());
 
         // then
         assertEquals(expectedCmmStudyJsonString, actualCmmStudyJsonString, false);
@@ -172,9 +172,9 @@ public class RecordXMLParserTest {
         var record = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
 
         then(record).hasSize(1);
-        then(record.get(0).abstractField().size()).isEqualTo(3);
-        then(record.get(0).abstractField()).isEqualTo(expectedAbstract);
-        validateCMMStudyResultAgainstSchema(record.get(0));
+        then(record.getFirst().abstractField().size()).isEqualTo(3);
+        then(record.getFirst().abstractField()).isEqualTo(expectedAbstract);
+        validateCMMStudyResultAgainstSchema(record.getFirst());
     }
 
     @Test // https://github.com/cessda/cessda.cdc.versions/issues/135
@@ -192,9 +192,9 @@ public class RecordXMLParserTest {
         var record = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
 
         then(record).hasSize(1);
-        then(record.get(0).titleStudy().size()).isEqualTo(3);
-        then(record.get(0).titleStudy()).isEqualTo(expectedTitle);
-        validateCMMStudyResultAgainstSchema(record.get(0));
+        then(record.getFirst().titleStudy().size()).isEqualTo(3);
+        then(record.getFirst().titleStudy()).isEqualTo(expectedTitle);
+        validateCMMStudyResultAgainstSchema(record.getFirst());
     }
 
     @Test()
@@ -233,14 +233,14 @@ public class RecordXMLParserTest {
         var result = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
 
         then(result).hasSize(1);
-        validateCMMStudyResultAgainstSchema(result.get(0));
-        assertThatCmmRequiredFieldsAreExtracted(result.get(0));
+        validateCMMStudyResultAgainstSchema(result.getFirst());
+        assertThatCmmRequiredFieldsAreExtracted(result.getFirst());
     }
 
     private void validateCMMStudyResultAgainstSchema(CMMStudy record) throws IOException, ProcessingException, JSONException {
         String jsonString = objectMapper.writeValueAsString(record);
         JSONObject json = new JSONObject(jsonString);
-        log.debug("RETRIEVED STUDY JSON: \n" + json.toString(4));
+        log.debug("RETRIEVED STUDY JSON: \n{}", json.toString(4));
 
         JsonNode jsonNodeRecord = JsonLoader.fromString(jsonString);
         final JsonSchema schema = JsonSchemaFactory.byDefault().getJsonSchema("resource:/json/schema/CMMStudy.schema.json");
@@ -276,10 +276,10 @@ public class RecordXMLParserTest {
         var result = new RecordXMLParser(cmmStudyMapper).getRecord(repository, Path.of(recordXML.toURI()));
 
         then(result).hasSize(1);
-        validateCMMStudyResultAgainstSchema(result.get(0));
+        validateCMMStudyResultAgainstSchema(result.getFirst());
 
         // Assert the language is as expected
-        Assert.assertNotNull(result.get(0).titleStudy().get("zz"));
+        Assert.assertNotNull(result.getFirst().titleStudy().get("zz"));
     }
 
     @Test
@@ -297,7 +297,7 @@ public class RecordXMLParserTest {
             validateCMMStudyResultAgainstSchema(study);
         }
 
-        var actualJson = objectMapper.writeValueAsString(result.get(0));
+        var actualJson = objectMapper.writeValueAsString(result.getFirst());
 
         // Check if the JSON for the first study differs from the expected source
         assertEquals(expectedJson, actualJson, true);
