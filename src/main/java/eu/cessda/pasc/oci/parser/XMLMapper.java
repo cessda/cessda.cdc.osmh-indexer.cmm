@@ -21,7 +21,6 @@ import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
-import org.jdom2.xpath.XPathFactory;
 
 import java.util.*;
 import java.util.function.BinaryOperator;
@@ -31,24 +30,20 @@ import static eu.cessda.pasc.oci.parser.OaiPmhConstants.LANG_ATTR;
 import static org.jdom2.Namespace.XML_NAMESPACE;
 
 /**
- * Maps elements found at a specified XPath using a provided mapping function.
+ * Maps elements to a resolved type
  *
  * @param <T> the resulting type of the mapping function.
  */
-class XMLMapper<T> {
-    private final String xPath;
-    private final Function<List<Element>, T> mappingFunction;
-
+public interface XMLMapper<T> {
     /**
-     * Constructs a new instance of the XMLMapper.
+     * Resolves the given context object to an instance of T.
      *
-     * @param xPath the XPath of the elements to map.
-     * @param mappingFunction the mapping function.
+     * @param context a XPath context to pass to {@link XPathExpression#evaluate(Object)}.
+     * @param namespace the XML namespaces to allow resolution of prefixes.
+     * @return an instance of {@link T}.
      */
-    XMLMapper(String xPath, Function<List<Element>, T> mappingFunction) {
-        this.xPath = xPath;
-        this.mappingFunction = mappingFunction;
-    }
+    T resolve(Object context, Namespace... namespace);
+
 
     /**
      * Returns the {@code xml:lang} attributes of the given elements.
@@ -98,19 +93,6 @@ class XMLMapper<T> {
     }
 
     /**
-     * Resolves the given context object to an instance of T.
-     *
-     * @param context a XPath context to pass to {@link XPathExpression#evaluate(Object)}.
-     * @param namespace the XML namespaces to allow resolution of prefixes.
-     * @return an instance of {@link T}.
-     */
-    T resolve(Object context, Namespace... namespace) {
-        XPathExpression<Element> expression = XPathFactory.instance().compile(xPath, Filters.element(), null, namespace);
-        var result = expression.evaluate(context);
-        return mappingFunction.apply(result);
-    }
-
-    /**
      * Gets the content of the {@code xml:lang} attribute of the given element. If the language code
      * contains a region (i.e. de-DE) the region is stripped.
      *
@@ -138,7 +120,7 @@ class XMLMapper<T> {
      * if the parent element doesn't have a language code.
      * <p>
      * The language code is extracted from the {@code xml:lang} attribute using the
-     * semantics of {@link XMLMapper#getLangOfElement(Element)}.
+     * semantics of {@link SimpleXMLMapper#getLangOfElement(Element)}.
      *
      * @param element the element to extract
      * @return the language, or an empty string if the {@code xml:lang} attribute was not present.
@@ -160,7 +142,7 @@ class XMLMapper<T> {
      * Returns a function that will extract language specific content from an {@link Element} list.
      * <p>
      * The language code is extracted from the {@code xml:lang} attribute using the
-     * semantics of {@link XMLMapper#getLangOfElement(Element)}.
+     * semantics of {@link SimpleXMLMapper#getLangOfElement(Element)}.
      * <p>
      * If conflicts are found (i.e. multiple elements have content with the same {@code xml:lang},
      * the last encountered element will be returned.
@@ -177,7 +159,7 @@ class XMLMapper<T> {
      * Returns a function that will extract language specific content from an {@link Element} list.
      * <p>
      * The language code is extracted from the {@code xml:lang} attribute using the
-     * semantics of {@link XMLMapper#getLangOfElement(Element)}.
+     * semantics of {@link SimpleXMLMapper#getLangOfElement(Element)}.
      *
      * @param mappingFunction the function to map an element to {@link T}.
      * @param mergeFunction the function to merge language specific content in case of conflicts.
@@ -201,7 +183,7 @@ class XMLMapper<T> {
     /**
      * Extracts metadata from the given list of {@link Element}s, using the given element extractor {@link Function}.
      * <p>
-     * This uses {@link XMLMapper#getLangOfElement(Element)} to extract the language of the elements. If no
+     * This uses {@link SimpleXMLMapper#getLangOfElement(Element)} to extract the language of the elements. If no
      * language information is found then the elements are added under the {@code ""} key.
      *
      * @param <T>                the type returned by the parser strategy.

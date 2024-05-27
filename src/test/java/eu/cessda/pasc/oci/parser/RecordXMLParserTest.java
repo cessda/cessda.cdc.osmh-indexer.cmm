@@ -17,11 +17,7 @@ package eu.cessda.pasc.oci.parser;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.fge.jackson.JsonLoader;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
-import com.github.fge.jsonschema.core.report.ProcessingReport;
-import com.github.fge.jsonschema.main.JsonSchema;
-import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import eu.cessda.pasc.oci.ResourceHandler;
 import eu.cessda.pasc.oci.configurations.Repo;
 import eu.cessda.pasc.oci.exception.IndexerException;
@@ -30,7 +26,6 @@ import eu.cessda.pasc.oci.mock.data.ReposTestData;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -42,7 +37,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
-import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
@@ -56,6 +50,7 @@ public class RecordXMLParserTest {
 
     private final Repo repo = ReposTestData.getUKDSRepo();
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ParserTestUtilities utils = new ParserTestUtilities(objectMapper);
 
     // Class under test
     private final CMMStudyMapper cmmStudyMapper = new CMMStudyMapper();
@@ -75,7 +70,7 @@ public class RecordXMLParserTest {
         var result = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
 
         then(result).hasSize(1);
-        validateCMMStudyResultAgainstSchema(result.getFirst());
+        utils.validateCMMStudyResultAgainstSchema(result.getFirst());
 
         String actualJson = objectMapper.writeValueAsString(result.getFirst());
 
@@ -109,7 +104,7 @@ public class RecordXMLParserTest {
     }
 
     @Test
-    public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
+    public void shouldReturnValidCMMStudyRecordFromOaiPmhDDI2_5MetadataRecord() throws IOException, ProcessingException, IndexerException, URISyntaxException {
 
         // Given
         var recordXML = ResourceHandler.getResource("xml/ddi_2_5/ddi_record_1683.xml");
@@ -119,12 +114,12 @@ public class RecordXMLParserTest {
 
         // Then
         then(record).hasSize(1);
-        validateCMMStudyResultAgainstSchema(record.getFirst());
+        utils.validateCMMStudyResultAgainstSchema(record.getFirst());
     }
 
     @Test
     @SuppressWarnings("PreferJavaTimeOverload")
-    public void shouldOnlyExtractSingleDateAsStartDateForRecordsWithASingleDateAttr() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
+    public void shouldOnlyExtractSingleDateAsStartDateForRecordsWithASingleDateAttr() throws IOException, ProcessingException, IndexerException, URISyntaxException {
 
         // Given
         var recordXML = ResourceHandler.getResource("xml/ddi_2_5/ddi_record_1683.xml");
@@ -132,7 +127,7 @@ public class RecordXMLParserTest {
         // When
         var record = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
         then(record).hasSize(1);
-        validateCMMStudyResultAgainstSchema(record.getFirst());
+        utils.validateCMMStudyResultAgainstSchema(record.getFirst());
         final ObjectMapper mapper = new ObjectMapper();
         String jsonString = objectMapper.writeValueAsString(record.getFirst());
         final JsonNode actualTree = mapper.readTree(jsonString);
@@ -159,7 +154,7 @@ public class RecordXMLParserTest {
 
     @Test
     @SuppressWarnings("PreferJavaTimeOverload")
-    public void shouldReturnCMMStudyRecordWithRepeatedAbstractConcatenated() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
+    public void shouldReturnCMMStudyRecordWithRepeatedAbstractConcatenated() throws IOException, ProcessingException, IndexerException, URISyntaxException {
 
         Map<String, String> expectedAbstract = new HashMap<>();
         expectedAbstract.put("de", "de de");
@@ -174,12 +169,12 @@ public class RecordXMLParserTest {
         then(record).hasSize(1);
         then(record.getFirst().abstractField().size()).isEqualTo(3);
         then(record.getFirst().abstractField()).isEqualTo(expectedAbstract);
-        validateCMMStudyResultAgainstSchema(record.getFirst());
+        utils.validateCMMStudyResultAgainstSchema(record.getFirst());
     }
 
     @Test // https://github.com/cessda/cessda.cdc.versions/issues/135
     @SuppressWarnings("PreferJavaTimeOverload")
-    public void shouldReturnCMMStudyRecordWithOutParTitleWhenThereIsALangDifferentFromDefault() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
+    public void shouldReturnCMMStudyRecordWithOutParTitleWhenThereIsALangDifferentFromDefault() throws IOException, ProcessingException, IndexerException, URISyntaxException {
 
         Map<String, String> expectedTitle = new HashMap<>();
         expectedTitle.put("en", "Machinery of Government, 1976-1977");
@@ -194,7 +189,7 @@ public class RecordXMLParserTest {
         then(record).hasSize(1);
         then(record.getFirst().titleStudy().size()).isEqualTo(3);
         then(record.getFirst().titleStudy()).isEqualTo(expectedTitle);
-        validateCMMStudyResultAgainstSchema(record.getFirst());
+        utils.validateCMMStudyResultAgainstSchema(record.getFirst());
     }
 
     @Test()
@@ -233,22 +228,21 @@ public class RecordXMLParserTest {
         var result = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
 
         then(result).hasSize(1);
-        validateCMMStudyResultAgainstSchema(result.getFirst());
+        utils.validateCMMStudyResultAgainstSchema(result.getFirst());
         assertThatCmmRequiredFieldsAreExtracted(result.getFirst());
     }
 
-    private void validateCMMStudyResultAgainstSchema(CMMStudy record) throws IOException, ProcessingException, JSONException {
-        String jsonString = objectMapper.writeValueAsString(record);
-        JSONObject json = new JSONObject(jsonString);
-        log.debug("RETRIEVED STUDY JSON: \n{}", json.toString(4));
+    @Test
+    public void shouldHaveNullDataCollectionYearWhenRequiredFieldsAreNotPreset() throws FileNotFoundException, URISyntaxException, XMLParseException {
 
-        JsonNode jsonNodeRecord = JsonLoader.fromString(jsonString);
-        final JsonSchema schema = JsonSchemaFactory.byDefault().getJsonSchema("resource:/json/schema/CMMStudy.schema.json");
+        // Given
+        var recordXML = ResourceHandler.getResource("xml/ddi_2_5/ddi_record_ukds_example.xml");
 
-        ProcessingReport validate = schema.validate(jsonNodeRecord);
-        if (!validate.isSuccess()) {
-            fail("Validation not successful : " + validate);
-        }
+        // When
+        var result = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
+
+        then(result).hasSize(1);
+        then(result.get(0).dataCollectionYear()).isNull();
     }
 
     private void assertThatCmmRequiredFieldsAreExtracted(CMMStudy record) throws IOException, JSONException {
@@ -265,7 +259,7 @@ public class RecordXMLParserTest {
     }
 
     @Test
-    public void shouldOverrideGlobalLanguageDefaultIfAPerRepositoryOverrideIsSpecified() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
+    public void shouldOverrideGlobalLanguageDefaultIfAPerRepositoryOverrideIsSpecified() throws IOException, ProcessingException, IndexerException, URISyntaxException {
 
         var repository = ReposTestData.getUKDSLanguageOverrideRepository();
 
@@ -276,7 +270,7 @@ public class RecordXMLParserTest {
         var result = new RecordXMLParser(cmmStudyMapper).getRecord(repository, Path.of(recordXML.toURI()));
 
         then(result).hasSize(1);
-        validateCMMStudyResultAgainstSchema(result.getFirst());
+        utils.validateCMMStudyResultAgainstSchema(result.getFirst());
 
         // Assert the language is as expected
         Assert.assertNotNull(result.getFirst().titleStudy().get("zz"));
@@ -294,7 +288,7 @@ public class RecordXMLParserTest {
         then(result).hasSize(2);
 
         for (var study : result) {
-            validateCMMStudyResultAgainstSchema(study);
+            utils.validateCMMStudyResultAgainstSchema(study);
         }
 
         var actualJson = objectMapper.writeValueAsString(result.getFirst());

@@ -16,9 +16,7 @@
 package eu.cessda.pasc.oci.parser;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.fge.jackson.JsonLoader;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
-import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import eu.cessda.pasc.oci.ResourceHandler;
 import eu.cessda.pasc.oci.configurations.Repo;
 import eu.cessda.pasc.oci.exception.IndexerException;
@@ -33,7 +31,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.HashMap;
 
-import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
@@ -44,7 +41,7 @@ public class RecordXMLParserNesstarTest {
 
     private final CMMStudyMapper cmmStudyMapper = new CMMStudyMapper();
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ParserTestUtilities utils = new ParserTestUtilities(objectMapper);
 
     private static HashMap<String, String> getAbstractFixture() {
         var expectedAbstract = new HashMap<String, String>();
@@ -73,7 +70,7 @@ public class RecordXMLParserNesstarTest {
 
         // Then
         then(result).hasSize(1);
-        validateCMMStudyResultAgainstSchema(result.getFirst());
+        utils.validateCMMStudyResultAgainstSchema(result.getFirst());
 
         var actualJson = objectMapper.writeValueAsString(result.getFirst());
         var expectedJson = ResourceHandler.getResourceAsString("json/synthetic_compliant_record_nesstar.json");
@@ -93,7 +90,7 @@ public class RecordXMLParserNesstarTest {
 
         // Then
         then(record).hasSize(1);
-        validateCMMStudyResultAgainstSchema(record.getFirst());
+        utils.validateCMMStudyResultAgainstSchema(record.getFirst());
     }
 
     @Test
@@ -106,9 +103,9 @@ public class RecordXMLParserNesstarTest {
         // When
         var record = new RecordXMLParser(cmmStudyMapper).getRecord(nesstarRepo, Path.of(recordXML.toURI()));
         then(record).hasSize(1);
-        validateCMMStudyResultAgainstSchema(record.getFirst());
+        utils.validateCMMStudyResultAgainstSchema(record.getFirst());
         var jsonString = objectMapper.writeValueAsString(record.getFirst());
-        var actualTree = mapper.readTree(jsonString);
+        var actualTree = objectMapper.readTree(jsonString);
 
         // Then
         then(actualTree.get("dataCollectionPeriodStartdate").asText()).isEqualTo("2004-09-16");
@@ -147,7 +144,7 @@ public class RecordXMLParserNesstarTest {
         then(record).hasSize(1);
         then(record.getFirst().abstractField().size()).isEqualTo(4);
         then(record.getFirst().abstractField()).isEqualTo(expectedAbstract);
-        validateCMMStudyResultAgainstSchema(record.getFirst());
+        utils.validateCMMStudyResultAgainstSchema(record.getFirst());
     }
 
     @Test // https://github.com/cessda/cessda.cdc.versions/issues/135
@@ -166,7 +163,7 @@ public class RecordXMLParserNesstarTest {
         then(record).hasSize(1);
         then(record.getFirst().titleStudy().size()).isEqualTo(2);
         then(record.getFirst().titleStudy()).isEqualTo(expectedTitle);
-        validateCMMStudyResultAgainstSchema(record.getFirst());
+        utils.validateCMMStudyResultAgainstSchema(record.getFirst());
     }
 
     @Test()
@@ -207,28 +204,16 @@ public class RecordXMLParserNesstarTest {
 
         // Then
         then(result).hasSize(1);
-        validateCMMStudyResultAgainstSchema(result.getFirst());
+        utils.validateCMMStudyResultAgainstSchema(result.getFirst());
         assertThatCmmRequiredFieldsAreExtracted(result.getFirst());
-    }
-
-    private void validateCMMStudyResultAgainstSchema(CMMStudy record) throws IOException, ProcessingException {
-        var jsonString = objectMapper.writeValueAsString(record);
-
-        var jsonNodeRecord = JsonLoader.fromString(jsonString);
-        var schema = JsonSchemaFactory.byDefault().getJsonSchema("resource:/json/schema/CMMStudy.schema.json");
-
-        var validate = schema.validate(jsonNodeRecord);
-        if (!validate.isSuccess()) {
-            fail("Validation not successful: " + validate);
-        }
     }
 
     private void assertThatCmmRequiredFieldsAreExtracted(CMMStudy record) throws JSONException, IOException {
 
         var jsonString = objectMapper.writeValueAsString(record);
         var expectedJson = ResourceHandler.getResourceAsString("json/synthetic_compliant_record_nesstar.json");
-        final var actualTree = mapper.readTree(jsonString);
-        final var expectedTree = mapper.readTree(expectedJson);
+        final var actualTree = objectMapper.readTree(jsonString);
+        final var expectedTree = objectMapper.readTree(expectedJson);
 
         // CMM Model Schema required fields
         assertEquals(expectedTree.get("abstract").toString(), actualTree.get("abstract").toString(), true);
@@ -259,7 +244,7 @@ public class RecordXMLParserNesstarTest {
         var result = new RecordXMLParser(cmmStudyMapper).getRecord(langRepo, Path.of(recordXML.toURI()));
 
         then(result).hasSize(1);
-        validateCMMStudyResultAgainstSchema(result.getFirst());
+        utils.validateCMMStudyResultAgainstSchema(result.getFirst());
 
         // Assert the language is as expected
         Assert.assertNotNull(result.getFirst().titleStudy().get("zz"));

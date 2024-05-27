@@ -471,9 +471,13 @@ public class CMMStudyMapper {
     @Value
     public static class DataCollectionPeriod {
         String startDate;
-        int dataCollectionYear;
+        Integer dataCollectionYear;
         String endDate;
         Map<String, List<DataCollectionFreeText>> freeTexts;
+
+        public Optional<Integer> getDataCollectionYear() {
+            return Optional.ofNullable(dataCollectionYear);
+        }
 
         public Optional<String> getStartDate() {
             return Optional.ofNullable(startDate);

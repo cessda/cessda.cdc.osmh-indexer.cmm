@@ -1,0 +1,1037 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type='text/xsl' href='/oai/oai-pmh.xsl'?>
+<oai:OAI-PMH xmlns:oai="http://www.openarchives.org/OAI/2.0/">
+    <oai:responseDate>2024-05-06T06:33:38Z</oai:responseDate>
+    <oai:request verb="GetRecord">/oai/request</oai:request>
+    <oai:GetRecord>
+        <oai:record>
+            <oai:header>
+                <oai:identifier>no.nsd:39c1f667-17c2-475b-9333-846f59666e32:16</oai:identifier>
+                <oai:datestamp>2024-05-03T13:14:02.3620880Z</oai:datestamp>
+                <oai:setSpec>30ea0200-7121-4f01-8d21-a931a182b86d</oai:setSpec>
+            </oai:header>
+            <oai:metadata>
+                <ddi:FragmentInstance xmlns:ddi="ddi:instance:3_3"
+                                      xmlns:r="ddi:reusable:3_3"
+                                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                                      xsi:schemaLocation="ddi:instance:3_3 http://www.ddialliance.org/Specification/DDI-Lifecycle/3.3/XMLSchema/instance.xsd">
+                    <ddi:TopLevelReference>
+                        <r:Agency>no.nsd</r:Agency>
+                        <r:ID>39c1f667-17c2-475b-9333-846f59666e32</r:ID>
+                        <r:Version>16</r:Version>
+                        <r:TypeOfObject>StudyUnit</r:TypeOfObject>
+                    </ddi:TopLevelReference>
+                    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+                        <Organization isUniversallyUnique="true" versionDate="2024-04-29T13:36:36.8270814Z" xmlns="ddi:archive:3_3">
+                            <r:URN>urn:ddi:no.nsd:f0478985-f894-4294-a400-c3551ff87c56:1</r:URN>
+                            <r:Agency>no.nsd</r:Agency>
+                            <r:ID>f0478985-f894-4294-a400-c3551ff87c56</r:ID>
+                            <r:Version>1</r:Version>
+                            <r:VersionResponsibility>SIKT\jolei</r:VersionResponsibility>
+                            <r:VersionRationale>
+                                <r:RationaleDescription>
+                                    <r:String xml:lang="no">Lagt inn Dhulikhel Hospital-Kathmandu University School of Medical Sciences, Kathmandu Medical College, Linnaeus University og John Hopkins University School of Nursing</r:String>
+                                </r:RationaleDescription>
+                            </r:VersionRationale>
+                            <OrganizationIdentification>
+                                <OrganizationName>
+                                    <r:String xml:lang="en">Linnaeus University</r:String>
+                                    <r:String xml:lang="no">Linnéuniversitetet</r:String>
+                                </OrganizationName>
+                            </OrganizationIdentification>
+                        </Organization>
+                    </Fragment>
+                    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+                        <Organization isUniversallyUnique="true" versionDate="2024-04-29T13:36:36.8270814Z" xmlns="ddi:archive:3_3">
+                            <r:URN>urn:ddi:no.nsd:be253f98-7aa0-4720-af65-2fb27d2257e3:1</r:URN>
+                            <r:Agency>no.nsd</r:Agency>
+                            <r:ID>be253f98-7aa0-4720-af65-2fb27d2257e3</r:ID>
+                            <r:Version>1</r:Version>
+                            <r:VersionResponsibility>SIKT\jolei</r:VersionResponsibility>
+                            <r:VersionRationale>
+                                <r:RationaleDescription>
+                                    <r:String xml:lang="no">Lagt inn Dhulikhel Hospital-Kathmandu University School of Medical Sciences, Kathmandu Medical College, Linnaeus University og John Hopkins University School of Nursing</r:String>
+                                </r:RationaleDescription>
+                            </r:VersionRationale>
+                            <OrganizationIdentification>
+                                <OrganizationName>
+                                    <r:String xml:lang="en">Kathmandu Medical College</r:String>
+                                    <r:String xml:lang="no">Kathmandu Medical College</r:String>
+                                </OrganizationName>
+                            </OrganizationIdentification>
+                        </Organization>
+                    </Fragment>
+                    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+                        <Organization isUniversallyUnique="true" versionDate="2024-04-29T13:36:36.8270814Z" xmlns="ddi:archive:3_3">
+                            <r:URN>urn:ddi:no.nsd:09dfdcc2-e650-4a3e-83e1-e850c98f8ed8:1</r:URN>
+                            <r:Agency>no.nsd</r:Agency>
+                            <r:ID>09dfdcc2-e650-4a3e-83e1-e850c98f8ed8</r:ID>
+                            <r:Version>1</r:Version>
+                            <r:VersionResponsibility>SIKT\jolei</r:VersionResponsibility>
+                            <r:VersionRationale>
+                                <r:RationaleDescription>
+                                    <r:String xml:lang="no">Lagt inn Dhulikhel Hospital-Kathmandu University School of Medical Sciences, Kathmandu Medical College, Linnaeus University og John Hopkins University School of Nursing</r:String>
+                                </r:RationaleDescription>
+                            </r:VersionRationale>
+                            <OrganizationIdentification>
+                                <OrganizationName>
+                                    <r:String xml:lang="en">John Hopkins University School of Nursing</r:String>
+                                    <r:String xml:lang="no">John Hopkins University School of Nursing</r:String>
+                                </OrganizationName>
+                            </OrganizationIdentification>
+                        </Organization>
+                    </Fragment>
+                    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+                        <Organization isUniversallyUnique="true" versionDate="2024-04-29T13:36:36.8270814Z" xmlns="ddi:archive:3_3">
+                            <r:URN>urn:ddi:no.nsd:53052e71-eb74-49f5-808c-2026512a1763:1</r:URN>
+                            <r:Agency>no.nsd</r:Agency>
+                            <r:ID>53052e71-eb74-49f5-808c-2026512a1763</r:ID>
+                            <r:Version>1</r:Version>
+                            <r:VersionResponsibility>SIKT\jolei</r:VersionResponsibility>
+                            <r:VersionRationale>
+                                <r:RationaleDescription>
+                                    <r:String xml:lang="no">Lagt inn Dhulikhel Hospital-Kathmandu University School of Medical Sciences, Kathmandu Medical College, Linnaeus University og John Hopkins University School of Nursing</r:String>
+                                </r:RationaleDescription>
+                            </r:VersionRationale>
+                            <OrganizationIdentification>
+                                <OrganizationName>
+                                    <r:String xml:lang="en">Dhulikhel Hospital-Kathmandu University School of Medical Sciences</r:String>
+                                    <r:String xml:lang="no">Dhulikhel Hospital-Kathmandu University School of Medical Sciences</r:String>
+                                </OrganizationName>
+                            </OrganizationIdentification>
+                        </Organization>
+                    </Fragment>
+                    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+                        <Organization isUniversallyUnique="true" versionDate="2021-05-07T21:04:23.9815098Z" xmlns="ddi:archive:3_3">
+                            <r:URN>urn:ddi:no.nsd:ebadc6e6-7994-4844-9822-646fbf5cd224:1</r:URN>
+                            <r:Agency>no.nsd</r:Agency>
+                            <r:ID>ebadc6e6-7994-4844-9822-646fbf5cd224</r:ID>
+                            <r:Version>1</r:Version>
+                            <OrganizationIdentification>
+                                <OrganizationName>
+                                    <r:String xml:lang="en">OsloMet</r:String>
+                                    <r:String xml:lang="no">OsloMet</r:String>
+                                </OrganizationName>
+                            </OrganizationIdentification>
+                        </Organization>
+                    </Fragment>
+                    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+                        <Organization isUniversallyUnique="true" versionDate="2023-06-26T07:48:33.9842933Z" xmlns="ddi:archive:3_3">
+                            <r:URN>urn:ddi:no.nsd:1581d2af-6d25-4a21-87bc-f5705779092a:3</r:URN>
+                            <r:Agency>no.nsd</r:Agency>
+                            <r:ID>1581d2af-6d25-4a21-87bc-f5705779092a</r:ID>
+                            <r:Version>3</r:Version>
+                            <r:VersionResponsibility>SIKT\mja047</r:VersionResponsibility>
+                            <r:VersionRationale>
+                                <r:RationaleDescription>
+                                    <r:String xml:lang="no">Oppdatert Sikt til versjon 3 for å forsøke å "av-deprecate"</r:String>
+                                </r:RationaleDescription>
+                            </r:VersionRationale>
+                            <OrganizationIdentification>
+                                <OrganizationName>
+                                    <r:String xml:lang="en">Sikt - Norwegian Agency for Shared Services in Education and Research</r:String>
+                                    <r:String xml:lang="no">Sikt - Kunnskapssektorens tjenesteleverandør</r:String>
+                                </OrganizationName>
+                            </OrganizationIdentification>
+                        </Organization>
+                    </Fragment>
+                    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+                        <Universe isUniversallyUnique="true" versionDate="2024-04-29T13:53:58.9438971Z" xmlns="ddi:conceptualcomponent:3_3">
+                            <r:URN>urn:ddi:no.nsd:7fc27ed5-9094-4181-9717-cb228812f326:2</r:URN>
+                            <r:Agency>no.nsd</r:Agency>
+                            <r:ID>7fc27ed5-9094-4181-9717-cb228812f326</r:ID>
+                            <r:Version>2</r:Version>
+                            <r:VersionResponsibility>SIKT\jolei</r:VersionResponsibility>
+                            <r:VersionRationale>
+                                <r:RationaleDescription>
+                                    <r:String xml:lang="no">Feilretting.</r:String>
+                                </r:RationaleDescription>
+                            </r:VersionRationale>
+                            <UniverseName>
+                                <r:String xml:lang="en">Pregnant women attending the Outpatient Department (OPD) of Obstetrics and Gynecology departments at two collaborating hospitals in Nepal.</r:String>
+                                <r:String xml:lang="no">Gravide kvinner som deltar i poliklinisk avdeling (OPD) for obstetrikk og gynekologi ved to samarbeidende sykehus i Nepal.</r:String>
+                            </UniverseName>
+                            <r:Label>
+                                <r:Content xml:lang="en">Pregnant women attending the Outpatient Department (OPD) of Obstetrics and Gynecology departments at two collaborating hospitals in Nepal.</r:Content>
+                                <r:Content xml:lang="no">Gravide kvinner som deltar i poliklinisk avdeling (OPD) for obstetrikk og gynekologi ved to samarbeidende sykehus i Nepal.</r:Content>
+                            </r:Label>
+                        </Universe>
+                    </Fragment>
+                    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+                        <DataCollection isUniversallyUnique="true" versionDate="2024-05-03T13:06:51.4209387Z" xmlns="ddi:datacollection:3_3">
+                            <r:URN>urn:ddi:no.nsd:c60e5fba-6b5d-4061-9dd1-792bf681c603:4</r:URN>
+                            <r:Agency>no.nsd</r:Agency>
+                            <r:ID>c60e5fba-6b5d-4061-9dd1-792bf681c603</r:ID>
+                            <r:Version>4</r:Version>
+                            <r:UserAttributePair>
+                                <r:AttributeKey>extension:ProcessingEventReferences</r:AttributeKey>
+                                <r:AttributeValue>["urn:ddi:no.nsd:eb71ff35-b507-4601-8b1c-2a5aba9c7604:1"]</r:AttributeValue>
+                            </r:UserAttributePair>
+                            <r:VersionResponsibility>SIKT\kst109</r:VersionResponsibility>
+                            <r:Label>
+                                <r:Content xml:lang="no">1363</r:Content>
+                            </r:Label>
+                            <MethodologyReference>
+                                <r:Agency>no.nsd</r:Agency>
+                                <r:ID>4a5f3c0a-cee4-453d-bf23-757c621086dd</r:ID>
+                                <r:Version>2</r:Version>
+                                <r:TypeOfObject>DataCollectionMethodology</r:TypeOfObject>
+                            </MethodologyReference>
+                            <CollectionEvent isUniversallyUnique="true">
+                                <r:URN>urn:ddi:no.nsd:019b9c6a-bd4e-4dac-adbe-2d2b6a607d73:4</r:URN>
+                                <r:Agency>no.nsd</r:Agency>
+                                <r:ID>019b9c6a-bd4e-4dac-adbe-2d2b6a607d73</r:ID>
+                                <r:Version>4</r:Version>
+                                <DataCollectionDate>
+                                    <r:StartDate>2021-12-01</r:StartDate>
+                                    <r:EndDate>2022-11-30</r:EndDate>
+                                </DataCollectionDate>
+                                <ModeOfCollection isUniversallyUnique="true">
+                                    <r:URN>urn:ddi:no.nsd:41f0f382-85e7-4e9b-a4e4-c269c4dd01ad:4</r:URN>
+                                    <r:Agency>no.nsd</r:Agency>
+                                    <r:ID>41f0f382-85e7-4e9b-a4e4-c269c4dd01ad</r:ID>
+                                    <r:Version>4</r:Version>
+                                    <TypeOfModeOfCollection controlledVocabularyID="00f4b65f-fcfd-4fa7-a113-27acb13d3b1e" controlledVocabularyAgencyName="no.nsd" controlledVocabularyVersionID="1">Interview.FaceToFace.CAPIorCAMI</TypeOfModeOfCollection>
+                                </ModeOfCollection>
+                                <ModeOfCollection isUniversallyUnique="true">
+                                    <r:URN>urn:ddi:no.nsd:6b7c86d0-63c0-4818-9b62-fbab35976899:4</r:URN>
+                                    <r:Agency>no.nsd</r:Agency>
+                                    <r:ID>6b7c86d0-63c0-4818-9b62-fbab35976899</r:ID>
+                                    <r:Version>4</r:Version>
+                                    <TypeOfModeOfCollection controlledVocabularyID="00f4b65f-fcfd-4fa7-a113-27acb13d3b1e" controlledVocabularyAgencyName="no.nsd" controlledVocabularyVersionID="1">Interview.FaceToFace</TypeOfModeOfCollection>
+                                </ModeOfCollection>
+                            </CollectionEvent>
+                        </DataCollection>
+                    </Fragment>
+                    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+                        <Methodology isUniversallyUnique="true" versionDate="2024-04-29T13:46:44.999184Z" xmlns="ddi:datacollection:3_3">
+                            <r:URN>urn:ddi:no.nsd:4a5f3c0a-cee4-453d-bf23-757c621086dd:2</r:URN>
+                            <r:Agency>no.nsd</r:Agency>
+                            <r:ID>4a5f3c0a-cee4-453d-bf23-757c621086dd</r:ID>
+                            <r:Version>2</r:Version>
+                            <r:VersionResponsibility>SIKT\jolei</r:VersionResponsibility>
+                            <r:VersionRationale>
+                                <r:RationaleDescription>
+                                    <r:String xml:lang="no">Dokumentert på studienivå.</r:String>
+                                </r:RationaleDescription>
+                            </r:VersionRationale>
+                            <TimeMethod isUniversallyUnique="true">
+                                <r:URN>urn:ddi:no.nsd:0fc1fc99-5aa1-4193-b081-ae81d21ea392:2</r:URN>
+                                <r:Agency>no.nsd</r:Agency>
+                                <r:ID>0fc1fc99-5aa1-4193-b081-ae81d21ea392</r:ID>
+                                <r:Version>2</r:Version>
+                                <TypeOfTimeMethod controlledVocabularyID="5247ed79-600e-431c-ad3b-b1743df6295c" controlledVocabularyAgencyName="no.nsd" controlledVocabularyVersionID="1">CrossSection</TypeOfTimeMethod>
+                            </TimeMethod>
+                            <SamplingProcedure isUniversallyUnique="true">
+                                <r:URN>urn:ddi:no.nsd:3b9c9957-fe2d-4689-9ac9-4ba7add6cbfd:2</r:URN>
+                                <r:Agency>no.nsd</r:Agency>
+                                <r:ID>3b9c9957-fe2d-4689-9ac9-4ba7add6cbfd</r:ID>
+                                <r:Version>2</r:Version>
+                                <TypeOfSamplingProcedure controlledVocabularyID="60c23367-cf0c-41d3-b885-4af6ad800ec8" controlledVocabularyAgencyName="no.nsd" controlledVocabularyVersionID="1">MixedProbabilityNonprobability</TypeOfSamplingProcedure>
+                                <r:Description>
+                                    <r:Content xml:lang="en">The partisipating women were referred to the data collection site by nursing staff following their registration. The purpose of the data collection was to validate a culturally-sensitive, Nepalese language clinical screening instrument for identifying women experiencing domestic violence. The screening instrument aims to address the unique sociocultural context of Nepal, as existing screening tools have primarily been developed in high-income countries.</r:Content>
+                                    <r:Content xml:lang="no">De deltagende kvinnene ble henvist til datainnsamlingsstedet av sykepleiepersonalet etter deres registrering. Formålet med datainnsamlingen var å validere et kulturelt sensitivt, nepalsk språklig klinisk screeninginstrument for å identifisere kvinner som opplever vold i hjemmet. Screeninginstrumentet har som mål å ta hensyn til Nepals unike sosiokulturelle kontekst, ettersom eksisterende screeningverktøy hovedsakelig har blitt utviklet i høyinntektsland.</r:Content>
+                                </r:Description>
+                            </SamplingProcedure>
+                        </Methodology>
+                    </Fragment>
+                    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+                        <VariableGroup isUniversallyUnique="true" versionDate="2024-05-03T12:40:44.6023468Z" xmlns="ddi:logicalproduct:3_3">
+                            <r:URN>urn:ddi:no.nsd:fd4d2cfa-3eea-4a7f-bf2b-645f89e72903:2</r:URN>
+                            <r:Agency>no.nsd</r:Agency>
+                            <r:ID>fd4d2cfa-3eea-4a7f-bf2b-645f89e72903</r:ID>
+                            <r:Version>2</r:Version>
+                            <r:VersionResponsibility>SIKT\kst109</r:VersionResponsibility>
+                            <r:VersionRationale>
+                                <r:RationaleDescription>
+                                    <r:String xml:lang="no">Lagt inn variabelgrupper</r:String>
+                                </r:RationaleDescription>
+                            </r:VersionRationale>
+                            <r:Label>
+                                <r:Content xml:lang="en">Data1 Validation Test Retest</r:Content>
+                            </r:Label>
+                            <VariableGroupReference>
+                                <r:Agency>no.nsd</r:Agency>
+                                <r:ID>8fb4d6df-149f-44ef-ab63-baf461a0b645</r:ID>
+                                <r:Version>1</r:Version>
+                                <r:TypeOfObject>VariableGroup</r:TypeOfObject>
+                            </VariableGroupReference>
+                            <VariableGroupReference>
+                                <r:Agency>no.nsd</r:Agency>
+                                <r:ID>0dfcd1c2-a850-4767-b1c9-252507f50676</r:ID>
+                                <r:Version>1</r:Version>
+                                <r:TypeOfObject>VariableGroup</r:TypeOfObject>
+                            </VariableGroupReference>
+                            <VariableGroupReference>
+                                <r:Agency>no.nsd</r:Agency>
+                                <r:ID>bbb6ac57-dda1-46fe-8606-ccec1cc51707</r:ID>
+                                <r:Version>1</r:Version>
+                                <r:TypeOfObject>VariableGroup</r:TypeOfObject>
+                            </VariableGroupReference>
+                            <VariableGroupReference>
+                                <r:Agency>no.nsd</r:Agency>
+                                <r:ID>a6ae4676-5045-41a7-a102-8716fed437a5</r:ID>
+                                <r:Version>1</r:Version>
+                                <r:TypeOfObject>VariableGroup</r:TypeOfObject>
+                            </VariableGroupReference>
+                            <VariableGroupReference>
+                                <r:Agency>no.nsd</r:Agency>
+                                <r:ID>162ad198-ab67-425b-bdc3-9aef58ae03ee</r:ID>
+                                <r:Version>2</r:Version>
+                                <r:TypeOfObject>VariableGroup</r:TypeOfObject>
+                            </VariableGroupReference>
+                            <VariableGroupReference>
+                                <r:Agency>no.nsd</r:Agency>
+                                <r:ID>99b86f4d-e082-483c-892e-9bbf797782a5</r:ID>
+                                <r:Version>1</r:Version>
+                                <r:TypeOfObject>VariableGroup</r:TypeOfObject>
+                            </VariableGroupReference>
+                            <VariableGroupReference>
+                                <r:Agency>no.nsd</r:Agency>
+                                <r:ID>b31ca375-6e51-40aa-8168-0fcdaa7d55f4</r:ID>
+                                <r:Version>1</r:Version>
+                                <r:TypeOfObject>VariableGroup</r:TypeOfObject>
+                            </VariableGroupReference>
+                            <VariableGroupReference>
+                                <r:Agency>no.nsd</r:Agency>
+                                <r:ID>a6533862-4f4e-42c9-8b5a-bba7f3824727</r:ID>
+                                <r:Version>1</r:Version>
+                                <r:TypeOfObject>VariableGroup</r:TypeOfObject>
+                            </VariableGroupReference>
+                            <VariableGroupReference>
+                                <r:Agency>no.nsd</r:Agency>
+                                <r:ID>8b692c34-ca59-4108-a9a8-b8ca80059dc5</r:ID>
+                                <r:Version>1</r:Version>
+                                <r:TypeOfObject>VariableGroup</r:TypeOfObject>
+                            </VariableGroupReference>
+                        </VariableGroup>
+                    </Fragment>
+                    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+                        <DataRelationship isUniversallyUnique="true" versionDate="2024-05-03T12:14:49.5005405Z" xmlns="ddi:logicalproduct:3_3">
+                            <r:URN>urn:ddi:no.nsd:a6d07d30-6640-48ed-afa7-12504040c726:3</r:URN>
+                            <r:Agency>no.nsd</r:Agency>
+                            <r:ID>a6d07d30-6640-48ed-afa7-12504040c726</r:ID>
+                            <r:Version>3</r:Version>
+                            <r:VersionResponsibility>SIKT\kst109</r:VersionResponsibility>
+                            <DataRelationshipName>
+                                <r:String xml:lang="en">Data 3_validation_Testvsgoldstandard</r:String>
+                            </DataRelationshipName>
+                            <LogicalRecord isUniversallyUnique="true">
+                                <r:URN>urn:ddi:no.nsd:6cd57a0f-7217-4088-b88a-819df0bdbdc2:3</r:URN>
+                                <r:Agency>no.nsd</r:Agency>
+                                <r:ID>6cd57a0f-7217-4088-b88a-819df0bdbdc2</r:ID>
+                                <r:Version>3</r:Version>
+                                <LogicalRecordName>
+                                    <r:String xml:lang="en">Data 3_validation_Testvsgoldstandard</r:String>
+                                </LogicalRecordName>
+                                <VariablesInRecord>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>240d85f5-5c23-4842-9b61-15ce6064a7a7</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>ba778177-92f4-40fa-958b-af87d52c6153</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>0d46233d-59aa-4ea2-868a-b09719131335</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>afb543d8-6344-40d0-ba6b-995208f77d99</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>70cadf7e-590e-4424-8a8a-ca53118fe4fe</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>2b6c4d52-7b12-46d8-80d1-c96e4853efb5</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>f50ca5ca-805e-4ded-85f4-f3d6a30607e0</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>0c7a43dc-6516-43b7-9f7f-86cb2d2d54db</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>22985c72-2b04-4674-affb-184489d1c249</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>e024ae2e-bd94-4322-9fa1-6158ffc41aad</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>5b61bed7-e1c8-4e56-bd14-e0b620e94f6d</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>0aa0d949-ea11-4476-9a75-4906d7c2532a</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>4b15bc4b-3e1c-4f77-8af1-b8558c3dcb89</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>1c84b206-db97-430d-ae9d-b8a084209e9f</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>a1d2a346-6de7-44cd-933f-07214b3a509f</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                </VariablesInRecord>
+                            </LogicalRecord>
+                        </DataRelationship>
+                    </Fragment>
+                    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+                        <VariableGroup isUniversallyUnique="true" versionDate="2024-05-03T12:40:44.6023468Z" xmlns="ddi:logicalproduct:3_3">
+                            <r:URN>urn:ddi:no.nsd:21a73385-3262-4491-a4e3-f05d14c7da43:1</r:URN>
+                            <r:Agency>no.nsd</r:Agency>
+                            <r:ID>21a73385-3262-4491-a4e3-f05d14c7da43</r:ID>
+                            <r:Version>1</r:Version>
+                            <r:VersionResponsibility>SIKT\kst109</r:VersionResponsibility>
+                            <r:VersionRationale>
+                                <r:RationaleDescription>
+                                    <r:String xml:lang="no">Lagt inn variabelgrupper</r:String>
+                                </r:RationaleDescription>
+                            </r:VersionRationale>
+                            <r:Label>
+                                <r:Content xml:lang="en">Data 3 Validation test vs gold standard</r:Content>
+                            </r:Label>
+                            <VariableGroupReference>
+                                <r:Agency>no.nsd</r:Agency>
+                                <r:ID>9efe2ee4-33e7-424a-b3c7-880dc6fc0dbe</r:ID>
+                                <r:Version>1</r:Version>
+                                <r:TypeOfObject>VariableGroup</r:TypeOfObject>
+                            </VariableGroupReference>
+                            <VariableGroupReference>
+                                <r:Agency>no.nsd</r:Agency>
+                                <r:ID>1d3b2f51-2e8a-4d9c-bdda-a85a37f53ab0</r:ID>
+                                <r:Version>1</r:Version>
+                                <r:TypeOfObject>VariableGroup</r:TypeOfObject>
+                            </VariableGroupReference>
+                        </VariableGroup>
+                    </Fragment>
+                    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+                        <DataRelationship isUniversallyUnique="true" versionDate="2024-05-03T12:14:49.5005405Z" xmlns="ddi:logicalproduct:3_3">
+                            <r:URN>urn:ddi:no.nsd:97f63354-b417-4522-95fb-85731c1d58d1:3</r:URN>
+                            <r:Agency>no.nsd</r:Agency>
+                            <r:ID>97f63354-b417-4522-95fb-85731c1d58d1</r:ID>
+                            <r:Version>3</r:Version>
+                            <r:VersionResponsibility>SIKT\kst109</r:VersionResponsibility>
+                            <DataRelationshipName>
+                                <r:String xml:lang="en">Data 4_validation_Delphi</r:String>
+                            </DataRelationshipName>
+                            <LogicalRecord isUniversallyUnique="true">
+                                <r:URN>urn:ddi:no.nsd:69bcd10f-aebc-4aaa-89be-b5f67e9a23c9:3</r:URN>
+                                <r:Agency>no.nsd</r:Agency>
+                                <r:ID>69bcd10f-aebc-4aaa-89be-b5f67e9a23c9</r:ID>
+                                <r:Version>3</r:Version>
+                                <LogicalRecordName>
+                                    <r:String xml:lang="en">Data 4_validation_Delphi</r:String>
+                                </LogicalRecordName>
+                                <VariablesInRecord>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>c0b1908a-3388-4a66-a241-48ab3db002a0</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>fd456371-7b3d-485a-9421-c954501af128</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>55a89c40-0c85-4cf0-9e0e-5c9c99a18293</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>b90c1520-6597-4746-b553-9ed4a9c03f7d</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>da86beb1-7b39-4789-9b00-811547e51791</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>119eb95f-3a39-4d3b-bde0-8f7c5664e197</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>df1f81ae-00cc-4b8c-9f7b-2dc2643ae6bc</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>9997a33d-b7e0-4d27-b39a-b27c83e53be2</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>ff2dff66-4157-4021-b854-db089e6ae525</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>6c00184f-2b48-421f-990a-72efc15d66cd</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>7a7eb41b-d051-4a7c-aa7f-59119b1c0a1c</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>2f75c244-e90e-4416-ba63-8059e7c9b97d</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>c5d64932-46c4-4e1b-b80b-49e849d35712</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>b08dfc3c-3ea6-4d99-b8f7-9b28a52c8d8a</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>4ec5e616-ed8f-48f7-977a-104c30b27943</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>6ae47c38-1a95-428a-87f7-1cd9597eaafb</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>f852a7b6-96b0-4e66-b8ef-847339401e07</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>ad8b8ffc-342c-4ce3-9ac9-ba1736f29ab4</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>adfc7166-3884-45ba-9d04-26984b66292a</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>fa0b5c28-85b8-46f7-bbbd-215df860bb3c</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>f705e936-37d2-43bb-b29c-d4b54ec15241</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                    <VariableUsedReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>41aca9f0-aedc-414b-a324-99d133486e0d</r:ID>
+                                        <r:Version>2</r:Version>
+                                        <r:TypeOfObject>Variable</r:TypeOfObject>
+                                    </VariableUsedReference>
+                                </VariablesInRecord>
+                            </LogicalRecord>
+                        </DataRelationship>
+                    </Fragment>
+                    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+                        <ProcessingEvent isUniversallyUnique="true" versionDate="2024-04-26T13:34:15.209794Z" xmlns="ddi:datacollection:3_3">
+                            <r:URN>urn:ddi:no.nsd:eb71ff35-b507-4601-8b1c-2a5aba9c7604:1</r:URN>
+                            <r:Agency>no.nsd</r:Agency>
+                            <r:ID>eb71ff35-b507-4601-8b1c-2a5aba9c7604</r:ID>
+                            <r:Version>1</r:Version>
+                            <r:VersionResponsibility>e997a8ab-87f9-4396-be02-3a6fb978986c</r:VersionResponsibility>
+                            <r:VersionRationale>
+                                <r:RationaleDescription>
+                                    <r:String xml:lang="en">Commit</r:String>
+                                    <r:String xml:lang="no">Commit</r:String>
+                                </r:RationaleDescription>
+                            </r:VersionRationale>
+                            <r:Label>
+                                <r:Content xml:lang="no">1363</r:Content>
+                            </r:Label>
+                            <ControlOperation />
+                            <CleaningOperation />
+                        </ProcessingEvent>
+                    </Fragment>
+                    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+                        <Organization isUniversallyUnique="true" versionDate="2021-05-07T21:04:23.9815098Z" xmlns="ddi:archive:3_3">
+                            <r:URN>urn:ddi:no.nsd:e7ffa38f-91c2-41be-8c70-5e8ed24e5081:1</r:URN>
+                            <r:Agency>no.nsd</r:Agency>
+                            <r:ID>e7ffa38f-91c2-41be-8c70-5e8ed24e5081</r:ID>
+                            <r:Version>1</r:Version>
+                            <OrganizationIdentification>
+                                <OrganizationName>
+                                    <r:String xml:lang="en">University of South-Eastern Norway</r:String>
+                                    <r:String xml:lang="no">Universitetet i Sørøst-Norge</r:String>
+                                </OrganizationName>
+                            </OrganizationIdentification>
+                        </Organization>
+                    </Fragment>
+                    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+                        <StudyUnit isUniversallyUnique="true" versionDate="2024-05-03T13:12:27.8426901Z" xmlns="ddi:studyunit:3_3">
+                            <r:URN>urn:ddi:no.nsd:39c1f667-17c2-475b-9333-846f59666e32:16</r:URN>
+                            <r:Agency>no.nsd</r:Agency>
+                            <r:ID>39c1f667-17c2-475b-9333-846f59666e32</r:ID>
+                            <r:Version>16</r:Version>
+                            <r:UserID typeOfUserID="ArchiveID">1363</r:UserID>
+                            <r:UserID typeOfUserID="StudyNumber">NSD3174</r:UserID>
+                            <r:UserID typeOfUserID="StudyVersion">1.0</r:UserID>
+                            <r:UserID typeOfUserID="DOI">https://doi.org/10.18712/NSD-NSD3174-V1</r:UserID>
+                            <r:UserAttributePair>
+                                <r:AttributeKey>extension:CustomField</r:AttributeKey>
+                                <r:AttributeValue>{"Title":{"en-US":"","no":"Dataspråk"},"Description":{},"ValueType":0,"DefinedTypeId":"d0357d5c-6ba9-4e66-ad7c-9f466f177abb","HasValue":true,"RelationshipTargetType":"00000000-0000-0000-0000-000000000000","StringValue":"en","MultilingualStringValue":{},"BooleanValue":false,"HasDefinedType":true,"DisplayLabel":"Dataspråk"}</r:AttributeValue>
+                            </r:UserAttributePair>
+                            <r:UserAttributePair>
+                                <r:AttributeKey>extension:CustomField</r:AttributeKey>
+                                <r:AttributeValue>{"Title":{"en-US":"","no":"Annet"},"Description":{},"ValueType":1,"DefinedTypeId":"c05e597c-dc06-4f10-898b-5a3396db1a2a","HasValue":true,"RelationshipTargetType":"00000000-0000-0000-0000-000000000000","MultilingualStringValue":{"no":"","en":"This is a de-identified dataset from a phase of clinical pre-testing for a validation study in Nepal."},"BooleanValue":false,"HasDefinedType":true,"DisplayLabel":"Annet"}</r:AttributeValue>
+                            </r:UserAttributePair>
+                            <r:UserAttributePair>
+                                <r:AttributeKey>extension:CustomField</r:AttributeKey>
+                                <r:AttributeValue>{"Title":{"en-US":"","no":"Persondata"},"Description":{},"ValueType":0,"DefinedTypeId":"4d77a21b-d4fb-42bd-8a06-cc0b1cadb598","HasValue":true,"RelationshipTargetType":"00000000-0000-0000-0000-000000000000","StringValue":"FALSE","MultilingualStringValue":{},"BooleanValue":false,"HasDefinedType":true,"DisplayLabel":"Persondata"}</r:AttributeValue>
+                            </r:UserAttributePair>
+                            <r:UserAttributePair>
+                                <r:AttributeKey>extension:CustomField</r:AttributeKey>
+                                <r:AttributeValue>{"Title":{"no":"Interne notater"},"Description":{},"ValueType":0,"HasValue":true,"RelationshipTargetType":"00000000-0000-0000-0000-000000000000","StringValue":"Datasett mottatt: 05.04.2024, ny versjon mottatt 26.04.2024.\r\n\r\nDokumentert på studienivå (bør ses over når mer dokumentasjon finnes... DateTime brukt for temporal coverage pga. bugg i colectica) (29.04.24 JAL).\r\n\r\nImportert alle 4 datafiler, importert metadata input sheet og lagt variabler i variabelgrupper (03.02.24 KS)\r\n","MultilingualStringValue":{},"BooleanValue":false,"HasDefinedType":false,"DisplayLabel":"Interne notater"}</r:AttributeValue>
+                            </r:UserAttributePair>
+                            <r:VersionResponsibility>SIKT\kst109</r:VersionResponsibility>
+                            <r:Citation>
+                                <r:Title>
+                                    <r:String xml:lang="en">Addressing Domestic Violence in Antenatal Care Environments 2 (ADVANCE 2)</r:String>
+                                    <r:String xml:lang="no">Addressing Domestic Violence in Antenatal Care Environments 2 (ADVANCE 2)</r:String>
+                                </r:Title>
+                                <r:Creator>
+                                    <r:CreatorName>
+                                        <r:String xml:lang="en">NTNU</r:String>
+                                        <r:String xml:lang="no">NTNU</r:String>
+                                    </r:CreatorName>
+                                    <r:CreatorReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>92c44fbd-1206-4af6-b8bc-5b2f954a6958</r:ID>
+                                        <r:Version>1</r:Version>
+                                        <r:TypeOfObject>Organization</r:TypeOfObject>
+                                    </r:CreatorReference>
+                                </r:Creator>
+                                <r:Publisher>
+                                    <r:PublisherName>
+                                        <r:String xml:lang="en">Sikt</r:String>
+                                        <r:String xml:lang="no">Sikt</r:String>
+                                    </r:PublisherName>
+                                    <r:PublisherReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>1581d2af-6d25-4a21-87bc-f5705779092a</r:ID>
+                                        <r:Version>3</r:Version>
+                                        <r:TypeOfObject>Organization</r:TypeOfObject>
+                                    </r:PublisherReference>
+                                </r:Publisher>
+                                <r:Contributor>
+                                    <r:ContributorName affiliation="NTNU">
+                                        <r:String xml:lang="en">Infanti, Jennifer</r:String>
+                                        <r:String xml:lang="no">Infanti, Jennifer</r:String>
+                                    </r:ContributorName>
+                                    <r:ContributorRole controlledVocabularyID="69b03d1d-53cc-4df1-8b03-db96fd2907f6" controlledVocabularyAgencyName="no.nsd" controlledVocabularyVersionID="1">ProjectOperations.ProjectLeader</r:ContributorRole>
+                                    <r:ContributorReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>92c44fbd-1206-4af6-b8bc-5b2f954a6958</r:ID>
+                                        <r:Version>1</r:Version>
+                                        <r:TypeOfObject>Organization</r:TypeOfObject>
+                                    </r:ContributorReference>
+                                </r:Contributor>
+                                <r:Contributor>
+                                    <r:ContributorName affiliation="USN">
+                                        <r:String xml:lang="en">Lukasse, Mirjam</r:String>
+                                        <r:String xml:lang="no">Lukasse, Mirjam</r:String>
+                                    </r:ContributorName>
+                                    <r:ContributorRole controlledVocabularyID="69b03d1d-53cc-4df1-8b03-db96fd2907f6" controlledVocabularyAgencyName="no.nsd" controlledVocabularyVersionID="1">ProjectOperations.ProjectLeader</r:ContributorRole>
+                                    <r:ContributorReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>e7ffa38f-91c2-41be-8c70-5e8ed24e5081</r:ID>
+                                        <r:Version>1</r:Version>
+                                        <r:TypeOfObject>Organization</r:TypeOfObject>
+                                    </r:ContributorReference>
+                                </r:Contributor>
+                                <r:Contributor>
+                                    <r:ContributorName affiliation="NTNU">
+                                        <r:String xml:lang="en">Schei, Berit</r:String>
+                                        <r:String xml:lang="no">Schei, Berit</r:String>
+                                    </r:ContributorName>
+                                    <r:ContributorRole controlledVocabularyID="69b03d1d-53cc-4df1-8b03-db96fd2907f6" controlledVocabularyAgencyName="no.nsd" controlledVocabularyVersionID="1">ProjectOperations.ProjectLeader</r:ContributorRole>
+                                    <r:ContributorReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>92c44fbd-1206-4af6-b8bc-5b2f954a6958</r:ID>
+                                        <r:Version>1</r:Version>
+                                        <r:TypeOfObject>Organization</r:TypeOfObject>
+                                    </r:ContributorReference>
+                                </r:Contributor>
+                                <r:Contributor>
+                                    <r:ContributorName affiliation="Dhulikhel Hospital-Kathmandu University School of Medical Sciences">
+                                        <r:String xml:lang="en">Pun, Kunta Devi</r:String>
+                                        <r:String xml:lang="no">Pun, Kunta Devi</r:String>
+                                    </r:ContributorName>
+                                    <r:ContributorRole controlledVocabularyID="69b03d1d-53cc-4df1-8b03-db96fd2907f6" controlledVocabularyAgencyName="no.nsd" controlledVocabularyVersionID="1">ProjectOperations.ProjectLeader</r:ContributorRole>
+                                    <r:ContributorReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>53052e71-eb74-49f5-808c-2026512a1763</r:ID>
+                                        <r:Version>1</r:Version>
+                                        <r:TypeOfObject>Organization</r:TypeOfObject>
+                                    </r:ContributorReference>
+                                </r:Contributor>
+                                <r:Contributor>
+                                    <r:ContributorName affiliation="Dhulikhel Hospital-Kathmandu University School of Medical Sciences">
+                                        <r:String xml:lang="en">Koju, Rajendra</r:String>
+                                        <r:String xml:lang="no">Koju, Rajendra</r:String>
+                                    </r:ContributorName>
+                                    <r:ContributorRole controlledVocabularyID="69b03d1d-53cc-4df1-8b03-db96fd2907f6" controlledVocabularyAgencyName="no.nsd" controlledVocabularyVersionID="1">ProjectOperations.ProjectLeader</r:ContributorRole>
+                                    <r:ContributorReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>53052e71-eb74-49f5-808c-2026512a1763</r:ID>
+                                        <r:Version>1</r:Version>
+                                        <r:TypeOfObject>Organization</r:TypeOfObject>
+                                    </r:ContributorReference>
+                                </r:Contributor>
+                                <r:Contributor>
+                                    <r:ContributorName affiliation="Kathmandu Medical College">
+                                        <r:String xml:lang="en">Joshi, Sunil Kumar</r:String>
+                                        <r:String xml:lang="no">Joshi, Sunil Kumar</r:String>
+                                    </r:ContributorName>
+                                    <r:ContributorRole controlledVocabularyID="69b03d1d-53cc-4df1-8b03-db96fd2907f6" controlledVocabularyAgencyName="no.nsd" controlledVocabularyVersionID="1">ProjectOperations.ProjectLeader</r:ContributorRole>
+                                    <r:ContributorReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>be253f98-7aa0-4720-af65-2fb27d2257e3</r:ID>
+                                        <r:Version>1</r:Version>
+                                        <r:TypeOfObject>Organization</r:TypeOfObject>
+                                    </r:ContributorReference>
+                                </r:Contributor>
+                                <r:Contributor>
+                                    <r:ContributorName affiliation="Linnaeus University">
+                                        <r:String xml:lang="en">Swahnberg, Katarina</r:String>
+                                        <r:String xml:lang="no">Swahnberg, Katarina</r:String>
+                                    </r:ContributorName>
+                                    <r:ContributorRole controlledVocabularyID="69b03d1d-53cc-4df1-8b03-db96fd2907f6" controlledVocabularyAgencyName="no.nsd" controlledVocabularyVersionID="1">ProjectOperations.ProjectMember</r:ContributorRole>
+                                    <r:ContributorReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>f0478985-f894-4294-a400-c3551ff87c56</r:ID>
+                                        <r:Version>1</r:Version>
+                                        <r:TypeOfObject>Organization</r:TypeOfObject>
+                                    </r:ContributorReference>
+                                </r:Contributor>
+                                <r:Contributor>
+                                    <r:ContributorName affiliation="John Hopkins University School of Nursing">
+                                        <r:String xml:lang="en">Campbell, Jacquelyn</r:String>
+                                        <r:String xml:lang="no">Campbell, Jacquelyn</r:String>
+                                    </r:ContributorName>
+                                    <r:ContributorRole controlledVocabularyID="69b03d1d-53cc-4df1-8b03-db96fd2907f6" controlledVocabularyAgencyName="no.nsd" controlledVocabularyVersionID="1">ResearchGroup</r:ContributorRole>
+                                    <r:ContributorReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>09dfdcc2-e650-4a3e-83e1-e850c98f8ed8</r:ID>
+                                        <r:Version>1</r:Version>
+                                        <r:TypeOfObject>Organization</r:TypeOfObject>
+                                    </r:ContributorReference>
+                                </r:Contributor>
+                                <r:Contributor>
+                                    <r:ContributorName affiliation="Kathmandu Medical College">
+                                        <r:String xml:lang="en">Rishal, Poonam</r:String>
+                                        <r:String xml:lang="no">Rishal, Poonam</r:String>
+                                    </r:ContributorName>
+                                    <r:ContributorRole controlledVocabularyID="69b03d1d-53cc-4df1-8b03-db96fd2907f6" controlledVocabularyAgencyName="no.nsd" controlledVocabularyVersionID="1">ResearchGroup</r:ContributorRole>
+                                    <r:ContributorReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>be253f98-7aa0-4720-af65-2fb27d2257e3</r:ID>
+                                        <r:Version>1</r:Version>
+                                        <r:TypeOfObject>Organization</r:TypeOfObject>
+                                    </r:ContributorReference>
+                                </r:Contributor>
+                                <r:Contributor>
+                                    <r:ContributorName affiliation="Oslo Metropolitan University">
+                                        <r:String xml:lang="en">Henriksen, Lena</r:String>
+                                        <r:String xml:lang="no">Henriksen, Lena</r:String>
+                                    </r:ContributorName>
+                                    <r:ContributorRole controlledVocabularyID="69b03d1d-53cc-4df1-8b03-db96fd2907f6" controlledVocabularyAgencyName="no.nsd" controlledVocabularyVersionID="1">ResearchGroup</r:ContributorRole>
+                                    <r:ContributorReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>ebadc6e6-7994-4844-9822-646fbf5cd224</r:ID>
+                                        <r:Version>1</r:Version>
+                                        <r:TypeOfObject>Organization</r:TypeOfObject>
+                                    </r:ContributorReference>
+                                </r:Contributor>
+                                <r:Contributor>
+                                    <r:ContributorName affiliation="Kathmandu Medical College">
+                                        <r:String xml:lang="en">Manandhar, Pratibha</r:String>
+                                        <r:String xml:lang="no">Manandhar, Pratibha</r:String>
+                                    </r:ContributorName>
+                                    <r:ContributorRole controlledVocabularyID="69b03d1d-53cc-4df1-8b03-db96fd2907f6" controlledVocabularyAgencyName="no.nsd" controlledVocabularyVersionID="1">DataCollection</r:ContributorRole>
+                                    <r:ContributorReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>be253f98-7aa0-4720-af65-2fb27d2257e3</r:ID>
+                                        <r:Version>1</r:Version>
+                                        <r:TypeOfObject>Organization</r:TypeOfObject>
+                                    </r:ContributorReference>
+                                </r:Contributor>
+                                <r:Contributor>
+                                    <r:ContributorName affiliation="Dhulikhel Hospital-Kathmandu University School of Medical Sciences">
+                                        <r:String xml:lang="en">Chalise, Pratibha</r:String>
+                                        <r:String xml:lang="no">Chalise, Pratibha</r:String>
+                                    </r:ContributorName>
+                                    <r:ContributorRole controlledVocabularyID="69b03d1d-53cc-4df1-8b03-db96fd2907f6" controlledVocabularyAgencyName="no.nsd" controlledVocabularyVersionID="1">DataCollection</r:ContributorRole>
+                                    <r:ContributorReference>
+                                        <r:Agency>no.nsd</r:Agency>
+                                        <r:ID>53052e71-eb74-49f5-808c-2026512a1763</r:ID>
+                                        <r:Version>1</r:Version>
+                                        <r:TypeOfObject>Organization</r:TypeOfObject>
+                                    </r:ContributorReference>
+                                </r:Contributor>
+                                <r:PublicationDate>
+                                    <r:SimpleDate>2024-05-03T00:00:00Z</r:SimpleDate>
+                                </r:PublicationDate>
+                                <r:InternationalIdentifier>
+                                    <r:IdentifierContent>https://doi.org/10.18712/NSD-NSD3174-V1</r:IdentifierContent>
+                                    <r:ManagingAgency>DOI</r:ManagingAgency>
+                                </r:InternationalIdentifier>
+                            </r:Citation>
+                            <r:Abstract>
+                                <r:Content xml:lang="en">ADVANCE 2 builds on the accomplishments of the original ADVANCE study (2013-2018), which established an international collaboration of researchers and health providers addressing the field of domestic violence. The focus is on supporting women living with domestic violence in pregnancy in Nepal, an important cause of poor pregnancy outcomes. Domestic violence is highest in low-income countries, yet the scientific evidence for interventions in antenatal care is most lacking in these contexts. The study aims to remedy this gap in four complementary work packages (sub-studies), employing interdisciplinary research methods. The goal is to enable antenatal care providers in Nepal to identify effectively and assist pregnant women living with domestic violence. This data archive is for the initial phase (first work package) of the project, where clinical pretesting is carried out to adapt culturally, and to validate a linguistically relevant version of the Abuse Assessment Screen (AAS) specifically for routine clinical use in Nepal. This version is called the Nepalese Abuse Assessment Screen (N-AAS).
+
+Concerning the variables labeled 'Retest': In the study, the reliability of a questionnaire was assessed using a test-retest analysis. Participants completed the same questionnaire at two different time points, allowing the researchers to assess the same variables twice - first at the initial time point (T1 or 'Test') and again later (T2 or 'Retest'). This methodology is detailed in the journal article associated with this data.
+
+To evaluate the precision of the 7 questions validated in this study (called the Nepalese-Abuse Assessment Screen or N-AAS),  participants' answers were compared to the same questions administered via computer-assisted interview and the gold standard, which is a traditional face-to-face interview with participants, conducted by an interviewer.
+
+In the Data4 datafile the variable 'Expert_category' includes different types of experts who reviewed and provided feedback on the Nepalese Abuse Assessment Screen (N-AAS) questions:
+- International experts = professionals with expertise in domestic violence or related fields from various international organizations. They participated in Delphi rounds during the study to assess and provide feedback on the N-AAS.
+- National experts = a group of national professionals such as nurses, psychologists, researchers, and clinicians based in Nepal who reviewed and evaluated the N-AAS during the Delphi method. The numbers (1, 2, etc.) represent different national experts/different people.
+- User experts = a group of pregnant women who participated in cognitive interviews, providing feedback on the N-AAS based on their own experiences. These women assessed our questions for relevance, understandability, and sensitivity.
+
+The questions marked with 'Relevant,' 'Understandable/Clear', and 'Sensitive' were assessed by experts using a five-point Likert scale as follows:
+- Relevance: The expert panels rated each question based on its importance and pertinence for measuring domestic violence. A score of 0 indicated the question was irrelevant, while a score of 4 indicated it was highly relevant.
+- Understandability/Clarity: The experts assessed whether the wording of each question was clear and easy to understand. A score of 0 meant the question was non-understandable, whereas a score of 4 meant it was easily understandable.
+- Sensitivity: The experts evaluated the level of sensitivity of each question, particularly in the context of the cultural environment of Nepal. A score of 0 indicated the question was highly sensitive, while a score of 4 indicated it was non-sensitive.</r:Content>
+                                <r:Content xml:lang="no">ADVANCE 2 bygger på funnene fra den opprinnelige ADVANCE-studien (2013-2018) som etablerte et internasjonalt samarbeid av forskere og helsepersonell som adresserer vold i hjemmet. Fokuset er på å støtte kvinner som lever med vold i hjemmet under graviditet i Nepal, en viktig årsak til dårlige graviditetsutfall. Forekomst av vold i hjemmet er høyest i lavinntektsland, men de vitenskapelige bevis for intervensjoner i svangerskapsomsorgen er mest mangelfull i disse sammenhengene. Studien sikter på å rette opp denne mangelen i fire komplementære arbeidspakker (delstudier), ved å bruke tverrfaglige forskningsmetoder. Målet er å gjøre det mulig for svangerskapsomsorgsleverandører i Nepal å effektivt identifisere og hjelpe gravide kvinner som lever med vold i hjemmet. Dette dataarkivet er for den innledende fasen (første arbeidspakke) av prosjektet, der kliniske fortester utføres for å tilpasse seg kulturelt, og for å validere en språklig relevant versjon av Abuse Assessment Screen (AAS) spesielt for rutinemessig klinisk bruk i Nepal.Denne versjonen kalles  the Nepalese Abuse Assessment Screen (N-AAS).
+
+Angående variablene merket 'Retest': I studien ble påliteligheten til et spørreskjema vurdert ved hjelp av en test-retest-analyse. Deltakerne fullførte det samme spørreskjemaet på to forskjellige tidspunkter, noe som tillot forskerne å vurdere de samme variablene to ganger - først ved det opprinnelige tidspunktet (T1 eller 'Test') og igjen senere (T2 eller 'Retest'). Denne metoden er beskrevet i detalj i tidsskriftartikkelen som er knyttet til disse dataene.
+
+For å evaluere presisjonen av de 7 spørsmålene som ble validert i denne studien (kalt Nepalese-Abuse Assessment Screen eller N-AAS), ble deltakernes svar sammenlignet med de samme spørsmålene administrert via dataassistert intervju og gullstandarden, som er en tradisjonell ansikt-til-ansikt intervju med deltakere, utført av en intervjuer.
+
+I Data4-datafilen finner man variabelen "Expert_category" med forskjellige typer eksperter som har gjennomgått og gitt tilbakemelding på spørsmålene om skjermbildet for vurdering av overgrep i Nepal (N-AAS):
+- Internasjonale eksperter = fagpersoner med ekspertise innen vold i hjemmet eller relaterte felt fra ulike internasjonale organisasjoner. De deltok i Delphi-runder under studien for å vurdere og gi tilbakemelding på N-AAS.
+- Nasjonale eksperter = en gruppe nasjonale fagpersoner som sykepleiere, psykologer, forskere og klinikere basert i Nepal som gjennomgikk og evaluerte N-AAS under Delphi-metoden. Tallene (1, 2 osv.) representerer ulike nasjonale eksperter/forskjellige personer.
+- Brukereksperter = en gruppe gravide som deltok i kognitive intervjuer, som gir tilbakemelding på N-AAS basert på egne erfaringer. Disse kvinnene vurderte spørsmålene våre for relevans, forståelighet og sensitivitet.
+
+Spørsmålene merket med 'Relevant,' 'Understandable/Clear', og 'Sensitive' ble vurdert av eksperter ved å bruke en fempunkts Likert-skala:
+- Relevans ('Relevant'): Ekspertpanelene vurderte hvert spørsmål basert på dets betydning og relevans for å måle vold i hjemmet. En score på 0 indikerte at spørsmålet var irrelevant, mens en score på 4 indikerte at det var svært relevant.
+- Forståelighet/Klarhet ('Understandable/Clear'): Ekspertene vurderte om ordlyden i hvert spørsmål var tydelig og lett å forstå. En score på 0 betydde at spørsmålet var uforståelig, mens en score på 4 betydde at det var lett forståelig.
+- Sensitivitet ('Sensitive'): Ekspertene evaluerte følsomhetsnivået for hvert spørsmål, spesielt i sammenheng med det kulturelle miljøet i Nepal. En score på 0 indikerte at spørsmålet var høysensitivt, mens en score på 4 indikerte at det var ikke-sensitivt.</r:Content>
+                            </r:Abstract>
+                            <r:UniverseReference>
+                                <r:Agency>no.nsd</r:Agency>
+                                <r:ID>7fc27ed5-9094-4181-9717-cb228812f326</r:ID>
+                                <r:Version>2</r:Version>
+                                <r:TypeOfObject>Universe</r:TypeOfObject>
+                            </r:UniverseReference>
+                            <r:FundingInformation>
+                                <r:AgencyOrganizationReference>
+                                    <r:Agency>no.nsd</r:Agency>
+                                    <r:ID>9e2509c2-bc20-4083-b555-f6f3d7f34bf8</r:ID>
+                                    <r:Version>3</r:Version>
+                                    <r:TypeOfObject>Organization</r:TypeOfObject>
+                                </r:AgencyOrganizationReference>
+                                <r:GrantNumber>301525</r:GrantNumber>
+                            </r:FundingInformation>
+                            <r:Coverage>
+                                <r:TopicalCoverage isUniversallyUnique="true">
+                                    <r:URN>urn:ddi:no.nsd:6d0b85bc-d090-4881-9c82-4bb1cd6c816f:16</r:URN>
+                                    <r:Agency>no.nsd</r:Agency>
+                                    <r:ID>6d0b85bc-d090-4881-9c82-4bb1cd6c816f</r:ID>
+                                    <r:Version>16</r:Version>
+                                    <r:Subject controlledVocabularyID="7803963d-cc69-4cf3-89fd-dc752bb16086" controlledVocabularyAgencyName="no.nsd" controlledVocabularyVersionID="1">Health.PublicHealth</r:Subject>
+                                    <r:Subject controlledVocabularyID="7803963d-cc69-4cf3-89fd-dc752bb16086" controlledVocabularyAgencyName="no.nsd" controlledVocabularyVersionID="1">Health.ReproductiveHealth</r:Subject>
+                                </r:TopicalCoverage>
+                                <r:SpatialCoverage isUniversallyUnique="true">
+                                    <r:URN>urn:ddi:no.nsd:afd2b786-69f3-4876-a494-0f6ffe62c399:16</r:URN>
+                                    <r:Agency>no.nsd</r:Agency>
+                                    <r:ID>afd2b786-69f3-4876-a494-0f6ffe62c399</r:ID>
+                                    <r:Version>16</r:Version>
+                                    <r:BoundingBox>
+                                        <r:WestLongitude>0</r:WestLongitude>
+                                        <r:EastLongitude>0</r:EastLongitude>
+                                        <r:SouthLatitude>0</r:SouthLatitude>
+                                        <r:NorthLatitude>0</r:NorthLatitude>
+                                    </r:BoundingBox>
+                                    <r:Description>
+                                        <r:Content xml:lang="en">Country</r:Content>
+                                        <r:Content xml:lang="no">Land</r:Content>
+                                    </r:Description>
+                                    <r:CountryCode>NP</r:CountryCode>
+                                </r:SpatialCoverage>
+                                <r:TemporalCoverage isUniversallyUnique="true">
+                                    <r:URN>urn:ddi:no.nsd:0c91610a-d5b9-4bf8-8fa2-11d90e50a9b1:16</r:URN>
+                                    <r:Agency>no.nsd</r:Agency>
+                                    <r:ID>0c91610a-d5b9-4bf8-8fa2-11d90e50a9b1</r:ID>
+                                    <r:Version>16</r:Version>
+                                    <r:ReferenceDate>
+                                        <r:StartDate>2021-12-01T00:00:00Z</r:StartDate>
+                                        <r:EndDate>2022-11-30T00:00:00Z</r:EndDate>
+                                    </r:ReferenceDate>
+                                </r:TemporalCoverage>
+                            </r:Coverage>
+                            <r:AnalysisUnit controlledVocabularyID="0bdbed9d-6e38-4158-8fff-dc7ae75ad6f1" controlledVocabularyAgencyName="no.nsd" controlledVocabularyVersionID="1">Individual</r:AnalysisUnit>
+                            <r:KindOfData controlledVocabularyID="7a26bd9e-8af6-49d6-8028-e0b698b8ead7" controlledVocabularyAgencyName="no.nsd" controlledVocabularyVersionID="2">Numeric</r:KindOfData>
+                            <r:DataCollectionReference>
+                                <r:Agency>no.nsd</r:Agency>
+                                <r:ID>c60e5fba-6b5d-4061-9dd1-792bf681c603</r:ID>
+                                <r:Version>4</r:Version>
+                                <r:TypeOfObject>DataCollection</r:TypeOfObject>
+                            </r:DataCollectionReference>
+                            <r:PhysicalInstanceReference>
+                                <r:Agency>no.nsd</r:Agency>
+                                <r:ID>b26778a9-3df1-4921-82a9-572232e70858</r:ID>
+                                <r:Version>6</r:Version>
+                                <r:TypeOfObject>PhysicalInstance</r:TypeOfObject>
+                            </r:PhysicalInstanceReference>
+                            <r:PhysicalInstanceReference>
+                                <r:Agency>no.nsd</r:Agency>
+                                <r:ID>cdbc4681-c503-4d4d-b25a-60e872e32fb3</r:ID>
+                                <r:Version>5</r:Version>
+                                <r:TypeOfObject>PhysicalInstance</r:TypeOfObject>
+                            </r:PhysicalInstanceReference>
+                            <r:PhysicalInstanceReference>
+                                <r:Agency>no.nsd</r:Agency>
+                                <r:ID>3716ccad-f6d9-4c92-96ad-730d12bf7134</r:ID>
+                                <r:Version>5</r:Version>
+                                <r:TypeOfObject>PhysicalInstance</r:TypeOfObject>
+                            </r:PhysicalInstanceReference>
+                            <r:PhysicalInstanceReference>
+                                <r:Agency>no.nsd</r:Agency>
+                                <r:ID>0194c956-b6b7-446b-8087-57e94a5249e7</r:ID>
+                                <r:Version>5</r:Version>
+                                <r:TypeOfObject>PhysicalInstance</r:TypeOfObject>
+                            </r:PhysicalInstanceReference>
+                            <r:ArchiveReference>
+                                <r:Agency>no.nsd</r:Agency>
+                                <r:ID>5725b3ee-a8ba-4868-b59c-4fc21c5331b4</r:ID>
+                                <r:Version>3</r:Version>
+                                <r:TypeOfObject>Archive</r:TypeOfObject>
+                            </r:ArchiveReference>
+                        </StudyUnit>
+                    </Fragment>
+                    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+                        <PhysicalInstance isUniversallyUnique="true" versionDate="2024-05-03T13:12:27.8426901Z" xmlns="ddi:physicalinstance:3_3">
+                            <r:URN>urn:ddi:no.nsd:0194c956-b6b7-446b-8087-57e94a5249e7:5</r:URN>
+                            <r:Agency>no.nsd</r:Agency>
+                            <r:ID>0194c956-b6b7-446b-8087-57e94a5249e7</r:ID>
+                            <r:Version>5</r:Version>
+                            <r:UserAttributePair>
+                                <r:AttributeKey>ddi31:Paths</r:AttributeKey>
+                                <r:AttributeValue>{"0":"C:\\Users\\kst109\\dev\\ADVANCE 2\\Ferdige filer\\Data 4_validation_Delphi.sav"}</r:AttributeValue>
+                            </r:UserAttributePair>
+                            <r:VersionResponsibility>SIKT\kst109</r:VersionResponsibility>
+                            <r:Citation>
+                                <r:Title>
+                                    <r:String xml:lang="en">Data 4_validation_Delphi</r:String>
+                                    <r:String xml:lang="no">Data 4_validation_Delphi</r:String>
+                                </r:Title>
+                            </r:Citation>
+                            <DataFileIdentification isMaster="false">
+                                <DataFileURI isPublic="false">file:///C:/Users/kst109/dev/ADVANCE 2/Ferdige filer/Data 4_validation_Delphi.sav</DataFileURI>
+                            </DataFileIdentification>
+                            <GrossFileStructure isUniversallyUnique="true">
+                                <r:URN>urn:ddi:no.nsd:82749bb1-9636-4943-8ac8-43548487b54f:5</r:URN>
+                                <r:Agency>no.nsd</r:Agency>
+                                <r:ID>82749bb1-9636-4943-8ac8-43548487b54f</r:ID>
+                                <r:Version>5</r:Version>
+                                <CaseQuantity>45</CaseQuantity>
+                            </GrossFileStructure>
+                        </PhysicalInstance>
+                    </Fragment>
+                    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+                        <Organization isUniversallyUnique="true" versionDate="2022-03-30T11:24:17.8935675Z" xmlns="ddi:archive:3_3">
+                            <r:URN>urn:ddi:no.nsd:9e2509c2-bc20-4083-b555-f6f3d7f34bf8:3</r:URN>
+                            <r:Agency>no.nsd</r:Agency>
+                            <r:ID>9e2509c2-bc20-4083-b555-f6f3d7f34bf8</r:ID>
+                            <r:Version>3</r:Version>
+                            <r:VersionResponsibility>SIKT\mja047</r:VersionResponsibility>
+                            <r:VersionRationale>
+                                <r:RationaleDescription>
+                                    <r:String xml:lang="no">Lagt inn navn på NFR, det hadde blitt fjernet. Er nå mismatch med published</r:String>
+                                </r:RationaleDescription>
+                            </r:VersionRationale>
+                            <OrganizationIdentification>
+                                <OrganizationName>
+                                    <r:String xml:lang="en">The Research Council of Norway</r:String>
+                                    <r:String xml:lang="no">Norges forskningsråd</r:String>
+                                </OrganizationName>
+                            </OrganizationIdentification>
+                        </Organization>
+                    </Fragment>
+                </ddi:FragmentInstance>
+            </oai:metadata>
+        </oai:record>
+    </oai:GetRecord>
+</oai:OAI-PMH>
