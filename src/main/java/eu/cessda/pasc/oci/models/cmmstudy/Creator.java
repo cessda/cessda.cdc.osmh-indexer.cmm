@@ -29,7 +29,7 @@ public record Creator(
     public record Identifier(
         @JsonProperty("id") String id,
         @JsonProperty("type") String type,
-        @JsonProperty("uri") URI link
+        @JsonProperty("uri") URI uri
     ) {
     }
 }

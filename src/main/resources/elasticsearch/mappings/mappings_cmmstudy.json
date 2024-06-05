@@ -47,7 +47,7 @@
               "type": "keyword",
               "ignore_above": 256
             },
-            "link": {
+            "uri": {
               "type": "keyword",
               "ignore_above": 256
             }
