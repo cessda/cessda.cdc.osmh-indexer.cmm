@@ -15,13 +15,19 @@
  */
 package eu.cessda.pasc.oci.elasticsearch;
 
+import lombok.Getter;
+
 import java.io.Serial;
 
+@Getter
 public class IndexCreationFailedException extends IndexingException {
 
     @Serial
     private static final long serialVersionUID = 291787204525296576L;
 
+    /**
+     * The name of the index that failed to be created.
+     */
     private final String indexName;
 
     IndexCreationFailedException(String indexName) {
@@ -37,9 +43,5 @@ public class IndexCreationFailedException extends IndexingException {
     IndexCreationFailedException(String message, String indexName, Throwable cause) {
         super("[" + indexName + "] " + message + ": " + cause, cause);
         this.indexName = indexName;
-    }
-
-    public String getIndexName() {
-        return indexName;
     }
 }

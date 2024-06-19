@@ -15,6 +15,8 @@
  */
 package eu.cessda.pasc.oci;
 
+import lombok.Getter;
+
 import java.io.Serial;
 import java.text.ParseException;
 import java.time.LocalDateTime;
@@ -24,12 +26,19 @@ import java.util.List;
 /**
  * Represents errors when parsing date strings into {@link LocalDateTime} objects.
  */
+@Getter
 public class DateNotParsedException extends Exception {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The date string that caused this exception.
+     */
     private final String dateString;
+    /**
+     * The expected date formats used by the parser.
+     */
     private final List<String> expectedDateFormats;
 
     /**
@@ -47,19 +56,5 @@ public class DateNotParsedException extends Exception {
         );
         this.dateString = dateString;
         this.expectedDateFormats = List.of(expectedDateFormats);
-    }
-
-    /**
-     * Get the date string that caused this exception.
-     */
-    public String getDateString() {
-        return dateString;
-    }
-
-    /**
-     * Get the expected date formats used by the parser. The returned list is immutable.
-     */
-    public List<String> getExpectedDateFormats() {
-        return expectedDateFormats;
     }
 }

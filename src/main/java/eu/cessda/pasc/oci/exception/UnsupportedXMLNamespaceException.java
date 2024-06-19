@@ -15,6 +15,7 @@
  */
 package eu.cessda.pasc.oci.exception;
 
+import lombok.Getter;
 import org.jdom2.Namespace;
 
 import java.io.Serial;
@@ -22,10 +23,14 @@ import java.io.Serial;
 /**
  * Thrown when attempting to parse a DDI document with an unsupported XML namespace.
  */
+@Getter
 public class UnsupportedXMLNamespaceException extends IllegalArgumentException {
     @Serial
     private static final long serialVersionUID = -5524959625579025110L;
 
+    /**
+     * The XML namespace that was not supported.
+     */
     private final Namespace namespace;
 
     /**
@@ -35,9 +40,5 @@ public class UnsupportedXMLNamespaceException extends IllegalArgumentException {
     public UnsupportedXMLNamespaceException(Namespace namespace) {
         super("XML namespace \"" + namespace.getURI() + "\" not supported");
         this.namespace = namespace;
-    }
-
-    public Namespace getNamespace() {
-        return namespace;
     }
 }
