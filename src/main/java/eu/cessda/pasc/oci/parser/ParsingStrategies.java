@@ -430,6 +430,7 @@ class ParsingStrategies{
 
     /**
      * Parse the universe element. The clusion defaults to I if the source element doesn't specify its inclusivity.
+     *
      * @param elements the elements to parse.
      * @return a {@link Map} the language as the key and a list of universes as the value.
      */
@@ -544,7 +545,7 @@ class ParsingStrategies{
         }
 
         // Parse free texts
-        var freeTexts = XMLMapper.extractMetadataObjectListForEachLang(ParsingStrategies::dataCollFreeTextStrategy).apply(elementList);
+        var freeTexts = extractMetadataObjectListForEachLang(ParsingStrategies::dataCollFreeTextStrategy).apply(elementList);
         dataCollectionPeriodBuilder.freeTexts(freeTexts);
 
         return new CMMStudyMapper.ParseResults<>(
@@ -590,11 +591,6 @@ class ParsingStrategies{
             }
         }
 
-        // Default to 0 if the year cannot be parsed
-        if (year == null) {
-            year = 0;
-        }
-
         var dataCollectionPeriod = new CMMStudyMapper.DataCollectionPeriod(startDate, year, endDate, Collections.emptyMap());
         return new CMMStudyMapper.ParseResults<>(dataCollectionPeriod, parseExceptions);
     }
@@ -605,7 +601,7 @@ class ParsingStrategies{
 
         for (var element : elementList) {
             mappingFunction.apply(element).ifPresent(mappedElement ->
-                map.computeIfAbsent(XMLMapper.parseConceptLanguageCode(element), k -> new ArrayList<>()).add(mappedElement)
+                map.computeIfAbsent(parseConceptLanguageCode(element), k -> new ArrayList<>()).add(mappedElement)
             );
         }
 

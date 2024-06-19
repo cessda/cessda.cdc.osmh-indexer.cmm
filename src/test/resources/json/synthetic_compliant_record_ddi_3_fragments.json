@@ -1,0 +1,100 @@
+{
+  "abstract": {
+    "no": "ADVANCE 2 bygger på funnene fra den opprinnelige ADVANCE-studien (2013-2018) som etablerte et internasjonalt samarbeid av forskere og helsepersonell som adresserer vold i hjemmet. Fokuset er på å støtte kvinner som lever med vold i hjemmet under graviditet i Nepal, en viktig årsak til dårlige graviditetsutfall. Forekomst av vold i hjemmet er høyest i lavinntektsland, men de vitenskapelige bevis for intervensjoner i svangerskapsomsorgen er mest mangelfull i disse sammenhengene. Studien sikter på å rette opp denne mangelen i fire komplementære arbeidspakker (delstudier), ved å bruke tverrfaglige forskningsmetoder. Målet er å gjøre det mulig for svangerskapsomsorgsleverandører i Nepal å effektivt identifisere og hjelpe gravide kvinner som lever med vold i hjemmet. Dette dataarkivet er for den innledende fasen (første arbeidspakke) av prosjektet, der kliniske fortester utføres for å tilpasse seg kulturelt, og for å validere en språklig relevant versjon av Abuse Assessment Screen (AAS) spesielt for rutinemessig klinisk bruk i Nepal.Denne versjonen kalles  the Nepalese Abuse Assessment Screen (N-AAS).\n\nAngående variablene merket 'Retest': I studien ble påliteligheten til et spørreskjema vurdert ved hjelp av en test-retest-analyse. Deltakerne fullførte det samme spørreskjemaet på to forskjellige tidspunkter, noe som tillot forskerne å vurdere de samme variablene to ganger - først ved det opprinnelige tidspunktet (T1 eller 'Test') og igjen senere (T2 eller 'Retest'). Denne metoden er beskrevet i detalj i tidsskriftartikkelen som er knyttet til disse dataene.\n\nFor å evaluere presisjonen av de 7 spørsmålene som ble validert i denne studien (kalt Nepalese-Abuse Assessment Screen eller N-AAS), ble deltakernes svar sammenlignet med de samme spørsmålene administrert via dataassistert intervju og gullstandarden, som er en tradisjonell ansikt-til-ansikt intervju med deltakere, utført av en intervjuer.\n\nI Data4-datafilen finner man variabelen \"Expert_category\" med forskjellige typer eksperter som har gjennomgått og gitt tilbakemelding på spørsmålene om skjermbildet for vurdering av overgrep i Nepal (N-AAS):\n- Internasjonale eksperter = fagpersoner med ekspertise innen vold i hjemmet eller relaterte felt fra ulike internasjonale organisasjoner. De deltok i Delphi-runder under studien for å vurdere og gi tilbakemelding på N-AAS.\n- Nasjonale eksperter = en gruppe nasjonale fagpersoner som sykepleiere, psykologer, forskere og klinikere basert i Nepal som gjennomgikk og evaluerte N-AAS under Delphi-metoden. Tallene (1, 2 osv.) representerer ulike nasjonale eksperter/forskjellige personer.\n- Brukereksperter = en gruppe gravide som deltok i kognitive intervjuer, som gir tilbakemelding på N-AAS basert på egne erfaringer. Disse kvinnene vurderte spørsmålene våre for relevans, forståelighet og sensitivitet.\n\nSpørsmålene merket med 'Relevant,' 'Understandable/Clear', og 'Sensitive' ble vurdert av eksperter ved å bruke en fempunkts Likert-skala:\n- Relevans ('Relevant'): Ekspertpanelene vurderte hvert spørsmål basert på dets betydning og relevans for å måle vold i hjemmet. En score på 0 indikerte at spørsmålet var irrelevant, mens en score på 4 indikerte at det var svært relevant.\n- Forståelighet/Klarhet ('Understandable/Clear'): Ekspertene vurderte om ordlyden i hvert spørsmål var tydelig og lett å forstå. En score på 0 betydde at spørsmålet var uforståelig, mens en score på 4 betydde at det var lett forståelig.\n- Sensitivitet ('Sensitive'): Ekspertene evaluerte følsomhetsnivået for hvert spørsmål, spesielt i sammenheng med det kulturelle miljøet i Nepal. En score på 0 indikerte at spørsmålet var høysensitivt, mens en score på 4 indikerte at det var ikke-sensitivt.",
+    "en": "ADVANCE 2 builds on the accomplishments of the original ADVANCE study (2013-2018), which established an international collaboration of researchers and health providers addressing the field of domestic violence. The focus is on supporting women living with domestic violence in pregnancy in Nepal, an important cause of poor pregnancy outcomes. Domestic violence is highest in low-income countries, yet the scientific evidence for interventions in antenatal care is most lacking in these contexts. The study aims to remedy this gap in four complementary work packages (sub-studies), employing interdisciplinary research methods. The goal is to enable antenatal care providers in Nepal to identify effectively and assist pregnant women living with domestic violence. This data archive is for the initial phase (first work package) of the project, where clinical pretesting is carried out to adapt culturally, and to validate a linguistically relevant version of the Abuse Assessment Screen (AAS) specifically for routine clinical use in Nepal. This version is called the Nepalese Abuse Assessment Screen (N-AAS).\n\nConcerning the variables labeled 'Retest': In the study, the reliability of a questionnaire was assessed using a test-retest analysis. Participants completed the same questionnaire at two different time points, allowing the researchers to assess the same variables twice - first at the initial time point (T1 or 'Test') and again later (T2 or 'Retest'). This methodology is detailed in the journal article associated with this data.\n\nTo evaluate the precision of the 7 questions validated in this study (called the Nepalese-Abuse Assessment Screen or N-AAS),  participants' answers were compared to the same questions administered via computer-assisted interview and the gold standard, which is a traditional face-to-face interview with participants, conducted by an interviewer.\n\nIn the Data4 datafile the variable 'Expert_category' includes different types of experts who reviewed and provided feedback on the Nepalese Abuse Assessment Screen (N-AAS) questions:\n- International experts = professionals with expertise in domestic violence or related fields from various international organizations. They participated in Delphi rounds during the study to assess and provide feedback on the N-AAS.\n- National experts = a group of national professionals such as nurses, psychologists, researchers, and clinicians based in Nepal who reviewed and evaluated the N-AAS during the Delphi method. The numbers (1, 2, etc.) represent different national experts/different people.\n- User experts = a group of pregnant women who participated in cognitive interviews, providing feedback on the N-AAS based on their own experiences. These women assessed our questions for relevance, understandability, and sensitivity.\n\nThe questions marked with 'Relevant,' 'Understandable/Clear', and 'Sensitive' were assessed by experts using a five-point Likert scale as follows:\n- Relevance: The expert panels rated each question based on its importance and pertinence for measuring domestic violence. A score of 0 indicated the question was irrelevant, while a score of 4 indicated it was highly relevant.\n- Understandability/Clarity: The experts assessed whether the wording of each question was clear and easy to understand. A score of 0 meant the question was non-understandable, whereas a score of 4 meant it was easily understandable.\n- Sensitivity: The experts evaluated the level of sensitivity of each question, particularly in the context of the cultural environment of Nepal. A score of 0 indicated the question was highly sensitive, while a score of 4 indicated it was non-sensitive."
+  },
+  "classifications": {
+    "en": [
+      {
+        "vocab": "",
+        "vocabUri": "",
+        "id": "",
+        "term": "Health.PublicHealth"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "",
+        "id": "",
+        "term": "Health.ReproductiveHealth"
+      }
+    ]
+  },
+  "creators": {
+    "no": [
+      "NTNU"
+    ],
+    "en": [
+      "NTNU"
+    ]
+  },
+  "dataAccessFreeTexts": {},
+  "dataAccessUrl": {},
+  "dataCollectionPeriodStartdate": "2021-12-01",
+  "dataCollectionPeriodEnddate": "2022-11-30",
+  "dataCollectionYear": 2021,
+  "dataCollectionFreeTexts": {},
+  "fileLanguages": [
+    "no",
+    "en"
+  ],
+  "funding": {
+    "no": [
+      {
+        "grantNumber": "301525",
+        "agency": "Norges forskningsråd"
+      }
+    ],
+    "en": [
+      {
+        "grantNumber": "301525",
+        "agency": "The Research Council of Norway"
+      }
+    ]
+  },
+  "keywords": {},
+  "pidStudies": {
+    "en": [
+      {
+        "agency": "DOI",
+        "pid": "https://doi.org/10.18712/NSD-NSD3174-V1"
+      }
+    ]
+  },
+  "publicationYear": "2024-05-03T00:00:00Z",
+  "publisher": {
+    "no": {
+      "abbr": "",
+      "publisher": "Sikt - Kunnskapssektorens tjenesteleverandør"
+    },
+    "en": {
+      "abbr": "",
+      "publisher": "Sikt - Norwegian Agency for Shared Services in Education and Research"
+    }
+  },
+  "relatedPublications": {},
+  "samplingProcedureFreeTexts": {},
+  "studyAreaCountries": {},
+  "studyNumber": "no.nsd:39c1f667-17c2-475b-9333-846f59666e32:16",
+  "studyUrl": {},
+  "typeOfModeOfCollections": {},
+  "titleStudy": {
+    "no": "Addressing Domestic Violence in Antenatal Care Environments 2 (ADVANCE 2)",
+    "en": "Addressing Domestic Violence in Antenatal Care Environments 2 (ADVANCE 2)"
+  },
+  "typeOfTimeMethods": {},
+  "typeOfSamplingProcedures": {},
+  "unitTypes": {
+    "en": [
+      {
+        "vocab": "",
+        "vocabUri": "",
+        "id": "",
+        "term": "Individual"
+      }
+    ]
+  },
+  "universe": {},
+  "lastModified": "2024-05-03T13:14:02.3620880Z",
+  "studyXmlSourceUrl": "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=GetRecord&identifier=no.nsd%3A39c1f667-17c2-475b-9333-846f59666e32%3A16&metadataPrefix=ddi",
+  "repositoryUrl": "/oai/request"
+}

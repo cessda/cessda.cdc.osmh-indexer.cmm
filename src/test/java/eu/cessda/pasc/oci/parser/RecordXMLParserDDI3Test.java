@@ -15,18 +15,13 @@
  */
 package eu.cessda.pasc.oci.parser;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.fge.jackson.JsonLoader;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
-import com.github.fge.jsonschema.core.report.ProcessingReport;
-import com.github.fge.jsonschema.main.JsonSchema;
-import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import eu.cessda.pasc.oci.ResourceHandler;
 import eu.cessda.pasc.oci.configurations.Repo;
 import eu.cessda.pasc.oci.exception.IndexerException;
+import eu.cessda.pasc.oci.exception.XMLParseException;
 import eu.cessda.pasc.oci.mock.data.ReposTestData;
-import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
 import org.junit.Test;
@@ -36,7 +31,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.TimeZone;
 
-import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
@@ -50,6 +44,7 @@ public class RecordXMLParserDDI3Test {
 
     private final Repo repo = ReposTestData.getUKDSRepo();
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ParserTestUtilities utils = new ParserTestUtilities(objectMapper);
 
     // Class under test
     private final CMMStudyMapper cmmStudyMapper = new CMMStudyMapper();
@@ -61,51 +56,35 @@ public class RecordXMLParserDDI3Test {
 
     @Test
     public void shouldReturnValidCMMStudyRecordFromAFullyComplaintCmmDdi32Record() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
-        // Given
-        var expectedJson = ResourceHandler.getResourceAsString("json/synthetic_compliant_record_ddi_3.json");
-        var recordXML = ResourceHandler.getResource("xml/ddi_3_2/synthetic_compliant_cmm_ddi3_2.xml");
-
-        // When
-        var result = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
-
-        then(result).hasSize(1);
-        validateCMMStudyResultAgainstSchema(result.get(0));
-
-        String actualJson = objectMapper.writeValueAsString(result.get(0));
-
-        // Check if the JSON generated differs from the expected source
-        assertEquals(expectedJson, actualJson, true);
+        testParsing("xml/ddi_3_2/synthetic_compliant_cmm_ddi3_2.xml", "json/synthetic_compliant_record_ddi_3.json");
     }
 
     @Test
     public void shouldReturnValidCMMStudyRecordFromAFullyComplaintCmmDdi33Record() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
         // Given
-        var expectedJson = ResourceHandler.getResourceAsString("json/synthetic_compliant_record_ddi_3.json");
-        var recordXML = ResourceHandler.getResource("xml/ddi_3_3/synthetic_compliant_cmm_ddi3_3.xml");
+        testParsing("xml/ddi_3_3/synthetic_compliant_cmm_ddi3_3.xml", "json/synthetic_compliant_record_ddi_3.json");
+    }
+
+    @Test
+    public void shouldReturnValidCMMStudyRecordFromAFullyFragmentRecord() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
+        // Given
+        testParsing("xml/ddi_3_3/compliant_fragments_cmm_ddi_3_3.xml", "json/synthetic_compliant_record_ddi_3_fragments.json");
+    }
+
+    private void testParsing(String sourceXML, String expectedJSON) throws IOException, XMLParseException, URISyntaxException, ProcessingException, JSONException {
+        // Given
+        var recordXML = ResourceHandler.getResource(sourceXML);
+        var expectedJson = ResourceHandler.getResourceAsString(expectedJSON);
 
         // When
         var result = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
 
         then(result).hasSize(1);
-        validateCMMStudyResultAgainstSchema(result.get(0));
+        utils.validateCMMStudyResultAgainstSchema(result.getFirst());
 
-        String actualJson = objectMapper.writeValueAsString(result.get(0));
+        String actualJson = objectMapper.writeValueAsString(result.getFirst());
 
         // Check if the JSON generated differs from the expected source
         assertEquals(expectedJson, actualJson, true);
-    }
-
-    private void validateCMMStudyResultAgainstSchema(CMMStudy record) throws IOException, ProcessingException {
-        String jsonString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(record);
-        log.debug("RETRIEVED STUDY JSON: \n" + jsonString);
-
-
-        JsonSchema schema = JsonSchemaFactory.byDefault().getJsonSchema("resource:/json/schema/CMMStudy.schema.json");
-        JsonNode jsonNodeRecord = JsonLoader.fromString(jsonString);
-
-        ProcessingReport validate = schema.validate(jsonNodeRecord);
-        if (!validate.isSuccess()) {
-            fail("Validation not successful : " + validate);
-        }
     }
 }

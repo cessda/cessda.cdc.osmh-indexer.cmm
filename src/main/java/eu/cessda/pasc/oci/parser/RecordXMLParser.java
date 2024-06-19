@@ -202,7 +202,7 @@ public class RecordXMLParser {
                 var oaiMetadataElement = recordElement.getChild("metadata", OaiPmhConstants.OAI_NS);
                 if (oaiMetadataElement != null && !oaiMetadataElement.getChildren().isEmpty()) {
                     // Detach the metadata from its document and attach it to a new document
-                    var metadataElement = oaiMetadataElement.getChildren().get(0);
+                    var metadataElement = oaiMetadataElement.getChildren().getFirst();
                     metadataDocument = new Document(metadataElement.detach());
                 }
                 recordList.add(new Record(header, metadataDocument));
@@ -260,21 +260,22 @@ public class RecordXMLParser {
 
             var parseStudyUrlResults = cmmStudyMapper.parseStudyUrl(metadata, xPaths, defaultLangIsoCode);
             builder.studyUrl(parseStudyUrlResults.results());
-            if (!parseStudyUrlResults.exceptions().isEmpty()) {
-                log.warn("[{}] Some URLs in study {} couldn't be parsed: {}",
-                    value(LoggingConstants.REPO_NAME, repository.code()),
-                    value(LoggingConstants.STUDY_ID, studyNumber),
-                    parseStudyUrlResults.exceptions()
-                );
-            }
 
             var parseDataAccessURIResults = cmmStudyMapper.parseDataAccessURI(metadata, xPaths, defaultLangIsoCode);
             builder.dataAccessUrl(parseDataAccessURIResults.results());
-            if (!parseDataAccessURIResults.exceptions().isEmpty()) {
+
+            if (!parseStudyUrlResults.exceptions().isEmpty() || !parseDataAccessURIResults.exceptions().isEmpty()) {
+                // Copy exceptions into a single list
+                var combinedExceptions = new ArrayList<>(
+                    parseStudyUrlResults.exceptions().size() + parseDataAccessURIResults.exceptions().size()
+                );
+                combinedExceptions.addAll(parseDataAccessURIResults.exceptions());
+                combinedExceptions.addAll(parseStudyUrlResults.exceptions());
+
                 log.warn("[{}] Some URLs in study {} couldn't be parsed: {}",
                     value(LoggingConstants.REPO_NAME, repository.code()),
                     value(LoggingConstants.STUDY_ID, studyNumber),
-                    parseDataAccessURIResults.exceptions()
+                    combinedExceptions
                 );
             }
 
@@ -297,9 +298,6 @@ public class RecordXMLParser {
             builder.typeOfModeOfCollections(cmmStudyMapper.parseTypeOfModeOfCollection(metadata, xPaths, defaultLangIsoCode));
 
             var dataCollectionPeriodResults = cmmStudyMapper.parseDataCollectionDates(metadata, xPaths, defaultLangIsoCode);
-            dataCollectionPeriodResults.results().getStartDate().ifPresent(builder::dataCollectionPeriodStartdate);
-            dataCollectionPeriodResults.results().getEndDate().ifPresent(builder::dataCollectionPeriodEnddate);
-            builder.dataCollectionYear(dataCollectionPeriodResults.results().getDataCollectionYear());
             if (!dataCollectionPeriodResults.exceptions().isEmpty()) {
                 // Parsing errors occurred, log here
                 log.warn("[{}] Some dates in study {} couldn't be parsed: {}",
@@ -308,6 +306,9 @@ public class RecordXMLParser {
                     dataCollectionPeriodResults.exceptions()
                 );
             }
+            dataCollectionPeriodResults.results().getStartDate().ifPresent(builder::dataCollectionPeriodStartdate);
+            dataCollectionPeriodResults.results().getEndDate().ifPresent(builder::dataCollectionPeriodEnddate);
+            dataCollectionPeriodResults.results().getDataCollectionYear().ifPresent(builder::dataCollectionYear);
             builder.dataCollectionFreeTexts(dataCollectionPeriodResults.results().getFreeTexts());
 
             try {

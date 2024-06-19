@@ -22,6 +22,7 @@ import co.elastic.clients.elasticsearch.core.CountRequest;
 import co.elastic.clients.elasticsearch.core.ScrollRequest;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.search.ResponseBody;
+import lombok.NonNull;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -64,7 +65,7 @@ public class ElasticsearchSet<T> extends AbstractSet<T> {
      * @throws java.io.UncheckedIOException if an IO error occurs when decoding the JSON.
      */
     @Override
-    public Iterator<T> iterator() {
+    public @NonNull Iterator<T> iterator() {
         try {
             return new ElasticsearchIterator();
         } catch (IOException e) {

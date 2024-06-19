@@ -102,52 +102,52 @@ public final class XPaths {
             Namespace.getNamespace("s", "ddi:studyunit:3_2")
         })
         // Abstract
-        .abstractXPath(new XMLMapper<>("//s:StudyUnit[1]/r:Abstract/r:Content", parseLanguageContentOfElement(Element::getTextTrim)))
+        .abstractXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Abstract/r:Content", parseLanguageContentOfElement(Element::getTextTrim)))
         // Study title
-        .titleXPath(new XMLMapper<>("//s:StudyUnit[1]/r:Citation/r:Title/r:String", parseLanguageContentOfElement(Element::getTextTrim)))
+        .titleXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Citation/r:Title/r:String", parseLanguageContentOfElement(Element::getTextTrim)))
         // 'Access study' link (when @typeOfUserID attribute is "URLServiceProvider")
-        .studyURLDocDscrXPath(new XMLMapper<>("//s:StudyUnit[1]/r:UserID", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
+        .studyURLDocDscrXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:UserID", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
         // URL of the study description page at the SP website (when @typeOfUserID attribute is "URLServiceProvider")
-        .studyURLStudyDscrXPath(new XMLMapper<>("//s:StudyUnit[1]/r:UserID", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
+        .studyURLStudyDscrXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:UserID", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
         // Study number/PID
-        .pidStudyXPath(new XMLMapper<>("//s:StudyUnit[1]/r:Citation/r:InternationalIdentifier", extractMetadataObjectListForEachLang(ParsingStrategies::pidLifecycleStrategy)))
+        .pidStudyXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Citation/r:InternationalIdentifier", extractMetadataObjectListForEachLang(ParsingStrategies::pidLifecycleStrategy)))
         // Creator/PI
-        .creatorsXPath(new XMLMapper<>("//s:StudyUnit[1]/r:Citation/r:Creator", ParsingStrategies::creatorsStrategy))
+        .creatorsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Citation/r:Creator", ParsingStrategies::creatorsStrategy))
         // Terms of data access
-        .dataRestrctnXPath(new XMLMapper<>("//s:StudyUnit[1]/a:Archive/a:ArchiveSpecific/a:Item/a:Access/r:Description/r:Content", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy)))
+        .dataRestrctnXPath(new ResolvingXMLMapper<>("//s:StudyUnit[1]/a:Archive", "//s:StudyUnit[1]/r:ArchiveReference", "//a:ArchiveSpecific/a:Item/a:Access/r:Description/r:Content", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy)))
         // Data collection period
-        .dataCollectionPeriodsXPath(new XMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:CollectionEvent/d:DataCollectionDate", elementList -> getFirstEntry(ParsingStrategies::dataCollectionPeriodsLifecycleStrategy).apply(elementList).orElse(EMPTY_PARSE_RESULTS)))
+        .dataCollectionPeriodsXPath(new ResolvingXMLMapper<>("//s:StudyUnit[1]/d:DataCollection", "//s:StudyUnit[1]/r:DataCollectionReference", "//d:CollectionEvent/d:DataCollectionDate", elementList -> getFirstEntry(ParsingStrategies::dataCollectionPeriodsLifecycleStrategy).apply(elementList).orElse(EMPTY_PARSE_RESULTS)))
         // Publication year
-        .yearOfPubXPath(new XMLMapper<>("//s:StudyUnit[1]/r:Citation/r:PublicationDate/r:SimpleDate", getFirstEntry(Element::getTextTrim)))
+        .yearOfPubXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Citation/r:PublicationDate/r:SimpleDate", getFirstEntry(Element::getTextTrim)))
         // Topics
-        .classificationsXPath(new XMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:TopicalCoverage/r:Subject", extractMetadataObjectListForEachLang(TERM_VOCAB_ATTR_3_2_STRATEGY)))
+        .classificationsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:TopicalCoverage/r:Subject", extractMetadataObjectListForEachLang(TERM_VOCAB_ATTR_3_2_STRATEGY)))
         // Keywords
-        .keywordsXPath(new XMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:TopicalCoverage/r:Keyword", extractMetadataObjectListForEachLang(TERM_VOCAB_ATTR_3_2_STRATEGY)))
+        .keywordsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:TopicalCoverage/r:Keyword", extractMetadataObjectListForEachLang(TERM_VOCAB_ATTR_3_2_STRATEGY)))
         // Time dimension
-        .typeOfTimeMethodXPath(new XMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:Methodology/d:TimeMethod", (List<Element> elementList) -> typeOfTimeMethodLifecycleStrategy(elementList, DDI_3_2_ATTR_NAMES)))
+        .typeOfTimeMethodXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:Methodology/d:TimeMethod", (List<Element> elementList) -> typeOfTimeMethodLifecycleStrategy(elementList, DDI_3_2_ATTR_NAMES)))
         // Country
-        .studyAreaCountriesXPath(new XMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:SpatialCoverage/r:GeographicLocationReference", ParsingStrategies::geographicLocationStrategy))
+        .studyAreaCountriesXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:SpatialCoverage/r:GeographicLocationReference", ParsingStrategies::geographicLocationStrategy))
         // Analysis unit
-        .unitTypeXPath(new XMLMapper<>("//s:StudyUnit[1]/r:AnalysisUnit", (List<Element> elementList) -> analysisUnitStrategy(elementList, DDI_3_2_ATTR_NAMES)))
+        .unitTypeXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:AnalysisUnit", (List<Element> elementList) -> analysisUnitStrategy(elementList, DDI_3_2_ATTR_NAMES)))
         // Publisher
-        .publisherXPath(new XMLMapper<>("//s:StudyUnit[1]/r:Citation/r:Publisher/r:PublisherReference", ParsingStrategies::publisherReferenceStrategy))
+        .publisherXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Citation/r:Publisher/r:PublisherReference", ParsingStrategies::publisherReferenceStrategy))
         // Language of data file(s)
-        .fileTxtLanguagesXPath(new XMLMapper<>( "//ddi:DDIInstance/g:ResourcePackage/pi:PhysicalInstance/r:Citation/r:Language", XMLMapper::getLanguageFromElements))
+        .fileTxtLanguagesXPath(new ResolvingXMLMapper<>( "//s:StudyUnit[1]/pi:PhysicalInstance",  "//s:StudyUnit[1]/r:PhysicalInstanceReference","//r:Citation/r:Language", XMLMapper::getLanguageFromElements))
         // Language-specific name of file
-        .filenameLanguagesXPath(new XMLMapper<>("//ddi:DDIInstance/g:ResourcePackage/pi:PhysicalInstance/r:Citation/r:Title/r:String", XMLMapper::getLanguagesOfElements))
+        .filenameLanguagesXPath(new ResolvingXMLMapper<>( "//s:StudyUnit[1]/pi:PhysicalInstance",  "//s:StudyUnit[1]/r:PhysicalInstanceReference","//r:Citation/r:Title/r:String", XMLMapper::getLanguagesOfElements))
         // Sampling procedure
-        .samplingXPath(new XMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:Methodology/d:SamplingProcedure", (List<Element> elementList) -> samplingProceduresLifecycleStrategy(elementList, DDI_3_2_ATTR_NAMES)))
+        .samplingXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:Methodology/d:SamplingProcedure", (List<Element> elementList) -> samplingProceduresLifecycleStrategy(elementList, DDI_3_2_ATTR_NAMES)))
         // Data collection mode
-        .typeOfModeOfCollectionXPath(new XMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:CollectionEvent/d:ModeOfCollection", (List<Element> elementList) -> typeOfModeOfCollectionLifecycleStrategy(elementList, DDI_3_2_ATTR_NAMES)))
+        .typeOfModeOfCollectionXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:CollectionEvent/d:ModeOfCollection", (List<Element> elementList) -> typeOfModeOfCollectionLifecycleStrategy(elementList, DDI_3_2_ATTR_NAMES)))
         // PID of Related publication
-        .relatedPublicationsXPath(new XMLMapper<>("//s:StudyUnit[1]/r:OtherMaterial", ParsingStrategies::relatedPublicationLifecycleStrategy))
+        .relatedPublicationsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:OtherMaterial", ParsingStrategies::relatedPublicationLifecycleStrategy))
         /// /r:Citation/r:InternationalIdentifier/r:IdentifierContent
         // Study description language
         .recordDefaultLanguage("//ddi:DDIInstance/@xml:lang")
         // Description of population
-        .universeXPath(new XMLMapper<>("//s:StudyUnit[1]/c:ConceptualComponent/c:UniverseScheme/c:Universe", ParsingStrategies::universeLifecycleStrategy))
+        .universeXPath(new ResolvingXMLMapper<>("//s:StudyUnit[1]/c:ConceptualComponent/c:UniverseScheme/c:Universe" ,"//s:StudyUnit[1]/r:UniverseReference", ParsingStrategies::universeLifecycleStrategy))
         // Funding information
-        .fundingXPath(new XMLMapper<>("//s:StudyUnit[1]/r:FundingInformation", ParsingStrategies::fundingLifecycleStrategy))
+        .fundingXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:FundingInformation", ParsingStrategies::fundingLifecycleStrategy))
         .build();
 
     private static final TermVocabAttributeNames DDI_3_3_ATTR_NAMES = new TermVocabAttributeNames("controlledVocabularyName", "controlledVocabularyURN");
@@ -169,19 +169,19 @@ public final class XPaths {
             Namespace.getNamespace("s", "ddi:studyunit:3_3")
         })
         // PID of Related publication
-        .withRelatedPublicationsXPath(new XMLMapper<>("//s:StudyUnit[1]/r:OtherMaterialScheme/r:OtherMaterial", ParsingStrategies::relatedPublicationLifecycleStrategy))
+        .withRelatedPublicationsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:OtherMaterialScheme/r:OtherMaterial", ParsingStrategies::relatedPublicationLifecycleStrategy))
         // Topics
-        .withClassificationsXPath(new XMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:TopicalCoverage/r:Subject", extractMetadataObjectListForEachLang(TERM_VOCAB_ATTR_3_3_STRATEGY)))
+        .withClassificationsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:TopicalCoverage/r:Subject", extractMetadataObjectListForEachLang(TERM_VOCAB_ATTR_3_3_STRATEGY)))
         // Keywords
-        .withKeywordsXPath(new XMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:TopicalCoverage/r:Keyword", extractMetadataObjectListForEachLang(TERM_VOCAB_ATTR_3_3_STRATEGY)))
+        .withKeywordsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:TopicalCoverage/r:Keyword", extractMetadataObjectListForEachLang(TERM_VOCAB_ATTR_3_3_STRATEGY)))
         // Time dimension
-        .withTypeOfTimeMethodXPath(new XMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:Methodology/d:TimeMethod", (List<Element> elementList) -> ParsingStrategies.typeOfTimeMethodLifecycleStrategy(elementList, DDI_3_3_ATTR_NAMES)))
+        .withTypeOfTimeMethodXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:Methodology/d:TimeMethod", (List<Element> elementList) -> ParsingStrategies.typeOfTimeMethodLifecycleStrategy(elementList, DDI_3_3_ATTR_NAMES)))
         // Analysis unit
-        .withUnitTypeXPath(new XMLMapper<>("//s:StudyUnit[1]/r:AnalysisUnit", (List<Element> elementList) -> ParsingStrategies.analysisUnitStrategy(elementList, DDI_3_3_ATTR_NAMES)))
+        .withUnitTypeXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:AnalysisUnit", (List<Element> elementList) -> ParsingStrategies.analysisUnitStrategy(elementList, DDI_3_3_ATTR_NAMES)))
         // Sampling procedure
-        .withSamplingXPath(new XMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:Methodology/d:SamplingProcedure", (List<Element> elementList) -> ParsingStrategies.samplingProceduresLifecycleStrategy(elementList, DDI_3_3_ATTR_NAMES)))
+        .withSamplingXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:Methodology/d:SamplingProcedure", (List<Element> elementList) -> ParsingStrategies.samplingProceduresLifecycleStrategy(elementList, DDI_3_3_ATTR_NAMES)))
         // Data collection mode
-        .withTypeOfModeOfCollectionXPath(new XMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:CollectionEvent/d:ModeOfCollection", (List<Element> elementList) -> ParsingStrategies.typeOfModeOfCollectionLifecycleStrategy(elementList, DDI_3_3_ATTR_NAMES)));
+        .withTypeOfModeOfCollectionXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:CollectionEvent/d:ModeOfCollection", (List<Element> elementList) -> ParsingStrategies.typeOfModeOfCollectionLifecycleStrategy(elementList, DDI_3_3_ATTR_NAMES)));
 
 
     Optional<XMLMapper<Map<String, String>>> getParTitleXPath() {
@@ -213,57 +213,57 @@ public final class XPaths {
     public static final XPaths DDI_2_5_XPATHS = XPaths.builder()
         .namespace(new Namespace[]{ Namespace.getNamespace("ddi", "ddi:codebook:2_5") })
         // Abstract
-        .abstractXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:abstract", parseLanguageContentOfElement(Element::getTextTrim, (a, b) -> a + "<br>" + b)))
+        .abstractXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:abstract", parseLanguageContentOfElement(Element::getTextTrim, (a, b) -> a + "<br>" + b)))
         // Study title
-        .titleXPath(new XMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:titl", parseLanguageContentOfElement(Element::getTextTrim)))
+        .titleXPath(new SimpleXMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:titl", parseLanguageContentOfElement(Element::getTextTrim)))
         // Study title (in additional languages)
-        .parTitleXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:parTitl", parseLanguageContentOfElement(Element::getTextTrim)))
+        .parTitleXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:parTitl", parseLanguageContentOfElement(Element::getTextTrim)))
         // 'Access study' link
-        .studyURLDocDscrXPath(new XMLMapper<>("//ddi:codeBook/ddi:docDscr/ddi:citation/ddi:holdings", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
+        .studyURLDocDscrXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:docDscr/ddi:citation/ddi:holdings", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
         // URL of the study description page at the SP website
-        .studyURLStudyDscrXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:holdings", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
+        .studyURLStudyDscrXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:holdings", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
         // Study number/PID
-        .pidStudyXPath(new XMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo", extractMetadataObjectListForEachLang(ParsingStrategies::pidStrategy)))
+        .pidStudyXPath(new SimpleXMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo", extractMetadataObjectListForEachLang(ParsingStrategies::pidStrategy)))
         // Creator
-        .creatorsXPath(new XMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty", extractMetadataObjectListForEachLang(ParsingStrategies::creatorStrategy)))
+        .creatorsXPath(new SimpleXMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty", extractMetadataObjectListForEachLang(ParsingStrategies::creatorStrategy)))
         // Terms of data access
-        .dataAccessUrlXPath(new XMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:specPerm", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
+        .dataAccessUrlXPath(new SimpleXMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:specPerm", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
         // Terms of data access
-        .dataRestrctnXPath(new XMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:restrctn", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy)))
+        .dataRestrctnXPath(new SimpleXMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:restrctn", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy)))
         // Data collection period
-        .dataCollectionPeriodsXPath(new XMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate", ParsingStrategies::dataCollectionPeriodsStrategy))
+        .dataCollectionPeriodsXPath(new SimpleXMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate", ParsingStrategies::dataCollectionPeriodsStrategy))
         // Publication year
-        .yearOfPubXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:distDate[1]", getFirstEntry(ParsingStrategies::dateStrategy)))
+        .yearOfPubXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:distDate[1]", getFirstEntry(ParsingStrategies::dateStrategy)))
         // Topics
-        .classificationsXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:subject/ddi:topcClas", extractMetadataObjectListForEachLang(element -> ParsingStrategies.termVocabAttributeStrategy(element, false))))
+        .classificationsXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:subject/ddi:topcClas", extractMetadataObjectListForEachLang(element -> ParsingStrategies.termVocabAttributeStrategy(element, false))))
         // Keywords
-        .keywordsXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:subject/ddi:keyword", extractMetadataObjectListForEachLang(element -> ParsingStrategies.termVocabAttributeStrategy(element, false))))
+        .keywordsXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:subject/ddi:keyword", extractMetadataObjectListForEachLang(element -> ParsingStrategies.termVocabAttributeStrategy(element, false))))
         // Time dimension
-        .typeOfTimeMethodXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:timeMeth", elementList -> ParsingStrategies.conceptStrategy(elementList, e -> ParsingStrategies.termVocabAttributeStrategy(e, true))))
+        .typeOfTimeMethodXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:timeMeth", elementList -> ParsingStrategies.conceptStrategy(elementList, e -> ParsingStrategies.termVocabAttributeStrategy(e, true))))
         // Country
-        .studyAreaCountriesXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:nation", extractMetadataObjectListForEachLang(ParsingStrategies::countryStrategy)))
+        .studyAreaCountriesXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:nation", extractMetadataObjectListForEachLang(ParsingStrategies::countryStrategy)))
         // Analysis unit
-        .unitTypeXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:anlyUnit", elementList -> ParsingStrategies.conceptStrategy(elementList, ParsingStrategies::samplingTermVocabAttributeStrategy)))
+        .unitTypeXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:anlyUnit", elementList -> ParsingStrategies.conceptStrategy(elementList, ParsingStrategies::samplingTermVocabAttributeStrategy)))
         // Publisher name/Contributor
-        .publisherXPath(new XMLMapper<>("//ddi:codeBook/ddi:docDscr/ddi:citation/ddi:prodStmt/ddi:producer", parseLanguageContentOfElement(ParsingStrategies::publisherStrategy)))
+        .publisherXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:docDscr/ddi:citation/ddi:prodStmt/ddi:producer", parseLanguageContentOfElement(ParsingStrategies::publisherStrategy)))
         // Publisher
-        .distributorXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:distrbtr", parseLanguageContentOfElement(ParsingStrategies::publisherStrategy)))
+        .distributorXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:distrbtr", parseLanguageContentOfElement(ParsingStrategies::publisherStrategy)))
         // Language of data file(s)
-        .fileTxtLanguagesXPath(new XMLMapper<>( "//ddi:codeBook/ddi:fileDscr/ddi:fileTxt", XMLMapper::getLanguagesOfElements))
+        .fileTxtLanguagesXPath(new SimpleXMLMapper<>( "//ddi:codeBook/ddi:fileDscr/ddi:fileTxt", XMLMapper::getLanguagesOfElements))
         // Language-specific name of file
-        .filenameLanguagesXPath(new XMLMapper<>("//ddi:codeBook/ddi:fileDscr/ddi:fileTxt/ddi:fileName", XMLMapper::getLanguagesOfElements))
+        .filenameLanguagesXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:fileDscr/ddi:fileTxt/ddi:fileName", XMLMapper::getLanguagesOfElements))
         // Sampling procedure
-        .samplingXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:sampProc", elementList -> ParsingStrategies.conceptStrategy(elementList, ParsingStrategies::samplingTermVocabAttributeStrategy)))
+        .samplingXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:sampProc", elementList -> ParsingStrategies.conceptStrategy(elementList, ParsingStrategies::samplingTermVocabAttributeStrategy)))
         // Data collection mode
-        .typeOfModeOfCollectionXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:collMode", elementList -> ParsingStrategies.conceptStrategy(elementList, e -> ParsingStrategies.termVocabAttributeStrategy(e, true))))
+        .typeOfModeOfCollectionXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:collMode", elementList -> ParsingStrategies.conceptStrategy(elementList, e -> ParsingStrategies.termVocabAttributeStrategy(e, true))))
         // Related publication
-        .relatedPublicationsXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:othrStdyMat/ddi:relPubl", extractMetadataObjectListForEachLang(ParsingStrategies::relatedPublicationsStrategy)))
+        .relatedPublicationsXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:othrStdyMat/ddi:relPubl", extractMetadataObjectListForEachLang(ParsingStrategies::relatedPublicationsStrategy)))
         // Study description language
         .recordDefaultLanguage("//ddi:codeBook/@xml:lang")
         // Description of population
-        .universeXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:universe", extractMetadataObjectListForEachLang(ParsingStrategies::universeStrategy)))
+        .universeXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:universe", extractMetadataObjectListForEachLang(ParsingStrategies::universeStrategy)))
         // Funding information
-        .fundingXPath(new XMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:prodStmt/ddi:grantNo", extractMetadataObjectListForEachLang(ParsingStrategies::fundingStrategy)))
+        .fundingXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:prodStmt/ddi:grantNo", extractMetadataObjectListForEachLang(ParsingStrategies::fundingStrategy)))
         .build();
 
     /**
@@ -273,31 +273,31 @@ public final class XPaths {
         .namespace(new Namespace[]{ Namespace.getNamespace("ddi", "http://www.icpsr.umich.edu/DDI") })
         .recordDefaultLanguage("//ddi:codeBook/@xml-lang") // Nesstar with "-"
         // Closest for Nesstar based on CMM mapping doc but the above existing one for ddi2.5 seems to be present in Nesstar
-        .yearOfPubXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/citation/distStmt/distDate[1]", getFirstEntry(ParsingStrategies::dateStrategy)))
-        .abstractXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/abstract", parseLanguageContentOfElement(Element::getTextTrim, (a, b) -> a + "<br>" + b)))
-        .titleXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/citation/titlStmt/titl", parseLanguageContentOfElement(Element::getTextTrim)))
-        .parTitleXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/citation/titlStmt/parTitl", parseLanguageContentOfElement(Element::getTextTrim)))
-        .studyURLStudyDscrXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/dataAccs/setAvail/accsPlac", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
+        .yearOfPubXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/citation/distStmt/distDate[1]", getFirstEntry(ParsingStrategies::dateStrategy)))
+        .abstractXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/abstract", parseLanguageContentOfElement(Element::getTextTrim, (a, b) -> a + "<br>" + b)))
+        .titleXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/citation/titlStmt/titl", parseLanguageContentOfElement(Element::getTextTrim)))
+        .parTitleXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/citation/titlStmt/parTitl", parseLanguageContentOfElement(Element::getTextTrim)))
+        .studyURLStudyDscrXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/dataAccs/setAvail/accsPlac", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
         // PID path missing for most nesstar repos. Available in FORS but:
         //  -No agency
         //  -Only element freetext value.
-        .pidStudyXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/citation/titlStmt/IDNo", extractMetadataObjectListForEachLang(ParsingStrategies::pidStrategy))) // use @agency instead?
-        .creatorsXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/citation/rspStmt/AuthEnty", extractMetadataObjectListForEachLang(ParsingStrategies::creatorStrategy)))
-        .dataRestrctnXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/dataAccs/useStmt/restrctn", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy)))
-        .dataCollectionPeriodsXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/collDate", ParsingStrategies::dataCollectionPeriodsStrategy))
-        .classificationsXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/subject/topcClas", extractMetadataObjectListForEachLang(element -> ParsingStrategies.termVocabAttributeStrategy(element, false))))
-        .keywordsXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/subject/keyword", extractMetadataObjectListForEachLang(element -> ParsingStrategies.termVocabAttributeStrategy(element, false))))
-        .typeOfTimeMethodXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/method/dataColl/timeMeth", elementList -> ParsingStrategies.conceptStrategy(elementList, e -> ParsingStrategies.termVocabAttributeStrategy(e, true))))
-        .studyAreaCountriesXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/nation", extractMetadataObjectListForEachLang(ParsingStrategies::countryStrategy)))
-        .unitTypeXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/anlyUnit", extractMetadataObjectListForEachLang(element -> termVocabAttributeStrategy(element, true))))
-        .publisherXPath(new XMLMapper<>("//ddi:codeBook/docDscr/citation/prodStmt/producer", parseLanguageContentOfElement(ParsingStrategies::publisherStrategy)))
-        .distributorXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/citation/distStmt/distrbtr", parseLanguageContentOfElement(ParsingStrategies::publisherStrategy)))
-        .samplingXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/method/dataColl/sampProc", elementList -> ParsingStrategies.conceptStrategy(elementList, ParsingStrategies::samplingTermVocabAttributeStrategy)))
-        .typeOfModeOfCollectionXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/method/dataColl/collMode",  elementList -> ParsingStrategies.conceptStrategy(elementList, e -> ParsingStrategies.termVocabAttributeStrategy(e, true))))
-        .relatedPublicationsXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/othrStdyMat/relPubl", extractMetadataObjectListForEachLang(ParsingStrategies::relatedPublicationsStrategy)))
-        .universeXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/universe", extractMetadataObjectListForEachLang(ParsingStrategies::universeStrategy)))
+        .pidStudyXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/citation/titlStmt/IDNo", extractMetadataObjectListForEachLang(ParsingStrategies::pidStrategy))) // use @agency instead?
+        .creatorsXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/citation/rspStmt/AuthEnty", extractMetadataObjectListForEachLang(ParsingStrategies::creatorStrategy)))
+        .dataRestrctnXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/dataAccs/useStmt/restrctn", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy)))
+        .dataCollectionPeriodsXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/collDate", ParsingStrategies::dataCollectionPeriodsStrategy))
+        .classificationsXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/subject/topcClas", extractMetadataObjectListForEachLang(element -> ParsingStrategies.termVocabAttributeStrategy(element, false))))
+        .keywordsXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/subject/keyword", extractMetadataObjectListForEachLang(element -> ParsingStrategies.termVocabAttributeStrategy(element, false))))
+        .typeOfTimeMethodXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/method/dataColl/timeMeth", elementList -> ParsingStrategies.conceptStrategy(elementList, e -> ParsingStrategies.termVocabAttributeStrategy(e, true))))
+        .studyAreaCountriesXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/nation", extractMetadataObjectListForEachLang(ParsingStrategies::countryStrategy)))
+        .unitTypeXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/anlyUnit", extractMetadataObjectListForEachLang(element -> termVocabAttributeStrategy(element, true))))
+        .publisherXPath(new SimpleXMLMapper<>("//ddi:codeBook/docDscr/citation/prodStmt/producer", parseLanguageContentOfElement(ParsingStrategies::publisherStrategy)))
+        .distributorXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/citation/distStmt/distrbtr", parseLanguageContentOfElement(ParsingStrategies::publisherStrategy)))
+        .samplingXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/method/dataColl/sampProc", elementList -> ParsingStrategies.conceptStrategy(elementList, ParsingStrategies::samplingTermVocabAttributeStrategy)))
+        .typeOfModeOfCollectionXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/method/dataColl/collMode", elementList -> ParsingStrategies.conceptStrategy(elementList, e -> ParsingStrategies.termVocabAttributeStrategy(e, true))))
+        .relatedPublicationsXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/othrStdyMat/relPubl", extractMetadataObjectListForEachLang(ParsingStrategies::relatedPublicationsStrategy)))
+        .universeXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/universe", extractMetadataObjectListForEachLang(ParsingStrategies::universeStrategy)))
         // Funding information
-        .fundingXPath(new XMLMapper<>("//ddi:codeBook/stdyDscr/citation/prodStmt/grantNo", extractMetadataObjectListForEachLang(ParsingStrategies::fundingStrategy)))
+        .fundingXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/citation/prodStmt/grantNo", extractMetadataObjectListForEachLang(ParsingStrategies::fundingStrategy)))
         .build();
 
     /**

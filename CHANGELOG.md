@@ -13,6 +13,29 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 - *Fixed (for any bug fixes)*
 - *Security (in case of vulnerabilities)*
 
+## [3.6.0] - 2024-06-18
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12090308.svg)](https://doi.org/10.5281/zenodo.12090308)
+
+### Added
+
+* Add support for parsing funding information into the CMMStudy model ([#560](https://github.com/cessda/cessda.cdc.versions/issues/560)
+* Add support for parsing DDI 3.2 and 3.3 lifecycle instance documents ([#626](https://github.com/cessda/cessda.cdc.versions/issues/626))
+* Add support for parsing DDI 3.2 and 3.3 lifecycle fragment documents ([#652](https://github.com/cessda/cessda.cdc.versions/issues/652))
+
+### Changed
+
+* Updated OpenJDK to version 21 ([#657](https://github.com/cessda/cessda.cdc.versions/issues/657))
+* Updated SQAAaS badge ([#661](https://github.com/cessda/cessda.cdc.versions/issues/661))
+
+### Removed
+
+* Removed mapping related publications from other languages into the current language if not present ([#502](https://github.com/cessda/cessda.cdc.versions/issues/502))
+
+### Fixed
+
+* Fixed instances where structured logging fields wouldn't be set as expected ([PR-81](https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/pull/81))
+
 ## [3.5.0] - 2023-01-30
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10580661.svg)](https://doi.org/10.5281/zenodo.10580661)
@@ -252,6 +275,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 - verify SSL
 - removed the option to disable HTTPS verification
 
+[3.6.0]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/3.6.0
 [3.5.0]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/3.5.0
 [3.4.0]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/3.4.0
 [3.2.1]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/3.2.1
