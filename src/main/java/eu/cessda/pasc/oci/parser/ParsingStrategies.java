@@ -18,6 +18,7 @@ package eu.cessda.pasc.oci.parser;
 import eu.cessda.pasc.oci.DateNotParsedException;
 import eu.cessda.pasc.oci.TimeUtility;
 import eu.cessda.pasc.oci.exception.InvalidUniverseException;
+import eu.cessda.pasc.oci.models.Record;
 import eu.cessda.pasc.oci.models.cmmstudy.*;
 import lombok.NonNull;
 import org.jdom2.Element;
@@ -132,15 +133,26 @@ class ParsingStrategies{
      *
      * @param element the {@link Element} to parse.
      */
-    static Optional<String> creatorStrategy(Element element) {
+    static Optional<Creator> creatorStrategy(Element element) {
 
         var creator = element.getTextTrim();
-        var affiliation = getAttributeValue(element, CREATOR_AFFILIATION_ATTR);
+        var affiliation = element.getAttributeValue(CREATOR_AFFILIATION_ATTR);
 
-        if (affiliation.isPresent()) {
-            return Optional.of(creator + " (" + affiliation.get() + ")");
-        } else if (!creator.isEmpty()) {
-            return Optional.of(creator);
+        Creator.Identifier identifier = null;
+
+        // Is there an ExtLink?
+        var extLinkElement = element.getChild("ExtLink", null);
+        if (extLinkElement != null) {
+            var type = extLinkElement.getAttributeValue("title");
+            var identifierString = extLinkElement.getTextTrim();
+            var extLink = getAttributeValue(extLinkElement, URI_ATTR).map(URI::create).orElse(null);
+
+            identifier = new Creator.Identifier(identifierString, type, extLink);
+        }
+
+        if (!creator.isEmpty()) {
+            var creatorRecord = new Creator(creator, affiliation, identifier);
+            return Optional.of(creatorRecord);
         } else {
             return Optional.empty();
         }
@@ -480,16 +492,11 @@ class ParsingStrategies{
     }
 
     @NonNull
-    static Map<String, String> creatorsLifecycleStrategy(Element element) {
-        var creatorsMap = new HashMap<String, String>();
+    static Map<String, Creator> creatorsLifecycleStrategy(Element element) {
+        var creatorsMap = new HashMap<String, Creator>();
 
-        // Attempt to parse the affiliation attribute
-        String affiliation = null;
-        for (var attr : element.getAttributes()) {
-            if (attr.getName().equals("affiliation")) {
-                affiliation = attr.getValue();
-            }
-        }
+        // Parse affiliation attribute
+        String affiliation = element.getAttributeValue("affiliation");
 
         for (var child : element.getChildren(STRING, null)) {
             // Extract the creator name and language
@@ -497,11 +504,7 @@ class ParsingStrategies{
             var lang = getLangOfElement(child);
 
             if (creator != null) {
-                if (affiliation != null) {
-                    creator += " (" + affiliation + ")";
-                }
-
-                creatorsMap.put(lang, creator);
+                creatorsMap.put(lang, new Creator(creator, affiliation, null));
             }
         }
 
@@ -711,13 +714,30 @@ class ParsingStrategies{
      * @param element the element to parse.
      * @return a map containing language specific version of the publisher.
      */
-    static Map<String, Publisher> individualStrategy(Element element) {
+    static Map<String, Creator> individualStrategy(Element element) {
         var identification = element.getChild("IndividualIdentification", null);
         if (identification == null) {
             return Collections.emptyMap();
         }
 
-        var map = new HashMap<String, Publisher>();
+        var map = new HashMap<String, Creator>();
+
+        Creator.Identifier identifier = null;
+
+        var researcherID = identification.getChild("ResearcherID", null);
+        if (researcherID != null) {
+            String rtype = XMLMapper.getTextContent(researcherID.getChild("TypeOfID", null));
+            String rid = XMLMapper.getTextContent(researcherID.getChild("ResearcherIdentification", null));
+
+            // avoid NullPointerException by checking the string for null
+            URI ruri = null;
+            var uriString = getTextContent(researcherID.getChild("URI", null));
+            if (uriString != null) {
+               ruri = URI.create(uriString);
+            }
+
+            identifier = new Creator.Identifier(rid, rtype, ruri);
+        }
 
         var names = identification.getChildren("IndividualName", null);
         for (var name : names) {
@@ -727,10 +747,10 @@ class ParsingStrategies{
             // Use the full name if present
             var fullName = name.getChild("FullName", null);
             if (fullName != null) {
-                var string = fullName.getChild(STRING, null);
-                if (string != null) {
+                var stringElements = fullName.getChildren(STRING, null);
+                for (var string : stringElements) {
                     var lang = getLangOfElement(string);
-                    var publisher = new Publisher("", string.getTextTrim());
+                    var publisher = new Creator(string.getTextTrim(), null, identifier);
 
                     if (Boolean.parseBoolean(isPreferred)) {
                         map.put(lang, publisher);
@@ -760,8 +780,8 @@ class ParsingStrategies{
      * @return a map of creators per language.
      */
     @NonNull
-    static Map<String, List<String>> creatorsStrategy(List<Element> creatorElements) {
-        var creatorsMap = new HashMap<String, List<String>>();
+    static Map<String, List<Creator>> creatorsStrategy(List<Element> creatorElements) {
+        var creatorsMap = new HashMap<String, List<Creator>>();
 
         for (var element : creatorElements) {
 
@@ -778,22 +798,48 @@ class ParsingStrategies{
                     case "Individual" -> Optional.of(individualStrategy(r.element()));
                     case "Organization" -> Optional.of(organizationStrategy(r.element()));
                     default -> Optional.empty();
-                });
+                }).orElse(
+                    // Placeholder empty map
+                    Collections.<String, Record>emptyMap()
+                );
 
-                publisherMapOpt.ifPresent(m -> m.forEach((key, v) -> {
-                    String name;
-                    if (v.abbreviation().isEmpty()) {
-                        name = v.name();
+                publisherMapOpt.forEach((key, v) -> {
+                    Creator creator;
+
+                    if (v instanceof Publisher publisher) {
+                        creator = extractCreatorFromPublisher(publisher);
+                    } else if (v instanceof Creator) {
+                        creator = (Creator) v;
                     } else {
-                        name = v.name() + " (" + v.abbreviation() + ")";
+                        return;
                     }
 
-                    creatorsMap.computeIfAbsent(key, k -> new ArrayList<>()).add(name);
-                }));
+                    creatorsMap.computeIfAbsent(key, k -> new ArrayList<>()).add(creator);
+                });
             }
         }
 
         return creatorsMap;
+    }
+
+    /**
+     * Create a new {@link Creator} using the given {@link Publisher}. Only the publisher's name
+     * is extracted.
+     *
+     * @param publisher the {@link Publisher} to convert
+     * @return a creator.
+     */
+    private static @NonNull Creator extractCreatorFromPublisher(Publisher publisher) {
+        Creator creator;
+        String name;
+        if (publisher.abbreviation().isEmpty()) {
+            name = publisher.name();
+        } else {
+            name = publisher.name() + " (" + publisher.abbreviation() + ")";
+        }
+
+        creator = new Creator(name, null, null);
+        return creator;
     }
 
     @NonNull
@@ -921,15 +967,28 @@ class ParsingStrategies{
         for (var element : elementList) {
             var referencedElement = resolveReference(element);
             var publisherMapOpt = referencedElement.flatMap(r -> switch (r.type()) {
-                case "Individual" -> Optional.of(individualStrategy(r.element()));
+                case "Individual" -> {
+                    var creatorMap = individualStrategy(r.element());
+
+                    // Create a Publisher to represent this creator
+                    var publisherMap = new HashMap<String, Publisher>(creatorMap.size());
+                    creatorMap.forEach((lang, creator) -> {
+                        var publisher = new Publisher(null, creator.name());
+                        publisherMap.put(lang, publisher);
+                    });
+                    yield Optional.of(publisherMap);
+                }
                 case "Organization" -> Optional.of(organizationStrategy(r.element()));
                 default -> Optional.empty();
-            });
-            if (publisherMapOpt.isPresent()) {
-                return publisherMapOpt.get();
+            }).orElse(Collections.emptyMap());
+
+            // Return the first publisher entry found
+            if (!publisherMapOpt.isEmpty()) {
+                return publisherMapOpt;
             }
         }
 
+        // No publishers found
         return Collections.emptyMap();
     }
 
@@ -992,7 +1051,7 @@ class ParsingStrategies{
      * @return a map of language specific funding information.
      */
     @NonNull
-    static HashMap<String, List<Funding>> fundingLifecycleStrategy(List<Element> elementList) {
+    static Map<String, List<Funding>> fundingLifecycleStrategy(List<Element> elementList) {
         var fundingMap = new HashMap<String, List<Funding>>();
 
         for (var element : elementList) {

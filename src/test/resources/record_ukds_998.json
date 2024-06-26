@@ -449,7 +449,9 @@
   "fileLanguages": [],
   "creators": {
     "en": [
-      "JICNARS"
+      {
+        "name": "JICNARS"
+      }
     ]
   },
   "typeOfSamplingProcedures": {},

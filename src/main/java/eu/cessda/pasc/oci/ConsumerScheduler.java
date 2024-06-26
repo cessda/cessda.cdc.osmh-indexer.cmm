@@ -77,7 +77,7 @@ public class ConsumerScheduler {
                 value("job_duration", Duration.between(startTime, endTime).getSeconds())
             );
         } catch (IOException e) {
-            log.error("Cannot connect to Elasticsearch: " + e);
+            log.error("Cannot connect to Elasticsearch: {}", e.toString());
         }
     }
 }

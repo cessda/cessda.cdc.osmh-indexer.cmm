@@ -75,7 +75,7 @@ public final class XPaths {
     private final XMLMapper<Map<String, List<RelatedPublication>>> relatedPublicationsXPath;
     @Nullable
     private final XMLMapper<Map<String, List<UniverseElement>>> universeXPath;
-    private final XMLMapper<Map<String, List<String>>> creatorsXPath;
+    private final XMLMapper<Map<String, List<Creator>>> creatorsXPath;
     private final XMLMapper<Map<String, List<Funding>>> fundingXPath;
 
     private static final CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateNotParsedException>> EMPTY_PARSE_RESULTS = new CMMStudyMapper.ParseResults<>(

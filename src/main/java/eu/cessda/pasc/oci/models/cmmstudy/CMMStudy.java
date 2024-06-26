@@ -39,7 +39,7 @@ import java.util.Set;
 public record CMMStudy(
     @JsonProperty("abstract") Map<String, String> abstractField,
     @JsonProperty("classifications") Map<String, List<TermVocabAttributes>> classifications,
-    @JsonProperty("creators") Map<String, List<String>> creators,
+    @JsonProperty("creators") Map<String, List<Creator>> creators,
     @JsonProperty("dataAccessFreeTexts") Map<String, List<String>> dataAccessFreeTexts,
     @JsonProperty("dataAccessUrl") Map<String, URI> dataAccessUrl,
     @JsonProperty("dataCollectionPeriodStartdate") String dataCollectionPeriodStartdate,

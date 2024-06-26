@@ -51,6 +51,7 @@
               <rspStmt>
                 <AuthEnty affiliation="Jyväskylän yliopisto. Psykologian laitos" xml:lang="fi">Pulkkinen, Lea</AuthEnty>
                 <AuthEnty affiliation="Jyväskylän Essex. Department of Psychology" xml:lang="fi">David Brook</AuthEnty>
+
               </rspStmt>
               <prodStmt>
               </prodStmt>
@@ -73,6 +74,10 @@
               <rspStmt>
                 <AuthEnty affiliation="University of Jyväskylä. Department of Psychology" xml:lang="en">En Pulkkinen, Lea</AuthEnty>
                 <AuthEnty affiliation="University of Essex. Department of Psychology" xml:lang="en">David Brook</AuthEnty>
+                <AuthEnty affiliation="Synthetic ORCID Association" xml:lang="en" >
+                  Synthetic ORCID
+                  <ExtLink URI="https://orcid.org/0000-0000-0000-0000" role="PID" title="ORCID" xml:lang="en" >0000-0000-0000-0000</ExtLink>
+                </AuthEnty>
               </rspStmt>
               <prodStmt>
                 <grantNo agency="Grant Agency">Grant Number</grantNo>
