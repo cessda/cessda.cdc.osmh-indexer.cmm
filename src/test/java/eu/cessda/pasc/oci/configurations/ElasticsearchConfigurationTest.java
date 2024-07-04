@@ -36,8 +36,7 @@ public class ElasticsearchConfigurationTest {
     public void shouldCreateElasticsearchRestClient() {
         // Given
         var elasticsearchConfiguration = getElasticsearchConfiguration();
-        var transport = elasticsearchConfiguration.elasticsearchTransport();
-        var client = elasticsearchConfiguration.elasticsearchClient(transport);
+        var client = elasticsearchConfiguration.elasticsearchClient();
 
         // Then
         assertNotNull(client);

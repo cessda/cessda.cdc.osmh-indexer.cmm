@@ -30,13 +30,18 @@ import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
 import co.elastic.clients.elasticsearch.core.bulk.DeleteOperation;
 import co.elastic.clients.elasticsearch.core.bulk.IndexOperation;
 import co.elastic.clients.elasticsearch.indices.*;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.cessda.pasc.oci.DateNotParsedException;
 import eu.cessda.pasc.oci.ResourceHandler;
 import eu.cessda.pasc.oci.TimeUtility;
 import eu.cessda.pasc.oci.configurations.ESConfigurationProperties;
+import eu.cessda.pasc.oci.configurations.ElasticsearchConfiguration;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
+import eu.cessda.pasc.oci.service.DebuggingJMXBean;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -46,6 +51,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -67,13 +73,42 @@ public class ESIngestService implements IngestService {
      */
     private static final int INDEX_COMMIT_SIZE = 500;
 
-    private final ElasticsearchClient esClient;
-    private final ESConfigurationProperties esConfig;
+    private final ESConfigurationProperties esConfigProps;
+
+    private ElasticsearchClient client = null;
+    private final Supplier<ElasticsearchClient> esClient;
 
     @Autowired
-    public ESIngestService(ElasticsearchClient esClient, ESConfigurationProperties esConfig) {
-        this.esClient = esClient;
-        this.esConfig = esConfig;
+    public ESIngestService(
+        ElasticsearchConfiguration elasticsearchConfiguration,
+        ESConfigurationProperties esConfigProps,
+        ObjectMapper objectMapper
+    ) {
+        this.esConfigProps = esConfigProps;
+        this.esClient = () -> {
+            if (this.client == null
+                // Reset the client if the underlying HTTPClient is not running
+                || !((RestClientTransport) this.client._transport()).restClient().isRunning()) {
+                this.client = elasticsearchConfiguration.elasticsearchClient();
+                log.info("Started Elasticsearch REST client");
+            }
+            return this.client;
+        };
+    }
+
+    public ESIngestService(ElasticsearchClient esClient, ESConfigurationProperties esConfigProps) {
+        this.esConfigProps = esConfigProps;
+        this.client = esClient;
+        this.esClient = () -> this.client;
+    }
+
+    private ElasticsearchClient esClient() {
+        return this.esClient.get();
+    }
+
+    @Bean
+    public DebuggingJMXBean debuggingJMXBean() {
+        return new DebuggingJMXBean(esClient());
     }
 
     @Override
@@ -117,7 +152,7 @@ public class ESIngestService implements IngestService {
 
     private void indexBulkRequest(String indexName, BulkRequest request) throws IndexingException {
         try {
-            var response = esClient.bulk(request);
+            var response = this.esClient().bulk(request);
             if (response.errors()) {
                 for (var item : response.items()) {
                     if (item.error() != null && "strict_dynamic_mapping_exception".equals(item.error().type())) {
@@ -127,10 +162,10 @@ public class ESIngestService implements IngestService {
                             .index(indexName)
                             .build();
 
-                        esClient.indices().putMapping(updateMappingRequest);
+                        esClient().indices().putMapping(updateMappingRequest);
 
                         // Retry indexing with updated mappings.
-                        response = esClient.bulk(request);
+                        response = esClient().bulk(request);
                         break;
                     }
                 }
@@ -170,7 +205,7 @@ public class ESIngestService implements IngestService {
     @Override
     public long getTotalHitCount(String language) throws IOException {
         var matchAllCountRequest = new CountRequest.Builder().index(String.format(INDEX_NAME_TEMPLATE, language)).build();
-        var response = esClient.count(matchAllCountRequest);
+        var response = esClient().count(matchAllCountRequest);
         return response.count();
     }
 
@@ -179,7 +214,7 @@ public class ESIngestService implements IngestService {
         log.debug("Getting all studies for language [{}]", language);
         return new ElasticsearchSet<>(
             getSearchRequest("*", new MatchAllQuery.Builder().build()._toQuery()),
-            esClient,
+            esClient(),
             CMMStudyOfLanguage.class
         );
     }
@@ -190,7 +225,7 @@ public class ESIngestService implements IngestService {
         var repositorySearchRequest = getSearchRequest(language,
             new TermQuery.Builder().field("code").value(repository).build()._toQuery()
         );
-        return new ElasticsearchSet<>(repositorySearchRequest, esClient, CMMStudyOfLanguage.class);
+        return new ElasticsearchSet<>(repositorySearchRequest, esClient(), CMMStudyOfLanguage.class);
     }
 
     @Override
@@ -200,7 +235,7 @@ public class ESIngestService implements IngestService {
         try {
             var request = new co.elastic.clients.elasticsearch.core.GetRequest.Builder()
                 .index(String.format(INDEX_NAME_TEMPLATE, language)).id(id).build();
-            var response = esClient.get(request, CMMStudyOfLanguage.class);
+            var response = esClient().get(request, CMMStudyOfLanguage.class);
 
             var source = response.source();
 
@@ -241,7 +276,7 @@ public class ESIngestService implements IngestService {
 
         SearchResponse<CMMStudyOfLanguage> response;
         try {
-            response = esClient.search(request, CMMStudyOfLanguage.class);
+            response = esClient().search(request, CMMStudyOfLanguage.class);
         } catch (IOException e) {
             log.error("IO Error when retrieving last modified study: {}", e.toString());
             return Optional.empty();
@@ -275,7 +310,7 @@ public class ESIngestService implements IngestService {
     private void createIndex(String indexName) throws IndexingException {
 
         try {
-            if (esClient.indices().exists(ExistsRequest.of(r -> r.index(indexName))).value()) {
+            if (esClient().indices().exists(ExistsRequest.of(r -> r.index(indexName))).value()) {
                 log.debug("[{}] index name already exists, Skipping creation.", indexName);
                 return;
             }
@@ -292,7 +327,7 @@ public class ESIngestService implements IngestService {
 
             // Load language specific settings
             var settingsTemplate = ResourceHandler.getResourceAsString("elasticsearch/settings/settings_" + indexName + ".json");
-            var settingsString = String.format(settingsTemplate, esConfig.getNumberOfShards(), esConfig.getNumberOfReplicas());
+            var settingsString = String.format(settingsTemplate, esConfigProps.getNumberOfShards(), esConfigProps.getNumberOfReplicas());
             settings = new IndexSettings.Builder().withJson(new StringReader(settingsString)).build();
 
             // Load mappings
@@ -315,12 +350,12 @@ public class ESIngestService implements IngestService {
             .build();
 
         try {
-            var response = esClient.indices().create(indexCreationRequest);
+            var response = esClient().indices().create(indexCreationRequest);
             if (response.acknowledged()) {
                 log.info("[{}] Index created.", indexName);
 
                 // Wait until the index is ready
-                esClient.indices().open(new OpenRequest.Builder().index(indexName).build());
+                esClient().indices().open(new OpenRequest.Builder().index(indexName).build());
             } else {
                 throw new IndexCreationFailedException(indexName);
             }

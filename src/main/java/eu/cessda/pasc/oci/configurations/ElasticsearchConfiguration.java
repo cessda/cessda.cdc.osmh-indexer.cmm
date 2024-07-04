@@ -27,7 +27,6 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.elasticsearch.client.RestClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -43,6 +42,7 @@ public class ElasticsearchConfiguration {
     private final int esHttpPort;
     private final String esUsername;
     private final String esPassword;
+
     private final ObjectMapper objectMapper;
 
     @Autowired
@@ -60,7 +60,6 @@ public class ElasticsearchConfiguration {
         this.objectMapper = objectMapper;
     }
 
-    @Bean
     public RestClientTransport elasticsearchTransport() {
         var esHosts = new HttpHost(esHost, esHttpPort, "http");
         final var restClientBuilder = RestClient.builder(esHosts);
@@ -78,8 +77,8 @@ public class ElasticsearchConfiguration {
         return new RestClientTransport(restClient , new JacksonJsonpMapper(objectMapper));
     }
 
-    @Bean
-    public ElasticsearchClient elasticsearchClient(RestClientTransport transport) {
+    public ElasticsearchClient elasticsearchClient() {
+        var transport = elasticsearchTransport();
         return new ElasticsearchClient(transport);
     }
 }

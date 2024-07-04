@@ -28,8 +28,8 @@ import co.elastic.clients.elasticsearch.core.bulk.OperationType;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.indices.DeleteIndexRequest;
 import co.elastic.clients.elasticsearch.indices.RefreshRequest;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.cessda.pasc.oci.configurations.ESConfigurationProperties;
+import eu.cessda.pasc.oci.configurations.ElasticsearchConfiguration;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
@@ -68,14 +68,14 @@ public class ESIngestServiceTestIT {
     public static final String LANGUAGE_ISO_CODE = "en";
     private static final String INDEX_NAME = INDEX_TYPE + "_" + LANGUAGE_ISO_CODE;
 
-    @Autowired
-    private ObjectMapper mapper;
+    private final ESConfigurationProperties esConfigProp;
+    private final ElasticsearchClient elasticsearchClient;
 
     @Autowired
-    private ESConfigurationProperties esConfigProp;
-
-    @Autowired
-    private ElasticsearchClient elasticsearchClient;
+    public ESIngestServiceTestIT(ESConfigurationProperties esConfigProp, ElasticsearchConfiguration elasticsearchConfiguration) {
+        this.esConfigProp = esConfigProp;
+        this.elasticsearchClient = elasticsearchConfiguration.elasticsearchClient();
+    }
 
     /**
      * Reset Elasticsearch after each test
