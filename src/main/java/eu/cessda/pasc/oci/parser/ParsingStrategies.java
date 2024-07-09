@@ -995,14 +995,8 @@ class ParsingStrategies{
     @NonNull
     static Optional<Funding> fundingStrategy(Element element) {
         var grantNumber = nullableElementValueStrategy(element);
-        if (grantNumber.isPresent()) {
-            // Extract the agency from the "agency" attribute
-            var agency = getAttributeValue(element, AGENCY_ATTR).orElse(null);
-
-            return Optional.of(new Funding(grantNumber.get(), agency));
-        } else {
-            return Optional.empty();
-        }
+        var agency = getAttributeValue(element, AGENCY_ATTR).orElse(null);
+        return Optional.of(new Funding(grantNumber.orElse(null), agency));
     }
 
     /**
@@ -1070,11 +1064,6 @@ class ParsingStrategies{
                         grantNumber = childElement.getTextTrim();
                         break;
                 }
-            }
-
-            // Skip setting funding if the grant number is missing
-            if (grantNumber == null) {
-                continue;
             }
 
             for (var organization : orgLangMap.entrySet()) {

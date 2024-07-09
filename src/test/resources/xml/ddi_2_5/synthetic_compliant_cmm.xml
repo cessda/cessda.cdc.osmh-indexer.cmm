@@ -81,6 +81,8 @@
               </rspStmt>
               <prodStmt>
                 <grantNo agency="Grant Agency">Grant Number</grantNo>
+                <grantNo xml:lang="en" agency="Agency Without Grant Number"/>
+                <grantNo xml:lang="fi" agency="Finnish Agency"/>
               </prodStmt>
               <distStmt>
               </distStmt>
