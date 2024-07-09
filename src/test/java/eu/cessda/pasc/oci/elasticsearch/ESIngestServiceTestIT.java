@@ -35,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -68,13 +69,17 @@ public class ESIngestServiceTestIT {
     public static final String LANGUAGE_ISO_CODE = "en";
     private static final String INDEX_NAME = INDEX_TYPE + "_" + LANGUAGE_ISO_CODE;
 
-    private final ESConfigurationProperties esConfigProp;
-    private final ElasticsearchClient elasticsearchClient;
+    @Autowired
+    private ESConfigurationProperties esConfigProp;
 
     @Autowired
-    public ESIngestServiceTestIT(ESConfigurationProperties esConfigProp, ElasticsearchConfiguration elasticsearchConfiguration) {
-        this.esConfigProp = esConfigProp;
-        this.elasticsearchClient = elasticsearchConfiguration.elasticsearchClient();
+    private ElasticsearchConfiguration elasticsearchConfiguration;
+
+    private ElasticsearchClient elasticsearchClient;
+
+    @BeforeAll
+    public void setUp() {
+        elasticsearchClient = elasticsearchConfiguration.elasticsearchClient();
     }
 
     /**

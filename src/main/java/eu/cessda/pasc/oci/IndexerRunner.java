@@ -155,19 +155,16 @@ public class IndexerRunner {
         if (indexerRunning.get() && !cmmStudies.isEmpty()) {
             log.info("[{}({})] Indexing...", repo.code(), langIsoCode);
 
-            // Perform indexing and deletions
-            ingestService.bulkIndex(cmmStudies, langIsoCode);
-
             // Calculate the amount of changed studies
             var studiesUpdated = getUpdatedStudies(cmmStudies, langIsoCode);
 
             // Discover studies to delete, we do this by creating a HashSet of ids and then comparing what's in the database
-            var studyIds = new HashSet<String>();
+            var studyIds = new HashSet<String>(cmmStudies.size());
             for (var study : cmmStudies) {
                 studyIds.add(study.id());
             }
 
-            var studiesToDelete = new ArrayList<CMMStudyOfLanguage>();
+            var studiesToDelete = new ArrayList<CMMStudyOfLanguage>(cmmStudies.size());
             try {
                 for (var presentStudy : ingestService.getStudiesByRepository(repo.code(), langIsoCode)) {
                     if (!studyIds.contains(presentStudy.id())) {
@@ -184,6 +181,8 @@ public class IndexerRunner {
                 }
             }
 
+            // Perform indexing and deletions
+            ingestService.bulkIndex(cmmStudies, langIsoCode);
             ingestService.bulkDelete(studiesToDelete, langIsoCode);
 
             log.info("[{}({})] Indexing succeeded: {} studies created, {} studies deleted, {} studies updated.",
