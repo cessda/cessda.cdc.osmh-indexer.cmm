@@ -134,8 +134,16 @@
   "funding":  {
     "en": [
       {
+        "agency": "Agency Without Grant Number"
+      },
+      {
         "agency": "Grant Agency",
         "grantNumber": "Grant Number"
+      }
+    ],
+    "fi": [
+      {
+        "agency": "Finnish Agency"
       }
     ]
   },
