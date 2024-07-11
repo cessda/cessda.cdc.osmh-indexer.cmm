@@ -33,6 +33,11 @@
   "dataCollectionPeriodEnddate": "2022-11-30",
   "dataCollectionYear": 2021,
   "dataCollectionFreeTexts": {},
+  "dataKindFreeTexts": {
+    "en": [
+      "Numeric"
+    ]
+  },
   "fileLanguages": [
     "no",
     "en"

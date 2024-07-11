@@ -135,6 +135,8 @@
                 <!-- Valid Data Collection FreeText description -->
                 <collDate event="start">Spring 2018</collDate>
                 <collDate event="end">Christmas 2018</collDate>
+                <dataKind xml:lang="en">Numeric</dataKind>
+                <dataKind xml:lang="en">Text</dataKind>
               </sumDscr>
             </stdyInfo>
             <method>

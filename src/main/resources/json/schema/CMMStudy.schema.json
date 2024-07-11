@@ -172,6 +172,23 @@
       "type": "integer",
       "description": "A JSON date year string, e.g. 2012."
     },
+    "dataKindFreeTexts": {
+      "type": "object",
+      "description": "A Collection of Data Kind Free Texts descriptions for data collection, potentially translated in multiple languages",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "array",
+          "items": [
+            {
+              "type": "string",
+              "description": "A Data Kind Free Texts description for data collection.",
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
     "fileLanguages": {
       "type": "array",
       "items": {

@@ -68,6 +68,11 @@
   "dataCollectionYear": 1958,
   "dataCollectionPeriodEnddate": "1958-04",
   "dataCollectionPeriodStartdate": "1958-02",
+  "dataKindFreeTexts": {
+    "en": [
+      "Numeric"
+    ]
+  },
   "fileLanguages":[
     "de",
     "en"

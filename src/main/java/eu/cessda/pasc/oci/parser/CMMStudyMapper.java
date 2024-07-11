@@ -329,7 +329,7 @@ public class CMMStudyMapper {
     }
 
     /**
-     * Parses Sampling Procedure(s) from:
+     * Parses Data Access(es) from:
      * <p>
      * Xpath = {@link XPaths#getDataRestrctnXPath()}
      */
@@ -354,6 +354,16 @@ public class CMMStudyMapper {
             mapNullLanguage(parseResults.results().freeTexts, defaultLangIsoCode)
         );
         return new ParseResults<>(mappedResults, parseResults.exceptions);
+    }
+
+    /**
+     * Parses Data Kind(s) from:
+     * <p>
+     * Xpath = {@link XPaths#getDataKindXPath()}
+     */
+    Map<String, List<String>> parseDataKindFreeText(Document doc, XPaths xPaths, String defaultLangIsoCode) {
+        var unmappedDataKindTexts = xPaths.getDataKindXPath().resolve(doc, xPaths.getNamespace());
+        return mapNullLanguage(unmappedDataKindTexts, defaultLangIsoCode);
     }
 
     /**

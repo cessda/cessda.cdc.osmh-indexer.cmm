@@ -77,6 +77,8 @@ public final class XPaths {
     private final XMLMapper<Map<String, List<UniverseElement>>> universeXPath;
     private final XMLMapper<Map<String, List<String>>> creatorsXPath;
     private final XMLMapper<Map<String, List<Funding>>> fundingXPath;
+    @Nullable
+    private final XMLMapper<Map<String, List<String>>> dataKindXPath;
 
     private static final CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateNotParsedException>> EMPTY_PARSE_RESULTS = new CMMStudyMapper.ParseResults<>(
         new CMMStudyMapper.DataCollectionPeriod(null, 0, null, Collections.emptyMap()),
@@ -148,6 +150,8 @@ public final class XPaths {
         .universeXPath(new ResolvingXMLMapper<>("//s:StudyUnit[1]/c:ConceptualComponent/c:UniverseScheme/c:Universe" ,"//s:StudyUnit[1]/r:UniverseReference", ParsingStrategies::universeLifecycleStrategy))
         // Funding information
         .fundingXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:FundingInformation", ParsingStrategies::fundingLifecycleStrategy))
+        // Data kind
+        .dataKindXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:KindOfData", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy)))
         .build();
 
     private static final TermVocabAttributeNames DDI_3_3_ATTR_NAMES = new TermVocabAttributeNames("controlledVocabularyName", "controlledVocabularyURN");
@@ -264,6 +268,8 @@ public final class XPaths {
         .universeXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:universe", extractMetadataObjectListForEachLang(ParsingStrategies::universeStrategy)))
         // Funding information
         .fundingXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:prodStmt/ddi:grantNo", extractMetadataObjectListForEachLang(ParsingStrategies::fundingStrategy)))
+        // Data kind
+        .dataKindXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:dataKind", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy)))
         .build();
 
     /**
@@ -298,6 +304,8 @@ public final class XPaths {
         .universeXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/universe", extractMetadataObjectListForEachLang(ParsingStrategies::universeStrategy)))
         // Funding information
         .fundingXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/citation/prodStmt/grantNo", extractMetadataObjectListForEachLang(ParsingStrategies::fundingStrategy)))
+        // Data kind
+        .dataKindXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/dataKind", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy)))
         .build();
 
     /**

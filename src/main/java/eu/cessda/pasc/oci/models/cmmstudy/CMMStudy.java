@@ -46,6 +46,7 @@ public record CMMStudy(
     @JsonProperty("dataCollectionPeriodEnddate") String dataCollectionPeriodEnddate,
     @JsonProperty("dataCollectionYear") Integer dataCollectionYear,
     @JsonProperty("dataCollectionFreeTexts") Map<String, List<DataCollectionFreeText>> dataCollectionFreeTexts,
+    @JsonProperty("dataKindFreeTexts") Map<String, List<String>> dataKindFreeTexts,
     @JsonProperty("fileLanguages") Set<String> fileLanguages,
     @JsonProperty("funding") Map<String, List<Funding>> funding,
     @JsonProperty("keywords") Map<String, List<TermVocabAttributes>> keywords,
