@@ -20,7 +20,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.cessda.pasc</groupId>
     <artifactId>pasc-oci</artifactId>
-    <version>3.6.0</version>
+    <version>4.0.0</version>
     <packaging>jar</packaging>
 
     <name>CESSDA Data Catalogue OSMH Indexer</name>
@@ -63,8 +63,8 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
 
         <!-- Dependency versions -->
-        <lombok.version>1.18.32</lombok.version>
-        <elasticsearch.version>8.14.1</elasticsearch.version>
+        <lombok.version>1.18.34</lombok.version>
+        <elasticsearch.version>8.14.2</elasticsearch.version>
     </properties>
 
     <dependencies>
@@ -304,6 +304,7 @@
                         <exclude>mvnw*</exclude>
                         <exclude>.mvn/**</exclude>
                         <exclude>.*</exclude>
+                        <exclude>CITATION.cff</exclude>
                         <exclude>LICENSE.txt</exclude>
                         <exclude>**/.m2/**</exclude>
                         <exclude>lombok.config</exclude>

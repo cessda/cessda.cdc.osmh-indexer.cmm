@@ -105,8 +105,14 @@
     "bb"
   ],
   "creators": [
-    "En Pulkkinen, Lea (University of Jyväskylä. Department of Psychology)",
-    "David Brook (University of Essex. Department of Psychology)"
+    {
+      "name": "En Pulkkinen, Lea",
+      "affiliation": "University of Jyväskylä. Department of Psychology"
+    },
+    {
+      "name": "David Brook",
+      "affiliation": "University of Essex. Department of Psychology"
+    }
   ],
   "typeOfSamplingProcedures": [
     {

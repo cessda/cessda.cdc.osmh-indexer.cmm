@@ -242,7 +242,7 @@ public class RecordXMLParserTest {
         var result = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
 
         then(result).hasSize(1);
-        then(result.get(0).dataCollectionYear()).isNull();
+        then(result.getFirst().dataCollectionYear()).isNull();
     }
 
     private void assertThatCmmRequiredFieldsAreExtracted(CMMStudy record) throws IOException, JSONException {

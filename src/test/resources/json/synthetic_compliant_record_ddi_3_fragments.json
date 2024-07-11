@@ -21,10 +21,14 @@
   },
   "creators": {
     "no": [
-      "NTNU"
+      {
+        "name": "NTNU"
+      }
     ],
     "en": [
-      "NTNU"
+      {
+        "name": "NTNU"
+      }
     ]
   },
   "dataAccessFreeTexts": {},

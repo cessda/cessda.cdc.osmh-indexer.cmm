@@ -158,9 +158,16 @@
   ],
   "creators": {
     "zz": [
-      "Hood, C.C., University of York. Institute of Social and Economic Research",
-      "Dunsire, A. (institution)",
-      "Thomson, K.S., University of York. Institute of Social and Economic Research"
+      {
+        "name": "Hood, C.C., University of York. Institute of Social and Economic Research"
+      },
+      {
+        "name": "Dunsire, A.",
+        "affiliation": "institution"
+      },
+      {
+        "name": "Thomson, K.S., University of York. Institute of Social and Economic Research"
+      }
     ]
   },
   "typeOfSamplingProcedures": {},

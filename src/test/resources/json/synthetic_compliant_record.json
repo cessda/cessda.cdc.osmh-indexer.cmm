@@ -97,12 +97,33 @@
   },
   "creators": {
     "fi": [
-      "Pulkkinen, Lea (Jyväskylän yliopisto. Psykologian laitos)",
-      "David Brook (Jyväskylän Essex. Department of Psychology)"
+      {
+        "name": "Pulkkinen, Lea",
+        "affiliation": "Jyväskylän yliopisto. Psykologian laitos"
+      },
+      {
+        "name": "David Brook",
+        "affiliation": "Jyväskylän Essex. Department of Psychology"
+      }
     ],
     "en": [
-      "En Pulkkinen, Lea (University of Jyväskylä. Department of Psychology)",
-      "David Brook (University of Essex. Department of Psychology)"
+      {
+        "name": "En Pulkkinen, Lea",
+        "affiliation": "University of Jyväskylä. Department of Psychology"
+      },
+      {
+        "name": "David Brook",
+        "affiliation": "University of Essex. Department of Psychology"
+      },
+      {
+        "name": "Synthetic ORCID",
+        "affiliation": "Synthetic ORCID Association",
+        "identifier": {
+          "id": "0000-0000-0000-0000",
+          "type": "ORCID",
+          "uri": "https://orcid.org/0000-0000-0000-0000"
+        }
+      }
     ]
   },
   "fileLanguages": [
@@ -113,8 +134,16 @@
   "funding":  {
     "en": [
       {
+        "agency": "Agency Without Grant Number"
+      },
+      {
         "agency": "Grant Agency",
         "grantNumber": "Grant Number"
+      }
+    ],
+    "fi": [
+      {
+        "agency": "Finnish Agency"
       }
     ]
   },

@@ -41,7 +41,7 @@ public record CMMStudyOfLanguage(
     @JsonProperty("abstract") String abstractField,
     @JsonProperty("classifications") List<TermVocabAttributes> classifications,
     @JsonProperty("code") String code,
-    @JsonProperty("creators") List<String> creators,
+    @JsonProperty("creators") List<Creator> creators,
     @JsonProperty("dataAccessFreeTexts") List<String> dataAccessFreeTexts,
     @JsonProperty("dataAccessUrl") URI dataAccessUrl,
     @JsonProperty("dataCollectionPeriodStartdate") String dataCollectionPeriodStartdate,

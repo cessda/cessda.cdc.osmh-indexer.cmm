@@ -45,6 +45,15 @@ public interface XMLMapper<T> {
     T resolve(Object context, Namespace... namespace);
 
 
+    static String getTextContent(Element element) {
+        if (element != null) {
+            var elementText = element.getTextTrim();
+            return elementText.isEmpty() ? null : elementText;
+        } else {
+            return null;
+        }
+    }
+
     /**
      * Returns the {@code xml:lang} attributes of the given elements.
      *

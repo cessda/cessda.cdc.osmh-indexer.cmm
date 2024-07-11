@@ -169,7 +169,7 @@ public class CMMStudyMapper {
      * <p>
      * Xpath = {@link XPaths#getCreatorsXPath()}
      */
-    Map<String, List<String>> parseCreator(Document document, XPaths xPaths, String defaultLangIsoCode) {
+    Map<String, List<Creator>> parseCreator(Document document, XPaths xPaths, String defaultLangIsoCode) {
         var unmappedCreators = xPaths.getCreatorsXPath().resolve(document, xPaths.getNamespace());
         return mapNullLanguage(unmappedCreators, defaultLangIsoCode, CMMStudyMapper::mergeLists);
     }
@@ -459,7 +459,7 @@ public class CMMStudyMapper {
 
     Map<String, List<Funding>> parseFunding(Document document, XPaths xPaths, String defaultLangIsoCode) {
         var unmappedXPaths = xPaths.getFundingXPath().resolve(document, xPaths.getNamespace());
-        return mapNullLanguage(unmappedXPaths, defaultLangIsoCode);
+        return mapNullLanguage(unmappedXPaths, defaultLangIsoCode, CMMStudyMapper::mergeLists);
     }
 
     @Value

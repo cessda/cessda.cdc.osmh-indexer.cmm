@@ -88,8 +88,32 @@
           "description": "A Collection of Creators(affiliation) translated in this language",
           "items": [
             {
-              "type": "string",
-              "description": "A Creators(affiliation).",
+              "type": "object",
+              "description": "A Creator instance.",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "affiliation": {
+                  "type": "string"
+                },
+                "identifier": {
+                  "type": "object",
+                  "description": "A unique identifier for a creator (e.g. ORCID)",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
               "additionalProperties": false
             }
           ]

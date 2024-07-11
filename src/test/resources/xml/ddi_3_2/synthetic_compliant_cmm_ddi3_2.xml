@@ -68,19 +68,6 @@
         <r:ID>ZA0004_ResPac</r:ID>
         <r:Version>1.0.0</r:Version>
         <a:OrganizationScheme>
-            <r:Agency>de.gesis</r:Agency>
-            <r:ID>ZA0004_OrgSch</r:ID>
-            <r:Version>1.0.0</r:Version>
-            <a:Organization>
-                <r:Agency>de.gesis</r:Agency>
-                <r:ID>ZA0004_Org_Cre1</r:ID>
-                <r:Version>1.0.0</r:Version>
-                <a:OrganizationIdentification>
-                    <a:OrganizationName>
-                        <r:String>Institute for International Social Research, Princeton, N.J.</r:String>
-                    </a:OrganizationName>
-                </a:OrganizationIdentification>
-            </a:Organization>
             <a:Organization>
                 <r:Agency>de.gesis</r:Agency>
                 <r:ID>ZA0004_Org_Pub1</r:ID>
@@ -129,6 +116,24 @@
                     </a:OrganizationName>
                 </a:OrganizationIdentification>
             </a:Organization>
+            <a:Individual>
+                <r:Agency>eu.cessda</r:Agency>
+                <r:ID>synthetic-id</r:ID>
+                <r:Version>1.0.0</r:Version>
+                <a:IndividualIdentification>
+                    <a:IndividualName>
+                        <a:FullName>
+                            <r:String xml:lang="en">Synthetic ORCID</r:String>
+                            <r:String xml:lang="de">Synthetic ORCID de</r:String>
+                        </a:FullName>
+                    </a:IndividualName>
+                    <a:ResearcherID>
+                        <a:TypeOfID>ORCID</a:TypeOfID>
+                        <a:ResearcherIdentification>0000-0000-0000-0000</a:ResearcherIdentification>
+                        <r:URI>https://orcid.org/0000-0000-0000-0000</r:URI>
+                    </a:ResearcherID>
+                </a:IndividualIdentification>
+            </a:Individual>
         </a:OrganizationScheme>
         <c:GeographicLocationScheme>
             <r:Agency>de.gesis</r:Agency>
@@ -191,15 +196,11 @@
                 <r:String xml:lang="de">International Outlooks of Political Leaders (USA)</r:String>
             </r:Title>
             <r:Creator>
-                <r:CreatorName affiliation="GESIS">
-                    <r:String xml:lang="en">Institute for International Social Research, Princeton, N.J.</r:String>
-                    <r:String xml:lang="de">Creator de</r:String>
-                </r:CreatorName>
                 <r:CreatorReference>
-                    <r:Agency>de.gesis</r:Agency>
-                    <r:ID>ZA0004_Org_Cre1</r:ID>
+                    <r:Agency>eu.cessda</r:Agency>
+                    <r:ID>synthetic-id</r:ID>
                     <r:Version>1.0.0</r:Version>
-                    <r:TypeOfObject>Organization</r:TypeOfObject>
+                    <r:TypeOfObject>Individual</r:TypeOfObject>
                 </r:CreatorReference>
             </r:Creator>
             <r:Publisher>
