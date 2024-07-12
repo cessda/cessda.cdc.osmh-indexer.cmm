@@ -361,9 +361,9 @@ public class CMMStudyMapper {
      * <p>
      * Xpath = {@link XPaths#getDataKindXPath()}
      */
-    Map<String, List<String>> parseDataKindFreeText(Document doc, XPaths xPaths, String defaultLangIsoCode) {
+    Map<String, List<DataKindFreeText>> parseDataKindFreeText(Document doc, XPaths xPaths, String defaultLangIsoCode) {
         var unmappedDataKindTexts = xPaths.getDataKindXPath().resolve(doc, xPaths.getNamespace());
-        return mapNullLanguage(unmappedDataKindTexts, defaultLangIsoCode);
+        return mapNullLanguage(unmappedDataKindTexts, defaultLangIsoCode, CMMStudyMapper::mergeLists);
     }
 
     /**

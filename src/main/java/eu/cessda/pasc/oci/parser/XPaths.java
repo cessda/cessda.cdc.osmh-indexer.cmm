@@ -78,7 +78,7 @@ public final class XPaths {
     private final XMLMapper<Map<String, List<Creator>>> creatorsXPath;
     private final XMLMapper<Map<String, List<Funding>>> fundingXPath;
     @Nullable
-    private final XMLMapper<Map<String, List<String>>> dataKindXPath;
+    private final XMLMapper<Map<String, List<DataKindFreeText>>> dataKindXPath;
 
     private static final CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateNotParsedException>> EMPTY_PARSE_RESULTS = new CMMStudyMapper.ParseResults<>(
         new CMMStudyMapper.DataCollectionPeriod(null, 0, null, Collections.emptyMap()),
@@ -151,7 +151,7 @@ public final class XPaths {
         // Funding information
         .fundingXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:FundingInformation", ParsingStrategies::fundingLifecycleStrategy))
         // Data kind
-        .dataKindXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:KindOfData", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy)))
+        .dataKindXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:KindOfData", extractMetadataObjectListForEachLang(ParsingStrategies::dataKindFreeTextStrategy)))
         .build();
 
     private static final TermVocabAttributeNames DDI_3_3_ATTR_NAMES = new TermVocabAttributeNames("controlledVocabularyName", "controlledVocabularyURN");
@@ -269,7 +269,7 @@ public final class XPaths {
         // Funding information
         .fundingXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:prodStmt/ddi:grantNo", extractMetadataObjectListForEachLang(ParsingStrategies::fundingStrategy)))
         // Data kind
-        .dataKindXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:dataKind", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy)))
+        .dataKindXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:dataKind", extractMetadataObjectListForEachLang(ParsingStrategies::dataKindFreeTextStrategy)))
         .build();
 
     /**
@@ -305,7 +305,7 @@ public final class XPaths {
         // Funding information
         .fundingXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/citation/prodStmt/grantNo", extractMetadataObjectListForEachLang(ParsingStrategies::fundingStrategy)))
         // Data kind
-        .dataKindXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/dataKind", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy)))
+        .dataKindXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/dataKind", extractMetadataObjectListForEachLang(ParsingStrategies::dataKindFreeTextStrategy)))
         .build();
 
     /**

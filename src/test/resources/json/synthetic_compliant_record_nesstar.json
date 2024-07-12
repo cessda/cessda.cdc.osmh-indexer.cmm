@@ -209,7 +209,9 @@
   },
   "dataKindFreeTexts": {
     "xy": [
-      "Données quantitatives"
+      {
+        "dataKindFreeText": "Données quantitatives"
+      }
     ]
   },
   "relatedPublications": {},

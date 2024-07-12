@@ -39,7 +39,9 @@
   "dataCollectionFreeTexts": {},
   "dataKindFreeTexts": {
     "en": [
-      "Numeric"
+      {
+        "dataKindFreeText": "Numeric"
+      }
     ]
   },
   "fileLanguages": [

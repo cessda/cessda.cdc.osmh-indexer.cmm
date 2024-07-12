@@ -198,14 +198,23 @@
     },
     "dataKindFreeTexts": {
       "type": "object",
-      "description": "A Collection of Data Kind Free Texts descriptions for data collection, potentially translated in multiple languages",
+      "description": "A collection of Data Kind FreeTexts, potentially translated in multiple languages",
       "patternProperties": {
         "^[a-z]{2}$": {
           "type": "array",
+          "description": "A collection Data Kind FreeTexts for this given language",
           "items": [
             {
-              "type": "string",
-              "description": "A Data Kind Free Texts description for data collection.",
+              "type": "object",
+              "description": "A Data Kind FreeTexts instance",
+              "properties": {
+                "dataKindFreeText": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                }
+              },
               "additionalProperties": false
             }
           ]

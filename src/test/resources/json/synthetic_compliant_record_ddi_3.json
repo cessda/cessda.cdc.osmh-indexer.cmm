@@ -84,7 +84,10 @@
   "dataCollectionPeriodStartdate": "1958-02",
   "dataKindFreeTexts": {
     "en": [
-      "Numeric"
+      {
+        "dataKindFreeText": "Numeric",
+        "type": "Quantitative"
+      }
     ]
   },
   "fileLanguages":[

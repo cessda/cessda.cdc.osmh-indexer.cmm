@@ -97,10 +97,29 @@
     "dataCollectionYear": {
       "type": "integer"
     },
-    "dataKindFreeTexts": {
+    "dataKindFreeTexts" : {
+      "type" : "nested",
+      "properties" : {
+        "dataKindFreeText" : {
+          "type" : "text",
+          "copy_to" : [
+            "dataKindFreeTextSearchField"
+          ],
+          "term_vector" : "with_positions_offsets",
+          "analyzer" : "pasc_standard_analyzer"
+        },
+        "type" : {
+          "type" : "text",
+          "copy_to" : [
+            "dataKindFreeTextSearchField"
+          ],
+          "analyzer" : "pasc_standard_analyzer"
+        }
+      }
+    },
+    "dataKindFreeTextSearchField": {
       "type": "text",
-      "analyzer": "pasc_standard_analyzer",
-      "term_vector": "with_positions_offsets"
+      "analyzer": "pasc_standard_analyzer"
     },
     "fileLanguages": {
       "type": "keyword",

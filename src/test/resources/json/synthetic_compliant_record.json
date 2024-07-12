@@ -418,8 +418,13 @@
   },
   "dataKindFreeTexts": {
     "en": [
-      "Numeric",
-      "Text"
+      {
+        "dataKindFreeText": "Numeric",
+        "type": "Quantitative"
+      },
+      {
+        "dataKindFreeText": "Text"
+      }
     ]
   },
   "relatedPublications": {
