@@ -50,5 +50,6 @@ public class OaiPmhConstants {
     static final String AGENCY_ATTR = "agency";
     static final String CONCEPT_EL = "concept";
     static final String URI_ATTR = "URI";
+    static final String TYPE_ATTR = "type";
 
 }

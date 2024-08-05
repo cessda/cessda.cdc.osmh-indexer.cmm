@@ -1000,6 +1000,22 @@ class ParsingStrategies{
     }
 
     /**
+     * Constructs a {@link DataKindFreeText} using the given element.
+     * <p>
+     * The free text field is derived from the element text, and the type is derived from the
+     * {@value OaiPmhConstants#TYPE_ATTR} attribute.
+     *
+     * @param element the {@link Element} to parse.
+     * @return a {@link DataKindFreeText}.
+     */
+    @NonNull
+    static Optional<DataKindFreeText> dataKindFreeTextStrategy(Element element) {
+        var dataKind = nullableElementValueStrategy(element);
+        var type = getAttributeValue(element, TYPE_ATTR).orElse(null);
+        return Optional.of(new DataKindFreeText(dataKind.orElse(null), type));
+    }
+
+    /**
      * Returns the text content of the given attribute.
      * If the attribute does not exist, an empty {@link Optional} will be returned.
      *
