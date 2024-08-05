@@ -30,10 +30,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import static com.google.common.io.Files.getFileExtension;
 import static java.lang.Math.max;
@@ -82,12 +82,12 @@ public class IndexerConsumerService {
         )) {
             var studies = new AtomicInteger();
 
+            var studiesByLanguage = new ConcurrentHashMap<String, List<CMMStudyOfLanguage>>();
+
             // Parse the XML asynchronously
-            var studiesByLanguage = stream.map(path -> CompletableFuture.supplyAsync(() -> {
+            stream.map(path -> CompletableFuture.runAsync(() -> {
                 // Extract the individual studies from the parsed XML
                 var records = getRecord(repo, path);
-
-                var studiesLangMap = new ArrayList<Map.Entry<String, CMMStudyOfLanguage>>();
 
                 // Collect all study entries into a list
                 for (var cmmStudy : records) {
@@ -95,16 +95,19 @@ public class IndexerConsumerService {
                     if (!extractedStudies.isEmpty()) {
                         studies.getAndIncrement();
                     }
-                    studiesLangMap.addAll(extractedStudies.entrySet());
+                    extractedStudies.forEach((lang, study) ->
+                        studiesByLanguage.computeIfAbsent(
+                            // Ensure the list is only modified by one thread
+                            lang, k -> Collections.synchronizedList(new ArrayList<>())
+                        ).add(study)
+                    );
                 }
-
-                return studiesLangMap;
-            }, executor))
+            }, executor).exceptionally(
+                    e -> { log.warn("[{}] Couldn't parse {}", repo.code(), path, e); return null; }
+                ))
+                .toList()
                 // Wait for the XML to be parsed
-                .map(CompletableFuture::join)
-                .flatMap(List::stream)
-                // Group the language specific studies by language
-                .collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
+                .forEach(CompletableFuture::join);
 
             log.info("[{}] Retrieved {} studies.",
                 value(LoggingConstants.REPO_NAME, repo.code()),

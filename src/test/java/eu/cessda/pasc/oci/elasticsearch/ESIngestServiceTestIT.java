@@ -28,12 +28,13 @@ import co.elastic.clients.elasticsearch.core.bulk.OperationType;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.indices.DeleteIndexRequest;
 import co.elastic.clients.elasticsearch.indices.RefreshRequest;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.cessda.pasc.oci.configurations.ESConfigurationProperties;
+import eu.cessda.pasc.oci.configurations.ElasticsearchConfiguration;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,13 +70,17 @@ public class ESIngestServiceTestIT {
     private static final String INDEX_NAME = INDEX_TYPE + "_" + LANGUAGE_ISO_CODE;
 
     @Autowired
-    private ObjectMapper mapper;
-
-    @Autowired
     private ESConfigurationProperties esConfigProp;
 
     @Autowired
+    private ElasticsearchConfiguration elasticsearchConfiguration;
+
     private ElasticsearchClient elasticsearchClient;
+
+    @Before
+    public void setUp() {
+        elasticsearchClient = elasticsearchConfiguration.elasticsearchClient();
+    }
 
     /**
      * Reset Elasticsearch after each test

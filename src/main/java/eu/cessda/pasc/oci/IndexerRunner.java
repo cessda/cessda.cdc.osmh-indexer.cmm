@@ -33,13 +33,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.concurrent.CompletableFuture.runAsync;
 import static net.logstash.logback.argument.StructuredArguments.keyValue;
 import static net.logstash.logback.argument.StructuredArguments.value;
 
@@ -70,6 +67,7 @@ public class IndexerRunner {
      *
      * @throws IllegalStateException if a harvest is already running.
      */
+    @SuppressWarnings("OverlyBroadCatchBlock")
     public void executeHarvestAndIngest() {
         if (!indexerRunning.getAndSet(true)) {
 
@@ -86,19 +84,16 @@ public class IndexerRunner {
             }
 
             try (repoStream) {
-                var futures = repoStream.map(repo ->
-                        runAsync(() ->
-                            // Index the repository in an asynchronous context
-                            indexRepository(repo)
-                        ).exceptionally(e -> {
-                            // Handle exceptional completion here, this allows failures to be logged as soon as possible
-                            log.error("[{}]: Unexpected error occurred when harvesting!", value(LoggingConstants.REPO_NAME, repo.code()), e);
-                            return null;
-                        })
-                    ).toArray(CompletableFuture[]::new);
+                repoStream.forEach(repo -> {
+                    try {
+                        // Index the repository
+                        indexRepository(repo);
+                    } catch (Exception e) {
+                        // Handle exceptional completion here, this allows failures to be logged as soon as possible
+                        log.error("[{}]: Unexpected error occurred when harvesting!", value(LoggingConstants.REPO_NAME, repo.code()), e);
+                    }
+                });
 
-                // Wait until all indexing futures have completed
-                CompletableFuture.allOf(futures).join();
 
                 log.info("Indexing finished. Summary of the current state:\nTotal number of records: {}",
                     value("total_cmm_studies", ingestService.getTotalHitCount("*"))
@@ -128,8 +123,18 @@ public class IndexerRunner {
             var lang = entry.getKey();
             try {
                 indexRecords(repo, lang, entry.getValue());
+            } catch (IndexingException e) {
+                log.error("[{}({})] Indexing failed: {}: {}",
+                    value(LoggingConstants.REPO_NAME, repo.code()),
+                    value(LoggingConstants.LANG_CODE, lang),
+                    value(LoggingConstants.EXCEPTION_NAME, e.getClass().getName()),
+                    value(LoggingConstants.REASON, e.getMessage())
+                );
             } catch (ElasticsearchException e) {
-                log.error("[{}({})] Error communicating with Elasticsearch!", value(LoggingConstants.REPO_NAME, repo.code()), value(LoggingConstants.LANG_CODE, lang), e);
+                log.error("[{}({})] Error communicating with Elasticsearch!",
+                    value(LoggingConstants.REPO_NAME, repo.code()),
+                    value(LoggingConstants.LANG_CODE, lang), e
+                );
             }
         }
         log.info("[{}] Repo finished, took {} seconds",
@@ -146,13 +151,20 @@ public class IndexerRunner {
      * @param langIsoCode the language code.
      * @param cmmStudies  the studies to index.
      */
-    private void indexRecords(Repo repo, String langIsoCode, List<CMMStudyOfLanguage> cmmStudies) {
+    private void indexRecords(Repo repo, String langIsoCode, List<CMMStudyOfLanguage> cmmStudies) throws IndexingException {
         if (indexerRunning.get() && !cmmStudies.isEmpty()) {
             log.info("[{}({})] Indexing...", repo.code(), langIsoCode);
 
+            // Calculate the amount of changed studies
+            var studiesUpdated = getUpdatedStudies(cmmStudies, langIsoCode);
+
             // Discover studies to delete, we do this by creating a HashSet of ids and then comparing what's in the database
-            var studyIds = cmmStudies.stream().map(CMMStudyOfLanguage::id).collect(Collectors.toCollection(HashSet::new));
-            var studiesToDelete = new ArrayList<CMMStudyOfLanguage>();
+            var studyIds = new HashSet<String>(cmmStudies.size());
+            for (var study : cmmStudies) {
+                studyIds.add(study.id());
+            }
+
+            var studiesToDelete = new ArrayList<CMMStudyOfLanguage>(cmmStudies.size());
             try {
                 for (var presentStudy : ingestService.getStudiesByRepository(repo.code(), langIsoCode)) {
                     if (!studyIds.contains(presentStudy.id())) {
@@ -169,28 +181,17 @@ public class IndexerRunner {
                 }
             }
 
-            // Calculate the amount of changed studies
-            var studiesUpdated = getUpdatedStudies(cmmStudies, studiesToDelete.size(), langIsoCode);
-
             // Perform indexing and deletions
-            try {
-                ingestService.bulkIndex(cmmStudies, langIsoCode);
-                ingestService.bulkDelete(studiesToDelete, langIsoCode);
-                log.info("[{}({})] Indexing succeeded: {} studies created, {} studies deleted, {} studies updated.",
-                    value(LoggingConstants.REPO_NAME, repo.code()),
-                    value(LoggingConstants.LANG_CODE, langIsoCode),
-                    value("created_cmm_studies", studiesUpdated.studiesCreated),
-                    value("deleted_cmm_studies", studiesUpdated.studiesDeleted),
-                    value("updated_cmm_studies", studiesUpdated.studiesUpdated)
-                );
-            } catch (IndexingException e) {
-                log.error("[{}({})] Indexing failed: {}: {}",
-                    value(LoggingConstants.REPO_NAME, repo.code()),
-                    value(LoggingConstants.LANG_CODE, langIsoCode),
-                    value(LoggingConstants.EXCEPTION_NAME, e.getClass().getName()),
-                    value(LoggingConstants.REASON, e.getMessage())
-                );
-            }
+            ingestService.bulkIndex(cmmStudies, langIsoCode);
+            ingestService.bulkDelete(studiesToDelete, langIsoCode);
+
+            log.info("[{}({})] Indexing succeeded: {} studies created, {} studies deleted, {} studies updated.",
+                value(LoggingConstants.REPO_NAME, repo.code()),
+                value(LoggingConstants.LANG_CODE, langIsoCode),
+                value("created_cmm_studies", studiesUpdated.studiesCreated),
+                value("deleted_cmm_studies", studiesToDelete.size()),
+                value("updated_cmm_studies", studiesUpdated.studiesUpdated)
+            );
         }
     }
 
@@ -201,12 +202,12 @@ public class IndexerRunner {
      * @param language   the language of the studies
      * @return a {@link UpdatedStudies} describing the amount of created, deleted and updated studies
      */
-    private UpdatedStudies getUpdatedStudies(Collection<CMMStudyOfLanguage> cmmStudies, int studiesToDelete, String language) {
+    private UpdatedStudies getUpdatedStudies(Collection<CMMStudyOfLanguage> cmmStudies, String language) {
 
         var studiesCreated = new AtomicInteger(0);
         var studiesUpdated = new AtomicInteger(0);
 
-        cmmStudies.parallelStream().forEach(localStudy -> ingestService.getStudy(localStudy.id(), language)
+        cmmStudies.forEach(localStudy -> ingestService.getStudy(localStudy.id(), language)
             .ifPresentOrElse(study -> {
                 if (!localStudy.equals(study)) {
                     // The study has been updated
@@ -218,12 +219,11 @@ public class IndexerRunner {
             )
         );
 
-        return new UpdatedStudies(studiesCreated.get(), studiesToDelete, studiesUpdated.get());
+        return new UpdatedStudies(studiesCreated.get(), studiesUpdated.get());
     }
 
     private record UpdatedStudies(
         int studiesCreated,
-        int studiesDeleted,
         int studiesUpdated
     ) {
     }
