@@ -108,6 +108,6 @@ public final class RecordTestData {
     }
 
     public static String getSyntheticCMMStudyOfLanguageEn() throws IOException {
-        return ResourceHandler.getResourceAsString("synthetic_complaint_record_en.json");
+        return ResourceHandler.getResourceAsString("synthetic_compliant_record_en.json");
     }
 }

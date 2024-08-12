@@ -15,7 +15,7 @@
          xsi:schemaLocation="ddi:instance:3_3 http://www.ddialliance.org/Specification/DDI-Lifecycle/3.3/XMLSchema/instance.xsd">
 <responseDate>2023-12-05T10:54:28Z</responseDate>
     <!-- $Workfile: GetRecord.asp $ $Revision: 13 $ $Date: 2/17/16 5:30p $ -->
-<request verb="GetRecord" identifier="oai:dbk.gesis.org:DBK/ZA0004" metadataPrefix="oai_ddi32">http://dbkapps.gesis.org/dbkoai/oai.asp</request>
+<request verb="GetRecord" identifier="oai:dbk.gesis.org:DBK/ZA0004" metadataPrefix="oai_ddi33">http://dbkapps.gesis.org/dbkoai/oai.asp</request>
 <GetRecord>
 <record>
 <header>
@@ -30,8 +30,8 @@
     <r:Version>1.0.0</r:Version>
     <r:Citation>
         <r:Title>
-            <r:String xml:lang="en">DDI3.2 study level documentation for study ZA0004 International Outlooks of Political Leaders (USA)</r:String>
-            <r:String xml:lang="de">DDI3.2 Dokumentation auf Studienebene für Studie ZA0004 International Outlooks of Political Leaders (USA)</r:String>
+            <r:String xml:lang="en">DDI3.3 study level documentation for study ZA0004 International Outlooks of Political Leaders (USA)</r:String>
+            <r:String xml:lang="de">DDI3.3 Dokumentation auf Studienebene für Studie ZA0004 International Outlooks of Political Leaders (USA)</r:String>
         </r:Title>
         <r:Creator>
             <r:CreatorName affiliation="GESIS">
@@ -271,6 +271,7 @@
         </r:Coverage>
         <r:AnalysisUnit controlledVocabularyAgencyName="DDI Alliance" controlledVocabularyName="AnalysisUnit" controlledVocabularyURN="urn:ddi:int.ddi.cv:AnalysisUnit:2.1.3">Individual</r:AnalysisUnit>
         <r:KindOfData type="Quantitative">Numeric</r:KindOfData>
+        <r:GeneralDataFormat controlledVocabularyAgencyName="DDI Alliance" controlledVocabularyName="GeneralDataFormat" controlledVocabularyURN="urn:ddi:int.ddi.cv:GeneralDataFormat:2.0.3">Numeric</r:GeneralDataFormat>
         <r:OtherMaterialScheme>
             <r:Agency>gesis</r:Agency>
             <r:ID>othermat</r:ID>

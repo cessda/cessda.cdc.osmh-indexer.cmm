@@ -60,7 +60,7 @@ public class RecordXMLParserNesstarTest {
     }
 
     @Test
-    public void shouldReturnValidCMMStudyRecordFromAFullyComplaintCmmDdiRecord() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
+    public void shouldReturnValidCMMStudyRecordFromAFullyCompliantCmmDdiRecord() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
 
         // Given
         var recordXML = ResourceHandler.getResource("xml/nesstar/synthetic_compliant_cmm_nesstar.xml");

@@ -323,6 +323,7 @@ public class RecordXMLParser {
             builder.relatedPublications(cmmStudyMapper.parseRelatedPublications(metadata, xPaths, defaultLangIsoCode));
             builder.funding(cmmStudyMapper.parseFunding(metadata, xPaths, defaultLangIsoCode));
             builder.dataKindFreeTexts(cmmStudyMapper.parseDataKindFreeText(metadata, xPaths, defaultLangIsoCode));
+            builder.generalDataFormats(cmmStudyMapper.parseGeneralDataFormats(metadata, xPaths, defaultLangIsoCode));
         }
 
         URI repositoryUrl;

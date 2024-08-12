@@ -61,7 +61,7 @@ public class RecordXMLParserTest {
     }
 
     @Test
-    public void shouldReturnValidCMMStudyRecordFromAFullyComplaintCmmDdiRecord() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
+    public void shouldReturnValidCMMStudyRecordFromAFullyCompliantCmmDdiRecord() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
         // Given
         var expectedJson = ResourceHandler.getResourceAsString("json/synthetic_compliant_record.json");
         var recordXML = ResourceHandler.getResource("xml/ddi_2_5/synthetic_compliant_cmm.xml");

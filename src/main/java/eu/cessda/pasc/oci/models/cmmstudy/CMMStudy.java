@@ -49,6 +49,7 @@ public record CMMStudy(
     @JsonProperty("dataKindFreeTexts") Map<String, List<DataKindFreeText>> dataKindFreeTexts,
     @JsonProperty("fileLanguages") Set<String> fileLanguages,
     @JsonProperty("funding") Map<String, List<Funding>> funding,
+    @JsonProperty("generalDataFormats") Map<String, List<TermVocabAttributes>> generalDataFormats,
     @JsonProperty("keywords") Map<String, List<TermVocabAttributes>> keywords,
     @JsonProperty("pidStudies") Map<String, List<Pid>> pidStudies,
     @JsonProperty("publicationYear") String publicationYear,

@@ -357,16 +357,6 @@ public class CMMStudyMapper {
     }
 
     /**
-     * Parses Data Kind(s) from:
-     * <p>
-     * Xpath = {@link XPaths#getDataKindXPath()}
-     */
-    Map<String, List<DataKindFreeText>> parseDataKindFreeText(Document doc, XPaths xPaths, String defaultLangIsoCode) {
-        var unmappedDataKindTexts = xPaths.getDataKindXPath().resolve(doc, xPaths.getNamespace());
-        return mapNullLanguage(unmappedDataKindTexts, defaultLangIsoCode, CMMStudyMapper::mergeLists);
-    }
-
-    /**
      * Parses File Language(s) from:
      * <p>
      * Xpath = {@link XPaths#getFileTxtLanguagesXPath() }
@@ -460,6 +450,31 @@ public class CMMStudyMapper {
     Map<String, List<Funding>> parseFunding(Document document, XPaths xPaths, String defaultLangIsoCode) {
         var unmappedXPaths = xPaths.getFundingXPath().resolve(document, xPaths.getNamespace());
         return mapNullLanguage(unmappedXPaths, defaultLangIsoCode, CMMStudyMapper::mergeLists);
+    }
+
+    /**
+     * Parses Data Kind(s) from:
+     * <p>
+     * Xpath = {@link XPaths#getDataKindXPath()}
+     */
+    Map<String, List<DataKindFreeText>> parseDataKindFreeText(Document doc, XPaths xPaths, String defaultLangIsoCode) {
+        var unmappedXPaths = xPaths.getDataKindXPath().resolve(doc, xPaths.getNamespace());
+        return mapNullLanguage(unmappedXPaths, defaultLangIsoCode, CMMStudyMapper::mergeLists);
+    }
+
+    /**
+     * Parses General Data Format(s) from:
+     * <p>
+     * Xpath = {@link XPaths#getGeneralDataFormatXPath()}
+     */
+    Map<String, List<TermVocabAttributes>> parseGeneralDataFormats(Document doc, XPaths xPaths, String defaultLangIsoCode) {
+        var generalDataFormatXPath = xPaths.getGeneralDataFormatXPath();
+        if (generalDataFormatXPath.isPresent()) {
+            var unmappedXPaths = generalDataFormatXPath.get().resolve(doc, xPaths.getNamespace());
+            return mapNullLanguage(unmappedXPaths, defaultLangIsoCode, CMMStudyMapper::mergeLists);
+        } else {
+            return Collections.emptyMap();
+        }
     }
 
     @Value

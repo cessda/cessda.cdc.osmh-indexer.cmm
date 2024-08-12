@@ -77,8 +77,8 @@ public final class XPaths {
     private final XMLMapper<Map<String, List<UniverseElement>>> universeXPath;
     private final XMLMapper<Map<String, List<Creator>>> creatorsXPath;
     private final XMLMapper<Map<String, List<Funding>>> fundingXPath;
-    @Nullable
     private final XMLMapper<Map<String, List<DataKindFreeText>>> dataKindXPath;
+    private final XMLMapper<Map<String, List<TermVocabAttributes>>> generalDataFormatXPath;
 
     private static final CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateNotParsedException>> EMPTY_PARSE_RESULTS = new CMMStudyMapper.ParseResults<>(
         new CMMStudyMapper.DataCollectionPeriod(null, 0, null, Collections.emptyMap()),
@@ -185,8 +185,9 @@ public final class XPaths {
         // Sampling procedure
         .withSamplingXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:Methodology/d:SamplingProcedure", (List<Element> elementList) -> ParsingStrategies.samplingProceduresLifecycleStrategy(elementList, DDI_3_3_ATTR_NAMES)))
         // Data collection mode
-        .withTypeOfModeOfCollectionXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:CollectionEvent/d:ModeOfCollection", (List<Element> elementList) -> ParsingStrategies.typeOfModeOfCollectionLifecycleStrategy(elementList, DDI_3_3_ATTR_NAMES)));
-
+        .withTypeOfModeOfCollectionXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:CollectionEvent/d:ModeOfCollection", (List<Element> elementList) -> ParsingStrategies.typeOfModeOfCollectionLifecycleStrategy(elementList, DDI_3_3_ATTR_NAMES)))
+        // General data format
+        .withGeneralDataFormatXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:GeneralDataFormat", extractMetadataObjectListForEachLang(TERM_VOCAB_ATTR_3_3_STRATEGY)));
 
     Optional<XMLMapper<Map<String, String>>> getParTitleXPath() {
         return Optional.ofNullable(parTitleXPath);
@@ -210,6 +211,10 @@ public final class XPaths {
 
     Optional<XMLMapper<Map<String, List<UniverseElement>>>> getUniverseXPath() {
         return Optional.ofNullable(universeXPath);
+    }
+
+    Optional<XMLMapper<Map<String, List<TermVocabAttributes>>>> getGeneralDataFormatXPath() {
+        return Optional.ofNullable(generalDataFormatXPath);
     }
     /**
      * XPaths needed to extract metadata from DDI 2.5 documents.
