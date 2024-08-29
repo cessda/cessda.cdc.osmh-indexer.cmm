@@ -207,6 +207,14 @@
       "inclusion": "Population suisse âgée de 15 ans et plus parlant allemand, français ou italien."
     }
   },
+  "dataKindFreeTexts": {
+    "xy": [
+      {
+        "dataKindFreeText": "Données quantitatives"
+      }
+    ]
+  },
+  "generalDataFormats": {},
   "relatedPublications": {},
   "repositoryUrl": "http://fors-getdata.unil.ch/",
   "studyXmlSourceUrl": "https://oai-pmh.nsd.no/oai-pmh?verb=GetRecord&identifier=http%3A%2F%2Ffors-getdata.unil.ch%3A80%2Fobj%2FfStudy%2Fch.sidos.ddi.468.7773&metadataPrefix=oai_ddi"

@@ -108,7 +108,14 @@
       }
     ]
   },
-  "generalDataFormats": {},
+  "generalDataFormats": {
+    "en": [{
+      "vocabUri": "urn:ddi:int.ddi.cv:GeneralDataFormat:2.0.3",
+      "vocab": "GeneralDataFormat",
+      "term": "Numeric",
+      "id": ""
+    }]
+  },
   "keywords": {
     "en": [
       {

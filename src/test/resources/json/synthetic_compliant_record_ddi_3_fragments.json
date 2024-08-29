@@ -37,6 +37,13 @@
   "dataCollectionPeriodEnddate": "2022-11-30",
   "dataCollectionYear": 2021,
   "dataCollectionFreeTexts": {},
+  "dataKindFreeTexts": {
+    "en": [
+      {
+        "dataKindFreeText": "Numeric"
+      }
+    ]
+  },
   "fileLanguages": [
     "no",
     "en"
@@ -55,6 +62,7 @@
       }
     ]
   },
+  "generalDataFormats": {},
   "keywords": {},
   "pidStudies": {
     "en": [

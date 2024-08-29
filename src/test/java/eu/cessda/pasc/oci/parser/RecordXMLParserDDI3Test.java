@@ -55,12 +55,12 @@ public class RecordXMLParserDDI3Test {
     }
 
     @Test
-    public void shouldReturnValidCMMStudyRecordFromAFullyComplaintCmmDdi32Record() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
+    public void shouldReturnValidCMMStudyRecordFromAFullyCompliantCmmDdi32Record() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
         testParsing("xml/ddi_3_2/synthetic_compliant_cmm_ddi3_2.xml", "json/synthetic_compliant_record_ddi_3.json");
     }
 
     @Test
-    public void shouldReturnValidCMMStudyRecordFromAFullyComplaintCmmDdi33Record() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
+    public void shouldReturnValidCMMStudyRecordFromAFullyCompliantCmmDdi33Record() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
         // Given
         testParsing("xml/ddi_3_3/synthetic_compliant_cmm_ddi3_3.xml", "json/synthetic_compliant_record_ddi_3.json");
     }
@@ -69,6 +69,12 @@ public class RecordXMLParserDDI3Test {
     public void shouldReturnValidCMMStudyRecordFromAFullyFragmentRecord() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
         // Given
         testParsing("xml/ddi_3_3/compliant_fragments_cmm_ddi_3_3.xml", "json/synthetic_compliant_record_ddi_3_fragments.json");
+    }
+
+    @Test
+    public void shouldReturnValidCMMStudyRecordFromAFullyCompliantCmmDdi33NewFieldsRecord() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
+        // Given
+        testParsing("xml/ddi_3_3/synthetic_compliant_cmm_ddi3_3_new_fields.xml", "json/synthetic_compliant_record_ddi_3_new_fields.json");
     }
 
     private void testParsing(String sourceXML, String expectedJSON) throws IOException, XMLParseException, URISyntaxException, ProcessingException, JSONException {

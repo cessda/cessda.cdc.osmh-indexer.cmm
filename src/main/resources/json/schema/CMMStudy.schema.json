@@ -196,6 +196,32 @@
       "type": "integer",
       "description": "A JSON date year string, e.g. 2012."
     },
+    "dataKindFreeTexts": {
+      "type": "object",
+      "description": "A collection of Data Kind FreeTexts, potentially translated in multiple languages",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "array",
+          "description": "A collection Data Kind FreeTexts for this given language",
+          "items": [
+            {
+              "type": "object",
+              "description": "A Data Kind FreeTexts instance",
+              "properties": {
+                "dataKindFreeText": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
     "fileLanguages": {
       "type": "array",
       "items": {
@@ -227,6 +253,22 @@
           ]
         }
       }
+    },
+    "generalDataFormats": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "array",
+          "description": "An array of General Data Formats for this CMMStudy in this Given iso Language code.",
+          "items": [
+            {
+              "$ref": "#/$defs/vocabAttributes"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "description": "General Data Formats for this CMMStudy in potentially multiple languages."
     },
     "isActive": {
       "type": "boolean",

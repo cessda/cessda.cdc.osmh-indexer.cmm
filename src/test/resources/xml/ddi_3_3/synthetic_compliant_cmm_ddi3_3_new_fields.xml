@@ -2,22 +2,20 @@
 <!-- $Workfile: oai.asp $ $Revision: 15 $ $Date: 2/23/04 5:30p $ -->
 <!-- $Workfile: functions.inc $ $Revision: 14 $ $Date: 2/17/16 5:30p $ -->
 <OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
+         xmlns:ddi="ddi:instance:3_3"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns:ddi="ddi:instance:3_2"
-         xmlns:s="ddi:studyunit:3_2"
-         xmlns:pi="ddi:physicalinstance:3_2"
-         xmlns:c="ddi:conceptualcomponent:3_2"
-         xmlns:l="ddi:logicalproduct:3_2"
-         xmlns:r="ddi:reusable:3_2"
-         xmlns:d="ddi:datacollection:3_2"
-         xmlns:a="ddi:archive:3_2"
-         xmlns:dc="http://purl.org/dc/terms/"
-         xmlns:g="ddi:group:3_2"
-         xsi:schemaLocation="ddi:instance:3_2 http://www.ddialliance.org/Specification/DDI-Lifecycle/3.2/XMLSchema/instance.xsd
-         http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+         xmlns:s="ddi:studyunit:3_3"
+         xmlns:pi="ddi:physicalinstance:3_3"
+         xmlns:c="ddi:conceptualcomponent:3_3"
+         xmlns:l="ddi:logicalproduct:3_3"
+         xmlns:r="ddi:reusable:3_3"
+         xmlns:d="ddi:datacollection:3_3"
+         xmlns:a="ddi:archive:3_3"
+         xmlns:g="ddi:group:3_3"
+         xsi:schemaLocation="ddi:instance:3_3 http://www.ddialliance.org/Specification/DDI-Lifecycle/3.3/XMLSchema/instance.xsd">
 <responseDate>2023-12-05T10:54:28Z</responseDate>
-<!-- $Workfile: GetRecord.asp $ $Revision: 13 $ $Date: 2/17/16 5:30p $ -->
-<request verb="GetRecord" identifier="oai:dbk.gesis.org:DBK/ZA0004" metadataPrefix="oai_ddi32">http://dbkapps.gesis.org/dbkoai/oai.asp</request>
+    <!-- $Workfile: GetRecord.asp $ $Revision: 13 $ $Date: 2/17/16 5:30p $ -->
+<request verb="GetRecord" identifier="oai:dbk.gesis.org:DBK/ZA0004" metadataPrefix="oai_ddi33">http://dbkapps.gesis.org/dbkoai/oai.asp</request>
 <GetRecord>
 <record>
 <header>
@@ -26,15 +24,14 @@
     <setSpec>DBK</setSpec>
 </header>
 <metadata>
-<!-- $Workfile: metadata-ddi32.asp $ $Revision: 10 $ $Date: 2/17/16 5:30p $ -->
 <ddi:DDIInstance>
     <r:Agency>de.gesis</r:Agency>
     <r:ID>gesis_ZA0004</r:ID>
     <r:Version>1.0.0</r:Version>
     <r:Citation>
         <r:Title>
-            <r:String xml:lang="en">DDI3.2 study level documentation for study ZA0004 International Outlooks of Political Leaders (USA)</r:String>
-            <r:String xml:lang="de">DDI3.2 Dokumentation auf Studienebene für Studie ZA0004 International Outlooks of Political Leaders (USA)</r:String>
+            <r:String xml:lang="en">DDI3.3 study level documentation for study ZA0004 International Outlooks of Political Leaders (USA)</r:String>
+            <r:String xml:lang="de">DDI3.3 Dokumentation auf Studienebene für Studie ZA0004 International Outlooks of Political Leaders (USA)</r:String>
         </r:Title>
         <r:Creator>
             <r:CreatorName affiliation="GESIS">
@@ -61,13 +58,15 @@
                 GESIS selbst. Für weitere Informationen siehe https://dbk.gesis.org/dbksearch/guidelines.asp?db=d
             </r:String>
         </r:Copyright>
-        <dc:hasVersion>1.0.0</dc:hasVersion>
     </r:Citation>
     <g:ResourcePackage>
         <r:Agency>de.gesis</r:Agency>
         <r:ID>ZA0004_ResPac</r:ID>
         <r:Version>1.0.0</r:Version>
         <a:OrganizationScheme>
+            <r:Agency>de.gesis</r:Agency>
+            <r:ID>ZA0004_OrgSch</r:ID>
+            <r:Version>1.0.0</r:Version>
             <a:Organization>
                 <r:Agency>de.gesis</r:Agency>
                 <r:ID>ZA0004_Org_Pub1</r:ID>
@@ -172,7 +171,7 @@
         <r:UserID typeOfUserID="StudyNumber">ZA0004</r:UserID>
         <r:UserID typeOfUserID="VersionNumber">1.0.0</r:UserID>
         <r:Note>
-            <r:TypeOfNote codeListName="GesisTypeOfNote" codeListAgencyName="Gesis" codeListURN="">FurtherRemarks</r:TypeOfNote>
+            <r:TypeOfNote controlledVocabularyName="GesisTypeOfNote" controlledVocabularyAgencyName="Gesis" controlledVocabularyURN="">FurtherRemarks</r:TypeOfNote>
             <r:Relationship>
                 <r:RelatedToReference>
                     <r:Agency>de.gesis</r:Agency>
@@ -240,13 +239,13 @@
                 <r:Agency>de.gesis</r:Agency>
                 <r:ID>ZA0004_Top</r:ID>
                 <r:Version>1.0.0</r:Version>
-                <r:Subject xml:lang="en" codeListAgencyName="de.gesis" codeListName="ZA-Categories">Political Issues</r:Subject>
-                <r:Subject xml:lang="de" codeListAgencyName="de.gesis" codeListName="ZA-Kategorien">Politische Fragen (Issues)</r:Subject>
-                <r:Subject xml:lang="en" codeListAgencyName="cessda" codeListName="CESSDA Topic Classification" codeListURN="https://vocabularies.cessda.eu/urn/urn:ddi:int.cessda.cv:TopicClassification:4.2.2">International politics and organisations</r:Subject>
-                <r:Subject xml:lang="de" codeListAgencyName="cessda" codeListName="CESSDA Topic Classification" codeListURN="https://vocabularies.cessda.eu/urn/urn:ddi:int.cessda.cv:TopicClassification:4.2.2">Internationale Politik und Internationale Organisationen</r:Subject>
-                <r:Subject xml:lang="en" codeListAgencyName="cessda" codeListName="CESSDA Topic Classification" codeListURN="https://vocabularies.cessda.eu/urn/urn:ddi:int.cessda.cv:TopicClassification:4.2.2">Conflict, security and peace</r:Subject>
-                <r:Subject xml:lang="de" codeListAgencyName="cessda" codeListName="CESSDA Topic Classification" codeListURN="https://vocabularies.cessda.eu/urn/urn:ddi:int.cessda.cv:TopicClassification:4.2.2">Konflikte, Sicherheit und Frieden</r:Subject>
-                <r:Keyword xml:lang="en" codeListAgencyName="cessda" codeListName="ELSST" codeListURN="https://elsst.cessda.eu/id/">POLITICAL ISSUES</r:Keyword>
+                <r:Subject xml:lang="en" controlledVocabularyAgencyName="de.gesis" controlledVocabularyName="ZA-Categories">Political Issues</r:Subject>
+                <r:Subject xml:lang="de" controlledVocabularyAgencyName="de.gesis" controlledVocabularyName="ZA-Kategorien">Politische Fragen (Issues)</r:Subject>
+                <r:Subject xml:lang="en" controlledVocabularyAgencyName="cessda" controlledVocabularyName="CESSDA Topic Classification" controlledVocabularyURN="https://vocabularies.cessda.eu/urn/urn:ddi:int.cessda.cv:TopicClassification:4.2.2">International politics and organisations</r:Subject>
+                <r:Subject xml:lang="de" controlledVocabularyAgencyName="cessda" controlledVocabularyName="CESSDA Topic Classification" controlledVocabularyURN="https://vocabularies.cessda.eu/urn/urn:ddi:int.cessda.cv:TopicClassification:4.2.2">Internationale Politik und Internationale Organisationen</r:Subject>
+                <r:Subject xml:lang="en" controlledVocabularyAgencyName="cessda" controlledVocabularyName="CESSDA Topic Classification" controlledVocabularyURN="https://vocabularies.cessda.eu/urn/urn:ddi:int.cessda.cv:TopicClassification:4.2.2">Conflict, security and peace</r:Subject>
+                <r:Subject xml:lang="de" controlledVocabularyAgencyName="cessda" controlledVocabularyName="CESSDA Topic Classification" controlledVocabularyURN="https://vocabularies.cessda.eu/urn/urn:ddi:int.cessda.cv:TopicClassification:4.2.2">Konflikte, Sicherheit und Frieden</r:Subject>
+                <r:Keyword xml:lang="en" controlledVocabularyAgencyName="cessda" controlledVocabularyName="ELSST" controlledVocabularyURN="https://elsst.cessda.eu/id/">POLITICAL ISSUES</r:Keyword>
             </r:TopicalCoverage>
             <r:SpatialCoverage>
                 <r:Agency>de.gesis</r:Agency>
@@ -270,38 +269,44 @@
                 </r:ReferenceDate>
             </r:TemporalCoverage>
         </r:Coverage>
-        <r:AnalysisUnit codeListAgencyName="DDI Alliance" codeListName="AnalysisUnit" codeListURN="urn:ddi:int.ddi.cv:AnalysisUnit:2.1.3">Individual</r:AnalysisUnit>
-        <r:KindOfData controlledVocabularyAgencyName="DDI Alliance" controlledVocabularyName="KindOfDataFormat" controlledVocabularyURN="urn:ddi-cv:KindOfDataFormat:1.0" type="Quantitative">Numeric</r:KindOfData>
-        <r:OtherMaterial>
-            <r:Agency>de.gesis</r:Agency>
-            <r:ID>ZA0004_Mat4</r:ID>
+        <r:AnalysisUnit controlledVocabularyAgencyName="DDI Alliance" controlledVocabularyName="AnalysisUnit" controlledVocabularyURN="urn:ddi:int.ddi.cv:AnalysisUnit:2.1.3">Individual</r:AnalysisUnit>
+        <r:KindOfData type="Quantitative">Numeric</r:KindOfData>
+        <r:GeneralDataFormat controlledVocabularyAgencyName="DDI Alliance" controlledVocabularyName="GeneralDataFormat" controlledVocabularyURN="urn:ddi:int.ddi.cv:GeneralDataFormat:2.0.3">Numeric</r:GeneralDataFormat>
+        <r:OtherMaterialScheme>
+            <r:Agency>gesis</r:Agency>
+            <r:ID>othermat</r:ID>
             <r:Version>1.0.0</r:Version>
-            <r:TypeOfMaterial codeListAgencyName="gesis" codeListName="GesisTypeOfMaterial">OriginalLiterature</r:TypeOfMaterial>
-            <r:Description>
-                <r:Content>Free, Lloyd A.:
-                    Six Allies And A Neutral.
-                    Glencoe, Ill.: Free Press 1959
-                </r:Content>
-            </r:Description>
-        </r:OtherMaterial>
-        <r:OtherMaterial xml:lang="de">
-            <r:Agency>de.gesis</r:Agency>
-            <r:ID>ZA0004_OthMat54968</r:ID>
-            <r:Version>1.0.0</r:Version>
-            <r:UserID typeOfUserID="Dokument-ID">54968</r:UserID>
-            <r:TypeOfMaterial codeListName="GesisDBKTypeOfMaterial">Questionnaire</r:TypeOfMaterial>
-            <r:Description>
-                <r:Content xml:lang="en"/>
-                <r:Content xml:lang="de"/>
-            </r:Description>
-            <r:Citation>
-                <r:Title>
-                    <r:String xml:lang="en">ZA0004-10_q.pdf (Questionnaire)</r:String>
-                    <r:String xml:lang="de">ZA0004-10_q.pdf (Fragebogen)</r:String>
-                </r:Title>
-            </r:Citation>
-            <r:ExternalURLReference>https://dbk.gesis.org/dbksearch/download.asp?id=54968</r:ExternalURLReference>
-        </r:OtherMaterial>
+            <r:OtherMaterial>
+                <r:Agency>de.gesis</r:Agency>
+                <r:ID>ZA0004_Mat4</r:ID>
+                <r:Version>1.0.0</r:Version>
+                <r:TypeOfMaterial controlledVocabularyAgencyName="gesis" controlledVocabularyName="GesisTypeOfMaterial">OriginalLiterature</r:TypeOfMaterial>
+                <r:Description>
+                    <r:Content>Free, Lloyd A.:
+                        Six Allies And A Neutral.
+                        Glencoe, Ill.: Free Press 1959
+                    </r:Content>
+                </r:Description>
+            </r:OtherMaterial>
+            <r:OtherMaterial xml:lang="de">
+                <r:Agency>de.gesis</r:Agency>
+                <r:ID>ZA0004_OthMat54968</r:ID>
+                <r:Version>1.0.0</r:Version>
+                <r:UserID typeOfUserID="Dokument-ID">54968</r:UserID>
+                <r:TypeOfMaterial controlledVocabularyName="GesisDBKTypeOfMaterial">Questionnaire</r:TypeOfMaterial>
+                <r:Description>
+                    <r:Content xml:lang="en"/>
+                    <r:Content xml:lang="de"/>
+                </r:Description>
+                <r:Citation>
+                    <r:Title>
+                        <r:String xml:lang="en">ZA0004-10_q.pdf (Questionnaire)</r:String>
+                        <r:String xml:lang="de">ZA0004-10_q.pdf (Fragebogen)</r:String>
+                    </r:Title>
+                </r:Citation>
+                <r:ExternalURLReference>https://dbk.gesis.org/dbksearch/download.asp?id=54968</r:ExternalURLReference>
+            </r:OtherMaterial>
+        </r:OtherMaterialScheme>
         <c:ConceptualComponent>
             <r:Agency>de.gesis</r:Agency>
             <r:ID>ZA0004h</r:ID>
@@ -333,13 +338,13 @@
                     <r:Agency>de.gesis</r:Agency>
                     <r:ID>ZA0004_TimeMethod</r:ID>
                     <r:Version>1.0.0</r:Version>
-                    <d:TypeOfTimeMethod codeListAgencyName="DDI Alliance" codeListName="TimeMethod" codeListURN="urn:ddi:int.ddi.cv:TimeMethod:1.2.3">Longitudinal</d:TypeOfTimeMethod>
+                    <d:TypeOfTimeMethod controlledVocabularyAgencyName="DDI Alliance" controlledVocabularyName="TimeMethod" controlledVocabularyURN="urn:ddi:int.ddi.cv:TimeMethod:1.2.3">Longitudinal</d:TypeOfTimeMethod>
                 </d:TimeMethod>
                 <d:SamplingProcedure>
                     <r:Agency>de.gesis</r:Agency>
                     <r:ID>ZA0004_SamPro</r:ID>
                     <r:Version>1.0.0</r:Version>
-                    <d:TypeOfSamplingProcedure codeListAgencyName="DDI Alliance" codeListURN="urn:ddi:int.ddi.cv:SamplingProcedure:1.1.4">Quota sample</d:TypeOfSamplingProcedure>
+                    <d:TypeOfSamplingProcedure controlledVocabularyAgencyName="DDI Alliance" controlledVocabularyURN="urn:ddi:int.ddi.cv:SamplingProcedure:1.1.4">Quota sample</d:TypeOfSamplingProcedure>
                     <r:Description>
                         <r:Content xml:lang="en">Quota sample</r:Content>
                         <r:Content xml:lang="de">Quotenauswahl</r:Content>
@@ -382,7 +387,7 @@
             <r:ID>ZA0004_LogPro</r:ID>
             <r:Version>1.0.0</r:Version>
             <r:Note>
-                <r:TypeOfNote codeListName="GesisTypeOfNote" codeListAgencyName="Gesis" codeListURN="">Software</r:TypeOfNote>
+                <r:TypeOfNote controlledVocabularyName="GesisTypeOfNote" controlledVocabularyAgencyName="Gesis">Software</r:TypeOfNote>
                 <r:Relationship>
                     <r:RelatedToReference>
                         <r:Agency>de.gesis</r:Agency>
@@ -397,7 +402,7 @@
                 </r:NoteContent>
             </r:Note>
             <r:Note>
-                <r:TypeOfNote codeListName="GesisTypeOfNote" codeListAgencyName="Gesis" codeListURN="">VariableQuantity</r:TypeOfNote>
+                <r:TypeOfNote controlledVocabularyName="GesisTypeOfNote" controlledVocabularyAgencyName="Gesis">VariableQuantity</r:TypeOfNote>
                 <r:Relationship>
                     <r:RelatedToReference>
                         <r:Agency>de.gesis</r:Agency>

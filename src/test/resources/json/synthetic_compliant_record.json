@@ -416,6 +416,18 @@
       "inclusion": "Otantahetkellä vuonna 1968 kansakoulun toisluokkalaiset keskisuomalaisen kaupungin oppilaat, jotka ovat edelleen mukana pitkittäistutkimuksessa ja kuuluivat 8- ja 14 -vuotiaana sosiaalisen käyttäytymisen ääriryhmiin."
     }
   },
+  "dataKindFreeTexts": {
+    "en": [
+      {
+        "dataKindFreeText": "Numeric",
+        "type": "Quantitative"
+      },
+      {
+        "dataKindFreeText": "Text"
+      }
+    ]
+  },
+  "generalDataFormats": {},
   "relatedPublications": {
     "en": [
       {

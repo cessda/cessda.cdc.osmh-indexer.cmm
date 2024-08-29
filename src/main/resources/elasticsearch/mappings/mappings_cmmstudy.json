@@ -97,6 +97,30 @@
     "dataCollectionYear": {
       "type": "integer"
     },
+    "dataKindFreeTexts" : {
+      "type" : "nested",
+      "properties" : {
+        "dataKindFreeText" : {
+          "type" : "text",
+          "copy_to" : [
+            "dataKindFreeTextSearchField"
+          ],
+          "term_vector" : "with_positions_offsets",
+          "analyzer" : "pasc_standard_analyzer"
+        },
+        "type" : {
+          "type" : "text",
+          "copy_to" : [
+            "dataKindFreeTextSearchField"
+          ],
+          "analyzer" : "pasc_standard_analyzer"
+        }
+      }
+    },
+    "dataKindFreeTextSearchField": {
+      "type": "text",
+      "analyzer": "pasc_standard_analyzer"
+    },
     "fileLanguages": {
       "type": "keyword",
       "ignore_above": 256
@@ -113,6 +137,36 @@
           "ignore_above": 256
         }
       }
+    },
+    "generalDataFormats": {
+      "type": "nested",
+      "properties": {
+        "id": {
+          "type": "keyword",
+          "ignore_above": 256,
+          "copy_to": "generalDataFormatsSearchField"
+        },
+        "term": {
+          "type": "text",
+          "analyzer": "pasc_standard_analyzer",
+          "term_vector": "with_positions_offsets",
+          "copy_to": "generalDataFormatsSearchField"
+        },
+        "vocab": {
+          "type": "keyword",
+          "ignore_above": 256,
+          "copy_to": "generalDataFormatsSearchField"
+        },
+        "vocabUri": {
+          "type": "keyword",
+          "ignore_above": 256,
+          "copy_to": "generalDataFormatsSearchField"
+        }
+      }
+    },
+    "generalDataFormatsSearchField": {
+      "type": "text",
+      "analyzer": "pasc_standard_analyzer"
     },
     "id": {
       "type": "keyword",

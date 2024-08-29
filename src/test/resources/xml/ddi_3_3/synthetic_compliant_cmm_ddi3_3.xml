@@ -270,6 +270,7 @@
             </r:TemporalCoverage>
         </r:Coverage>
         <r:AnalysisUnit controlledVocabularyAgencyName="DDI Alliance" controlledVocabularyName="AnalysisUnit" controlledVocabularyURN="urn:ddi:int.ddi.cv:AnalysisUnit:2.1.3">Individual</r:AnalysisUnit>
+        <r:KindOfData type="Quantitative">Numeric</r:KindOfData>
         <r:OtherMaterialScheme>
             <r:Agency>gesis</r:Agency>
             <r:ID>othermat</r:ID>
