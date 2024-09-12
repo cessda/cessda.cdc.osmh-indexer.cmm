@@ -58,7 +58,7 @@ import java.util.stream.Collectors;
 public class ESIngestService implements IngestService {
 
     private static final String LAST_MODIFIED_FIELD = "lastModified";
-    private static final String INDEX_TYPE = "cmmstudy";
+    private static final String INDEX_TYPE = "coordinate";
     private static final String MAPPINGS_JSON = "elasticsearch/mappings/mappings_" + INDEX_TYPE + ".json";
     private static final String INDEX_NAME_TEMPLATE = INDEX_TYPE + "_%s";
 
