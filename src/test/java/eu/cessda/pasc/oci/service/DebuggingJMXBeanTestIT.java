@@ -15,8 +15,8 @@
  */
 package eu.cessda.pasc.oci.service;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
+import eu.cessda.pasc.oci.configurations.ElasticsearchConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,12 +40,12 @@ public class DebuggingJMXBeanTestIT {
     private AppConfigurationProperties appConfigurationProperties;
 
     @Autowired
-    private ElasticsearchClient elasticsearchTemplate;
+    private ElasticsearchConfiguration elasticsearchTemplate;
 
     @Test
     public void shouldPrintElasticsearchDetails() throws IOException {
         // Class under test
-        DebuggingJMXBean debuggingJMXBean = new DebuggingJMXBean(elasticsearchTemplate);
+        DebuggingJMXBean debuggingJMXBean = new DebuggingJMXBean(elasticsearchTemplate.elasticsearchClient());
         assertThat(debuggingJMXBean.printElasticSearchInfo()).startsWith("Elasticsearch Client Settings");
     }
 }
