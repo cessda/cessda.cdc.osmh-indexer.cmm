@@ -35,6 +35,8 @@ import static org.jdom2.Namespace.XML_NAMESPACE;
  * @param <T> the resulting type of the mapping function.
  */
 public interface XMLMapper<T> {
+    String EMPTY_LANGUAGE = "*";
+
     /**
      * Resolves the given context object to an instance of T.
      *
@@ -120,7 +122,7 @@ public interface XMLMapper<T> {
                 return langValue;
             }
         } else {
-            return "";
+            return EMPTY_LANGUAGE;
         }
     }
 
@@ -137,7 +139,7 @@ public interface XMLMapper<T> {
     static String parseConceptLanguageCode(Element element) {
 
         var lang = getLangOfElement(element);
-        if (lang.isEmpty()) {
+        if (lang.equals(XMLMapper.EMPTY_LANGUAGE)) {
             var concept = element.getChild("concept", element.getNamespace());
             if (concept != null) {
                 lang = getLangOfElement(concept);

@@ -258,7 +258,7 @@ public class RecordXMLParser {
             var defaultLangIsoCode = cmmStudyMapper.parseDefaultLanguage(metadata, repository, xPaths);
             builder.titleStudy(cmmStudyMapper.parseStudyTitle(metadata, xPaths, defaultLangIsoCode));
 
-            var parseStudyUrlResults = cmmStudyMapper.parseStudyUrl(metadata, xPaths, defaultLangIsoCode);
+            var parseStudyUrlResults = cmmStudyMapper.parseStudyUrl(metadata, xPaths);
             builder.studyUrl(parseStudyUrlResults.results());
 
             var parseDataAccessURIResults = cmmStudyMapper.parseDataAccessURI(metadata, xPaths, defaultLangIsoCode);
@@ -280,8 +280,8 @@ public class RecordXMLParser {
             }
 
             builder.abstractField(cmmStudyMapper.parseAbstract(metadata, xPaths, defaultLangIsoCode));
-            builder.pidStudies(cmmStudyMapper.parsePidStudies(metadata, xPaths, defaultLangIsoCode));
-            builder.creators(cmmStudyMapper.parseCreator(metadata, xPaths, defaultLangIsoCode));
+            builder.pidStudies(cmmStudyMapper.parsePidStudies(metadata, xPaths));
+            builder.creators(cmmStudyMapper.parseCreator(metadata, xPaths));
             builder.dataAccessFreeTexts(cmmStudyMapper.parseDataAccessFreeText(metadata, xPaths, defaultLangIsoCode));
             builder.classifications(cmmStudyMapper.parseClassifications(metadata, xPaths, defaultLangIsoCode));
             builder.keywords(cmmStudyMapper.parseKeywords(metadata, xPaths, defaultLangIsoCode));

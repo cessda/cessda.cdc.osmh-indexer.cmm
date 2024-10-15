@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -38,6 +39,7 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import static org.assertj.core.api.BDDAssertions.then;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 /**
@@ -219,7 +221,7 @@ public class RecordXMLParserTest {
     }
 
     @Test
-    public void shouldExtractAllRequiredCMMFieldsForAGivenAUKDSRecord() throws IOException, ProcessingException, JSONException, IndexerException, URISyntaxException {
+    public void shouldExtractAllRequiredCMMFieldsForAGivenAUKDSRecord() throws IOException, ProcessingException, IndexerException, URISyntaxException {
 
         // Given
         var recordXML = ResourceHandler.getResource("xml/ddi_2_5/ddi_record_ukds_example.xml");
@@ -245,17 +247,19 @@ public class RecordXMLParserTest {
         then(result.getFirst().dataCollectionYear()).isNull();
     }
 
-    private void assertThatCmmRequiredFieldsAreExtracted(CMMStudy record) throws IOException, JSONException {
+    private void assertThatCmmRequiredFieldsAreExtracted(CMMStudy record) throws IOException {
         var expectedJson = ResourceHandler.getResource("json/ddi_record_ukds_example_extracted.json");
         final JsonNode actualTree = objectMapper.valueToTree(record);
         final JsonNode expectedTree = objectMapper.readTree(expectedJson);
 
         // CMM Model Schema required fields
-        assertEquals(expectedTree.get("abstract").toString(), actualTree.get("abstract").toString(), true);
-        assertEquals(expectedTree.get("titleStudy").toString(), actualTree.get("titleStudy").toString(), true);
-        assertEquals(expectedTree.get("studyUrl").toString(), actualTree.get("studyUrl").toString(), true);
-        then(actualTree.get("studyNumber").toString()).isEqualTo(expectedTree.get("studyNumber").toString());
-        assertEquals(expectedTree.get("publisher").toString(), actualTree.get("publisher").toString(), true);
+        assertAll(
+            () -> assertEquals("abstract", expectedTree.get("abstract").toString(), actualTree.get("abstract").toString(), true),
+            () -> assertEquals("titleStudy", expectedTree.get("titleStudy").toString(), actualTree.get("titleStudy").toString(), true),
+            () -> assertEquals("studyUrl", expectedTree.get("studyUrl").toString(), actualTree.get("studyUrl").toString(), true),
+            () -> Assertions.assertEquals(expectedTree.get("studyNumber").toString(), actualTree.get("studyNumber").toString(), "studyNumber"),
+            () -> assertEquals("publisher", expectedTree.get("publisher").toString(), actualTree.get("publisher").toString(), true)
+        );
     }
 
     @Test
