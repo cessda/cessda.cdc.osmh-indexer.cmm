@@ -35,6 +35,9 @@ import static org.jdom2.Namespace.XML_NAMESPACE;
  * @param <T> the resulting type of the mapping function.
  */
 public interface XMLMapper<T> {
+    /**
+     * Constant representing an empty language.
+     */
     String EMPTY_LANGUAGE = "*";
 
     /**
@@ -46,7 +49,12 @@ public interface XMLMapper<T> {
      */
     T resolve(Object context, Namespace... namespace);
 
-
+    /**
+     * Gets the text content of the given XML element.
+     *
+     * @param element the element
+     * @return the text of the element, or {@code null} if the element has no text
+     */
     static String getTextContent(Element element) {
         if (element != null) {
             var elementText = element.getTextTrim();
