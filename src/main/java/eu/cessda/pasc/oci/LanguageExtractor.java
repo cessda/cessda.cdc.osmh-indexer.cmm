@@ -149,7 +149,7 @@ public class LanguageExtractor {
         Optional.ofNullable(cmmStudy.samplingProcedureFreeTexts()).map(map -> map.get(lang)).ifPresent(builder::samplingProcedureFreeTexts);
         Optional.ofNullable(cmmStudy.typeOfModeOfCollections()).map(map -> map.get(lang)).ifPresent(builder::typeOfModeOfCollections);
         Optional.ofNullable(cmmStudy.titleStudy()).map(map -> map.get(lang)).ifPresent(builder::titleStudy);
-        Optional.ofNullable(cmmStudy.dataCollectionFreeTexts()).map(map -> map.get(lang)).ifPresent(builder::dataCollectionFreeTexts);
+        Optional.ofNullable(cmmStudy.dataCollectionFreeTexts()).map(map -> mergeLanguages(map, lang)).ifPresent(builder::dataCollectionFreeTexts);
         Optional.ofNullable(cmmStudy.dataAccessFreeTexts()).map(map -> map.get(lang)).ifPresent(builder::dataAccessFreeTexts);
         Optional.ofNullable(cmmStudy.publisher()).map(map -> map.get(lang)).ifPresent(builder::publisher);
         Optional.ofNullable(cmmStudy.universe()).map(map -> map.get(lang)).ifPresent(builder::universe);

@@ -297,7 +297,7 @@ public class RecordXMLParser {
             builder.samplingProcedureFreeTexts(result.terms());
             builder.typeOfModeOfCollections(cmmStudyMapper.parseTypeOfModeOfCollection(metadata, xPaths, defaultLangIsoCode));
 
-            var dataCollectionPeriodResults = cmmStudyMapper.parseDataCollectionDates(metadata, xPaths, defaultLangIsoCode);
+            var dataCollectionPeriodResults = cmmStudyMapper.parseDataCollectionDates(metadata, xPaths);
             if (!dataCollectionPeriodResults.exceptions().isEmpty()) {
                 // Parsing errors occurred, log here
                 log.warn("[{}] Some dates in study {} couldn't be parsed: {}",

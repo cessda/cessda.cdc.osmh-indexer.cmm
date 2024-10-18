@@ -210,7 +210,7 @@
     ]
   },
   "dataCollectionFreeTexts": {
-    "en": [
+    "*": [
       {
         "dataCollectionFreeText": "End of October",
         "event": "end"

@@ -162,7 +162,7 @@
       "type": "object",
       "description": "A collection of data collection FreeTexts Dates, potentially translated in multiple languages",
       "patternProperties": {
-        "^[a-z]{2}$": {
+        "^[a-z]{2}|\\*$": {
           "type": "array",
           "description": "A collection data collection FreeTexts for this given language",
           "items": [

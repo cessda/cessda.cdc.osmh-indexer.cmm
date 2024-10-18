@@ -1046,7 +1046,7 @@ class ParsingStrategies{
         for (var element : elements) {
             var eventAttr = getAttributeValue(element, EVENT_ATTR);
             var dateAttr = getAttributeValue(element, DATE_ATTR);
-            if (dateAttr.isPresent() && eventAttr.isPresent()) {
+            if (eventAttr.isPresent() && dateAttr.isPresent()) {
                 map.putIfAbsent(eventAttr.get(), dateAttr.get());
             }
         }

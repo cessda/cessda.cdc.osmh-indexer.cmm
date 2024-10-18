@@ -134,7 +134,7 @@
     ]
   },
   "dataCollectionFreeTexts": {
-    "xy": [
+    "*": [
       {
         "dataCollectionFreeText": "start",
         "event": "start"
