@@ -417,6 +417,6 @@
   },
   "lastModified": "2018-02-09T14:36:13Z",
   "studyUrl": {
-    "en": "http://doi.org/10.5255/UKDA-SN-6684-1"
+    "*": "http://doi.org/10.5255/UKDA-SN-6684-1"
   }
 }

@@ -65,7 +65,7 @@
   "generalDataFormats": {},
   "keywords": {},
   "pidStudies": {
-    "en": [
+    "*": [
       {
         "agency": "DOI",
         "pid": "https://doi.org/10.18712/NSD-NSD3174-V1"

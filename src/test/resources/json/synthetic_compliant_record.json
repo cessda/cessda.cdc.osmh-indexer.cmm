@@ -1,6 +1,6 @@
 {
   "pidStudies": {
-    "en": [
+    "*": [
       {
         "agency": "UKDA",
         "pid": "2305"
@@ -210,7 +210,7 @@
     ]
   },
   "dataCollectionFreeTexts": {
-    "en": [
+    "*": [
       {
         "dataCollectionFreeText": "End of October",
         "event": "end"
