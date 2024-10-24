@@ -178,7 +178,7 @@ public class LanguageExtractor {
      * @param <T> the type of elements
      */
     private static <T> List<T> mergeLanguages(Map<String, List<T>> map, String lang) {
-        // Get language specific PIDs, and then language nonspecific PIDs
+        // Get language specific elements, and then language nonspecific elements
         var languageSpecificList = map.get(lang);
         var nonLanguageSpecificList = map.get(XMLMapper.EMPTY_LANGUAGE);
         if (languageSpecificList != null && nonLanguageSpecificList != null) {
