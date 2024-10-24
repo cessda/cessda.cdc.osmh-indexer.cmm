@@ -141,7 +141,7 @@
   },
   "publicationYear": "1982-01-01T00:00:00Z",
   "pidStudies": {
-    "zz": [
+    "*": [
       {
         "agency": "UKDA",
         "pid": "1683"
@@ -157,7 +157,7 @@
     "us"
   ],
   "creators": {
-    "zz": [
+    "*": [
       {
         "name": "Hood, C.C., University of York. Institute of Social and Economic Research"
       },
