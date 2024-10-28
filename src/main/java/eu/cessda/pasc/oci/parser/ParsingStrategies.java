@@ -770,7 +770,7 @@ class ParsingStrategies{
         for (var element : elementList) {
             termVocabAttributeLifecycleStrategy(element, attrNames).ifPresent(termList::add);
         }
-        return Map.of("", termList);
+        return Map.of(EMPTY_LANGUAGE, termList);
     }
 
     /**
@@ -898,7 +898,7 @@ class ParsingStrategies{
 
             // If no descriptions are present, derive the text from the TypeOfSamplingProcedure element
             if (langMap.isEmpty() && termVocabAttributes.isPresent()) {
-                mergedMap.computeIfAbsent("", k -> new ArrayList<>()).add(termVocabAttributes.get());
+                mergedMap.computeIfAbsent(EMPTY_LANGUAGE, k -> new ArrayList<>()).add(termVocabAttributes.get());
             }
         }
 
@@ -1046,7 +1046,7 @@ class ParsingStrategies{
         for (var element : elements) {
             var eventAttr = getAttributeValue(element, EVENT_ATTR);
             var dateAttr = getAttributeValue(element, DATE_ATTR);
-            if (dateAttr.isPresent() && eventAttr.isPresent()) {
+            if (eventAttr.isPresent() && dateAttr.isPresent()) {
                 map.putIfAbsent(eventAttr.get(), dateAttr.get());
             }
         }

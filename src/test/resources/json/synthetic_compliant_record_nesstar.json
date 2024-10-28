@@ -1,6 +1,6 @@
 {
   "pidStudies": {
-    "xy": [
+    "*": [
       {
         "pid": "\nch.sidos.ddi.468.7773\n"
       }
@@ -102,7 +102,7 @@
     ]
   },
   "creators": {
-    "xy": [
+    "*": [
       {
         "name": "Joye, Dominique (resp.)",
         "affiliation": "Service suisse d'information et d'archivage de données pour les sciences sociales - SIDOS"
@@ -134,7 +134,7 @@
     ]
   },
   "dataCollectionFreeTexts": {
-    "xy": [
+    "*": [
       {
         "dataCollectionFreeText": "start",
         "event": "start"
@@ -186,7 +186,7 @@
   "publicationYear": "2007",
   "lastModified": "2015-05-04T22:55:30+0000",
   "studyUrl": {
-    "xy": "http://forscenter.ch/fr/service-de-donnees-et-d-information-sur-la-recherche/"
+    "*": "http://forscenter.ch/fr/service-de-donnees-et-d-information-sur-la-recherche/"
   },
   "studyNumber": "http://fors-getdata.unil.ch:80/obj/fStudy/ch.sidos.ddi.468.7773",
   "typeOfModeOfCollections": {

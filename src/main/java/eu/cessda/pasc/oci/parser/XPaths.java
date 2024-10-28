@@ -21,6 +21,8 @@ import eu.cessda.pasc.oci.models.cmmstudy.*;
 import lombok.*;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
+import org.jdom2.filter.Filters;
+import org.jdom2.xpath.XPathFactory;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -56,8 +58,7 @@ public final class XPaths {
     @Nullable
     private final XMLMapper<Map<String, List<String>>> dataAccessUrlXPath;
     @Nullable
-    private final XMLMapper<Map<String, List<String>>> studyURLDocDscrXPath;
-    private final XMLMapper<Map<String, List<String>>> studyURLStudyDscrXPath;
+    private final XMLMapper<Map<String, List<String>>> studyURLXPath;
     private final XMLMapper<Map<String, List<Pid>>> pidStudyXPath;
     private final XMLMapper<Map<String, List<String>>> dataRestrctnXPath;
     private final XMLMapper<CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateNotParsedException>>> dataCollectionPeriodsXPath;
@@ -111,9 +112,7 @@ public final class XPaths {
         // Study title
         .titleXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Citation/r:Title/r:String", parseLanguageContentOfElement(Element::getTextTrim)))
         // 'Access study' link (when @typeOfUserID attribute is "URLServiceProvider")
-        .studyURLDocDscrXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:UserID", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
-        // URL of the study description page at the SP website (when @typeOfUserID attribute is "URLServiceProvider")
-        .studyURLStudyDscrXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:UserID", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
+        .studyURLXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:UserID", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
         // Study number/PID
         .pidStudyXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Citation/r:InternationalIdentifier", extractMetadataObjectListForEachLang(ParsingStrategies::pidLifecycleStrategy)))
         // Creator/PI
@@ -208,8 +207,8 @@ public final class XPaths {
         return Optional.ofNullable(filenameLanguagesXPath);
     }
 
-    Optional<XMLMapper<Map<String, List<String>>>> getStudyURLDocDscrXPath() {
-        return Optional.ofNullable(studyURLDocDscrXPath);
+    Optional<XMLMapper<Map<String, List<String>>>> getStudyURLXPath() {
+        return Optional.ofNullable(studyURLXPath);
     }
 
     Optional<XMLMapper<Map<String, List<UniverseElement>>>> getUniverseXPath() {
@@ -239,9 +238,22 @@ public final class XPaths {
         // Study title (in additional languages)
         .parTitleXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:parTitl", parseLanguageContentOfElement(Element::getTextTrim)))
         // 'Access study' link
-        .studyURLDocDscrXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:docDscr/ddi:citation/ddi:holdings", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
-        // URL of the study description page at the SP website
-        .studyURLStudyDscrXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:holdings", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
+        .studyURLXPath((context, namespace) -> {
+            var docDscrExpr = XPathFactory.instance().compile("//ddi:codeBook/ddi:docDscr/ddi:citation/ddi:holdings", Filters.element(), null, namespace);
+            var docDscrElems = docDscrExpr.evaluate(context);
+            var docUriStrings = extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy).apply(docDscrElems);
+
+            var stdyDscrExpr = XPathFactory.instance().compile("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:holdings", Filters.element(), null, namespace);
+            var stdyDscrElems = stdyDscrExpr.evaluate(context);
+            var studyUriStrings = extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy).apply(stdyDscrElems);
+
+            // URLs in docDscr override stdyDscr
+            var studyURLs = new HashMap<>(docUriStrings);
+            for (var uriStrings : studyUriStrings.entrySet()) {
+                studyURLs.computeIfAbsent(uriStrings.getKey(), k -> new ArrayList<>()).addAll(uriStrings.getValue());
+            }
+            return studyURLs;
+        })
         // Study number/PID
         .pidStudyXPath(new SimpleXMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo", extractMetadataObjectListForEachLang(ParsingStrategies::pidStrategy)))
         // Creator
@@ -303,7 +315,7 @@ public final class XPaths {
         .abstractXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/abstract", parseLanguageContentOfElement(Element::getTextTrim, (a, b) -> a + "<br>" + b)))
         .titleXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/citation/titlStmt/titl", parseLanguageContentOfElement(Element::getTextTrim)))
         .parTitleXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/citation/titlStmt/parTitl", parseLanguageContentOfElement(Element::getTextTrim)))
-        .studyURLStudyDscrXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/dataAccs/setAvail/accsPlac", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
+        .studyURLXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/dataAccs/setAvail/accsPlac", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
         // PID path missing for most nesstar repos. Available in FORS but:
         //  -No agency
         //  -Only element freetext value.

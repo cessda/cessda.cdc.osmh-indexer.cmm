@@ -127,13 +127,13 @@ public class CMMStudyMapper {
      * @param mergeOperator      the operation to run on merge conflicts
      */
     private <T> Map<String, T> mapNullLanguage(Map<String, T> langMap, String defaultLangIsoCode, BinaryOperator<T> mergeOperator) {
-        var hasEmptyLangContent = langMap.containsKey("");
+        var hasEmptyLangContent = langMap.containsKey(XMLMapper.EMPTY_LANGUAGE);
         if (hasEmptyLangContent && oaiPmh.metadataParsingDefaultLang().active()) {
             // Create a new map to store the result in
             var newMap = new HashMap<>(langMap);
 
             // Extract the empty value and merge with the default language value
-            var emptyLangContentValue = newMap.remove("");
+            var emptyLangContentValue = newMap.remove(XMLMapper.EMPTY_LANGUAGE);
             newMap.merge(defaultLangIsoCode, emptyLangContentValue, mergeOperator);
 
             return newMap;
@@ -166,9 +166,8 @@ public class CMMStudyMapper {
      * <p>
      * Xpath = {@link XPaths#getPidStudyXPath()}
      */
-    Map<String, List<Pid>> parsePidStudies(Document document, XPaths xPaths, String defaultLangIsoCode) {
-        var pids = xPaths.getPidStudyXPath().resolve(document, xPaths.getNamespace());
-        return mapNullLanguage(pids, defaultLangIsoCode, CMMStudyMapper::mergeLists);
+    Map<String, List<Pid>> parsePidStudies(Document document, XPaths xPaths) {
+        return xPaths.getPidStudyXPath().resolve(document, xPaths.getNamespace());
     }
 
     /**
@@ -176,9 +175,8 @@ public class CMMStudyMapper {
      * <p>
      * Xpath = {@link XPaths#getCreatorsXPath()}
      */
-    Map<String, List<Creator>> parseCreator(Document document, XPaths xPaths, String defaultLangIsoCode) {
-        var unmappedCreators = xPaths.getCreatorsXPath().resolve(document, xPaths.getNamespace());
-        return mapNullLanguage(unmappedCreators, defaultLangIsoCode, CMMStudyMapper::mergeLists);
+    Map<String, List<Creator>> parseCreator(Document document, XPaths xPaths) {
+        return xPaths.getCreatorsXPath().resolve(document, xPaths.getNamespace());
     }
 
     /**
@@ -292,18 +290,17 @@ public class CMMStudyMapper {
     /**
      * Parses the Study Url from two plausible allowed xPaths
      * <p>
-     * Xpath = {@link XPaths#getStudyURLDocDscrXPath()}
-     * Xpath = {@link XPaths#getStudyURLStudyDscrXPath()}
+     * Xpath = {@link XPaths#getStudyURLXPath()}
      */
     @SuppressWarnings("java:S3776") // Extracting parts of the method will increase complexity
-    ParseResults<Map<String, URI>, List<URISyntaxException>> parseStudyUrl(Document document, XPaths xPaths, String langCode) {
+    ParseResults<Map<String, URI>, List<URISyntaxException>> parseStudyUrl(Document document, XPaths xPaths) {
 
         var studyURLs = new HashMap<String, URI>();
         var parsingExceptions = new ArrayList<URISyntaxException>();
 
         // If studyURLStudyDscrXPath defined, use that XPath as well.
-        xPaths.getStudyURLDocDscrXPath().ifPresent(xpath -> {
-            var docUriStrings = mapNullLanguage(xpath.resolve(document, xPaths.getNamespace()), langCode);
+        xPaths.getStudyURLXPath().ifPresent(xpath -> {
+            var docUriStrings = xpath.resolve(document, xPaths.getNamespace());
 
             for (var uriStrings : docUriStrings.entrySet()) {
                 for (var uriString : uriStrings.getValue()) {
@@ -317,20 +314,6 @@ public class CMMStudyMapper {
                 }
             }
         });
-
-        var studyUriStrings = mapNullLanguage(xPaths.getStudyURLStudyDscrXPath().resolve(document, xPaths.getNamespace()), langCode);
-        for (var uriStrings : studyUriStrings.entrySet()) {
-            studyURLs.computeIfAbsent(uriStrings.getKey(), k -> {
-                for (var uriString : uriStrings.getValue()) {
-                    try {
-                        return new URI(uriString);
-                    } catch (URISyntaxException e) {
-                        parsingExceptions.add(e);
-                    }
-                }
-                return null;
-            });
-        }
 
         return new ParseResults<>(studyURLs, parsingExceptions);
     }
@@ -433,13 +416,13 @@ public class CMMStudyMapper {
      * <p>
      * For Data Collection start and end date plus the four digit Year value as Data Collection Year
      */
-    ParseResults<DataCollectionPeriod, List<DateNotParsedException>> parseDataCollectionDates(Document doc, XPaths xPaths, String defaultLangIsoCode) {
+    ParseResults<DataCollectionPeriod, List<DateNotParsedException>> parseDataCollectionDates(Document doc, XPaths xPaths) {
         var parseResults = xPaths.getDataCollectionPeriodsXPath().resolve(doc, xPaths.getNamespace());
         var mappedResults = new DataCollectionPeriod(
             parseResults.results().startDate,
             parseResults.results().dataCollectionYear,
             parseResults.results().endDate,
-            mapNullLanguage(parseResults.results().freeTexts, defaultLangIsoCode)
+            parseResults.results().freeTexts
         );
         return new ParseResults<>(mappedResults, parseResults.exceptions);
     }
@@ -458,7 +441,7 @@ public class CMMStudyMapper {
 
         return Stream.concat(fileTxtAttrsStream, fileNameAttrsStream)
             .flatMap(xpath -> xpath.resolve(document, xPaths.getNamespace()).stream())
-            .filter(lang -> !lang.isEmpty())
+            .filter(lang -> !lang.equals(XMLMapper.EMPTY_LANGUAGE)) // Filter out empty language results
             .collect(Collectors.toSet());
     }
 
@@ -562,21 +545,6 @@ public class CMMStudyMapper {
             return mapNullLanguage(unmappedXPaths, defaultLangIsoCode, CMMStudyMapper::mergeLists);
         } else {
             return Collections.emptyMap();
-        }
-    }
-
-    @Value
-    public static class HeaderElement {
-        String studyNumber;
-        String lastModified;
-        boolean recordActive;
-
-        public Optional<String> getStudyNumber() {
-            return Optional.ofNullable(studyNumber);
-        }
-
-        public Optional<String> getLastModified() {
-            return Optional.ofNullable(lastModified);
         }
     }
 

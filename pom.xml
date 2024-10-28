@@ -64,7 +64,7 @@
 
         <!-- Dependency versions -->
         <lombok.version>1.18.34</lombok.version>
-        <elasticsearch.version>8.15.2</elasticsearch.version>
+        <elasticsearch.version>8.15.3</elasticsearch.version>
     </properties>
 
     <dependencies>
@@ -232,7 +232,7 @@
                         <path>
                             <groupId>com.google.errorprone</groupId>
                             <artifactId>error_prone_core</artifactId>
-                            <version>2.33.0</version>
+                            <version>2.34.0</version>
                         </path>
                         <path>
                             <groupId>org.projectlombok</groupId>
@@ -327,7 +327,7 @@
             <plugin>
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
-                <version>3.4.3</version>
+                <version>3.4.4</version>
                 <configuration>
                     <to>
                         <image>cessda/${project.artifactId}:${project.version}</image>

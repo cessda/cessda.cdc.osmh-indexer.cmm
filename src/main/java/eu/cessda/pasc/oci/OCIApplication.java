@@ -34,24 +34,28 @@ public class OCIApplication {
 
     private static int exitCode = 0;
 
-    private final ConsumerScheduler consumerScheduler;
-
-    public OCIApplication(ConsumerScheduler consumerScheduler) {
-        this.consumerScheduler = consumerScheduler;
-    }
-
 	public static void main(String[] args) {
         // Set settings needed for the application to work properly
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 
-        // Start the application
-        System.exit(SpringApplication.exit(SpringApplication.run(OCIApplication.class, args), () -> exitCode));
+        // Start the application. This method returns once Runner.run() returns.
+        var applicationContext = SpringApplication.run(OCIApplication.class, args);
+
+        // Exit the Spring Boot application. The exit code will have already been set.
+        var status = SpringApplication.exit(applicationContext, () -> exitCode);
+        System.exit(status);
     }
 
     @Component
     @Profile("!test")
     @SuppressWarnings({"java:S3985", "UnusedNestedClass"})
-    private class Runner implements CommandLineRunner {
+    private static class Runner implements CommandLineRunner {
+        private final ConsumerScheduler consumerScheduler;
+
+        public Runner(ConsumerScheduler consumerScheduler) {
+            this.consumerScheduler = consumerScheduler;
+        }
+
         /**
          * Run the indexer. If an exception is thrown, the exit code of the indexer is set to -1.
          * @param args unused.

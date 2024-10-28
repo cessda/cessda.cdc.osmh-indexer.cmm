@@ -22,6 +22,7 @@ import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.models.cmmstudy.Country;
 import eu.cessda.pasc.oci.models.cmmstudy.Publisher;
+import eu.cessda.pasc.oci.parser.XMLMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,13 +144,13 @@ public class LanguageExtractor {
             ).toList();
         builder.studyAreaCountries(countries);
         Optional.ofNullable(cmmStudy.unitTypes()).map(map -> map.get(lang)).ifPresent(builder::unitTypes);
-        Optional.ofNullable(cmmStudy.pidStudies()).map(map -> map.get(lang)).ifPresent(builder::pidStudies);
-        Optional.ofNullable(cmmStudy.creators()).map(map -> map.get(lang)).ifPresent(builder::creators);
+        Optional.ofNullable(cmmStudy.pidStudies()).map(map -> mergeLanguages(map, lang)).ifPresent(builder::pidStudies);
+        Optional.ofNullable(cmmStudy.creators()).map(map -> mergeLanguages(map, lang)).ifPresent(builder::creators);
         Optional.ofNullable(cmmStudy.typeOfSamplingProcedures()).map(map -> map.get(lang)).ifPresent(builder::typeOfSamplingProcedures);
         Optional.ofNullable(cmmStudy.samplingProcedureFreeTexts()).map(map -> map.get(lang)).ifPresent(builder::samplingProcedureFreeTexts);
         Optional.ofNullable(cmmStudy.typeOfModeOfCollections()).map(map -> map.get(lang)).ifPresent(builder::typeOfModeOfCollections);
         Optional.ofNullable(cmmStudy.titleStudy()).map(map -> map.get(lang)).ifPresent(builder::titleStudy);
-        Optional.ofNullable(cmmStudy.dataCollectionFreeTexts()).map(map -> map.get(lang)).ifPresent(builder::dataCollectionFreeTexts);
+        Optional.ofNullable(cmmStudy.dataCollectionFreeTexts()).map(map -> mergeLanguages(map, lang)).ifPresent(builder::dataCollectionFreeTexts);
         Optional.ofNullable(cmmStudy.dataAccessFreeTexts()).map(map -> map.get(lang)).ifPresent(builder::dataAccessFreeTexts);
         Optional.ofNullable(cmmStudy.publisher()).map(map -> map.get(lang)).ifPresent(builder::publisher);
         Optional.ofNullable(cmmStudy.universe()).map(map -> map.get(lang)).ifPresent(builder::universe);
@@ -169,4 +170,28 @@ public class LanguageExtractor {
         return builder.build();
     }
 
+    /**
+     * Merge language specific content with all languages content.
+     *
+     * @param map a map with a list of content for each language
+     * @param lang the language to merge
+     * @return a merged list
+     * @param <T> the type of elements
+     */
+    private static <T> List<T> mergeLanguages(Map<String, List<T>> map, String lang) {
+        // Get language specific elements, and then language nonspecific elements
+        var languageSpecificList = map.get(lang);
+        var nonLanguageSpecificList = map.get(XMLMapper.EMPTY_LANGUAGE);
+        if (languageSpecificList != null && nonLanguageSpecificList != null) {
+            // Allocate a new list and copy all content
+            var combinedList = new ArrayList<T>(languageSpecificList.size() + nonLanguageSpecificList.size());
+            combinedList.addAll(languageSpecificList);
+            combinedList.addAll(nonLanguageSpecificList);
+            return combinedList;
+        } else if (languageSpecificList != null) {
+            return languageSpecificList;
+        } else {
+            return nonLanguageSpecificList;
+        }
+    }
 }
