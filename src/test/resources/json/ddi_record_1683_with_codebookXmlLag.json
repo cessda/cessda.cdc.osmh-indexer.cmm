@@ -189,6 +189,7 @@
   },
   "dataCollectionPeriodStartdate": "1976-01-01T00:00:00Z",
   "dataCollectionFreeTexts": {},
+  "dataAccess": "Restricted",
   "dataAccessFreeTexts": {
     "zz": [
       "The depositor has specified that registration is required and standard conditions of use apply. The depositor may be informed about usage. See <a href=http://ukdataservice.ac.uk/get-data/how-to-access/conditions.aspx>terms and conditions of access</a> for further information."

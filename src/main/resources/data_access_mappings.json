@@ -1,0 +1,90 @@
+{
+    "UniData": {
+      "dataRestrctnXPath": [
+        {
+          "content": "Data are released in according to Creative Commons – Attribution 4.0 Licence, available <a href=\"https://creativecommons.org/licenses/by/4.0/\" target=\"_blank\">here</a>.",
+          "accessCategory": "Open"
+        },
+        {
+          "content": "ISTAT data are released in according to Creative Commons – Attribution 3.0 Licence, available <a href=\"https://creativecommons.org/licenses/by/3.0\" target=\"_blank\">here</a>. The redistribution to the third party, even in partial form, of data available to UniData members only is not allowed.",
+          "accessCategory": "Open"
+        },
+        {
+          "content": "Data are released for research purposes only and are subject to authorization. The redistribution to the third party, even in partial form, of data is not allowed. Please, contact <a href=\"mailto:unidata@unimib.it\">UniData's archive</a> in order to data access.",
+          "accessCategory": "Restricted"
+        },
+        {
+          "content": "Data are available only for members of UniData. Data are released only for scientific purpose. User agrees not to redistribute data to the third party, even in partial form, and to quote the data source in all publications using the information showed later. Other users will need to directly contact Istat.",
+          "accessCategory": "Restricted"
+        },
+        {
+          "content": "Data are available only to members of the Department of Sociology and Social Research of the University of Milano-Bicocca. The redistribution to the third party, even in partial form, of data is not allowed. Please, contact <a href=\"mailto:unidata@unimib.it\">UniData's archive</a> in order to data access.",
+          "accessCategory": "Restricted"
+        },
+        {
+          "content": "Data are released for research and teaching purposes only, and the redistribution to the third party, even in partial form, of data is not allowed.",
+          "accessCategory": "Restricted"
+        },
+        {
+          "content": "Data are available only for UniData's members. Data are released for research purposes only, and the redistribution to the third party - even in partial form - of data is not allowed. For all other users an expenses reimbursement is required. Please, contact <a href=\"mailto:unidata@unimib.it\">UniData's archive</a> directly for more information.",
+          "accessCategory": "Restricted"
+        },
+        {
+          "content": "Banca d'Italia data are released for research purposes only. The redistribution to the third party, even in partial form, of data available to UniData members only is not allowed. User agrees to quote the data source in all publications using the information showed later, and to send the complete reference of his/her research work based on the data to studi.indagini@bancaditalia.it.",
+          "accessCategory": "Restricted"
+        }
+      ]
+    },
+    "FSD": {
+      "dataRestrctnXPath": [
+        {
+          "content": "The dataset is (A) openly available for all users without registration (CC BY 4.0).",
+          "accessCategory": "Open"
+        },
+        {
+          "content": "The dataset is (B) available for research, teaching and study.",
+          "accessCategory": "Restricted"
+        },
+        {
+          "content": "The dataset is (C) available only for research including master's theses.",
+          "accessCategory": "Restricted"
+        },
+        {
+          "content": "The dataset is (D) available only by permission from the data depositor/creator.",
+          "accessCategory": "Restricted"
+        }
+      ]
+    },
+    "SND": {
+      "dataRestrctnXPath": [
+        {
+          "content": "Access to data through SND. Data are freely accessible.",
+          "accessCategory": "Open"
+        },
+        {
+          "content": "Access to data through SND. Data are freely accessible",
+          "accessCategory": "Open"
+        },
+        {
+          "content": "Access to data through SND. Access to data is restricted.",
+          "accessCategory": "Restricted"
+        }
+      ]
+    },
+    "UKDS": {
+      "dataAccessAltXPath": [
+        {
+          "content": "Open",
+          "accessCategory": "Open"
+        },
+        {
+          "content": "Controlled",
+          "accessCategory": "Restricted"
+        },
+        {
+          "content": "Safeguarded",
+          "accessCategory": "Restricted"
+        }
+      ]
+    }
+  }

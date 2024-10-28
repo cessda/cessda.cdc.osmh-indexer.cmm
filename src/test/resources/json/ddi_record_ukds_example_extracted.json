@@ -410,6 +410,7 @@
       }
     ]
   },
+  "dataAccess": "Restricted",
   "dataAccessFreeTexts": {
     "en": [
       "The depositor has specified that registration is required. Available to all registered users. The depositor may be informed about usage."

@@ -74,15 +74,19 @@ public class ReposTestData
     }
 
     public static Repo getFSDRepo() {
-        return new Repo(
-            URI.create("http://services.fsd.uta.fi/v0/oai"),
-            null,
-            "FSD",
-            null,
-            "oai_ddi25",
-            null,
-            null
-        );
+        try {
+            return new Repo(
+                URI.create("http://services.fsd.uta.fi/v0/oai"),
+                Path.of(ResourceHandler.getResource("xml/ddi_2_5/").toURI()),
+                "FSD",
+                null,
+                "oai_ddi25",
+                null,
+                null
+            );
+        } catch (FileNotFoundException | URISyntaxException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     public static Repo getNSDRepo() {

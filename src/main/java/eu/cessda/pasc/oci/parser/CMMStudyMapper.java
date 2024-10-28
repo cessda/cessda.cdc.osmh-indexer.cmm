@@ -15,6 +15,8 @@
  */
 package eu.cessda.pasc.oci.parser;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.cessda.pasc.oci.DateNotParsedException;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.configurations.Repo;
@@ -31,12 +33,17 @@ import org.jdom2.xpath.XPathFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Responsible for Mapping oai-pmh fields to a CMMStudy
@@ -326,6 +333,87 @@ public class CMMStudyMapper {
         }
 
         return new ParseResults<>(studyURLs, parsingExceptions);
+    }
+
+    /**
+     * Parses Data Access to be Open / Restricted if possible.
+     * <p>
+     * Xpath = {@link XPaths#getDataAccessXPath()}, {@link XPaths#getDataAccessAltXPath()} and {@link XPaths#getDataRestrctnXPath()}
+     * <p>
+     */
+    Optional<String> parseDataAccess(Document doc, XPaths xPaths, String defaultLangIsoCode, String repository) {
+        Optional<String> dataAccess = Optional.empty();
+        var dataAccessXPath = xPaths.getDataAccessXPath();
+        if(dataAccessXPath.isPresent()) {
+            dataAccess = dataAccessXPath.get().resolve(doc, xPaths.getNamespace());
+        }
+
+        if (dataAccess.isEmpty()) {
+            try {
+                // Load the Data Access mapping JSON file
+                ClassLoader classLoader = CMMStudyMapper.class.getClassLoader();
+                InputStream inputStream = classLoader.getResourceAsStream("data_access_mappings.json");
+
+                if (inputStream == null) {
+                    throw new FileNotFoundException("Data access mapping file not found!");
+                }
+
+                // Parse the file into a JsonNode
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode rootNode = objectMapper.readTree(inputStream);
+
+                // Check if repository can be found in mappings file
+                if (rootNode.has(repository)) {
+                    JsonNode repositoryNode = rootNode.get(repository);
+                    Iterator<Map.Entry<String, JsonNode>> xpaths = repositoryNode.fields();
+
+                    // Check XPaths specified for the repository
+                    while (xpaths.hasNext()) {
+                        // Get the key (short form of XPath) and value (values to map to Open / Restricted)
+                        Map.Entry<String, JsonNode> entry = xpaths.next();
+                        String xpathKey = entry.getKey();
+                        JsonNode xpathValue = entry.getValue();
+
+                        // Resolve the corresponding XPath
+                        Map<String, List<String>> resolvedMap = null;
+                        if ("dataRestrctnXPath".equals(xpathKey)) {
+                            var dataRestrctnXPath = xPaths.getDataRestrctnXPath();
+                            if (dataRestrctnXPath != null) {
+                                resolvedMap = mapNullLanguage(dataRestrctnXPath.resolve(doc, xPaths.getNamespace()), defaultLangIsoCode);
+                            }
+                        } else if ("dataAccessAltXPath".equals(xpathKey)) {
+                            var dataAccessAltXPath = xPaths.getDataAccessAltXPath();
+                            if (dataAccessAltXPath.isPresent()) {
+                                resolvedMap = mapNullLanguage(dataAccessAltXPath.get().resolve(doc, xPaths.getNamespace()), defaultLangIsoCode);
+                            }
+                        }
+
+                        // Check if the map has entries, and if so, iterate through the list and compare each value separately
+                        if (resolvedMap != null && !resolvedMap.isEmpty()) {
+                            for (Map.Entry<String, List<String>> resolvedEntry : resolvedMap.entrySet()) {
+                                for (String resolvedValue : resolvedEntry.getValue()) {
+                                    if (xpathValue.isArray()) {
+                                        for (JsonNode arrayElement : xpathValue) {
+                                            String content = arrayElement.get("content").asText();
+                                            String accessCategory = arrayElement.get("accessCategory").asText();
+
+                                            // Compare resolved value from XPath with the content in mapping JSON
+                                            if (resolvedValue.equals(content)) {
+                                                // Return the matched access category
+                                                return Optional.of(accessCategory);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                log.error("Cannot process Data Access mapping JSON: {}", e.toString());
+            }
+        }
+        return dataAccess;
     }
 
     /**

@@ -190,6 +190,7 @@
                                 <conditions xml:lang="en">Conditions Text en</conditions>
                                 <specPerm URI="http://localhost/specPerm-test-link" xml:lang="en">SpecPerm Text en</specPerm>
                                 <specPerm xml:lang="fi">SpecPerm Text fi</specPerm>
+                                <conditions elementVersion="info:eu-repo-Access-Terms vocabulary">openAccess</conditions>
                             </useStmt>
                             <setAvail>
                                 <avlStatus xml:lang="en">AvlStatus Text en</avlStatus>

@@ -50,6 +50,9 @@ public final class XPaths {
     private final XMLMapper<Map<String, String>> titleXPath;
     @Nullable
     private final XMLMapper<Map<String, String>> parTitleXPath;
+    private final XMLMapper<Optional<String>> dataAccessXPath;
+    @Nullable
+    private final XMLMapper<Map<String, List<String>>> dataAccessAltXPath;
     @Nullable
     private final XMLMapper<Map<String, List<String>>> dataAccessUrlXPath;
     @Nullable
@@ -216,6 +219,14 @@ public final class XPaths {
     Optional<XMLMapper<Map<String, List<TermVocabAttributes>>>> getGeneralDataFormatXPath() {
         return Optional.ofNullable(generalDataFormatXPath);
     }
+
+    Optional<XMLMapper<Optional<String>>> getDataAccessXPath() {
+        return Optional.ofNullable(dataAccessXPath);
+    }
+
+    Optional<XMLMapper<Map<String, List<String>>>> getDataAccessAltXPath() {
+        return Optional.ofNullable(dataAccessAltXPath);
+    }
     /**
      * XPaths needed to extract metadata from DDI 2.5 documents.
      */
@@ -235,6 +246,10 @@ public final class XPaths {
         .pidStudyXPath(new SimpleXMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo", extractMetadataObjectListForEachLang(ParsingStrategies::pidStrategy)))
         // Creator
         .creatorsXPath(new SimpleXMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty", extractMetadataObjectListForEachLang(ParsingStrategies::creatorStrategy)))
+        // Data access open/restricted
+        .dataAccessXPath(new SimpleXMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:conditions", ParsingStrategies::dataAccessStrategy))
+        // Data access open/restricted specPerm alternative
+        .dataAccessAltXPath(new SimpleXMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:specPerm", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy)))
         // Terms of data access
         .dataAccessUrlXPath(new SimpleXMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:specPerm", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
         // Terms of data access

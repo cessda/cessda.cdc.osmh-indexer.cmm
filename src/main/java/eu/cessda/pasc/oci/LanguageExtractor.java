@@ -119,6 +119,7 @@ public class LanguageExtractor {
             .dataCollectionPeriodStartdate(cmmStudy.dataCollectionPeriodStartdate())
             .dataCollectionPeriodEnddate(cmmStudy.dataCollectionPeriodEnddate())
             .dataCollectionYear(cmmStudy.dataCollectionYear())
+            .dataAccess(cmmStudy.dataAccess())
             .langAvailableIn(Set.copyOf(availableLanguages));
         Optional.ofNullable(cmmStudy.studyXmlSourceUrl()).ifPresent(url -> builder.studyXmlSourceUrl(url.toString()));
 

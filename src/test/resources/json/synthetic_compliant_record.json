@@ -225,6 +225,7 @@
       }
     ]
   },
+  "dataAccess": "Open",
   "dataAccessFreeTexts": {
     "fi": [
       "Restriction Text fi"
