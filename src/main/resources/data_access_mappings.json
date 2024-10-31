@@ -52,6 +52,22 @@
         {
           "content": "The dataset is (D) available only by permission from the data depositor/creator.",
           "accessCategory": "Restricted"
+        },
+        {
+          "content": "Aineisto on (A) vapaasti käytettävissä ilman rekisteröitymistä (CC BY 4.0).",
+          "accessCategory": "Open"
+        },
+        {
+          "content": "Aineisto on käytettävissä (B) tutkimukseen, opetukseen ja opiskeluun.",
+          "accessCategory": "Restricted"
+        },
+        {
+          "content": "Aineisto on käytettävissä (C) vain tutkimukseen ja ylempiin opinnäytteisiin.",
+          "accessCategory": "Restricted"
+        },
+        {
+          "content": "Aineisto on käytettävissä (D) vain luovuttajan luvalla.",
+          "accessCategory": "Restricted"
         }
       ]
     },
@@ -67,6 +83,18 @@
         },
         {
           "content": "Access to data through SND. Access to data is restricted.",
+          "accessCategory": "Restricted"
+        },
+        {
+          "content": "Åtkomst till data via SND. Data är fritt tillgängliga.",
+          "accessCategory": "Open"
+        },
+        {
+          "content": "Åtkomst till data via SND. Data är fritt tillgängliga",
+          "accessCategory": "Open"
+        },
+        {
+          "content": "Åtkomst till data via SND. Tillgång till data är begränsad.",
           "accessCategory": "Restricted"
         }
       ]

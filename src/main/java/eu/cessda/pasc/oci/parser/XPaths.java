@@ -117,6 +117,8 @@ public final class XPaths {
         .pidStudyXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Citation/r:InternationalIdentifier", extractMetadataObjectListForEachLang(ParsingStrategies::pidLifecycleStrategy)))
         // Creator/PI
         .creatorsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Citation/r:Creator", ParsingStrategies::creatorsStrategy))
+        // Data access open/restricted
+        .dataAccessXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/a:Archive/a:ArchiveSpecific/a:Item/a:Access/a:AccessTypeName/r:String", ParsingStrategies::dataAccessStrategy))
         // Terms of data access
         .dataRestrctnXPath(new ResolvingXMLMapper<>("//s:StudyUnit[1]/a:Archive", "//s:StudyUnit[1]/r:ArchiveReference", "//a:ArchiveSpecific/a:Item/a:Access/r:Description/r:Content", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy)))
         // Data collection period
@@ -176,6 +178,8 @@ public final class XPaths {
         })
         // PID of Related publication
         .withRelatedPublicationsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:OtherMaterialScheme/r:OtherMaterial", ParsingStrategies::relatedPublicationLifecycleStrategy))
+        // Data access open/restricted
+        .withDataAccessXPath(new SimpleXMLMapper<>("//s:StudyUnit/a:Archive/a:ArchiveSpecific/a:Item/a:Access/a:TypeOfAccess", ParsingStrategies::dataAccessStrategy))
         // Topics
         .withClassificationsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:TopicalCoverage/r:Subject", extractMetadataObjectListForEachLang(TERM_VOCAB_ATTR_3_3_STRATEGY)))
         // Keywords
