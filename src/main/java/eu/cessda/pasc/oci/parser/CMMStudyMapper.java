@@ -325,11 +325,7 @@ public class CMMStudyMapper {
      * <p>
      */
     Optional<String> parseDataAccess(Document doc, XPaths xPaths, String defaultLangIsoCode, String repository) {
-        Optional<String> dataAccess = Optional.empty();
-        var dataAccessXPath = xPaths.getDataAccessXPath();
-        if(dataAccessXPath.isPresent()) {
-            dataAccess = dataAccessXPath.get().resolve(doc, xPaths.getNamespace());
-        }
+        var dataAccess = xPaths.getDataAccessXPath().resolve(doc, xPaths.getNamespace());
 
         if (dataAccess.isEmpty()) {
             try {

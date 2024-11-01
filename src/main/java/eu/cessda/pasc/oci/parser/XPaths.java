@@ -223,10 +223,6 @@ public final class XPaths {
         return Optional.ofNullable(generalDataFormatXPath);
     }
 
-    Optional<XMLMapper<Optional<String>>> getDataAccessXPath() {
-        return Optional.ofNullable(dataAccessXPath);
-    }
-
     Optional<XMLMapper<Map<String, List<String>>>> getDataAccessAltXPath() {
         return Optional.ofNullable(dataAccessAltXPath);
     }
@@ -325,6 +321,7 @@ public final class XPaths {
         //  -Only element freetext value.
         .pidStudyXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/citation/titlStmt/IDNo", extractMetadataObjectListForEachLang(ParsingStrategies::pidStrategy))) // use @agency instead?
         .creatorsXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/citation/rspStmt/AuthEnty", extractMetadataObjectListForEachLang(ParsingStrategies::creatorStrategy)))
+        .dataAccessXPath(new SimpleXMLMapper<>("//ddi:codeBook//stdyDscr/dataAccs/useStmt/conditions", ParsingStrategies::dataAccessStrategy))
         .dataRestrctnXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/dataAccs/useStmt/restrctn", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy)))
         .dataCollectionPeriodsXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/collDate", ParsingStrategies::dataCollectionPeriodsStrategy))
         .classificationsXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/subject/topcClas", extractMetadataObjectListForEachLang(element -> ParsingStrategies.termVocabAttributeStrategy(element, false))))

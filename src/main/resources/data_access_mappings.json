@@ -32,6 +32,14 @@
         {
           "content": "Banca d'Italia data are released for research purposes only. The redistribution to the third party, even in partial form, of data available to UniData members only is not allowed. User agrees to quote the data source in all publications using the information showed later, and to send the complete reference of his/her research work based on the data to studi.indagini@bancaditalia.it.",
           "accessCategory": "Restricted"
+        },
+        {
+          "content": "Data are embargoed and temporarily accessible only to members of the Department of Sociology and Social Research of the University of Milano-Bicocca. The redistribution to the third party, even in partial form, of data is not allowed. Please, contact UniData's archive in order to data access.",
+          "accessCategory": "Restricted"
+        },
+        {
+          "content": "Data are released for research and teaching purposes only and are subject to authorization. The redistribution to the third party, even in partial form, of data is not allowed. Please, contact UniData's archive in order to data access.",
+          "accessCategory": "Restricted"
         }
       ]
     },
