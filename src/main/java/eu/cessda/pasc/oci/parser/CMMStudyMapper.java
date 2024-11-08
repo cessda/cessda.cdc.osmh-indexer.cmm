@@ -15,9 +15,13 @@
  */
 package eu.cessda.pasc.oci.parser;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.cessda.pasc.oci.DateNotParsedException;
+import eu.cessda.pasc.oci.ResourceHandler;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.configurations.Repo;
+import eu.cessda.pasc.oci.models.DataAccessMapping;
 import eu.cessda.pasc.oci.models.cmmstudy.*;
 import lombok.Builder;
 import lombok.NonNull;
@@ -31,12 +35,16 @@ import org.jdom2.xpath.XPathFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static eu.cessda.pasc.oci.parser.XMLMapper.extractMetadataObjectListForEachLang;
 
 /**
  * Responsible for Mapping oai-pmh fields to a CMMStudy
@@ -48,8 +56,9 @@ import java.util.stream.Stream;
 public class CMMStudyMapper {
 
     private final AppConfigurationProperties.OaiPmh oaiPmh;
+    private final Map<String, Map<String, List<DataAccessMapping>>> dataAccessMappings;
 
-    public CMMStudyMapper() {
+    public CMMStudyMapper() throws IOException {
         this.oaiPmh = new AppConfigurationProperties.OaiPmh(
             new AppConfigurationProperties.MetadataParsingDefaultLang(
                 true,
@@ -57,11 +66,22 @@ public class CMMStudyMapper {
             ),
             "<br>"
         );
+        this.dataAccessMappings = loadDataMappings(new ObjectMapper());
     }
 
     @Autowired
-    CMMStudyMapper(AppConfigurationProperties appConfigurationProperties) {
+    CMMStudyMapper(AppConfigurationProperties appConfigurationProperties, ObjectMapper objectMapper) throws IOException {
         this.oaiPmh = appConfigurationProperties.oaiPmh();
+
+        // Load the Data Access mapping JSON file
+        this.dataAccessMappings = loadDataMappings(objectMapper);
+    }
+
+    private static Map<String, Map<String, List<DataAccessMapping>>> loadDataMappings(ObjectMapper objectMapper) throws IOException {
+        try (InputStream inputStream = ResourceHandler.getResourceAsStream("data_access_mappings.json")) {
+            return objectMapper.readValue(inputStream, new TypeReference<>() {
+            });
+        }
     }
 
     /**
@@ -309,6 +329,54 @@ public class CMMStudyMapper {
         });
 
         return new ParseResults<>(studyURLs, parsingExceptions);
+    }
+
+    /**
+     * Parses Data Access to be Open / Restricted if possible.
+     * <p>
+     * Xpath = {@link XPaths#getDataAccessXPath()}, {@link XPaths#getDataAccessAltXPath()} and {@link XPaths#getDataRestrctnXPath()}
+     * <p>
+     */
+    Optional<String> parseDataAccess(Document doc, XPaths xPaths, String defaultLangIsoCode, String repository) {
+        var dataAccess = xPaths.getDataAccessXPath().resolve(doc, xPaths.getNamespace());
+
+        if (dataAccess.isEmpty()) {
+            // Try deriving from free text - check if repository can be found in mappings file
+            var repositoryNode = dataAccessMappings.get(repository);
+            if (repositoryNode != null) {
+                for (var entry : repositoryNode.entrySet()) {
+                    // Get the key (short form of XPath) and value (values to map to Open / Restricted)
+                    String xpathKey = entry.getKey();
+
+                    // Copy data access to a map for more optimised comparisons
+                    var dataAccessMap = new HashMap<String, DataAccessMapping.AccessCategory>();
+                    for (var dataAccessMapping : entry.getValue()) {
+                        dataAccessMap.put(dataAccessMapping.content(), dataAccessMapping.accessCategory());
+                    }
+
+                    // Resolve the corresponding XPath for the repository
+                    Map<String, List<String>> resolvedMap = Collections.emptyMap();
+                    if ("dataRestrctnXPath".equals(xpathKey)) {
+                        resolvedMap = parseDataAccessFreeText(doc, xPaths, defaultLangIsoCode);
+                    } else if ("dataAccessAltXPath".equals(xpathKey)) {
+                        var dataAccessAltXPath = new SimpleXMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:specPerm", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy));
+                        resolvedMap = dataAccessAltXPath.resolve(doc, xPaths.getNamespace());
+                    }
+
+                    // Check if the map has entries, and if so, iterate through the list and compare each value separately
+                    for (Map.Entry<String, List<String>> resolvedEntry : resolvedMap.entrySet()) {
+                        for (String resolvedValue : resolvedEntry.getValue()) {
+                            var match = dataAccessMap.get(resolvedValue);
+                            if (match != null) {
+                                return Optional.of(match.name());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return dataAccess;
     }
 
     /**

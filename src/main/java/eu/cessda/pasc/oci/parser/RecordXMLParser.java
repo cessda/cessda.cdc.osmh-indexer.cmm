@@ -288,6 +288,7 @@ public class RecordXMLParser {
             builder.abstractField(cmmStudyMapper.parseAbstract(metadata, xPaths, defaultLangIsoCode));
             builder.pidStudies(cmmStudyMapper.parsePidStudies(metadata, xPaths));
             builder.creators(cmmStudyMapper.parseCreator(metadata, xPaths));
+            cmmStudyMapper.parseDataAccess(metadata, xPaths, defaultLangIsoCode, repository.code()).ifPresent(builder::dataAccess);
             builder.dataAccessFreeTexts(cmmStudyMapper.parseDataAccessFreeText(metadata, xPaths, defaultLangIsoCode));
             builder.classifications(cmmStudyMapper.parseClassifications(metadata, xPaths, defaultLangIsoCode));
             builder.keywords(cmmStudyMapper.parseKeywords(metadata, xPaths, defaultLangIsoCode));

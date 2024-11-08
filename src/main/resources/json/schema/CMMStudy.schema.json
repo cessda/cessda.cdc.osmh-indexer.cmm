@@ -122,15 +122,8 @@
       "additionalProperties": false
     },
     "dataAccess": {
-      "type": "object",
-      "patternProperties": {
-        "^[a-z]{2}$": {
-          "type": "string",
-          "description": "Freetext description of possibilities to access data."
-        }
-      },
-      "additionalProperties": false,
-      "description": "An object containing Freetext description of possibilities to access data. E.g. {'en': 'via web', 'no': 'Et via web'}."
+      "type": "string",
+      "description": "Data Access as Open/Restricted, either according to CV values or mapped from free text values."
     },
     "dataAccessFreeTexts": {
       "type": "object",
