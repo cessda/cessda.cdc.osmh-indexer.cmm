@@ -41,6 +41,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.channels.Channels;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.OffsetDateTime;
@@ -61,6 +62,7 @@ import static net.logstash.logback.argument.StructuredArguments.value;
 public class RecordXMLParser {
 
     private static final XPathExpression<Element> OAI_RECORD_EXPRESSION = XPathFactory.instance().compile(OaiPmhConstants.RECORD_ELEMENT, Filters.element(), null, OaiPmhConstants.OAI_NS);
+    private static final int MAX_FILE_SIZE_MB = 50;
 
     private final CMMStudyMapper cmmStudyMapper;
     private Set<Namespace> suppressedNamespaceWarnings = null;
@@ -76,10 +78,14 @@ public class RecordXMLParser {
      * @throws XMLParseException if the document could not be parsed, or an IO error occurred.
      */
     private Document getDocument(Path path) throws XMLParseException {
-        try (var inputStream = Files.newInputStream(path)) {
+        try (var channel = Files.newByteChannel(path)) {
+            if (channel.size() > MAX_FILE_SIZE_MB * (1000*1000)) { // 50 MB
+                throw new IOException("File size " + (channel.size()/(1000*1000)) + " MB is greater than " + MAX_FILE_SIZE_MB +" MB" );
+            }
+            var inputStream = Channels.newInputStream(channel);
             return OaiPmhHelpers.getSaxBuilder().build(inputStream);
         } catch (IOException | JDOMException e) {
-            throw new XMLParseException(e);
+            throw new XMLParseException(path.toUri(), e);
         }
     }
 
