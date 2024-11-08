@@ -81,6 +81,7 @@ public final class XPaths {
     private final XMLMapper<Map<String, List<Funding>>> fundingXPath;
     private final XMLMapper<Map<String, List<DataKindFreeText>>> dataKindXPath;
     private final XMLMapper<Map<String, List<TermVocabAttributes>>> generalDataFormatXPath;
+    private final XMLMapper<Map<String, List<Series>>> seriesXPath;
 
     private static final CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateNotParsedException>> EMPTY_PARSE_RESULTS = new CMMStudyMapper.ParseResults<>(
         new CMMStudyMapper.DataCollectionPeriod(null, 0, null, Collections.emptyMap()),
@@ -154,6 +155,8 @@ public final class XPaths {
         .fundingXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:FundingInformation", ParsingStrategies::fundingLifecycleStrategy))
         // Data kind
         .dataKindXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:KindOfData", extractMetadataObjectListForEachLang(ParsingStrategies::dataKindFreeTextStrategy)))
+        // Series
+        .seriesXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:SeriesStatement", ParsingStrategies::seriesLifecycleStrategy))
         .build();
 
     private static final TermVocabAttributeNames DDI_3_3_ATTR_NAMES = new TermVocabAttributeNames("controlledVocabularyName", "controlledVocabularyURN");
@@ -295,6 +298,8 @@ public final class XPaths {
         .fundingXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:prodStmt/ddi:grantNo", extractMetadataObjectListForEachLang(ParsingStrategies::fundingStrategy)))
         // Data kind
         .dataKindXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:dataKind", extractMetadataObjectListForEachLang(ParsingStrategies::dataKindFreeTextStrategy)))
+        // Series
+        .seriesXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:serStmt", extractMetadataObjectListForEachLang(ParsingStrategies::seriesStrategy)))
         .build();
 
     /**
@@ -332,6 +337,7 @@ public final class XPaths {
         .fundingXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/citation/prodStmt/grantNo", extractMetadataObjectListForEachLang(ParsingStrategies::fundingStrategy)))
         // Data kind
         .dataKindXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/dataKind", extractMetadataObjectListForEachLang(ParsingStrategies::dataKindFreeTextStrategy)))
+        .seriesXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/citation/serStmt", extractMetadataObjectListForEachLang(ParsingStrategies::seriesStrategy)))
         .build();
 
     /**

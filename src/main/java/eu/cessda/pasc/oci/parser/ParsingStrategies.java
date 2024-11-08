@@ -30,6 +30,7 @@ import java.net.URISyntaxException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 import static eu.cessda.pasc.oci.parser.OaiPmhConstants.*;
 import static eu.cessda.pasc.oci.parser.XMLMapper.*;
@@ -1121,5 +1122,96 @@ class ParsingStrategies{
 
         // Return empty if no valid element was found
         return Optional.empty();
+    }
+
+    /**
+     * Constructs a {@link Series} using the given element.
+     * <p>
+     * Names come from `serName` child elements, descriptions from `serInfo` child elements,
+     * and uri from the {@value OaiPmhConstants#URI_ATTR} attribute.
+     *
+     * @param element the {@link Element} to parse.
+     * @return a {@link Series} if at least one name, description, or uri is found.
+     */
+    static Optional<Series> seriesStrategy(Element element) {
+        var namespace = element.getNamespace();
+
+        var names = element.getChildren("serName", namespace).stream()
+                .map(Element::getTextTrim)
+                .filter(name -> !name.isEmpty())
+                .collect(Collectors.toList());
+
+        var descriptions = element.getChildren("serInfo", namespace).stream()
+                .map(Element::getTextTrim)
+                .filter(info -> !info.isEmpty())
+                .collect(Collectors.toList());
+
+        var uriString = element.getAttributeValue(URI_ATTR);
+        var uris = new ArrayList<URI>();
+        if (uriString != null && !uriString.isEmpty()) {
+            try {
+                uris.add(new URI(uriString.trim()));
+            } catch (URISyntaxException e) {
+                // filter out invalid URIs
+            }
+        }
+
+        if (names.isEmpty() && descriptions.isEmpty() && uris.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(new Series(names, descriptions, uris));
+    }
+
+    /**
+     * Parse names, descriptions and uris for series from DDI Lifecycle {@code SeriesStatement} element.
+     *
+     * @param elements the elements to parse.
+     * @return a {@link Map} with the language as the key and a list of series as the value.
+     */
+    @NonNull
+    static Map<String, List<Series>> seriesLifecycleStrategy(List<Element> elements) {
+        var seriesMap = new HashMap<String, List<Series>>();
+
+        for (var seriesElement : elements) {
+
+            var uriMap = new HashMap<String, List<URI>>();
+            var nameMap = new HashMap<String, List<String>>();
+            var descriptionMap = new HashMap<String, List<String>>();
+
+            for (var repoLocation : seriesElement.getChildren("SeriesRepositoryLocation", null)) {
+                var lang = XMLMapper.getLangOfElement(repoLocation);
+                uriMap.computeIfAbsent(lang, k -> new ArrayList<>()).add(URI.create(repoLocation.getTextTrim()));
+            }
+
+            for (var nameElement : seriesElement.getChildren("SeriesName", null)) {
+                for (var nameContent : nameElement.getChildren("String", null)) {
+                    var lang = XMLMapper.getLangOfElement(nameContent);
+                    nameMap.computeIfAbsent(lang, k -> new ArrayList<>()).add(nameContent.getTextTrim());
+                }
+            }
+
+            for (var descElement : seriesElement.getChildren("SeriesDescription", null)) {
+                for (var descContent : descElement.getChildren("Content", null)) {
+                    var lang = XMLMapper.getLangOfElement(descContent);
+                    descriptionMap.computeIfAbsent(lang, k -> new ArrayList<>()).add(descContent.getTextTrim());
+                }
+            }
+
+            var allLangs = new HashSet<>(uriMap.keySet());
+            allLangs.addAll(nameMap.keySet());
+            allLangs.addAll(descriptionMap.keySet());
+
+            for (String lang : allLangs) {
+                var series = new Series(
+                    nameMap.getOrDefault(lang, new ArrayList<>()),
+                    descriptionMap.getOrDefault(lang, new ArrayList<>()),
+                    uriMap.getOrDefault(lang, new ArrayList<>())
+                );
+                seriesMap.computeIfAbsent(lang, k -> new ArrayList<>()).add(series);
+            }
+        }
+
+        return seriesMap;
     }
 }

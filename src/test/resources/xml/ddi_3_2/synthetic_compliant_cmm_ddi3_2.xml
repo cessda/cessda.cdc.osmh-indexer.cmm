@@ -223,6 +223,28 @@
             <r:Content xml:lang="en">Attitude of the political leadership (members of parliament) in the USA to other nations and problems in world politics.</r:Content>
             <r:Content xml:lang="de">Einstellung der politischen Führungsschicht (Parlamentsmitglieder) in den USA zu anderen Nationen und weltpolitischen Problemen.</r:Content>
         </r:Abstract>
+        <r:SeriesStatement>
+            <r:SeriesRepositoryLocation xml:lang="en">https://example.com/series</r:SeriesRepositoryLocation>
+            <r:SeriesRepositoryLocation xml:lang="en">https://example.com/seriesaltlink</r:SeriesRepositoryLocation>
+            <r:SeriesRepositoryLocation xml:lang="de">https://example.com/series</r:SeriesRepositoryLocation>
+            <r:SeriesRepositoryLocation xml:lang="de">https://example.com/seriesaltlink</r:SeriesRepositoryLocation>
+            <r:SeriesName>
+                <r:String xml:lang="en">Made up series name</r:String>
+                <r:String xml:lang="de">Ausgedachter Serienname</r:String>
+            </r:SeriesName>
+            <r:SeriesName>
+                <r:String xml:lang="en">Has second made up name in English</r:String>
+            </r:SeriesName>
+            <r:SeriesDescription>
+                <r:Content xml:lang="en">This is an example of series description. This made up series has been collected over several made-up decades.</r:Content>
+                <r:Content xml:lang="de">Dies ist ein Beispiel für eine Serienbeschreibung. Diese erfundene Serie wurde über mehrere erfundene Jahrzehnte hinweg gesammelt.</r:Content>
+            </r:SeriesDescription>
+        </r:SeriesStatement>
+        <r:SeriesStatement>
+            <r:SeriesName>
+                <r:String xml:lang="en">Simple second series test</r:String>
+            </r:SeriesName>
+        </r:SeriesStatement>
         <r:FundingInformation>
             <r:AgencyOrganizationReference>
                 <r:Agency>de.gesis</r:Agency>

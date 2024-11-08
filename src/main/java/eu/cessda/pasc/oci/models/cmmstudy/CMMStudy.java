@@ -57,6 +57,7 @@ public record CMMStudy(
     @JsonProperty("publisher") Map<String, Publisher> publisher,
     @JsonProperty("relatedPublications") Map<String, List<RelatedPublication>> relatedPublications,
     @JsonProperty("samplingProcedureFreeTexts") Map<String, List<String>> samplingProcedureFreeTexts,
+    @JsonProperty("series") Map<String, List<Series>> series,
     @JsonProperty("studyAreaCountries") Map<String, List<Country>> studyAreaCountries,
     @JsonProperty("studyNumber") String studyNumber,
     @JsonProperty("studyUrl") Map<String, URI> studyUrl,

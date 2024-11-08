@@ -420,6 +420,44 @@
       },
       "additionalProperties": false
     },
+    "series": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "description": "Series / study group that the study belongs to.",
+              "properties": {
+                "names": {
+                  "type": "array",
+                  "description": "An array of names of the series / study group.",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "descriptions": {
+                  "type": "array",
+                  "description": "An array of descriptions of the series / study group.",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "uris": {
+                  "type": "array",
+                  "description": "An array of URIs to the series / study group description page in the SPs web page.",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      }
+    },
     "studyAreaCountries": {
       "type": "object",
       "patternProperties": {

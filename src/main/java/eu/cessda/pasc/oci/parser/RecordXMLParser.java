@@ -331,6 +331,7 @@ public class RecordXMLParser {
             builder.funding(cmmStudyMapper.parseFunding(metadata, xPaths, defaultLangIsoCode));
             builder.dataKindFreeTexts(cmmStudyMapper.parseDataKindFreeText(metadata, xPaths, defaultLangIsoCode));
             builder.generalDataFormats(cmmStudyMapper.parseGeneralDataFormats(metadata, xPaths, defaultLangIsoCode));
+            builder.series(cmmStudyMapper.parseSeries(metadata, xPaths, defaultLangIsoCode));
         }
 
         URI repositoryUrl;
