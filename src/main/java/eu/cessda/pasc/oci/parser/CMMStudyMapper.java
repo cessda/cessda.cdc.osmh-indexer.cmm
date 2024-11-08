@@ -348,14 +348,14 @@ public class CMMStudyMapper {
                     // Get the key (short form of XPath) and value (values to map to Open / Restricted)
                     String xpathKey = entry.getKey();
 
-
-                    var maps = new HashMap<String, DataAccessMapping.AccessCategory>();
-                    for (var e : entry.getValue()) {
-                        maps.put(e.content(), e.accessCategory());
+                    // Copy data access to a map for more optimised comparisons
+                    var dataAccessMap = new HashMap<String, DataAccessMapping.AccessCategory>();
+                    for (var dataAccessMapping : entry.getValue()) {
+                        dataAccessMap.put(dataAccessMapping.content(), dataAccessMapping.accessCategory());
                     }
 
-                    // Resolve the corresponding XPath
-                    Map<String, List<String>> resolvedMap = null;
+                    // Resolve the corresponding XPath for the repository
+                    Map<String, List<String>> resolvedMap = Collections.emptyMap();
                     if ("dataRestrctnXPath".equals(xpathKey)) {
                         resolvedMap = parseDataAccessFreeText(doc, xPaths, defaultLangIsoCode);
                     } else if ("dataAccessAltXPath".equals(xpathKey)) {
@@ -364,13 +364,11 @@ public class CMMStudyMapper {
                     }
 
                     // Check if the map has entries, and if so, iterate through the list and compare each value separately
-                    if (resolvedMap != null) {
-                        for (Map.Entry<String, List<String>> resolvedEntry : resolvedMap.entrySet()) {
-                            for (String resolvedValue : resolvedEntry.getValue()) {
-                                var match = maps.get(resolvedValue);
-                                if (match != null) {
-                                    return Optional.of(match.name());
-                                }
+                    for (Map.Entry<String, List<String>> resolvedEntry : resolvedMap.entrySet()) {
+                        for (String resolvedValue : resolvedEntry.getValue()) {
+                            var match = dataAccessMap.get(resolvedValue);
+                            if (match != null) {
+                                return Optional.of(match.name());
                             }
                         }
                     }
