@@ -49,7 +49,7 @@ public class RecordXMLParserDDI3Test {
     // Class under test
     private final CMMStudyMapper cmmStudyMapper = new CMMStudyMapper();
 
-    public RecordXMLParserDDI3Test() {
+    public RecordXMLParserDDI3Test() throws IOException {
         // Needed because TimeUtility only works properly in UTC timezones
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
     }
