@@ -59,6 +59,7 @@ public record CMMStudyOfLanguage(
     @JsonProperty("publisherFilter") Publisher publisherFilter,
     @JsonProperty("relatedPublications") List<RelatedPublication> relatedPublications,
     @JsonProperty("samplingProcedureFreeTexts") List<String> samplingProcedureFreeTexts,
+    @JsonProperty("series") List<Series> series,
     @JsonProperty("studyAreaCountries") List<Country> studyAreaCountries,
     @JsonProperty("studyNumber") String studyNumber,
     @JsonProperty("studyUrl") URI studyUrl,

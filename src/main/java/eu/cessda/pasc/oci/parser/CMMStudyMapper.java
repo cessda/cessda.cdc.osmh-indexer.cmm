@@ -483,4 +483,14 @@ public class CMMStudyMapper {
 
     record ParseResults<T, E>(T results, E exceptions) {
     }
+
+    /**
+     * Parses Series from:
+     * <p>
+     * Xpath = {@link XPaths#getSeriesXPath()}
+     */
+    Map<String, List<Series>> parseSeries(Document document, XPaths xPaths, String defaultLangIsoCode) {
+        var unmappedXPaths = xPaths.getSeriesXPath().resolve(document, xPaths.getNamespace());
+        return mapNullLanguage(unmappedXPaths, defaultLangIsoCode);
+    }
 }

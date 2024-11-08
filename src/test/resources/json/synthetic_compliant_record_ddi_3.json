@@ -158,6 +158,27 @@
       "Quotenauswahl"
     ]
   },
+  "series": {
+    "de": [
+      {
+        "names": ["Ausgedachter Serienname"],
+        "descriptions": ["Dies ist ein Beispiel für eine Serienbeschreibung. Diese erfundene Serie wurde über mehrere erfundene Jahrzehnte hinweg gesammelt."],
+        "uris": ["https://example.com/series", "https://example.com/seriesaltlink"]
+      }
+    ],
+    "en": [
+      {
+        "names": ["Made up series name", "Has second made up name in English"],
+        "descriptions": ["This is an example of series description. This made up series has been collected over several made-up decades."],
+        "uris": ["https://example.com/series", "https://example.com/seriesaltlink"]
+      },
+      {
+        "names": ["Simple second series test"],
+        "descriptions": [],
+        "uris": []
+      }
+    ]
+  },
   "studyAreaCountries": {
     "de": [{
       "abbr": "US",

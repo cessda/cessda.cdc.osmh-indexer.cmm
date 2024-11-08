@@ -247,6 +247,30 @@
       "analyzer": "pasc_standard_analyzer",
       "term_vector": "with_positions_offsets"
     },
+    "series": {
+      "type": "nested",
+      "properties": {
+        "names": {
+          "type": "keyword",
+          "ignore_above": 256,
+          "copy_to": "seriesSearchField"
+        },
+        "descriptions": {
+          "type": "text",
+          "analyzer": "pasc_index_autocomplete_analyzer",
+          "search_analyzer": "pasc_standard_analyzer",
+          "copy_to": "seriesSearchField"
+        },
+        "uris": {
+          "type": "keyword",
+          "ignore_above": 256
+        }
+      }
+    },
+    "seriesSearchField": {
+      "type": "text",
+      "analyzer": "pasc_standard_analyzer"
+    },
     "studyAreaCountries": {
       "type": "nested",
       "properties": {
