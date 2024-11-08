@@ -43,6 +43,9 @@ public class RecordXMLParserNesstarTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final ParserTestUtilities utils = new ParserTestUtilities(objectMapper);
 
+    public RecordXMLParserNesstarTest() throws IOException {
+    }
+
     private static HashMap<String, String> getAbstractFixture() {
         var expectedAbstract = new HashMap<String, String>();
         expectedAbstract.put("de", "de de");

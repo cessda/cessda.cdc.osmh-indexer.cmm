@@ -158,6 +158,12 @@ endpoints:
 | `preferredMetadataParam` | String | The metadata prefix used when harvesting from the OAI-PMH repository.                                                                                                                                                                        |
 | `defaultLanguage`        | String | Used to set a language on an element that doesn't have `@xml:lang` defined. Defaults to `oaiPmh.metadataParsingDefaultLang.lang` if not set. This setting is only considered if `oaiPmh.metadataParsingDefaultLang.active` is set to `true`. |
 
+### Data Access mappings
+
+Data Access is primarily read in DDI-C 2.5 from `/codeBook/stdyDscr/dataAccs/useStmt/conditions` by checking for the values in [Access Rights CV](https://wiki.surfnet.nl/display/standards/info-eu-repo#infoeurepo-AccessRights) but free text values are also supported through the use of mappings JSON. Mappings for each repository can be specified in [data_access_mappings.json](/src/main/resources/data_access_mappings.json) by which XPath to use from [XPaths.java](src/main/java/eu/cessda/pasc/oci/parser/XPaths.java) and then which free texts to map to Open / Restricted. Any new XPaths that aren't already used for Data Access for some repository will also be needed to be added as a part of `parseDataAccess` in [CMMStudyMapper.java](src/main/java/eu/cessda/pasc/oci/parser/CMMStudyMapper.java).
+
+Repository names in mapping JSON should be the same as code set in harvesting configuration (which follows the [configuration from cessda.cdc.aggregator.deploy](https://github.com/cessda/cessda.cdc.aggregator.deploy/blob/main/charts/harvester/config/config.yaml)).
+
 ## Built With
 
 * [Maven](https://maven.apache.org/) - Dependency Management

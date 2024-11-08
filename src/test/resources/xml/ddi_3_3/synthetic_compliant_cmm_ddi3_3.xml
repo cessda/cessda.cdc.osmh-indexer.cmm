@@ -459,9 +459,9 @@
                         <r:Agency>de.gesis</r:Agency>
                         <r:ID>ZA0004_Acc</r:ID>
                         <r:Version>1.0.0</r:Version>
-                        <a:AccessTypeName context="info:eu-repo-Access-Terms vocabulary">
-                            <r:String>C</r:String>
-                        </a:AccessTypeName>
+                        <a:TypeOfAccess controlledVocabularyName="info:eu-repo-Access-Terms vocabulary">
+                            openAccess
+                        </a:TypeOfAccess>
                         <r:Description>
                             <r:Content xml:lang="en">Data and documents are only released for academic research and teaching after the data depositor's written authorization.</r:Content>
                             <r:Content xml:lang="de">Daten und Dokumente sind für die akademische Forschung und Lehre nur nach schriftlicher Genehmigung des Datengebers zugänglich.</r:Content>

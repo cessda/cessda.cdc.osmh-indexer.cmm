@@ -1092,6 +1092,37 @@ class ParsingStrategies{
         return fundingMap;
     }
 
+    /**
+     * Processes a list of {@link Element}s, returning an {@link Optional} representing the access category (Open/Restricted).
+     * Returns the first non-empty valid result, otherwise returns an empty optional.
+     *
+     * @param elements the list of {@link Element}s to parse.
+     * @return an {@link Optional<String>} with "Open", "Restricted", or empty if no valid value is found.
+     */
+    static Optional<String> dataAccessStrategy(List<Element> elements) {
+        for (Element element : elements) {
+            String value = element.getTextTrim();
+
+            // Check if the value is "openAccess", return "Open"
+            if (!value.isEmpty()) {
+                if ("openAccess".equalsIgnoreCase(value)
+                    || "info:eu-repo/semantics/openAccess".equalsIgnoreCase(value)) {
+                    return Optional.of("Open");
+                }
+
+                // Check if the value is one of the restricted types and return "Restricted"
+                if ("closedAccess".equalsIgnoreCase(value)
+                    || "embargoedAccess".equalsIgnoreCase(value)
+                    || "restrictedAccess".equalsIgnoreCase(value)
+                    || "info:eu-repo/semantics/restrictedAccess".equalsIgnoreCase(value)) {
+                    return Optional.of("Restricted");
+                }
+            }
+        }
+
+        // Return empty if no valid element was found
+        return Optional.empty();
+    }
 
     /**
      * Constructs a {@link Series} using the given element.

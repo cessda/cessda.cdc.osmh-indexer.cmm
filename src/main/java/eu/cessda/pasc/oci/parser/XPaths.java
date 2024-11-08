@@ -52,6 +52,7 @@ public final class XPaths {
     private final XMLMapper<Map<String, String>> titleXPath;
     @Nullable
     private final XMLMapper<Map<String, String>> parTitleXPath;
+    private final XMLMapper<Optional<String>> dataAccessXPath;
     @Nullable
     private final XMLMapper<Map<String, List<String>>> dataAccessUrlXPath;
     @Nullable
@@ -115,6 +116,8 @@ public final class XPaths {
         .pidStudyXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Citation/r:InternationalIdentifier", extractMetadataObjectListForEachLang(ParsingStrategies::pidLifecycleStrategy)))
         // Creator/PI
         .creatorsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Citation/r:Creator", ParsingStrategies::creatorsStrategy))
+        // Data access open/restricted
+        .dataAccessXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/a:Archive/a:ArchiveSpecific/a:Item/a:Access/a:AccessTypeName/r:String", ParsingStrategies::dataAccessStrategy))
         // Terms of data access
         .dataRestrctnXPath(new ResolvingXMLMapper<>("//s:StudyUnit[1]/a:Archive", "//s:StudyUnit[1]/r:ArchiveReference", "//a:ArchiveSpecific/a:Item/a:Access/r:Description/r:Content", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy)))
         // Data collection period
@@ -176,6 +179,8 @@ public final class XPaths {
         })
         // PID of Related publication
         .withRelatedPublicationsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:OtherMaterialScheme/r:OtherMaterial", ParsingStrategies::relatedPublicationLifecycleStrategy))
+        // Data access open/restricted
+        .withDataAccessXPath(new SimpleXMLMapper<>("//s:StudyUnit/a:Archive/a:ArchiveSpecific/a:Item/a:Access/a:TypeOfAccess", ParsingStrategies::dataAccessStrategy))
         // Topics
         .withClassificationsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:TopicalCoverage/r:Subject", extractMetadataObjectListForEachLang(TERM_VOCAB_ATTR_3_3_STRATEGY)))
         // Keywords
@@ -218,6 +223,7 @@ public final class XPaths {
     Optional<XMLMapper<Map<String, List<TermVocabAttributes>>>> getGeneralDataFormatXPath() {
         return Optional.ofNullable(generalDataFormatXPath);
     }
+
     /**
      * XPaths needed to extract metadata from DDI 2.5 documents.
      */
@@ -250,6 +256,8 @@ public final class XPaths {
         .pidStudyXPath(new SimpleXMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo", extractMetadataObjectListForEachLang(ParsingStrategies::pidStrategy)))
         // Creator
         .creatorsXPath(new SimpleXMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty", extractMetadataObjectListForEachLang(ParsingStrategies::creatorStrategy)))
+        // Data access open/restricted
+        .dataAccessXPath(new SimpleXMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:conditions", ParsingStrategies::dataAccessStrategy))
         // Terms of data access
         .dataAccessUrlXPath(new SimpleXMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:specPerm", extractMetadataObjectListForEachLang(ParsingStrategies::uriStrategy)))
         // Terms of data access
@@ -311,6 +319,7 @@ public final class XPaths {
         //  -Only element freetext value.
         .pidStudyXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/citation/titlStmt/IDNo", extractMetadataObjectListForEachLang(ParsingStrategies::pidStrategy))) // use @agency instead?
         .creatorsXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/citation/rspStmt/AuthEnty", extractMetadataObjectListForEachLang(ParsingStrategies::creatorStrategy)))
+        .dataAccessXPath(new SimpleXMLMapper<>("//ddi:codeBook//stdyDscr/dataAccs/useStmt/conditions", ParsingStrategies::dataAccessStrategy))
         .dataRestrctnXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/dataAccs/useStmt/restrctn", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy)))
         .dataCollectionPeriodsXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/collDate", ParsingStrategies::dataCollectionPeriodsStrategy))
         .classificationsXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/subject/topcClas", extractMetadataObjectListForEachLang(element -> ParsingStrategies.termVocabAttributeStrategy(element, false))))

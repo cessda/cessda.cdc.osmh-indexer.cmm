@@ -55,6 +55,10 @@
         }
       }
     },
+    "dataAccess": {
+      "type": "keyword",
+      "ignore_above": 256
+    },
     "dataAccessFreeTexts": {
       "type": "text",
       "analyzer": "pasc_standard_analyzer",
