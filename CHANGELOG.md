@@ -13,6 +13,27 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 - *Fixed (for any bug fixes)*
 - *Security (in case of vulnerabilities)*
 
+## [3.7.0] - 2024-11-12
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14056449.svg)](https://doi.org/10.5281/zenodo.14056449)
+
+### Added
+
+* Added identifier information, such as an ORCID, to the creators field ([#290](https://github.com/cessda/cessda.cdc.versions/issues/290))
+* Parse Data Access as Open/Restricted according to CV values or free text mappings ([#557](https://github.com/cessda/cessda.cdc.versions/issues/557))
+* Parse series information which includes names, descriptions and URIs ([#559](https://github.com/cessda/cessda.cdc.versions/issues/559))
+* Parse data kind and general data format into the CMMStudy model ([#567](https://github.com/cessda/cessda.cdc.versions/issues/567))
+
+### Changed
+
+* Keep the funding agency even if the grant number is missing ([#560](https://github.com/cessda/cessda.cdc.versions/issues/560))
+* Copy PID, creator and URL elements without a xml:lang attribute to all languages ([#674](https://github.com/cessda/cessda.cdc.versions/issues/674))
+
+### Fixed
+
+* Restart the Elasticsearch client if it shuts down due to an OOM error ([PR-121](https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/pull/121))
+* Fix OOM errors by setting the maximum XML file size to be parsed to 20 MB ([#678](https://github.com/cessda/cessda.cdc.versions/issues/678))
+
 ## [3.6.0] - 2024-06-18
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12090308.svg)](https://doi.org/10.5281/zenodo.12090308)
@@ -275,6 +296,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 - verify SSL
 - removed the option to disable HTTPS verification
 
+[3.7.0]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/3.7.0
 [3.6.0]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/3.6.0
 [3.5.0]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/3.5.0
 [3.4.0]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/3.4.0
