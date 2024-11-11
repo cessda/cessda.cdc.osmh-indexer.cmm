@@ -62,7 +62,7 @@ import static net.logstash.logback.argument.StructuredArguments.value;
 public class RecordXMLParser {
 
     private static final XPathExpression<Element> OAI_RECORD_EXPRESSION = XPathFactory.instance().compile(OaiPmhConstants.RECORD_ELEMENT, Filters.element(), null, OaiPmhConstants.OAI_NS);
-    private static final int MAX_FILE_SIZE_MB = 20;
+    private static final int MAX_FILE_SIZE_MB = 50;
 
     private final CMMStudyMapper cmmStudyMapper;
     private Set<Namespace> suppressedNamespaceWarnings = null;
