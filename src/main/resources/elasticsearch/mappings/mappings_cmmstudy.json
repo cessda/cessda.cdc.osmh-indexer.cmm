@@ -7,7 +7,7 @@
       "search_analyzer": "pasc_standard_analyzer",
       "term_vector": "with_positions_offsets",
       "fields": {
-        "raw": {
+        "normalized": {
           "type": "keyword",
           "normalizer": "case_insensitive_normalizer"
         }
@@ -29,7 +29,13 @@
         "name": {
           "type": "text",
           "analyzer": "pasc_standard_analyzer",
-          "term_vector": "with_positions_offsets"
+          "term_vector": "with_positions_offsets",
+          "fields": {
+            "normalized": {
+              "type": "keyword",
+              "normalizer": "case_insensitive_normalizer"
+            }
+          }
         },
         "affiliation": {
           "type": "text",
@@ -287,7 +293,13 @@
           "type": "text",
           "analyzer": "pasc_index_autocomplete_analyzer",
           "search_analyzer": "pasc_standard_analyzer",
-          "copy_to": "studyAreaCountriesSearchField"
+          "copy_to": "studyAreaCountriesSearchField",
+          "fields": {
+            "normalized": {
+              "type": "keyword",
+              "normalizer": "case_insensitive_normalizer"
+            }
+          }
         },
         "searchField": {
           "type": "keyword",
@@ -328,7 +340,7 @@
           "term_vector": "with_positions_offsets",
           "copy_to": [ "keywordsSearchField", "keywordsKeywordField" ],
           "fields": {
-            "raw": {
+            "normalized": {
               "type": "keyword",
               "normalizer": "case_insensitive_normalizer"
             }
@@ -366,7 +378,13 @@
           "type": "text",
           "analyzer": "pasc_standard_analyzer",
           "term_vector": "with_positions_offsets",
-          "copy_to": "typeOfModeOfCollectionsSearchField"
+          "copy_to": "typeOfModeOfCollectionsSearchField",
+          "fields": {
+            "normalized": {
+              "type": "keyword",
+              "normalizer": "case_insensitive_normalizer"
+            }
+          }
         },
         "vocab": {
           "type": "keyword",
@@ -420,7 +438,13 @@
           "type": "text",
           "analyzer": "pasc_standard_analyzer",
           "term_vector": "with_positions_offsets",
-          "copy_to": "typeOfTimeMethodsSearchField"
+          "copy_to": "typeOfTimeMethodsSearchField",
+          "fields": {
+            "normalized": {
+              "type": "keyword",
+              "normalizer": "case_insensitive_normalizer"
+            }
+          }
         },
         "vocab": {
           "type": "keyword",
@@ -450,7 +474,13 @@
           "type": "text",
           "analyzer": "pasc_standard_analyzer",
           "term_vector": "with_positions_offsets",
-          "copy_to": "unitTypesSearchField"
+          "copy_to": "unitTypesSearchField",
+          "fields": {
+            "normalized": {
+              "type": "keyword",
+              "normalizer": "case_insensitive_normalizer"
+            }
+          }
         },
         "vocab": {
           "type": "keyword",
@@ -481,7 +511,7 @@
           "ignore_above": 256,
           "copy_to": "classificationsSearchField",
           "fields": {
-            "raw": {
+            "normalized": {
               "type": "keyword",
               "normalizer": "case_insensitive_normalizer"
             }

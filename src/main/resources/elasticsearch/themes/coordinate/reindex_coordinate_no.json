@@ -1,0 +1,61 @@
+{
+  "query": {
+    "bool": {
+      "should": [
+        {
+          "multi_match": {
+            "query": "barn",
+            "fields": [
+              "titleStudy^3",
+              "classificationsSearchField^2",
+              "keywordsSearchField"
+            ],
+            "type": "best_fields",
+            "fuzziness": "auto",
+            "prefix_length": 4
+          }
+        },
+        {
+          "multi_match": {
+            "query": "ungdom",
+            "fields": [
+              "titleStudy^3",
+              "classificationsSearchField^2",
+              "keywordsSearchField"
+            ],
+            "type": "best_fields",
+            "fuzziness": "auto",
+            "prefix_length": 6
+          }
+        },
+        {
+          "multi_match": {
+            "query": "children",
+            "fields": [
+              "titleStudy^3",
+              "classificationsSearchField^2",
+              "keywordsSearchField"
+            ],
+            "type": "best_fields",
+            "fuzziness": "auto",
+            "prefix_length": 5
+          }
+        },
+        {
+          "multi_match": {
+            "query": "youths",
+            "fields": [
+              "titleStudy^3",
+              "classificationsSearchField^2",
+              "keywordsSearchField"
+            ],
+            "type": "best_fields",
+            "fuzziness": "auto",
+            "prefix_length": 5
+          }
+        }
+      ],
+      "minimum_should_match": 1
+    }
+  }
+}

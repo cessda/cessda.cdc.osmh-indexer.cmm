@@ -50,6 +50,7 @@ public class IndexerRunner {
     private final IngestService ingestService;
 
     private final AtomicBoolean indexerRunning = new AtomicBoolean(false);
+    private final AtomicBoolean reindexingRunning = new AtomicBoolean(false);
 
     public IndexerRunner(AppConfigurationProperties configurationProperties,
                          IndexerConsumerService localHarvesterConsumerService,
@@ -70,7 +71,6 @@ public class IndexerRunner {
     @SuppressWarnings("OverlyBroadCatchBlock")
     public void executeHarvestAndIngest() {
         if (!indexerRunning.getAndSet(true)) {
-
             // Load explicitly configured repositories
             var repos = configurationProperties.repos();
 
@@ -139,7 +139,7 @@ public class IndexerRunner {
         }
         log.info("[{}] Repo finished, took {} seconds",
             value(LoggingConstants.REPO_NAME, repo.code()),
-            value("repository_duration", Duration.between(startTime, Instant.now()).getSeconds())
+            value("repository_duration", Duration.between(startTime, Instant.now()).toSeconds())
         );
     }
 
@@ -226,6 +226,29 @@ public class IndexerRunner {
         int studiesCreated,
         int studiesUpdated
     ) {
+    }
+
+    /**
+     * Trigger reindexing for all themes and their respective reindex queries.
+     *
+     * @throws IllegalStateException if reindexing is already running.
+     */
+    public void executeReindexing() {
+        if (!reindexingRunning.getAndSet(true)) {
+            try {
+                log.info("Starting reindexing process...");
+
+                ingestService.reindexAllThemes();
+
+                log.info("Reindexing process completed successfully.");
+            } catch (IndexingException e) {
+                log.error("Error occurred during reindexing: {}", e.getMessage(), e);
+            } finally {
+                reindexingRunning.set(false);
+            }
+        } else {
+            throw new IllegalStateException("Reindexing is already running");
+        }
     }
 
     @PreDestroy

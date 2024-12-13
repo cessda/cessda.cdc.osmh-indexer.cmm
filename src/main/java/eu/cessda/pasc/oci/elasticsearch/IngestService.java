@@ -93,4 +93,20 @@ public interface IngestService {
      * @return LocalDateTime. The exact most recent lastModified dateTime from the cluster for the index pattern.
      */
     Optional<LocalDateTime> getMostRecentLastModified();
+
+    /**
+     * Perform reindexing for all themes and their respective reindex queries.
+     * Loops through all theme directories and runs reindex queries for each one.
+     */
+    void reindexAllThemes() throws IndexingException;
+
+    /**
+     * Perform reindexing from a source index to a destination index using a query.
+     *
+     * @param sourceIndex      the source index name
+     * @param destinationIndex the destination index name
+     * @param queryJsonFilePath the file path to the reindex query
+     * @throws IndexingException if an error occurs during the reindexing process
+     */
+    void reindex(String sourceIndex, String destinationIndex, String queryJsonFilePath) throws IndexingException;
 }

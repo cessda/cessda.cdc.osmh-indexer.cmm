@@ -68,13 +68,35 @@ public class ConsumerScheduler {
                 debuggingJMXBean.printElasticSearchInfo()
             );
 
+            // Perform the indexing process
+            final var indexingStartTime = OffsetDateTime.now(ZoneId.systemDefault());
+            log.info("[{}] Indexing started at [{}]", FULL_RUN, indexingStartTime);
             indexerRunner.executeHarvestAndIngest();
 
+            final var indexingEndTime = OffsetDateTime.now(ZoneId.systemDefault());
+            log.info("[{}] Indexing completed at [{}] - Duration: [{}] seconds",
+                FULL_RUN,
+                indexingEndTime,
+                value("indexing_duration", Duration.between(indexingStartTime, indexingEndTime).toSeconds())
+            );
+
+            // Perform reindexing
+            final var reindexingStartTime = OffsetDateTime.now(ZoneId.systemDefault());
+            log.info("[{}] Reindexing started at [{}]", FULL_RUN, reindexingStartTime);
+            indexerRunner.executeReindexing();
+
+            final var reindexingEndTime = OffsetDateTime.now(ZoneId.systemDefault());
+            log.info("[{}] Reindexing completed at [{}] - Duration: [{}] seconds",
+                FULL_RUN,
+                reindexingEndTime,
+                value("reindexing_duration", Duration.between(reindexingStartTime, reindexingEndTime).toSeconds())
+            );
+
             final var endTime = OffsetDateTime.now(ZoneId.systemDefault());
-            log.info("[{}] Consume and Ingest All SPs Repos:\nEnded at: [{}]\nDuration: [{}] seconds",
+            log.info("[{}] Consume and Ingest All SPs Repos:\nEnded at: [{}]\nTotal Duration: [{}] seconds",
                 FULL_RUN,
                 endTime,
-                value("job_duration", Duration.between(startTime, endTime).getSeconds())
+                value("job_duration", Duration.between(startTime, endTime).toSeconds())
             );
         } catch (IOException e) {
             log.error("Cannot connect to Elasticsearch: {}", e.toString());

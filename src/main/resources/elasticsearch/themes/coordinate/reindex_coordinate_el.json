@@ -1,0 +1,61 @@
+{
+  "query": {
+    "bool": {
+      "should": [
+        {
+          "multi_match": {
+            "query": "ΠΑΙΔΙΑ",
+            "fields": [
+              "titleStudy^3",
+              "classificationsSearchField^2",
+              "keywordsSearchField"
+            ],
+            "type": "best_fields",
+            "fuzziness": "auto",
+            "prefix_length": 5
+          }
+        },
+        {
+          "multi_match": {
+            "query": "ΕΦΗΒΟΙ",
+            "fields": [
+              "titleStudy^3",
+              "classificationsSearchField^2",
+              "keywordsSearchField"
+            ],
+            "type": "best_fields",
+            "fuzziness": "auto",
+            "prefix_length": 5
+          }
+        },
+        {
+          "multi_match": {
+            "query": "child",
+            "fields": [
+              "titleStudy^3",
+              "classificationsSearchField^2",
+              "keywordsSearchField"
+            ],
+            "type": "best_fields",
+            "fuzziness": "auto",
+            "prefix_length": 5
+          }
+        },
+        {
+          "multi_match": {
+            "query": "youth",
+            "fields": [
+              "titleStudy^3",
+              "classificationsSearchField^2",
+              "keywordsSearchField"
+            ],
+            "type": "best_fields",
+            "fuzziness": "auto",
+            "prefix_length": 5
+          }
+        }
+      ],
+      "minimum_should_match": 1
+    }
+  }
+}

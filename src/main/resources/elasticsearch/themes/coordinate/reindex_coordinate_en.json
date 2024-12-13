@@ -1,0 +1,91 @@
+{
+  "query": {
+    "bool": {
+      "should": [
+        {
+          "multi_match": {
+            "query": "child",
+            "fields": [
+              "titleStudy^3",
+              "classificationsSearchField^2"
+            ],
+            "type": "best_fields",
+            "fuzziness": "auto",
+            "prefix_length": 5
+          }
+        },
+        {
+          "multi_match": {
+            "query": "youth",
+            "fields": [
+              "titleStudy^3",
+              "classificationsSearchField^2"
+            ],
+            "type": "best_fields",
+            "fuzziness": "auto",
+            "prefix_length": 5
+          }
+        },
+        {
+          "bool": {
+            "must": [
+              {
+                "multi_match": {
+                  "query": "child",
+                  "fields": [
+                    "keywordsSearchField"
+                  ],
+                  "fuzziness": "auto",
+                  "prefix_length": 5
+                }
+              }
+            ],
+            "must_not": [
+              {
+                "bool": {
+                  "should": [
+                    {
+                      "match_phrase": {
+                        "publisherSearchField": "UK Data Service"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "bool": {
+            "must": [
+              {
+                "multi_match": {
+                  "query": "youth",
+                  "fields": [
+                    "keywordsSearchField"
+                  ],
+                  "fuzziness": "auto",
+                  "prefix_length": 5
+                }
+              }
+            ],
+            "must_not": [
+              {
+                "bool": {
+                  "should": [
+                    {
+                      "match_phrase": {
+                        "publisherSearchField": "UK Data Service"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "minimum_should_match": 1
+    }
+  }
+}
