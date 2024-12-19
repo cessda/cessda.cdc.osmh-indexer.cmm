@@ -300,13 +300,7 @@
           "type": "text",
           "analyzer": "pasc_index_autocomplete_analyzer",
           "search_analyzer": "pasc_standard_analyzer",
-          "copy_to": "studyAreaCountriesSearchField",
-          "fields": {
-            "normalized": {
-              "type": "keyword",
-              "normalizer": "case_insensitive_normalizer"
-            }
-          }
+          "copy_to": "studyAreaCountriesSearchField"
         },
         "searchField": {
           "type": "keyword",
