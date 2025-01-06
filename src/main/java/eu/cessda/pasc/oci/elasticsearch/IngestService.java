@@ -19,7 +19,7 @@ import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
@@ -92,5 +92,5 @@ public interface IngestService {
      *
      * @return LocalDateTime. The exact most recent lastModified dateTime from the cluster for the index pattern.
      */
-    Optional<LocalDateTime> getMostRecentLastModified();
+    Optional<LocalDate> getMostRecentLastModified();
 }

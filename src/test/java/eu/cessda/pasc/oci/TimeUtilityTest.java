@@ -17,7 +17,11 @@ package eu.cessda.pasc.oci;
 
 import org.junit.Test;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.TimeZone;
+import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.api.BDDAssertions.then;
@@ -33,21 +37,21 @@ public class TimeUtilityTest {
 
 
     @Test
-    public void shouldReturnExpectedDateValue() throws DateNotParsedException {
+    public void shouldReturnExpectedDateValue() {
 
         // Given
-        var localDateTime = TimeUtility.getLocalDateTime("2018-03-20");
+        var localDate = TimeUtility.getTimeFormat("2018-03-20", LocalDate::from);
 
         // When
-        then(localDateTime.toString()).isEqualToIgnoringCase("2018-03-20T00:00");
+        then(localDate.toString()).isEqualToIgnoringCase("2018-03-20");
     }
 
     // String format yyyy-MM-dd'T'HH:mm:ssZ
     @Test
-    public void shouldReturnExpectedDateValueForNesstarDateFormats() throws DateNotParsedException {
+    public void shouldReturnExpectedDateValueForNesstarDateFormats() {
 
         // Given
-        var localDateTime = TimeUtility.getLocalDateTime("2015-05-04T22:55:30+0000");
+        var localDateTime = TimeUtility.getTimeFormat("2015-05-04T22:55:30+0000", LocalDateTime::from);
 
         // When
         then(localDateTime.toString()).isEqualToIgnoringCase("2015-05-04T22:55:30");
@@ -61,11 +65,10 @@ public class TimeUtilityTest {
 
       // Then
       try {
-          TimeUtility.getLocalDateTime(invalid);
-          fail(DateNotParsedException.class.getName() + " is expected to throw");
-      } catch (DateNotParsedException e) {
-          then(e.getDateString()).isEqualTo(invalid);
-          then(e.getExpectedDateFormats()).isNotEmpty();
+          TimeUtility.getTimeFormat(invalid, Function.identity());
+          fail(DateTimeParseException.class.getName() + " is expected to throw");
+      } catch (DateTimeParseException e) {
+          then(e.getParsedString()).isEqualTo(invalid);
       }
   }
 }

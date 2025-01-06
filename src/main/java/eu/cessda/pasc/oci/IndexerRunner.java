@@ -139,7 +139,7 @@ public class IndexerRunner {
         }
         log.info("[{}] Repo finished, took {} seconds",
             value(LoggingConstants.REPO_NAME, repo.code()),
-            value("repository_duration", Duration.between(startTime, Instant.now()).getSeconds())
+            value("repository_duration", Duration.between(startTime, Instant.now()).toSeconds())
         );
     }
 
