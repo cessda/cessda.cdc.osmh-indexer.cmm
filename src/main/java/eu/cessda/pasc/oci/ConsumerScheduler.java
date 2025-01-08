@@ -74,7 +74,7 @@ public class ConsumerScheduler {
             log.info("[{}] Consume and Ingest All SPs Repos:\nEnded at: [{}]\nDuration: [{}] seconds",
                 FULL_RUN,
                 endTime,
-                value("job_duration", Duration.between(startTime, endTime).getSeconds())
+                value("job_duration", Duration.between(startTime, endTime).toSeconds())
             );
         } catch (IOException e) {
             log.error("Cannot connect to Elasticsearch: {}", e.toString());

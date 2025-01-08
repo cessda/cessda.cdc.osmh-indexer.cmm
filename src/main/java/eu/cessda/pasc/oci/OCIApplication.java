@@ -25,8 +25,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import java.util.TimeZone;
-
 @EnableConfigurationProperties({AppConfigurationProperties.class, ESConfigurationProperties.class})
 @SpringBootApplication
 @Slf4j
@@ -35,9 +33,6 @@ public class OCIApplication {
     private static int exitCode = 0;
 
 	public static void main(String[] args) {
-        // Set settings needed for the application to work properly
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-
         // Start the application. This method returns once Runner.run() returns.
         var applicationContext = SpringApplication.run(OCIApplication.class, args);
 

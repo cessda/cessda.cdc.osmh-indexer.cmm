@@ -15,7 +15,6 @@
  */
 package eu.cessda.pasc.oci.parser;
 
-import eu.cessda.pasc.oci.DateNotParsedException;
 import eu.cessda.pasc.oci.TimeUtility;
 import eu.cessda.pasc.oci.exception.InvalidUniverseException;
 import eu.cessda.pasc.oci.models.Record;
@@ -27,10 +26,12 @@ import org.jdom2.Namespace;
 import javax.annotation.Nullable;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Year;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Stream;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static eu.cessda.pasc.oci.parser.OaiPmhConstants.*;
 import static eu.cessda.pasc.oci.parser.XMLMapper.*;
@@ -513,20 +514,20 @@ class ParsingStrategies{
     }
 
     @NonNull
-    static CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateNotParsedException>> dataCollectionPeriodsStrategy(List<Element> elementList) {
+    static CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateTimeParseException>> dataCollectionPeriodsStrategy(List<Element> elementList) {
         var dateAttrs = getDateElementAttributesValueMap(elementList);
 
         var dataCollectionPeriodBuilder = CMMStudyMapper.DataCollectionPeriod.builder();
 
-        var parseExceptions = new ArrayList<DateNotParsedException>(2);
+        var parseExceptions = new ArrayList<DateTimeParseException>(2);
 
         if (dateAttrs.containsKey(SINGLE_ATTR)) {
             final String singleDateValue = dateAttrs.get(SINGLE_ATTR);
             dataCollectionPeriodBuilder.startDate(singleDateValue);
             try {
-                var localDateTime = TimeUtility.getLocalDateTime(singleDateValue);
-                dataCollectionPeriodBuilder.dataCollectionYear(localDateTime.getYear());
-            } catch (DateNotParsedException e) {
+                var year = TimeUtility.getTimeFormat(singleDateValue, Year::from);
+                dataCollectionPeriodBuilder.dataCollectionYear(year.getValue());
+            } catch (DateTimeParseException e) {
                 parseExceptions.add(e);
             }
         } else {
@@ -534,9 +535,9 @@ class ParsingStrategies{
                 final String startDateValue = dateAttrs.get(START_ATTR);
                 dataCollectionPeriodBuilder.startDate(startDateValue);
                 try {
-                    var localDateTime = TimeUtility.getLocalDateTime(startDateValue);
-                    dataCollectionPeriodBuilder.dataCollectionYear(localDateTime.getYear());
-                } catch (DateNotParsedException e) {
+                    var year = TimeUtility.getTimeFormat(startDateValue, Year::from);
+                    dataCollectionPeriodBuilder.dataCollectionYear(year.getValue());
+                } catch (DateTimeParseException e) {
                     parseExceptions.add(e);
                 }
             }
@@ -557,7 +558,7 @@ class ParsingStrategies{
 
     @NonNull
     @SuppressWarnings("java:S131")
-    static CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateNotParsedException>> dataCollectionPeriodsLifecycleStrategy(Element dataCollectionDate) {
+    static CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateTimeParseException>> dataCollectionPeriodsLifecycleStrategy(Element dataCollectionDate) {
         String startDate = null;
         String endDate = null;
         String singleDate = null;
@@ -570,24 +571,24 @@ class ParsingStrategies{
             }
         }
 
-        var parseExceptions = new ArrayList<DateNotParsedException>();
+        var parseExceptions = new ArrayList<DateTimeParseException>();
 
         // Derive the data collection year
         Integer year = null;
         if (singleDate != null) {
             try {
-                var localDateTime = TimeUtility.getLocalDateTime(singleDate);
-                year = localDateTime.getYear();
-            } catch (DateNotParsedException e) {
+                var parsedYear = TimeUtility.getTimeFormat(singleDate, Year::from);
+                year = parsedYear.getValue();
+            } catch (DateTimeParseException e) {
                 parseExceptions.add(e);
             }
         }
 
         if (year == null && startDate != null) {
             try {
-                var localDateTime = TimeUtility.getLocalDateTime(startDate);
-                year = localDateTime.getYear();
-            } catch (DateNotParsedException e) {
+                var parsedYear = TimeUtility.getTimeFormat(startDate, Year::from);
+                year = parsedYear.getValue();
+            } catch (DateTimeParseException e) {
                 parseExceptions.add(e);
             }
         }

@@ -17,7 +17,6 @@ package eu.cessda.pasc.oci.parser;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.cessda.pasc.oci.DateNotParsedException;
 import eu.cessda.pasc.oci.ResourceHandler;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.configurations.Repo;
@@ -39,6 +38,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
@@ -396,7 +396,7 @@ public class CMMStudyMapper {
      * <p>
      * For Data Collection start and end date plus the four digit Year value as Data Collection Year
      */
-    ParseResults<DataCollectionPeriod, List<DateNotParsedException>> parseDataCollectionDates(Document doc, XPaths xPaths) {
+    ParseResults<DataCollectionPeriod, List<DateTimeParseException>> parseDataCollectionDates(Document doc, XPaths xPaths) {
         var parseResults = xPaths.getDataCollectionPeriodsXPath().resolve(doc, xPaths.getNamespace());
         var mappedResults = new DataCollectionPeriod(
             parseResults.results().startDate,

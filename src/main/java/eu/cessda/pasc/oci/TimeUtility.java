@@ -17,39 +17,60 @@ package eu.cessda.pasc.oci;
 
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.time.DateUtils;
 
-import java.text.ParseException;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.Optional;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+import java.time.format.SignStyle;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAccessor;
+import java.util.function.Function;
 
 @Slf4j
 @UtilityClass
 public class TimeUtility {
 
-    private static final String[] EXPECTED_DATE_FORMATS = new String[]{
-            "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
-            "yyyy-MM-dd'T'HH:mm:ss'Z'",
-            "yyyy-dd-MM HH:mm:ss.SSS",
-            "yyyy-MM-dd",
-            "yyyy-MM-dd'T'HH:mm:ssZ",
-            "yyyy-MM", "yyyy"
-    };
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = new DateTimeFormatterBuilder()
+        .appendValue(ChronoField.YEAR, 4, 10, SignStyle.EXCEEDS_PAD)
+        .optionalStart().appendLiteral('-').appendValue(ChronoField.MONTH_OF_YEAR)
+        .optionalStart().appendLiteral('-').appendValue(ChronoField.DAY_OF_MONTH)
+        .optionalStart().appendLiteral('T').append(DateTimeFormatter.ISO_TIME)
+        .toFormatter();
+
+    private static final DateTimeFormatter NESSTAR_DATE_TIME_FORMATTER = new DateTimeFormatterBuilder()
+        .appendValue(ChronoField.YEAR, 4, 10, SignStyle.EXCEEDS_PAD)
+        .appendLiteral('-').appendValue(ChronoField.MONTH_OF_YEAR)
+        .appendLiteral('-').appendValue(ChronoField.DAY_OF_MONTH)
+        .appendLiteral('T').append(DateTimeFormatter.ISO_LOCAL_TIME)
+        .appendOffset("+HHMM", "")
+        .toFormatter();
 
     /**
-     * Attempts to parse the date string into a LocalDateTime using multiple expected date formats.
+     * Attempts to parse the date string into an instance of {@link T} using multiple expected date formats.
+     * <p>
+     * The type {@link T} is determined by the return type of the {@code formatExtractor} function.
      *
-     * @param dateString to parse as a {@link LocalDateTime}.
-     * @return the {@link Optional} of {@link LocalDateTime}, or an {@link Optional#empty()} if the date failed to parse.
-     * @throws IllegalArgumentException if the string is {@code null}
+     * @param dateString the date string to parse.
+     * @param formatExtractor a function to convert the {@link TemporalAccessor} into {@link T}.
+     * @return the time format.
+     * @throws DateTimeParseException if unable to parse the date string.
      */
-    public static LocalDateTime getLocalDateTime(String dateString) throws DateNotParsedException {
+    @SuppressWarnings("ThrowInsideCatchBlockWhichIgnoresCaughtException")
+    public static <T> T getTimeFormat(String dateString, Function<TemporalAccessor, T> formatExtractor) {
+        TemporalAccessor temporalAccessor;
         try {
-            var date = DateUtils.parseDate(dateString, EXPECTED_DATE_FORMATS);
-            return date.toInstant().atZone(ZoneOffset.UTC).toLocalDateTime();
-        } catch (ParseException e) {
-            throw new DateNotParsedException(dateString, EXPECTED_DATE_FORMATS, e);
+            // Parse using the standard ISO formats
+            temporalAccessor = DATE_TIME_FORMATTER.parse(dateString);
+        } catch (DateTimeParseException e) {
+            try {
+                // Try parsing using the NESSTAR date format
+                temporalAccessor = NESSTAR_DATE_TIME_FORMATTER.parse(dateString);
+            } catch (DateTimeParseException ne) {
+                // Suppress the exception thrown by the NESSTAR formatter
+                e.addSuppressed(ne);
+                throw e;
+            }
         }
+        return formatExtractor.apply(temporalAccessor);
     }
 }

@@ -32,7 +32,6 @@ import co.elastic.clients.elasticsearch.core.bulk.IndexOperation;
 import co.elastic.clients.elasticsearch.indices.*;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.cessda.pasc.oci.DateNotParsedException;
 import eu.cessda.pasc.oci.ResourceHandler;
 import eu.cessda.pasc.oci.TimeUtility;
 import eu.cessda.pasc.oci.configurations.ESConfigurationProperties;
@@ -46,7 +45,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.time.LocalDateTime;
+import java.time.DateTimeException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
@@ -266,7 +266,7 @@ public class ESIngestService implements IngestService {
     }
 
     @Override
-    public Optional<LocalDateTime> getMostRecentLastModified() {
+    public Optional<LocalDate> getMostRecentLastModified() {
 
         var request = new SearchRequest.Builder().size(1).sort(
             new SortOptions.Builder().field(
@@ -293,9 +293,9 @@ public class ESIngestService implements IngestService {
         }
 
         try {
-            var localDateTime = TimeUtility.getLocalDateTime(study.lastModified());
-            return Optional.of(localDateTime.withHour(0).withMinute(0).withSecond(0).withNano(0));
-        } catch (DateNotParsedException e) {
+            var localDate = TimeUtility.getTimeFormat(study.lastModified(), LocalDate::from);
+            return Optional.of(localDate);
+        } catch (DateTimeException e) {
             log.error("[{}] lastModified field is not a valid ISO date: {}", study.id(), e.toString());
             return Optional.empty();
         }
