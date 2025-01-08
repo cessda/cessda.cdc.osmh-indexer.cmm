@@ -15,12 +15,12 @@
  */
 package eu.cessda.pasc.oci.parser;
 
-import eu.cessda.pasc.oci.DateNotParsedException;
 import eu.cessda.pasc.oci.TimeUtility;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import java.time.Year;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.TimeZone;
@@ -60,11 +60,11 @@ public class TimeUtilDateExtractionParameterisedTest {
     }
 
     @Test
-    public void shouldExtractDataCollYearDateFunction() throws DateNotParsedException {
+    public void shouldExtractDataCollYearDateFunction() {
 
         // When
-	    var localDateTime = TimeUtility.getLocalDateTime(fInput);
-	    var actualYearDate = localDateTime.getYear();
+	    var year = TimeUtility.getTimeFormat(fInput, Year::from);
+	    var actualYearDate = year.getValue();
 
         // Then
         then(actualYearDate).isEqualTo(fExpected);

@@ -44,7 +44,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.*;
 
 import static eu.cessda.pasc.oci.mock.data.RecordTestData.getCmmStudyOfLanguageCodeEnX1;
@@ -187,10 +187,10 @@ public class ESIngestServiceTestIT {
         then(response.hits().hits().get(2).id()).isEqualTo("UK-Data-Service__1000");
 
         // When
-        Optional<LocalDateTime> mostRecentLastModified = ingestService.getMostRecentLastModified();
+        Optional<LocalDate> mostRecentLastModified = ingestService.getMostRecentLastModified();
 
         // Then
-        then(mostRecentLastModified.orElse(null)).isEqualTo(LocalDateTime.parse("2017-11-17T00:00:00"));
+        then(mostRecentLastModified.orElse(null)).isEqualTo(LocalDate.parse("2017-11-17"));
     }
 
     @Test
@@ -210,7 +210,7 @@ public class ESIngestServiceTestIT {
         elasticsearchClient.indices().refresh(RefreshRequest.of(r -> r.index(INDEX_NAME)));
 
         // When
-        Optional<LocalDateTime> mostRecentLastModified = ingestService.getMostRecentLastModified();
+        Optional<LocalDate> mostRecentLastModified = ingestService.getMostRecentLastModified();
 
         // Then
         then(mostRecentLastModified.isEmpty()).isTrue();
@@ -223,7 +223,7 @@ public class ESIngestServiceTestIT {
         var ingestService = new ESIngestService(elasticsearchClient, esConfigProp);
 
         // When
-        Optional<LocalDateTime> mostRecentLastModified = ingestService.getMostRecentLastModified();
+        Optional<LocalDate> mostRecentLastModified = ingestService.getMostRecentLastModified();
 
         // Then
         then(mostRecentLastModified.isEmpty()).isTrue();

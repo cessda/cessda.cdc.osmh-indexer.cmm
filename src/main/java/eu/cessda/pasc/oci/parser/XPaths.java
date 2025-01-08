@@ -15,7 +15,6 @@
  */
 package eu.cessda.pasc.oci.parser;
 
-import eu.cessda.pasc.oci.DateNotParsedException;
 import eu.cessda.pasc.oci.exception.UnsupportedXMLNamespaceException;
 import eu.cessda.pasc.oci.models.cmmstudy.*;
 import lombok.*;
@@ -25,6 +24,7 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathFactory;
 
 import javax.annotation.Nullable;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.function.Function;
 
@@ -59,7 +59,7 @@ public final class XPaths {
     private final XMLMapper<Map<String, List<String>>> studyURLXPath;
     private final XMLMapper<Map<String, List<Pid>>> pidStudyXPath;
     private final XMLMapper<Map<String, List<String>>> dataRestrctnXPath;
-    private final XMLMapper<CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateNotParsedException>>> dataCollectionPeriodsXPath;
+    private final XMLMapper<CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateTimeParseException>>> dataCollectionPeriodsXPath;
     private final XMLMapper<Map<String, List<TermVocabAttributes>>> classificationsXPath;
     private final XMLMapper<Map<String, List<TermVocabAttributes>>> keywordsXPath;
     private final XMLMapper<Map<String, List<TermVocabAttributes>>> typeOfTimeMethodXPath;
@@ -83,7 +83,7 @@ public final class XPaths {
     private final XMLMapper<Map<String, List<TermVocabAttributes>>> generalDataFormatXPath;
     private final XMLMapper<Map<String, List<Series>>> seriesXPath;
 
-    private static final CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateNotParsedException>> EMPTY_PARSE_RESULTS = new CMMStudyMapper.ParseResults<>(
+    private static final CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateTimeParseException>> EMPTY_PARSE_RESULTS = new CMMStudyMapper.ParseResults<>(
         new CMMStudyMapper.DataCollectionPeriod(null, 0, null, Collections.emptyMap()),
         Collections.emptyList()
     );

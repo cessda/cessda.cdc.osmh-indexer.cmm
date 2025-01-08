@@ -30,24 +30,21 @@
           "type": "text",
           "analyzer": "pasc_standard_analyzer",
           "term_vector": "with_positions_offsets",
-          "fields": {
-            "normalized": {
-              "type": "keyword",
-              "normalizer": "case_insensitive_normalizer"
-            }
-          }
+          "copy_to": "creatorsSearchField"
         },
         "affiliation": {
           "type": "text",
           "analyzer": "pasc_standard_analyzer",
-          "term_vector": "with_positions_offsets"
+          "term_vector": "with_positions_offsets",
+          "copy_to": "creatorsSearchField"
         },
         "identifier": {
           "type": "object",
           "properties": {
             "id": {
               "type": "keyword",
-              "ignore_above": 256
+              "ignore_above": 256,
+              "copy_to": "creatorsSearchField"
             },
             "type": {
               "type": "keyword",
@@ -60,6 +57,10 @@
           }
         }
       }
+    },
+    "creatorsSearchField": {
+      "type": "text",
+      "analyzer": "pasc_standard_analyzer"
     },
     "dataAccess": {
       "type": "keyword",
@@ -140,13 +141,19 @@
       "properties": {
         "agency": {
           "type": "keyword",
-          "ignore_above": 256
+          "ignore_above": 256,
+          "copy_to": "fundingSearchField"
         },
         "grantNumber": {
           "type": "keyword",
-          "ignore_above": 256
+          "ignore_above": 256,
+          "copy_to": "fundingSearchField"
         }
       }
+    },
+    "fundingSearchField": {
+      "type": "text",
+      "analyzer": "pasc_standard_analyzer"
     },
     "generalDataFormats": {
       "type": "nested",
@@ -293,13 +300,7 @@
           "type": "text",
           "analyzer": "pasc_index_autocomplete_analyzer",
           "search_analyzer": "pasc_standard_analyzer",
-          "copy_to": "studyAreaCountriesSearchField",
-          "fields": {
-            "normalized": {
-              "type": "keyword",
-              "normalizer": "case_insensitive_normalizer"
-            }
-          }
+          "copy_to": "studyAreaCountriesSearchField"
         },
         "searchField": {
           "type": "keyword",
