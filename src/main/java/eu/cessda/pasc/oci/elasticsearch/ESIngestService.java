@@ -23,10 +23,10 @@ import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.CountRequest;
-import co.elastic.clients.elasticsearch.core.ReindexRequest;
-import co.elastic.clients.elasticsearch.core.ReindexResponse;
+import co.elastic.clients.elasticsearch.core.IndexRequest;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
 import co.elastic.clients.elasticsearch.core.bulk.DeleteOperation;
@@ -56,6 +56,9 @@ import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -450,14 +453,14 @@ public class ESIngestService implements IngestService {
                     // Set the source index by using INDEX_NAME_TEMPLATE and extracted language code
                     String sourceIndex = String.format(INDEX_NAME_TEMPLATE, langCode);
 
-                    // Set the destination index by removing the "reindex_" prefix and ".json" extension from filename
-                    String destinationIndex = filename.substring("reindex_".length(), filename.lastIndexOf(".json"));
+                    // Set the destination index template by getting substring between "reindex_" and last underscore character and adding _%s
+                    String destinationIndexTemplate = filename.substring("reindex_".length(), filename.lastIndexOf('_')) + "_%s";
 
-                    log.debug("Running reindexing from {} to {} using query file {}", sourceIndex, destinationIndex, reindexFile.toAbsolutePath());
+                    log.debug("Running reindexing from {} to {} using query file {}", sourceIndex, destinationIndexTemplate, reindexFile.toAbsolutePath());
 
                     // Construct the path to the query JSON file and initiate the reindexing operation
                     String queryJsonFilePath = Paths.get(REINDEX_THEMES_DIR, themeDir.getFileName().toString(), reindexFile.getFileName().toString()).toString();
-                    reindex(sourceIndex, destinationIndex, queryJsonFilePath);
+                    reindex(sourceIndex, destinationIndexTemplate, queryJsonFilePath);
                 } catch (Exception e) {
                     log.error("Error processing reindex file {}: {}", reindexFile.toAbsolutePath(), e.toString());
                 }
@@ -468,8 +471,8 @@ public class ESIngestService implements IngestService {
     }
 
     /**
-     * Performs the reindexing operation from a source index to a destination index
-     * using the query defined in the given JSON file.
+     * Performs the reindexing operation from a source index to a destination index matching with query
+     * defined in the given JSON file and then indexing matched studies in all available languages with same id.
      *
      * @param sourceIndex the name of the source index
      * @param destinationIndex the name of the destination index
@@ -477,56 +480,107 @@ public class ESIngestService implements IngestService {
      * @throws IndexingException if an error occurs during the reindexing process
      */
     @Override
-    public void reindex(String sourceIndex, String destinationIndex, String queryJsonFilePath) throws IndexingException {
+    public void reindex(String sourceIndex, String destinationIndexTemplate, String queryJsonFilePath) throws IndexingException {
         try {
-            // Check that the source index exists
-            if (!esClient().indices().exists(ExistsRequest.of(r -> r.index(sourceIndex))).value()) {
-                log.info("[{}] Source index does not exist, skipping reindexing.", destinationIndex);
+            ElasticsearchClient client = esClient();
+
+            // Check if the source index exists
+            if (!client.indices().exists(ExistsRequest.of(r -> r.index(sourceIndex))).value()) {
+                log.info("Source index [{}] does not exist, skipping reindexing.", sourceIndex);
                 return;
             }
 
-            ElasticsearchClient client = esClient();
+            log.info("Reindexing started for source [{}] with theme [{}].", sourceIndex, destinationIndexTemplate);
 
-            log.info("[{}] Reindexing started.", destinationIndex);
+            // Map to track reindex counts per index
+            Map<String, Integer> reindexCounts = new HashMap<>();
 
-            // Delete index if it already exists
-            try {
-                if (esClient().indices().exists(ExistsRequest.of(r -> r.index(destinationIndex))).value()) {
-                    client.indices().delete(d -> d.index(destinationIndex));
-                    log.info("[{}] index already existed. Index deleted.", destinationIndex);
-                }
-            } catch (ElasticsearchException | IOException e) {
-                throw new IndexingException(e);
-            }
-
-            // Create the destination index
-            createIndex(destinationIndex);
-
-            // Load the reindex query from JSON file
+            // Load the reindex query from the JSON file
             try (InputStream queryStream = getClass().getClassLoader().getResourceAsStream(queryJsonFilePath)) {
                 if (queryStream == null) {
                     log.error("Query file not found: {}", queryJsonFilePath);
                     return;
                 }
 
-                // Build the reindex request using the source and destination indices and the query JSON
-                ReindexRequest reindexRequest = new ReindexRequest.Builder()
-                    .source(s -> s.index(sourceIndex).withJson(queryStream))
-                    .dest(d -> d.index(destinationIndex))
-                    .build();
+                // Search for matching documents in the source index
+                SearchResponse<Map<String, Object>> searchResponse = client.search(s -> s
+                    .index(sourceIndex)
+                    .withJson(queryStream)
+                    .size(10000),
+                    (Class<Map<String, Object>>)(Class<?>) Map.class
+                );
 
-                // Execute the reindex operation
-                ReindexResponse response = client.reindex(reindexRequest);
+                for (Hit<Map<String, Object>> hit : searchResponse.hits().hits()) {
+                    Map<String, Object> source = hit.source();
 
-                // Log the number of documents successfully reindexed
-                long totalReindexed = response.created();
-                log.info("[{}] Reindexing completed. Total documents reindexed: {}.", destinationIndex, totalReindexed);
+                    if (source == null) {
+                        log.warn("Null source document in hit, skipping.");
+                        continue;
+                    }
+
+                    // Extract `langAvailableIn` and validate
+                    List<String> langAvailableIn = (List<String>) source.get("langAvailableIn");
+                    if (langAvailableIn == null || langAvailableIn.isEmpty()) {
+                        log.warn("Document [{}] has no languages in 'langAvailableIn', skipping.", hit.id());
+                        continue;
+                    }
+
+                    for (String lang : langAvailableIn) {
+                        String localizedSourceIndex = String.format(INDEX_NAME_TEMPLATE, lang);
+                        String localizedDestinationIndex = String.format(destinationIndexTemplate, lang);
+
+                        // Fetch the document from the localized source index
+                        SearchResponse<Map<String, Object>> localizedResponse = client.search(s -> s
+                            .index(localizedSourceIndex)
+                            .query(q -> q.ids(i -> i.values(hit.id()))), // Fetch by document ID
+                            (Class<Map<String, Object>>)(Class<?>) Map.class
+                        );
+
+                        if (localizedResponse.hits().hits().isEmpty()) {
+                            log.warn("No localized document found for ID [{}] in [{}], skipping.", hit.id(), localizedSourceIndex);
+                            continue;
+                        }
+
+                        // Assume only one document per ID
+                        Hit<Map<String, Object>> localizedHit = localizedResponse.hits().hits().get(0);
+                        Map<String, Object> localizedSource = localizedHit.source();
+
+                        if (localizedSource == null) {
+                            log.warn("Null localized source document for ID [{}], skipping.", hit.id());
+                            continue;
+                        }
+
+                        // Ensure the destination index exists
+                        if (!client.indices().exists(ExistsRequest.of(r -> r.index(localizedDestinationIndex))).value()) {
+                            createIndex(localizedDestinationIndex);
+                            log.info("Created destination index [{}].", localizedDestinationIndex);
+                        }
+
+                        // Reindex the localized document into the localized destination index
+                        IndexRequest<Map<String, Object>> indexRequest = new IndexRequest.Builder<Map<String, Object>>()
+                                .index(localizedDestinationIndex)
+                                .id(hit.id())  // Use the same document ID
+                                .document(localizedSource)
+                                .build();
+                        client.index(indexRequest);
+
+                        log.debug("Reindexed document [{}] from [{}] to [{}].", hit.id(), localizedSourceIndex, localizedDestinationIndex);
+
+                        // Increment reindex count for the localized destination index
+                        reindexCounts.merge(localizedDestinationIndex, 1, Integer::sum);
+                    }
+                }
+
+                // Log reindex counts for each index
+                reindexCounts.forEach((index, count) -> log.info("Reindexed [{}] documents to [{}].", count, index));
+
+                log.info("Reindexing completed for source [{}] with theme [{}].", sourceIndex, destinationIndexTemplate);
             } catch (IOException e) {
                 log.error("Error loading reindex query from file: {}", queryJsonFilePath);
             }
         } catch (IOException | ElasticsearchException e) {
             log.error("Error executing reindex operation from {} to {} using query file {}: {}",
-                    sourceIndex, destinationIndex, queryJsonFilePath, e.toString());
+                sourceIndex, destinationIndexTemplate, queryJsonFilePath, e.toString());
             throw new IndexingException("Error during reindex operation", e);
         }
     }
