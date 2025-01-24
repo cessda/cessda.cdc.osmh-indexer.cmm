@@ -62,6 +62,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -475,7 +476,7 @@ public class ESIngestService implements IngestService {
      * defined in the given JSON file and then indexing matched studies in all available languages with same id.
      *
      * @param sourceIndex the name of the source index
-     * @param destinationIndex the name of the destination index
+     * @param destinationIndexTemplate the template name for the destination index
      * @param queryJsonFilePath the file path to the JSON query used for reindexing
      * @throws IndexingException if an error occurs during the reindexing process
      */
@@ -502,16 +503,15 @@ public class ESIngestService implements IngestService {
                     return;
                 }
 
-                // Search for matching documents in the source index
-                SearchResponse<Map<String, Object>> searchResponse = client.search(s -> s
+                SearchResponse<CMMStudyOfLanguage> searchResponse = client.search(s -> s
                     .index(sourceIndex)
                     .withJson(queryStream)
                     .size(10000),
-                    (Class<Map<String, Object>>)(Class<?>) Map.class
+                    CMMStudyOfLanguage.class
                 );
 
-                for (Hit<Map<String, Object>> hit : searchResponse.hits().hits()) {
-                    Map<String, Object> source = hit.source();
+                for (Hit<CMMStudyOfLanguage> hit : searchResponse.hits().hits()) {
+                    CMMStudyOfLanguage source = hit.source();
 
                     if (source == null) {
                         log.warn("Null source document in hit, skipping.");
@@ -519,7 +519,7 @@ public class ESIngestService implements IngestService {
                     }
 
                     // Extract `langAvailableIn` and validate
-                    List<String> langAvailableIn = (List<String>) source.get("langAvailableIn");
+                    Set<String> langAvailableIn = source.langAvailableIn();
                     if (langAvailableIn == null || langAvailableIn.isEmpty()) {
                         log.warn("Document [{}] has no languages in 'langAvailableIn', skipping.", hit.id());
                         continue;
@@ -530,10 +530,10 @@ public class ESIngestService implements IngestService {
                         String localizedDestinationIndex = String.format(destinationIndexTemplate, lang);
 
                         // Fetch the document from the localized source index
-                        SearchResponse<Map<String, Object>> localizedResponse = client.search(s -> s
+                        SearchResponse<CMMStudyOfLanguage> localizedResponse = client.search(s -> s
                             .index(localizedSourceIndex)
                             .query(q -> q.ids(i -> i.values(hit.id()))), // Fetch by document ID
-                            (Class<Map<String, Object>>)(Class<?>) Map.class
+                            CMMStudyOfLanguage.class
                         );
 
                         if (localizedResponse.hits().hits().isEmpty()) {
@@ -542,8 +542,8 @@ public class ESIngestService implements IngestService {
                         }
 
                         // Assume only one document per ID
-                        Hit<Map<String, Object>> localizedHit = localizedResponse.hits().hits().get(0);
-                        Map<String, Object> localizedSource = localizedHit.source();
+                        Hit<CMMStudyOfLanguage> localizedHit = localizedResponse.hits().hits().get(0);
+                        CMMStudyOfLanguage localizedSource = localizedHit.source();
 
                         if (localizedSource == null) {
                             log.warn("Null localized source document for ID [{}], skipping.", hit.id());
@@ -557,7 +557,7 @@ public class ESIngestService implements IngestService {
                         }
 
                         // Reindex the localized document into the localized destination index
-                        IndexRequest<Map<String, Object>> indexRequest = new IndexRequest.Builder<Map<String, Object>>()
+                        IndexRequest<CMMStudyOfLanguage> indexRequest = new IndexRequest.Builder<CMMStudyOfLanguage>()
                                 .index(localizedDestinationIndex)
                                 .id(hit.id())  // Use the same document ID
                                 .document(localizedSource)
