@@ -30,7 +30,13 @@
           "type": "text",
           "analyzer": "pasc_standard_analyzer",
           "term_vector": "with_positions_offsets",
-          "copy_to": "creatorsSearchField"
+          "copy_to": "creatorsSearchField",
+          "fields": {
+            "normalized": {
+              "type": "keyword",
+              "normalizer": "case_insensitive_normalizer"
+            }
+          }
         },
         "affiliation": {
           "type": "text",

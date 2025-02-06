@@ -48,7 +48,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.1</version>
+        <version>3.4.2</version>
         <relativePath /> <!-- lookup parent from repository -->
     </parent>
 
@@ -64,7 +64,7 @@
 
         <!-- Dependency versions -->
         <lombok.version>1.18.36</lombok.version>
-        <elasticsearch.version>8.17.0</elasticsearch.version>
+        <elasticsearch.version>8.17.1</elasticsearch.version>
     </properties>
 
     <dependencies>
