@@ -53,7 +53,6 @@
     </parent>
 
     <properties>
-        <buildNumber>SNAPSHOT</buildNumber>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
@@ -61,10 +60,6 @@
         <java.version>21</java.version>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven.compiler.source>${java.version}</maven.compiler.source>
-
-        <!-- Dependency versions -->
-        <lombok.version>1.18.36</lombok.version>
-        <elasticsearch.version>8.17.1</elasticsearch.version>
     </properties>
 
     <dependencies>
@@ -79,7 +74,6 @@
         <dependency>
             <groupId>co.elastic.clients</groupId>
             <artifactId>elasticsearch-java</artifactId>
-            <version>${elasticsearch.version}</version>
         </dependency>
 
         <!-- Logging -->
@@ -327,7 +321,7 @@
                 <artifactId>elasticsearch-maven-plugin</artifactId>
                 <version>6.29</version>
                 <configuration>
-                    <version>${elasticsearch.version}</version>
+                    <version>${elasticsearch-client.version}</version>
                     <httpPort>9250</httpPort>
                     <transportPort>9350</transportPort>
                     <autoCreateIndex>false</autoCreateIndex>
