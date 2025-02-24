@@ -13,6 +13,24 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 - *Fixed (for any bug fixes)*
 - *Security (in case of vulnerabilities)*
 
+## [3.8.0] - 2025-02-25
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14843337.svg)](https://doi.org/10.5281/zenodo.14843337)
+
+### Added
+
+- Added search fields for creators and
+  funding ([#685](https://https://github.com/cessda/cessda.cdc.versions/issues/685))
+- Added the field normalizer to the `typeOfModeOfCollections`, `typeOfTimeMethods`, `unitTypes` and `creators`
+  fields ([#685](https://https://github.com/cessda/cessda.cdc.versions/issues/685))
+
+### Changed
+
+- The indexer now uses Java 8 time APIs for date
+  handling ([PR-160](https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/pull/160))
+- Changed the normalized field name from `raw` to
+  `normalised` ([#685](https://https://github.com/cessda/cessda.cdc.versions/issues/685))
+
 ## [3.7.0] - 2024-11-12
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14056449.svg)](https://doi.org/10.5281/zenodo.14056449)
@@ -296,6 +314,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 - verify SSL
 - removed the option to disable HTTPS verification
 
+[3.8.0]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/3.8.0
 [3.7.0]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/3.7.0
 [3.6.0]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/3.6.0
 [3.5.0]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/3.5.0
