@@ -16,6 +16,18 @@
         },
         {
           "multi_match": {
+            "query": "children",
+            "fields": [
+              "titleStudy^3",
+              "classificationsSearchField^2"
+            ],
+            "type": "best_fields",
+            "fuzziness": "auto",
+            "prefix_length": 5
+          }
+        },
+        {
+          "multi_match": {
             "query": "youth",
             "fields": [
               "titleStudy^3",
@@ -24,6 +36,19 @@
             "type": "best_fields",
             "fuzziness": "auto",
             "prefix_length": 5
+          }
+        },
+        {
+          "multi_match": {
+            "query": "adolescent",
+            "fields": [
+              "titleStudy^3",
+              "classificationsSearchField^2",
+              "keywordsSearchField"
+            ],
+            "type": "best_fields",
+            "fuzziness": "auto",
+            "prefix_length": 6
           }
         },
         {
@@ -60,12 +85,70 @@
             "must": [
               {
                 "multi_match": {
+                  "query": "children",
+                  "fields": [
+                    "keywordsSearchField"
+                  ],
+                  "fuzziness": "auto",
+                  "prefix_length": 5
+                }
+              }
+            ],
+            "must_not": [
+              {
+                "bool": {
+                  "should": [
+                    {
+                      "match_phrase": {
+                        "publisherSearchField": "UK Data Service"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "bool": {
+            "must": [
+              {
+                "multi_match": {
                   "query": "youth",
                   "fields": [
                     "keywordsSearchField"
                   ],
                   "fuzziness": "auto",
                   "prefix_length": 5
+                }
+              }
+            ],
+            "must_not": [
+              {
+                "bool": {
+                  "should": [
+                    {
+                      "match_phrase": {
+                        "publisherSearchField": "UK Data Service"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "bool": {
+            "must": [
+              {
+                "multi_match": {
+                  "query": "adolescent",
+                  "fields": [
+                    "keywordsSearchField"
+                  ],
+                  "fuzziness": "auto",
+                  "prefix_length": 6
                 }
               }
             ],

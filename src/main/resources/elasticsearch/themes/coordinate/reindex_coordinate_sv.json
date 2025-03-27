@@ -25,7 +25,7 @@
             ],
             "type": "best_fields",
             "fuzziness": "auto",
-            "prefix_length": 6
+            "prefix_length": 3
           }
         }
       ],

@@ -17,7 +17,7 @@
         },
         {
           "multi_match": {
-            "query": "adolescenten",
+            "query": "kinderen",
             "fields": [
               "titleStudy^3",
               "classificationsSearchField^2",
@@ -25,7 +25,20 @@
             ],
             "type": "best_fields",
             "fuzziness": "auto",
-            "prefix_length": 10
+            "prefix_length": 4
+          }
+        },
+        {
+          "multi_match": {
+            "query": "adolescent",
+            "fields": [
+              "titleStudy^3",
+              "classificationsSearchField^2",
+              "keywordsSearchField"
+            ],
+            "type": "best_fields",
+            "fuzziness": "auto",
+            "prefix_length": 6
           }
         },
         {
@@ -38,7 +51,7 @@
             ],
             "type": "best_fields",
             "fuzziness": "auto",
-            "prefix_length": 5
+            "prefix_length": 4
           }
         }
       ],

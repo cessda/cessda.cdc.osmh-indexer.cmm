@@ -4,6 +4,19 @@
       "should": [
         {
           "multi_match": {
+            "query": "kind",
+            "fields": [
+              "titleStudy^3",
+              "classificationsSearchField^2",
+              "keywordsSearchField"
+            ],
+            "type": "best_fields",
+            "fuzziness": "auto",
+            "prefix_length": 4
+          }
+        },
+        {
+          "multi_match": {
             "query": "kinder",
             "fields": [
               "titleStudy^3",
@@ -25,7 +38,7 @@
             ],
             "type": "best_fields",
             "fuzziness": "auto",
-            "prefix_length": 6
+            "prefix_length": 4
           }
         }
       ],

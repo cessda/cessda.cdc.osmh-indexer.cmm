@@ -17,7 +17,20 @@
         },
         {
           "multi_match": {
-            "query": "ung",
+            "query": "børn",
+            "fields": [
+              "titleStudy^3",
+              "classificationsSearchField^2",
+              "keywordsSearchField"
+            ],
+            "type": "best_fields",
+            "fuzziness": "auto",
+            "prefix_length": 4
+          }
+        },
+        {
+          "multi_match": {
+            "query": "ungdom",
             "fields": [
               "titleStudy^3",
               "classificationsSearchField^2",
