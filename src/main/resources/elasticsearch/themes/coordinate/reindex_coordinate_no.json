@@ -1,0 +1,35 @@
+{
+  "query": {
+    "bool": {
+      "should": [
+        {
+          "multi_match": {
+            "query": "barn",
+            "fields": [
+              "titleStudy^3",
+              "classificationsSearchField^2",
+              "keywordsSearchField"
+            ],
+            "type": "best_fields",
+            "fuzziness": "auto",
+            "prefix_length": 4
+          }
+        },
+        {
+          "multi_match": {
+            "query": "ungdom",
+            "fields": [
+              "titleStudy^3",
+              "classificationsSearchField^2",
+              "keywordsSearchField"
+            ],
+            "type": "best_fields",
+            "fuzziness": "auto",
+            "prefix_length": 4
+          }
+        }
+      ],
+      "minimum_should_match": 1
+    }
+  }
+}

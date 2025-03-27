@@ -1,0 +1,177 @@
+{
+  "query": {
+    "bool": {
+      "should": [
+        {
+          "multi_match": {
+            "query": "covid",
+            "fields": [
+              "titleStudy^3",
+              "classificationsSearchField^2"
+            ],
+            "type": "best_fields",
+            "fuzziness": "auto",
+            "prefix_length": 5
+          }
+        },
+        {
+          "multi_match": {
+            "query": "covid-19",
+            "fields": [
+              "titleStudy^3",
+              "classificationsSearchField^2"
+            ],
+            "type": "best_fields",
+            "fuzziness": "auto",
+            "prefix_length": 5,
+            "operator": "and"
+          }
+        },
+        {
+          "multi_match": {
+            "query": "sars-cov-2",
+            "fields": [
+              "titleStudy^3",
+              "classificationsSearchField^2"
+            ],
+            "type": "best_fields",
+            "fuzziness": "auto",
+            "prefix_length": 10,
+            "operator": "and"
+          }
+        },
+        {
+          "multi_match": {
+            "query": "coronavirus",
+            "fields": [
+              "titleStudy^3",
+              "classificationsSearchField^2"
+            ],
+            "type": "best_fields",
+            "fuzziness": "auto",
+            "prefix_length": 11
+          }
+        },
+        {
+          "bool": {
+            "must": [
+              {
+                "multi_match": {
+                  "query": "covid",
+                  "fields": [
+                    "keywordsSearchField"
+                  ],
+                  "fuzziness": "auto",
+                  "prefix_length": 5
+                }
+              }
+            ],
+            "must_not": [
+              {
+                "bool": {
+                  "should": [
+                    {
+                      "match_phrase": {
+                        "publisherSearchField": "UK Data Service"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "bool": {
+            "must": [
+              {
+                "multi_match": {
+                  "query": "covid-19",
+                  "fields": [
+                    "keywordsSearchField"
+                  ],
+                  "fuzziness": "auto",
+                  "prefix_length": 5,
+                  "operator": "and"
+                }
+              }
+            ],
+            "must_not": [
+              {
+                "bool": {
+                  "should": [
+                    {
+                      "match_phrase": {
+                        "publisherSearchField": "UK Data Service"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "bool": {
+            "must": [
+              {
+                "multi_match": {
+                  "query": "sars-cov-2",
+                  "fields": [
+                    "keywordsSearchField"
+                  ],
+                  "fuzziness": "auto",
+                  "prefix_length": 10,
+                  "operator": "and"
+                }
+              }
+            ],
+            "must_not": [
+              {
+                "bool": {
+                  "should": [
+                    {
+                      "match_phrase": {
+                        "publisherSearchField": "UK Data Service"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "bool": {
+            "must": [
+              {
+                "multi_match": {
+                  "query": "coronavirus",
+                  "fields": [
+                    "keywordsSearchField"
+                  ],
+                  "fuzziness": "auto",
+                  "prefix_length": 11
+                }
+              }
+            ],
+            "must_not": [
+              {
+                "bool": {
+                  "should": [
+                    {
+                      "match_phrase": {
+                        "publisherSearchField": "UK Data Service"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "minimum_should_match": 1
+    }
+  }
+}
