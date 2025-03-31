@@ -42,7 +42,7 @@ public class LanguageExtractorTest {
     private final LanguageExtractor languageExtractor;
 
     public LanguageExtractorTest() {
-        var appConfigurationProperties = new AppConfigurationProperties(null, ReposTestData.getListOfLanguages(), null, null);
+        var appConfigurationProperties = new AppConfigurationProperties(null, ReposTestData.getSetOfLanguages(), null, null);
         languageExtractor = new LanguageExtractor(appConfigurationProperties);
     }
 

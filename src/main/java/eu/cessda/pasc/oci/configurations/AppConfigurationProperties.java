@@ -15,37 +15,55 @@
  */
 package eu.cessda.pasc.oci.configurations;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Loads Default Configurations from application*.yml
  *
  * @author moses AT doraventures DOT com
  */
+@Slf4j
 @ConfigurationProperties
 public record AppConfigurationProperties(
     Path baseDirectory,
-    List<String> languages,
+    Set<String> languages,
     OaiPmh oaiPmh,
     List<Repo> repos
 ) {
 
-    private static final List<String> DEFAULT_LANGUAGES = List.of("cs", "da", "de", "el", "en", "et", "fi", "fr", "hu", "it", "nl", "no", "pt", "sk", "sl", "sr", "sv");
+    private static final Set<String> SUPPORTED_LANGUAGES = new LinkedHashSet<>(List.of("cs", "da", "de", "el", "en", "et", "fi", "fr", "hu", "is", "it", "nl", "no", "pt", "sk", "sl", "sr", "sv"));
 
-    public AppConfigurationProperties(Path baseDirectory, List<String> languages, OaiPmh oaiPmh, List<Repo> repos) {
+    public AppConfigurationProperties(Path baseDirectory, Set<String> languages, OaiPmh oaiPmh, List<Repo> repos) {
         this.repos = Objects.requireNonNullElseGet(repos, Collections::emptyList);
         this.oaiPmh = Objects.requireNonNullElseGet(oaiPmh, OaiPmh::new);
         this.baseDirectory = baseDirectory;
 
         if (languages == null || languages.isEmpty()) {
-            this.languages = DEFAULT_LANGUAGES;
+            // Enable all supported languages by default
+            this.languages = SUPPORTED_LANGUAGES;
         } else {
-            this.languages = languages;
+            this.languages = new HashSet<>(languages.size());
+
+            // Flag if unsupported languages are specified
+            boolean unsupportedLanguage = false;
+
+            for (var language : languages) {
+                // Check if the language is supported (i.e. has an Elasticsearch settings configuration)
+                if (SUPPORTED_LANGUAGES.contains(language)) {
+                    this.languages.add(language);
+                } else {
+                    unsupportedLanguage = true;
+                    log.warn("Language \"{}\" is not supported", language);
+                }
+            }
+
+            if (unsupportedLanguage) {
+                log.warn("Supported languages: {}", SUPPORTED_LANGUAGES);
+            }
         }
     }
 
