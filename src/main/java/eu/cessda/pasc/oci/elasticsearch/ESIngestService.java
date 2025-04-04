@@ -23,6 +23,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.CountRequest;
+import co.elastic.clients.elasticsearch.core.GetResponse;
 import co.elastic.clients.elasticsearch.core.IndexRequest;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
@@ -128,7 +129,7 @@ public class ESIngestService implements IngestService {
     public void bulkIndex(Collection<CMMStudyOfLanguage> languageCMMStudiesMap, String languageIsoCode) throws IndexingException {
         var indexName = String.format(INDEX_NAME_TEMPLATE, languageIsoCode);
 
-        createIndex(indexName);
+        createIndex(indexName, languageIsoCode);
 
         log.debug("[{}] Indexing {} studies", indexName, languageCMMStudiesMap.size());
 
@@ -318,9 +319,10 @@ public class ESIngestService implements IngestService {
      * Creates an index with the given name. If the index already exists, then no operation is performed.
      *
      * @param indexName the name of the index to create.
+     * @param langCode the language code to use for the index.
      * @throws IndexingException if an error occurred during index creation.
      */
-    private void createIndex(String indexName) throws IndexingException {
+    private void createIndex(String indexName, String langCode) throws IndexingException {
 
         try {
             if (esClient().indices().exists(ExistsRequest.of(r -> r.index(indexName))).value()) {
@@ -337,9 +339,7 @@ public class ESIngestService implements IngestService {
         final TypeMapping mappings;
 
         try {
-
             // Load language specific settings
-            String langCode = indexName.substring(indexName.lastIndexOf('_') + 1);
             var settingsTemplate = ResourceHandler.getResourceAsString("elasticsearch/settings/settings_" + INDEX_TYPE + "_" + langCode + ".json");
             var settingsString = String.format(settingsTemplate, esConfigProps.getNumberOfShards(), esConfigProps.getNumberOfReplicas());
             settings = new IndexSettings.Builder().withJson(new StringReader(settingsString)).build();
@@ -390,11 +390,6 @@ public class ESIngestService implements IngestService {
     @Override
     public void reindexAllThemes() {
         URL themesUrl = getClass().getClassLoader().getResource(REINDEX_THEMES_DIR);
-
-        if (themesUrl == null) {
-            log.info("Themes directory not found, skipping reindexing.");
-            return;
-        }
 
         Path themesDir = Paths.get(themesUrl.getPath());
 
@@ -454,14 +449,14 @@ public class ESIngestService implements IngestService {
                     // Set the source index by using INDEX_NAME_TEMPLATE and extracted language code
                     String sourceIndex = String.format(INDEX_NAME_TEMPLATE, langCode);
 
-                    // Set the destination index template by getting substring between "reindex_" and last underscore character and adding _%s
-                    String destinationIndexTemplate = filename.substring("reindex_".length(), filename.lastIndexOf('_')) + "_%s";
+                    // Set the destination index theme by getting substring between "reindex_" and last underscore character
+                    String destinationIndexTheme = filename.substring("reindex_".length(), filename.lastIndexOf('_'));
 
-                    log.debug("Running reindexing from {} to {} using query file {}", sourceIndex, destinationIndexTemplate, reindexFile.toAbsolutePath());
+                    log.debug("Running reindexing from {} to {} using query file {}", sourceIndex, destinationIndexTheme, reindexFile.toAbsolutePath());
 
                     // Construct the path to the query JSON file and initiate the reindexing operation
                     String queryJsonFilePath = Paths.get(REINDEX_THEMES_DIR, themeDir.getFileName().toString(), reindexFile.getFileName().toString()).toString();
-                    reindex(sourceIndex, destinationIndexTemplate, queryJsonFilePath);
+                    reindex(sourceIndex, destinationIndexTheme, queryJsonFilePath);
                 } catch (Exception e) {
                     log.error("Error processing reindex file {}: {}", reindexFile.toAbsolutePath(), e.toString());
                 }
@@ -476,22 +471,22 @@ public class ESIngestService implements IngestService {
      * defined in the given JSON file and then indexing matched studies in all available languages with same id.
      *
      * @param sourceIndex the name of the source index
-     * @param destinationIndexTemplate the template name for the destination index
+     * @param destinationIndexTheme the theme name for the destination index
      * @param queryJsonFilePath the file path to the JSON query used for reindexing
      * @throws IndexingException if an error occurs during the reindexing process
      */
     @Override
-    public void reindex(String sourceIndex, String destinationIndexTemplate, String queryJsonFilePath) throws IndexingException {
+    public void reindex(String sourceIndex, String destinationIndexTheme, String queryJsonFilePath) throws IndexingException {
         try {
             ElasticsearchClient client = esClient();
 
             // Check if the source index exists
             if (!client.indices().exists(ExistsRequest.of(r -> r.index(sourceIndex))).value()) {
-                log.info("Source index [{}] does not exist, skipping reindexing.", sourceIndex);
+                log.debug("Source index [{}] does not exist, skipping reindexing.", sourceIndex);
                 return;
             }
 
-            log.info("Reindexing started for source [{}] with theme [{}].", sourceIndex, destinationIndexTemplate);
+            log.debug("Reindexing started for source [{}] with theme [{}].", sourceIndex, destinationIndexTheme);
 
             // Map to track reindex counts per index
             Map<String, Integer> reindexCounts = new HashMap<>();
@@ -514,7 +509,7 @@ public class ESIngestService implements IngestService {
                     CMMStudyOfLanguage source = hit.source();
 
                     if (source == null) {
-                        log.warn("Null source document in hit, skipping.");
+                        log.warn("Null source document [{}] in hit, skipping.", hit.id());
                         continue;
                     }
 
@@ -527,32 +522,31 @@ public class ESIngestService implements IngestService {
 
                     for (String lang : langAvailableIn) {
                         String localizedSourceIndex = String.format(INDEX_NAME_TEMPLATE, lang);
-                        String localizedDestinationIndex = String.format(destinationIndexTemplate, lang);
+                        String localizedDestinationIndex = destinationIndexTheme + "_" + lang;
+                        CMMStudyOfLanguage localizedSource = null;
 
                         // Fetch the document from the localized source index
-                        SearchResponse<CMMStudyOfLanguage> localizedResponse = client.search(s -> s
+                        GetResponse<CMMStudyOfLanguage> localizedResponse = client.get(s -> s
                             .index(localizedSourceIndex)
-                            .query(q -> q.ids(i -> i.values(hit.id()))), // Fetch by document ID
+                            .id(hit.id()), // Fetch by document ID
                             CMMStudyOfLanguage.class
                         );
 
-                        if (localizedResponse.hits().hits().isEmpty()) {
+                        if (localizedResponse.found()) {
+                            localizedSource = localizedResponse.source();
+                        } else {
                             log.warn("No localized document found for ID [{}] in [{}], skipping.", hit.id(), localizedSourceIndex);
                             continue;
                         }
 
-                        // Assume only one document per ID
-                        Hit<CMMStudyOfLanguage> localizedHit = localizedResponse.hits().hits().get(0);
-                        CMMStudyOfLanguage localizedSource = localizedHit.source();
-
                         if (localizedSource == null) {
-                            log.warn("Null localized source document for ID [{}], skipping.", hit.id());
+                            log.warn("Null localized source document for ID [{}] in [{}], skipping.", hit.id(), localizedSourceIndex);
                             continue;
                         }
 
                         // Ensure the destination index exists
                         if (!client.indices().exists(ExistsRequest.of(r -> r.index(localizedDestinationIndex))).value()) {
-                            createIndex(localizedDestinationIndex);
+                            createIndex(localizedDestinationIndex, lang);
                             log.info("Created destination index [{}].", localizedDestinationIndex);
                         }
 
@@ -574,14 +568,13 @@ public class ESIngestService implements IngestService {
                 // Log reindex counts for each index
                 reindexCounts.forEach((index, count) -> log.info("Reindexed [{}] documents to [{}].", count, index));
 
-                log.info("Reindexing completed for source [{}] with theme [{}].", sourceIndex, destinationIndexTemplate);
+                log.info("Reindexing completed for source [{}] with theme [{}].", sourceIndex, destinationIndexTheme);
             } catch (IOException e) {
                 log.error("Error loading reindex query from file: {}", queryJsonFilePath);
             }
         } catch (IOException | ElasticsearchException e) {
             log.error("Error executing reindex operation from {} to {} using query file {}: {}",
-                sourceIndex, destinationIndexTemplate, queryJsonFilePath, e.toString());
-            throw new IndexingException("Error during reindex operation", e);
+                sourceIndex, destinationIndexTheme, queryJsonFilePath, e.toString());
         }
     }
 }

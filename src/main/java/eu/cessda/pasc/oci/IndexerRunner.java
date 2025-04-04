@@ -50,7 +50,6 @@ public class IndexerRunner {
     private final IngestService ingestService;
 
     private final AtomicBoolean indexerRunning = new AtomicBoolean(false);
-    private final AtomicBoolean reindexingRunning = new AtomicBoolean(false);
 
     public IndexerRunner(AppConfigurationProperties configurationProperties,
                          IndexerConsumerService localHarvesterConsumerService,
@@ -234,20 +233,14 @@ public class IndexerRunner {
      * @throws IllegalStateException if reindexing is already running.
      */
     public void executeReindexing() {
-        if (!reindexingRunning.getAndSet(true)) {
-            try {
-                log.info("Starting reindexing process...");
+        try {
+            log.info("Starting reindexing process...");
 
-                ingestService.reindexAllThemes();
+            ingestService.reindexAllThemes();
 
-                log.info("Reindexing process completed successfully.");
-            } catch (IndexingException e) {
-                log.error("Error occurred during reindexing: {}", e.getMessage(), e);
-            } finally {
-                reindexingRunning.set(false);
-            }
-        } else {
-            throw new IllegalStateException("Reindexing is already running");
+            log.info("Reindexing process completed successfully.");
+        } catch (IndexingException e) {
+            log.error("Error occurred during reindexing: {}", e.getMessage(), e);
         }
     }
 
