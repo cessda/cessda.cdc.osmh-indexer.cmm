@@ -21,6 +21,7 @@ import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -50,6 +51,20 @@ public interface IngestService {
      * @throws IndexingException if an error occurs connecting to Elasticsearch.
      */
     void bulkDelete(Collection<CMMStudyOfLanguage> cmmStudiesToDelete, String languageIsoCode) throws IndexingException;
+
+    /**
+     * Delete the specified studies from a specified index.
+     * <p>
+     * This method allows for specifying a custom index for deletion. If the custom index is provided as non-null
+     * and non-empty, it will be used for deletion. If the custom index is null or empty, the default index based
+     * on the provided languageIsoCode will be used.
+     *
+     * @param cmmStudiesToDelete the collection of studies to delete
+     * @param languageIsoCode    the language of the index to delete the studies from
+     * @param customIndex        the custom index to delete from (if null or empty, the default index is used)
+     * @throws IndexingException if an error occurs connecting to Elasticsearch.
+     */
+    void bulkDelete(Collection<CMMStudyOfLanguage> cmmStudiesToDelete, String languageIsoCode, String customIndex) throws IndexingException;
 
     /**
      * Gets the total number of hits for the specified language. The language is in the same form as languages configured
@@ -101,12 +116,17 @@ public interface IngestService {
     void reindexAllThemes() throws IndexingException;
 
     /**
-     * Perform reindexing from a source index to a destination index using a query.
+     * Performs reindexing from a source index to a destination index using a query.
+     * The method will execute the reindexing operation and return a map of reindexed IDs
+     * for each destination index. This allows tracking of which documents were reindexed
+     * into which indices, which can later be used for cleanup or further processing.
      *
-     * @param sourceIndex      the source index name
+     * @param sourceIndex the source index name
      * @param destinationIndex the destination index name
-     * @param queryJsonFilePath the file path to the reindex query
+     * @param queryJsonFilePath the file path to the reindex query in JSON format
+     * @return a map of reindexed IDs per destination index, where the key is the destination index
+     *         name, and the value is a set of reindexed document IDs for that index.
      * @throws IndexingException if an error occurs during the reindexing process
      */
-    void reindex(String sourceIndex, String destinationIndex, String queryJsonFilePath) throws IndexingException;
+    Map<String, Set<String>> reindex(String sourceIndex, String destinationIndex, String queryJsonFilePath) throws IndexingException;
 }

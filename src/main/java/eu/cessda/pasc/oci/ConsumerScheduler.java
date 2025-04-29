@@ -82,11 +82,11 @@ public class ConsumerScheduler {
 
             // Perform reindexing
             final var reindexingStartTime = OffsetDateTime.now(ZoneId.systemDefault());
-            log.info("[{}] Reindexing started at [{}]", FULL_RUN, reindexingStartTime);
+            log.info("[{}] Thematic reindexing started at [{}]", FULL_RUN, reindexingStartTime);
             indexerRunner.executeReindexing();
 
             final var reindexingEndTime = OffsetDateTime.now(ZoneId.systemDefault());
-            log.info("[{}] Reindexing completed at [{}] - Duration: [{}] seconds",
+            log.info("[{}] Thematic reindexing completed at [{}] - Duration: [{}] seconds",
                 FULL_RUN,
                 reindexingEndTime,
                 value("reindexing_duration", Duration.between(reindexingStartTime, reindexingEndTime).toSeconds())
