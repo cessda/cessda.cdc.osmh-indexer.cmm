@@ -33,3 +33,4 @@ elasticsearch:
   # Because tests clear Elasticsearch after completion make sure that we don't run against live clusters
   clustername: test
   httpPort: 9250
+languages: ['cs', 'da', 'de', 'el', 'en', 'et', 'fi', 'fr', 'hu', 'is', 'it', 'nl', 'no', 'pt', 'sk', 'sl', 'sr', 'sv', 'moon']
