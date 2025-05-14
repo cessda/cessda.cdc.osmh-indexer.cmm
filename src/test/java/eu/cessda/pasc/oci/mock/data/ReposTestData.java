@@ -24,6 +24,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 
 @UtilityClass
 public class ReposTestData
@@ -109,7 +110,7 @@ public class ReposTestData
         );
     }
 
-    public static List<String> getListOfLanguages() {
-        return List.of("cs", "da", "de", "el", "en", "et", "fi", "fr", "hu", "it", "nl", "no", "pt", "sk", "sl", "sr", "sv");
+    public static Set<String> getSetOfLanguages() {
+        return Set.of("cs", "da", "de", "el", "en", "et", "fi", "fr", "hu", "it", "nl", "no", "pt", "sk", "sl", "sr", "sv");
     }
 }

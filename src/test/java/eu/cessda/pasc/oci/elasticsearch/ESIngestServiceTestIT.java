@@ -66,7 +66,7 @@ import static org.mockito.Mockito.*;
 public class ESIngestServiceTestIT {
 
     private static final String INDEX_TYPE = "cmmstudy";
-    public static final String LANGUAGE_ISO_CODE = "en";
+    private static final String LANGUAGE_ISO_CODE = "en";
     private static final String INDEX_NAME = INDEX_TYPE + "_" + LANGUAGE_ISO_CODE;
 
     @Autowired

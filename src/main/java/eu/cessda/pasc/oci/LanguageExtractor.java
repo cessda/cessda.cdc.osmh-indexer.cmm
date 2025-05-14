@@ -45,11 +45,11 @@ import static net.logstash.logback.argument.StructuredArguments.value;
 @Slf4j
 public class LanguageExtractor {
 
-    private final AppConfigurationProperties appConfigurationProperties;
+    private final Set<String> languages;
 
     @Autowired
     public LanguageExtractor(AppConfigurationProperties appConfigurationProperties) {
-        this.appConfigurationProperties = appConfigurationProperties;
+        this.languages = appConfigurationProperties.languages();
     }
 
     /**
@@ -59,17 +59,17 @@ public class LanguageExtractor {
      * @return an unmodifiable {@link Map} with extracted documents for each language ISO code
      */
     public Map<String, CMMStudyOfLanguage> extractFromStudy(CMMStudy cmmStudy, Repo repository) {
-        var validLanguages = new ArrayList<String>(appConfigurationProperties.languages().size());
-        for (var language : appConfigurationProperties.languages()) {
+        var validLanguages = new ArrayList<String>(languages.size());
+        for (var language : languages) {
             if (isValidCMMStudyForLang(cmmStudy, language)) {
                 validLanguages.add(language);
             }
         }
 
         if (!validLanguages.isEmpty()) {
-            return validLanguages.stream().collect(Collectors.toUnmodifiableMap(
+            return validLanguages.stream().collect(Collectors.toMap(
                 langCode -> langCode,
-                langCode -> getCmmStudyOfLanguage(cmmStudy, langCode, validLanguages, repository)
+                langCode -> getCmmStudyOfLanguage(cmmStudy, langCode, Set.copyOf(validLanguages), repository)
             ));
         } else {
             log.debug("[{}] No valid languages for study [{}]",  value(LoggingConstants.REPO_NAME, repository.code()), value(LoggingConstants.STUDY_ID,cmmStudy.studyNumber()));
@@ -95,7 +95,7 @@ public class LanguageExtractor {
             (cmmStudy.publisher() != null) && (cmmStudy.publisher().get(languageIsoCode) != null);
     }
 
-    private CMMStudyOfLanguage getCmmStudyOfLanguage(CMMStudy cmmStudy, String lang, Collection<String> availableLanguages, Repo repository) {
+    private CMMStudyOfLanguage getCmmStudyOfLanguage(CMMStudy cmmStudy, String lang, Set<String> availableLanguages, Repo repository) {
 
         log.trace("[{}] Extracting CMMStudyOfLanguage for study [{}], language [{}]",
             value(LoggingConstants.REPO_NAME, repository.code()),
@@ -121,7 +121,7 @@ public class LanguageExtractor {
             .dataCollectionPeriodEnddate(cmmStudy.dataCollectionPeriodEnddate())
             .dataCollectionYear(cmmStudy.dataCollectionYear())
             .dataAccess(cmmStudy.dataAccess())
-            .langAvailableIn(Set.copyOf(availableLanguages));
+            .langAvailableIn(availableLanguages);
         Optional.ofNullable(cmmStudy.studyXmlSourceUrl()).ifPresent(url -> builder.studyXmlSourceUrl(url.toString()));
 
 

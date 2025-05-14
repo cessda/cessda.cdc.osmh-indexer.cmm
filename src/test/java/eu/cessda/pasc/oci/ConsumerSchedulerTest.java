@@ -34,6 +34,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static eu.cessda.pasc.oci.mock.data.RecordTestData.*;
 import static eu.cessda.pasc.oci.mock.data.ReposTestData.getSingleEndpoint;
@@ -49,7 +50,7 @@ import static org.mockito.Mockito.*;
 public class ConsumerSchedulerTest {
     // mock for debug logging
     private final AppConfigurationProperties appConfigurationProperties = new AppConfigurationProperties(
-            null, List.of("cs", "da", "de", "el", "en", "et", "fi", "fr", "hu", "it", "nl", "no", "pt", "sk", "sl", "sr", "sv"),
+            null, Set.of("cs", "da", "de", "el", "en", "et", "fi", "fr", "hu", "it", "nl", "no", "pt", "sk", "sl", "sr", "sv"),
             null, getSingleEndpoint()
     );
     private final IngestService esIndexer = mock(IngestService.class);
