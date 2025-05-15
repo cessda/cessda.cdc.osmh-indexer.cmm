@@ -70,7 +70,6 @@ public class IndexerRunner {
     @SuppressWarnings("OverlyBroadCatchBlock")
     public void executeHarvestAndIngest() {
         if (!indexerRunning.getAndSet(true)) {
-
             // Load explicitly configured repositories
             var repos = configurationProperties.repos();
 
@@ -226,6 +225,23 @@ public class IndexerRunner {
         int studiesCreated,
         int studiesUpdated
     ) {
+    }
+
+    /**
+     * Trigger reindexing for all themes and their respective reindex queries.
+     *
+     * @throws IllegalStateException if reindexing is already running.
+     */
+    public void executeReindexing() {
+        try {
+            log.info("Starting reindexing process...");
+
+            ingestService.reindexAllThemes();
+
+            log.info("Reindexing process completed successfully.");
+        } catch (IndexingException e) {
+            log.error("Error occurred during reindexing: {}", e.getMessage(), e);
+        }
     }
 
     @PreDestroy

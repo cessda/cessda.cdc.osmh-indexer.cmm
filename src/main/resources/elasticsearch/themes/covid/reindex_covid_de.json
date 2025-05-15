@@ -1,0 +1,76 @@
+{
+  "query": {
+    "bool": {
+      "should": [
+        {
+          "multi_match": {
+            "query": "covid",
+            "fields": [
+              "titleStudy^3",
+              "classificationsSearchField^2",
+              "keywordsSearchField"
+            ],
+            "type": "best_fields",
+            "fuzziness": "auto",
+            "prefix_length": 5
+          }
+        },
+        {
+          "multi_match": {
+            "query": "covid-19",
+            "fields": [
+              "titleStudy^3",
+              "classificationsSearchField^2",
+              "keywordsSearchField"
+            ],
+            "type": "best_fields",
+            "fuzziness": "auto",
+            "prefix_length": 5,
+            "operator": "and"
+          }
+        },
+        {
+          "multi_match": {
+            "query": "sars-cov-2",
+            "fields": [
+              "titleStudy^3",
+              "classificationsSearchField^2",
+              "keywordsSearchField"
+            ],
+            "type": "best_fields",
+            "fuzziness": "auto",
+            "prefix_length": 10,
+            "operator": "and"
+          }
+        },
+        {
+          "multi_match": {
+            "query": "coronavirus",
+            "fields": [
+              "titleStudy^3",
+              "classificationsSearchField^2",
+              "keywordsSearchField"
+            ],
+            "type": "best_fields",
+            "fuzziness": "auto",
+            "prefix_length": 10
+          }
+        },
+        {
+          "multi_match": {
+            "query": "2019-ncov",
+            "fields": [
+              "titleStudy^3",
+              "classificationsSearchField^2",
+              "keywordsSearchField"
+            ],
+            "type": "best_fields",
+            "fuzziness": "auto",
+            "prefix_length": 9
+          }
+        }
+      ],
+      "minimum_should_match": 1
+    }
+  }
+}

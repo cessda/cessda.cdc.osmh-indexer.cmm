@@ -113,7 +113,7 @@ public class ConsumerSchedulerTest {
     }
 
     @Test
-    public void shouldLogErrorOnException() throws IOException {
+    public void shouldLogErrorOnException() throws IOException, IndexingException {
 
         var debuggingJMXBean = mockDebuggingJMXBean();
 
@@ -131,6 +131,9 @@ public class ConsumerSchedulerTest {
 
         // Verify hit counts were obtained
         verify(esIndexer).getTotalHitCount("*");
+
+        // Reindexing currently runs regardless of indexing result
+        verify(esIndexer, times(1)).reindexAllThemes();
 
         // Verify that nothing else happened
         verifyNoMoreInteractions(esIndexer);
@@ -174,6 +177,9 @@ public class ConsumerSchedulerTest {
         // Called for logging purposes
         verify(esIndexer, times(27)).getStudy(Mockito.anyString(), Mockito.anyString());
         verify(esIndexer, times(1)).getTotalHitCount("*");
+
+        // Called for reindexing themes
+        verify(esIndexer, times(1)).reindexAllThemes();
         verifyNoMoreInteractions(esIndexer);
     }
 
@@ -199,6 +205,7 @@ public class ConsumerSchedulerTest {
         verify(esIndexer, times(1)).getTotalHitCount("*");
         verify(esIndexer, times(3)).bulkIndex(anyList(), anyString());
         verify(esIndexer, times(3)).getStudiesByRepository(anyString(), anyString());
+        verify(esIndexer, times(1)).reindexAllThemes();
         verifyNoMoreInteractions(esIndexer);
     }
 
@@ -225,6 +232,7 @@ public class ConsumerSchedulerTest {
         verify(esIndexer, times(1)).getTotalHitCount("*");
         verify(esIndexer, times(3)).bulkIndex(anyList(), anyString());
         verify(esIndexer, times(3)).getStudiesByRepository(anyString(), anyString());
+        verify(esIndexer, times(1)).reindexAllThemes();
         verifyNoMoreInteractions(esIndexer);
     }
 }
