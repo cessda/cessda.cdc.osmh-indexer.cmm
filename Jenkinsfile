@@ -57,6 +57,8 @@ pipeline {
                 }
                 stage('Record Issues') {
                     steps {
+                        discoverGitReferenceBuild()
+                        recordCoverage(tools: [[parser: 'JACOCO']])
                         recordIssues aggregatingResults: true, tools: [errorProne(), java()]
                     }
                 }
