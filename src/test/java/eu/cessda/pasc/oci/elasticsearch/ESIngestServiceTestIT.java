@@ -432,6 +432,7 @@ public class ESIngestServiceTestIT {
             then(searchResponse.hits().total().value()).isEqualTo(3L);
         } finally {
             deleteIndex("cmmstudy_de");
+            deleteIndex("test_en");
         }
     }
 }
