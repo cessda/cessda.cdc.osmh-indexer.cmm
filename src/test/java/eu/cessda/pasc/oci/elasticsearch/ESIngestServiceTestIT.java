@@ -413,12 +413,11 @@ public class ESIngestServiceTestIT {
         List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
         ESIngestService ingestService = new ESIngestService(elasticsearchClient, esConfigProp);
         ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
+        ingestService.bulkIndex(Collections.singleton(studyOfLanguages.getFirst()), "de");
         elasticsearchClient.indices().refresh(RefreshRequest.of(r -> r.index(INDEX_NAME)));
 
-        // Create empty cmmstudy_de index
-        try {
-            elasticsearchClient.indices().create(i -> i.index("cmmstudy_de"));
 
+        try {
             // Start reindexing
             ingestService.reindexAllThemes();
 
@@ -430,6 +429,15 @@ public class ESIngestServiceTestIT {
                 CMMStudyOfLanguage.class
             );
             then(searchResponse.hits().total().value()).isEqualTo(3L);
+
+            // Assert that reindexing worked as expected
+            var deResponse = elasticsearchClient.search(
+                r -> r.index("test_de")
+                    .query(q -> q.matchAll(m -> m))
+                    .trackTotalHits(h -> h.enabled(true)),
+                CMMStudyOfLanguage.class
+            );
+            then(deResponse.hits().total().value()).isEqualTo(1L);
         } finally {
             deleteIndex("cmmstudy_de");
             deleteIndex("test_en");
