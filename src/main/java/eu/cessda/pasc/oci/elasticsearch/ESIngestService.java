@@ -393,7 +393,7 @@ public class ESIngestService implements IngestService {
     public void reindexAllThemes() {
         Resource[] resources;
         try {
-            resources = resolver.getResources("classpath:" + REINDEX_THEMES_DIR + "/**/reindex_*.json");
+            resources = resolver.getResources("classpath*:" + REINDEX_THEMES_DIR + "/**/reindex_*.json");
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
