@@ -52,20 +52,6 @@ public interface IngestService {
     void bulkDelete(Collection<CMMStudyOfLanguage> cmmStudiesToDelete, String languageIsoCode) throws IndexingException;
 
     /**
-     * Delete the specified studies from a specified index.
-     * <p>
-     * This method allows for specifying a custom index for deletion. If the custom index is provided as non-null
-     * and non-empty, it will be used for deletion. If the custom index is null or empty, the default index based
-     * on the provided languageIsoCode will be used.
-     *
-     * @param cmmStudiesToDelete the collection of studies to delete
-     * @param languageIsoCode    the language of the index to delete the studies from
-     * @param customIndex        the custom index to delete from (if null or empty, the default index is used)
-     * @throws IndexingException if an error occurs connecting to Elasticsearch.
-     */
-    void bulkDelete(Collection<CMMStudyOfLanguage> cmmStudiesToDelete, String languageIsoCode, String customIndex) throws IndexingException;
-
-    /**
      * Gets the total number of hits for the specified language. The language is in the same form as languages configured
      * in application.yml.
      *

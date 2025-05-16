@@ -43,7 +43,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -189,16 +188,20 @@ public class ESIngestService implements IngestService {
     @Override
     public void bulkDelete(Collection<CMMStudyOfLanguage> cmmStudiesToDelete, String languageIsoCode) throws IndexingException {
         // Call the three-parameter method with null as the custom index name (default behavior)
-        bulkDelete(cmmStudiesToDelete, languageIsoCode, null);
+        bulkDeleteInternal(cmmStudiesToDelete, String.format(INDEX_NAME_TEMPLATE, languageIsoCode));
     }
 
-    @Override
-    public void bulkDelete(Collection<CMMStudyOfLanguage> cmmStudiesToDelete, String languageIsoCode, @Nullable String customIndexName) throws IndexingException {
-        // Determine which index to use
-        String indexName = (customIndexName != null && !customIndexName.isBlank())
-            ? customIndexName
-            : String.format(INDEX_NAME_TEMPLATE, languageIsoCode);
-
+    /**
+     * Delete the specified studies from a specified index.
+     * <p>
+     * This method allows for specifying the index in which items will be deleted.
+     * This is an internal method and is not part of the public interface.
+     *
+     * @param cmmStudiesToDelete the collection of studies to delete.
+     * @param indexName          the index to delete from.
+     * @throws IndexingException if an error occurs connecting to Elasticsearch.
+     */
+    private void bulkDeleteInternal(Collection<CMMStudyOfLanguage> cmmStudiesToDelete, String indexName) throws IndexingException {
         // Extract the ids from the studies, and add them to the delete query
         var deleteRequests = cmmStudiesToDelete.stream()
             .map(CMMStudyOfLanguage::id)
@@ -576,7 +579,6 @@ public class ESIngestService implements IngestService {
      * Stale documents are those that were not reindexed, based on the IDs tracked in the reindexing process.
      *
      * @param reindexedIdsPerIndex A map of reindexed IDs per index. Each entry maps an index to a set of document IDs that were reindexed into that index.
-     * @return the amount of documents deleted.
      */
     public void reindexCleanup(Map<String, Set<String>> reindexedIdsPerIndex) throws IndexingException {
         try {
@@ -602,11 +604,8 @@ public class ESIngestService implements IngestService {
                     }
                 }
 
-                // Extract languageIsoCode from the index name, e.g., "covid_en" → "en"
-                String languageIsoCode = index.substring(index.lastIndexOf('_') + 1);
-
                 // Perform bulk delete
-                bulkDelete(studiesToDelete, languageIsoCode, index);
+                bulkDelete(studiesToDelete, index);
 
                 log.info("[{}]: Deleted {} stale docs.", index, studiesToDelete.size());
             }
