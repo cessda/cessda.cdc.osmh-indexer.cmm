@@ -282,8 +282,10 @@ public class ESIngestService implements IngestService {
     @Override
     public Optional<LocalDate> getMostRecentLastModified() {
 
-        var request = new SearchRequest.Builder().size(1).sort(
-            new SortOptions.Builder().field(
+        var request = new SearchRequest.Builder()
+            .index(INDEX_TYPE + "_*")
+            .size(1)
+            .sort(new SortOptions.Builder().field(
                 new FieldSort.Builder().field(LAST_MODIFIED_FIELD).order(SortOrder.Desc).build()
             ).build()
         ).build();
