@@ -473,7 +473,7 @@ public class ESIngestService implements IngestService {
      * @return a map of reindexed IDs per index, where each entry maps an index to a set of document IDs that were reindexed into that index.
      * @throws IndexingException if an error occurs during the reindexing process
      */
-    public Map<String, Set<String>> reindex(String sourceIndex, String destinationThemeIndex, Resource queryJsonFilePath) throws IndexingException {
+    private Map<String, Set<String>> reindex(String sourceIndex, String destinationThemeIndex, Resource queryJsonFilePath) throws IndexingException {
         Map<String, Set<String>> reindexedIdsPerIndex = new HashMap<>();
         try {
 
@@ -530,14 +530,25 @@ public class ESIngestService implements IngestService {
                         createIndex(localizedDestinationIndex, lang);
 
                         // Fetch the localized document
-                        GetResponse<CMMStudyOfLanguage> localizedResponse = esClient().get(r -> r
-                            .index(localizedSourceIndex)
-                            .id(source.id()), // Fetch by document ID
-                            CMMStudyOfLanguage.class
-                        );
+                        GetResponse<CMMStudyOfLanguage> localizedResponse;
+                        try {
+                            localizedResponse = esClient().get(r -> r
+                                    .index(localizedSourceIndex)
+                                    .id(source.id()), // Fetch by document ID
+                                CMMStudyOfLanguage.class
+                            );
+                        } catch (ElasticsearchException e) {
+                            if ("index_not_found_exception".equals(e.error().type())) {
+                                // skip this language
+                                log.warn("[{}] Expected index [{}] not found whilst reindexing [{}]. Did a previous indexing run not complete?", destinationThemeIndex,  localizedSourceIndex, source.id());
+                                continue;
+                            } else {
+                                throw e;
+                            }
+                        }
 
-                        if (!localizedResponse.found() || localizedResponse.source() == null) {
-                            log.warn("No localized document found for ID [{}] in [{}], skipping.", source.id(), localizedSourceIndex);
+                        if (!localizedResponse.found()) {
+                            log.warn("[{}] Expected document [{}] not found whilst reindexing [{}]. Did a previous indexing run not complete?", destinationThemeIndex, source.id(), localizedSourceIndex);
                             continue;
                         }
 
@@ -553,16 +564,14 @@ public class ESIngestService implements IngestService {
 
                 // Log reindex counts for each index
                 log.info("[{}] Reindexing completed from source [{}]: {} documents reindexed", destinationThemeIndex, sourceIndex , reindexCount);
-                return reindexedIdsPerIndex;
 
-            } catch (ElasticsearchException e) {
-                log.error("Elasticsearch error during reindexing: {}", e.toString());
-                return reindexedIdsPerIndex;
             }
 
-        } catch (IOException e) {
+        } catch (ElasticsearchException | IOException e) {
             throw new IndexingException(e);
         }
+
+        return reindexedIdsPerIndex;
     }
 
     private void indexDocument(String index, CMMStudyOfLanguage source) throws IOException {
@@ -580,7 +589,7 @@ public class ESIngestService implements IngestService {
      *
      * @param reindexedIdsPerIndex A map of reindexed IDs per index. Each entry maps an index to a set of document IDs that were reindexed into that index.
      */
-    public void reindexCleanup(Map<String, Set<String>> reindexedIdsPerIndex) throws IndexingException {
+    private void reindexCleanup(Map<String, Set<String>> reindexedIdsPerIndex) throws IndexingException {
         try {
             for (Map.Entry<String, Set<String>> entry : reindexedIdsPerIndex.entrySet()) {
                 String index = entry.getKey();
