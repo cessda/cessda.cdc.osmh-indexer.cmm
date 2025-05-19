@@ -87,8 +87,12 @@ public class ESIngestServiceTestIT {
      */
     @After
     public void tearDown() throws IOException {
+        deleteIndex(INDEX_NAME);
+    }
+
+    private void deleteIndex(String index) throws IOException {
         try {
-            elasticsearchClient.indices().delete(DeleteIndexRequest.of(d -> d.index(INDEX_NAME)));
+            elasticsearchClient.indices().delete(DeleteIndexRequest.of(d -> d.index(index)));
         } catch (ElasticsearchException e) {
             // ignore all Elasticsearch Exceptions
         }
@@ -400,5 +404,43 @@ public class ESIngestServiceTestIT {
         // Expect 1 study to be returned
         studies = ingestService.getStudiesByRepository("TEST", LANGUAGE_ISO_CODE);
         then(studies).contains(studyWithDifferentRepoCode).doesNotContainAnyElementsOf(studyOfLanguages);
+    }
+
+    @Test
+    public void shouldReindexStudies() throws IOException, IndexingException {
+
+        // Given
+        List<CMMStudyOfLanguage> studyOfLanguages = getCmmStudyOfLanguageCodeEnX3();
+        ESIngestService ingestService = new ESIngestService(elasticsearchClient, esConfigProp);
+        ingestService.bulkIndex(studyOfLanguages, LANGUAGE_ISO_CODE);
+        ingestService.bulkIndex(Collections.singleton(studyOfLanguages.getFirst()), "de");
+        elasticsearchClient.indices().refresh(RefreshRequest.of(r -> r.index(INDEX_NAME)));
+
+
+        try {
+            // Start reindexing
+            ingestService.reindexAllThemes();
+
+            // Assert that reindexing worked as expected
+            var searchResponse = elasticsearchClient.search(
+                r -> r.index("test_en")
+                    .query(q -> q.matchAll(m -> m))
+                    .trackTotalHits(h -> h.enabled(true)),
+                CMMStudyOfLanguage.class
+            );
+            then(searchResponse.hits().total().value()).isEqualTo(3L);
+
+            // Assert that reindexing worked as expected
+            var deResponse = elasticsearchClient.search(
+                r -> r.index("test_de")
+                    .query(q -> q.matchAll(m -> m))
+                    .trackTotalHits(h -> h.enabled(true)),
+                CMMStudyOfLanguage.class
+            );
+            then(deResponse.hits().total().value()).isEqualTo(1L);
+        } finally {
+            deleteIndex("cmmstudy_de");
+            deleteIndex("test_en");
+        }
     }
 }

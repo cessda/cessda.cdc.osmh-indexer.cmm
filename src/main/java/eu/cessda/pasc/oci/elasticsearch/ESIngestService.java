@@ -21,18 +21,13 @@ import co.elastic.clients.elasticsearch._types.mapping.TypeMapping;
 import co.elastic.clients.elasticsearch._types.query_dsl.MatchAllQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
-import co.elastic.clients.elasticsearch.core.BulkRequest;
-import co.elastic.clients.elasticsearch.core.CountRequest;
-import co.elastic.clients.elasticsearch.core.GetResponse;
-import co.elastic.clients.elasticsearch.core.IndexRequest;
-import co.elastic.clients.elasticsearch.core.SearchRequest;
-import co.elastic.clients.elasticsearch.core.SearchResponse;
-import co.elastic.clients.elasticsearch.core.search.Hit;
+import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
 import co.elastic.clients.elasticsearch.core.bulk.DeleteOperation;
 import co.elastic.clients.elasticsearch.core.bulk.IndexOperation;
 import co.elastic.clients.elasticsearch.indices.*;
+import co.elastic.clients.elasticsearch.indices.ExistsRequest;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.cessda.pasc.oci.ResourceHandler;
@@ -44,30 +39,18 @@ import eu.cessda.pasc.oci.service.DebuggingJMXBean;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nullable;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.DateTimeException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Supplier;
-import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Service responsible for triggering harvesting and Metadata ingestion to the search engine
@@ -84,12 +67,15 @@ public class ESIngestService implements IngestService {
     private static final String INDEX_NAME_TEMPLATE = INDEX_TYPE + "_%s";
     private static final String REINDEX_THEMES_DIR = "elasticsearch/themes";
 
+    private static final String REINDEXED_DOCUMENT = "Reindexed document [{}] from [{}] to [{}].";
+
     /**
      * The amount of studies to BulkIndex at once
      */
     private static final int INDEX_COMMIT_SIZE = 500;
 
     private final ESConfigurationProperties esConfigProps;
+    private final PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 
     private ElasticsearchClient client = null;
     private final Supplier<ElasticsearchClient> esClient;
@@ -202,16 +188,20 @@ public class ESIngestService implements IngestService {
     @Override
     public void bulkDelete(Collection<CMMStudyOfLanguage> cmmStudiesToDelete, String languageIsoCode) throws IndexingException {
         // Call the three-parameter method with null as the custom index name (default behavior)
-        bulkDelete(cmmStudiesToDelete, languageIsoCode, null);
+        bulkDeleteInternal(cmmStudiesToDelete, String.format(INDEX_NAME_TEMPLATE, languageIsoCode));
     }
 
-    @Override
-    public void bulkDelete(Collection<CMMStudyOfLanguage> cmmStudiesToDelete, String languageIsoCode, @Nullable String customIndexName) throws IndexingException {
-        // Determine which index to use
-        String indexName = (customIndexName != null && !customIndexName.isBlank())
-            ? customIndexName
-            : String.format(INDEX_NAME_TEMPLATE, languageIsoCode);
-
+    /**
+     * Delete the specified studies from a specified index.
+     * <p>
+     * This method allows for specifying the index in which items will be deleted.
+     * This is an internal method and is not part of the public interface.
+     *
+     * @param cmmStudiesToDelete the collection of studies to delete.
+     * @param indexName          the index to delete from.
+     * @throws IndexingException if an error occurs connecting to Elasticsearch.
+     */
+    private void bulkDeleteInternal(Collection<CMMStudyOfLanguage> cmmStudiesToDelete, String indexName) throws IndexingException {
         // Extract the ids from the studies, and add them to the delete query
         var deleteRequests = cmmStudiesToDelete.stream()
             .map(CMMStudyOfLanguage::id)
@@ -292,8 +282,10 @@ public class ESIngestService implements IngestService {
     @Override
     public Optional<LocalDate> getMostRecentLastModified() {
 
-        var request = new SearchRequest.Builder().size(1).sort(
-            new SortOptions.Builder().field(
+        var request = new SearchRequest.Builder()
+            .index(INDEX_TYPE + "_*")
+            .size(1)
+            .sort(new SortOptions.Builder().field(
                 new FieldSort.Builder().field(LAST_MODIFIED_FIELD).order(SortOrder.Desc).build()
             ).build()
         ).build();
@@ -399,31 +391,54 @@ public class ESIngestService implements IngestService {
      */
     @Override
     public void reindexAllThemes() {
-        URL themesUrl = getClass().getClassLoader().getResource(REINDEX_THEMES_DIR);
-
-        Path themesDir = Paths.get(themesUrl.getPath());
-
-        if (!Files.isDirectory(themesDir)) {
-            log.info("Themes directory is not a valid directory, skipping reindexing.");
-            return;
+        Resource[] resources;
+        try {
+            resources = resolver.getResources("classpath*:" + REINDEX_THEMES_DIR + "/**/reindex_*.json");
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
         }
 
-        try (Stream<Path> themeDirsStream = Files.list(themesDir)) {
-            var themeDirs = themeDirsStream.filter(Files::isDirectory)
-                                           .collect(Collectors.toList());
+        var allReindexedIdsPerIndex = new HashMap<String, Set<String>>();
 
-            // If no theme directories found, skip reindexing
-            if (themeDirs.isEmpty()) {
-                log.info("No theme directories found in themes directory, skipping reindexing.");
-                return;
+        for (var reindexJson : resources) {
+            // Split the theme path into separate elements
+            String[] splitPath;
+            try {
+                splitPath = reindexJson.getURL().getPath().split("/");
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
             }
 
-            // Process each theme directory
-            for (Path themeDir : themeDirs) {
-                processThemeReindexing(themeDir);
+            // Theme name is the name of the parent directory where the JSON is found
+            String themeName = splitPath[splitPath.length - 2];
+
+            // Get the filename
+            String filename = splitPath[splitPath.length - 1];
+
+            try {
+                // Process theme file
+                Map<String, Set<String>> reindexedIdsPerIndex = processThemeReindexing(reindexJson, themeName, filename);
+
+                for(var entry : reindexedIdsPerIndex.entrySet()) {
+                    allReindexedIdsPerIndex.merge(entry.getKey(), entry.getValue(), (a, b) -> {
+                        a.addAll(b);
+                        return a;
+                    });
+                }
+
+                // After reindexing is done, clean up stale documents
+                log.debug("Reindexing completed for theme directory [{}", themeName);
+            } catch (IndexingException e) {
+                log.error("[{}]: Error processing reindex file [{}]: {}", themeName, reindexJson, e.toString());
             }
-        } catch (IOException e) {
-            log.error("Error listing theme directories: {}", e.toString());
+        }
+
+        try {
+            // Clean up stale documents
+            log.info("Cleaning up stale documents");
+            reindexCleanup(allReindexedIdsPerIndex);
+        } catch (IndexingException e) {
+            log.error("Error cleaning reindex file: {}", e.toString());
         }
     }
 
@@ -433,67 +448,21 @@ public class ESIngestService implements IngestService {
      * For each reindex query file, it extracts the language code and constructs the
      * source and destination index names before triggering the reindexing operation.
      *
-     * @param themeDir the theme directory to process
+     * @param themeDir the theme JSON to process
+     *
+     * @return a map of processed document IDs per index
      */
-    private void processThemeReindexing(Path themeDir) {
-        try (Stream<Path> reindexFilesStream = Files.list(themeDir)) {
-            String themeName = themeDir.getFileName().toString();
-            // Filter and collect the files that match the criteria
-            var reindexFiles = reindexFilesStream
-                .filter(file -> file.getFileName().toString().startsWith("reindex_") && file.getFileName().toString().endsWith(".json"))
-                .collect(Collectors.toList());
+    private Map<String, Set<String>> processThemeReindexing(Resource themeDir, String themeName, String filename) throws IndexingException {
+        // Extract language code from the filename (e.g., "reindex_abc_en.json" -> "en")
+        String langCode = filename.substring(filename.lastIndexOf('_') + 1, filename.lastIndexOf('.'));
 
-            // If no reindex query files are found, log and skip
-            if (reindexFiles.isEmpty()) {
-                log.info("No reindex query files found in theme directory [{}]", themeName);
-                return;
-            }
+        // Set the source index by using INDEX_NAME_TEMPLATE and extracted language code
+        String sourceIndex = String.format(INDEX_NAME_TEMPLATE, langCode);
 
-            Map<String, Set<String>> allReindexedIdsPerIndex = new HashMap<>();
+        log.debug("Running reindexing from [{}] to [{}] using query file [{}]", sourceIndex, themeName, themeDir);
 
-            // Process each reindex query file found
-            for (Path reindexFile : reindexFiles) {
-                try {
-                    String filename = reindexFile.getFileName().toString();
-
-                    // Extract language code from the filename (e.g., "reindex_abc_en.json" -> "en")
-                    String langCode = filename.substring(filename.lastIndexOf('_') + 1, filename.lastIndexOf('.'));
-
-                    // Set the source index by using INDEX_NAME_TEMPLATE and extracted language code
-                    String sourceIndex = String.format(INDEX_NAME_TEMPLATE, langCode);
-
-                    log.debug("Running reindexing from [{}] to [{}] using query file [{}]", sourceIndex, themeName, reindexFile.toAbsolutePath());
-
-                    // Construct the path to the query JSON file and initiate the reindexing operation
-                    String queryJsonFilePath = Paths.get(REINDEX_THEMES_DIR, themeName, reindexFile.getFileName().toString()).toString();
-
-                    // Collect reindexed IDs for this reindex operation
-                    Map<String, Set<String>> reindexedIdsPerIndex = reindex(sourceIndex, themeName, queryJsonFilePath);
-
-                    // Merge reindexed IDs into the overall map
-                    for (Map.Entry<String, Set<String>> entry : reindexedIdsPerIndex.entrySet()) {
-                        String destinationIndex = entry.getKey();
-                        Set<String> reindexedIds = entry.getValue();
-
-                        // Merge with existing set of reindexed IDs
-                        allReindexedIdsPerIndex.computeIfAbsent(destinationIndex, k -> new HashSet<>()).addAll(reindexedIds);
-                    }
-                } catch (Exception e) {
-                    log.error("Error processing reindex file [{}]: {}", reindexFile.toAbsolutePath(), e.toString());
-                }
-            }
-
-            // After reindexing is done, clean up stale documents
-            log.debug("Reindexing completed for theme directory [{}]. Starting cleanup for stale documents.", themeName);
-            try {
-                reindexCleanup(allReindexedIdsPerIndex, themeName);
-            } catch (Exception e) {
-                log.error("Error during reindex cleanup for theme [{}]: {}", themeName, e.toString());
-            }
-
-        } catch (IOException e) {
-            log.error("Error reading reindex query files in theme directory: {}", e.toString());
-        }
+        // Collect reindexed IDs for this reindex operation
+        return reindex(sourceIndex, themeName, themeDir);
     }
 
     /**
@@ -501,124 +470,119 @@ public class ESIngestService implements IngestService {
      * defined in the given JSON file and then indexing matched studies in all available languages with the same ID.
      *
      * @param sourceIndex the name of the source index
-     * @param destinationIndexTheme the theme name for the destination index
+     * @param destinationThemeIndex the theme name for the destination index
      * @param queryJsonFilePath the file path to the JSON query used for reindexing
      * @return a map of reindexed IDs per index, where each entry maps an index to a set of document IDs that were reindexed into that index.
      * @throws IndexingException if an error occurs during the reindexing process
      */
-    @Override
-    public Map<String, Set<String>> reindex(String sourceIndex, String destinationIndexTheme, String queryJsonFilePath) throws IndexingException {
+    private Map<String, Set<String>> reindex(String sourceIndex, String destinationThemeIndex, Resource queryJsonFilePath) throws IndexingException {
         Map<String, Set<String>> reindexedIdsPerIndex = new HashMap<>();
         try {
-            ElasticsearchClient client = esClient();
 
             // Check if the source index exists
-            if (!client.indices().exists(ExistsRequest.of(r -> r.index(sourceIndex))).value()) {
+            var existsRequest = ExistsRequest.of(r -> r.index(sourceIndex));
+            if (!esClient().indices().exists(existsRequest).value()) {
                 log.debug("Source index [{}] does not exist, skipping reindexing.", sourceIndex);
                 return reindexedIdsPerIndex;
             }
 
-            log.debug("Reindexing started for source [{}] with theme [{}].", sourceIndex, destinationIndexTheme);
+            log.debug("Reindexing started for source [{}] with theme [{}].", sourceIndex, queryJsonFilePath);
+
+            String currentLang = sourceIndex.substring(sourceIndex.lastIndexOf('_') + 1);
 
             // Maps to track reindex counts and IDs
-            Map<String, Integer> reindexCounts = new HashMap<>();
+            int reindexCount = 0;
 
             // Load the reindex query from the JSON file
-            try (InputStream queryStream = getClass().getClassLoader().getResourceAsStream(queryJsonFilePath)) {
-                if (queryStream == null) {
-                    log.error("Query file not found: {}", queryJsonFilePath);
-                    return reindexedIdsPerIndex;
-                }
+            try (InputStream queryStream = queryJsonFilePath.getInputStream()) {
 
                 // Execute search query on the source index
-                SearchResponse<CMMStudyOfLanguage> searchResponse = client.search(s -> s
-                    .index(sourceIndex)
-                    .withJson(queryStream)
-                    .size(10000),
+                var searchResponse = new ElasticsearchSet<>(
+                    new SearchRequest.Builder().index(sourceIndex).withJson(queryStream),
+                    esClient(),
                     CMMStudyOfLanguage.class
                 );
 
-                for (Hit<CMMStudyOfLanguage> hit : searchResponse.hits().hits()) {
-                    CMMStudyOfLanguage source = hit.source();
+                for (CMMStudyOfLanguage source : searchResponse) {
 
-                    if (source == null) {
-                        log.warn("Null source document [{}] in hit, skipping.", hit.id());
-                        continue;
-                    }
+                    // Check if localized destination index exists; create if not
+                    var destinationIndex = destinationThemeIndex + "_" + currentLang;
+                    createIndex(destinationIndex, currentLang);
 
-                    // Extract `langAvailableIn` and validate
-                    Set<String> langAvailableIn = source.langAvailableIn();
-                    if (langAvailableIn == null || langAvailableIn.isEmpty()) {
-                        log.warn("Document [{}] has no languages in 'langAvailableIn', skipping.", hit.id());
-                        continue;
-                    }
+                    // Reindex the document into the destination index
+                    indexDocument(destinationIndex, source);
+                    log.debug(REINDEXED_DOCUMENT, source.id(), sourceIndex, destinationIndex);
 
-                    // Process each language
-                    for (String lang : langAvailableIn) {
-                        String localizedSourceIndex = String.format(INDEX_NAME_TEMPLATE, lang);
-                        String localizedDestinationIndex = destinationIndexTheme + "_" + lang;
+                    // Add the identifier to the list of processed documents
+                    reindexCount++;
+                    reindexedIdsPerIndex.computeIfAbsent(destinationIndex, k -> new HashSet<>()).add(source.id());
 
-                        // Check if localized destination index exists; create if not
-                        if (!client.indices().exists(ExistsRequest.of(r -> r.index(localizedDestinationIndex))).value()) {
-                            createIndex(localizedDestinationIndex, lang);
-                            log.info("Created destination index [{}] for language [{}].", localizedDestinationIndex, lang);
-                        }
+                    // Process other language
+                    for (String lang : source.langAvailableIn()) {
 
-                        // Fetch the localized document
-                        GetResponse<CMMStudyOfLanguage> localizedResponse = client.get(r -> r
-                            .index(localizedSourceIndex)
-                            .id(hit.id()), // Fetch by document ID
-                            CMMStudyOfLanguage.class
-                        );
-
-                        if (!localizedResponse.found()) {
-                            log.warn("No localized document found for ID [{}] in [{}], skipping.", hit.id(), localizedSourceIndex);
+                        // Skip retrieving the source twice
+                        if (currentLang.equals(lang)) {
                             continue;
                         }
 
-                        CMMStudyOfLanguage localizedSource = localizedResponse.source();
+                        String localizedSourceIndex = String.format(INDEX_NAME_TEMPLATE, lang);
+                        String localizedDestinationIndex = destinationThemeIndex + "_" + lang;
 
-                        if (localizedSource == null) {
-                            log.warn("Null localized source document for ID [{}] in [{}], skipping.", hit.id(), localizedSourceIndex);
+                        // Check if localized destination index exists; create if not
+                        createIndex(localizedDestinationIndex, lang);
+
+                        // Fetch the localized document
+                        GetResponse<CMMStudyOfLanguage> localizedResponse;
+                        try {
+                            localizedResponse = esClient().get(r -> r
+                                    .index(localizedSourceIndex)
+                                    .id(source.id()), // Fetch by document ID
+                                CMMStudyOfLanguage.class
+                            );
+                        } catch (ElasticsearchException e) {
+                            if ("index_not_found_exception".equals(e.error().type())) {
+                                // skip this language
+                                log.warn("[{}] Expected index [{}] not found whilst reindexing [{}]. Did a previous indexing run not complete?", destinationThemeIndex,  localizedSourceIndex, source.id());
+                                continue;
+                            } else {
+                                throw e;
+                            }
+                        }
+
+                        if (!localizedResponse.found()) {
+                            log.warn("[{}] Expected document [{}] not found whilst reindexing [{}]. Did a previous indexing run not complete?", destinationThemeIndex, source.id(), localizedSourceIndex);
                             continue;
                         }
 
                         // Reindex the localized document into the localized destination index
-                        IndexRequest<CMMStudyOfLanguage> indexRequest = new IndexRequest.Builder<CMMStudyOfLanguage>()
-                            .index(localizedDestinationIndex)
-                            .id(hit.id())
-                            .document(localizedSource)
-                            .build();
-                        client.index(indexRequest);
-
-                        log.debug("Reindexed document [{}] from [{}] to [{}].", hit.id(), localizedSourceIndex, localizedDestinationIndex);
+                        indexDocument(localizedDestinationIndex, localizedResponse.source());
+                        log.debug(REINDEXED_DOCUMENT, source.id(), localizedSourceIndex, localizedDestinationIndex);
 
                         // Track reindex stats and matched IDs
-                        reindexCounts.merge(localizedDestinationIndex, 1, Integer::sum);
-                        reindexedIdsPerIndex.computeIfAbsent(localizedDestinationIndex, k -> new HashSet<>()).add(hit.id());
+                        reindexCount++;
+                        reindexedIdsPerIndex.computeIfAbsent(localizedDestinationIndex, k -> new HashSet<>()).add(source.id());
                     }
                 }
 
                 // Log reindex counts for each index
-                reindexCounts.forEach((index, count) -> log.info("Reindexed {} documents to [{}].", count, index));
+                log.info("[{}] Reindexing completed from source [{}]: {} documents reindexed", destinationThemeIndex, sourceIndex , reindexCount);
 
-                log.info("Reindexing completed for source [{}] with theme [{}].", sourceIndex, destinationIndexTheme);
-                return reindexedIdsPerIndex;
-
-            } catch (IOException e) {
-                log.error("Error loading reindex query from file: {}", queryJsonFilePath, e);
-                return reindexedIdsPerIndex;
-
-            } catch (ElasticsearchException e) {
-                log.error("Elasticsearch error during reindexing: {}", e.toString(), e);
-                return reindexedIdsPerIndex;
             }
 
-        } catch (IOException | ElasticsearchException e) {
-            log.error("Error executing reindex operation from [{}] to [{}] using query file [{}]: {}",
-                sourceIndex, destinationIndexTheme, queryJsonFilePath, e.toString());
-            return reindexedIdsPerIndex;
+        } catch (ElasticsearchException | IOException e) {
+            throw new IndexingException(e);
         }
+
+        return reindexedIdsPerIndex;
+    }
+
+    private void indexDocument(String index, CMMStudyOfLanguage source) throws IOException {
+        IndexRequest<CMMStudyOfLanguage> indexRequest = new IndexRequest.Builder<CMMStudyOfLanguage>()
+            .index(index)
+            .id(source.id())
+            .document(source)
+            .build();
+        esClient().index(indexRequest);
     }
 
     /**
@@ -626,53 +590,38 @@ public class ESIngestService implements IngestService {
      * Stale documents are those that were not reindexed, based on the IDs tracked in the reindexing process.
      *
      * @param reindexedIdsPerIndex A map of reindexed IDs per index. Each entry maps an index to a set of document IDs that were reindexed into that index.
-     * @param themeName The name of the theme being processed.
      */
-    public void reindexCleanup(Map<String, Set<String>> reindexedIdsPerIndex, String themeName) throws IndexingException {
+    private void reindexCleanup(Map<String, Set<String>> reindexedIdsPerIndex) throws IndexingException {
         try {
-            ElasticsearchClient client = esClient();
-            long totalRemainingDocs = 0;
-
             for (Map.Entry<String, Set<String>> entry : reindexedIdsPerIndex.entrySet()) {
                 String index = entry.getKey();
                 Set<String> reindexedIds = entry.getValue();
 
-                SearchResponse<CMMStudyOfLanguage> existingDocs = client.search(r -> r
-                    .index(index)
-                    .size(10000),
+                // Refresh the index to ensure up-to-date queries
+                esClient().indices().refresh(r -> r.index(index));
+
+                var existingDocs = new ElasticsearchSet<>(
+                    new SearchRequest.Builder().index(index),
+                    esClient(),
                     CMMStudyOfLanguage.class
                 );
 
                 // Create a list of studies to delete
                 List<CMMStudyOfLanguage> studiesToDelete = new ArrayList<>();
-                for (Hit<CMMStudyOfLanguage> hit : existingDocs.hits().hits()) {
+                for (CMMStudyOfLanguage hit : existingDocs) {
                     // If this ID is not part of the reindexed documents, it's stale
                     if (!reindexedIds.contains(hit.id())) {
-                        studiesToDelete.add(hit.source());
+                        studiesToDelete.add(hit);
                     }
                 }
 
-                // Extract languageIsoCode from the index name, e.g., "covid_en" → "en"
-                String languageIsoCode = index.substring(index.lastIndexOf('_') + 1);
-
                 // Perform bulk delete
-                bulkDelete(studiesToDelete, languageIsoCode, index);
+                bulkDelete(studiesToDelete, index);
 
-                // Refresh the index to ensure deletions are visible in count
-                client.indices().refresh(r -> r.index(index));
-
-                // Count the remaining documents in the index
-                long remainingDocs = client.count(CountRequest.of(c -> c.index(index))).count();
-                totalRemainingDocs += remainingDocs;
-
-                log.info("Index [{}]: Deleted {} stale docs, Remaining {} docs.", index, studiesToDelete.size(), remainingDocs);
+                log.info("[{}]: Deleted {} stale docs.", index, studiesToDelete.size());
             }
-
-            // Log the total number of remaining documents across all indices
-            log.info("Reindex cleanup completed for [{}]. Total remaining documents across all indices: {}.", themeName, totalRemainingDocs);
-
         } catch (IOException | ElasticsearchException e) {
-            log.error("Error during deletion of stale reindexed documents for theme [{}]: {}", themeName, e.toString());
+            throw new IndexingException(e);
         }
     }
 }
