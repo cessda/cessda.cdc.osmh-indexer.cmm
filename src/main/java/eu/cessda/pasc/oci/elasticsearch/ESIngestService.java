@@ -187,7 +187,6 @@ public class ESIngestService implements IngestService {
 
     @Override
     public void bulkDelete(Collection<CMMStudyOfLanguage> cmmStudiesToDelete, String languageIsoCode) throws IndexingException {
-        // Call the three-parameter method with null as the custom index name (default behavior)
         bulkDeleteInternal(cmmStudiesToDelete, String.format(INDEX_NAME_TEMPLATE, languageIsoCode));
     }
 
