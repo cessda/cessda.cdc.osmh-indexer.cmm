@@ -616,7 +616,7 @@ public class ESIngestService implements IngestService {
                 }
 
                 // Perform bulk delete
-                bulkDelete(studiesToDelete, index);
+                bulkDeleteInternal(studiesToDelete, index);
 
                 log.info("[{}]: Deleted {} stale docs.", index, studiesToDelete.size());
             }
