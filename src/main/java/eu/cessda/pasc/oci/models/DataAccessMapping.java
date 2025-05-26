@@ -24,6 +24,7 @@ package eu.cessda.pasc.oci.models;
 public record DataAccessMapping(String content, AccessCategory accessCategory) {
     public enum AccessCategory {
         Open,
-        Restricted
+        Restricted,
+        Uncategorized
     }
 }

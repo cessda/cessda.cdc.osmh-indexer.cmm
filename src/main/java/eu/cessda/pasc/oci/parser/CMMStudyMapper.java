@@ -332,15 +332,15 @@ public class CMMStudyMapper {
     }
 
     /**
-     * Parses Data Access to be Open / Restricted if possible.
+     * Parses Data Access to be Open / Restricted if possible, otherwise returns Uncategorized.
      * <p>
      * Xpath = {@link XPaths#getDataAccessXPath()}, {@link XPaths#getDataAccessAltXPath()} and {@link XPaths#getDataRestrctnXPath()}
      * <p>
      */
-    Optional<String> parseDataAccess(Document doc, XPaths xPaths, String defaultLangIsoCode, String repository) {
+    String parseDataAccess(Document doc, XPaths xPaths, String defaultLangIsoCode, String repository) {
         var dataAccess = xPaths.getDataAccessXPath().resolve(doc, xPaths.getNamespace());
 
-        if (dataAccess.isEmpty()) {
+        if (dataAccess == null) {
             // Try deriving from free text - check if repository can be found in mappings file
             var repositoryNode = dataAccessMappings.get(repository);
             if (repositoryNode != null) {
@@ -368,12 +368,14 @@ public class CMMStudyMapper {
                         for (String resolvedValue : resolvedEntry.getValue()) {
                             var match = dataAccessMap.get(resolvedValue);
                             if (match != null) {
-                                return Optional.of(match.name());
+                                return match.name();
                             }
                         }
                     }
                 }
             }
+            // If data access is null and no mapping is found, return Uncategorized
+            return "Uncategorized";
         }
 
         return dataAccess;
