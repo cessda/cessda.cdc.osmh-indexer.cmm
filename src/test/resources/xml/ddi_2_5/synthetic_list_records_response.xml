@@ -274,7 +274,7 @@
                                 <prodDate xml:lang="en">2017-12-12</prodDate>
                             </prodStmt>
                             <distStmt>
-                                <distDate xml:lang="en" date="2017-12-12"/>
+                                <distDate xml:lang="en" date="4056-12-12"/>
                                 <distrbtr abbr="FSD" URI="http://www.fsd.uta.fi/" xml:lang="en">Finnish Social Science Data Archive</distrbtr>
                             </distStmt>
                             <serStmt>
