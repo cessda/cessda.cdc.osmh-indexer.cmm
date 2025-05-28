@@ -52,7 +52,8 @@ public final class XPaths {
     private final XMLMapper<Map<String, String>> titleXPath;
     @Nullable
     private final XMLMapper<Map<String, String>> parTitleXPath;
-    private final XMLMapper<Optional<String>> dataAccessXPath;
+    @Nullable
+    private final XMLMapper<String> dataAccessXPath;
     @Nullable
     private final XMLMapper<Map<String, List<String>>> dataAccessUrlXPath;
     @Nullable

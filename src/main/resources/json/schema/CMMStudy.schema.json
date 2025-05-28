@@ -123,7 +123,7 @@
     },
     "dataAccess": {
       "type": "string",
-      "description": "Data Access as Open/Restricted, either according to CV values or mapped from free text values."
+      "description": "Data Access preferably as Open or Restricted, either according to CV values or mapped from free text values. Will be Uncategorized if it would be empty otherwise."
     },
     "dataAccessFreeTexts": {
       "type": "object",
