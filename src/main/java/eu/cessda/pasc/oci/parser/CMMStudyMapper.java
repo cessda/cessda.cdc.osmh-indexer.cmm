@@ -400,13 +400,7 @@ public class CMMStudyMapper {
      */
     ParseResults<DataCollectionPeriod, List<DateTimeParseException>> parseDataCollectionDates(Document doc, XPaths xPaths) {
         var parseResults = xPaths.getDataCollectionPeriodsXPath().resolve(doc, xPaths.getNamespace());
-        var mappedResults = new DataCollectionPeriod(
-            parseResults.results().startDate,
-            parseResults.results().dataCollectionYear,
-            parseResults.results().endDate,
-            parseResults.results().freeTexts
-        );
-        return new ParseResults<>(mappedResults, parseResults.exceptions);
+        return new ParseResults<>(parseResults.results, parseResults.exceptions);
     }
 
     /**

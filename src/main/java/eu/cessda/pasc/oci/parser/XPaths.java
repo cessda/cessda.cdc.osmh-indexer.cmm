@@ -85,7 +85,7 @@ public final class XPaths {
     private final XMLMapper<Map<String, List<Series>>> seriesXPath;
 
     private static final CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateTimeParseException>> EMPTY_PARSE_RESULTS = new CMMStudyMapper.ParseResults<>(
-        new CMMStudyMapper.DataCollectionPeriod(null, 0, null, Collections.emptyMap()),
+        new CMMStudyMapper.DataCollectionPeriod(null, null, null, Collections.emptyMap()),
         Collections.emptyList()
     );
 
