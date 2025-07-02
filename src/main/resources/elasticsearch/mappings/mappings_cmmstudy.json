@@ -567,6 +567,11 @@
           "type": "keyword",
           "ignore_above": 256,
           "copy_to": "relatedPublicationsSearchField"
+        },
+        "publicationDate": {
+          "type": "date",
+          "format": "strict_date_optional_time||epoch_millis||year_month||year",
+          "ignore_malformed": true
         }
       }
     },

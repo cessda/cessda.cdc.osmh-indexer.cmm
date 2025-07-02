@@ -25,9 +25,11 @@ import java.util.List;
  *
  * @param title    The title of the related publication.
  * @param holdings The URI of the holdings of the related publication.
+ * @param publicationDate The publication date of the related publication.
  */
 public record RelatedPublication(
     @JsonProperty("title") String title,
-    @JsonProperty("holdings") List<URI> holdings
+    @JsonProperty("holdings") List<URI> holdings,
+    @JsonProperty("publicationDate") String publicationDate
 ) {
 }

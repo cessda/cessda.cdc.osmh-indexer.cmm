@@ -304,8 +304,9 @@ class ParsingStrategies{
     /**
      * Constructs a {@link RelatedPublication} using the given element.
      * <p>
-     * The strategy tries to extract the title from {@code //citation/titlStmt/titl} and the holdings from
-     * {@code //citation/holdings} using the URI attribute. If the {@code titl} element cannot be found, or if the
+     * The strategy tries to extract the title from {@code //citation/titlStmt/titl}, the holdings from
+     * {@code //citation/holdings} using the URI attribute and the publication date from
+     * {@code //citation/distStmt/distDate/@date}. If the {@code titl} element cannot be found, or if the
      * {@code titl} element is blank then the method attempts to extract directly from the element.
      * If a title cannot be extracted, an empty {@link Optional} is returned.
      * @param element the {@link Element} to parse.
@@ -317,6 +318,7 @@ class ParsingStrategies{
         // Result variables
         String title = null;
         var holdings = new ArrayList<URI>();
+        String publicationDate = "";
 
         // Determine whether the element has a citation in it
         var citation = ofNullable(element.getChild("citation", namespace));
@@ -333,10 +335,26 @@ class ParsingStrategies{
                 }
             }).ifPresent(holdings::add);
 
-        // Parse the holdings in the citation if present
+        // Parse the holdings and publication date in the citation if present
         if (citation.isPresent()) {
             var uris = parseHoldingsURI(citation.orElseThrow());
             holdings.addAll(uris);
+
+            // Parse the publication date from citation/distStmt/distDate/@date
+            publicationDate = citation
+            .map(c -> c.getChild("distStmt", namespace))
+            .map(d -> d.getChild("distDate", namespace))
+            .map(e -> e.getAttributeValue("date"))
+            .map(String::trim)
+            .flatMap(dateStr -> {
+                try {
+                    TimeUtility.getTimeFormat(dateStr, Function.identity());
+                    return Optional.of(dateStr);
+                } catch (DateTimeParseException e) {
+                    // Invalid date, ignore
+                    return Optional.empty();
+                }
+            }).orElse("");
         }
 
         // Try to extract text from the relPubl element
@@ -366,7 +384,7 @@ class ParsingStrategies{
 
         // Only return if the title is set
         if (title != null) {
-            var relatedPublication = new RelatedPublication(title, holdings);
+            var relatedPublication = new RelatedPublication(title, holdings, publicationDate);
             return Optional.of(relatedPublication);
         } else {
             return Optional.empty();
@@ -920,8 +938,25 @@ class ParsingStrategies{
 
         for (var element : elementList) {
 
+            // Filter by TypeOfMaterial = "Related Publication"
+            var typeOfMaterial = element.getChildTextTrim("TypeOfMaterial", null);
+            if (typeOfMaterial == null || !typeOfMaterial.equalsIgnoreCase("Related Publication")) {
+                continue;
+            }
+
             var uriList = new ArrayList<URI>();
             var titleMap = new HashMap<String, String>();
+            String publicationDate = "";
+
+            // First try ExternalURLReference as primary URI
+            var externalUrl = element.getChildTextTrim("ExternalURLReference", null);
+            if (externalUrl != null && !externalUrl.isBlank()) {
+                try {
+                    uriList.add(URI.create(externalUrl));
+                } catch (IllegalArgumentException e) {
+                    // Invalid URI, ignore
+                }
+            }
 
             // Extract the citation
             var citation = element.getChild("Citation", null);
@@ -930,20 +965,43 @@ class ParsingStrategies{
                     if (child.getName().equals("InternationalIdentifier")) {
                         // Extract the URL of the identifier
                         var identifierContext = child.getChild("IdentifierContent", null);
-                        uriList.add(URI.create(identifierContext.getTextTrim()));
+                        if (identifierContext != null) {
+                            var uriStr = identifierContext.getTextTrim();
+                            try {
+                                uriList.add(URI.create(uriStr));
+                            } catch (IllegalArgumentException e) {
+                                // Invalid URI, ignore
+                            }
+                        }
 
                     } else if (child.getName().equals("Title")) {
                         // Extract the language-dependent title
                         for (var string : child.getChildren(STRING, null)) {
                             titleMap.put(getLangOfElement(string), string.getTextTrim());
                         }
+
+                    } else if (child.getName().equals("PublicationDate")) {
+                        // Try to extract and validate SimpleDate
+                        var simpleDate = child.getChild("SimpleDate", null);
+                        if (simpleDate != null) {
+                            var dateStr = simpleDate.getTextTrim();
+                            if (!dateStr.isBlank()) {
+                                try {
+                                    TimeUtility.getTimeFormat(dateStr, Function.identity());
+                                    publicationDate = dateStr;
+                                } catch (DateTimeParseException e) {
+                                    // Invalid date, keep as ""
+                                }
+                            }
+                        }
                     }
                 }
             }
 
+            final String finalPublicationDate = publicationDate;
             titleMap.forEach((lang, title) -> {
-                // Merge the language dependent title with the list of URIs
-                var relPub = new RelatedPublication(title, uriList);
+                // Merge the language dependent title with the list of URIs and publication date
+                var relPub = new RelatedPublication(title, uriList, finalPublicationDate);
                 relPubLMap.computeIfAbsent(lang, k -> new ArrayList<>()).add(relPub);
             });
         }
