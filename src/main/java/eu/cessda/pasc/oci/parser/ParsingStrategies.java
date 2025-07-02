@@ -346,16 +346,15 @@ class ParsingStrategies{
             .map(d -> d.getChild("distDate", namespace))
             .map(e -> e.getAttributeValue("date"))
             .map(String::trim)
-            .orElse("");
-
-            if (!dateStr.isBlank()) {
+            .flatMap(dateStr -> {
                 try {
                     TimeUtility.getTimeFormat(dateStr, Function.identity());
-                    publicationDate = dateStr;
+                    return Optional.of(dateStr);
                 } catch (DateTimeParseException e) {
                     // Invalid date, ignore
+                    return Optional.empty();
                 }
-            }
+            }).orElse("");
         }
 
         // Try to extract text from the relPubl element
