@@ -341,7 +341,7 @@ class ParsingStrategies{
             holdings.addAll(uris);
 
             // Parse the publication date from citation/distStmt/distDate/@date
-            var dateStr = citation
+            publicationDate = citation
             .map(c -> c.getChild("distStmt", namespace))
             .map(d -> d.getChild("distDate", namespace))
             .map(e -> e.getAttributeValue("date"))
