@@ -208,6 +208,9 @@
                                     <titlStmt>
                                         <titl xml:lang="en">Arosio A. (2015). Parental divorce, cohabitation and the celebration of marriage in Italy. International Review of Sociology, 25(1), 166-179. doi:10.1080/03906701.2014.976950</titl>
                                     </titlStmt>
+                                    <distStmt>
+                                        <distDate xml:lang="en" date="2015"></distDate>
+                                    </distStmt>
                                     <holdings URI="http://dx.doi.org/10.1080/03906701.2014.976950" xml:lang="en"/>
                                     <holdings URI="http://example.com/test-holding"/>
                                 </citation>
@@ -225,6 +228,9 @@
                                     <titlStmt>
                                         <titl xml:lang="en">This should not be present</titl>
                                     </titlStmt>
+                                    <distStmt>
+                                        <distDate xml:lang="en" date="2025-06-19"></distDate>
+                                    </distStmt>
                                     <holdings URI="http://dx.doi.org/10.1080/03906701.2014.976950" xml:lang="en"/>
                                 </citation>
                                 <ExtLink URI="http://example.com/test-ext-link"/>

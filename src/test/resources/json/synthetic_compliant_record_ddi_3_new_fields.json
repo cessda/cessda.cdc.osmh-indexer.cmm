@@ -149,12 +149,21 @@
   "publicationYear": "1964",
   "relatedPublications": {
     "en": [{
-      "title": "ZA0004-10_q.pdf (Questionnaire)",
-      "holdings": []
-     }],
+      "title": "Synthetic Publication 1",
+      "holdings": [
+        "https://doi.org/10.4232/00000",
+        "doi:10.4232/00000"
+      ],
+      "publicationDate": "2025"
+     }
+    ],
     "de": [{
-      "title": "ZA0004-10_q.pdf (Fragebogen)",
-      "holdings": []
+      "title": "Synthetische Publikation 1",
+      "holdings": [
+        "https://doi.org/10.4232/00000",
+        "doi:10.4232/00000"
+      ],
+      "publicationDate": "2025"
     }]
   },
   "repositoryUrl": "http://dbkapps.gesis.org/dbkoai/oai.asp",
