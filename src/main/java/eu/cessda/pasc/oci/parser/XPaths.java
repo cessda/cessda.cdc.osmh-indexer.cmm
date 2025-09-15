@@ -79,6 +79,10 @@ public final class XPaths {
     @Nullable
     private final XMLMapper<Map<String, List<UniverseElement>>> universeXPath;
     private final XMLMapper<Map<String, List<Creator>>> creatorsXPath;
+    @Nullable
+    private final XMLMapper<List<Element>> creatorElementsXPath;
+    @Nullable
+    private final XMLMapper<List<Element>> relationElementsXPath;
     private final XMLMapper<Map<String, List<Funding>>> fundingXPath;
     private final XMLMapper<Map<String, List<DataKindFreeText>>> dataKindXPath;
     private final XMLMapper<Map<String, List<TermVocabAttributes>>> generalDataFormatXPath;
@@ -116,7 +120,10 @@ public final class XPaths {
         // Study number/PID
         .pidStudyXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Citation/r:InternationalIdentifier", extractMetadataObjectListForEachLang(ParsingStrategies::pidLifecycleStrategy)))
         // Creator/PI
-        .creatorsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Citation/r:Creator", ParsingStrategies::creatorsStrategy))
+        .creatorsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Citation/r:Creator", elements -> ParsingStrategies.creatorsStrategy(elements, Collections.emptyMap())))
+        .creatorElementsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Citation/r:Creator", Function.identity()))
+        // Relations (for affiliations of individual creators)
+        .relationElementsXPath(new SimpleXMLMapper<>("//a:Relation", Function.identity()))
         // Data access open/restricted
         .dataAccessXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/a:Archive/a:ArchiveSpecific/a:Item/a:Access/a:AccessTypeName/r:String", ParsingStrategies::dataAccessStrategy))
         // Terms of data access

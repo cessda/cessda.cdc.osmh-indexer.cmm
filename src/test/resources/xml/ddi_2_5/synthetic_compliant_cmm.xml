@@ -76,9 +76,10 @@
               <rspStmt>
                 <AuthEnty affiliation="University of Jyväskylä. Department of Psychology" xml:lang="en">En Pulkkinen, Lea</AuthEnty>
                 <AuthEnty affiliation="University of Essex. Department of Psychology" xml:lang="en">David Brook</AuthEnty>
-                <AuthEnty affiliation="Synthetic ORCID Association" xml:lang="en" >
-                  Synthetic ORCID
+                <AuthEnty affiliation="Synthetic PID Associations" xml:lang="en" >
+                  Synthetic PIDs
                   <ExtLink URI="https://orcid.org/0000-0000-0000-0000" role="PID" title="ORCID" xml:lang="en" >0000-0000-0000-0000</ExtLink>
+                  <ExtLink URI="https://ror.org/000000000" role="Affiliation-PID" title="ROR" xml:lang="en">000000000</ExtLink>
                 </AuthEnty>
               </rspStmt>
               <prodStmt>

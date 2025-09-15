@@ -97,20 +97,29 @@
                 "affiliation": {
                   "type": "string"
                 },
-                "identifier": {
-                  "type": "object",
-                  "description": "A unique identifier for a creator (e.g. ORCID)",
-                  "properties": {
-                    "id": {
-                      "type": "string"
-                    },
-                    "type": {
-                      "type": "string"
-                    },
-                    "uri": {
-                      "type": "string"
+                "identifiers": {
+                  "type": "array",
+                  "description": "A collection of unique identifiers for a creator (e.g. ORCID)",
+                  "items": [
+                    {
+                      "type": "object",
+                      "description": "A unique identifier for a creator (e.g. ORCID, ROR etc.)",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "uri": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string"
+                        }
+                      }
                     }
-                  },
+                  ],
                   "additionalProperties": false
                 }
               },
