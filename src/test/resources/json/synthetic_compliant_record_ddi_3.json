@@ -49,21 +49,23 @@
     "en": [
       {
         "name": "Synthetic ORCID",
-        "identifier": {
+        "identifiers": [{
           "id": "0000-0000-0000-0000",
           "type": "ORCID",
-          "uri": "https://orcid.org/0000-0000-0000-0000"
-        }
+          "uri": "https://orcid.org/0000-0000-0000-0000",
+          "role": "pid"
+        }]
       }
     ],
     "de": [
       {
         "name": "Synthetic ORCID de",
-        "identifier": {
+        "identifiers": [{
           "id": "0000-0000-0000-0000",
           "type": "ORCID",
-          "uri": "https://orcid.org/0000-0000-0000-0000"
-        }
+          "uri": "https://orcid.org/0000-0000-0000-0000",
+          "role": "pid"
+        }]
       }
     ]
   },

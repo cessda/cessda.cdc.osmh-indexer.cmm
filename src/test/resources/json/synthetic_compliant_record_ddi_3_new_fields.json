@@ -49,21 +49,39 @@
     "en": [
       {
         "name": "Synthetic ORCID",
-        "identifier": {
-          "id": "0000-0000-0000-0000",
-          "type": "ORCID",
-          "uri": "https://orcid.org/0000-0000-0000-0000"
-        }
+        "identifiers": [
+          {
+            "id": "0000-0000-0000-0000",
+            "type": "ORCID",
+            "uri": "https://orcid.org/0000-0000-0000-0000",
+            "role": "pid"
+          },
+          {
+            "id": "000000000",
+            "type": "ROR",
+            "uri": "https://ror.org/000000000",
+            "role": "affiliation-pid"
+          }
+        ]
       }
     ],
     "de": [
       {
         "name": "Synthetic ORCID de",
-        "identifier": {
-          "id": "0000-0000-0000-0000",
-          "type": "ORCID",
-          "uri": "https://orcid.org/0000-0000-0000-0000"
-        }
+        "identifiers": [
+          {
+            "id": "0000-0000-0000-0000",
+            "type": "ORCID",
+            "uri": "https://orcid.org/0000-0000-0000-0000",
+            "role": "pid"
+          },
+          {
+            "id": "000000000",
+            "type": "ROR",
+            "uri": "https://ror.org/000000000",
+            "role": "affiliation-pid"
+          }
+        ]
       }
     ]
   },

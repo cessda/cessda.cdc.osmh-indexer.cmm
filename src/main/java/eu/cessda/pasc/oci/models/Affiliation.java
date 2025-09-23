@@ -13,25 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.models.cmmstudy;
+package eu.cessda.pasc.oci.models;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import eu.cessda.pasc.oci.models.cmmstudy.Creator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.net.URI;
 import java.util.List;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public record Creator(
-    @JsonProperty("name") String name,
-    @JsonProperty("affiliation") String affiliation,
-    @JsonProperty("identifiers") List<Identifier> identifiers
+/**
+ * Represents an individual's affiliation with an organization.
+ *
+ * @param organizationName the name of the affiliated organization
+ * @param identifiers      the list of affiliation-related identifiers (e.g.
+ *                         ROR, ISNI)
+ */
+public record Affiliation(
+    @JsonProperty("organizationName") String organizationName,
+    @JsonProperty("identifiers") List<Creator.Identifier> identifiers
 ) {
-    public record Identifier(
-        @JsonProperty("id") String id,
-        @JsonProperty("type") String type,
-        @JsonProperty("uri") URI uri,
-        @JsonProperty("role") String role // "pid", "affiliation-pid"
-    ) {
-    }
 }

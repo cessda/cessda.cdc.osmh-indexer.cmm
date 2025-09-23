@@ -116,13 +116,22 @@
         "affiliation": "University of Essex. Department of Psychology"
       },
       {
-        "name": "Synthetic ORCID",
-        "affiliation": "Synthetic ORCID Association",
-        "identifier": {
-          "id": "0000-0000-0000-0000",
-          "type": "ORCID",
-          "uri": "https://orcid.org/0000-0000-0000-0000"
-        }
+        "name": "Synthetic PIDs",
+        "affiliation": "Synthetic PID Associations",
+        "identifiers": [
+          {
+            "id": "0000-0000-0000-0000",
+            "type": "ORCID",
+            "uri": "https://orcid.org/0000-0000-0000-0000",
+            "role": "PID"
+          },
+          {
+            "id": "000000000",
+            "type": "ROR",
+            "uri": "https://ror.org/000000000",
+            "role": "Affiliation-PID"
+          }
+        ]
       }
     ]
   },

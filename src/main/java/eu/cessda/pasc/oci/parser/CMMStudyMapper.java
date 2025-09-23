@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.cessda.pasc.oci.ResourceHandler;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.configurations.Repo;
+import eu.cessda.pasc.oci.models.Affiliation;
 import eu.cessda.pasc.oci.models.DataAccessMapping;
 import eu.cessda.pasc.oci.models.cmmstudy.*;
 import lombok.Builder;
@@ -28,6 +29,7 @@ import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
+import org.jdom2.Element;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
@@ -184,16 +186,26 @@ public class CMMStudyMapper {
     }
 
     /**
-     * Parses PID Study(s) from:
+     * Parses Creators from:
      * <p>
      * Xpath = {@link XPaths#getCreatorsXPath()}
      */
     Map<String, List<Creator>> parseCreator(Document document, XPaths xPaths) {
+        if (xPaths.getRelationElementsXPath() != null && xPaths.getCreatorElementsXPath() != null) {
+            // Resolve raw elements first and parse afterwards if relations are found (DDI-Lifecycle)
+            List<Element> creatorElements = xPaths.getCreatorElementsXPath().resolve(document, xPaths.getNamespace());
+            List<Element> relationElements = xPaths.getRelationElementsXPath().resolve(document, xPaths.getNamespace());
+
+            Map<String, Affiliation> affiliationMap = ParsingStrategies.parseAffiliationRelations(relationElements);
+
+            return ParsingStrategies.creatorsStrategy(creatorElements, affiliationMap);
+        }
+
         return xPaths.getCreatorsXPath().resolve(document, xPaths.getNamespace());
     }
 
     /**
-     * Parses PID Study(s) from:
+     * Parses Topic Classifications from:
      * <p>
      * Xpath = {@link XPaths#getClassificationsXPath()}
      */

@@ -44,8 +44,8 @@
           "term_vector": "with_positions_offsets",
           "copy_to": "creatorsSearchField"
         },
-        "identifier": {
-          "type": "object",
+        "identifiers": {
+          "type": "nested",
           "properties": {
             "id": {
               "type": "keyword",
@@ -57,6 +57,10 @@
               "ignore_above": 256
             },
             "uri": {
+              "type": "keyword",
+              "ignore_above": 256
+            },
+            "role": {
               "type": "keyword",
               "ignore_above": 256
             }
