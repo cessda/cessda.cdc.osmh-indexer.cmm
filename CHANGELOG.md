@@ -13,6 +13,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 - *Fixed (for any bug fixes)*
 - *Security (in case of vulnerabilities)*
 
+## [4.1.0] - 2025-09-29
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17192544.svg)](https://doi.org/10.5281/zenodo.17192544)
+
+### Added
+
+- Parse creator role and all creator identifiers ([#712](https://github.com/cessda/cessda.cdc.versions/issues/712))
+
+### Changed
+
+- Parse publication date of related publications, check `TypeOfMaterial` when parsing publications in DDI-L ([#660](https://github.com/cessda/cessda.cdc.versions/issues/660))
+
 ## [4.0.0] - 2025-06-16
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15630626.svg)](https://doi.org/10.5281/zenodo.15630626)
@@ -332,6 +344,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 - verify SSL
 - removed the option to disable HTTPS verification
 
+[4.1.0]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/4.1.0
 [4.0.0]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/4.0.0
 [3.8.0]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/3.8.0
 [3.7.0]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/3.7.0
