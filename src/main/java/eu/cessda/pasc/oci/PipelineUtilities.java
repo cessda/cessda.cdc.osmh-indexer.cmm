@@ -53,6 +53,11 @@ public class PipelineUtilities {
                 try (var inputStream = Files.newInputStream(json)) {
                     PipelineMetadata sharedModel = repositoryModelObjectReader.readValue(inputStream);
 
+                    // Only harvest the repository if it has a CDC role
+                    if (!sharedModel.role().contains("CDC")) {
+                        return Stream.empty();
+                    }
+
                     // Convert the shared model to a Repo object
                     var repo = new Repo(
                         sharedModel.url(),
@@ -60,7 +65,6 @@ public class PipelineUtilities {
                         sharedModel.code(),
                         sharedModel.name(),
                         sharedModel.metadataPrefix(),
-                        null,
                         sharedModel.defaultLanguage()
                     );
 
