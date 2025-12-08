@@ -13,6 +13,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 - *Fixed (for any bug fixes)*
 - *Security (in case of vulnerabilities)*
 
+## [4.1.0]
+
+### Changed
+
+- Parse publication date of related publications, check TypeOfMaterial when parsing publications in
+  DDI-L ([#660](https://github.com/cessda/cessda.cdc.versions/issues/660))
+
 ## [4.0.0] - 2025-06-16
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15630626.svg)](https://doi.org/10.5281/zenodo.15630626)
