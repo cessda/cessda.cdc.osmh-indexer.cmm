@@ -1308,21 +1308,29 @@ class ParsingStrategies{
      * @return a {@link String} with "Open", "Restricted", or null if no valid value is found.
      */
     static String dataAccessStrategy(List<Element> elements) {
+        final String OPEN = "openaccess";
+        final Set<String> RESTRICTED = Set.of(
+                "closedaccess",
+                "embargoedaccess",
+                "restrictedaccess",
+                "metadataonlyaccess");
+
         for (Element element : elements) {
-            String value = element.getTextTrim();
+            String raw = element.getTextTrim();
+            if (raw == null || raw.isBlank())
+                continue;
 
-            // Check if the value is "openAccess", return "Open"
-            if (!value.isEmpty()) {
-                if ("openAccess".equalsIgnoreCase(value)
-                    || "info:eu-repo/semantics/openAccess".equalsIgnoreCase(value)) {
-                    return "Open";
-                }
+            // Normalize to lowercase and strip all non-alphanumerics (spaces, underscores, etc.)
+            String normalized = raw.toLowerCase().replaceAll("[^a-z0-9]+", "");
 
-                // Check if the value is one of the restricted types and return "Restricted"
-                if ("closedAccess".equalsIgnoreCase(value)
-                    || "embargoedAccess".equalsIgnoreCase(value)
-                    || "restrictedAccess".equalsIgnoreCase(value)
-                    || "info:eu-repo/semantics/restrictedAccess".equalsIgnoreCase(value)) {
+            // Open: exact or suffix so it still works for info:eu-repo/semantics/openAccess also
+            if (normalized.equals(OPEN) || normalized.endsWith(OPEN)) {
+                return "Open";
+            }
+
+            // Restricted: exact or suffix so it still works for info:eu-repo/semantics/restrictedAccess also
+            for (String t : RESTRICTED) {
+                if (normalized.equals(t) || normalized.endsWith(t)) {
                     return "Restricted";
                 }
             }

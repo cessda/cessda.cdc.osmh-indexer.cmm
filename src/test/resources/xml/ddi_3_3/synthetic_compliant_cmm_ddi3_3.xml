@@ -479,8 +479,8 @@
                         <r:Agency>de.gesis</r:Agency>
                         <r:ID>ZA0004_Acc</r:ID>
                         <r:Version>1.0.0</r:Version>
-                        <a:TypeOfAccess controlledVocabularyName="info:eu-repo-Access-Terms vocabulary">
-                            openAccess
+                        <a:TypeOfAccess controlledVocabularyName="COAR Access Right Vocabulary">
+                            open access
                         </a:TypeOfAccess>
                         <r:Description>
                             <r:Content xml:lang="en">Data and documents are only released for academic research and teaching after the data depositor's written authorization.</r:Content>
