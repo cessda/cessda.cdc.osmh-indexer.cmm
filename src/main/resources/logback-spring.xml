@@ -18,7 +18,11 @@
 -->
 <configuration>
     <springProperty name="jsonEnabled" source="logging.json.enabled" defaultValue="false"/>
-    <if condition='p("jsonEnabled").equals("true")'>
+    <condition class="ch.qos.logback.core.boolex.PropertyEqualityCondition">
+        <key>jsonEnabled</key>
+        <value>true</value>
+    </condition>
+    <if>
         <then>
             <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
             <appender name="jsonConsoleAppender" class="ch.qos.logback.core.ConsoleAppender">
