@@ -18,7 +18,6 @@ package eu.cessda.pasc.oci.parser;
 import eu.cessda.pasc.oci.TimeUtility;
 import eu.cessda.pasc.oci.exception.InvalidUniverseException;
 import eu.cessda.pasc.oci.models.Affiliation;
-import eu.cessda.pasc.oci.models.Record;
 import eu.cessda.pasc.oci.models.cmmstudy.*;
 import lombok.NonNull;
 import org.jdom2.Element;
@@ -31,6 +30,7 @@ import java.time.Year;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -1300,6 +1300,16 @@ class ParsingStrategies{
         return fundingMap;
     }
 
+    // Data access strategy constants
+    private static final String OPEN_ACCESS = "openaccess";
+    private static final Set<String> RESTRICTED = Set.of(
+            "closedaccess",
+            "embargoedaccess",
+            "restrictedaccess",
+            "metadataonlyaccess"
+    );
+    private static final Pattern NORMALIZE_PATTERN = Pattern.compile("[^a-z0-9]+");
+
     /**
      * Processes a list of {@link Element}s, returning a {@link String} representing the access category (Open/Restricted).
      * Returns the first non-empty valid result, otherwise returns null.
@@ -1308,12 +1318,6 @@ class ParsingStrategies{
      * @return a {@link String} with "Open", "Restricted", or null if no valid value is found.
      */
     static String dataAccessStrategy(List<Element> elements) {
-        final String OPEN = "openaccess";
-        final Set<String> RESTRICTED = Set.of(
-                "closedaccess",
-                "embargoedaccess",
-                "restrictedaccess",
-                "metadataonlyaccess");
 
         for (Element element : elements) {
             String raw = element.getTextTrim();
@@ -1321,16 +1325,21 @@ class ParsingStrategies{
                 continue;
 
             // Normalize to lowercase and strip all non-alphanumerics (spaces, underscores, etc.)
-            String normalized = raw.toLowerCase().replaceAll("[^a-z0-9]+", "");
+            String normalized = NORMALIZE_PATTERN.matcher(raw.toLowerCase()).replaceAll("");
 
             // Open: exact or suffix so it still works for info:eu-repo/semantics/openAccess also
-            if (normalized.equals(OPEN) || normalized.endsWith(OPEN)) {
+            if (normalized.endsWith(OPEN_ACCESS)) {
                 return "Open";
             }
 
             // Restricted: exact or suffix so it still works for info:eu-repo/semantics/restrictedAccess also
+            if (RESTRICTED.contains(normalized)) {
+                return "Restricted";
+            }
+
+            // Fallback for partial matches
             for (String t : RESTRICTED) {
-                if (normalized.equals(t) || normalized.endsWith(t)) {
+                if (normalized.endsWith(t)) {
                     return "Restricted";
                 }
             }
