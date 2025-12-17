@@ -278,17 +278,17 @@ public class CMMStudyMapper {
      * Parse Publisher from:
      * <p>
      * Xpath = {@link XPaths#getPublisherXPath()} and
-     * Xpath = {@link XPaths#getDistributorXPath()}
+     * Xpath = {@link XPaths#getProducerXPath()}
      */
     Map<String, Publisher> parsePublisher(Document document, XPaths xPaths, String defaultLang) {
-        var producerPathMap = mapNullLanguage(xPaths.getPublisherXPath().resolve(document, xPaths.getNamespace()), defaultLang);
+        Map<String, Publisher> publisherMap = mapNullLanguage(xPaths.getPublisherXPath().resolve(document, xPaths.getNamespace()), defaultLang);
 
-        if (xPaths.getDistributorXPath() != null) {
-            var distrPathMap = mapNullLanguage(xPaths.getDistributorXPath().resolve(document, xPaths.getNamespace()), defaultLang);
-            distrPathMap.forEach(producerPathMap::putIfAbsent);
+        // If publisher is empty, fallback to producer
+        if (publisherMap.isEmpty() && xPaths.getProducerXPath() != null) {
+            publisherMap = mapNullLanguage(xPaths.getProducerXPath().resolve(document, xPaths.getNamespace()), defaultLang);
         }
 
-        return producerPathMap;
+        return publisherMap;
     }
 
     /**
