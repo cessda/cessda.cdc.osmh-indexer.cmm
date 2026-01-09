@@ -28,7 +28,7 @@ import co.elastic.clients.elasticsearch.core.bulk.DeleteOperation;
 import co.elastic.clients.elasticsearch.core.bulk.IndexOperation;
 import co.elastic.clients.elasticsearch.indices.*;
 import co.elastic.clients.elasticsearch.indices.ExistsRequest;
-import co.elastic.clients.transport.rest_client.RestClientTransport;
+import co.elastic.clients.transport.rest5_client.Rest5ClientTransport;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.cessda.pasc.oci.ResourceHandler;
 import eu.cessda.pasc.oci.TimeUtility;
@@ -90,7 +90,7 @@ public class ESIngestService implements IngestService {
         this.esClient = () -> {
             if (this.client == null
                 // Reset the client if the underlying HTTPClient is not running
-                || !((RestClientTransport) this.client._transport()).restClient().isRunning()) {
+                || !((Rest5ClientTransport) this.client._transport()).restClient().isRunning()) {
                 this.client = elasticsearchConfiguration.elasticsearchClient();
                 log.info("Started Elasticsearch REST client");
             }
