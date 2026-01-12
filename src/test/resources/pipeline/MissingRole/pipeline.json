@@ -1,12 +1,11 @@
 {
-  "code": "APIS",
+  "code": "UniData",
   "name": null,
-  "url": "http://194.117.18.18:6003/v0/oai",
+  "url": "http://oai.unidata.unimib.it/v0/oai",
   "setSpec": null,
-  "metadataPrefix": "ddi_c",
+  "metadataPrefix": "oai_ddi25",
   "ddiVersion": "DDI_2_5",
   "profile": "https://cmv.cessda.eu/profiles/cdc/ddi-2.5/latest/profile.xml",
   "validationGate": "BASIC",
   "defaultLanguage": null,
-  "role": ["CDC"]
 }
