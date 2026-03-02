@@ -38,7 +38,6 @@ public class ReposTestData
                 "UKDS",
                 null,
                 "ddi",
-                null,
                 null
             );
         } catch (FileNotFoundException | URISyntaxException e) {
@@ -54,7 +53,6 @@ public class ReposTestData
                 "UKDS",
                 null,
                 "ddi",
-                null,
                 "zz"
             );
         } catch (FileNotFoundException | URISyntaxException e) {
@@ -69,7 +67,6 @@ public class ReposTestData
             "GESIS",
             null,
             null,
-            null,
             null
         );
     }
@@ -81,7 +78,6 @@ public class ReposTestData
             "FSD",
             null,
             "oai_ddi25",
-            null,
             null
         );
     }
@@ -93,7 +89,6 @@ public class ReposTestData
             "NSD",
             null,
             "oai_ddi",
-            null,
             null
         );
     }
