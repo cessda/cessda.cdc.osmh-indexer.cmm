@@ -1321,8 +1321,9 @@ class ParsingStrategies{
 
         for (Element element : elements) {
             String raw = element.getTextTrim();
-            if (raw == null || raw.isBlank())
+            if (raw.isBlank()) {
                 continue;
+            }
 
             // Normalize to lowercase and strip all non-alphanumerics (spaces, underscores, etc.)
             String normalized = NORMALIZE_PATTERN.matcher(raw.toLowerCase()).replaceAll("");

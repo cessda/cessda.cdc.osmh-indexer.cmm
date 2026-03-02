@@ -179,6 +179,7 @@
                 <specPerm>Safeguarded</specPerm>
                 <restrctn>The depositor has specified that registration is required. Available to all registered users. The depositor may be informed about usage.</restrctn>
                 <contact>&lt;a href=http://www.ukdataservice.ac.uk/help/get-in-touch.aspx&gt;Get in touch&lt;/a&gt;</contact>
+                <conditions>restrictedAccess</conditions>
               </useStmt>
             </dataAccs>
             <othrStdyMat>
