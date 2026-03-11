@@ -20,6 +20,7 @@ public class StreamingLifecycleParser {
     private static final String DDI_DATACOLLECTION = "ddi:datacollection:3_3";
     private static final String DDI_INSTANCE = "ddi:instance:3_3";
     private static final String DDI_REUSABLE = "ddi:reusable:3_3";
+    private static final String DDI_STUDYUNIT = "ddi:studyunit:3_3";
 
     // QNames
     private static final QName FRAGMENT = new QName(DDI_INSTANCE, "Fragment");
@@ -36,12 +37,50 @@ public class StreamingLifecycleParser {
     private static final QName METHODOLOGY = new QName(DDI_DATACOLLECTION, "Methodology");
     private static final QName METHODOLOGY_REFERENCE = new QName(DDI_DATACOLLECTION, "MethodologyReference");
     private static final QName MODE_OF_COLLECTION = new QName(DDI_DATACOLLECTION, "ModeOfCollection");
-    private static final QName TIME_METHOD = new QName(DDI_DATACOLLECTION, "TimeMethod");
     private static final QName SAMPLING_PROCEDURE = new QName(DDI_DATACOLLECTION, "SamplingProcedure");
+    private static final QName TIME_METHOD = new QName(DDI_DATACOLLECTION, "TimeMethod");
     private static final QName TYPE_OF_SAMPLING_PROCEDURE = new QName(DDI_DATACOLLECTION, "TypeOfSamplingProcedure");
+    private static final QName TYPE_OF_TIME_METHOD = new QName(DDI_DATACOLLECTION, "TypeOfTimeMethod");
 
+    private static final QName ABSTRACT = new QName(DDI_REUSABLE, "Abstract");
+    private static final QName AGENCY_ORGANIZATION_REFERENCE = new QName(DDI_REUSABLE, "AgencyOrganizationReference");
+    private static final QName ANALYSIS_UNIT = new QName(DDI_REUSABLE, "AnalysisUnit");
+    private static final QName ARCHIVE_REFERENCE = new QName(DDI_REUSABLE, "ArchiveReference");
+    private static final QName CITATION = new QName(DDI_REUSABLE, "Citation");
     private static final QName CONTENT = new QName(DDI_REUSABLE, "Content");
+    private static final QName CONTRIBUTOR = new QName(DDI_REUSABLE, "Contributor");
+    private static final QName CONTRIBUTOR_NAME = new QName(DDI_REUSABLE, "ContributorName");
+    private static final QName CONTRIBUTOR_REFERENCE = new QName(DDI_REUSABLE, "ContributorReference");
+    private static final QName CONTRIBUTOR_ROLE = new QName(DDI_REUSABLE, "ContributorRole");
+    private static final QName COVERAGE = new QName(DDI_REUSABLE, "Coverage");
+    private static final QName COUNTRY_CODE = new QName(DDI_REUSABLE, "CountryCode");
+    private static final QName CREATOR = new QName(DDI_REUSABLE, "Creator");
+    private static final QName CREATOR_NAME = new QName(DDI_REUSABLE, "CreatorName");
+    private static final QName CREATOR_REFERENCE = new QName(DDI_REUSABLE, "CreatorReference");
+    private static final QName DATA_COLLECTION_REFERENCE = new QName(DDI_REUSABLE, "DataCollectionReference");
+    private static final QName DESCRIPTION = new QName(DDI_REUSABLE, "Description");
+    private static final QName FUNDING_INFORMATION = new QName(DDI_REUSABLE, "FundingInformation");
+    private static final QName GRANT_NUMBER = new QName(DDI_REUSABLE, "GrantNumber");
+    private static final QName KEYWORD = new QName(DDI_REUSABLE, "Keyword");
+    private static final QName KIND_OF_DATA = new QName(DDI_REUSABLE, "KindOfData");
+    private static final QName IDENTIFIER_CONTENT = new QName(DDI_REUSABLE, "IdentifierContent");
+    private static final QName INTERNATIONAL_IDENTIFIER = new QName(DDI_REUSABLE, "InternationalIdentifier");
+    private static final QName MANAGING_AGENCY = new QName(DDI_REUSABLE, "ManagingAgency");
+    private static final QName PHYSICAL_INSTANCE_REFERENCE = new QName(DDI_REUSABLE, "PhysicalInstanceReference");
+    private static final QName PUBLICATION_DATE = new QName(DDI_REUSABLE, "PublicationDate");
+    private static final QName PUBLISHER = new QName(DDI_REUSABLE, "Publisher");
+    private static final QName PUBLISHER_NAME = new QName(DDI_REUSABLE, "PublisherName");
+    private static final QName PUBLISHER_REFERENCE = new QName(DDI_REUSABLE, "PublisherReference");
+    private static final QName REFERENCE_DATE = new QName(DDI_REUSABLE, "ReferenceDate");
+    private static final QName SPATIAL_COVERAGE = new QName(DDI_REUSABLE, "SpatialCoverage");
     private static final QName STRING = new QName(DDI_REUSABLE, "String");
+    private static final QName SUBJECT = new QName(DDI_REUSABLE, "Subject");
+    private static final QName TEMPORAL_COVERAGE = new QName(DDI_REUSABLE, "TemporalCoverage");
+    private static final QName TITLE = new QName(DDI_REUSABLE, "Title");
+    private static final QName TOPICAL_COVERAGE = new QName(DDI_REUSABLE, "TopicalCoverage");
+    private static final QName UNIVERSE_REFERENCE = new QName(DDI_REUSABLE, "UniverseReference");
+
+    private static final QName STUDY_UNIT = new QName(DDI_STUDYUNIT, "StudyUnit");
 
     // URN Matcher
     private static final Pattern DDI_URN_REGEX = Pattern.compile("^urn:ddi:([^:]*):([^:]*):([^:]*)$");
@@ -74,7 +113,7 @@ public class StreamingLifecycleParser {
             if (reader.getEventType() == START_ELEMENT) {
                 // Switch on element name
                 if (reader.getName().equals(TOP_LEVEL_REFERENCE)) {
-                    var topLevel = parseTopLevelRef();
+                    var topLevel = parseReference();
                     parsedObjects.add(topLevel);
                 } else if (reader.getName().equals(FRAGMENT)) {
                     var ddiObject = parseObject();
@@ -101,9 +140,355 @@ public class StreamingLifecycleParser {
             return parseDataCollection();
         } else if (fragmentElement.equals(METHODOLOGY)) {
             return parseMethodology();
+        } else if (fragmentElement.equals(STUDY_UNIT)) {
+            return parseStudyUnit();
         }
 
         return null;
+    }
+
+    private StudyUnit parseStudyUnit() throws XMLStreamException {
+        validateElement(STUDY_UNIT);
+
+        // Stream to the next element
+        reader.nextTag();
+
+        // Parse object information
+        var objInf = parseObjectInformation();
+
+        Citation citation = null;
+        Map<String, String> abstractMap = Collections.emptyMap();
+        Reference universeReference = null;
+        List<FundingInformation> fundingInformationList = new ArrayList<>();
+        Coverage coverage = null;
+        List<ControlledVocabulary> analysisUnitList = new ArrayList<>();
+        List<ControlledVocabulary> kindOfDataList = new ArrayList<>();
+        List<Reference> dataCollectionReferenceList = new ArrayList<>();
+        List<Reference> physicalInstanceReferenceList = new ArrayList<>();
+        List<Reference> archiveReferenceList = new ArrayList<>();
+
+        do {
+            if (reader.getEventType() == START_ELEMENT) {
+                var qName = reader.getName();
+                if (qName.equals(CITATION)) {
+                    citation = parseCitation();
+                } else if (qName.equals(ABSTRACT)) {
+                    reader.nextTag();
+                    abstractMap = extractMultilingualContent();
+                } else if (qName.equals(UNIVERSE_REFERENCE)) {
+                    universeReference = parseReference();
+                } else if (qName.equals(FUNDING_INFORMATION)) {
+                    var fundingInformation = parseFundingInformation();
+                    fundingInformationList.add(fundingInformation);
+                } else if (qName.equals(COVERAGE)) {
+                    coverage = parseCoverage();
+                } else if (qName.equals(ANALYSIS_UNIT)) {
+                    var analysisUnit = parseControlledVocabularyInformation();
+                    analysisUnitList.add(analysisUnit);
+                } else if (qName.equals(KIND_OF_DATA)) {
+                    var kindOfData = parseControlledVocabularyInformation();
+                    kindOfDataList.add(kindOfData);
+                } else if (qName.equals(DATA_COLLECTION_REFERENCE)) {
+                    var dataCollectionReference = parseReference();
+                    dataCollectionReferenceList.add(dataCollectionReference);
+                } else if (qName.equals(PHYSICAL_INSTANCE_REFERENCE)) {
+                    var physicalInstRef = parseReference();
+                    physicalInstanceReferenceList.add(physicalInstRef);
+                } else if (qName.equals(ARCHIVE_REFERENCE)) {
+                    var archiveRef = parseReference();
+                    archiveReferenceList.add(archiveRef);
+                }
+            }
+
+        } while (reader.next() != END_ELEMENT || !reader.getName().equals(STUDY_UNIT));
+
+        return new StudyUnit(
+            objInf,
+            citation,
+            abstractMap,
+            universeReference,
+            fundingInformationList,
+            coverage,
+            analysisUnitList,
+            kindOfDataList,
+            dataCollectionReferenceList,
+            physicalInstanceReferenceList,
+            archiveReferenceList
+        );
+    }
+
+    private Coverage parseCoverage() throws XMLStreamException {
+        validateElement(COVERAGE);
+
+        reader.nextTag();
+
+        TopicalCoverage topicalCoverage = null;
+        SpatialCoverage spatialCoverage = null;
+        TemporalCoverage temporalCoverage = null;
+
+        do {
+            if (reader.getEventType() == START_ELEMENT) {
+                var qName = reader.getName();
+                if (qName.equals(TOPICAL_COVERAGE)) {
+                    topicalCoverage = parseTopicalCoverage();
+                } else if (qName.equals(SPATIAL_COVERAGE)) {
+                    spatialCoverage = parseSpatialCoverage();
+                } else if (qName.equals(TEMPORAL_COVERAGE)) {
+                    temporalCoverage = parseTemporalCoverage();
+                }
+            }
+        } while (reader.next() != END_ELEMENT || !reader.getName().equals(COVERAGE));
+
+        return new Coverage(topicalCoverage, spatialCoverage, temporalCoverage);
+    }
+
+    private TemporalCoverage parseTemporalCoverage() throws XMLStreamException {
+        validateElement(TEMPORAL_COVERAGE);
+
+        reader.nextTag();
+
+        // Parse object information
+        var objInf = parseObjectInformation();
+        DateType referenceDate = null;
+
+        do {
+            if (reader.getEventType() == START_ELEMENT) {
+                if (reader.getName().equals(REFERENCE_DATE)) {
+                    referenceDate = parseReferenceDate();
+                }
+            }
+        } while (reader.next() != END_ELEMENT || !reader.getName().equals(TEMPORAL_COVERAGE));
+
+        return new TemporalCoverage(objInf, referenceDate);
+    }
+
+    private DateType parseReferenceDate() throws XMLStreamException {
+        return parseDateType(REFERENCE_DATE);
+    }
+
+    private SpatialCoverage parseSpatialCoverage() throws XMLStreamException {
+        validateElement(SPATIAL_COVERAGE);
+
+        reader.nextTag();
+
+        // Parse object information
+        var objectInformation = parseObjectInformation();
+        Map<String, String> description = Collections.emptyMap();
+        var countryCodes = new ArrayList<String>();
+
+        do {
+            if (reader.getEventType() == START_ELEMENT) {
+                var qName = reader.getName();
+                if (qName.equals(DESCRIPTION)) {
+                    reader.nextTag();
+                    description = extractMultilingualContent();
+                } else if (qName.equals(COUNTRY_CODE)) {
+                    var code = reader.getElementText();
+                    countryCodes.add(code);
+                }
+            }
+        } while (reader.next() != END_ELEMENT || !reader.getName().equals(SPATIAL_COVERAGE));
+
+        return new SpatialCoverage(objectInformation, description, countryCodes);
+    }
+
+    private TopicalCoverage parseTopicalCoverage() throws XMLStreamException {
+        validateElement(TOPICAL_COVERAGE);
+
+        reader.nextTag();
+
+        // Parse object information
+        var objectInformation = parseObjectInformation();
+
+        // Parse subjects
+        var subjects = new ArrayList<ControlledVocabulary>();
+        var keywords = new ArrayList<ControlledVocabulary>();
+
+        do {
+            if (reader.getEventType() == START_ELEMENT) {
+                var qName = reader.getName();
+                if (qName.equals(SUBJECT)) {
+                    var subject = parseControlledVocabularyInformation();
+                    subjects.add(subject);
+                } else if (qName.equals(KEYWORD)) {
+                    var keyword = parseControlledVocabularyInformation();
+                    keywords.add(keyword);
+                }
+            }
+        } while (reader.next() != END_ELEMENT || !reader.getName().equals(TOPICAL_COVERAGE));
+
+        return new TopicalCoverage(objectInformation, subjects, keywords);
+    }
+
+    private FundingInformation parseFundingInformation() throws XMLStreamException {
+        validateElement(FUNDING_INFORMATION);
+
+        reader.nextTag();
+
+        Reference agencyOrganizationReference = null;
+        String grantNumber = null;
+
+        do {
+            if (reader.getEventType() == START_ELEMENT) {
+                if (reader.getName().equals(AGENCY_ORGANIZATION_REFERENCE)) {
+                    agencyOrganizationReference = parseReference();
+                } else if (reader.getName().equals(GRANT_NUMBER)) {
+                    grantNumber = reader.getElementText();
+                }
+            }
+        } while (reader.next() != END_ELEMENT || !reader.getName().equals(FUNDING_INFORMATION));
+
+        return new FundingInformation(agencyOrganizationReference, grantNumber);
+    }
+
+    private Citation parseCitation() throws XMLStreamException {
+        validateElement(CITATION);
+
+        Map<String, String> title = Collections.emptyMap();
+        Creator creator = null;
+        Publisher publisher = null;
+        List<Contributor> contributors = new ArrayList<>();
+        DateType publicationDate = null;
+        InternationalIdentifier internationalIdentifier = null;
+
+        do {
+            if (reader.getEventType() == START_ELEMENT) {
+                var qName = reader.getName();
+                if (qName.equals(TITLE)) {
+                    reader.nextTag();
+                    title = extractMultilingualStrings();
+                } else if (qName.equals(CREATOR)) {
+                    creator = parseCreator();
+                } else if (qName.equals(PUBLISHER)) {
+                    publisher = parsePublisher();
+                } else if (qName.equals(CONTRIBUTOR)) {
+                    var contributor = parseContributor();
+                    contributors.add(contributor);
+                } else if (qName.equals(PUBLICATION_DATE)) {
+                    publicationDate = parsePublicationDate();
+                } else if (qName.equals(INTERNATIONAL_IDENTIFIER)) {
+                    internationalIdentifier = parseInternationalIdentifier();
+                }
+            }
+
+        } while (reader.next() != END_ELEMENT || !reader.getName().equals(CITATION));
+
+        return new Citation(title, creator, publisher, contributors, publicationDate, internationalIdentifier);
+    }
+
+    private InternationalIdentifier parseInternationalIdentifier() throws XMLStreamException {
+        validateElement(INTERNATIONAL_IDENTIFIER);
+
+        reader.nextTag();
+
+        String identifierContent = null;
+        String managingAgency = null;
+
+        do {
+            if (reader.getEventType() == START_ELEMENT) {
+                if (reader.getName().equals(IDENTIFIER_CONTENT)) {
+                    identifierContent = reader.getElementText();
+                } else if (reader.getName().equals(MANAGING_AGENCY)) {
+                    managingAgency = reader.getElementText();
+                }
+            }
+        } while (reader.next() != END_ELEMENT || !reader.getName().equals(INTERNATIONAL_IDENTIFIER));
+
+        return new InternationalIdentifier(identifierContent, managingAgency);
+    }
+
+    private DateType parsePublicationDate() throws XMLStreamException {
+        return parseDateType(PUBLICATION_DATE);
+    }
+
+    private Contributor parseContributor() throws XMLStreamException {
+        validateElement(CONTRIBUTOR);
+
+        reader.nextTag();
+
+        // Contributor
+        Map<String, String> contributorName = Collections.emptyMap();
+        ControlledVocabulary contributorRole = null;
+        Reference contributorReference = null;
+
+        do {
+            if (reader.getEventType() == START_ELEMENT) {
+                var qName = reader.getName();
+                if (qName.equals(CONTRIBUTOR_NAME)) {
+                    // Stream to the next element
+                    reader.nextTag();
+
+                    // Extract creator names
+                    contributorName = extractMultilingualStrings();
+                } else if (qName.equals(CONTRIBUTOR_ROLE)) {
+                    contributorRole = parseControlledVocabularyInformation();
+                } else if (qName.equals(CONTRIBUTOR_REFERENCE)) {
+                    // Extract creator reference
+                    contributorReference = parseReference();
+                }
+            }
+
+        } while (reader.next() != END_ELEMENT || !reader.getName().equals(CONTRIBUTOR));
+
+        return new Contributor(contributorReference, contributorRole, contributorName);
+    }
+
+    private Publisher parsePublisher() throws XMLStreamException {
+        validateElement(PUBLISHER);
+
+        reader.nextTag();
+
+        // Publisher
+        Map<String, String> publisherName = Collections.emptyMap();
+        Reference publisherReference = null;
+
+        do {
+            if (reader.getEventType() == START_ELEMENT) {
+                var qName = reader.getName();
+                if (qName.equals(PUBLISHER_NAME)) {
+                    // Stream to the next element
+                    reader.nextTag();
+
+                    // Extract creator names
+                    publisherName = extractMultilingualStrings();
+                } else if (qName.equals(PUBLISHER_REFERENCE)) {
+                    // Extract creator reference
+                    publisherReference = parseReference();
+                }
+            }
+
+        } while (reader.next() != END_ELEMENT || !reader.getName().equals(PUBLISHER));
+
+        return new Publisher(publisherReference, publisherName);
+    }
+
+    private Creator parseCreator() throws XMLStreamException {
+        validateElement(CREATOR);
+
+        reader.nextTag();
+
+        // Creator
+        Map<String, String> creatorName = Collections.emptyMap();
+        Reference creatorReference = null;
+
+        do {
+            if (reader.getEventType() == START_ELEMENT) {
+                var qName = reader.getName();
+                if (qName.equals(CREATOR_NAME)) {
+                    // Stream to the next element
+                    reader.nextTag();
+
+                    // Extract creator names
+                    creatorName = extractMultilingualStrings();
+                } else if (qName.equals(CREATOR_REFERENCE)) {
+                    // Extract creator reference
+                    creatorReference = parseReference();
+                }
+            }
+
+        } while (reader.next() != END_ELEMENT || !reader.getName().equals(CREATOR));
+
+        return new Creator(creatorReference, creatorName);
     }
 
     private Methodology parseMethodology() throws XMLStreamException {
@@ -120,9 +505,10 @@ public class StreamingLifecycleParser {
 
         do {
             if (reader.getEventType() == START_ELEMENT) {
-                if (reader.getName().equals(SAMPLING_PROCEDURE)) {
+                var qName = reader.getName();
+                if (qName.equals(SAMPLING_PROCEDURE)) {
                     samplingProcedure = parseSamplingProcedure();
-                } else if (reader.getName().equals(TIME_METHOD)) {
+                } else if (qName.equals(TIME_METHOD)) {
                     timeMethod = parseTimeMethod();
                 }
             }
@@ -149,7 +535,7 @@ public class StreamingLifecycleParser {
         do {
             if (event == START_ELEMENT) {
                 var elementName = reader.getName();
-                if (elementName.equals(new QName(DDI_DATACOLLECTION, "TypeOfTimeMethod"))) {
+                if (elementName.equals(TYPE_OF_TIME_METHOD)) {
                     // Parse controlled vocabulary information
                     controlledVocabulary = parseControlledVocabularyInformation();
 
@@ -184,14 +570,14 @@ public class StreamingLifecycleParser {
         int event = reader.getEventType();
         do {
             if (event == START_ELEMENT) {
-                var elementName = reader.getName();
-                if (elementName.equals(TYPE_OF_SAMPLING_PROCEDURE)) {
+                var qName = reader.getName();
+                if (qName.equals(TYPE_OF_SAMPLING_PROCEDURE)) {
                     // Parse controlled vocabulary information
                     controlledVocabulary = parseControlledVocabularyInformation();
 
                     // Get mode of collection
                     typeOfSamplingProcedure = reader.getElementText();
-                } else if (elementName.equals(new QName(DDI_REUSABLE, "Description"))) {
+                } else if (qName.equals(DESCRIPTION)) {
                     // Parse content
                     int d2 = reader.getDepth();
                     do {
@@ -218,48 +604,16 @@ public class StreamingLifecycleParser {
         // Parse object information
         var objInf = parseObjectInformation();
 
-        ObjectInformation methodologyReference = null;
+        Reference methodologyReference = null;
         CollectionEvent collectionEvent = null;
 
         do {
             if (reader.getEventType() == START_ELEMENT) {
                 if (reader.getName().equals(COLLECTION_EVENT)) {
-                    // Stream to the next element
-                    reader.nextTag();
-
-                    // Parse object information
-                    var collectionEventObjInf = parseObjectInformation();
-
-                    DateType collectionDates = null;
-                    var modeOfCollections = new ArrayList<ModeOfCollection>();
-
-                    // Current event
-                    int event = reader.getEventType();
-                    int depth = reader.getDepth() - 1;
-                    do {
-                        // Get next event
-                        if (event == START_ELEMENT) {
-                            if (reader.getName().equals(DATA_COLLECTION_DATE)) {
-                                // Parse date
-                                collectionDates = parseDateType();
-                            } else if (reader.getName().equals(MODE_OF_COLLECTION)) {
-                                // Parse mode of collection
-                                var modeOfCollection = parseModeOfCollection();
-                                modeOfCollections.add(modeOfCollection);
-                            }
-                        }
-                        // Get next event
-                        event = reader.next();
-                    } while (depth <= reader.getDepth());
-
-                    collectionEvent = new CollectionEvent(collectionEventObjInf, collectionDates, modeOfCollections);
-
+                    collectionEvent = parseCollectionEvent();
                 } else if (reader.getName().equals(METHODOLOGY_REFERENCE)) {
-                    // Stream to the next element
-                    reader.nextTag();
-
                     // Parse object information
-                    methodologyReference = parseObjectInformation();
+                    methodologyReference = parseReference();
                 }
             }
         } while (reader.next() != END_ELEMENT || !reader.getName().equals(DATA_COLLECTION));
@@ -267,8 +621,44 @@ public class StreamingLifecycleParser {
         return new DataCollection(objInf, collectionEvent, methodologyReference);
     }
 
-    private DateType parseDateType() throws XMLStreamException {
-        validateElement(DATA_COLLECTION_DATE);
+    private CollectionEvent parseCollectionEvent() throws XMLStreamException {
+        // Stream to the next element
+        reader.nextTag();
+
+        // Parse object information
+        var collectionEventObjInf = parseObjectInformation();
+
+        DateType collectionDates = null;
+        var modeOfCollections = new ArrayList<ModeOfCollection>();
+
+        // Current event
+        int event = reader.getEventType();
+        int depth = reader.getDepth() - 1;
+        do {
+            // Get next event
+            if (event == START_ELEMENT) {
+                if (reader.getName().equals(DATA_COLLECTION_DATE)) {
+                    // Parse date
+                    collectionDates = parseDataCollectionDate();
+                } else if (reader.getName().equals(MODE_OF_COLLECTION)) {
+                    // Parse mode of collection
+                    var modeOfCollection = parseModeOfCollection();
+                    modeOfCollections.add(modeOfCollection);
+                }
+            }
+            // Get next event
+            event = reader.next();
+        } while (depth <= reader.getDepth());
+
+        return new CollectionEvent(collectionEventObjInf, collectionDates, modeOfCollections);
+    }
+
+    private DateType parseDataCollectionDate() throws XMLStreamException {
+        return parseDateType(DATA_COLLECTION_DATE);
+    }
+
+    private DateType parseDateType(QName element) throws XMLStreamException {
+        validateElement(element);
 
         int depth = reader.getDepth();
 
@@ -432,18 +822,23 @@ public class StreamingLifecycleParser {
         return map;
     }
 
-    private TopLevelReference parseTopLevelRef() throws XMLStreamException {
+    private Reference parseReference() throws XMLStreamException {
         // Check document position
-        validateElement(TOP_LEVEL_REFERENCE);
+        if (!reader.getLocalName().contains("Reference")) {
+            throw new XMLStreamException("Unexpected element: " + reader.getName(), reader.getLocation());
+        }
 
         // Stream to next element
         reader.nextTag();
 
         // Parse information
         var objInf = parseObjectInformation();
-        var typeOfObject = reader.getElementText();
+        String typeOfObject = null;
+        if (reader.getName().equals(new QName(DDI_REUSABLE, "TypeOfObject"))) {
+            typeOfObject = reader.getElementText();
+        }
 
-        return new TopLevelReference(objInf, typeOfObject);
+        return new Reference(objInf, typeOfObject);
     }
 
     private void validateElement(QName expectedElement) throws XMLStreamException {
@@ -508,17 +903,17 @@ public class StreamingLifecycleParser {
         throw new IllegalStateException("Invalid ID");
     }
 
-    sealed interface DDIObject permits CollectionEvent, DataCollection, Methodology, Organization, TopLevelReference {
+    sealed interface DDIObject permits CollectionEvent, DataCollection, Methodology, Organization, Reference, StudyUnit {
         ObjectInformation objInf();
     }
 
-    record DataCollection(ObjectInformation objInf, CollectionEvent collectionEvent, ObjectInformation methodologyReference) implements DDIObject {
+    record DataCollection(ObjectInformation objInf, CollectionEvent collectionEvent, Reference methodologyReference) implements DDIObject {
     }
 
     record Organization(ObjectInformation objInf, Map<String, String> names) implements DDIObject {
     }
 
-    record TopLevelReference(ObjectInformation objInf, String typeOfObject) implements DDIObject {
+    record Reference(ObjectInformation objInf, String typeOfObject) implements DDIObject {
     }
 
     record ObjectInformation(
@@ -559,5 +954,49 @@ public class StreamingLifecycleParser {
     }
 
     record SamplingProcedure(ObjectInformation objInf, ControlledVocabulary cv, String typeOfSamplingProcedure, Map<String, String> content)  {
+    }
+
+    private record Creator(Reference creatorReference, Map<String, String> creatorName) {
+    }
+
+    private record Publisher(Reference publisherReference, Map<String, String> publisherName) {
+    }
+
+    private record Contributor(Reference contributorReference, ControlledVocabulary contributorRole, Map<String, String> contributorName) {
+    }
+
+    private record InternationalIdentifier(String identifierContent, String managingAgency) implements DateType {
+    }
+
+    private record Citation(
+            Map<String, String> title,
+            Creator creator,
+            Publisher publisher,
+            List<Contributor> contributors,
+            DateType publicationDate,
+            InternationalIdentifier internationalIdentifier
+    ) {
+    }
+
+    private record FundingInformation(Reference agencyOrganizationReference, String grantNumber) {
+    }
+
+    private record TopicalCoverage(ObjectInformation objectInformation, List<ControlledVocabulary> subjects, List<ControlledVocabulary> keywords) {
+    }
+
+    private record SpatialCoverage(ObjectInformation objectInformation, Map<String, String> description, List<String> countryCodes) {
+    }
+
+    private record TemporalCoverage(ObjectInformation objInf, DateType referenceDate) {
+    }
+
+    private record Coverage(TopicalCoverage topicalCoverage, SpatialCoverage spatialCoverage, TemporalCoverage temporalCoverage) {
+    }
+
+    private record StudyUnit(ObjectInformation objInf, Citation citation, Map<String, String> abstractMap,
+                             Reference universe, List<FundingInformation> fundingInformation,
+                             Coverage coverage, List<ControlledVocabulary> analysisUnit,
+                             List<ControlledVocabulary> kindOfData, List<Reference> dataCollectionReference,
+                             List<Reference> physicalInstanceReference, List<Reference> archiveReference) implements DDIObject {
     }
 }
