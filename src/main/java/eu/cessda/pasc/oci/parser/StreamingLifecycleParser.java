@@ -19,6 +19,7 @@ public class StreamingLifecycleParser {
     private static final String DDI_ARCHIVE = "ddi:archive:3_3";
     private static final String DDI_DATACOLLECTION = "ddi:datacollection:3_3";
     private static final String DDI_INSTANCE = "ddi:instance:3_3";
+    private static final String DDI_PHYSICALINSTANCE = "ddi:physicalinstance:3_3";
     private static final String DDI_REUSABLE = "ddi:reusable:3_3";
     private static final String DDI_STUDYUNIT = "ddi:studyunit:3_3";
 
@@ -41,6 +42,10 @@ public class StreamingLifecycleParser {
     private static final QName TIME_METHOD = new QName(DDI_DATACOLLECTION, "TimeMethod");
     private static final QName TYPE_OF_SAMPLING_PROCEDURE = new QName(DDI_DATACOLLECTION, "TypeOfSamplingProcedure");
     private static final QName TYPE_OF_TIME_METHOD = new QName(DDI_DATACOLLECTION, "TypeOfTimeMethod");
+
+    private static final QName DATA_FILE_IDENTIFICATION = new QName(DDI_PHYSICALINSTANCE, "DataFileIdentification");
+    private static final QName DATA_FILE_URI = new QName(DDI_PHYSICALINSTANCE, "DataFileURI");
+    private static final QName PHYSICAL_INSTANCE = new QName(DDI_PHYSICALINSTANCE, "PhysicalInstance");
 
     private static final QName ABSTRACT = new QName(DDI_REUSABLE, "Abstract");
     private static final QName AGENCY_ORGANIZATION_REFERENCE = new QName(DDI_REUSABLE, "AgencyOrganizationReference");
@@ -142,9 +147,53 @@ public class StreamingLifecycleParser {
             return parseMethodology();
         } else if (fragmentElement.equals(STUDY_UNIT)) {
             return parseStudyUnit();
+        } else if (fragmentElement.equals(PHYSICAL_INSTANCE)) {
+            return parsePhysicalInstance();
         }
 
         return null;
+    }
+
+    private PhysicalInstance parsePhysicalInstance() throws XMLStreamException {
+        validateElement(PHYSICAL_INSTANCE);
+
+        // Stream to the next element
+        reader.nextTag();
+
+        // Parse object information
+        var objInf = parseObjectInformation();
+
+        Citation citation = null;
+        List<String> dataFileUris = new ArrayList<>();
+
+        do {
+            if (reader.getEventType() == START_ELEMENT) {
+                var qName = reader.getName();
+                if (qName.equals(CITATION)) {
+                    citation = parseCitation();
+                } else if (qName.equals(DATA_COLLECTION_REFERENCE)) {
+                    var dataFileUri = parseDataFileIdentification();
+                    dataFileUris.add(dataFileUri);
+                }
+            }
+        } while (reader.next() != END_ELEMENT || !reader.getName().equals(PHYSICAL_INSTANCE));
+
+        return new PhysicalInstance(objInf, citation, dataFileUris);
+    }
+
+    private String parseDataFileIdentification() throws XMLStreamException {
+        validateElement(DATA_FILE_IDENTIFICATION);
+
+        // Stream to the next element
+        reader.nextTag();
+
+        do {
+            if (reader.getEventType() == START_ELEMENT && reader.getName().equals(DATA_FILE_URI)) {
+                return reader.getElementText();
+            }
+        } while (reader.next() != END_ELEMENT || !reader.getName().equals(DATA_FILE_IDENTIFICATION));
+
+        throw new XMLStreamException("Expected element \"DataFileURI\" not found", reader.getLocation());
     }
 
     private StudyUnit parseStudyUnit() throws XMLStreamException {
@@ -686,14 +735,14 @@ public class StreamingLifecycleParser {
 
         if (simpleDate != null) {
             if (startDate != null || endDate != null) {
-                throw new XMLStreamException("DateType cannot have SimpleDate and either StartDate or EndDate");
+                throw new XMLStreamException("DateType cannot have SimpleDate and either StartDate or EndDate", reader.getLocation());
             }
             return new SimpleDateType(simpleDate);
         } else {
             if (startDate != null || endDate != null) {
                 return new PeriodDateType(startDate, endDate);
             }
-            throw new XMLStreamException("DateType has no dates");
+            throw new XMLStreamException("DateType has no dates", reader.getLocation());
         }
     }
 
@@ -903,7 +952,7 @@ public class StreamingLifecycleParser {
         throw new IllegalStateException("Invalid ID");
     }
 
-    sealed interface DDIObject permits CollectionEvent, DataCollection, Methodology, Organization, Reference, StudyUnit {
+    sealed interface DDIObject permits CollectionEvent, DataCollection, Methodology, Organization, Reference, PhysicalInstance, StudyUnit {
         ObjectInformation objInf();
     }
 
@@ -998,5 +1047,8 @@ public class StreamingLifecycleParser {
                              Coverage coverage, List<ControlledVocabulary> analysisUnit,
                              List<ControlledVocabulary> kindOfData, List<Reference> dataCollectionReference,
                              List<Reference> physicalInstanceReference, List<Reference> archiveReference) implements DDIObject {
+    }
+
+    private record PhysicalInstance(ObjectInformation objInf, Citation citation, List<String> dataFileUris) implements DDIObject {
     }
 }
