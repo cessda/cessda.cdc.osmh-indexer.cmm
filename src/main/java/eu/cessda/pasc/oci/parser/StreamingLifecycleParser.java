@@ -1,5 +1,6 @@
 package eu.cessda.pasc.oci.parser;
 
+import eu.cessda.pasc.oci.models.lifecycle.*;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.xml.XMLConstants;
@@ -17,6 +18,7 @@ public class StreamingLifecycleParser {
 
     // Namespaces
     private static final String DDI_ARCHIVE = "ddi:archive:3_3";
+    private static final String DDI_CONCEPTUALCOMPONENT = "ddi:conceptualcomponent:3_3";
     private static final String DDI_DATACOLLECTION = "ddi:datacollection:3_3";
     private static final String DDI_INSTANCE = "ddi:instance:3_3";
     private static final String DDI_PHYSICALINSTANCE = "ddi:physicalinstance:3_3";
@@ -31,6 +33,9 @@ public class StreamingLifecycleParser {
     private static final QName ORGANIZATION = new QName(DDI_ARCHIVE, "Organization");
     private static final QName ORGANIZATION_NAME = new QName(DDI_ARCHIVE, "OrganizationName");
     private static final QName ORGANIZATION_IDENTIFICATION = new QName(DDI_ARCHIVE, "OrganizationIdentification");
+
+    private static final QName UNIVERSE = new QName(DDI_CONCEPTUALCOMPONENT, "Universe");
+    private static final QName UNIVERSE_NAME = new QName(DDI_CONCEPTUALCOMPONENT, "UniverseName");
 
     private static final QName COLLECTION_EVENT = new QName(DDI_DATACOLLECTION, "CollectionEvent");
     private static final QName DATA_COLLECTION = new QName(DDI_DATACOLLECTION, "DataCollection");
@@ -70,6 +75,7 @@ public class StreamingLifecycleParser {
     private static final QName KIND_OF_DATA = new QName(DDI_REUSABLE, "KindOfData");
     private static final QName IDENTIFIER_CONTENT = new QName(DDI_REUSABLE, "IdentifierContent");
     private static final QName INTERNATIONAL_IDENTIFIER = new QName(DDI_REUSABLE, "InternationalIdentifier");
+    private static final QName LABEL = new QName(DDI_REUSABLE, "Label");
     private static final QName MANAGING_AGENCY = new QName(DDI_REUSABLE, "ManagingAgency");
     private static final QName PHYSICAL_INSTANCE_REFERENCE = new QName(DDI_REUSABLE, "PhysicalInstanceReference");
     private static final QName PUBLICATION_DATE = new QName(DDI_REUSABLE, "PublicationDate");
@@ -87,29 +93,77 @@ public class StreamingLifecycleParser {
 
     private static final QName STUDY_UNIT = new QName(DDI_STUDYUNIT, "StudyUnit");
 
+    private static final Set<QName> LOCAL_NAMES = Set.of(
+            new QName(DDI_REUSABLE, "URN"),
+            new QName(DDI_REUSABLE, "Agency"),
+            new QName(DDI_REUSABLE, "ID"),
+            new QName(DDI_REUSABLE, "Version")
+    );
+
     // URN Matcher
     private static final Pattern DDI_URN_REGEX = Pattern.compile("^urn:ddi:([^:]*):([^:]*):([^:]*)$");
+
+    private final XMLInputFactory factory;
+    private final Source source;
     private final ArrayList<DDIObject> parsedObjects = new ArrayList<>();
+
     private TrackingXMLReader reader;
 
-    private List<DDIObject> parsedObjects() {
-        return List.copyOf(parsedObjects);
+    public StreamingLifecycleParser(XMLInputFactory factory, Source source) {
+        this.factory = factory;
+        this.source = source;
     }
 
-    public void parseDDI(Source source) throws XMLStreamException {
+    public Map<Class<? extends DDIObject>, List<DDIObject>> getObjectsByType() {
+        var objectMap = new HashMap<Class<? extends DDIObject>, List<DDIObject>>();
+        for (var object : parsedObjects) {
+            objectMap.computeIfAbsent(object.getClass(), k -> new ArrayList<>()).add(object);
+        }
+        return objectMap;
+    }
+
+    public Map<ObjectInformation, DDIObject> getObjectsById() {
+        var objectMap = new HashMap<ObjectInformation, DDIObject>();
+        for (var object : parsedObjects) {
+            objectMap.put(object.objInf(), object);
+        }
+        return objectMap;
+    }
+
+    public static StreamingLifecycleParser parseDocument(XMLInputFactory factory, Source source) throws XMLStreamException {
+        var parser = new StreamingLifecycleParser(factory, source);
+
+        // Parse the document
+        parser.parseDDI();
+
+        // Return the parsed document
+        return parser;
+    }
+
+    private void parseDDI() throws XMLStreamException {
+
         // Create reader
-        var streamReader = XMLInputFactory.newInstance().createXMLStreamReader(source);
+        var streamReader = factory.createXMLStreamReader(source);
         reader = new TrackingXMLReader(streamReader);
 
-        // Get the root DDI element
-        do {
-            if (reader.getEventType() == START_ELEMENT) {
-                if (reader.getName().equals(FRAGMENT_INSTANCE)) {
+        boolean found = false;
+
+        try {
+            // Get the root DDI element
+            do {
+                if (reader.getEventType() == START_ELEMENT && reader.getName().equals(FRAGMENT_INSTANCE)) {
                     // Start parsing
                     parseFromRoot();
+                    found = true;
                 }
-            }
-        } while (reader.next() != END_DOCUMENT);
+            } while (reader.next() != END_DOCUMENT);
+        } finally {
+            reader = null;
+        }
+
+        if (!found) {
+            throw new XMLStreamException("Expected element \"" + FRAGMENT_INSTANCE + "\" not found");
+        }
     }
 
     private void parseFromRoot() throws XMLStreamException {
@@ -149,9 +203,39 @@ public class StreamingLifecycleParser {
             return parseStudyUnit();
         } else if (fragmentElement.equals(PHYSICAL_INSTANCE)) {
             return parsePhysicalInstance();
+        } else if (fragmentElement.equals(UNIVERSE)) {
+            return parseUniverse();
         }
 
         return null;
+    }
+
+    private Universe parseUniverse() throws XMLStreamException {
+        validateElement(UNIVERSE);
+
+        // Stream to the next element
+        reader.nextTag();
+
+        // Parse object information
+        var objInf = parseObjectInformation();
+
+        Map<String, String> universeName = Collections.emptyMap();
+        Map<String, String> label = Collections.emptyMap();
+
+        do {
+            if (reader.getEventType() == START_ELEMENT) {
+                var qName = reader.getName();
+                if (qName.equals(UNIVERSE_NAME)) {
+                    reader.nextTag();
+                    universeName = extractMultilingualStrings();
+                } else if (qName.equals(LABEL)) {
+                    reader.nextTag();
+                    label = extractMultilingualContent();
+                }
+            }
+        } while (reader.next() != END_ELEMENT || !reader.getName().equals(UNIVERSE));
+
+        return new Universe(objInf, universeName, label);
     }
 
     private PhysicalInstance parsePhysicalInstance() throws XMLStreamException {
@@ -193,7 +277,7 @@ public class StreamingLifecycleParser {
             }
         } while (reader.next() != END_ELEMENT || !reader.getName().equals(DATA_FILE_IDENTIFICATION));
 
-        throw new XMLStreamException("Expected element \"DataFileURI\" not found", reader.getLocation());
+        throw new XMLStreamException("Expected element \"" + DATA_FILE_URI + "\" not found", reader.getLocation());
     }
 
     private StudyUnit parseStudyUnit() throws XMLStreamException {
@@ -301,10 +385,8 @@ public class StreamingLifecycleParser {
         DateType referenceDate = null;
 
         do {
-            if (reader.getEventType() == START_ELEMENT) {
-                if (reader.getName().equals(REFERENCE_DATE)) {
-                    referenceDate = parseReferenceDate();
-                }
+            if (reader.getEventType() == START_ELEMENT && reader.getName().equals(REFERENCE_DATE)) {
+                referenceDate = parseReferenceDate();
             }
         } while (reader.next() != END_ELEMENT || !reader.getName().equals(TEMPORAL_COVERAGE));
 
@@ -926,11 +1008,10 @@ public class StreamingLifecycleParser {
                 case "Agency" -> agency = reader.getElementText();
                 case "ID" -> id = reader.getElementText();
                 case "Version" -> version = reader.getElementText();
-                default ->
-                    throw new XMLStreamException("Element " + reader.getName() + " was unexpected", reader.getLocation());
+                default -> throw new XMLStreamException("Element " + reader.getName() + " was unexpected", reader.getLocation());
             }
 
-        } while (ObjectInformation.LOCAL_NAMES.contains(reader.nextElement()));
+        } while (LOCAL_NAMES.contains(reader.nextElement()));
 
         // Finalise object
         if (agency != null && id != null && version != null) {
@@ -950,105 +1031,5 @@ public class StreamingLifecycleParser {
         }
 
         throw new IllegalStateException("Invalid ID");
-    }
-
-    sealed interface DDIObject permits CollectionEvent, DataCollection, Methodology, Organization, Reference, PhysicalInstance, StudyUnit {
-        ObjectInformation objInf();
-    }
-
-    record DataCollection(ObjectInformation objInf, CollectionEvent collectionEvent, Reference methodologyReference) implements DDIObject {
-    }
-
-    record Organization(ObjectInformation objInf, Map<String, String> names) implements DDIObject {
-    }
-
-    record Reference(ObjectInformation objInf, String typeOfObject) implements DDIObject {
-    }
-
-    record ObjectInformation(
-        String agency,
-        String id,
-        String version
-    ) {
-        static Set<QName> LOCAL_NAMES = Set.of(
-            new QName(DDI_REUSABLE, "URN"),
-            new QName(DDI_REUSABLE, "Agency"),
-            new QName(DDI_REUSABLE, "ID"),
-            new QName(DDI_REUSABLE, "Version")
-        );
-    }
-
-    interface DateType {
-    }
-
-    record SimpleDateType(String simpleDate) implements DateType {
-    }
-
-    record PeriodDateType(String startDate, String endDate) implements DateType {
-    }
-
-    record CollectionEvent(ObjectInformation objInf, DateType collectionDate, List<ModeOfCollection> modesOfCollection) implements DDIObject {
-    }
-
-    private record Methodology(ObjectInformation objInf, SamplingProcedure samplingProcedure, TimeMethod timeMethod) implements DDIObject {
-    }
-
-    record ControlledVocabulary(String id, String agencyName, String versionId) {
-    }
-
-    record ModeOfCollection(ObjectInformation objInf, ControlledVocabulary cv, String modeOfCollection) {
-    }
-
-    record TimeMethod(ObjectInformation objInf, ControlledVocabulary cv, String typeOfTimeMethod) {
-    }
-
-    record SamplingProcedure(ObjectInformation objInf, ControlledVocabulary cv, String typeOfSamplingProcedure, Map<String, String> content)  {
-    }
-
-    private record Creator(Reference creatorReference, Map<String, String> creatorName) {
-    }
-
-    private record Publisher(Reference publisherReference, Map<String, String> publisherName) {
-    }
-
-    private record Contributor(Reference contributorReference, ControlledVocabulary contributorRole, Map<String, String> contributorName) {
-    }
-
-    private record InternationalIdentifier(String identifierContent, String managingAgency) implements DateType {
-    }
-
-    private record Citation(
-            Map<String, String> title,
-            Creator creator,
-            Publisher publisher,
-            List<Contributor> contributors,
-            DateType publicationDate,
-            InternationalIdentifier internationalIdentifier
-    ) {
-    }
-
-    private record FundingInformation(Reference agencyOrganizationReference, String grantNumber) {
-    }
-
-    private record TopicalCoverage(ObjectInformation objectInformation, List<ControlledVocabulary> subjects, List<ControlledVocabulary> keywords) {
-    }
-
-    private record SpatialCoverage(ObjectInformation objectInformation, Map<String, String> description, List<String> countryCodes) {
-    }
-
-    private record TemporalCoverage(ObjectInformation objInf, DateType referenceDate) {
-    }
-
-    private record Coverage(TopicalCoverage topicalCoverage, SpatialCoverage spatialCoverage, TemporalCoverage temporalCoverage) {
-    }
-
-    private record StudyUnit(ObjectInformation objInf, Citation citation, Map<String, String> abstractMap,
-                             Reference universe, List<FundingInformation> fundingInformation,
-                             Coverage coverage, List<ControlledVocabulary> analysisUnit,
-                             List<ControlledVocabulary> kindOfData, List<Reference> dataCollectionReference,
-                             List<Reference> physicalInstanceReference, List<Reference> archiveReference) implements DDIObject {
-    }
-
-    private record PhysicalInstance(ObjectInformation objInf, Citation citation, List<String> dataFileUris) implements DDIObject {
     }
 }
