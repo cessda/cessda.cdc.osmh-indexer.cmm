@@ -51,11 +51,13 @@
               <rspStmt>
                 <AuthEnty affiliation="Jyväskylän yliopisto. Psykologian laitos" xml:lang="fi">Pulkkinen, Lea</AuthEnty>
                 <AuthEnty affiliation="Jyväskylän Essex. Department of Psychology" xml:lang="fi">David Brook</AuthEnty>
-
               </rspStmt>
-              <prodStmt>
-              </prodStmt>
+              <prodStmt/>
               <distStmt>
+                <!--Compliant examples -->
+                <distrbtr xml:lang="fi" abbr="FSD">Yhteiskuntatieteellinen tietoarkisto</distrbtr>
+                <distrbtr xml:lang="en" abbr="FSD">Finnish Social Science Data Archive</distrbtr>
+                <distrbtr xml:lang="se">Samhällsdatablad</distrbtr>
                 <distDate date="1982-01-01T00:00:00Z">1982</distDate>
               </distStmt>
               <serStmt URI="https://services.fsd.tuni.fi/catalogue/series/28?lang=fi" xml:lang="fi" ID="S28">
