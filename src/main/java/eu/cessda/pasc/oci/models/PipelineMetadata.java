@@ -18,6 +18,8 @@ package eu.cessda.pasc.oci.models;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.net.URI;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * Model for metadata passed in the CESSDA metadata pipeline.
@@ -36,6 +38,13 @@ public record PipelineMetadata(
     String defaultLanguage,
     URI url,
     String metadataPrefix,
-    String ddiVersion
+    String ddiVersion,
+    Set<String> role
 ) {
+    public PipelineMetadata {
+        // Initialise role if null
+        if (role == null) {
+            role = Collections.emptySet();
+        }
+    }
 }
