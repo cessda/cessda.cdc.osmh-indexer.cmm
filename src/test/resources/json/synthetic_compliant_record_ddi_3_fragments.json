@@ -22,17 +22,22 @@
   "creators": {
     "no": [
       {
-        "name": "NTNU"
+        "name": "NTNU",
+        "affiliation" : "NTNU"
       }
     ],
     "en": [
       {
-        "name": "NTNU"
+        "name": "NTNU",
+        "affiliation" : "NTNU"
       }
     ]
   },
-  "dataAccess": "Uncategorized",
-  "dataAccessFreeTexts": {},
+  "dataAccess": "Open",
+  "dataAccessFreeTexts" : {
+    "no" : [ "Syntetisk Tilgang Beskrivelse NO" ],
+    "en" : [ "Synthetic Access Description EN" ]
+  },
   "dataAccessUrl": {},
   "dataCollectionPeriodStartdate": "2021-12-01",
   "dataCollectionPeriodEnddate": "2022-11-30",
@@ -76,11 +81,11 @@
   "publicationYear": "2024-05-03T00:00:00Z",
   "publisher": {
     "no": {
-      "abbr": "",
+      "abbr": "Sikt",
       "publisher": "Sikt - Kunnskapssektorens tjenesteleverandør"
     },
     "en": {
-      "abbr": "",
+      "abbr": "Sikt",
       "publisher": "Sikt - Norwegian Agency for Shared Services in Education and Research"
     }
   },

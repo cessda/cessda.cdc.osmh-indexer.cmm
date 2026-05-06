@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.models;
+package eu.cessda.pasc.oci.models.oaipmh;
 
-import lombok.Builder;
+import java.util.List;
 
 /**
  * Represents an OAI-PMH header.
@@ -24,10 +24,10 @@ import lombok.Builder;
  * @author moses AT doraventures DOT com
  * @see <a href="http://www.openarchives.org/OAI/openarchivesprotocol.html#Record">http://www.openarchives.org/OAI/openarchivesprotocol.html#Record</a>
  */
-@Builder
-public record RecordHeader(
-    String lastModified,
-    String identifier,
-    boolean deleted
+public record Header(
+        String identifier,
+        String datestamp,
+        List<String> setSpec,
+        boolean deleted
 ) {
 }

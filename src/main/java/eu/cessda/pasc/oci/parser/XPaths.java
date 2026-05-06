@@ -60,7 +60,7 @@ public final class XPaths {
     private final XMLMapper<Map<String, List<String>>> studyURLXPath;
     private final XMLMapper<Map<String, List<Pid>>> pidStudyXPath;
     private final XMLMapper<Map<String, List<String>>> dataRestrctnXPath;
-    private final XMLMapper<CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateTimeParseException>>> dataCollectionPeriodsXPath;
+    private final XMLMapper<CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, DateTimeParseException>> dataCollectionPeriodsXPath;
     private final XMLMapper<Map<String, List<TermVocabAttributes>>> classificationsXPath;
     private final XMLMapper<Map<String, List<TermVocabAttributes>>> keywordsXPath;
     private final XMLMapper<Map<String, List<TermVocabAttributes>>> typeOfTimeMethodXPath;
@@ -84,9 +84,9 @@ public final class XPaths {
     private final XMLMapper<Map<String, List<TermVocabAttributes>>> generalDataFormatXPath;
     private final XMLMapper<Map<String, List<Series>>> seriesXPath;
 
-    private static final CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateTimeParseException>> EMPTY_PARSE_RESULTS = new CMMStudyMapper.ParseResults<>(
+    static final CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, DateTimeParseException> EMPTY_PARSE_RESULTS = new CMMStudyMapper.ParseResults<>(
         new CMMStudyMapper.DataCollectionPeriod(null, null, null, Collections.emptyMap()),
-        Collections.emptyList()
+        null
     );
 
     private static final TermVocabAttributeNames DDI_3_2_ATTR_NAMES = new TermVocabAttributeNames("codeListName", "codeListURN");
@@ -118,7 +118,7 @@ public final class XPaths {
         // Creator/PI
         .creatorsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Citation/r:Creator", ParsingStrategies::creatorsStrategy))
         // Data access open/restricted
-        .dataAccessXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/a:Archive/a:ArchiveSpecific/a:Item/a:Access/a:AccessTypeName/r:String", ParsingStrategies::dataAccessStrategy))
+        .dataAccessXPath(new ResolvingXMLMapper<>("//s:StudyUnit[1]/a:Archive", "//s:StudyUnit[1]/r:ArchiveReference", "//a:ArchiveSpecific/a:Item/a:Access/a:AccessTypeName/r:String", ParsingStrategies::dataAccessStrategy))
         // Terms of data access
         .dataRestrctnXPath(new ResolvingXMLMapper<>("//s:StudyUnit[1]/a:Archive", "//s:StudyUnit[1]/r:ArchiveReference", "//a:ArchiveSpecific/a:Item/a:Access/r:Description/r:Content", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy)))
         // Data collection period
@@ -180,8 +180,6 @@ public final class XPaths {
         })
         // PID of Related publication
         .withRelatedPublicationsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:OtherMaterialScheme/r:OtherMaterial", ParsingStrategies::relatedPublicationLifecycleStrategy))
-        // Data access open/restricted
-        .withDataAccessXPath(new SimpleXMLMapper<>("//s:StudyUnit/a:Archive/a:ArchiveSpecific/a:Item/a:Access/a:TypeOfAccess", ParsingStrategies::dataAccessStrategy))
         // Topics
         .withClassificationsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:TopicalCoverage/r:Subject", extractMetadataObjectListForEachLang(TERM_VOCAB_ATTR_3_3_STRATEGY)))
         // Keywords

@@ -1,4 +1,4 @@
 package eu.cessda.pasc.oci.models.lifecycle;
 
-public interface DateType {
+public sealed interface DateType permits PeriodDateType, SimpleDateType {
 }

@@ -398,7 +398,7 @@ public class CMMStudyMapper {
      * <p>
      * For Data Collection start and end date plus the four digit Year value as Data Collection Year
      */
-    ParseResults<DataCollectionPeriod, List<DateTimeParseException>> parseDataCollectionDates(Document doc, XPaths xPaths) {
+    ParseResults<DataCollectionPeriod, DateTimeParseException> parseDataCollectionDates(Document doc, XPaths xPaths) {
         var parseResults = xPaths.getDataCollectionPeriodsXPath().resolve(doc, xPaths.getNamespace());
         return new ParseResults<>(parseResults.results, parseResults.exceptions);
     }

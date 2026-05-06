@@ -26,12 +26,14 @@ import org.jdom2.Namespace;
 @UtilityClass
 public class OaiPmhConstants {
     // Namespaces
-    static final Namespace OAI_NS = Namespace.getNamespace("oai", "http://www.openarchives.org/OAI/2.0/");
+    static final String OAI_NS_URI = "http://www.openarchives.org/OAI/2.0/";
+    static final Namespace OAI_NS = Namespace.getNamespace("oai", OAI_NS_URI);
 
     // Elements
     static final String IDENTIFIER = "identifier";
     static final String DATESTAMP_ELEMENT = "datestamp";
     static final String RECORD_ELEMENT = "//oai:record";
+    static final String REQUEST = "request";
     static final String DELETED = "deleted";
 
     // Attributes
@@ -51,5 +53,5 @@ public class OaiPmhConstants {
     static final String CONCEPT_EL = "concept";
     static final String URI_ATTR = "URI";
     static final String TYPE_ATTR = "type";
-
+    static final String HEADER = "header";
 }

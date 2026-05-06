@@ -1,6 +1,7 @@
 package eu.cessda.pasc.oci.parser;
 
 import eu.cessda.pasc.oci.models.lifecycle.*;
+import eu.cessda.pasc.oci.models.oaipmh.Header;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.xml.XMLConstants;
@@ -11,6 +12,7 @@ import javax.xml.transform.Source;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import static eu.cessda.pasc.oci.parser.OaiPmhConstants.*;
 import static javax.xml.stream.XMLStreamConstants.*;
 
 @Slf4j
@@ -26,13 +28,31 @@ public class StreamingLifecycleParser {
     private static final String DDI_STUDYUNIT = "ddi:studyunit:3_3";
 
     // QNames
+    private static final QName OAI_DATESTAMP = new QName(OAI_NS_URI, "datestamp");
+    private static final QName OAI_HEADER = new QName(OAI_NS_URI, HEADER);
+    private static final QName OAI_IDENTIFIER = new QName(OAI_NS_URI, IDENTIFIER);
+    private static final QName OAI_REQUEST = new QName(OAI_NS_URI, REQUEST);
+    private static final QName OAI_SETSPEC = new QName(OAI_NS_URI, "setSpec");
+
     private static final QName FRAGMENT = new QName(DDI_INSTANCE, "Fragment");
     private static final QName FRAGMENT_INSTANCE = new QName(DDI_INSTANCE, "FragmentInstance");
     private static final QName TOP_LEVEL_REFERENCE = new QName(DDI_INSTANCE, "TopLevelReference");
 
+    private static final QName ACCESS = new QName(DDI_ARCHIVE, "Access");
+    private static final QName ACCESS_TYPE_NAME = new QName(DDI_ARCHIVE, "AccessTypeName");
+    private static final QName ARCHIVE = new QName(DDI_ARCHIVE, "Archive");
+    private static final QName ARCHIVE_SPECIFIC = new QName(DDI_ARCHIVE, "ArchiveSpecific");
+    private static final QName FULL_NAME = new QName(DDI_ARCHIVE, "FullName");
+    private static final QName INDIVIDUAL = new QName(DDI_ARCHIVE, "Individual");
+    private static final QName INDIVIDUAL_IDENTIFICATION = new QName(DDI_ARCHIVE, "IndividualIdentification");
+    private static final QName INDIVIDUAL_NAME = new QName(DDI_ARCHIVE, "IndividualName");
+    private static final QName ITEM = new QName(DDI_ARCHIVE, "Item");
     private static final QName ORGANIZATION = new QName(DDI_ARCHIVE, "Organization");
     private static final QName ORGANIZATION_NAME = new QName(DDI_ARCHIVE, "OrganizationName");
     private static final QName ORGANIZATION_IDENTIFICATION = new QName(DDI_ARCHIVE, "OrganizationIdentification");
+    private static final QName RESEARCHER_ID = new QName(DDI_ARCHIVE, "ResearcherID");
+    private static final QName RESEARCHER_IDENTIFICATION = new QName(DDI_ARCHIVE, "ResearcherIdentification");
+    private static final QName TYPE_OF_ID = new QName(DDI_ARCHIVE, "TypeOfID");
 
     private static final QName UNIVERSE = new QName(DDI_CONCEPTUALCOMPONENT, "Universe");
     private static final QName UNIVERSE_NAME = new QName(DDI_CONCEPTUALCOMPONENT, "UniverseName");
@@ -52,6 +72,7 @@ public class StreamingLifecycleParser {
     private static final QName DATA_FILE_URI = new QName(DDI_PHYSICALINSTANCE, "DataFileURI");
     private static final QName PHYSICAL_INSTANCE = new QName(DDI_PHYSICALINSTANCE, "PhysicalInstance");
 
+    private static final QName ABBREVIATION = new QName(DDI_REUSABLE, "Abbreviation");
     private static final QName ABSTRACT = new QName(DDI_REUSABLE, "Abstract");
     private static final QName AGENCY_ORGANIZATION_REFERENCE = new QName(DDI_REUSABLE, "AgencyOrganizationReference");
     private static final QName ANALYSIS_UNIT = new QName(DDI_REUSABLE, "AnalysisUnit");
@@ -90,6 +111,7 @@ public class StreamingLifecycleParser {
     private static final QName TITLE = new QName(DDI_REUSABLE, "Title");
     private static final QName TOPICAL_COVERAGE = new QName(DDI_REUSABLE, "TopicalCoverage");
     private static final QName UNIVERSE_REFERENCE = new QName(DDI_REUSABLE, "UniverseReference");
+    private static final QName URI = new QName(DDI_REUSABLE, "URI");
 
     private static final QName STUDY_UNIT = new QName(DDI_STUDYUNIT, "StudyUnit");
 
@@ -105,13 +127,31 @@ public class StreamingLifecycleParser {
 
     private final XMLInputFactory factory;
     private final Source source;
+
     private final ArrayList<DDIObject> parsedObjects = new ArrayList<>();
+
+    private String oaiRequest = null;
+    private Header oaiRecordHeader = null;
 
     private TrackingXMLReader reader;
 
     public StreamingLifecycleParser(XMLInputFactory factory, Source source) {
         this.factory = factory;
         this.source = source;
+    }
+
+    /**
+     * Get OAI-PMH request if present
+     */
+    public Optional<String> getRequest() {
+        return Optional.ofNullable(oaiRequest);
+    }
+
+    /**
+     * Get OAI-PMH record header if present
+     */
+    public Optional<Header> getRecordHeader() {
+        return Optional.ofNullable(oaiRecordHeader);
     }
 
     public Map<Class<? extends DDIObject>, List<DDIObject>> getObjectsByType() {
@@ -151,10 +191,17 @@ public class StreamingLifecycleParser {
         try {
             // Get the root DDI element
             do {
-                if (reader.getEventType() == START_ELEMENT && reader.getName().equals(FRAGMENT_INSTANCE)) {
-                    // Start parsing
-                    parseFromRoot();
-                    found = true;
+                if (reader.getEventType() == START_ELEMENT) {
+                    var qName = reader.getName();
+                    if (qName.equals(OAI_REQUEST)) {
+                        oaiRequest = reader.getElementText();
+                    } else if (qName.equals(OAI_HEADER)) {
+                        oaiRecordHeader = parseOAIHeader();
+                    } else if (qName.equals(FRAGMENT_INSTANCE)) {
+                        // Start parsing
+                        parseFromRoot();
+                        found = true;
+                    }
                 }
             } while (reader.next() != END_DOCUMENT);
         } finally {
@@ -166,7 +213,48 @@ public class StreamingLifecycleParser {
         }
     }
 
+    private Header parseOAIHeader() throws XMLStreamException {
+        validateElement(OAI_HEADER);
+
+        int initialDepth = reader.getDepth();
+
+        // Header values
+        String identifier = null;
+        String datestamp = null;
+        ArrayList<String> setSpec = new ArrayList<>(0);
+        boolean deleted = false;
+
+        // Try to get the status of the record. This may not be present.
+        // If it is, the value should be 'deleted'.
+        var status = reader.getAttributeValue(null, "status");
+        if (DELETED.equals(status)) {
+            deleted = true;
+        }
+
+        do {
+            if (reader.getEventType() == START_ELEMENT) {
+                // Switch on element name
+                var qName = reader.getName();
+                if (qName.equals(OAI_IDENTIFIER)) {
+                    identifier = reader.getElementText();
+                } else if (qName.equals(OAI_DATESTAMP)) {
+                    datestamp = reader.getElementText();
+                } else if (qName.equals(OAI_SETSPEC)) {
+                    setSpec.add(reader.getElementText());
+                }
+            }
+        } while (reader.getDepth() >= initialDepth && reader.next() != END_DOCUMENT);
+
+        // Assert that identifier and datestamp are set
+        assert identifier != null;
+        assert datestamp != null;
+
+        return new Header(identifier, datestamp, setSpec, deleted);
+    }
+
     private void parseFromRoot() throws XMLStreamException {
+        validateElement(FRAGMENT_INSTANCE);
+
         int initialDepth = reader.getDepth();
         do {
             if (reader.getEventType() == START_ELEMENT) {
@@ -182,8 +270,6 @@ public class StreamingLifecycleParser {
                 }
             }
         } while (reader.getDepth() >= initialDepth && reader.next() != END_DOCUMENT);
-
-        log.warn(parsedObjects.toString());
     }
 
     // Parses the object contained within the DDI fragment
@@ -193,7 +279,11 @@ public class StreamingLifecycleParser {
 
         var fragmentElement = reader.nextElement();
 
-        if (fragmentElement.equals(ORGANIZATION)) {
+        if (fragmentElement.equals(ARCHIVE)) {
+            return parseArchive();
+        } else if (fragmentElement.equals(INDIVIDUAL)) {
+            return parseIndividual();
+        } else if (fragmentElement.equals(ORGANIZATION)) {
             return parseOrganization();
         } else if (fragmentElement.equals(DATA_COLLECTION)) {
             return parseDataCollection();
@@ -208,6 +298,178 @@ public class StreamingLifecycleParser {
         }
 
         return null;
+    }
+
+    private Individual parseIndividual() throws XMLStreamException {
+        validateElement(INDIVIDUAL);
+
+        // Stream to the next element
+        reader.nextTag();
+
+        // Parse object information
+        var objInf = parseObjectInformation();
+
+        IndividualIdentification individualIdentification = null;
+
+        do {
+            if (reader.getEventType() == START_ELEMENT) {
+                var qName = reader.getName();
+                if (qName.equals(INDIVIDUAL_IDENTIFICATION)) {
+                    individualIdentification = parseIndividualIdentification();
+                }
+            }
+        } while (reader.next() != END_ELEMENT || !reader.getName().equals(INDIVIDUAL));
+
+        return new Individual(objInf, individualIdentification);
+    }
+
+    private IndividualIdentification parseIndividualIdentification() throws XMLStreamException {
+        validateElement(INDIVIDUAL_IDENTIFICATION);
+
+        // Stream to the next element
+        reader.nextTag();
+
+        IndividualName individualName = null;
+        ResearcherID researcherID = null;
+
+        do {
+            if (reader.getEventType() == START_ELEMENT) {
+                var qName = reader.getName();
+                if (qName.equals(INDIVIDUAL_NAME)) {
+                    individualName = parseIndividualName();
+                } else if (qName.equals(RESEARCHER_ID)) {
+                    researcherID = parseResearcherID();
+                }
+            }
+        } while (reader.next() != END_ELEMENT || !reader.getName().equals(INDIVIDUAL_IDENTIFICATION));
+
+        return new IndividualIdentification(individualName, researcherID);
+    }
+
+    private ResearcherID parseResearcherID() throws XMLStreamException {
+        validateElement(RESEARCHER_ID);
+
+        String typeOfId = null;
+        String researcherIdentification = null;
+        String uri = null;
+
+        do {
+            if (reader.getEventType() == START_ELEMENT) {
+                var qName = reader.getName();
+                if (qName.equals(TYPE_OF_ID)) {
+                    typeOfId = reader.getElementText();
+                } else if (qName.equals(RESEARCHER_IDENTIFICATION)) {
+                    researcherIdentification = reader.getElementText();
+                } else if (qName.equals(URI)) {
+                    uri = reader.getElementText();
+                }
+            }
+        } while (reader.next() != END_ELEMENT || !reader.getName().equals(RESEARCHER_ID));
+
+        return new ResearcherID(typeOfId, researcherIdentification, uri);
+    }
+
+    private IndividualName parseIndividualName() throws XMLStreamException {
+        validateElement(INDIVIDUAL_NAME);
+
+        Map<String, String> fullName = Collections.emptyMap();
+
+        do {
+            if (reader.getEventType() == START_ELEMENT) {
+                var qName = reader.getName();
+                if (qName.equals(FULL_NAME)) {
+                    reader.nextTag();
+                    fullName = extractMultilingualStrings();
+                }
+            }
+        } while (reader.next() != END_ELEMENT || !reader.getName().equals(INDIVIDUAL_NAME));
+
+        return new IndividualName(fullName);
+    }
+
+    private Archive parseArchive() throws XMLStreamException {
+        validateElement(ARCHIVE);
+
+        // Stream to the next element
+        reader.nextTag();
+
+        // Parse object information
+        var objInf = parseObjectInformation();
+
+        Access access = null;
+
+        do {
+            if (reader.getEventType() == START_ELEMENT) {
+                var qName = reader.getName();
+                if (qName.equals(ARCHIVE_SPECIFIC)) {
+                    access = parseArchiveSpecific();
+                }
+            }
+        } while (reader.next() != END_ELEMENT || !reader.getName().equals(ARCHIVE));
+
+        return new Archive(objInf, access);
+    }
+
+    private Access parseArchiveSpecific() throws XMLStreamException {
+        validateElement(ARCHIVE_SPECIFIC);
+
+        Access access = null;
+
+        do {
+            if (reader.getEventType() == START_ELEMENT) {
+                var qName = reader.getName();
+                if (qName.equals(ITEM)) {
+                    access = parseItem();
+                }
+            }
+        } while (reader.next() != END_ELEMENT || !reader.getName().equals(ARCHIVE_SPECIFIC));
+
+        return access;
+    }
+
+    private Access parseItem() throws XMLStreamException {
+        validateElement(ITEM);
+
+        Access access = null;
+
+        do {
+            if (reader.getEventType() == START_ELEMENT) {
+                var qName = reader.getName();
+                if (qName.equals(ACCESS)) {
+                    access = parseAccess();
+                }
+            }
+        } while (reader.next() != END_ELEMENT || !reader.getName().equals(ITEM));
+
+        return access;
+    }
+
+    private Access parseAccess() throws XMLStreamException {
+        validateElement(ACCESS);
+
+        // Stream to the next element
+        reader.nextTag();
+
+        // Parse object information
+        var objInf = parseObjectInformation();
+
+        Map<String, String> accessTypeName = Collections.emptyMap();
+        Map<String, String> accessDescription = Collections.emptyMap();
+
+        do {
+            if (reader.getEventType() == START_ELEMENT) {
+                var qName = reader.getName();
+                if (qName.equals(ACCESS_TYPE_NAME)) {
+                    reader.nextTag();
+                    accessTypeName = extractMultilingualStrings();
+                } else if (qName.equals(DESCRIPTION)) {
+                    reader.nextTag();
+                    accessDescription = extractMultilingualContent();
+                }
+            }
+        } while (reader.next() != END_ELEMENT || !reader.getName().equals(ACCESS));
+
+        return new Access(objInf, accessTypeName, accessDescription);
     }
 
     private Universe parseUniverse() throws XMLStreamException {
@@ -295,7 +557,7 @@ public class StreamingLifecycleParser {
         List<FundingInformation> fundingInformationList = new ArrayList<>();
         Coverage coverage = null;
         List<ControlledVocabulary> analysisUnitList = new ArrayList<>();
-        List<ControlledVocabulary> kindOfDataList = new ArrayList<>();
+        List<KindOfData> kindOfDataList = new ArrayList<>();
         List<Reference> dataCollectionReferenceList = new ArrayList<>();
         List<Reference> physicalInstanceReferenceList = new ArrayList<>();
         List<Reference> archiveReferenceList = new ArrayList<>();
@@ -319,7 +581,9 @@ public class StreamingLifecycleParser {
                     var analysisUnit = parseControlledVocabularyInformation();
                     analysisUnitList.add(analysisUnit);
                 } else if (qName.equals(KIND_OF_DATA)) {
-                    var kindOfData = parseControlledVocabularyInformation();
+                    var type = reader.getAttributeValue(null, TYPE_ATTR);
+                    var controlledVocabulary = parseControlledVocabularyInformation();
+                    var kindOfData = new KindOfData(controlledVocabulary, type);
                     kindOfDataList.add(kindOfData);
                 } else if (qName.equals(DATA_COLLECTION_REFERENCE)) {
                     var dataCollectionReference = parseReference();
@@ -432,18 +696,20 @@ public class StreamingLifecycleParser {
         var objectInformation = parseObjectInformation();
 
         // Parse subjects
-        var subjects = new ArrayList<ControlledVocabulary>();
-        var keywords = new ArrayList<ControlledVocabulary>();
+        var subjects = new HashMap<String, List<ControlledVocabulary>>();
+        var keywords = new HashMap<String, List<ControlledVocabulary>>();
 
         do {
             if (reader.getEventType() == START_ELEMENT) {
                 var qName = reader.getName();
                 if (qName.equals(SUBJECT)) {
+                    var lang = reader.getAttributeValue(XMLConstants.XML_NS_URI, LANG_ATTR);
                     var subject = parseControlledVocabularyInformation();
-                    subjects.add(subject);
+                    subjects.computeIfAbsent(lang, k -> new ArrayList<>()).add(subject);
                 } else if (qName.equals(KEYWORD)) {
+                    var lang = reader.getAttributeValue(XMLConstants.XML_NS_URI, LANG_ATTR);
                     var keyword = parseControlledVocabularyInformation();
-                    keywords.add(keyword);
+                    keywords.computeIfAbsent(lang, k -> new ArrayList<>()).add(keyword);
                 }
             }
         } while (reader.next() != END_ELEMENT || !reader.getName().equals(TOPICAL_COVERAGE));
@@ -600,12 +866,16 @@ public class StreamingLifecycleParser {
 
         // Creator
         Map<String, String> creatorName = Collections.emptyMap();
+        String affiliation = null;
         Reference creatorReference = null;
 
         do {
             if (reader.getEventType() == START_ELEMENT) {
                 var qName = reader.getName();
                 if (qName.equals(CREATOR_NAME)) {
+                    // Extract creator affiliation
+                    affiliation = reader.getAttributeValue(null, "affiliation");
+
                     // Stream to the next element
                     reader.nextTag();
 
@@ -619,7 +889,7 @@ public class StreamingLifecycleParser {
 
         } while (reader.next() != END_ELEMENT || !reader.getName().equals(CREATOR));
 
-        return new Creator(creatorReference, creatorName);
+        return new Creator(creatorReference, creatorName, affiliation);
     }
 
     private Methodology parseMethodology() throws XMLStreamException {
@@ -658,8 +928,7 @@ public class StreamingLifecycleParser {
 
         int depth = reader.getDepth();
 
-        ControlledVocabulary controlledVocabulary = null;
-        String typeOfTimeMethod = null;
+        ControlledVocabulary typeOfTimeMethod = null;
 
         // Current event
         int event = reader.getEventType();
@@ -668,10 +937,7 @@ public class StreamingLifecycleParser {
                 var elementName = reader.getName();
                 if (elementName.equals(TYPE_OF_TIME_METHOD)) {
                     // Parse controlled vocabulary information
-                    controlledVocabulary = parseControlledVocabularyInformation();
-
-                    // Get mode of collection
-                    typeOfTimeMethod = reader.getElementText();
+                    typeOfTimeMethod = parseControlledVocabularyInformation();
                 }
             }
 
@@ -679,7 +945,7 @@ public class StreamingLifecycleParser {
             event = reader.next();
         } while (depth <= reader.getDepth());
 
-        return new TimeMethod(objInf, controlledVocabulary, typeOfTimeMethod);
+        return new TimeMethod(objInf, typeOfTimeMethod);
     }
 
     private SamplingProcedure parseSamplingProcedure() throws XMLStreamException {
@@ -692,8 +958,7 @@ public class StreamingLifecycleParser {
 
         int depth = reader.getDepth();
 
-        ControlledVocabulary controlledVocabulary = null;
-        String typeOfSamplingProcedure = null;
+        ControlledVocabulary typeOfSamplingProcedure = null;
 
         Map<String, String> content = Collections.emptyMap();
 
@@ -704,10 +969,7 @@ public class StreamingLifecycleParser {
                 var qName = reader.getName();
                 if (qName.equals(TYPE_OF_SAMPLING_PROCEDURE)) {
                     // Parse controlled vocabulary information
-                    controlledVocabulary = parseControlledVocabularyInformation();
-
-                    // Get mode of collection
-                    typeOfSamplingProcedure = reader.getElementText();
+                    typeOfSamplingProcedure = parseControlledVocabularyInformation();
                 } else if (qName.equals(DESCRIPTION)) {
                     // Parse content
                     int d2 = reader.getDepth();
@@ -723,7 +985,7 @@ public class StreamingLifecycleParser {
             event = reader.next();
         } while (depth <= reader.getDepth());
 
-        return new SamplingProcedure(objInf, controlledVocabulary, typeOfSamplingProcedure, content);
+        return new SamplingProcedure(objInf, typeOfSamplingProcedure, content);
     }
 
     private DataCollection parseDataCollection() throws XMLStreamException {
@@ -736,12 +998,13 @@ public class StreamingLifecycleParser {
         var objInf = parseObjectInformation();
 
         Reference methodologyReference = null;
-        CollectionEvent collectionEvent = null;
+        ArrayList<CollectionEvent> collectionEvents = new ArrayList<>();
 
         do {
             if (reader.getEventType() == START_ELEMENT) {
                 if (reader.getName().equals(COLLECTION_EVENT)) {
-                    collectionEvent = parseCollectionEvent();
+                    var collectionEvent = parseCollectionEvent();
+                    collectionEvents.add(collectionEvent);
                 } else if (reader.getName().equals(METHODOLOGY_REFERENCE)) {
                     // Parse object information
                     methodologyReference = parseReference();
@@ -749,7 +1012,7 @@ public class StreamingLifecycleParser {
             }
         } while (reader.next() != END_ELEMENT || !reader.getName().equals(DATA_COLLECTION));
 
-        return new DataCollection(objInf, collectionEvent, methodologyReference);
+        return new DataCollection(objInf, collectionEvents, methodologyReference);
     }
 
     private CollectionEvent parseCollectionEvent() throws XMLStreamException {
@@ -840,7 +1103,6 @@ public class StreamingLifecycleParser {
         int depth = reader.getDepth();
 
         ControlledVocabulary controlledVocabulary = null;
-        String modeOfCollection = null;
 
         // Current event
         int event = reader.getEventType();
@@ -850,9 +1112,6 @@ public class StreamingLifecycleParser {
                 if (elementName.equals(new QName(DDI_DATACOLLECTION, "TypeOfModeOfCollection"))) {
                     // Parse controlled vocabulary information
                     controlledVocabulary = parseControlledVocabularyInformation();
-
-                    // Get mode of collection
-                    modeOfCollection = reader.getElementText();
                 }
             }
 
@@ -860,24 +1119,31 @@ public class StreamingLifecycleParser {
             event = reader.next();
         } while (depth <= reader.getDepth());
 
-        return new ModeOfCollection(objInf, controlledVocabulary, modeOfCollection);
+        return new ModeOfCollection(objInf, controlledVocabulary);
     }
 
-    private ControlledVocabulary parseControlledVocabularyInformation() {
+    @SuppressWarnings("java:S131") // only act on known attribute names
+    private ControlledVocabulary parseControlledVocabularyInformation() throws XMLStreamException {
         // Parse attributes
         String id = null;
+        String name = null;
         String agencyName = null;
         String versionId = null;
+        String urn = null;
 
         for (int i = 0; i < reader.getAttributeCount(); i++) {
             switch (reader.getAttributeLocalName(i)) {
                 case "controlledVocabularyID" -> id = reader.getAttributeValue(i);
+                case "controlledVocabularyName" -> name = reader.getAttributeValue(i);
                 case "controlledVocabularyAgencyName" -> agencyName = reader.getAttributeValue(i);
                 case "controlledVocabularyVersionID" -> versionId = reader.getAttributeValue(i);
+                case "controlledVocabularyURN" -> urn = reader.getAttributeValue(i);
             }
         }
 
-        return new ControlledVocabulary(id, agencyName, versionId);
+        String content = reader.getElementText();
+
+        return new ControlledVocabulary(id, name, agencyName, versionId, urn, content);
     }
 
     private Organization parseOrganization() throws XMLStreamException {
@@ -889,7 +1155,7 @@ public class StreamingLifecycleParser {
         // Parse object information
         var objInf = parseObjectInformation();
 
-        Map<String, String> names = Collections.emptyMap();
+        OrganizationName names = null;
 
         do {
             if (reader.getEventType() == START_ELEMENT && reader.getName().equals(ORGANIZATION_IDENTIFICATION)) {
@@ -904,21 +1170,45 @@ public class StreamingLifecycleParser {
             }
         } while (reader.next() != END_ELEMENT || !reader.getName().equals(ORGANIZATION));
 
+        assert names != null;
+
         return new Organization(objInf, names);
     }
 
-    private Map<String, String> parseOrganizationName() throws XMLStreamException {
+    private OrganizationName parseOrganizationName() throws XMLStreamException {
         validateElement(ORGANIZATION_NAME);
         Map<String, String> names = Collections.emptyMap();
+        Map<String, String> abbreviations = Collections.emptyMap();
+
+        var depth = reader.getDepth();
+        do {
+            int event = reader.next();
+            if (event == START_ELEMENT && reader.getName().equals(STRING)) {
+                names = extractMultilingualStrings();
+            }
+
+            // extractMultilingualStrings() will return on a START_ELEMENT event. Check what
+            // that element is. This prevents overwriting full names with abbreviations.
+            if (event == START_ELEMENT && reader.getName().equals(ABBREVIATION)) {
+                abbreviations = parseAbbreviation();
+            }
+        } while (depth <= reader.getDepth());
+
+        return new OrganizationName(names, abbreviations);
+    }
+
+    private Map<String, String> parseAbbreviation() throws XMLStreamException {
+        validateElement(ABBREVIATION);
+        Map<String, String> abbreviations = Collections.emptyMap();
 
         var depth = reader.getDepth();
         do {
             if (reader.next() == START_ELEMENT && reader.getName().equals(STRING)) {
-                names = extractMultilingualStrings();
+                abbreviations = extractMultilingualStrings();
             }
         } while (depth <= reader.getDepth());
 
-        return names;
+        return abbreviations;
     }
 
     private Map<String, String> extractMultilingualContent() throws XMLStreamException {
@@ -948,7 +1238,7 @@ public class StreamingLifecycleParser {
 
             // Get next event
             event = reader.next();
-        } while (depth <= reader.getDepth() && (event != START_ELEMENT || reader.getName().equals(STRING)));
+        } while (depth <= reader.getDepth() && (event != START_ELEMENT || reader.getName().equals(qname)));
 
         return map;
     }

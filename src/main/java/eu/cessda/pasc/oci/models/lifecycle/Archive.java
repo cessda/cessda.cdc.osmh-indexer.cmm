@@ -1,7 +1,7 @@
 package eu.cessda.pasc.oci.models.lifecycle;
 
-public record Organization(
+public record Archive(
         ObjectInformation objInf,
-        OrganizationName names
+        Access access
 ) implements DDIObject {
 }

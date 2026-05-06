@@ -532,12 +532,12 @@ class ParsingStrategies{
     }
 
     @NonNull
-    static CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateTimeParseException>> dataCollectionPeriodsStrategy(List<Element> elementList) {
+    static CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, DateTimeParseException> dataCollectionPeriodsStrategy(List<Element> elementList) {
         var dateAttrs = getDateElementAttributesValueMap(elementList);
 
         var dataCollectionPeriodBuilder = CMMStudyMapper.DataCollectionPeriod.builder();
 
-        var parseExceptions = new ArrayList<DateTimeParseException>(2);
+        DateTimeParseException parseException = null;
 
         if (dateAttrs.containsKey(SINGLE_ATTR)) {
             final String singleDateValue = dateAttrs.get(SINGLE_ATTR);
@@ -546,7 +546,7 @@ class ParsingStrategies{
                 var year = TimeUtility.getTimeFormat(singleDateValue, Year::from);
                 dataCollectionPeriodBuilder.dataCollectionYear(year.getValue());
             } catch (DateTimeParseException e) {
-                parseExceptions.add(e);
+                parseException = e;
             }
         } else {
             if (dateAttrs.containsKey(START_ATTR)) {
@@ -556,7 +556,7 @@ class ParsingStrategies{
                     var year = TimeUtility.getTimeFormat(startDateValue, Year::from);
                     dataCollectionPeriodBuilder.dataCollectionYear(year.getValue());
                 } catch (DateTimeParseException e) {
-                    parseExceptions.add(e);
+                    parseException = e;
                 }
             }
             if (dateAttrs.containsKey(END_ATTR)) {
@@ -570,13 +570,13 @@ class ParsingStrategies{
 
         return new CMMStudyMapper.ParseResults<>(
             dataCollectionPeriodBuilder.build(),
-            parseExceptions
+            parseException
         );
     }
 
     @NonNull
     @SuppressWarnings("java:S131")
-    static CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateTimeParseException>> dataCollectionPeriodsLifecycleStrategy(Element dataCollectionDate) {
+    static CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, DateTimeParseException> dataCollectionPeriodsLifecycleStrategy(Element dataCollectionDate) {
         String startDate = null;
         String endDate = null;
         String singleDate = null;
@@ -589,30 +589,27 @@ class ParsingStrategies{
             }
         }
 
-        var parseExceptions = new ArrayList<DateTimeParseException>();
+        DateTimeParseException parseException = null;
 
         // Derive the data collection year
         Integer year = null;
-        if (singleDate != null) {
-            try {
-                var parsedYear = TimeUtility.getTimeFormat(singleDate, Year::from);
-                year = parsedYear.getValue();
-            } catch (DateTimeParseException e) {
-                parseExceptions.add(e);
+        try {
+            if (singleDate != null) {
+                year = parseDateIntoYear(singleDate);
+            } else if(startDate != null) {
+                year = parseDateIntoYear(startDate);
             }
-        }
-
-        if (year == null && startDate != null) {
-            try {
-                var parsedYear = TimeUtility.getTimeFormat(startDate, Year::from);
-                year = parsedYear.getValue();
-            } catch (DateTimeParseException e) {
-                parseExceptions.add(e);
-            }
+        } catch (DateTimeParseException e) {
+            parseException = e;
         }
 
         var dataCollectionPeriod = new CMMStudyMapper.DataCollectionPeriod(startDate, year, endDate, Collections.emptyMap());
-        return new CMMStudyMapper.ParseResults<>(dataCollectionPeriod, parseExceptions);
+        return new CMMStudyMapper.ParseResults<>(dataCollectionPeriod, parseException);
+    }
+
+    public static int parseDateIntoYear(String singleDate) throws DateTimeParseException {
+        var parsedYear = TimeUtility.getTimeFormat(singleDate, Year::from);
+        return parsedYear.getValue();
     }
 
     @NonNull
@@ -940,7 +937,7 @@ class ParsingStrategies{
 
             // Filter by TypeOfMaterial = "Related Publication"
             var typeOfMaterial = element.getChildTextTrim("TypeOfMaterial", null);
-            if (typeOfMaterial == null || !typeOfMaterial.equalsIgnoreCase("Related Publication")) {
+            if (!"Related Publication".equalsIgnoreCase(typeOfMaterial)) {
                 continue;
             }
 
@@ -1031,7 +1028,7 @@ class ParsingStrategies{
                     var creatorMap = individualStrategy(r.element());
 
                     // Create a Publisher to represent this creator
-                    var publisherMap = new HashMap<String, Publisher>(creatorMap.size());
+                    var publisherMap = HashMap.<String, Publisher>newHashMap(creatorMap.size());
                     creatorMap.forEach((lang, creator) -> {
                         var publisher = new Publisher(null, creator.name());
                         publisherMap.put(lang, publisher);
@@ -1162,24 +1159,33 @@ class ParsingStrategies{
         for (Element element : elements) {
             String value = element.getTextTrim();
 
-            // Check if the value is "openAccess", return "Open"
             if (!value.isEmpty()) {
-                if ("openAccess".equalsIgnoreCase(value)
-                    || "info:eu-repo/semantics/openAccess".equalsIgnoreCase(value)) {
-                    return "Open";
-                }
-
-                // Check if the value is one of the restricted types and return "Restricted"
-                if ("closedAccess".equalsIgnoreCase(value)
-                    || "embargoedAccess".equalsIgnoreCase(value)
-                    || "restrictedAccess".equalsIgnoreCase(value)
-                    || "info:eu-repo/semantics/restrictedAccess".equalsIgnoreCase(value)) {
-                    return "Restricted";
+                var dataAccess = parseDataAccessString(value);
+                if (dataAccess != null) {
+                    return dataAccess;
                 }
             }
         }
 
         // Return null if no valid value was found
+        return null;
+    }
+
+    @Nullable
+    public static String parseDataAccessString(String value) {
+        // Check if the value is "openAccess", return "Open"
+        if ("openAccess".equalsIgnoreCase(value)
+            || "info:eu-repo/semantics/openAccess".equalsIgnoreCase(value)) {
+            return "Open";
+        }
+
+        // Check if the value is one of the restricted types and return "Restricted"
+        if ("closedAccess".equalsIgnoreCase(value)
+            || "embargoedAccess".equalsIgnoreCase(value)
+            || "restrictedAccess".equalsIgnoreCase(value)
+            || "info:eu-repo/semantics/restrictedAccess".equalsIgnoreCase(value)) {
+            return "Restricted";
+        }
         return null;
     }
 
@@ -1244,7 +1250,7 @@ class ParsingStrategies{
             }
 
             for (var nameElement : seriesElement.getChildren("SeriesName", null)) {
-                for (var nameContent : nameElement.getChildren("String", null)) {
+                for (var nameContent : nameElement.getChildren(STRING, null)) {
                     var lang = XMLMapper.getLangOfElement(nameContent);
                     nameMap.computeIfAbsent(lang, k -> new ArrayList<>()).add(nameContent.getTextTrim());
                 }

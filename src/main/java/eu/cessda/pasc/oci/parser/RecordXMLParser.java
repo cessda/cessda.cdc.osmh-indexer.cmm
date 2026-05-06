@@ -21,11 +21,11 @@ import eu.cessda.pasc.oci.exception.InvalidUniverseException;
 import eu.cessda.pasc.oci.exception.UnsupportedXMLNamespaceException;
 import eu.cessda.pasc.oci.exception.XMLParseException;
 import eu.cessda.pasc.oci.models.Record;
-import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.Request;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.TermVocabAttributes;
 import eu.cessda.pasc.oci.models.cmmstudy.VocabAttributes;
+import eu.cessda.pasc.oci.models.oaipmh.Header;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.jdom2.Document;
@@ -90,37 +90,35 @@ public class RecordXMLParser {
     }
 
     /**
-     * Parse an OAI-PMH record header element into a {@link RecordHeader} object.
+     * Parse an OAI-PMH record header element into a {@link Header} object.
      *
      * @param headerElement the element to parse.
      * @return a record header.
      */
     @SuppressWarnings({"java:S131", "java:S1301"}) // There is no need to take action for other element names
-    private RecordHeader parseRecordHeader(Element headerElement) {
+    private Header parseRecordHeader(Element headerElement) {
 
-        var recordHeaderBuilder = RecordHeader.builder();
+        // Header values
+        String identifier = null;
+        String datestamp = null;
+        List<String> setSpec = Collections.emptyList();
+        boolean deleted = false;
 
         // Check if the record is deleted
         if (headerElement.hasAttributes()) {
             var deletedAttribute = headerElement.getAttributeValue(OaiPmhConstants.STATUS_ATTR);
-            recordHeaderBuilder.deleted(OaiPmhConstants.DELETED.equals(deletedAttribute));
+            deleted = OaiPmhConstants.DELETED.equals(deletedAttribute);
         }
 
         // Parse the elements of the header
         var childElements = headerElement.getChildren();
         for (var child : childElements) {
             switch (child.getName()) {
-                case OaiPmhConstants.IDENTIFIER -> {
-                    String identifier = child.getText();
-                    recordHeaderBuilder.identifier(identifier);
-                }
-                case OaiPmhConstants.DATESTAMP_ELEMENT -> {
-                    String lastModified = child.getText();
-                    recordHeaderBuilder.lastModified(lastModified);
-                }
+                case OaiPmhConstants.IDENTIFIER -> identifier = child.getText();
+                case OaiPmhConstants.DATESTAMP_ELEMENT -> datestamp = child.getText();
             }
         }
-        return recordHeaderBuilder.build();
+        return new Header(identifier, datestamp, setSpec, deleted);
     }
 
     /**
@@ -178,7 +176,7 @@ public class RecordXMLParser {
         if (document.getRootElement().getNamespace().equals(OaiPmhConstants.OAI_NS)) {
 
             // Parse request element
-            var elem = document.getRootElement().getChild("request", OaiPmhConstants.OAI_NS);
+            var elem = document.getRootElement().getChild(OaiPmhConstants.REQUEST, OaiPmhConstants.OAI_NS);
 
             var uriString = elem.getTextTrim();
 
@@ -239,7 +237,7 @@ public class RecordXMLParser {
         if (recordObj.recordHeader() != null) {
             // A header was present, extract values
             studyNumber = recordObj.recordHeader().identifier();
-            lastModified = recordObj.recordHeader().lastModified();
+            lastModified = recordObj.recordHeader().datestamp();
         } else {
             // Derive the study number from the file name
             studyNumber = getNameWithoutExtension(path.toString());
@@ -305,12 +303,12 @@ public class RecordXMLParser {
             builder.typeOfModeOfCollections(cmmStudyMapper.parseTypeOfModeOfCollection(metadata, xPaths, defaultLangIsoCode));
 
             var dataCollectionPeriodResults = cmmStudyMapper.parseDataCollectionDates(metadata, xPaths);
-            if (!dataCollectionPeriodResults.exceptions().isEmpty()) {
+            if (dataCollectionPeriodResults.exceptions() != null) {
                 // Parsing errors occurred, log here
                 log.warn("[{}] Some dates in study {} couldn't be parsed: {}",
                     value(LoggingConstants.REPO_NAME, repository.code()),
                     value(LoggingConstants.STUDY_ID, studyNumber),
-                    dataCollectionPeriodResults.exceptions()
+                    dataCollectionPeriodResults.exceptions().toString()
                 );
             }
             dataCollectionPeriodResults.results().getStartDate().ifPresent(builder::dataCollectionPeriodStartdate);

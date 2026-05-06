@@ -4,8 +4,7 @@ import java.util.Map;
 
 public record SamplingProcedure(
         ObjectInformation objInf,
-        ControlledVocabulary cv,
-        String typeOfSamplingProcedure,
+        ControlledVocabulary typeOfSamplingProcedure,
         Map<String, String> content
 ) {
 }

@@ -131,6 +131,10 @@
                                 <OrganizationName>
                                     <r:String xml:lang="en">Sikt - Norwegian Agency for Shared Services in Education and Research</r:String>
                                     <r:String xml:lang="no">Sikt - Kunnskapssektorens tjenesteleverandør</r:String>
+                                    <r:Abbreviation>
+                                        <r:String xml:lang="en">Sikt</r:String>
+                                        <r:String xml:lang="no">Sikt</r:String>
+                                    </r:Abbreviation>
                                 </OrganizationName>
                             </OrganizationIdentification>
                         </Organization>
@@ -670,7 +674,7 @@
                                     <r:String xml:lang="no">Addressing Domestic Violence in Antenatal Care Environments 2 (ADVANCE 2)</r:String>
                                 </r:Title>
                                 <r:Creator>
-                                    <r:CreatorName>
+                                    <r:CreatorName affiliation="NTNU">
                                         <r:String xml:lang="en">NTNU</r:String>
                                         <r:String xml:lang="no">NTNU</r:String>
                                     </r:CreatorName>
@@ -847,6 +851,14 @@
                                         <r:ID>53052e71-eb74-49f5-808c-2026512a1763</r:ID>
                                         <r:Version>1</r:Version>
                                         <r:TypeOfObject>Organization</r:TypeOfObject>
+                                    </r:ContributorReference>
+                                </r:Contributor>
+                                <r:Contributor>
+                                    <r:ContributorReference>
+                                        <r:Agency>eu.cessda</r:Agency>
+                                        <r:ID>synthetic-id</r:ID>
+                                        <r:Version>1.0.0</r:Version>
+                                        <r:TypeOfObject>Individual</r:TypeOfObject>
                                     </r:ContributorReference>
                                 </r:Contributor>
                                 <r:PublicationDate>
@@ -1029,6 +1041,47 @@ Spørsmålene merket med 'Relevant,' 'Understandable/Clear', og 'Sensitive' ble 
                                 </OrganizationName>
                             </OrganizationIdentification>
                         </Organization>
+                    </Fragment>
+                    <Fragment xmlns:a="ddi:archive:3_3" xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+                        <a:Archive>
+                            <r:URN>urn:ddi:no.nsd:5725b3ee-a8ba-4868-b59c-4fc21c5331b4:3</r:URN>
+                            <a:ArchiveSpecific>
+                                <a:Item>
+                                    <a:Access>
+                                        <r:Agency>eu.cessda</r:Agency>
+                                        <r:ID>AccessType</r:ID>
+                                        <r:Version>1.0.0</r:Version>
+                                        <a:AccessTypeName>
+                                            <r:String>info:eu-repo/semantics/openAccess</r:String>
+                                        </a:AccessTypeName>
+                                        <r:Description>
+                                            <r:Content xml:lang="en">Synthetic Access Description EN</r:Content>
+                                            <r:Content xml:lang="no">Syntetisk Tilgang Beskrivelse NO</r:Content>
+                                        </r:Description>
+                                    </a:Access>
+                                </a:Item>
+                            </a:ArchiveSpecific>
+                        </a:Archive>
+                    </Fragment>
+                    <Fragment xmlns:a="ddi:archive:3_3" xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+                        <a:Individual>
+                            <r:Agency>eu.cessda</r:Agency>
+                            <r:ID>synthetic-id</r:ID>
+                            <r:Version>1.0.0</r:Version>
+                            <a:IndividualIdentification>
+                                <a:IndividualName>
+                                    <a:FullName>
+                                        <r:String xml:lang="en">Synthetic ORCID EN</r:String>
+                                        <r:String xml:lang="no">Syntetisk ORCID NO</r:String>
+                                    </a:FullName>
+                                </a:IndividualName>
+                                <a:ResearcherID>
+                                    <a:TypeOfID>ORCID</a:TypeOfID>
+                                    <a:ResearcherIdentification>0000-0000-0000-0000</a:ResearcherIdentification>
+                                    <r:URI>https://orcid.org/0000-0000-0000-0000</r:URI>
+                                </a:ResearcherID>
+                            </a:IndividualIdentification>
+                        </a:Individual>
                     </Fragment>
                 </ddi:FragmentInstance>
             </oai:metadata>

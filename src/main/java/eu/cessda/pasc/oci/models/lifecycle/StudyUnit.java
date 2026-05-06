@@ -11,7 +11,7 @@ public record StudyUnit(
         List<FundingInformation> fundingInformation,
         Coverage coverage,
         List<ControlledVocabulary> analysisUnit,
-        List<ControlledVocabulary> kindOfData,
+        List<KindOfData> kindOfData,
         List<Reference> dataCollectionReference,
         List<Reference> physicalInstanceReference,
         List<Reference> archiveReference
