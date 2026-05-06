@@ -298,10 +298,7 @@ public class RecordXMLParser {
             builder.publisher(cmmStudyMapper.parsePublisher(metadata, xPaths, defaultLangIsoCode));
             cmmStudyMapper.parseYrOfPublication(metadata, xPaths).ifPresent(builder::publicationYear);
             builder.fileLanguages(cmmStudyMapper.parseFileLanguages(metadata, xPaths));
-            var samplingProcedures = cmmStudyMapper.parseTypeOfSamplingProcedure(metadata, xPaths, defaultLangIsoCode);
-            var result = extractSamplingProcedures(samplingProcedures);
-            builder.typeOfSamplingProcedures(result.vocabAttributes());
-            builder.samplingProcedureFreeTexts(result.terms());
+            builder.typeOfSamplingProcedures(cmmStudyMapper.parseTypeOfSamplingProcedure(metadata, xPaths, defaultLangIsoCode));
             builder.typeOfModeOfCollections(cmmStudyMapper.parseTypeOfModeOfCollection(metadata, xPaths, defaultLangIsoCode));
 
             var dataCollectionPeriodResults = cmmStudyMapper.parseDataCollectionDates(metadata, xPaths);
@@ -354,43 +351,5 @@ public class RecordXMLParser {
         }
 
         return builder.build();
-    }
-
-    @NonNull
-    private static SamplingProcedures extractSamplingProcedures(Map<String, List<TermVocabAttributes>> samplingProcedures) {
-        var vocab = new HashMap<String, List<VocabAttributes>>();
-        var sampTerm = new HashMap<String, List<String>>();
-
-        samplingProcedures.forEach((lang, termVocabAttributesList) -> {
-            // Create separate lists
-            var va = new ArrayList<VocabAttributes>(termVocabAttributesList.size());
-            var ft = new ArrayList<String>(termVocabAttributesList.size());
-
-            // Copy content to the lists
-            for (var vocAttr : termVocabAttributesList) {
-                if (!vocAttr.id().isEmpty()) {
-                    va.add(new VocabAttributes(vocAttr.vocab(), vocAttr.vocabUri(), vocAttr.id()));
-                }
-                if (!vocAttr.term().isEmpty()) {
-                    ft.add(vocAttr.term());
-                }
-            }
-
-            // Put the lists with the separated content in the maps
-            if (!va.isEmpty()) {
-                vocab.put(lang, va);
-            }
-            if (!ft.isEmpty()) {
-                sampTerm.put(lang, ft);
-            }
-        });
-
-        return new SamplingProcedures(vocab, sampTerm);
-    }
-
-    private record SamplingProcedures(
-        Map<String, List<VocabAttributes>> vocabAttributes,
-        Map<String, List<String>> terms
-    ) {
     }
 }

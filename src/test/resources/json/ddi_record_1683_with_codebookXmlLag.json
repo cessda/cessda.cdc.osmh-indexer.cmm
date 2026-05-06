@@ -170,11 +170,20 @@
       }
     ]
   },
-  "typeOfSamplingProcedures": {},
-  "samplingProcedureFreeTexts": {
+  "typeOfSamplingProcedures": {
     "zz": [
-      "No sampling (total universe)",
-      "No sampling (total universe) TEST"
+      {
+        "vocab": "",
+        "vocabUri": "",
+        "id": "",
+        "term": "No sampling (total universe)"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "",
+        "id": "",
+        "term": "No sampling (total universe) TEST"
+      }
     ]
   },
   "typeOfModeOfCollections": {
