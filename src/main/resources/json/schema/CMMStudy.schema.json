@@ -412,23 +412,6 @@
       "type": "string",
       "description": "The URL of the repository as defined in the repository's configuration"
     },
-    "samplingProcedureFreeTexts": {
-      "type": "object",
-      "description": "Sampling procedures freeText description for data collection.",
-      "patternProperties": {
-        "^[a-z]{2}$": {
-          "type": "array",
-          "items": [
-            {
-              "type": "string",
-              "description": "A Sampling procedure freeText description for data collection.",
-              "additionalProperties": false
-            }
-          ]
-        }
-      },
-      "additionalProperties": false
-    },
     "series": {
       "type": "object",
       "patternProperties": {
