@@ -13,6 +13,26 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 - *Fixed (for any bug fixes)*
 - *Security (in case of vulnerabilities)*
 
+## [4.2.0] - 2026-05-26
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20272466.svg)](https://doi.org/10.5281/zenodo.20272466)
+
+### Added
+
+- Added support for the new pipeline metadata format ([#745](https://github.com/cessda/cessda.cdc.versions/issues/745))
+- Added support for using the [COAR Access Right Vocabulary](https://vocabularies.coar-repositories.org/access_rights/) when parsing data access types. All previously supported values are still supported. ([#746](https://github.com/cessda/cessda.cdc.versions/issues/746))
+
+### Changed
+
+- Modified `typeOfSamplingProcedures` to contain the term previously held by `samplingProcedureFreeTexts` ([#756](https://github.com/cessda/cessda.cdc.versions/issues/756))
+- Prioritise `ddi:distrbtr` over `ddi:producer` when parsing publisher information in DDI Codebook 2.5 XMLs
+
+### Removed
+
+- Removed the `samplingProcedureFreeTexts` field ([#756](https://github.com/cessda/cessda.cdc.versions/issues/756))
+- Removed the `VocabAttributes` record, this was only used by `typeOfSamplingProcedures` ([#756](https://github.com/cessda/cessda.cdc.versions/issues/756))
+- Removed the `setSpec` field from the repository configuration model ([#745](https://github.com/cessda/cessda.cdc.versions/issues/745))
+
 ## [4.1.0] - 2025-09-29
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17192544.svg)](https://doi.org/10.5281/zenodo.17192544)
