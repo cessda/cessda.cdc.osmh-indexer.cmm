@@ -364,6 +364,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 - verify SSL
 - removed the option to disable HTTPS verification
 
+[4.2.0]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/4.2.0
 [4.1.0]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/4.1.0
 [4.0.0]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/4.0.0
 [3.8.0]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/3.8.0
