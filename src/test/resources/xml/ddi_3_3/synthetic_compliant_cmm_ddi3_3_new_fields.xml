@@ -109,6 +109,7 @@
                 <r:Agency>de.gesis</r:Agency>
                 <r:ID>ZA0004_Org_DC</r:ID>
                 <r:Version>1.0.0</r:Version>
+                <r:UserID typeOfUserID="ROR">https://ror.org/000000000</r:UserID>
                 <a:OrganizationIdentification>
                     <a:OrganizationName>
                         <r:String>Institute for International Social Research, Princeton, N.J.</r:String>
@@ -133,6 +134,32 @@
                     </a:ResearcherID>
                 </a:IndividualIdentification>
             </a:Individual>
+            <a:Relation>
+                <r:Agency>de.gesis</r:Agency>
+                <r:ID>ZA0055_Org_RelCre1</r:ID>
+                <r:Version>1.0.0</r:Version>
+                <a:SourceObject>
+                    <a:IndividualReference>
+                        <r:Agency>eu.cessda</r:Agency>
+                        <r:ID>synthetic-id</r:ID>
+                        <r:Version>1.0.0</r:Version>
+                        <r:TypeOfObject>Individual</r:TypeOfObject>
+                    </a:IndividualReference>
+                </a:SourceObject>
+                <a:TargetObject>
+                    <a:OrganizationReference>
+                        <r:Agency>de.gesis</r:Agency>
+                        <r:ID>ZA0004_Org_DC</r:ID>
+                        <r:Version>1.0.0</r:Version>
+                        <r:TypeOfObject>Organization</r:TypeOfObject>
+                    </a:OrganizationReference>
+                    <a:Role>
+                        <r:Description>
+                            <r:Content>Affiliation</r:Content>
+                        </r:Description>
+                    </a:Role>
+                </a:TargetObject>
+            </a:Relation>
         </a:OrganizationScheme>
         <c:GeographicLocationScheme>
             <r:Agency>de.gesis</r:Agency>
@@ -305,6 +332,26 @@
                     </r:Title>
                 </r:Citation>
                 <r:ExternalURLReference>https://dbk.gesis.org/dbksearch/download.asp?id=54968</r:ExternalURLReference>
+            </r:OtherMaterial>
+            <r:OtherMaterial>
+                <r:Agency>de.gesis</r:Agency>
+                <r:ID>ZA0004_RelPub1</r:ID>
+                <r:Version>1.0.0</r:Version>
+                <r:TypeOfMaterial>Related Publication</r:TypeOfMaterial>
+                <r:Citation>
+                    <r:Title>
+                        <r:String xml:lang="en">Synthetic Publication 1</r:String>
+                        <r:String xml:lang="de">Synthetische Publikation 1</r:String>
+                    </r:Title>
+                    <r:PublicationDate>
+                        <r:SimpleDate>2025</r:SimpleDate>
+                    </r:PublicationDate>
+                    <r:InternationalIdentifier>
+                        <r:IdentifierContent>doi:10.4232/00000</r:IdentifierContent>
+                        <r:ManagingAgency>DOI</r:ManagingAgency>
+                    </r:InternationalIdentifier>
+                </r:Citation>
+                <r:ExternalURLReference>https://doi.org/10.4232/00000</r:ExternalURLReference>
             </r:OtherMaterial>
         </r:OtherMaterialScheme>
         <c:ConceptualComponent>

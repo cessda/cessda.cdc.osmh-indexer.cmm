@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2024 CESSDA ERIC (support@cessda.eu)
+ * Copyright © 2017-2025 CESSDA ERIC (support@cessda.eu)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,6 @@ public record CMMStudy(
     @JsonProperty("publicationYear") String publicationYear,
     @JsonProperty("publisher") Map<String, Publisher> publisher,
     @JsonProperty("relatedPublications") Map<String, List<RelatedPublication>> relatedPublications,
-    @JsonProperty("samplingProcedureFreeTexts") Map<String, List<String>> samplingProcedureFreeTexts,
     @JsonProperty("series") Map<String, List<Series>> series,
     @JsonProperty("studyAreaCountries") Map<String, List<Country>> studyAreaCountries,
     @JsonProperty("studyNumber") String studyNumber,
@@ -64,7 +63,7 @@ public record CMMStudy(
     @JsonProperty("typeOfModeOfCollections") Map<String, List<TermVocabAttributes>> typeOfModeOfCollections,
     @JsonProperty("titleStudy") Map<String, String> titleStudy,
     @JsonProperty("typeOfTimeMethods") Map<String, List<TermVocabAttributes>> typeOfTimeMethods,
-    @JsonProperty("typeOfSamplingProcedures") Map<String, List<VocabAttributes>> typeOfSamplingProcedures,
+    @JsonProperty("typeOfSamplingProcedures") Map<String, List<TermVocabAttributes>> typeOfSamplingProcedures,
     @JsonProperty("unitTypes") Map<String, List<TermVocabAttributes>> unitTypes,
     @JsonProperty("universe") Map<String, Universe> universe,
     @JsonProperty("lastModified") String lastModified,

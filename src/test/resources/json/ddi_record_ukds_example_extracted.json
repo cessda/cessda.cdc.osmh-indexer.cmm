@@ -386,10 +386,14 @@
       "National Centre for Social Research"
     ]
   },
-  "typeOfSamplingProcedures": {},
-  "samplingProcedureFreeTexts": {
+  "typeOfSamplingProcedures": {
     "en": [
-      "Multi-stage stratified random sample"
+      {
+        "vocab": "",
+        "vocabUri": "",
+        "id": "",
+        "term": "Multi-stage stratified random sample"
+      }
     ]
   },
   "typeOfModeOfCollections": {

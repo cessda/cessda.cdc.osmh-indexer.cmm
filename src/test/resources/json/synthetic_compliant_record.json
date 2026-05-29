@@ -116,13 +116,22 @@
         "affiliation": "University of Essex. Department of Psychology"
       },
       {
-        "name": "Synthetic ORCID",
-        "affiliation": "Synthetic ORCID Association",
-        "identifier": {
-          "id": "0000-0000-0000-0000",
-          "type": "ORCID",
-          "uri": "https://orcid.org/0000-0000-0000-0000"
-        }
+        "name": "Synthetic PIDs",
+        "affiliation": "Synthetic PID Associations",
+        "identifiers": [
+          {
+            "id": "0000-0000-0000-0000",
+            "type": "ORCID",
+            "uri": "https://orcid.org/0000-0000-0000-0000",
+            "role": "PID"
+          },
+          {
+            "id": "000000000",
+            "type": "ROR",
+            "uri": "https://ror.org/000000000",
+            "role": "Affiliation-PID"
+          }
+        ]
       }
     ]
   },
@@ -145,22 +154,6 @@
       {
         "agency": "Finnish Agency"
       }
-    ]
-  },
-  "samplingProcedureFreeTexts": {
-    "sv": [
-      "Sannolikhetsurval: stratifierat urval",
-      "Undersökningen bygger på program sända i SVT1, SVT2, SVT24, Barnkanalen, Kunskapskanalen, TV4, Sjuan, TV3, Kanal 5, TV6 och TV8 under 12 veckor 2015. Urvalet av veckor skedde obundet och slumpmässigt och stratifierades efter säsong."
-    ],
-    "en": [
-      "This is the term",
-      "This is the term 2",
-      "This is the term. xml:lang in parent el wins over concept",
-      "This is the term. xml:lang in parent el wins over concept regardless",
-      "Should ignore elements without a concept by TypeOfSamplingProcedures"
-    ],
-    "fr": [
-      "Quelque chose"
     ]
   },
   "abstract": {
@@ -298,29 +291,62 @@
       {
         "vocabUri": "fi:urn:ddi-cv:SamplingProcedure:1.1",
         "vocab": "fi DDI Sampling Procedure",
-        "id": "et Probability.Stratified"
+        "id": "et Probability.Stratified",
+        "term": ""
       }
     ],
     "en": [
       {
         "vocabUri": "urn:ddi-cv:SamplingProcedure:1.1",
         "vocab": "DDI Sampling Procedure",
-        "id": "This is the id"
+        "id": "This is the id",
+        "term": "This is the term"
       },
       {
         "vocabUri": "urn:ddi-cv:SamplingProcedure:1.1",
         "vocab": "DDI Sampling Procedure",
-        "id": "Probability.Stratified 2"
+        "id": "Probability.Stratified 2",
+        "term": "This is the term 2"
       },
       {
         "vocabUri": "urn:ddi-cv:SamplingProcedure:1.1",
         "vocab": "DDI Sampling Procedure",
-        "id": "Probability.Stratified 2"
+        "id": "Probability.Stratified 2",
+        "term": "This is the term. xml:lang in parent el wins over concept"
       },
       {
         "vocabUri": "urn:ddi-cv:SamplingProcedure:1.1",
         "vocab": "DDI Sampling Procedure",
-        "id": "Probability.Stratified 2"
+        "id": "Probability.Stratified 2",
+        "term": "This is the term. xml:lang in parent el wins over concept regardless"
+      },
+      {
+        "vocabUri": "",
+        "vocab": "",
+        "id": "",
+        "term": "Element without a concept or lang"
+      }
+    ],
+    "fr": [
+      {
+        "vocabUri": "",
+        "vocab": "",
+        "id": "",
+        "term": "Quelque chose"
+      }
+    ],
+    "sv": [
+      {
+        "vocabUri": "",
+        "vocab": "",
+        "id": "",
+        "term": "Sannolikhetsurval: stratifierat urval"
+      },
+      {
+        "vocabUri": "",
+        "vocab": "",
+        "id": "",
+        "term": "Undersökningen bygger på program sända i SVT1, SVT2, SVT24, Barnkanalen, Kunskapskanalen, TV4, Sjuan, TV3, Kanal 5, TV6 och TV8 under 12 veckor 2015. Urvalet av veckor skedde obundet och slumpmässigt och stratifierades efter säsong."
       }
     ]
   },
@@ -449,21 +475,24 @@
     "en": [
       {
         "title": "Speight, S. Smith, R. and Lloyd, E. with Coshall, C. (2010) Families experiencing multiple disadvantage: their use of and views on childcare provision, Research Report No. DCSF-RR191, London: Department for Children, Schools and Families/National Centre for Social Research. ISBN 978 1 84775 628 2.",
-        "holdings": []
+        "holdings": [],
+        "publicationDate": ""
       },
       {
         "title": "Arosio A. (2015). Parental divorce, cohabitation and the celebration of marriage in Italy. International Review of Sociology, 25(1), 166-179. doi:10.1080/03906701.2014.976950",
         "holdings": [
           "http://dx.doi.org/10.1080/03906701.2014.976950",
           "http://example.com/test-holding"
-        ]
+        ],
+        "publicationDate": "2015"
       },
       {
         "title": "This should be present",
         "holdings": [
           "http://example.com/test-ext-link",
           "http://dx.doi.org/10.1080/03906701.2014.976950"
-        ]
+        ],
+        "publicationDate": "2025-06-19"
       }
     ]
   },

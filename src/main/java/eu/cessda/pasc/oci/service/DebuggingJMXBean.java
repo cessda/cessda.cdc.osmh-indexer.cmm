@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2024 CESSDA ERIC (support@cessda.eu)
+ * Copyright © 2017-2025 CESSDA ERIC (support@cessda.eu)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package eu.cessda.pasc.oci.service;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.cluster.GetClusterSettingsRequest;
 import co.elastic.clients.elasticsearch.cluster.HealthRequest;
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.stream.Collectors;
@@ -28,7 +27,6 @@ import java.util.stream.Collectors;
  *
  * @author moses AT doraventures DOT com
  */
-@Slf4j
 public class DebuggingJMXBean {
 
   private final ElasticsearchClient elasticsearchClient;

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2024 CESSDA ERIC (support@cessda.eu)
+ * Copyright © 2017-2025 CESSDA ERIC (support@cessda.eu)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,11 @@ import java.util.List;
  *
  * @param title    The title of the related publication.
  * @param holdings The URI of the holdings of the related publication.
+ * @param publicationDate The publication date of the related publication.
  */
 public record RelatedPublication(
     @JsonProperty("title") String title,
-    @JsonProperty("holdings") List<URI> holdings
+    @JsonProperty("holdings") List<URI> holdings,
+    @JsonProperty("publicationDate") String publicationDate
 ) {
 }

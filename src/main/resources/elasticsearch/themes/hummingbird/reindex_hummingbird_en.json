@@ -1,18 +1,12 @@
 {
   "query": {
-    "bool": {
-      "must": [
-        {
-          "nested": {
-            "path": "publisherFilter",
-            "query": {
-              "term": {
-                "publisherFilter.publisher": "HumMingBird"
-              }
-            }
-          }
+    "nested": {
+      "path": "publisherFilter",
+      "query": {
+        "term": {
+          "publisherFilter.abbr": "HMB"
         }
-      ]
+      }
     }
   }
 }

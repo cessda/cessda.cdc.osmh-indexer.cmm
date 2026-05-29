@@ -82,6 +82,7 @@
             <dataAccs>
               <useStmt>
                 <restrctn xml:lang="en">The dataset is (D) available only by permission from the data depositor/creator.</restrctn><restrctn xml:lang="fi">Aineisto on käytettävissä (D) vain luovuttajan luvalla.</restrctn>
+                <conditions>info:eu-repo/semantics/restrictedAccess</conditions>
               </useStmt>
             </dataAccs>
             <othrStdyMat>

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2024 CESSDA ERIC (support@cessda.eu)
+ * Copyright © 2017-2025 CESSDA ERIC (support@cessda.eu)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -158,7 +158,7 @@ public class IndexerRunner {
             var studiesUpdated = getUpdatedStudies(cmmStudies, langIsoCode);
 
             // Discover studies to delete, we do this by creating a HashSet of ids and then comparing what's in the database
-            var studyIds = new HashSet<String>(cmmStudies.size());
+            var studyIds = HashSet.<String>newHashSet(cmmStudies.size());
             for (var study : cmmStudies) {
                 studyIds.add(study.id());
             }
@@ -206,17 +206,17 @@ public class IndexerRunner {
         var studiesCreated = new AtomicInteger(0);
         var studiesUpdated = new AtomicInteger(0);
 
-        cmmStudies.forEach(localStudy -> ingestService.getStudy(localStudy.id(), language)
-            .ifPresentOrElse(study -> {
-                if (!localStudy.equals(study)) {
-                    // The study has been updated
-                    studiesUpdated.getAndIncrement();
-                }
-            },
+        for (CMMStudyOfLanguage localStudy : cmmStudies) {
+            ingestService.getStudy(localStudy.id(), language).ifPresentOrElse(study -> {
+                    if (!localStudy.equals(study)) {
+                        // The study has been updated
+                        studiesUpdated.getAndIncrement();
+                    }
+                },
                 // If empty then the study didn't exist in Elasticsearch, and will be created
                 studiesCreated::getAndIncrement
-            )
-        );
+            );
+        }
 
         return new UpdatedStudies(studiesCreated.get(), studiesUpdated.get());
     }

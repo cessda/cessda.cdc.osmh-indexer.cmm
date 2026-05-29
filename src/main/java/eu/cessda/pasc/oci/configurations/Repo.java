@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2024 CESSDA ERIC (support@cessda.eu)
+ * Copyright © 2017-2025 CESSDA ERIC (support@cessda.eu)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import java.nio.file.Path;
  * @param code                   The short name of the repository.
  * @param name                   The friendly name of the repository.
  * @param preferredMetadataParam The {@code metadataPrefix} of the metadata format to be retrieved from the repository.
- * @param setSpec                The set of metadata records to be retrieved from the remote repository.
  * @param defaultLanguage        The default language, overrides the global default if set
  * @author moses AT doraventures DOT com
  */
@@ -36,7 +35,6 @@ public record Repo(
     String code,
     String name,
     String preferredMetadataParam,
-    String setSpec,
     String defaultLanguage
 ) {
 }

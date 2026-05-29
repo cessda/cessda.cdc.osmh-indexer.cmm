@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2024 CESSDA ERIC (support@cessda.eu)
+ * Copyright © 2017-2025 CESSDA ERIC (support@cessda.eu)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,17 +19,19 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.net.URI;
+import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record Creator(
     @JsonProperty("name") String name,
     @JsonProperty("affiliation") String affiliation,
-    @JsonProperty("identifier") Identifier identifier
+    @JsonProperty("identifiers") List<Identifier> identifiers
 ) {
     public record Identifier(
         @JsonProperty("id") String id,
         @JsonProperty("type") String type,
-        @JsonProperty("uri") URI uri
+        @JsonProperty("uri") URI uri,
+        @JsonProperty("role") String role // "pid", "affiliation-pid"
     ) {
     }
 }

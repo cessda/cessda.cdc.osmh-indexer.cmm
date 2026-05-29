@@ -1,22 +1,9 @@
-[![SQAaaS badge](https://github.com/EOSC-synergy/SQAaaS/raw/master/badges/badges_150x116/badge_software_silver.png)](https://api.eu.badgr.io/public/assertions/ezzXKbd7QcKK6r9enfROsQ "SQAaaS silver badge achieved")
-
-[![SQAaaS badge shields.io](https://img.shields.io/badge/sqaaas%20software-silver-lightgrey)](https://api.eu.badgr.io/public/assertions/ezzXKbd7QcKK6r9enfROsQ "SQAaaS silver badge achieved")
-
+# OSMH Consumer Indexer (PaSC-OCI)
 
 [![Build Status](https://jenkins.cessda.eu/buildStatus/icon?job=cessda.cdc.osmh-indexer.cmm%2Fmain)](https://jenkins.cessda.eu/job/cessda.cdc.osmh-indexer.cmm/job/main/)
-[![Bugs](https://sonarqube.cessda.eu/api/project_badges/measure?project=eu.cessda.pasc%3Apasc-oci&metric=bugs)](https://sonarqube.cessda.eu/dashboard?id=eu.cessda.pasc%3Apasc-oci)
-[![Code Smells](https://sonarqube.cessda.eu/api/project_badges/measure?project=eu.cessda.pasc%3Apasc-oci&metric=code_smells)](https://sonarqube.cessda.eu/dashboard?id=eu.cessda.pasc%3Apasc-oci)
-[![Coverage](https://sonarqube.cessda.eu/api/project_badges/measure?project=eu.cessda.pasc%3Apasc-oci&metric=coverage)](https://sonarqube.cessda.eu/dashboard?id=eu.cessda.pasc%3Apasc-oci)
-[![Duplicated Lines (%)](https://sonarqube.cessda.eu/api/project_badges/measure?project=eu.cessda.pasc%3Apasc-oci&metric=duplicated_lines_density)](https://sonarqube.cessda.eu/dashboard?id=eu.cessda.pasc%3Apasc-oci)
-[![Lines of Code](https://sonarqube.cessda.eu/api/project_badges/measure?project=eu.cessda.pasc%3Apasc-oci&metric=ncloc)](https://sonarqube.cessda.eu/dashboard?id=eu.cessda.pasc%3Apasc-oci)
-[![Maintainability Rating](https://sonarqube.cessda.eu/api/project_badges/measure?project=eu.cessda.pasc%3Apasc-oci&metric=sqale_rating)](https://sonarqube.cessda.eu/dashboard?id=eu.cessda.pasc%3Apasc-oci)
 [![Quality Gate Status](https://sonarqube.cessda.eu/api/project_badges/measure?project=eu.cessda.pasc%3Apasc-oci&metric=alert_status)](https://sonarqube.cessda.eu/dashboard?id=eu.cessda.pasc%3Apasc-oci)
-[![Reliability Rating](https://sonarqube.cessda.eu/api/project_badges/measure?project=eu.cessda.pasc%3Apasc-oci&metric=reliability_rating)](https://sonarqube.cessda.eu/dashboard?id=eu.cessda.pasc%3Apasc-oci)
-[![Security Rating](https://sonarqube.cessda.eu/api/project_badges/measure?project=eu.cessda.pasc%3Apasc-oci&metric=security_rating)](https://sonarqube.cessda.eu/dashboard?id=eu.cessda.pasc%3Apasc-oci)
-[![Technical Debt](https://sonarqube.cessda.eu/api/project_badges/measure?project=eu.cessda.pasc%3Apasc-oci&metric=sqale_index)](https://sonarqube.cessda.eu/dashboard?id=eu.cessda.pasc%3Apasc-oci)
-[![Vulnerabilities](https://sonarqube.cessda.eu/api/project_badges/measure?project=eu.cessda.pasc%3Apasc-oci&metric=vulnerabilities)](https://sonarqube.cessda.eu/dashboard?id=eu.cessda.pasc%3Apasc-oci)
-
-# OSMH Consumer Indexer (PaSC-OCI)
+[![Coverage](https://sonarqube.cessda.eu/api/project_badges/measure?project=eu.cessda.pasc%3Apasc-oci&metric=coverage)](https://sonarqube.cessda.eu/dashboard?id=eu.cessda.pasc%3Apasc-oci)
+[![SQAaaS badge shields.io](https://img.shields.io/badge/sqaaas%20software-silver-lightgrey)](https://api.eu.badgr.io/public/assertions/-g_si_SfR0qEB25iI2Ru8A "SQAaaS silver badge achieved")
 
 CESSDA CDC Consumer Indexer (an OSMH Consumer) for Metadata harvesting and ingestion into Elasticsearch. See the [OSMH System Architecture Document](https://docs.google.com/document/d/1RrXjpbyUGdd5FKSjrnQmRdbzaCQzE2W-92lYKs1KeCA/edit) for more information about The Open Source Metadata Harvester (OSMH).
 
@@ -34,19 +21,15 @@ The following tools must be installed before compiling
 
 * Java JDK 17
 
-### Test it
-
-    ./mvnw clean test
-
 ### Sonar it
 
 To perform SonarQube analysis locally, run SonarQube and then execute
 
     ./mvnw sonar:sonar
 
-### Build it
+### Build and test it
 
-    ./mvnw clean package
+    ./mvnw verify
 
 ### Run it
 
@@ -84,13 +67,7 @@ The application loads configuration in this order as defined by the Spring Boot 
 
 See <https://docs.spring.io/spring-boot/docs/3.1.x/reference/html/features.html#features.external-config> for detailed documentation.
 
-### At Runtime
-
-If the application is registered at a [Spring Boot Admin server](https://github.com/codecentric/spring-boot-admin), all environment properties can be changed at runtime.
-
-**Changes made at runtime will be effective after a context reload but are lost after an application restart unless persisted in** `application.yml`
-
-## Configuring the indexer
+## Configuring the Indexer
 
 The OSMH indexer has many settings that change the behaviour of the indexing process.
 
@@ -117,7 +94,7 @@ elasticsearch:
   numberOfReplicas: 0 # The number of replicas each primary shard has
 ```
 
-### Language settings
+### Language Settings
 
 The languages that the OSMH indexer will attempt to harvest are specified under `languages`. These languages will be parsed and indexed into Elasticsearch. The default languages are specified below.
 
@@ -127,14 +104,13 @@ languages: ['cs', 'da', 'de', 'el', 'en', 'et', 'fi', 'fr', 'hu', 'it', 'nl', 'n
 
 Custom mappings and settings can be defined in [src/main/resources/elasticsearch](src/main/resources/elasticsearch). Mappings are global for all defined languages, whereas settings are selected per language. If the required mappings and settings can't be loaded, the index will not be created and an error will be logged.
 
-
-### Indexing a repository
+### Indexing a Repository
 
 In most cases, repositories to index are detected using instances of `pipeline.json`. These are generated by the [CESSDA Metadata Harvester](https://github.com/cessda/cessda.metadata.harvester) and contain all the information needed to index the XMLs present alongside them.
 
 Repositories are discovered by searching for instances of `pipeline.json` in the `baseDirectory`. The `baseDirectory` can be specified using the `--baseDirectory` command line parameter, or by specifying `baseDirectory` in `application.yml`.
 
-### Explicitly declaring a repository
+### Explicitly Declaring a Repository
 
 Repositories are declared in [application.yml](/src/main/resources/application.yml) and are specified under the key `endpoints.repos`.
 
@@ -158,9 +134,9 @@ endpoints:
 | `preferredMetadataParam` | String | The metadata prefix used when harvesting from the OAI-PMH repository.                                                                                                                                                                        |
 | `defaultLanguage`        | String | Used to set a language on an element that doesn't have `@xml:lang` defined. Defaults to `oaiPmh.metadataParsingDefaultLang.lang` if not set. This setting is only considered if `oaiPmh.metadataParsingDefaultLang.active` is set to `true`. |
 
-### Data Access mappings
+### Data Access Mappings
 
-Data Access is primarily read in DDI-C 2.5 from `/codeBook/stdyDscr/dataAccs/useStmt/conditions` by checking for the values in [Access Rights CV](https://wiki.surfnet.nl/display/standards/info-eu-repo#infoeurepo-AccessRights) but free text values are also supported through the use of mappings JSON. Mappings for each repository can be specified in [data_access_mappings.json](/src/main/resources/data_access_mappings.json) by which XPath to use from [XPaths.java](src/main/java/eu/cessda/pasc/oci/parser/XPaths.java) and then which free texts to map to Open / Restricted. Any new XPaths that aren't already used for Data Access for some repository will also be needed to be added as a part of `parseDataAccess` in [CMMStudyMapper.java](src/main/java/eu/cessda/pasc/oci/parser/CMMStudyMapper.java).
+Data Access is primarily read in DDI-C 2.5 from `/codeBook/stdyDscr/dataAccs/useStmt/conditions` by checking for the values in [Access Rights CV](https://vocabularies.coar-repositories.org/documentation/access_rights/) but free text values are also supported through the use of mappings JSON. Mappings for each repository can be specified in [data_access_mappings.json](/src/main/resources/data_access_mappings.json) by which XPath to use from [XPaths.java](src/main/java/eu/cessda/pasc/oci/parser/XPaths.java) and then which free texts to map to Open / Restricted. Any new XPaths that aren't already used for Data Access for some repository will also be needed to be added as a part of `parseDataAccess` in [CMMStudyMapper.java](src/main/java/eu/cessda/pasc/oci/parser/CMMStudyMapper.java).
 
 Repository names in mapping JSON should be the same as code set in harvesting configuration (which follows the [configuration from cessda.cdc.aggregator.deploy](https://github.com/cessda/cessda.cdc.aggregator.deploy/blob/main/charts/harvester/config/config.yaml)).
 

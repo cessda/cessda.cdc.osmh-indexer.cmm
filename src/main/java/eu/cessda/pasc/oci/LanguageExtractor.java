@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2024 CESSDA ERIC (support@cessda.eu)
+ * Copyright © 2017-2025 CESSDA ERIC (support@cessda.eu)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -147,7 +147,6 @@ public class LanguageExtractor {
         Optional.ofNullable(cmmStudy.pidStudies()).map(map -> mergeLanguages(map, lang)).ifPresent(builder::pidStudies);
         Optional.ofNullable(cmmStudy.creators()).map(map -> mergeLanguages(map, lang)).ifPresent(builder::creators);
         Optional.ofNullable(cmmStudy.typeOfSamplingProcedures()).map(map -> map.get(lang)).ifPresent(builder::typeOfSamplingProcedures);
-        Optional.ofNullable(cmmStudy.samplingProcedureFreeTexts()).map(map -> map.get(lang)).ifPresent(builder::samplingProcedureFreeTexts);
         Optional.ofNullable(cmmStudy.typeOfModeOfCollections()).map(map -> map.get(lang)).ifPresent(builder::typeOfModeOfCollections);
         Optional.ofNullable(cmmStudy.titleStudy()).map(map -> map.get(lang)).ifPresent(builder::titleStudy);
         Optional.ofNullable(cmmStudy.dataCollectionFreeTexts()).map(map -> mergeLanguages(map, lang)).ifPresent(builder::dataCollectionFreeTexts);

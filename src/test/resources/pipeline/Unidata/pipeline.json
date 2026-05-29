@@ -7,5 +7,6 @@
   "ddiVersion": "DDI_2_5",
   "profile": "https://cmv.cessda.eu/profiles/cdc/ddi-2.5/latest/profile.xml",
   "validationGate": "BASIC",
-  "defaultLanguage": null
+  "defaultLanguage": null,
+  "role": ["CDC"]
 }

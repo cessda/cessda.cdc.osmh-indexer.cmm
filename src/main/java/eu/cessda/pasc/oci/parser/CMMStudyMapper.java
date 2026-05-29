@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2024 CESSDA ERIC (support@cessda.eu)
+ * Copyright © 2017-2025 CESSDA ERIC (support@cessda.eu)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.cessda.pasc.oci.ResourceHandler;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.configurations.Repo;
+import eu.cessda.pasc.oci.models.Affiliation;
 import eu.cessda.pasc.oci.models.DataAccessMapping;
 import eu.cessda.pasc.oci.models.cmmstudy.*;
 import lombok.Builder;
@@ -28,6 +29,7 @@ import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
+import org.jdom2.Element;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
@@ -184,16 +186,26 @@ public class CMMStudyMapper {
     }
 
     /**
-     * Parses PID Study(s) from:
+     * Parses Creators from:
      * <p>
      * Xpath = {@link XPaths#getCreatorsXPath()}
      */
     Map<String, List<Creator>> parseCreator(Document document, XPaths xPaths) {
+        if (xPaths.getRelationElementsXPath() != null && xPaths.getCreatorElementsXPath() != null) {
+            // Resolve raw elements first and parse afterwards if relations are found (DDI-Lifecycle)
+            List<Element> creatorElements = xPaths.getCreatorElementsXPath().resolve(document, xPaths.getNamespace());
+            List<Element> relationElements = xPaths.getRelationElementsXPath().resolve(document, xPaths.getNamespace());
+
+            Map<String, Affiliation> affiliationMap = ParsingStrategies.parseAffiliationRelations(relationElements);
+
+            return ParsingStrategies.creatorsStrategy(creatorElements, affiliationMap);
+        }
+
         return xPaths.getCreatorsXPath().resolve(document, xPaths.getNamespace());
     }
 
     /**
-     * Parses PID Study(s) from:
+     * Parses Topic Classifications from:
      * <p>
      * Xpath = {@link XPaths#getClassificationsXPath()}
      */
@@ -266,17 +278,17 @@ public class CMMStudyMapper {
      * Parse Publisher from:
      * <p>
      * Xpath = {@link XPaths#getPublisherXPath()} and
-     * Xpath = {@link XPaths#getDistributorXPath()}
+     * Xpath = {@link XPaths#getProducerXPath()}
      */
     Map<String, Publisher> parsePublisher(Document document, XPaths xPaths, String defaultLang) {
-        var producerPathMap = mapNullLanguage(xPaths.getPublisherXPath().resolve(document, xPaths.getNamespace()), defaultLang);
+        Map<String, Publisher> publisherMap = mapNullLanguage(xPaths.getPublisherXPath().resolve(document, xPaths.getNamespace()), defaultLang);
 
-        if (xPaths.getDistributorXPath() != null) {
-            var distrPathMap = mapNullLanguage(xPaths.getDistributorXPath().resolve(document, xPaths.getNamespace()), defaultLang);
-            distrPathMap.forEach(producerPathMap::putIfAbsent);
+        // If publisher is empty, fallback to producer
+        if (publisherMap.isEmpty() && xPaths.getProducerXPath() != null) {
+            publisherMap = mapNullLanguage(xPaths.getProducerXPath().resolve(document, xPaths.getNamespace()), defaultLang);
         }
 
-        return producerPathMap;
+        return publisherMap;
     }
 
     /**
@@ -332,15 +344,15 @@ public class CMMStudyMapper {
     }
 
     /**
-     * Parses Data Access to be Open / Restricted if possible.
+     * Parses Data Access to be Open / Restricted if possible, otherwise returns Uncategorized.
      * <p>
      * Xpath = {@link XPaths#getDataAccessXPath()}, {@link XPaths#getDataAccessAltXPath()} and {@link XPaths#getDataRestrctnXPath()}
      * <p>
      */
-    Optional<String> parseDataAccess(Document doc, XPaths xPaths, String defaultLangIsoCode, String repository) {
+    String parseDataAccess(Document doc, XPaths xPaths, String defaultLangIsoCode, String repository) {
         var dataAccess = xPaths.getDataAccessXPath().resolve(doc, xPaths.getNamespace());
 
-        if (dataAccess.isEmpty()) {
+        if (dataAccess == null) {
             // Try deriving from free text - check if repository can be found in mappings file
             var repositoryNode = dataAccessMappings.get(repository);
             if (repositoryNode != null) {
@@ -368,12 +380,14 @@ public class CMMStudyMapper {
                         for (String resolvedValue : resolvedEntry.getValue()) {
                             var match = dataAccessMap.get(resolvedValue);
                             if (match != null) {
-                                return Optional.of(match.name());
+                                return match.name();
                             }
                         }
                     }
                 }
             }
+            // If data access is null and no mapping is found, return Uncategorized
+            return "Uncategorized";
         }
 
         return dataAccess;
@@ -398,13 +412,7 @@ public class CMMStudyMapper {
      */
     ParseResults<DataCollectionPeriod, List<DateTimeParseException>> parseDataCollectionDates(Document doc, XPaths xPaths) {
         var parseResults = xPaths.getDataCollectionPeriodsXPath().resolve(doc, xPaths.getNamespace());
-        var mappedResults = new DataCollectionPeriod(
-            parseResults.results().startDate,
-            parseResults.results().dataCollectionYear,
-            parseResults.results().endDate,
-            parseResults.results().freeTexts
-        );
-        return new ParseResults<>(mappedResults, parseResults.exceptions);
+        return new ParseResults<>(parseResults.results, parseResults.exceptions);
     }
 
     /**

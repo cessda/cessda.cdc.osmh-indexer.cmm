@@ -136,7 +136,7 @@
   "publisher": {
     "zz": {
       "abbr": "Publisher not specified",
-      "publisher": "Leeds University Business School"
+      "publisher": "UK Data Service"
     }
   },
   "publicationYear": "1982-01-01T00:00:00Z",
@@ -170,11 +170,20 @@
       }
     ]
   },
-  "typeOfSamplingProcedures": {},
-  "samplingProcedureFreeTexts": {
+  "typeOfSamplingProcedures": {
     "zz": [
-      "No sampling (total universe)",
-      "No sampling (total universe) TEST"
+      {
+        "vocab": "",
+        "vocabUri": "",
+        "id": "",
+        "term": "No sampling (total universe)"
+      },
+      {
+        "vocab": "",
+        "vocabUri": "",
+        "id": "",
+        "term": "No sampling (total universe) TEST"
+      }
     ]
   },
   "typeOfModeOfCollections": {

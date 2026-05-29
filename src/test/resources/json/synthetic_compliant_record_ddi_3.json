@@ -49,21 +49,23 @@
     "en": [
       {
         "name": "Synthetic ORCID",
-        "identifier": {
+        "identifiers": [{
           "id": "0000-0000-0000-0000",
           "type": "ORCID",
-          "uri": "https://orcid.org/0000-0000-0000-0000"
-        }
+          "uri": "https://orcid.org/0000-0000-0000-0000",
+          "role": "pid"
+        }]
       }
     ],
     "de": [
       {
         "name": "Synthetic ORCID de",
-        "identifier": {
+        "identifiers": [{
           "id": "0000-0000-0000-0000",
           "type": "ORCID",
-          "uri": "https://orcid.org/0000-0000-0000-0000"
-        }
+          "uri": "https://orcid.org/0000-0000-0000-0000",
+          "role": "pid"
+        }]
       }
     ]
   },
@@ -142,23 +144,24 @@
   "publicationYear": "1964",
   "relatedPublications": {
     "en": [{
-      "title": "ZA0004-10_q.pdf (Questionnaire)",
-      "holdings": []
-     }],
+      "title": "Synthetic Publication 1",
+      "holdings": [
+        "https://doi.org/10.4232/00000",
+        "doi:10.4232/00000"
+      ],
+      "publicationDate": "2025"
+     }
+    ],
     "de": [{
-      "title": "ZA0004-10_q.pdf (Fragebogen)",
-      "holdings": []
+      "title": "Synthetische Publikation 1",
+      "holdings": [
+        "https://doi.org/10.4232/00000",
+        "doi:10.4232/00000"
+      ],
+      "publicationDate": "2025"
     }]
   },
   "repositoryUrl": "http://dbkapps.gesis.org/dbkoai/oai.asp",
-  "samplingProcedureFreeTexts": {
-    "en": [
-      "Quota sample"
-    ],
-    "de": [
-      "Quotenauswahl"
-    ]
-  },
   "series": {
     "de": [
       {
@@ -217,6 +220,22 @@
     ]
   },
   "typeOfSamplingProcedures": {
+    "en": [
+      {
+        "vocabUri": "urn:ddi:int.ddi.cv:SamplingProcedure:1.1.4",
+        "vocab": "",
+        "term": "Quota sample",
+        "id": ""
+      }
+    ],
+    "de": [
+      {
+        "vocabUri": "urn:ddi:int.ddi.cv:SamplingProcedure:1.1.4",
+        "vocab": "",
+        "term": "Quotenauswahl",
+        "id": ""
+      }
+    ]
   },
   "typeOfTimeMethods": {
     "en": [

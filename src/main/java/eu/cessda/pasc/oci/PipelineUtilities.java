@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2024 CESSDA ERIC (support@cessda.eu)
+ * Copyright © 2017-2025 CESSDA ERIC (support@cessda.eu)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 @Service
@@ -49,31 +50,41 @@ public class PipelineUtilities {
             var directoryStream = Files.find(baseDirectory, Integer.MAX_VALUE,
                 (path, attributes) -> attributes.isRegularFile() && path.getFileName().equals(Path.of("pipeline.json"))
             );
-            return directoryStream.flatMap(json -> {
-                try (var inputStream = Files.newInputStream(json)) {
-                    PipelineMetadata sharedModel = repositoryModelObjectReader.readValue(inputStream);
-
-                    // Convert the shared model to a Repo object
-                    var repo = new Repo(
-                        sharedModel.url(),
-                        json.getParent(),
-                        sharedModel.code(),
-                        sharedModel.name(),
-                        sharedModel.metadataPrefix(),
-                        null,
-                        sharedModel.defaultLanguage()
-                    );
-
-                    // Add the repo object to the stream
-                    return Stream.of(repo);
-                } catch (IOException e) {
-                    log.error("Failed to load pipeline definition from \"{}\": {}", json, e.toString());
-                    return Stream.empty();
-                }
-            });
+            return directoryStream.map(this::parseRepositoryConfiguration).filter(Objects::nonNull);
         } catch (IOException e) {
             log.error("Error occurred when loading repositories: {}", e.toString());
+            return Stream.empty();
         }
-        return Stream.empty();
+    }
+
+    /**
+     * Parse a repository configuration JSON.
+     *
+     * @param json the path to the repository configuration.
+     * @return a repository configuration, or {@code null} if an IO error occurs or
+     * if the repository doesn't have the {@code CDC} role.
+     */
+    private Repo parseRepositoryConfiguration(Path json) {
+        try (var inputStream = Files.newInputStream(json)) {
+            PipelineMetadata sharedModel = repositoryModelObjectReader.readValue(inputStream);
+
+            // Only harvest the repository if it has a CDC role
+            if (sharedModel.role().contains("CDC")) {
+
+                // Convert the shared model to a Repo object
+                return new Repo(
+                    sharedModel.url(),
+                    json.getParent(),
+                    sharedModel.code(),
+                    sharedModel.name(),
+                    sharedModel.metadataPrefix(),
+                    sharedModel.defaultLanguage()
+                );
+            }
+        } catch (IOException e) {
+            log.error("Failed to load pipeline definition from \"{}\": {}", json, e.toString());
+        }
+
+        return null;
     }
 }

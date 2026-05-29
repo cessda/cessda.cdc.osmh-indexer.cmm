@@ -13,20 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.configurations;
+package eu.cessda.pasc.oci.models;
 
-import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Component;
+import eu.cessda.pasc.oci.models.cmmstudy.Creator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.nio.file.Path;
+import java.util.List;
 
-@Component
-@ConfigurationPropertiesBinding
-public class PathConverter implements Converter<String, Path> {
-    @Override
-    public Path convert(@NonNull String s) {
-        return Path.of(s).normalize();
-    }
+/**
+ * Represents an individual's affiliation with an organization.
+ *
+ * @param organizationName the name of the affiliated organization
+ * @param identifiers      the list of affiliation-related identifiers (e.g.
+ *                         ROR, ISNI)
+ */
+public record Affiliation(
+    @JsonProperty("organizationName") String organizationName,
+    @JsonProperty("identifiers") List<Creator.Identifier> identifiers
+) {
 }

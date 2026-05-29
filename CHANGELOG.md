@@ -13,6 +13,56 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 - *Fixed (for any bug fixes)*
 - *Security (in case of vulnerabilities)*
 
+## [4.2.0] - 2026-05-26
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20272466.svg)](https://doi.org/10.5281/zenodo.20272466)
+
+### Added
+
+- Added support for the new pipeline metadata format ([#745](https://github.com/cessda/cessda.cdc.versions/issues/745))
+- Added support for using the [COAR Access Right Vocabulary](https://vocabularies.coar-repositories.org/access_rights/) when parsing data access types. All previously supported values are still supported. ([#746](https://github.com/cessda/cessda.cdc.versions/issues/746))
+
+### Changed
+
+- Modified `typeOfSamplingProcedures` to contain the term previously held by `samplingProcedureFreeTexts` ([#756](https://github.com/cessda/cessda.cdc.versions/issues/756))
+- Prioritise `ddi:distrbtr` over `ddi:producer` when parsing publisher information in DDI Codebook 2.5 XMLs
+
+### Removed
+
+- Removed the `samplingProcedureFreeTexts` field ([#756](https://github.com/cessda/cessda.cdc.versions/issues/756))
+- Removed the `VocabAttributes` record, this was only used by `typeOfSamplingProcedures` ([#756](https://github.com/cessda/cessda.cdc.versions/issues/756))
+- Removed the `setSpec` field from the repository configuration model ([#745](https://github.com/cessda/cessda.cdc.versions/issues/745))
+
+## [4.1.0] - 2025-09-29
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17192544.svg)](https://doi.org/10.5281/zenodo.17192544)
+
+### Added
+
+- Parse creator role and all creator identifiers ([#712](https://github.com/cessda/cessda.cdc.versions/issues/712))
+
+### Changed
+
+- Parse publication date of related publications, check `TypeOfMaterial` when parsing publications in DDI-L ([#660](https://github.com/cessda/cessda.cdc.versions/issues/660))
+
+## [4.0.0] - 2025-06-16
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15630626.svg)](https://doi.org/10.5281/zenodo.15630626)
+
+### Added
+
+- Added thematic indexing support; using predefined queries to copy studies from `cmmstudy` indices to thematic
+  indices ([PR-173](https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/pull/173), [PR-180](https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/pull/180), [CP-80](https://github.com/cessda/coordinate-portal/issues/80))
+- Added "Uncategorized" as third Data Access category ([#692](https://github.com/cessda/cessda.cdc.versions/issues/692))
+- Added Icelandic language support to the indexer ([#706](https://github.com/cessda/cessda.cdc.versions/issues/706))
+- Log a warning on startup if an unsupported language is
+  configured ([#706](https://github.com/cessda/cessda.cdc.versions/issues/706))
+
+### Fixed
+
+- Fixed `dataCollectionYear` being set to 0 rather than `null` if the `<d:DataCollectionDate>` element was missing from
+  DDI Lifecycle documents ([#717](https://github.com/cessda/cessda.cdc.versions/issues/717))
+
 ## [3.8.0] - 2025-02-25
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14843337.svg)](https://doi.org/10.5281/zenodo.14843337)
@@ -314,6 +364,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 - verify SSL
 - removed the option to disable HTTPS verification
 
+[4.2.0]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/4.2.0
+[4.1.0]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/4.1.0
+[4.0.0]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/4.0.0
 [3.8.0]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/3.8.0
 [3.7.0]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/3.7.0
 [3.6.0]: https://github.com/cessda/cessda.cdc.osmh-indexer.cmm/releases/tag/3.6.0

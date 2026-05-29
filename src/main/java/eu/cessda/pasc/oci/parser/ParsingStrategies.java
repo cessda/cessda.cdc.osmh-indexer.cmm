@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2024 CESSDA ERIC (support@cessda.eu)
+ * Copyright © 2017-2025 CESSDA ERIC (support@cessda.eu)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package eu.cessda.pasc.oci.parser;
 
 import eu.cessda.pasc.oci.TimeUtility;
 import eu.cessda.pasc.oci.exception.InvalidUniverseException;
-import eu.cessda.pasc.oci.models.Record;
+import eu.cessda.pasc.oci.models.Affiliation;
 import eu.cessda.pasc.oci.models.cmmstudy.*;
 import lombok.NonNull;
 import org.jdom2.Element;
@@ -30,6 +30,7 @@ import java.time.Year;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -129,32 +130,31 @@ class ParsingStrategies{
 
     /**
      * Returns an {@link Optional} representing the text of the element, as well as the affiliation if present.
-     * <p>
+     * Supports multiple identifiers by collecting all <ExtLink> elements.
+     *
      * If the {@value OaiPmhConstants#CREATOR_AFFILIATION_ATTR} attribute is present, then the string is constructed
      * as "element text (attribute value)". Otherwise only the element text is returned.
      *
      * @param element the {@link Element} to parse.
      */
     static Optional<Creator> creatorStrategy(Element element) {
-
-        var creator = element.getTextTrim();
+        var creatorName = element.getTextTrim();
         var affiliation = element.getAttributeValue(CREATOR_AFFILIATION_ATTR);
 
-        Creator.Identifier identifier = null;
+        List<Creator.Identifier> identifiers = new ArrayList<>();
 
-        // Is there an ExtLink?
-        var extLinkElement = element.getChild("ExtLink", null);
-        if (extLinkElement != null) {
+        var extLinks = element.getChildren("ExtLink", null);
+        for (var extLinkElement : extLinks) {
             var type = extLinkElement.getAttributeValue("title");
-            var identifierString = extLinkElement.getTextTrim();
-            var extLink = getAttributeValue(extLinkElement, URI_ATTR).map(URI::create).orElse(null);
+            var role = extLinkElement.getAttributeValue("role");
+            var id = extLinkElement.getTextTrim();
+            var uri = getAttributeValue(extLinkElement, URI_ATTR).map(URI::create).orElse(null);
 
-            identifier = new Creator.Identifier(identifierString, type, extLink);
+            identifiers.add(new Creator.Identifier(id, type, uri, role));
         }
 
-        if (!creator.isEmpty()) {
-            var creatorRecord = new Creator(creator, affiliation, identifier);
-            return Optional.of(creatorRecord);
+        if (!creatorName.isEmpty()) {
+            return Optional.of(new Creator(creatorName, affiliation, identifiers.isEmpty() ? null : identifiers));
         } else {
             return Optional.empty();
         }
@@ -304,8 +304,9 @@ class ParsingStrategies{
     /**
      * Constructs a {@link RelatedPublication} using the given element.
      * <p>
-     * The strategy tries to extract the title from {@code //citation/titlStmt/titl} and the holdings from
-     * {@code //citation/holdings} using the URI attribute. If the {@code titl} element cannot be found, or if the
+     * The strategy tries to extract the title from {@code //citation/titlStmt/titl}, the holdings from
+     * {@code //citation/holdings} using the URI attribute and the publication date from
+     * {@code //citation/distStmt/distDate/@date}. If the {@code titl} element cannot be found, or if the
      * {@code titl} element is blank then the method attempts to extract directly from the element.
      * If a title cannot be extracted, an empty {@link Optional} is returned.
      * @param element the {@link Element} to parse.
@@ -317,6 +318,7 @@ class ParsingStrategies{
         // Result variables
         String title = null;
         var holdings = new ArrayList<URI>();
+        String publicationDate = "";
 
         // Determine whether the element has a citation in it
         var citation = ofNullable(element.getChild("citation", namespace));
@@ -333,10 +335,26 @@ class ParsingStrategies{
                 }
             }).ifPresent(holdings::add);
 
-        // Parse the holdings in the citation if present
+        // Parse the holdings and publication date in the citation if present
         if (citation.isPresent()) {
             var uris = parseHoldingsURI(citation.orElseThrow());
             holdings.addAll(uris);
+
+            // Parse the publication date from citation/distStmt/distDate/@date
+            publicationDate = citation
+            .map(c -> c.getChild("distStmt", namespace))
+            .map(d -> d.getChild("distDate", namespace))
+            .map(e -> e.getAttributeValue("date"))
+            .map(String::trim)
+            .flatMap(dateStr -> {
+                try {
+                    TimeUtility.getTimeFormat(dateStr, Function.identity());
+                    return Optional.of(dateStr);
+                } catch (DateTimeParseException e) {
+                    // Invalid date, ignore
+                    return Optional.empty();
+                }
+            }).orElse("");
         }
 
         // Try to extract text from the relPubl element
@@ -366,7 +384,7 @@ class ParsingStrategies{
 
         // Only return if the title is set
         if (title != null) {
-            var relatedPublication = new RelatedPublication(title, holdings);
+            var relatedPublication = new RelatedPublication(title, holdings, publicationDate);
             return Optional.of(relatedPublication);
         } else {
             return Optional.empty();
@@ -513,11 +531,11 @@ class ParsingStrategies{
 
         for (var child : element.getChildren(STRING, null)) {
             // Extract the creator name and language
-            var creator = child.getTextTrim();
+            var creatorName = child.getTextTrim();
             var lang = getLangOfElement(child);
 
-            if (creator != null) {
-                creatorsMap.put(lang, new Creator(creator, affiliation, null));
+            if (creatorName != null && !creatorName.isEmpty()) {
+                creatorsMap.put(lang, new Creator(creatorName, affiliation, null));
             }
         }
 
@@ -622,6 +640,88 @@ class ParsingStrategies{
     }
 
     /**
+     * Parses a list of DDI Lifecycle {@code UserID} elements to extract persistent identifiers for an organization.
+     *
+     * This method handles different identifier types (e.g., ROR, ISNI) and normalizes them by:
+     * - Extracting the last path segment for ROR
+     * - Removing the "/isni/" prefix for ISNI
+     * - Trimming leading slashes for other types
+     *
+     * If the URI is malformed, the raw ID is used as-is. Each identifier is tagged with the given role
+     * (e.g., {@code "pid"} for creators, {@code "affiliation-pid"} for affiliations).
+     *
+     * @param userIdElements the list of {@code UserID} elements to parse
+     * @param role           the role to assign to each identifier (e.g., "pid", "affiliation-pid")
+     * @return a list of parsed {@link Creator.Identifier} objects
+     */
+    private static List<Creator.Identifier> parseOrganizationIdentifiers(List<Element> userIdElements, String role) {
+        List<Creator.Identifier> identifiers = new ArrayList<>();
+
+        for (var userIdElement : userIdElements) {
+            var rawId = userIdElement.getTextTrim();
+            var type = userIdElement.getAttributeValue("typeOfUserID");
+
+            if (rawId == null || type == null)
+                continue;
+
+            String parsedId = rawId;
+            URI uri = null;
+
+            try {
+                uri = URI.create(rawId);
+                String path = uri.getPath();
+                if (path != null && !path.isEmpty()) {
+                    parsedId = switch (type.toUpperCase(Locale.ROOT)) {
+                        case "ROR" -> path.substring(path.lastIndexOf('/') + 1);
+                        case "ISNI" -> path.replaceFirst("^/isni/", "");
+                        default -> path.startsWith("/") ? path.substring(1) : path;
+                    };
+                }
+            } catch (IllegalArgumentException ignored) {
+                // fallback: keep id as-is
+            }
+
+            identifiers.add(new Creator.Identifier(parsedId, type, uri, role));
+        }
+
+        return identifiers;
+    }
+
+    /**
+     * Parses a DDI Lifecycle {@code Organization} element to extract creator metadata.
+     *
+     * Builds a map of language-specific {@link Creator} objects representing the organization.
+     * Extracts the organization's name and persistent identifiers (e.g., ROR, ISNI) from the
+     * {@code OrganizationIdentification} section.
+     *
+     * Each {@link Creator} includes:
+     * - {@code name}: full name of the organization
+     * - {@code affiliation}: always {@code null} for organizations
+     * - {@code identifiers}: list of {@link Creator.Identifier} objects, typically containing one PID
+     *
+     * @param element the {@code Organization} element to parse
+     * @return a map of language-specific {@link Creator} objects
+     */
+    @NonNull
+    static Map<String, Creator> organizationCreatorStrategy(Element element) {
+        var identification = element.getChild("OrganizationIdentification", null);
+        var organizationName = identification != null ? identification.getChild("OrganizationName", null) : null;
+        if (organizationName == null) return Collections.emptyMap();
+
+        List<Creator.Identifier> identifiers = parseOrganizationIdentifiers(element.getChildren("UserID", null), "pid");
+
+        var creatorMap = new HashMap<String, Creator>();
+        for (var nameElem : organizationName.getChildren("String", null)) {
+            var lang = getLangOfElement(nameElem);
+            var name = nameElem.getTextTrim();
+            var creator = new Creator(name, null, identifiers.isEmpty() ? null : identifiers);
+            creatorMap.put(lang, creator);
+        }
+
+        return Collections.unmodifiableMap(creatorMap);
+    }
+
+    /**
      * Extract the creator/publisher from a DDI Lifecycle {@code Organization} element.
      *
      * @param element the element to parse.
@@ -722,53 +822,133 @@ class ParsingStrategies{
     }
 
     /**
-     * Extract the creator/publisher from a DDI Lifecycle {@code Individual} element.
+     * Parses DDI Lifecycle {@code Relation} elements to extract affiliation links between individuals and organizations.
      *
-     * @param element the element to parse.
-     * @return a map containing language specific version of the publisher.
+     * This method filters relations with the role "Affiliation", resolves the referenced organization,
+     * and extracts its name and persistent identifiers (e.g., ROR, ISNI).
+     *
+     * Only the first affiliation per individual is retained.
+     *
+     * @param relationElements list of {@code Relation} elements from the DDI Lifecycle document
+     * @return map of individual IDs to their affiliated organization metadata
      */
-    static Map<String, Creator> individualStrategy(Element element) {
-        var identification = element.getChild("IndividualIdentification", null);
-        if (identification == null) {
-            return Collections.emptyMap();
+    static Map<String, Affiliation> parseAffiliationRelations(List<Element> relationElements) {
+        Map<String, Affiliation> affiliationMap = new HashMap<>();
+
+        for (Element relation : relationElements) {
+            var targetObject = relation.getChild("TargetObject", null);
+            if (targetObject == null)
+                continue;
+
+            var roleElem = targetObject.getChild("Role", null);
+            if (roleElem == null)
+                continue;
+
+            var roleContent = getTextContent(
+                    roleElem.getChild("Description", null)
+                            .getChild("Content", null));
+
+            if (!"Affiliation".equalsIgnoreCase(roleContent))
+                continue;
+
+            var sourceRef = relation.getChild("SourceObject", null)
+                    .getChild("IndividualReference", null);
+            var targetRef = targetObject.getChild("OrganizationReference", null);
+
+            if (sourceRef == null || targetRef == null) {
+                continue;
+            }
+
+            var resolvedOrg = resolveReference(targetRef);
+            if (resolvedOrg.isEmpty()) {
+                continue;
+            }
+
+            var sourceId = getTextContent(sourceRef.getChild("ID", null));
+            if (sourceId == null) {
+                continue;
+            }
+
+            var orgElement = resolvedOrg.get().element();
+            var orgName = getTextContent(orgElement.getChild("OrganizationName", null));
+            var userIdElements = orgElement.getChildren("UserID", null);
+
+            List<Creator.Identifier> identifiers = parseOrganizationIdentifiers(userIdElements, "affiliation-pid");
+
+            // Only store the first affiliation per individual
+            if (!identifiers.isEmpty() && !affiliationMap.containsKey(sourceId)) {
+                affiliationMap.put(sourceId, new Affiliation(orgName, identifiers));
+            }
         }
+
+        return affiliationMap;
+    }
+
+    /**
+     * Extracts creator metadata from a DDI Lifecycle {@code Individual} element.
+     *
+     * This method parses the individual's name and collects all relevant identifiers:
+     * - Personal PID (e.g., ORCID)
+     * - Affiliation PID (e.g., ROR), if available via relation map
+     *
+     * The affiliation name is stored in the creator's affiliation field, and all identifiers
+     * are stored in a list. Preferred names are prioritized per language.
+     *
+     * @param element        the {@code Individual} element to parse.
+     * @param affiliationMap a map of individual IDs to affiliated organization identifiers.
+     * @return a map of language-specific Creator objects.
+     */
+    static Map<String, Creator> individualStrategy(Element element, Map<String, Affiliation> affiliationMap) {
+        var identification = element.getChild("IndividualIdentification", null);
+        if (identification == null)
+            return Collections.emptyMap();
 
         var map = new HashMap<String, Creator>();
 
-        Creator.Identifier identifier = null;
+        // Collect all personal identifiers
+        List<Creator.Identifier> personalIds = new ArrayList<>();
+        var researcherIDs = identification.getChildren("ResearcherID", null);
 
-        var researcherID = identification.getChild("ResearcherID", null);
-        if (researcherID != null) {
-            String rtype = XMLMapper.getTextContent(researcherID.getChild("TypeOfID", null));
-            String rid = XMLMapper.getTextContent(researcherID.getChild("ResearcherIdentification", null));
+        for (var researcherID : researcherIDs) {
+            var type = getTextContent(researcherID.getChild("TypeOfID", null));
+            var id = getTextContent(researcherID.getChild("ResearcherIdentification", null));
+            var uri = Optional.ofNullable(getTextContent(researcherID.getChild("URI", null)))
+                    .map(URI::create).orElse(null);
 
-            // avoid NullPointerException by checking the string for null
-            URI ruri = null;
-            var uriString = getTextContent(researcherID.getChild("URI", null));
-            if (uriString != null) {
-               ruri = URI.create(uriString);
+            if (id != null && type != null) {
+                personalIds.add(new Creator.Identifier(id, type, uri, "pid"));
             }
-
-            identifier = new Creator.Identifier(rid, rtype, ruri);
         }
+
+        var individualId = getTextContent(element.getChild("ID", null));
+        Affiliation affiliationEntry = affiliationMap.get(individualId);
+        String affiliationName = affiliationEntry != null ? affiliationEntry.organizationName() : null;
+        List<Creator.Identifier> affiliationIds = affiliationEntry != null ? affiliationEntry.identifiers() : List.of();
 
         var names = identification.getChildren("IndividualName", null);
         for (var name : names) {
-
-            var isPreferred = name.getAttributeValue("isPreferred", (Namespace) null);
-
-            // Use the full name if present
+            var isPreferred = Boolean.parseBoolean(name.getAttributeValue("isPreferred", (Namespace) null));
             var fullName = name.getChild("FullName", null);
-            if (fullName != null) {
-                var stringElements = fullName.getChildren(STRING, null);
-                for (var string : stringElements) {
-                    var lang = getLangOfElement(string);
-                    var publisher = new Creator(string.getTextTrim(), null, identifier);
 
-                    if (Boolean.parseBoolean(isPreferred)) {
-                        map.put(lang, publisher);
+            if (fullName != null) {
+                for (var string : fullName.getChildren(STRING, null)) {
+                    var lang = getLangOfElement(string);
+                    List<Creator.Identifier> identifiers = new ArrayList<>();
+
+                    if (!personalIds.isEmpty())
+                        identifiers.addAll(personalIds);
+                    if (!affiliationIds.isEmpty())
+                        identifiers.addAll(affiliationIds);
+
+                    var creator = new Creator(
+                            string.getTextTrim(),
+                            affiliationName,
+                            identifiers.isEmpty() ? null : identifiers);
+
+                    if (isPreferred) {
+                        map.put(lang, creator);
                     } else {
-                        map.putIfAbsent(lang, publisher);
+                        map.putIfAbsent(lang, creator);
                     }
                 }
             }
@@ -793,42 +973,29 @@ class ParsingStrategies{
      * @return a map of creators per language.
      */
     @NonNull
-    static Map<String, List<Creator>> creatorsStrategy(List<Element> creatorElements) {
+    static Map<String, List<Creator>> creatorsStrategy(List<Element> creatorElements, Map<String, Affiliation> affiliationMap) {
         var creatorsMap = new HashMap<String, List<Creator>>();
 
-        for (var element : creatorElements) {
+        if (creatorElements.isEmpty()) return creatorsMap;
 
+        for (var element : creatorElements) {
             var creatorNameElement = element.getChild("CreatorName", null);
             var creatorReferenceElement = element.getChild("CreatorReference", null);
 
             if (creatorNameElement != null) {
-                creatorsLifecycleStrategy(creatorNameElement).forEach((lang, creator) ->
-                    creatorsMap.computeIfAbsent(lang, l -> new ArrayList<>()).add(creator)
-                );
+                creatorsLifecycleStrategy(creatorNameElement).forEach(
+                    (lang, creator) -> creatorsMap.computeIfAbsent(lang, l -> new ArrayList<>()).add(creator));
             } else if (creatorReferenceElement != null) {
                 var referencedElement = resolveReference(creatorReferenceElement);
-                var publisherMapOpt = referencedElement.flatMap(r -> switch (r.type()) {
-                    case "Individual" -> Optional.of(individualStrategy(r.element()));
-                    case "Organization" -> Optional.of(organizationStrategy(r.element()));
+
+                var creatorMapOpt = referencedElement.flatMap(r -> switch (r.type()) {
+                    case "Individual" -> Optional.of(individualStrategy(r.element(), affiliationMap));
+                    case "Organization" -> Optional.of(organizationCreatorStrategy(r.element()));
                     default -> Optional.empty();
-                }).orElse(
-                    // Placeholder empty map
-                    Collections.<String, Record>emptyMap()
-                );
+                }).orElse(Collections.emptyMap());
 
-                publisherMapOpt.forEach((key, v) -> {
-                    Creator creator;
-
-                    if (v instanceof Publisher publisher) {
-                        creator = extractCreatorFromPublisher(publisher);
-                    } else if (v instanceof Creator) {
-                        creator = (Creator) v;
-                    } else {
-                        return;
-                    }
-
-                    creatorsMap.computeIfAbsent(key, k -> new ArrayList<>()).add(creator);
-                });
+                creatorMapOpt.forEach(
+                    (lang, creator) -> creatorsMap.computeIfAbsent(lang, l -> new ArrayList<>()).add(creator));
             }
         }
 
@@ -931,8 +1098,25 @@ class ParsingStrategies{
 
         for (var element : elementList) {
 
+            // Filter by TypeOfMaterial = "Related Publication"
+            var typeOfMaterial = element.getChildTextTrim("TypeOfMaterial", null);
+            if (typeOfMaterial == null || !typeOfMaterial.equalsIgnoreCase("Related Publication")) {
+                continue;
+            }
+
             var uriList = new ArrayList<URI>();
             var titleMap = new HashMap<String, String>();
+            String publicationDate = "";
+
+            // First try ExternalURLReference as primary URI
+            var externalUrl = element.getChildTextTrim("ExternalURLReference", null);
+            if (externalUrl != null && !externalUrl.isBlank()) {
+                try {
+                    uriList.add(URI.create(externalUrl));
+                } catch (IllegalArgumentException e) {
+                    // Invalid URI, ignore
+                }
+            }
 
             // Extract the citation
             var citation = element.getChild("Citation", null);
@@ -941,20 +1125,43 @@ class ParsingStrategies{
                     if (child.getName().equals("InternationalIdentifier")) {
                         // Extract the URL of the identifier
                         var identifierContext = child.getChild("IdentifierContent", null);
-                        uriList.add(URI.create(identifierContext.getTextTrim()));
+                        if (identifierContext != null) {
+                            var uriStr = identifierContext.getTextTrim();
+                            try {
+                                uriList.add(URI.create(uriStr));
+                            } catch (IllegalArgumentException e) {
+                                // Invalid URI, ignore
+                            }
+                        }
 
                     } else if (child.getName().equals("Title")) {
                         // Extract the language-dependent title
                         for (var string : child.getChildren(STRING, null)) {
                             titleMap.put(getLangOfElement(string), string.getTextTrim());
                         }
+
+                    } else if (child.getName().equals("PublicationDate")) {
+                        // Try to extract and validate SimpleDate
+                        var simpleDate = child.getChild("SimpleDate", null);
+                        if (simpleDate != null) {
+                            var dateStr = simpleDate.getTextTrim();
+                            if (!dateStr.isBlank()) {
+                                try {
+                                    TimeUtility.getTimeFormat(dateStr, Function.identity());
+                                    publicationDate = dateStr;
+                                } catch (DateTimeParseException e) {
+                                    // Invalid date, keep as ""
+                                }
+                            }
+                        }
                     }
                 }
             }
 
+            final String finalPublicationDate = publicationDate;
             titleMap.forEach((lang, title) -> {
-                // Merge the language dependent title with the list of URIs
-                var relPub = new RelatedPublication(title, uriList);
+                // Merge the language dependent title with the list of URIs and publication date
+                var relPub = new RelatedPublication(title, uriList, finalPublicationDate);
                 relPubLMap.computeIfAbsent(lang, k -> new ArrayList<>()).add(relPub);
             });
         }
@@ -981,7 +1188,7 @@ class ParsingStrategies{
             var referencedElement = resolveReference(element);
             var publisherMapOpt = referencedElement.flatMap(r -> switch (r.type()) {
                 case "Individual" -> {
-                    var creatorMap = individualStrategy(r.element());
+                    var creatorMap = individualStrategy(r.element(), Collections.emptyMap());
 
                     // Create a Publisher to represent this creator
                     var publisherMap = new HashMap<String, Publisher>(creatorMap.size());
@@ -1104,36 +1311,54 @@ class ParsingStrategies{
         return fundingMap;
     }
 
+    // Data access strategy constants
+    private static final String OPEN_ACCESS = "openaccess";
+    private static final Set<String> RESTRICTED = Set.of(
+            "closedaccess",
+            "embargoedaccess",
+            "restrictedaccess",
+            "metadataonlyaccess"
+    );
+    private static final Pattern NORMALIZE_PATTERN = Pattern.compile("[^a-z0-9]+");
+
     /**
-     * Processes a list of {@link Element}s, returning an {@link Optional} representing the access category (Open/Restricted).
-     * Returns the first non-empty valid result, otherwise returns an empty optional.
+     * Processes a list of {@link Element}s, returning a {@link String} representing the access category (Open/Restricted).
+     * Returns the first non-empty valid result, otherwise returns null.
      *
      * @param elements the list of {@link Element}s to parse.
-     * @return an {@link Optional<String>} with "Open", "Restricted", or empty if no valid value is found.
+     * @return a {@link String} with "Open", "Restricted", or null if no valid value is found.
      */
-    static Optional<String> dataAccessStrategy(List<Element> elements) {
+    static String dataAccessStrategy(List<Element> elements) {
+
         for (Element element : elements) {
-            String value = element.getTextTrim();
+            String raw = element.getTextTrim();
+            if (raw.isBlank()) {
+                continue;
+            }
 
-            // Check if the value is "openAccess", return "Open"
-            if (!value.isEmpty()) {
-                if ("openAccess".equalsIgnoreCase(value)
-                    || "info:eu-repo/semantics/openAccess".equalsIgnoreCase(value)) {
-                    return Optional.of("Open");
-                }
+            // Normalize to lowercase and strip all non-alphanumerics (spaces, underscores, etc.)
+            String normalized = NORMALIZE_PATTERN.matcher(raw.toLowerCase()).replaceAll("");
 
-                // Check if the value is one of the restricted types and return "Restricted"
-                if ("closedAccess".equalsIgnoreCase(value)
-                    || "embargoedAccess".equalsIgnoreCase(value)
-                    || "restrictedAccess".equalsIgnoreCase(value)
-                    || "info:eu-repo/semantics/restrictedAccess".equalsIgnoreCase(value)) {
-                    return Optional.of("Restricted");
+            // Open: exact or suffix so it still works for info:eu-repo/semantics/openAccess also
+            if (normalized.endsWith(OPEN_ACCESS)) {
+                return "Open";
+            }
+
+            // Restricted: exact or suffix so it still works for info:eu-repo/semantics/restrictedAccess also
+            if (RESTRICTED.contains(normalized)) {
+                return "Restricted";
+            }
+
+            // Fallback for partial matches
+            for (String t : RESTRICTED) {
+                if (normalized.endsWith(t)) {
+                    return "Restricted";
                 }
             }
         }
 
-        // Return empty if no valid element was found
-        return Optional.empty();
+        // Return null if no valid value was found
+        return null;
     }
 
     /**
