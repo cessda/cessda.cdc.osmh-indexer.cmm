@@ -134,6 +134,7 @@ public class LanguageExtractor {
         Optional.ofNullable(cmmStudy.keywords()).map(map -> map.get(lang)).ifPresent(builder::keywords);
         Optional.ofNullable(cmmStudy.classifications()).map(map -> map.get(lang)).ifPresent(builder::classifications);
         Optional.ofNullable(cmmStudy.typeOfTimeMethods()).map(map -> map.get(lang)).ifPresent(builder::typeOfTimeMethods);
+        Optional.ofNullable(cmmStudy.typeOfTimeMethodCategory()).ifPresent(cat -> builder.typeOfTimeMethodCategory(cat.toString()));
         var countries = Optional.ofNullable(cmmStudy.studyAreaCountries())
             .map(map -> map.get(lang)).stream().flatMap(Collection::stream)
             // If the ISO code is not valid, then the optional will be empty

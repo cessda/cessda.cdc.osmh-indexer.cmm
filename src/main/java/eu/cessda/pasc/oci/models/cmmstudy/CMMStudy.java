@@ -63,6 +63,7 @@ public record CMMStudy(
     @JsonProperty("typeOfModeOfCollections") Map<String, List<TermVocabAttributes>> typeOfModeOfCollections,
     @JsonProperty("titleStudy") Map<String, String> titleStudy,
     @JsonProperty("typeOfTimeMethods") Map<String, List<TermVocabAttributes>> typeOfTimeMethods,
+    @JsonProperty("typeOfTimeMethodCategory") String typeOfTimeMethodCategory,
     @JsonProperty("typeOfSamplingProcedures") Map<String, List<TermVocabAttributes>> typeOfSamplingProcedures,
     @JsonProperty("unitTypes") Map<String, List<TermVocabAttributes>> unitTypes,
     @JsonProperty("universe") Map<String, Universe> universe,

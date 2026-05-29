@@ -480,6 +480,9 @@
       "type": "text",
       "analyzer": "pasc_standard_analyzer"
     },
+    "typeOfTimeMethodCategory": {
+      "type": "keyword"
+    },
     "unitTypes": {
       "type": "nested",
       "properties": {

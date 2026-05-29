@@ -235,6 +235,58 @@ public class CMMStudyMapper {
     }
 
     /**
+     * Parses Type Of Time Method Category as one of:
+     * - Longitudinal
+     * - Time series
+     * - Cross-section
+     * - Cross-section ad-hoc follow-up
+     *
+     * Returns null if no reliable category can be derived.
+     *
+     * XPath = {@link XPaths#getTypeOfTimeMethodXPath()}
+     */
+    String parseTypeOfTimeMethodCategory(Document doc, XPaths xPaths, String defaultLangIsoCode) {
+        var parsed = parseTypeOfTimeMethod(doc, xPaths, defaultLangIsoCode);
+
+        if (parsed == null || parsed.isEmpty()) {
+            return null;
+        }
+
+        for (var entry : parsed.values()) {
+            for (var attr : entry) {
+                String value = null;
+
+                if (attr.id() != null && !attr.id().isBlank()) {
+                    value = attr.id();
+                } else if (attr.term() != null && !attr.term().isBlank()) {
+                    value = attr.term();
+                }
+
+                if (value == null) {
+                    continue;
+                }
+
+                String n = value.toLowerCase().strip();
+
+                if (n.startsWith("timeseries") || n.contains("time series")) {
+                    return "Time series";
+                }
+                if (n.startsWith("longitudinal") || n.contains("panel") || n.contains("cohort") || n.contains("repeated")) {
+                    return "Longitudinal";
+                }
+                if (n.contains("crosssection") || n.contains("cross-section") || n.contains("cross section")) {
+                    if (n.contains("followup") || n.contains("follow-up") || n.contains("follow up")) {
+                        return "Cross-section ad-hoc follow-up";
+                    }
+                    return "Cross-section";
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Parses Type Of Mode Of Collection(s) from:
      * <p>
      * Xpath = {@link XPaths#getTypeOfModeOfCollectionXPath()}
