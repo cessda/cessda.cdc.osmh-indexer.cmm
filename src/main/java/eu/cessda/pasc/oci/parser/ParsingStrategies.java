@@ -1326,7 +1326,7 @@ class ParsingStrategies{
             }
 
             // Normalize to lowercase and strip all non-alphanumerics (spaces, underscores, etc.)
-            String normalized = NORMALIZE_PATTERN.matcher(raw.toLowerCase()).replaceAll("");
+            String normalized = NORMALIZE_PATTERN.matcher(raw.toLowerCase(Locale.ROOT)).replaceAll("");
 
             // Open: exact or suffix so it still works for info:eu-repo/semantics/openAccess also
             if (normalized.endsWith(OPEN_ACCESS)) {

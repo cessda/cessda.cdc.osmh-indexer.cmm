@@ -266,12 +266,12 @@ public class CMMStudyMapper {
                     continue;
                 }
 
-                String n = value.toLowerCase().strip();
+                String n = value.toLowerCase(Locale.ROOT).strip();
 
-                if (n.startsWith("timeseries") || n.contains("time series")) {
+                if (n.contains("timeseries") || n.contains("time series")) {
                     return "Time series";
                 }
-                if (n.startsWith("longitudinal") || n.contains("panel") || n.contains("cohort") || n.contains("repeated")) {
+                if (n.contains("longitudinal") || n.contains("panel") || n.contains("cohort") || n.contains("repeated")) {
                     return "Longitudinal";
                 }
                 if (n.contains("crosssection") || n.contains("cross-section") || n.contains("cross section")) {
