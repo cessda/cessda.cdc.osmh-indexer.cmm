@@ -170,10 +170,19 @@ public class CMMStudyMapper {
     /**
      * Parses Year of Publication from:
      * <p>
-     * Xpath = {@link XPaths#getYearOfPubXPath()}
+     * Xpath = {@link XPaths#getYearOfPubXPath()} or
+     * Xpath = {@link XPaths#getYearOfPubFallbackXPath()}
      */
     Optional<String> parseYrOfPublication(Document document, XPaths xPaths) {
-        return xPaths.getYearOfPubXPath().resolve(document, xPaths.getNamespace());
+        // Primary (Study description)
+        var primary = xPaths.getYearOfPubXPath().resolve(document, xPaths.getNamespace());
+
+        if (primary.isPresent()) {
+            return primary;
+        }
+
+        // Fallback (Document description)
+        return xPaths.getYearOfPubFallbackXPath().resolve(document, xPaths.getNamespace());
     }
 
     /**

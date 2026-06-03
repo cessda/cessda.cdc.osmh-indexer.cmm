@@ -515,8 +515,8 @@ class ParsingStrategies{
             // Parse the year from the string
             var year = TimeUtility.getTimeFormat(dateAttributeValue, Year::from);
 
-            // Return the date if the year is the same or after the current year
-            return Year.now().isBefore(year) ? null : dateAttributeValue;
+            // Return the date if the year is not after the current year
+            return !year.isAfter(Year.now()) ? dateAttributeValue : null;
         } else {
             return null;
         }
