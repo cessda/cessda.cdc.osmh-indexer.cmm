@@ -97,20 +97,29 @@
                 "affiliation": {
                   "type": "string"
                 },
-                "identifier": {
-                  "type": "object",
-                  "description": "A unique identifier for a creator (e.g. ORCID)",
-                  "properties": {
-                    "id": {
-                      "type": "string"
-                    },
-                    "type": {
-                      "type": "string"
-                    },
-                    "uri": {
-                      "type": "string"
+                "identifiers": {
+                  "type": "array",
+                  "description": "A collection of unique identifiers for a creator (e.g. ORCID)",
+                  "items": [
+                    {
+                      "type": "object",
+                      "description": "A unique identifier for a creator (e.g. ORCID, ROR etc.)",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "uri": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string"
+                        }
+                      }
                     }
-                  },
+                  ],
                   "additionalProperties": false
                 }
               },
@@ -402,23 +411,6 @@
     "repositoryUrl": {
       "type": "string",
       "description": "The URL of the repository as defined in the repository's configuration"
-    },
-    "samplingProcedureFreeTexts": {
-      "type": "object",
-      "description": "Sampling procedures freeText description for data collection.",
-      "patternProperties": {
-        "^[a-z]{2}$": {
-          "type": "array",
-          "items": [
-            {
-              "type": "string",
-              "description": "A Sampling procedure freeText description for data collection.",
-              "additionalProperties": false
-            }
-          ]
-        }
-      },
-      "additionalProperties": false
     },
     "series": {
       "type": "object",

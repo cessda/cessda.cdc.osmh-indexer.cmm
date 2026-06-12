@@ -22,20 +22,32 @@ import static org.junit.Assert.assertNotNull;
 
 public class ElasticsearchConfigurationTest {
 
-    private ElasticsearchConfiguration getElasticsearchConfiguration() {
-        return new ElasticsearchConfiguration(
-            "localhost",
-            9200,
-            null,
-            null,
-            new ObjectMapper()
-        );
-    }
-
     @Test
     public void shouldCreateElasticsearchRestClient() {
         // Given
-        var elasticsearchConfiguration = getElasticsearchConfiguration();
+        var elasticsearchConfiguration = new ElasticsearchConfiguration(
+                "localhost",
+                9200,
+                null,
+                null,
+                new ObjectMapper()
+        );
+        var client = elasticsearchConfiguration.elasticsearchClient();
+
+        // Then
+        assertNotNull(client);
+    }
+
+    @Test
+    public void shouldCreateElasticsearchRestClientWithCredentials() {
+        // Given
+        var elasticsearchConfiguration = new ElasticsearchConfiguration(
+                "localhost",
+                9200,
+                "username",
+                "password",
+                new ObjectMapper()
+        );
         var client = elasticsearchConfiguration.elasticsearchClient();
 
         // Then

@@ -109,6 +109,7 @@
                 <r:Agency>de.gesis</r:Agency>
                 <r:ID>ZA0004_Org_DC</r:ID>
                 <r:Version>1.0.0</r:Version>
+                <r:UserID typeOfUserID="ROR">https://ror.org/000000000</r:UserID>
                 <a:OrganizationIdentification>
                     <a:OrganizationName>
                         <r:String>Institute for International Social Research, Princeton, N.J.</r:String>
@@ -133,6 +134,32 @@
                     </a:ResearcherID>
                 </a:IndividualIdentification>
             </a:Individual>
+            <a:Relation>
+                <r:Agency>de.gesis</r:Agency>
+                <r:ID>ZA0055_Org_RelCre1</r:ID>
+                <r:Version>1.0.0</r:Version>
+                <a:SourceObject>
+                    <a:IndividualReference>
+                        <r:Agency>eu.cessda</r:Agency>
+                        <r:ID>synthetic-id</r:ID>
+                        <r:Version>1.0.0</r:Version>
+                        <r:TypeOfObject>Individual</r:TypeOfObject>
+                    </a:IndividualReference>
+                </a:SourceObject>
+                <a:TargetObject>
+                    <a:OrganizationReference>
+                        <r:Agency>de.gesis</r:Agency>
+                        <r:ID>ZA0004_Org_DC</r:ID>
+                        <r:Version>1.0.0</r:Version>
+                        <r:TypeOfObject>Organization</r:TypeOfObject>
+                    </a:OrganizationReference>
+                    <a:Role>
+                        <r:Description>
+                            <r:Content>Affiliation</r:Content>
+                        </r:Description>
+                    </a:Role>
+                </a:TargetObject>
+            </a:Relation>
         </a:OrganizationScheme>
         <c:GeographicLocationScheme>
             <r:Agency>de.gesis</r:Agency>

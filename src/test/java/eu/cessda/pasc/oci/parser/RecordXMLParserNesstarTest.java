@@ -239,7 +239,6 @@ public class RecordXMLParserNesstarTest {
             nsdRepo.code(),
             nsdRepo.name(),
             nsdRepo.preferredMetadataParam(),
-            nsdRepo.setSpec(),
             "zz"
         );
 

@@ -51,11 +51,13 @@
               <rspStmt>
                 <AuthEnty affiliation="Jyväskylän yliopisto. Psykologian laitos" xml:lang="fi">Pulkkinen, Lea</AuthEnty>
                 <AuthEnty affiliation="Jyväskylän Essex. Department of Psychology" xml:lang="fi">David Brook</AuthEnty>
-
               </rspStmt>
-              <prodStmt>
-              </prodStmt>
+              <prodStmt/>
               <distStmt>
+                <!--Compliant examples -->
+                <distrbtr xml:lang="fi" abbr="FSD">Yhteiskuntatieteellinen tietoarkisto</distrbtr>
+                <distrbtr xml:lang="en" abbr="FSD">Finnish Social Science Data Archive</distrbtr>
+                <distrbtr xml:lang="se">Samhällsdatablad</distrbtr>
                 <distDate date="1982-01-01T00:00:00Z">1982</distDate>
               </distStmt>
               <serStmt URI="https://services.fsd.tuni.fi/catalogue/series/28?lang=fi" xml:lang="fi" ID="S28">
@@ -76,9 +78,10 @@
               <rspStmt>
                 <AuthEnty affiliation="University of Jyväskylä. Department of Psychology" xml:lang="en">En Pulkkinen, Lea</AuthEnty>
                 <AuthEnty affiliation="University of Essex. Department of Psychology" xml:lang="en">David Brook</AuthEnty>
-                <AuthEnty affiliation="Synthetic ORCID Association" xml:lang="en" >
-                  Synthetic ORCID
+                <AuthEnty affiliation="Synthetic PID Associations" xml:lang="en" >
+                  Synthetic PIDs
                   <ExtLink URI="https://orcid.org/0000-0000-0000-0000" role="PID" title="ORCID" xml:lang="en" >0000-0000-0000-0000</ExtLink>
+                  <ExtLink URI="https://ror.org/000000000" role="Affiliation-PID" title="ROR" xml:lang="en">000000000</ExtLink>
                 </AuthEnty>
               </rspStmt>
               <prodStmt>
@@ -166,9 +169,7 @@
                 <sampProc xml:lang="en">This is the term. xml:lang in parent el wins over concept<concept xml:lang="should ignore this" vocab="DDI Sampling Procedure" vocabURI="urn:ddi-cv:SamplingProcedure:1.1">Probability.Stratified 2</concept></sampProc>
                 <sampProc xml:lang="en">This is the term. xml:lang in parent el wins over concept regardless<concept vocab="DDI Sampling Procedure" vocabURI="urn:ddi-cv:SamplingProcedure:1.1">Probability.Stratified 2</concept></sampProc>
                 <sampProc><concept xml:lang="fi" vocab="fi DDI Sampling Procedure" vocabURI="fi:urn:ddi-cv:SamplingProcedure:1.1">et Probability.Stratified</concept></sampProc>
-                <!-- FSD example: if concept element is missing, this must not be extracted TypeOfSamplingProcedure -->
-                <sampProc>Should ignore elements without a concept by TypeOfSamplingProcedures</sampProc>
-                <!-- PUG examples: valid element for SamplingProcedure extraction -->
+                <sampProc>Element without a concept or lang</sampProc>
                 <sampProc xml:lang="sv">Sannolikhetsurval: stratifierat urval</sampProc>
                 <sampProc xml:lang="fr">Quelque chose</sampProc>
                 <sampProc xml:lang="sv">Undersökningen bygger på program sända i SVT1, SVT2, SVT24, Barnkanalen, Kunskapskanalen, TV4, Sjuan, TV3, Kanal 5, TV6 och TV8 under 12 veckor 2015. Urvalet av veckor skedde obundet och slumpmässigt och stratifierades efter säsong.</sampProc>
@@ -195,7 +196,7 @@
                 <specPerm URI="http://localhost/specPerm-test-link" xml:lang="en">SpecPerm Text en</specPerm>
                 <specPerm URI="{invalid-uri}" xml:lang="en">Invalid SpecPerm Link</specPerm>
                 <specPerm xml:lang="fi">SpecPerm Text fi</specPerm>
-                <conditions elementVersion="info:eu-repo-Access-Terms vocabulary">openAccess</conditions>
+                <conditions elementVersion="COAR Access Right Vocabulary">open access</conditions>
               </useStmt>
               <setAvail>
                 <avlStatus xml:lang="en">AvlStatus Text en</avlStatus>

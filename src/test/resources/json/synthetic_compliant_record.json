@@ -116,13 +116,22 @@
         "affiliation": "University of Essex. Department of Psychology"
       },
       {
-        "name": "Synthetic ORCID",
-        "affiliation": "Synthetic ORCID Association",
-        "identifier": {
-          "id": "0000-0000-0000-0000",
-          "type": "ORCID",
-          "uri": "https://orcid.org/0000-0000-0000-0000"
-        }
+        "name": "Synthetic PIDs",
+        "affiliation": "Synthetic PID Associations",
+        "identifiers": [
+          {
+            "id": "0000-0000-0000-0000",
+            "type": "ORCID",
+            "uri": "https://orcid.org/0000-0000-0000-0000",
+            "role": "PID"
+          },
+          {
+            "id": "000000000",
+            "type": "ROR",
+            "uri": "https://ror.org/000000000",
+            "role": "Affiliation-PID"
+          }
+        ]
       }
     ]
   },
@@ -145,22 +154,6 @@
       {
         "agency": "Finnish Agency"
       }
-    ]
-  },
-  "samplingProcedureFreeTexts": {
-    "sv": [
-      "Sannolikhetsurval: stratifierat urval",
-      "Undersökningen bygger på program sända i SVT1, SVT2, SVT24, Barnkanalen, Kunskapskanalen, TV4, Sjuan, TV3, Kanal 5, TV6 och TV8 under 12 veckor 2015. Urvalet av veckor skedde obundet och slumpmässigt och stratifierades efter säsong."
-    ],
-    "en": [
-      "This is the term",
-      "This is the term 2",
-      "This is the term. xml:lang in parent el wins over concept",
-      "This is the term. xml:lang in parent el wins over concept regardless",
-      "Should ignore elements without a concept by TypeOfSamplingProcedures"
-    ],
-    "fr": [
-      "Quelque chose"
     ]
   },
   "abstract": {
@@ -298,29 +291,62 @@
       {
         "vocabUri": "fi:urn:ddi-cv:SamplingProcedure:1.1",
         "vocab": "fi DDI Sampling Procedure",
-        "id": "et Probability.Stratified"
+        "id": "et Probability.Stratified",
+        "term": ""
       }
     ],
     "en": [
       {
         "vocabUri": "urn:ddi-cv:SamplingProcedure:1.1",
         "vocab": "DDI Sampling Procedure",
-        "id": "This is the id"
+        "id": "This is the id",
+        "term": "This is the term"
       },
       {
         "vocabUri": "urn:ddi-cv:SamplingProcedure:1.1",
         "vocab": "DDI Sampling Procedure",
-        "id": "Probability.Stratified 2"
+        "id": "Probability.Stratified 2",
+        "term": "This is the term 2"
       },
       {
         "vocabUri": "urn:ddi-cv:SamplingProcedure:1.1",
         "vocab": "DDI Sampling Procedure",
-        "id": "Probability.Stratified 2"
+        "id": "Probability.Stratified 2",
+        "term": "This is the term. xml:lang in parent el wins over concept"
       },
       {
         "vocabUri": "urn:ddi-cv:SamplingProcedure:1.1",
         "vocab": "DDI Sampling Procedure",
-        "id": "Probability.Stratified 2"
+        "id": "Probability.Stratified 2",
+        "term": "This is the term. xml:lang in parent el wins over concept regardless"
+      },
+      {
+        "vocabUri": "",
+        "vocab": "",
+        "id": "",
+        "term": "Element without a concept or lang"
+      }
+    ],
+    "fr": [
+      {
+        "vocabUri": "",
+        "vocab": "",
+        "id": "",
+        "term": "Quelque chose"
+      }
+    ],
+    "sv": [
+      {
+        "vocabUri": "",
+        "vocab": "",
+        "id": "",
+        "term": "Sannolikhetsurval: stratifierat urval"
+      },
+      {
+        "vocabUri": "",
+        "vocab": "",
+        "id": "",
+        "term": "Undersökningen bygger på program sända i SVT1, SVT2, SVT24, Barnkanalen, Kunskapskanalen, TV4, Sjuan, TV3, Kanal 5, TV6 och TV8 under 12 veckor 2015. Urvalet av veckor skedde obundet och slumpmässigt och stratifierades efter säsong."
       }
     ]
   },

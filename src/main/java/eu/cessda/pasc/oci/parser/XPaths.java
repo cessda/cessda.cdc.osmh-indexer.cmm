@@ -68,7 +68,7 @@ public final class XPaths {
     private final XMLMapper<Map<String, List<TermVocabAttributes>>> unitTypeXPath;
     private final XMLMapper<Map<String, Publisher>> publisherXPath;
     @Nullable
-    private final XMLMapper<Map<String, Publisher>> distributorXPath;
+    private final XMLMapper<Map<String, Publisher>> producerXPath;
     @Nullable
     private final XMLMapper<Set<String>> fileTxtLanguagesXPath;
     @Nullable
@@ -79,6 +79,10 @@ public final class XPaths {
     @Nullable
     private final XMLMapper<Map<String, List<UniverseElement>>> universeXPath;
     private final XMLMapper<Map<String, List<Creator>>> creatorsXPath;
+    @Nullable
+    private final XMLMapper<List<Element>> creatorElementsXPath;
+    @Nullable
+    private final XMLMapper<List<Element>> relationElementsXPath;
     private final XMLMapper<Map<String, List<Funding>>> fundingXPath;
     private final XMLMapper<Map<String, List<DataKindFreeText>>> dataKindXPath;
     private final XMLMapper<Map<String, List<TermVocabAttributes>>> generalDataFormatXPath;
@@ -116,7 +120,10 @@ public final class XPaths {
         // Study number/PID
         .pidStudyXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Citation/r:InternationalIdentifier", extractMetadataObjectListForEachLang(ParsingStrategies::pidLifecycleStrategy)))
         // Creator/PI
-        .creatorsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Citation/r:Creator", ParsingStrategies::creatorsStrategy))
+        .creatorsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Citation/r:Creator", elements -> ParsingStrategies.creatorsStrategy(elements, Collections.emptyMap())))
+        .creatorElementsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Citation/r:Creator", Function.identity()))
+        // Relations (for affiliations of individual creators)
+        .relationElementsXPath(new SimpleXMLMapper<>("//a:Relation", Function.identity()))
         // Data access open/restricted
         .dataAccessXPath(new ResolvingXMLMapper<>("//s:StudyUnit[1]/a:Archive", "//s:StudyUnit[1]/r:ArchiveReference", "//a:ArchiveSpecific/a:Item/a:Access/a:AccessTypeName/r:String", ParsingStrategies::dataAccessStrategy))
         // Terms of data access
@@ -275,10 +282,10 @@ public final class XPaths {
         .studyAreaCountriesXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:nation", extractMetadataObjectListForEachLang(ParsingStrategies::countryStrategy)))
         // Analysis unit
         .unitTypeXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:anlyUnit", elementList -> ParsingStrategies.conceptStrategy(elementList, ParsingStrategies::samplingTermVocabAttributeStrategy)))
-        // Publisher name/Contributor
-        .publisherXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:docDscr/ddi:citation/ddi:prodStmt/ddi:producer", parseLanguageContentOfElement(ParsingStrategies::publisherStrategy)))
         // Publisher
-        .distributorXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:distrbtr", parseLanguageContentOfElement(ParsingStrategies::publisherStrategy)))
+        .publisherXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:distrbtr", parseLanguageContentOfElement(ParsingStrategies::publisherStrategy)))
+        // Publisher fallback
+        .producerXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:docDscr/ddi:citation/ddi:prodStmt/ddi:producer", parseLanguageContentOfElement(ParsingStrategies::publisherStrategy)))
         // Language of data file(s)
         .fileTxtLanguagesXPath(new SimpleXMLMapper<>( "//ddi:codeBook/ddi:fileDscr/ddi:fileTxt", XMLMapper::getLanguagesOfElements))
         // Language-specific name of file
@@ -326,8 +333,8 @@ public final class XPaths {
         .typeOfTimeMethodXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/method/dataColl/timeMeth", elementList -> ParsingStrategies.conceptStrategy(elementList, e -> ParsingStrategies.termVocabAttributeStrategy(e, true))))
         .studyAreaCountriesXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/nation", extractMetadataObjectListForEachLang(ParsingStrategies::countryStrategy)))
         .unitTypeXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/anlyUnit", extractMetadataObjectListForEachLang(element -> termVocabAttributeStrategy(element, true))))
-        .publisherXPath(new SimpleXMLMapper<>("//ddi:codeBook/docDscr/citation/prodStmt/producer", parseLanguageContentOfElement(ParsingStrategies::publisherStrategy)))
-        .distributorXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/citation/distStmt/distrbtr", parseLanguageContentOfElement(ParsingStrategies::publisherStrategy)))
+        .publisherXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/citation/distStmt/distrbtr", parseLanguageContentOfElement(ParsingStrategies::publisherStrategy)))
+        .producerXPath(new SimpleXMLMapper<>("//ddi:codeBook/docDscr/citation/prodStmt/producer", parseLanguageContentOfElement(ParsingStrategies::publisherStrategy)))
         .samplingXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/method/dataColl/sampProc", elementList -> ParsingStrategies.conceptStrategy(elementList, ParsingStrategies::samplingTermVocabAttributeStrategy)))
         .typeOfModeOfCollectionXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/method/dataColl/collMode", elementList -> ParsingStrategies.conceptStrategy(elementList, e -> ParsingStrategies.termVocabAttributeStrategy(e, true))))
         .relatedPublicationsXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/othrStdyMat/relPubl", extractMetadataObjectListForEachLang(ParsingStrategies::relatedPublicationsStrategy)))

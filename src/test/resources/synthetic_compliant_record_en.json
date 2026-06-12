@@ -118,18 +118,21 @@
     {
       "vocab": "DDI Sampling Procedure",
       "vocabUri": "urn:ddi-cv:SamplingProcedure:1.1",
-      "id": "This is the id"
+      "id": "This is the id",
+      "term": "This is the Term"
     },
     {
       "vocab": "DDI Sampling Procedure",
       "vocabUri": "urn:ddi-cv:SamplingProcedure:1.1",
-      "id": "Probability.Stratified 2"
+      "id": "Probability.Stratified 2",
+      "term": "This is the Term 2"
+    },
+    {
+      "vocab": "",
+      "vocabUri": "",
+      "id": "",
+      "term": "Sampling Procedure 1"
     }
-  ],
-  "samplingProcedureFreeTexts": [
-    "This is the term",
-    "This is the term 2",
-    "Should ignore elements without a concept by TypeOfSamplingProcedures"
   ],
   "typeOfModeOfCollections": [
     {

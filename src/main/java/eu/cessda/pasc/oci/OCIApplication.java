@@ -43,7 +43,7 @@ public class OCIApplication {
 
     @Component
     @Profile("!test")
-    @SuppressWarnings({"java:S3985", "UnusedNestedClass"})
+    @SuppressWarnings({"java:S3985", "EffectivelyPrivate", "UnusedNestedClass"})
     private static class Runner implements CommandLineRunner {
         private final ConsumerScheduler consumerScheduler;
 

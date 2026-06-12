@@ -17,14 +17,14 @@ package eu.cessda.pasc.oci.configurations;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
-import co.elastic.clients.transport.rest_client.RestClientTransport;
+import co.elastic.clients.transport.rest5_client.Rest5ClientTransport;
+import co.elastic.clients.transport.rest5_client.low_level.Rest5Client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.elasticsearch.client.RestClient;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.core5.http.HttpHost;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -60,21 +60,21 @@ public class ElasticsearchConfiguration {
         this.objectMapper = objectMapper;
     }
 
-    public RestClientTransport elasticsearchTransport() {
-        var esHosts = new HttpHost(esHost, esHttpPort, "http");
-        final var restClientBuilder = RestClient.builder(esHosts);
+    public Rest5ClientTransport elasticsearchTransport() {
+        var esHosts = new HttpHost("http", esHost, esHttpPort);
+        final var restClientBuilder = Rest5Client.builder(esHosts);
 
         if (esUsername != null && esPassword != null) {
             // Set HTTP credentials
             var credentialsProvider = new BasicCredentialsProvider();
-            credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(esUsername, esPassword));
+            credentialsProvider.setCredentials(new AuthScope(esHosts), new UsernamePasswordCredentials(esUsername, esPassword.toCharArray()));
             restClientBuilder.setHttpClientConfigCallback(httpClientBuilder ->
                 httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider)
             );
         }
 
         var restClient = restClientBuilder.build();
-        return new RestClientTransport(restClient , new JacksonJsonpMapper(objectMapper));
+        return new Rest5ClientTransport(restClient, new JacksonJsonpMapper(objectMapper));
     }
 
     public ElasticsearchClient elasticsearchClient() {

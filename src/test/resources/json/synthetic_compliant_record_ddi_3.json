@@ -49,21 +49,23 @@
     "en": [
       {
         "name": "Synthetic ORCID",
-        "identifier": {
+        "identifiers": [{
           "id": "0000-0000-0000-0000",
           "type": "ORCID",
-          "uri": "https://orcid.org/0000-0000-0000-0000"
-        }
+          "uri": "https://orcid.org/0000-0000-0000-0000",
+          "role": "pid"
+        }]
       }
     ],
     "de": [
       {
         "name": "Synthetic ORCID de",
-        "identifier": {
+        "identifiers": [{
           "id": "0000-0000-0000-0000",
           "type": "ORCID",
-          "uri": "https://orcid.org/0000-0000-0000-0000"
-        }
+          "uri": "https://orcid.org/0000-0000-0000-0000",
+          "role": "pid"
+        }]
       }
     ]
   },
@@ -160,14 +162,6 @@
     }]
   },
   "repositoryUrl": "http://dbkapps.gesis.org/dbkoai/oai.asp",
-  "samplingProcedureFreeTexts": {
-    "en": [
-      "Quota sample"
-    ],
-    "de": [
-      "Quotenauswahl"
-    ]
-  },
   "series": {
     "de": [
       {
@@ -226,6 +220,22 @@
     ]
   },
   "typeOfSamplingProcedures": {
+    "en": [
+      {
+        "vocabUri": "urn:ddi:int.ddi.cv:SamplingProcedure:1.1.4",
+        "vocab": "",
+        "term": "Quota sample",
+        "id": ""
+      }
+    ],
+    "de": [
+      {
+        "vocabUri": "urn:ddi:int.ddi.cv:SamplingProcedure:1.1.4",
+        "vocab": "",
+        "term": "Quotenauswahl",
+        "id": ""
+      }
+    ]
   },
   "typeOfTimeMethods": {
     "en": [
