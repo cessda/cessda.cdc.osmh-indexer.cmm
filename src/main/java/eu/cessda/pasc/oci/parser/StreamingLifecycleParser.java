@@ -104,6 +104,10 @@ public class StreamingLifecycleParser {
     private static final QName PUBLISHER_NAME = new QName(DDI_REUSABLE, "PublisherName");
     private static final QName PUBLISHER_REFERENCE = new QName(DDI_REUSABLE, "PublisherReference");
     private static final QName REFERENCE_DATE = new QName(DDI_REUSABLE, "ReferenceDate");
+    private static final QName SERIES_DESCRIPTION = new QName(DDI_REUSABLE, "SeriesDescription");
+    private static final QName SERIES_NAME = new QName(DDI_REUSABLE, "SeriesName");
+    private static final QName SERIES_REPOSITORY_LOCATION = new QName(DDI_REUSABLE, "SeriesRepositoryLocation");
+    private static final QName SERIES_STATEMENT = new QName(DDI_REUSABLE, "SeriesStatement");
     private static final QName SPATIAL_COVERAGE = new QName(DDI_REUSABLE, "SpatialCoverage");
     private static final QName STRING = new QName(DDI_REUSABLE, "String");
     private static final QName SUBJECT = new QName(DDI_REUSABLE, "Subject");
@@ -475,6 +479,10 @@ public class StreamingLifecycleParser {
     private Universe parseUniverse() throws XMLStreamException {
         validateElement(UNIVERSE);
 
+        // Get inclusivity information
+        var isInclusiveAttr = reader.getAttributeValue(null, "isInclusive");
+        boolean inclusive = Boolean.parseBoolean(isInclusiveAttr);
+
         // Stream to the next element
         reader.nextTag();
 
@@ -497,7 +505,7 @@ public class StreamingLifecycleParser {
             }
         } while (reader.next() != END_ELEMENT || !reader.getName().equals(UNIVERSE));
 
-        return new Universe(objInf, universeName, label);
+        return new Universe(objInf, universeName, label, inclusive);
     }
 
     private PhysicalInstance parsePhysicalInstance() throws XMLStreamException {
@@ -554,6 +562,7 @@ public class StreamingLifecycleParser {
         Citation citation = null;
         Map<String, String> abstractMap = Collections.emptyMap();
         Reference universeReference = null;
+        SeriesStatement seriesStatement = null;
         List<FundingInformation> fundingInformationList = new ArrayList<>();
         Coverage coverage = null;
         List<ControlledVocabulary> analysisUnitList = new ArrayList<>();
@@ -572,6 +581,8 @@ public class StreamingLifecycleParser {
                     abstractMap = extractMultilingualContent();
                 } else if (qName.equals(UNIVERSE_REFERENCE)) {
                     universeReference = parseReference();
+                } else if (qName.equals(SERIES_STATEMENT)) {
+                    seriesStatement = parseSeriesStatement();
                 } else if (qName.equals(FUNDING_INFORMATION)) {
                     var fundingInformation = parseFundingInformation();
                     fundingInformationList.add(fundingInformation);
@@ -603,6 +614,7 @@ public class StreamingLifecycleParser {
             objInf,
             citation,
             abstractMap,
+            seriesStatement,
             universeReference,
             fundingInformationList,
             coverage,
@@ -612,6 +624,38 @@ public class StreamingLifecycleParser {
             physicalInstanceReferenceList,
             archiveReferenceList
         );
+    }
+
+    private SeriesStatement parseSeriesStatement() throws XMLStreamException {
+        validateElement(SERIES_STATEMENT);
+
+        reader.nextTag();
+
+        List<String> seriesRepositoryLocation = new ArrayList<>();
+        Map<String, List<String>> seriesName = new HashMap<>();
+        Map<String, String> seriesDescription = Collections.emptyMap();
+
+        do {
+            if (reader.getEventType() == START_ELEMENT) {
+                var qName = reader.getName();
+                if (qName.equals(SERIES_REPOSITORY_LOCATION)) {
+                    seriesRepositoryLocation.add(reader.getElementText());
+                } else if (qName.equals(SERIES_NAME)) {
+                    reader.nextTag();
+                    var seriesNameMap = extractMultilingualStrings();
+
+                    // SeriesName can be repeated, add names to the list
+                    seriesNameMap.forEach((lang, name) ->
+                        seriesName.computeIfAbsent(lang, k -> new ArrayList<>()).add(name)
+                    );
+                } else if (qName.equals(SERIES_DESCRIPTION)) {
+                    reader.nextTag();
+                    seriesDescription = extractMultilingualStrings();
+                }
+            }
+        } while (reader.next() != END_ELEMENT || !reader.getName().equals(SERIES_STATEMENT));
+
+        return new SeriesStatement(seriesRepositoryLocation, seriesName, seriesDescription);
     }
 
     private Coverage parseCoverage() throws XMLStreamException {

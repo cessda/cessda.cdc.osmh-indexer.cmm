@@ -6,15 +6,11 @@
   "classifications": {
     "en": [
       {
-        "vocab": "",
-        "vocabUri": "",
-        "id": "",
+        "id": "7803963d-cc69-4cf3-89fd-dc752bb16086",
         "term": "Health.PublicHealth"
       },
       {
-        "vocab": "",
-        "vocabUri": "",
-        "id": "",
+        "id": "7803963d-cc69-4cf3-89fd-dc752bb16086",
         "term": "Health.ReproductiveHealth"
       }
     ]
@@ -95,7 +91,15 @@
   "studyAreaCountries": {},
   "studyNumber": "no.nsd:39c1f667-17c2-475b-9333-846f59666e32:16",
   "studyUrl": {},
-  "typeOfModeOfCollections": {},
+  "typeOfModeOfCollections" : {
+    "en" : [ {
+      "id" : "00f4b65f-fcfd-4fa7-a113-27acb13d3b1e",
+      "term" : "Interview.FaceToFace.CAPIorCAMI"
+    }, {
+      "id" : "00f4b65f-fcfd-4fa7-a113-27acb13d3b1e",
+      "term" : "Interview.FaceToFace"
+    } ]
+  },
   "titleStudy": {
     "no": "Addressing Domestic Violence in Antenatal Care Environments 2 (ADVANCE 2)",
     "en": "Addressing Domestic Violence in Antenatal Care Environments 2 (ADVANCE 2)"
@@ -105,14 +109,19 @@
   "unitTypes": {
     "en": [
       {
-        "vocab": "",
-        "vocabUri": "",
-        "id": "",
+        "id" : "0bdbed9d-6e38-4158-8fff-dc7ae75ad6f1",
         "term": "Individual"
       }
     ]
   },
-  "universe": {},
+  "universe": {
+    "en": {
+      "exclusion": "Pregnant women attending the Outpatient Department (OPD) of Obstetrics and Gynecology departments at two collaborating hospitals in Nepal."
+    },
+    "no": {
+      "exclusion": "Gravide kvinner som deltar i poliklinisk avdeling (OPD) for obstetrikk og gynekologi ved to samarbeidende sykehus i Nepal."
+    }
+  },
   "lastModified": "2024-05-03T13:14:02.3620880Z",
   "studyXmlSourceUrl": "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=GetRecord&identifier=no.nsd%3A39c1f667-17c2-475b-9333-846f59666e32%3A16&metadataPrefix=ddi",
   "repositoryUrl": "/oai/request"

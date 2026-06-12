@@ -1269,9 +1269,9 @@ class ParsingStrategies{
 
             for (String lang : allLangs) {
                 var series = new Series(
-                    nameMap.getOrDefault(lang, new ArrayList<>()),
-                    descriptionMap.getOrDefault(lang, new ArrayList<>()),
-                    uriMap.getOrDefault(lang, new ArrayList<>())
+                    nameMap.getOrDefault(lang, Collections.emptyList()),
+                    descriptionMap.getOrDefault(lang, Collections.emptyList()),
+                    uriMap.getOrDefault(lang, Collections.emptyList())
                 );
                 seriesMap.computeIfAbsent(lang, k -> new ArrayList<>()).add(series);
             }

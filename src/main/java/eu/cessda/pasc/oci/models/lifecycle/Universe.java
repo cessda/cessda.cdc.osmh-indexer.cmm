@@ -5,6 +5,7 @@ import java.util.Map;
 public record Universe(
         ObjectInformation objInf,
         Map<String, String> universeName,
-        Map<String, String> label
+        Map<String, String> label,
+        boolean inclusive
 ) implements DDIObject {
 }

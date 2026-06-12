@@ -417,7 +417,27 @@ public class StreamingLifecycleParserTest {
         /*
          * Series
          */
-        var series = Collections.<String, List<Series>>emptyMap();
+        var series = new HashMap<String, List<Series>>();
+        var seriesStatement = studyUnit.seriesStatement();
+        if (seriesStatement != null) {
+            // Discover all languages
+            var langSet = new HashSet<>(seriesStatement.seriesDescription().keySet());
+            langSet.addAll(seriesStatement.seriesName().keySet());
+
+            // URIs are added to all valid languages
+            for (var lang : langSet) {
+                var name = seriesStatement.seriesName().get(lang);
+                var descriptions = seriesStatement.seriesDescription().get(lang);
+                var uris = new ArrayList<URI>();
+                for (var uriString : seriesStatement.seriesRepositoryLocation()) {
+                    uris.add(new URI(uriString));
+                }
+                var seriesObj = new Series(name, Collections.singletonList(descriptions), uris);
+                series.computeIfAbsent(lang, k -> new ArrayList<>()).add(seriesObj);
+            }
+
+            // TODO handle the case where only URIs are present
+        }
 
         /*
          * Study Area Countries
@@ -456,8 +476,42 @@ public class StreamingLifecycleParserTest {
         /*
          * Universe
          */
-        // TODO implement
-        var universe = Collections.<String, eu.cessda.pasc.oci.models.cmmstudy.Universe>emptyMap();
+        var universeMap = new HashMap<String, eu.cessda.pasc.oci.models.cmmstudy.Universe>();
+        var uElemMap = new HashMap<String, UniverseElement>();
+
+        // Universe can be directly referenced in the StudyUnit
+        var universeReference = studyUnit.universe();
+        if (universeReference != null) {
+            DDIObject ddiObject = components.get(universeReference.objInf());
+            if (ddiObject instanceof Universe universe) {
+                eu.cessda.pasc.oci.models.cmmstudy.Universe.Clusion inclusionStatus;
+                if (universe.inclusive()) {
+                    inclusionStatus = eu.cessda.pasc.oci.models.cmmstudy.Universe.Clusion.I;
+                } else {
+                    inclusionStatus = eu.cessda.pasc.oci.models.cmmstudy.Universe.Clusion.E;
+                }
+
+                // Default to label
+                universe.label().forEach((lang, name) ->
+                    uElemMap.put(lang, new UniverseElement(inclusionStatus, name))
+                );
+
+                // Fallback to name if label is not present
+                universe.universeName().forEach((lang, name) ->
+                    uElemMap.putIfAbsent(lang, new UniverseElement(inclusionStatus, name))
+                );
+            }
+        }
+
+        // Convert uElemMap to universeMap
+        uElemMap.forEach((lang, uElem) -> {
+            switch (uElem.clusion()) {
+                case I -> universeMap.put(lang, new eu.cessda.pasc.oci.models.cmmstudy.Universe(uElem.content(), null));
+                case E -> universeMap.put(lang, new eu.cessda.pasc.oci.models.cmmstudy.Universe(null, uElem.content()));
+            }
+        });
+
+        // Universe can also be part of a ConceptualComponent
         //studyUnit.conceptualComponent().universeScheme().universe()
 
         // Extract data collection parse results
@@ -493,7 +547,7 @@ public class StreamingLifecycleParserTest {
                 typeOfTimeMethods,
                 typeOfSamplingProcedures,
                 unitTypeMap,
-                universe,
+                universeMap,
                 lastModified,
                 OaiPmhHelpers.buildGetStudyFullUrl(repository.url(), studyNumber, repository.preferredMetadataParam()),
                 uri

@@ -7,6 +7,7 @@ public record StudyUnit(
         ObjectInformation objInf,
         Citation citation,
         Map<String, String> abstractMap,
+        SeriesStatement seriesStatement,
         Reference universe,
         List<FundingInformation> fundingInformation,
         Coverage coverage,

@@ -140,7 +140,7 @@
                         </Organization>
                     </Fragment>
                     <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
-                        <Universe isUniversallyUnique="true" versionDate="2024-04-29T13:53:58.9438971Z" xmlns="ddi:conceptualcomponent:3_3">
+                        <Universe isInclusive="false" isUniversallyUnique="true" versionDate="2024-04-29T13:53:58.9438971Z" xmlns="ddi:conceptualcomponent:3_3">
                             <r:URN>urn:ddi:no.nsd:7fc27ed5-9094-4181-9717-cb228812f326:2</r:URN>
                             <r:Agency>no.nsd</r:Agency>
                             <r:ID>7fc27ed5-9094-4181-9717-cb228812f326</r:ID>
@@ -907,6 +907,21 @@ Spørsmålene merket med 'Relevant,' 'Understandable/Clear', og 'Sensitive' ble 
                                 <r:Version>2</r:Version>
                                 <r:TypeOfObject>Universe</r:TypeOfObject>
                             </r:UniverseReference>
+                            <r:SeriesStatement>
+                                <r:SeriesRepositoryLocation>https://example.com/series</r:SeriesRepositoryLocation>
+                                <r:SeriesRepositoryLocation>https://example.com/seriesaltlink</r:SeriesRepositoryLocation>
+                                <r:SeriesName>
+                                    <r:String xml:lang="en">Made up series name</r:String>
+                                    <r:String xml:lang="de">Ausgedachter Serienname</r:String>
+                                </r:SeriesName>
+                                <r:SeriesName>
+                                    <r:String xml:lang="en">Has second made up name in English</r:String>
+                                </r:SeriesName>
+                                <r:SeriesDescription>
+                                    <r:Content xml:lang="en">This is an example of series description. This made up series has been collected over several made-up decades.</r:Content>
+                                    <r:Content xml:lang="de">Dies ist ein Beispiel für eine Serienbeschreibung. Diese erfundene Serie wurde über mehrere erfundene Jahrzehnte hinweg gesammelt.</r:Content>
+                                </r:SeriesDescription>
+                            </r:SeriesStatement>
                             <r:FundingInformation>
                                 <r:AgencyOrganizationReference>
                                     <r:Agency>no.nsd</r:Agency>
