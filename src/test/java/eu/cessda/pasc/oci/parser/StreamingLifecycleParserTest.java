@@ -168,11 +168,12 @@ public class StreamingLifecycleParserTest {
                 var creatorIdentifier = new Creator.Identifier(
                         researcherID.typeOfId(),
                         researcherID.researcherIdentification(),
-                        URI.create(researcherID.uri())
+                        URI.create(researcherID.uri()),
+                        "pid"
                 );
 
                 individualIdentification.individualName().fullName().forEach((lang, name) -> {
-                    var crObj = new Creator(name, null, creatorIdentifier);
+                    var crObj = new Creator(name, null, Collections.singletonList(creatorIdentifier));
                     creatorMap.computeIfAbsent(lang, k -> new ArrayList<>()).add(crObj);
                 });
             } else {
@@ -410,11 +411,6 @@ public class StreamingLifecycleParserTest {
         //studyUnit.otherMaterial()
 
         /*
-         * Sampling Procedure
-         */
-        var samplingProcedureFreeTexts = Collections.<String, List<String>>emptyMap();
-
-        /*
          * Series
          */
         var series = new HashMap<String, List<Series>>();
@@ -424,19 +420,36 @@ public class StreamingLifecycleParserTest {
             var langSet = new HashSet<>(seriesStatement.seriesDescription().keySet());
             langSet.addAll(seriesStatement.seriesName().keySet());
 
-            // URIs are added to all valid languages
-            for (var lang : langSet) {
-                var name = seriesStatement.seriesName().get(lang);
-                var descriptions = seriesStatement.seriesDescription().get(lang);
+            if (langSet.isEmpty()) {
                 var uris = new ArrayList<URI>();
                 for (var uriString : seriesStatement.seriesRepositoryLocation()) {
                     uris.add(new URI(uriString));
                 }
-                var seriesObj = new Series(name, Collections.singletonList(descriptions), uris);
-                series.computeIfAbsent(lang, k -> new ArrayList<>()).add(seriesObj);
+
+                // URI only series object, set lang to *
+                var seriesObj = new Series(Collections.emptyList(), Collections.emptyList(), uris);
+                series.computeIfAbsent("*", k -> new ArrayList<>()).add(seriesObj);
             }
 
-            // TODO handle the case where only URIs are present
+            // URIs are added to all valid languages
+            for (var lang : langSet) {
+                var name = seriesStatement.seriesName().get(lang);
+                var descriptions = seriesStatement.seriesDescription().get(lang);
+
+                var uris = new ArrayList<URI>();
+                for (var uriString : seriesStatement.seriesRepositoryLocation()) {
+                    uris.add(new URI(uriString));
+                }
+
+                // Null check of descriptions
+                List<String> descriptionList = Collections.emptyList();
+                if (descriptions != null) {
+                    descriptionList = Collections.singletonList(descriptions);
+                }
+
+                var seriesObj = new Series(name, descriptionList, uris);
+                series.computeIfAbsent(lang, k -> new ArrayList<>()).add(seriesObj);
+            }
         }
 
         /*
@@ -457,7 +470,7 @@ public class StreamingLifecycleParserTest {
         /*
          * Type of Sampling Procedures
          */
-        var typeOfSamplingProcedures = Collections.<String, List<VocabAttributes>>emptyMap();
+        var typeOfSamplingProcedures = Collections.<String, List<TermVocabAttributes>>emptyMap();
 
         /*
          * Unit Types
@@ -537,7 +550,6 @@ public class StreamingLifecycleParserTest {
                 publicationYear,
                 publisherMap,
                 relatedPublications,
-                samplingProcedureFreeTexts,
                 series,
                 studyAreaCountries,
                 studyNumber,

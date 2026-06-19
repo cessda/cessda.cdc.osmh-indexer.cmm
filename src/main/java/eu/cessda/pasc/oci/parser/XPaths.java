@@ -93,7 +93,7 @@ public final class XPaths {
         null
     );
 
-    private static final TermVocabAttributeNames DDI_3_2_ATTR_NAMES = new TermVocabAttributeNames("codeListName", "codeListURN");
+    private static final TermVocabAttributeNames DDI_3_2_ATTR_NAMES = new TermVocabAttributeNames("codeListID", "codeListName", "codeListURN");
     private static final Function<Element, Optional<TermVocabAttributes>> TERM_VOCAB_ATTR_3_2_STRATEGY = (Element element) ->
         ParsingStrategies.termVocabAttributeLifecycleStrategy(element, DDI_3_2_ATTR_NAMES);
 
@@ -167,7 +167,7 @@ public final class XPaths {
         .seriesXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:SeriesStatement", ParsingStrategies::seriesLifecycleStrategy))
         .build();
 
-    private static final TermVocabAttributeNames DDI_3_3_ATTR_NAMES = new TermVocabAttributeNames("controlledVocabularyName", "controlledVocabularyURN");
+    private static final TermVocabAttributeNames DDI_3_3_ATTR_NAMES = new TermVocabAttributeNames("controlledVocabularyID", "controlledVocabularyName", "controlledVocabularyURN");
     private static final Function<Element, Optional<TermVocabAttributes>> TERM_VOCAB_ATTR_3_3_STRATEGY = (Element element) ->
         ParsingStrategies.termVocabAttributeLifecycleStrategy(element, DDI_3_3_ATTR_NAMES);
 

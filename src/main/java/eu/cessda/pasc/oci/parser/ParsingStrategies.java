@@ -221,20 +221,23 @@ class ParsingStrategies{
     @NonNull
     @SuppressWarnings("java:S131")
     static Optional<TermVocabAttributes> termVocabAttributeLifecycleStrategy(Element element, TermVocabAttributeNames attrNames) {
-        String vocab = "";
-        String vocabUri = "";
+        String id = null;
+        String vocab = null;
+        String vocabUri = null;
 
         var term = element.getText();
         for (var attr : element.getAttributes()) {
             String attrName = attr.getName();
-            if (attrName.equals(attrNames.vocab())) {
+            if (attrName.equals(attrNames.id())) {
+                id = attr.getValue();
+            } else if (attrName.equals(attrNames.vocab())) {
                 vocab = attr.getValue();
             } else if (attrName.equals(attrNames.vocabUri())) {
                 vocabUri = attr.getValue();
             }
         }
 
-        return Optional.of(new TermVocabAttributes(vocab, vocabUri, "", term));
+        return Optional.of(new TermVocabAttributes(vocab, vocabUri, id, term));
     }
 
     /**
@@ -462,7 +465,7 @@ class ParsingStrategies{
             var inclusionStatus = parseInclusionStatus(universeElement);
 
             // Language specific content is stored in sub-elements which needs to be flattened
-            for (var otherMaterial : universeElement.getChildren("Description", null)) {
+            for (var otherMaterial : universeElement.getChildren("Label", null)) {
                 for (var contentElement : otherMaterial.getChildren("Content", null)) {
                     map.computeIfAbsent(
                         XMLMapper.getLangOfElement(contentElement), k -> new ArrayList<>()
@@ -886,8 +889,9 @@ class ParsingStrategies{
      */
     static Map<String, Creator> individualStrategy(Element element, Map<String, Affiliation> affiliationMap) {
         var identification = element.getChild("IndividualIdentification", null);
-        if (identification == null)
+        if (identification == null) {
             return Collections.emptyMap();
+        }
 
         var map = new HashMap<String, Creator>();
 
@@ -1055,7 +1059,7 @@ class ParsingStrategies{
                         var vocabAttributes = termVocabAttributes.get();
                         vocabAttributesList.add(new TermVocabAttributes(vocabAttributes.vocab(), vocabAttributes.vocabUri(), vocabAttributes.id(), term));
                     } else {
-                        vocabAttributesList.add(new TermVocabAttributes("", "", "", term));
+                        vocabAttributesList.add(new TermVocabAttributes(null, null, null, term));
                     }
                 }
 
@@ -1406,13 +1410,13 @@ class ParsingStrategies{
 
         for (var seriesElement : elements) {
 
-            var uriMap = new HashMap<String, List<URI>>();
+            var uriList = new ArrayList<URI>();
             var nameMap = new HashMap<String, List<String>>();
             var descriptionMap = new HashMap<String, List<String>>();
 
+            // SeriesRepositoryLocation is not localised
             for (var repoLocation : seriesElement.getChildren("SeriesRepositoryLocation", null)) {
-                var lang = XMLMapper.getLangOfElement(repoLocation);
-                uriMap.computeIfAbsent(lang, k -> new ArrayList<>()).add(URI.create(repoLocation.getTextTrim()));
+                uriList.add(URI.create(repoLocation.getTextTrim()));
             }
 
             for (var nameElement : seriesElement.getChildren("SeriesName", null)) {
@@ -1429,15 +1433,14 @@ class ParsingStrategies{
                 }
             }
 
-            var allLangs = new HashSet<>(uriMap.keySet());
-            allLangs.addAll(nameMap.keySet());
+            var allLangs = new HashSet<>(nameMap.keySet());
             allLangs.addAll(descriptionMap.keySet());
 
             for (String lang : allLangs) {
                 var series = new Series(
                     nameMap.getOrDefault(lang, Collections.emptyList()),
                     descriptionMap.getOrDefault(lang, Collections.emptyList()),
-                    uriMap.getOrDefault(lang, Collections.emptyList())
+                    uriList
                 );
                 seriesMap.computeIfAbsent(lang, k -> new ArrayList<>()).add(series);
             }

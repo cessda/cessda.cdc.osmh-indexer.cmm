@@ -650,7 +650,7 @@ public class StreamingLifecycleParser {
                     );
                 } else if (qName.equals(SERIES_DESCRIPTION)) {
                     reader.nextTag();
-                    seriesDescription = extractMultilingualStrings();
+                    seriesDescription = extractMultilingualContent();
                 }
             }
         } while (reader.next() != END_ELEMENT || !reader.getName().equals(SERIES_STATEMENT));

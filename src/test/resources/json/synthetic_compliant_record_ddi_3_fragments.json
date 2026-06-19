@@ -86,7 +86,37 @@
     }
   },
   "relatedPublications": {},
-  "series": {},
+  "series": {
+    "de": [
+      {
+        "names": [
+          "Ausgedachter Serienname"
+        ],
+        "descriptions": [
+          "Dies ist ein Beispiel für eine Serienbeschreibung. Diese erfundene Serie wurde über mehrere erfundene Jahrzehnte hinweg gesammelt."
+        ],
+        "uris": [
+          "https://example.com/series",
+          "https://example.com/seriesaltlink"
+        ]
+      }
+    ],
+    "en": [
+      {
+        "names": [
+          "Made up series name",
+          "Has second made up name in English"
+        ],
+        "descriptions": [
+          "This is an example of series description. This made up series has been collected over several made-up decades."
+        ],
+        "uris": [
+          "https://example.com/series",
+          "https://example.com/seriesaltlink"
+        ]
+      }
+    ]
+  },
   "studyAreaCountries": {},
   "studyNumber": "no.nsd:39c1f667-17c2-475b-9333-846f59666e32:16",
   "studyUrl": {},
