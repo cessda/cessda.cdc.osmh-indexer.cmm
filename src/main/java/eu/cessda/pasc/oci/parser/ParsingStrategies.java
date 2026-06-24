@@ -465,13 +465,25 @@ class ParsingStrategies{
             var inclusionStatus = parseInclusionStatus(universeElement);
 
             // Language specific content is stored in sub-elements which needs to be flattened
-            for (var otherMaterial : universeElement.getChildren("Label", null)) {
+            var labels = universeElement.getChildren("Label", null);
+            for (var otherMaterial : labels) {
                 for (var contentElement : otherMaterial.getChildren("Content", null)) {
                     map.computeIfAbsent(
                         XMLMapper.getLangOfElement(contentElement), k -> new ArrayList<>()
                     ).add(
                         new UniverseElement(inclusionStatus, contentElement.getText())
                     );
+                }
+            }
+            if (labels.isEmpty()) {
+                for (var otherMaterial : universeElement.getChildren("Description", null)) {
+                    for (var contentElement : otherMaterial.getChildren("Content", null)) {
+                        map.computeIfAbsent(
+                                XMLMapper.getLangOfElement(contentElement), k -> new ArrayList<>()
+                        ).add(
+                                new UniverseElement(inclusionStatus, contentElement.getText())
+                        );
+                    }
                 }
             }
         }
@@ -755,7 +767,7 @@ class ParsingStrategies{
         // Merge name and abbreviation maps
         var publisherMap = new HashMap<String, Publisher>();
         Stream.concat(nameMap.keySet().stream(), abbrMap.keySet().stream()).distinct().forEach(key ->
-            publisherMap.put(key, new Publisher(abbrMap.getOrDefault(key, ""), nameMap.getOrDefault(key, "")))
+            publisherMap.put(key, new Publisher(abbrMap.get(key), nameMap.get(key)))
         );
 
         return Collections.unmodifiableMap(publisherMap);
@@ -923,17 +935,16 @@ class ParsingStrategies{
             if (fullName != null) {
                 for (var string : fullName.getChildren(STRING, null)) {
                     var lang = getLangOfElement(string);
-                    List<Creator.Identifier> identifiers = new ArrayList<>();
+                    var identifiers = new ArrayList<Creator.Identifier>(personalIds.size() + affiliationIds.size());
 
-                    if (!personalIds.isEmpty())
-                        identifiers.addAll(personalIds);
-                    if (!affiliationIds.isEmpty())
-                        identifiers.addAll(affiliationIds);
+                    identifiers.addAll(personalIds);
+                    identifiers.addAll(affiliationIds);
 
                     var creator = new Creator(
                             string.getTextTrim(),
                             affiliationName,
-                            identifiers.isEmpty() ? null : identifiers);
+                            identifiers
+                    );
 
                     if (isPreferred) {
                         map.put(lang, creator);

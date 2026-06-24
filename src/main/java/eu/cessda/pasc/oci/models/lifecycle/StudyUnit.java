@@ -13,6 +13,8 @@ public record StudyUnit(
         Coverage coverage,
         List<ControlledVocabulary> analysisUnit,
         List<KindOfData> kindOfData,
+        List<ControlledVocabulary> generalDataFormatList,
+        List<Reference> otherMaterialSchemeReferenceList,
         List<Reference> dataCollectionReference,
         List<Reference> physicalInstanceReference,
         List<Reference> archiveReference

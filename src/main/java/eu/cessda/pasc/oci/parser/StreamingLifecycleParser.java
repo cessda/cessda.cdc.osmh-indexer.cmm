@@ -52,6 +52,7 @@ public class StreamingLifecycleParser {
     private static final QName ORGANIZATION_IDENTIFICATION = new QName(DDI_ARCHIVE, "OrganizationIdentification");
     private static final QName RESEARCHER_ID = new QName(DDI_ARCHIVE, "ResearcherID");
     private static final QName RESEARCHER_IDENTIFICATION = new QName(DDI_ARCHIVE, "ResearcherIdentification");
+    private static final QName TYPE_OF_ACCESS = new QName(DDI_ARCHIVE, "TypeOfAccess");
     private static final QName TYPE_OF_ID = new QName(DDI_ARCHIVE, "TypeOfID");
 
     private static final QName UNIVERSE = new QName(DDI_CONCEPTUALCOMPONENT, "Universe");
@@ -91,6 +92,7 @@ public class StreamingLifecycleParser {
     private static final QName DATA_COLLECTION_REFERENCE = new QName(DDI_REUSABLE, "DataCollectionReference");
     private static final QName DESCRIPTION = new QName(DDI_REUSABLE, "Description");
     private static final QName FUNDING_INFORMATION = new QName(DDI_REUSABLE, "FundingInformation");
+    private static final QName GENERAL_DATA_FORMAT = new QName(DDI_REUSABLE, "GeneralDataFormat");
     private static final QName GRANT_NUMBER = new QName(DDI_REUSABLE, "GrantNumber");
     private static final QName KEYWORD = new QName(DDI_REUSABLE, "Keyword");
     private static final QName KIND_OF_DATA = new QName(DDI_REUSABLE, "KindOfData");
@@ -98,6 +100,8 @@ public class StreamingLifecycleParser {
     private static final QName INTERNATIONAL_IDENTIFIER = new QName(DDI_REUSABLE, "InternationalIdentifier");
     private static final QName LABEL = new QName(DDI_REUSABLE, "Label");
     private static final QName MANAGING_AGENCY = new QName(DDI_REUSABLE, "ManagingAgency");
+    private static final QName OTHER_MATERIAL_SCHEME = new QName(DDI_REUSABLE, "OtherMaterialScheme");
+    private static final QName OTHER_MATERIAL_SCHEME_REFERENCE = new QName(DDI_REUSABLE, "OtherMaterialSchemeReference");
     private static final QName PHYSICAL_INSTANCE_REFERENCE = new QName(DDI_REUSABLE, "PhysicalInstanceReference");
     private static final QName PUBLICATION_DATE = new QName(DDI_REUSABLE, "PublicationDate");
     private static final QName PUBLISHER = new QName(DDI_REUSABLE, "Publisher");
@@ -174,7 +178,18 @@ public class StreamingLifecycleParser {
         return objectMap;
     }
 
-    public static StreamingLifecycleParser parseDocument(XMLInputFactory factory, Source source) throws XMLStreamException {
+    /**
+     * Parse a DDI Lifecycle 3.3 Fragment instance, possibly wrapped in an OAI-PMH response.
+     * Use {@link #getObjectsByType()} and {@link #getObjectsByType()} to get the parsed
+     * components of the document.
+     *
+     * @param factory the XML input factory.
+     * @param source the document source.
+     * @return a parsed DDI document.
+     * @throws UnsupportedDDIException if unsupported DDI versions were encountered.
+     * @throws XMLStreamException if there was an error parsing the document.
+     */
+    public static StreamingLifecycleParser parseDocument(XMLInputFactory factory, Source source) throws UnsupportedDDIException, XMLStreamException {
         var parser = new StreamingLifecycleParser(factory, source);
 
         // Parse the document
@@ -184,7 +199,7 @@ public class StreamingLifecycleParser {
         return parser;
     }
 
-    private void parseDDI() throws XMLStreamException {
+    private void parseDDI() throws XMLStreamException, UnsupportedDDIException {
 
         // Create reader
         var streamReader = factory.createXMLStreamReader(source);
@@ -201,6 +216,12 @@ public class StreamingLifecycleParser {
                         oaiRequest = reader.getElementText();
                     } else if (qName.equals(OAI_HEADER)) {
                         oaiRecordHeader = parseOAIHeader();
+                    } else if (reader.getLocalName().equals("DDIInstance")) {
+                        // Fail here, we need to use the DOM parser
+                        throw new UnsupportedDDIException(qName);
+                    } else if (reader.getLocalName().equals("codeBook")) {
+                        // Fail here, we need to use the DOM parser
+                        throw new UnsupportedDDIException(qName);
                     } else if (qName.equals(FRAGMENT_INSTANCE)) {
                         // Start parsing
                         parseFromRoot();
@@ -459,6 +480,7 @@ public class StreamingLifecycleParser {
 
         Map<String, String> accessTypeName = Collections.emptyMap();
         Map<String, String> accessDescription = Collections.emptyMap();
+        String typeOfAccess = null;
 
         do {
             if (reader.getEventType() == START_ELEMENT) {
@@ -469,11 +491,13 @@ public class StreamingLifecycleParser {
                 } else if (qName.equals(DESCRIPTION)) {
                     reader.nextTag();
                     accessDescription = extractMultilingualContent();
+                } else if (qName.equals(TYPE_OF_ACCESS)) {
+                    typeOfAccess = reader.getElementText();
                 }
             }
         } while (reader.next() != END_ELEMENT || !reader.getName().equals(ACCESS));
 
-        return new Access(objInf, accessTypeName, accessDescription);
+        return new Access(objInf, accessTypeName, accessDescription, typeOfAccess);
     }
 
     private Universe parseUniverse() throws XMLStreamException {
@@ -566,7 +590,9 @@ public class StreamingLifecycleParser {
         List<FundingInformation> fundingInformationList = new ArrayList<>();
         Coverage coverage = null;
         List<ControlledVocabulary> analysisUnitList = new ArrayList<>();
+        List<ControlledVocabulary> generalDataFormatList = new ArrayList<>();
         List<KindOfData> kindOfDataList = new ArrayList<>();
+        List<Reference> otherMaterialSchemeReferenceList = new ArrayList<>();
         List<Reference> dataCollectionReferenceList = new ArrayList<>();
         List<Reference> physicalInstanceReferenceList = new ArrayList<>();
         List<Reference> archiveReferenceList = new ArrayList<>();
@@ -596,6 +622,12 @@ public class StreamingLifecycleParser {
                     var controlledVocabulary = parseControlledVocabularyInformation();
                     var kindOfData = new KindOfData(controlledVocabulary, type);
                     kindOfDataList.add(kindOfData);
+                } else if (qName.equals(GENERAL_DATA_FORMAT)) {
+                    var controlledVocabulary = parseControlledVocabularyInformation();
+                    generalDataFormatList.add(controlledVocabulary);
+                } else if (qName.equals(OTHER_MATERIAL_SCHEME_REFERENCE)) {
+                    var otherMaterialSchemeReference = parseReference();
+                    otherMaterialSchemeReferenceList.add(otherMaterialSchemeReference);
                 } else if (qName.equals(DATA_COLLECTION_REFERENCE)) {
                     var dataCollectionReference = parseReference();
                     dataCollectionReferenceList.add(dataCollectionReference);
@@ -620,6 +652,8 @@ public class StreamingLifecycleParser {
             coverage,
             analysisUnitList,
             kindOfDataList,
+            generalDataFormatList,
+            otherMaterialSchemeReferenceList,
             dataCollectionReferenceList,
             physicalInstanceReferenceList,
             archiveReferenceList
@@ -946,7 +980,7 @@ public class StreamingLifecycleParser {
         var objInf = parseObjectInformation();
 
         SamplingProcedure samplingProcedure = null;
-        TimeMethod timeMethod = null;
+        List<TimeMethod> timeMethodList = new ArrayList<>();
 
         do {
             if (reader.getEventType() == START_ELEMENT) {
@@ -954,12 +988,13 @@ public class StreamingLifecycleParser {
                 if (qName.equals(SAMPLING_PROCEDURE)) {
                     samplingProcedure = parseSamplingProcedure();
                 } else if (qName.equals(TIME_METHOD)) {
-                    timeMethod = parseTimeMethod();
+                    var timeMethod = parseTimeMethod();
+                    timeMethodList.add(timeMethod);
                 }
             }
         } while (reader.next() != END_ELEMENT || !reader.getName().equals(METHODOLOGY));
 
-        return new Methodology(objInf, samplingProcedure, timeMethod);
+        return new Methodology(objInf, samplingProcedure, timeMethodList);
     }
 
     private TimeMethod parseTimeMethod() throws XMLStreamException {

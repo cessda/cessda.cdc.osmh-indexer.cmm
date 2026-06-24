@@ -34,7 +34,7 @@ public class StreamingLifecycleParserTest {
     private final ParserTestUtilities utils = new ParserTestUtilities(objectMapper);
 
     @Test
-    public void shouldReturnValidCMMStudyRecordFromAFullyFragmentRecord() throws IOException, XMLStreamException, ProcessingException, JSONException, URISyntaxException {
+    public void shouldReturnValidCMMStudyRecordFromAFullyFragmentRecord() throws IOException, XMLStreamException, ProcessingException, JSONException, URISyntaxException, UnsupportedDDIException {
         // Given
         var expectedJson = ResourceHandler.getResourceAsString("json/synthetic_compliant_record_ddi_3_fragments.json");
         var repo = ReposTestData.getUKDSRepo();
@@ -112,19 +112,17 @@ public class StreamingLifecycleParserTest {
          */
         var abstr = studyUnit.abstractMap();
 
+        var topicalCoverage = studyUnit.coverage().topicalCoverage();
+
         /*
          * Classifications
          */
-        var classifications = new HashMap<String, List<TermVocabAttributes>>();
-        studyUnit.coverage().topicalCoverage().subjects().forEach((lang, subjectList) -> {
-            for (var subject : subjectList) {
-                var termVocabAttributes = new TermVocabAttributes(subject.name(), subject.urn(), subject.id(), subject.content());
-                if (lang == null || lang.equals("*")) {
-                    lang = defaultLang;
-                }
-                classifications.computeIfAbsent(lang, k -> new ArrayList<>()).add(termVocabAttributes);
-            }
-        });
+        var classifications = extractMultilingualCVMap(topicalCoverage.subjects(), defaultLang);
+
+        /*
+         * Keywords
+         */
+        var keywords = extractMultilingualCVMap(topicalCoverage.keywords(), defaultLang);
 
         /*
          * Citation related
@@ -256,12 +254,24 @@ public class StreamingLifecycleParserTest {
 
             if (referencedObject instanceof Archive archive) {
                 if (dataAccess == null) {
-                    var accessTypeName = archive.access().accessTypeName();
-                    for (var accessType : accessTypeName.values()) {
-                        var parsedDataAccess = parseDataAccessString(accessType);
+                    // Try parsing TypeOfAccess
+                    var typeOfAccess = archive.access().typeOfAccess();
+                    if (typeOfAccess != null) {
+                        var parsedDataAccess = parseDataAccessString(typeOfAccess);
                         if (parsedDataAccess != null) {
                             dataAccess = parsedDataAccess;
-                            break;
+                        }
+                    }
+
+                    // Fall back to AccessTypeName if TypeOfAccess is not present or didn't return a result
+                    if (dataAccess != null){
+                        var accessTypeName = archive.access().accessTypeName();
+                        for (var accessType : accessTypeName.values()) {
+                            var parsedDataAccess = parseDataAccessString(accessType);
+                            if (parsedDataAccess != null) {
+                                dataAccess = parsedDataAccess;
+                                break;
+                            }
                         }
                     }
                 }
@@ -276,12 +286,18 @@ public class StreamingLifecycleParserTest {
         /*
          * Data Access URL
          */
+        // Not needed for lifecycle document
         var dataAccessUrl = Collections.<String, URI>emptyMap();
 
         /*
          * Type of Mode of Collections
          */
         var typeOfModeOfCollectionsList = new ArrayList<TermVocabAttributes>();
+
+        /*
+         * Type of Time Methods
+         */
+        var timeMethodList = new ArrayList<TermVocabAttributes>();
 
         /*
          * Data Collection
@@ -337,10 +353,24 @@ public class StreamingLifecycleParserTest {
                             typeOfModeOfCollectionsList.add(term);
                         }
                     }
+
+
+                }
+
+                var methodologyReference = dataCollection.methodologyReference();
+                DDIObject mReferencedObject = components.get(methodologyReference.objInf());
+
+                if (mReferencedObject instanceof Methodology methodology) {
+                    for (var timeMethod : methodology.timeMethod()) {
+                        var tm = timeMethod.typeOfTimeMethod();
+                        var term = new TermVocabAttributes(tm.name(), tm.urn(), tm.id(), tm.content());
+                        timeMethodList.add(term);
+                    }
                 }
             }
         }
 
+        var typeOfTimeMethods = Map.<String, List<TermVocabAttributes>>of(defaultLang, timeMethodList);
         var typeOfModeOfCollections = Map.<String, List<TermVocabAttributes>>of(defaultLang, typeOfModeOfCollectionsList);
 
         /*
@@ -366,7 +396,7 @@ public class StreamingLifecycleParserTest {
                 // Get filenames from citation
                 var physicalInstanceCitation = physicalInstance.citation();
                 if (physicalInstanceCitation != null) {
-                    // fileLanguages.addAll(citation.language());
+                    //fileLanguages.addAll(citation.language());
                     fileLanguages.addAll(physicalInstanceCitation.title().keySet());
                 }
             }
@@ -396,12 +426,13 @@ public class StreamingLifecycleParserTest {
         /*
          * General Data Formats
          */
-        var generalDataFormats = Collections.<String, List<TermVocabAttributes>>emptyMap();
+        var generalDataFormatList = new ArrayList<TermVocabAttributes>();
+        for (var generalDataFormat : studyUnit.generalDataFormatList()) {
+            var term = new TermVocabAttributes(generalDataFormat.name(), generalDataFormat.urn(), generalDataFormat.id(), generalDataFormat.content());
+            generalDataFormatList.add(term);
+        }
+        var generalDataFormats = Map.<String, List<TermVocabAttributes>>of(defaultLang, generalDataFormatList);
 
-        /*
-         * Keywords
-         */
-        var keywords = Collections.<String, List<TermVocabAttributes>>emptyMap();
 
         /*
          * Related Publications
@@ -461,11 +492,6 @@ public class StreamingLifecycleParserTest {
          * Study URL
          */
         var studyUrl = Collections.<String, URI>emptyMap();
-
-        /*
-         * Type of Time Methods
-         */
-        var typeOfTimeMethods = Collections.<String, List<TermVocabAttributes>>emptyMap();
 
         /*
          * Type of Sampling Procedures
@@ -564,5 +590,19 @@ public class StreamingLifecycleParserTest {
                 OaiPmhHelpers.buildGetStudyFullUrl(repository.url(), studyNumber, repository.preferredMetadataParam()),
                 uri
         );
+    }
+
+    private static HashMap<String, List<TermVocabAttributes>> extractMultilingualCVMap(Map<String, List<ControlledVocabulary>> topicalCoverage, String defaultLang) {
+        var controlledVocabularyMap = new HashMap<String, List<TermVocabAttributes>>();
+        topicalCoverage.forEach((lang, keywordsList) -> {
+            for (var keyword : keywordsList) {
+                var termVocabAttributes = new TermVocabAttributes(keyword.name(), keyword.urn(), keyword.id(), keyword.content());
+                if (lang == null || lang.equals("*")) {
+                    lang = defaultLang;
+                }
+                controlledVocabularyMap.computeIfAbsent(lang, k -> new ArrayList<>()).add(termVocabAttributes);
+            }
+        });
+        return controlledVocabularyMap;
     }
 }

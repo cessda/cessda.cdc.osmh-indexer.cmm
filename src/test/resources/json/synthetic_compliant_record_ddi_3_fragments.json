@@ -64,7 +64,13 @@
       }
     ]
   },
-  "generalDataFormats": {},
+  "generalDataFormats": {
+    "en": [{
+      "vocabUri": "urn:ddi:int.ddi.cv:GeneralDataFormat:2.0.3",
+      "vocab": "GeneralDataFormat",
+      "term": "Numeric"
+    }]
+  },
   "keywords": {},
   "pidStudies": {
     "*": [
@@ -133,7 +139,14 @@
     "no": "Addressing Domestic Violence in Antenatal Care Environments 2 (ADVANCE 2)",
     "en": "Addressing Domestic Violence in Antenatal Care Environments 2 (ADVANCE 2)"
   },
-  "typeOfTimeMethods": {},
+  "typeOfTimeMethods": {
+    "en": [
+      {
+        "id": "5247ed79-600e-431c-ad3b-b1743df6295c",
+        "term": "CrossSection"
+      }
+    ]
+  },
   "typeOfSamplingProcedures": {},
   "unitTypes": {
     "en": [

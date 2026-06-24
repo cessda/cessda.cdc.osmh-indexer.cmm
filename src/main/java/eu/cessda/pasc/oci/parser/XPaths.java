@@ -137,7 +137,7 @@ public final class XPaths {
         // Keywords
         .keywordsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:TopicalCoverage/r:Keyword", extractMetadataObjectListForEachLang(TERM_VOCAB_ATTR_3_2_STRATEGY)))
         // Time dimension
-        .typeOfTimeMethodXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:Methodology/d:TimeMethod", (List<Element> elementList) -> typeOfTimeMethodLifecycleStrategy(elementList, DDI_3_2_ATTR_NAMES)))
+        .typeOfTimeMethodXPath(new SimpleXMLMapper<>("//d:Methodology/d:TimeMethod", (List<Element> elementList) -> typeOfTimeMethodLifecycleStrategy(elementList, DDI_3_2_ATTR_NAMES)))
         // Country
         .studyAreaCountriesXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:SpatialCoverage/r:GeographicLocationReference", ParsingStrategies::geographicLocationStrategy))
         // Analysis unit
@@ -151,7 +151,7 @@ public final class XPaths {
         // Sampling procedure
         .samplingXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:Methodology/d:SamplingProcedure", (List<Element> elementList) -> samplingProceduresLifecycleStrategy(elementList, DDI_3_2_ATTR_NAMES)))
         // Data collection mode
-        .typeOfModeOfCollectionXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:CollectionEvent/d:ModeOfCollection", (List<Element> elementList) -> typeOfModeOfCollectionLifecycleStrategy(elementList, DDI_3_2_ATTR_NAMES)))
+        .typeOfModeOfCollectionXPath(new ResolvingXMLMapper<>("//s:StudyUnit[1]/d:DataCollection", "//s:StudyUnit[1]/r:DataCollectionReference", "//d:CollectionEvent/d:ModeOfCollection", (List<Element> elementList) -> typeOfModeOfCollectionLifecycleStrategy(elementList, DDI_3_2_ATTR_NAMES)))
         // PID of Related publication
         .relatedPublicationsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:OtherMaterial", ParsingStrategies::relatedPublicationLifecycleStrategy))
         /// /r:Citation/r:InternationalIdentifier/r:IdentifierContent
@@ -192,13 +192,15 @@ public final class XPaths {
         // Keywords
         .withKeywordsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:TopicalCoverage/r:Keyword", extractMetadataObjectListForEachLang(TERM_VOCAB_ATTR_3_3_STRATEGY)))
         // Time dimension
-        .withTypeOfTimeMethodXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:Methodology/d:TimeMethod", (List<Element> elementList) -> ParsingStrategies.typeOfTimeMethodLifecycleStrategy(elementList, DDI_3_3_ATTR_NAMES)))
+        .withTypeOfTimeMethodXPath(new SimpleXMLMapper<>("//d:Methodology/d:TimeMethod", (List<Element> elementList) -> ParsingStrategies.typeOfTimeMethodLifecycleStrategy(elementList, DDI_3_3_ATTR_NAMES)))
+        // Data access open/restricted
+        .withDataAccessXPath(new ResolvingXMLMapper<>("//s:StudyUnit[1]/a:Archive", "//s:StudyUnit[1]/r:ArchiveReference", "//a:ArchiveSpecific/a:Item/a:Access/a:TypeOfAccess", ParsingStrategies::dataAccessStrategy))
         // Analysis unit
         .withUnitTypeXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:AnalysisUnit", (List<Element> elementList) -> ParsingStrategies.analysisUnitStrategy(elementList, DDI_3_3_ATTR_NAMES)))
         // Sampling procedure
         .withSamplingXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:Methodology/d:SamplingProcedure", (List<Element> elementList) -> ParsingStrategies.samplingProceduresLifecycleStrategy(elementList, DDI_3_3_ATTR_NAMES)))
         // Data collection mode
-        .withTypeOfModeOfCollectionXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:CollectionEvent/d:ModeOfCollection", (List<Element> elementList) -> ParsingStrategies.typeOfModeOfCollectionLifecycleStrategy(elementList, DDI_3_3_ATTR_NAMES)))
+        .withTypeOfModeOfCollectionXPath(new ResolvingXMLMapper<>("//s:StudyUnit[1]/d:DataCollection", "//s:StudyUnit[1]/r:DataCollectionReference", "//d:CollectionEvent/d:ModeOfCollection", (List<Element> elementList) -> typeOfModeOfCollectionLifecycleStrategy(elementList, DDI_3_3_ATTR_NAMES)))
         // General data format
         .withGeneralDataFormatXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:GeneralDataFormat", extractMetadataObjectListForEachLang(TERM_VOCAB_ATTR_3_3_STRATEGY)));
 

@@ -5,6 +5,7 @@ import java.util.Map;
 public record Access(
         ObjectInformation objInf,
         Map<String, String> accessTypeName,
-        Map<String, String> accessDescription
+        Map<String, String> accessDescription,
+        String typeOfAccess
 ) implements DDIObject {
 }

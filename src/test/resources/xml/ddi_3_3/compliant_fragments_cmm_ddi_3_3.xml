@@ -970,6 +970,13 @@ Spørsmålene merket med 'Relevant,' 'Understandable/Clear', og 'Sensitive' ble 
                             </r:Coverage>
                             <r:AnalysisUnit controlledVocabularyID="0bdbed9d-6e38-4158-8fff-dc7ae75ad6f1" controlledVocabularyAgencyName="no.nsd" controlledVocabularyVersionID="1">Individual</r:AnalysisUnit>
                             <r:KindOfData controlledVocabularyID="7a26bd9e-8af6-49d6-8028-e0b698b8ead7" controlledVocabularyAgencyName="no.nsd" controlledVocabularyVersionID="2">Numeric</r:KindOfData>
+                            <r:GeneralDataFormat controlledVocabularyAgencyName="DDI Alliance" controlledVocabularyName="GeneralDataFormat" controlledVocabularyURN="urn:ddi:int.ddi.cv:GeneralDataFormat:2.0.3">Numeric</r:GeneralDataFormat>
+                            <r:OtherMaterialSchemeReference>
+                                <r:Agency>gesis</r:Agency>
+                                <r:ID>othermat</r:ID>
+                                <r:Version>1.0.0</r:Version>
+                                <r:TypeOfObject>OtherMaterialScheme</r:TypeOfObject>
+                            </r:OtherMaterialSchemeReference>
                             <r:DataCollectionReference>
                                 <r:Agency>no.nsd</r:Agency>
                                 <r:ID>c60e5fba-6b5d-4061-9dd1-792bf681c603</r:ID>
@@ -1066,9 +1073,7 @@ Spørsmålene merket med 'Relevant,' 'Understandable/Clear', og 'Sensitive' ble 
                                         <r:Agency>eu.cessda</r:Agency>
                                         <r:ID>AccessType</r:ID>
                                         <r:Version>1.0.0</r:Version>
-                                        <a:AccessTypeName>
-                                            <r:String>info:eu-repo/semantics/openAccess</r:String>
-                                        </a:AccessTypeName>
+                                        <a:TypeOfAccess>info:eu-repo/semantics/openAccess</a:TypeOfAccess>
                                         <r:Description>
                                             <r:Content xml:lang="en">Synthetic Access Description EN</r:Content>
                                             <r:Content xml:lang="no">Syntetisk Tilgang Beskrivelse NO</r:Content>
@@ -1097,6 +1102,63 @@ Spørsmålene merket med 'Relevant,' 'Understandable/Clear', og 'Sensitive' ble 
                                 </a:ResearcherID>
                             </a:IndividualIdentification>
                         </a:Individual>
+                    </Fragment>
+                    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+                        <r:OtherMaterialScheme>
+                            <r:Agency>gesis</r:Agency>
+                            <r:ID>othermat</r:ID>
+                            <r:Version>1.0.0</r:Version>
+                            <r:OtherMaterial>
+                                <r:Agency>de.gesis</r:Agency>
+                                <r:ID>ZA0004_Mat4</r:ID>
+                                <r:Version>1.0.0</r:Version>
+                                <r:TypeOfMaterial controlledVocabularyAgencyName="gesis" controlledVocabularyName="GesisTypeOfMaterial">OriginalLiterature</r:TypeOfMaterial>
+                                <r:Description>
+                                    <r:Content>Free, Lloyd A.:
+                                        Six Allies And A Neutral.
+                                        Glencoe, Ill.: Free Press 1959
+                                    </r:Content>
+                                </r:Description>
+                            </r:OtherMaterial>
+                            <r:OtherMaterial xml:lang="de">
+                                <r:Agency>de.gesis</r:Agency>
+                                <r:ID>ZA0004_OthMat54968</r:ID>
+                                <r:Version>1.0.0</r:Version>
+                                <r:UserID typeOfUserID="Dokument-ID">54968</r:UserID>
+                                <r:TypeOfMaterial controlledVocabularyName="GesisDBKTypeOfMaterial">Questionnaire</r:TypeOfMaterial>
+                                <r:Description>
+                                    <r:Content xml:lang="en"/>
+                                    <r:Content xml:lang="de"/>
+                                </r:Description>
+                                <r:Citation>
+                                    <r:Title>
+                                        <r:String xml:lang="en">ZA0004-10_q.pdf (Questionnaire)</r:String>
+                                        <r:String xml:lang="de">ZA0004-10_q.pdf (Fragebogen)</r:String>
+                                    </r:Title>
+                                </r:Citation>
+                                <r:ExternalURLReference>https://dbk.gesis.org/dbksearch/download.asp?id=54968</r:ExternalURLReference>
+                            </r:OtherMaterial>
+                            <r:OtherMaterial>
+                                <r:Agency>de.gesis</r:Agency>
+                                <r:ID>ZA0004_RelPub1</r:ID>
+                                <r:Version>1.0.0</r:Version>
+                                <r:TypeOfMaterial>Related Publication</r:TypeOfMaterial>
+                                <r:Citation>
+                                    <r:Title>
+                                        <r:String xml:lang="en">Synthetic Publication 1</r:String>
+                                        <r:String xml:lang="de">Synthetische Publikation 1</r:String>
+                                    </r:Title>
+                                    <r:PublicationDate>
+                                        <r:SimpleDate>2025</r:SimpleDate>
+                                    </r:PublicationDate>
+                                    <r:InternationalIdentifier>
+                                        <r:IdentifierContent>doi:10.4232/00000</r:IdentifierContent>
+                                        <r:ManagingAgency>DOI</r:ManagingAgency>
+                                    </r:InternationalIdentifier>
+                                </r:Citation>
+                                <r:ExternalURLReference>https://doi.org/10.4232/00000</r:ExternalURLReference>
+                            </r:OtherMaterial>
+                        </r:OtherMaterialScheme>
                     </Fragment>
                 </ddi:FragmentInstance>
             </oai:metadata>
