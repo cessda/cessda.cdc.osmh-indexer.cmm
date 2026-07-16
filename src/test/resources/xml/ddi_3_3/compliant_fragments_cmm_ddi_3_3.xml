@@ -939,6 +939,7 @@ Spørsmålene merket med 'Relevant,' 'Understandable/Clear', og 'Sensitive' ble 
                                     <r:Version>16</r:Version>
                                     <r:Subject controlledVocabularyID="7803963d-cc69-4cf3-89fd-dc752bb16086" controlledVocabularyAgencyName="no.nsd" controlledVocabularyVersionID="1">Health.PublicHealth</r:Subject>
                                     <r:Subject controlledVocabularyID="7803963d-cc69-4cf3-89fd-dc752bb16086" controlledVocabularyAgencyName="no.nsd" controlledVocabularyVersionID="1">Health.ReproductiveHealth</r:Subject>
+                                    <r:Keyword xml:lang="en" controlledVocabularyAgencyName="cessda" controlledVocabularyName="ELSST" controlledVocabularyURN="https://elsst.cessda.eu/id/">POLITICAL ISSUES</r:Keyword>
                                 </r:TopicalCoverage>
                                 <r:SpatialCoverage isUniversallyUnique="true">
                                     <r:URN>urn:ddi:no.nsd:afd2b786-69f3-4876-a494-0f6ffe62c399:16</r:URN>
@@ -956,6 +957,12 @@ Spørsmålene merket med 'Relevant,' 'Understandable/Clear', og 'Sensitive' ble 
                                         <r:Content xml:lang="no">Land</r:Content>
                                     </r:Description>
                                     <r:CountryCode>NP</r:CountryCode>
+                                    <r:GeographicLocationReference>
+                                        <r:Agency>de.gesis</r:Agency>
+                                        <r:ID>ZA0004_GeoLocUS</r:ID>
+                                        <r:Version>1.0.0</r:Version>
+                                        <r:TypeOfObject>GeographicLocation</r:TypeOfObject>
+                                    </r:GeographicLocationReference>
                                 </r:SpatialCoverage>
                                 <r:TemporalCoverage isUniversallyUnique="true">
                                     <r:URN>urn:ddi:no.nsd:0c91610a-d5b9-4bf8-8fa2-11d90e50a9b1:16</r:URN>
@@ -1159,6 +1166,32 @@ Spørsmålene merket med 'Relevant,' 'Understandable/Clear', og 'Sensitive' ble 
                                 <r:ExternalURLReference>https://doi.org/10.4232/00000</r:ExternalURLReference>
                             </r:OtherMaterial>
                         </r:OtherMaterialScheme>
+                    </Fragment>
+                    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+                        <r:GeographicLocation>
+                            <r:Agency>de.gesis</r:Agency>
+                            <r:ID>ZA0004_GeoLocUS</r:ID>
+                            <r:Version>1.0.0</r:Version>
+                            <r:Description>
+                                <r:Content xml:lang="en"/>
+                                <r:Content xml:lang="de"/>
+                            </r:Description>
+                            <r:GeographicLevelDescription>
+                                <r:Content>Countries and Regions (ISO3166-1/2)</r:Content>
+                            </r:GeographicLevelDescription>
+                            <r:LocationValue>
+                                <r:Agency>de.gesis</r:Agency>
+                                <r:ID>ZA0004_LocValUS</r:ID>
+                                <r:Version>1.0.0</r:Version>
+                                <r:LocationValueName>
+                                    <r:String xml:lang="en">United States of America</r:String>
+                                    <r:String xml:lang="de">Vereinigte Staaten von Amerika</r:String>
+                                </r:LocationValueName>
+                                <r:GeographicLocationIdentifier>
+                                    <r:GeographicCode>US</r:GeographicCode>
+                                </r:GeographicLocationIdentifier>
+                            </r:LocationValue>
+                        </r:GeographicLocation>
                     </Fragment>
                 </ddi:FragmentInstance>
             </oai:metadata>

@@ -198,9 +198,11 @@ public final class XPaths {
         // Analysis unit
         .withUnitTypeXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:AnalysisUnit", (List<Element> elementList) -> ParsingStrategies.analysisUnitStrategy(elementList, DDI_3_3_ATTR_NAMES)))
         // Sampling procedure
-        .withSamplingXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:Methodology/d:SamplingProcedure", (List<Element> elementList) -> ParsingStrategies.samplingProceduresLifecycleStrategy(elementList, DDI_3_3_ATTR_NAMES)))
+        .withSamplingXPath(new ResolvingXMLMapper<>("//s:StudyUnit[1]/d:DataCollection", "//s:StudyUnit[1]/r:DataCollectionReference", "//d:Methodology/d:SamplingProcedure", (List<Element> elementList) -> ParsingStrategies.samplingProceduresLifecycleStrategy(elementList, DDI_3_3_ATTR_NAMES)))
         // Data collection mode
         .withTypeOfModeOfCollectionXPath(new ResolvingXMLMapper<>("//s:StudyUnit[1]/d:DataCollection", "//s:StudyUnit[1]/r:DataCollectionReference", "//d:CollectionEvent/d:ModeOfCollection", (List<Element> elementList) -> typeOfModeOfCollectionLifecycleStrategy(elementList, DDI_3_3_ATTR_NAMES)))
+        // PID of Related publication
+        .withRelatedPublicationsXPath(new ResolvingXMLMapper<>("//s:StudyUnit[1]/r:OtherMaterialScheme", "//s:StudyUnit[1]/r:OtherMaterialSchemeReference", "//r:OtherMaterial", ParsingStrategies::relatedPublicationLifecycleStrategy))
         // General data format
         .withGeneralDataFormatXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:GeneralDataFormat", extractMetadataObjectListForEachLang(TERM_VOCAB_ATTR_3_3_STRATEGY)));
 

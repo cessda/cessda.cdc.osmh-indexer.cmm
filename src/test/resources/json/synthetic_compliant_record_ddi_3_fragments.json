@@ -71,7 +71,15 @@
       "term": "Numeric"
     }]
   },
-  "keywords": {},
+  "keywords": {
+    "en": [
+      {
+        "vocabUri": "https://elsst.cessda.eu/id/",
+        "vocab": "ELSST",
+        "term": "POLITICAL ISSUES"
+      }
+    ]
+  },
   "pidStudies": {
     "*": [
       {
@@ -91,7 +99,25 @@
       "publisher": "Sikt - Norwegian Agency for Shared Services in Education and Research"
     }
   },
-  "relatedPublications": {},
+  "relatedPublications": {
+    "en": [{
+      "title": "Synthetic Publication 1",
+      "holdings": [
+        "https://doi.org/10.4232/00000",
+        "doi:10.4232/00000"
+      ],
+      "publicationDate": "2025"
+    }
+    ],
+    "de": [{
+      "title": "Synthetische Publikation 1",
+      "holdings": [
+        "https://doi.org/10.4232/00000",
+        "doi:10.4232/00000"
+      ],
+      "publicationDate": "2025"
+    }]
+  },
   "series": {
     "de": [
       {
@@ -123,7 +149,16 @@
       }
     ]
   },
-  "studyAreaCountries": {},
+  "studyAreaCountries": {
+    "de": [{
+      "abbr": "US",
+      "country": "Vereinigte Staaten von Amerika"
+    }],
+    "en": [{
+      "abbr": "US",
+      "country": "United States of America"
+    }]
+  },
   "studyNumber": "no.nsd:39c1f667-17c2-475b-9333-846f59666e32:16",
   "studyUrl": {},
   "typeOfModeOfCollections" : {
@@ -147,7 +182,12 @@
       }
     ]
   },
-  "typeOfSamplingProcedures": {},
+  "typeOfSamplingProcedures" : {
+    "en" : [ {
+      "id" : "60c23367-cf0c-41d3-b885-4af6ad800ec8",
+      "term" : "MixedProbabilityNonprobability"
+    } ]
+  },
   "unitTypes": {
     "en": [
       {

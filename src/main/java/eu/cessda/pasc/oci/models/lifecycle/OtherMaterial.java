@@ -15,11 +15,12 @@
  */
 package eu.cessda.pasc.oci.models.lifecycle;
 
-import java.util.Map;
+import java.util.List;
 
-public record SamplingProcedure(
+public record OtherMaterial(
         ObjectInformation objInf,
-        ControlledVocabulary typeOfSamplingProcedure,
-        Map<String, String> content
-) {
+        Citation citation,
+        List<String> externalURLReference,
+        ControlledVocabulary typeOfMaterial
+) implements DDIObject {
 }

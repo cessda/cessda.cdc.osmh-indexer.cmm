@@ -17,9 +17,9 @@ package eu.cessda.pasc.oci.models.lifecycle;
 
 import java.util.Map;
 
-public record SamplingProcedure(
+public record LocationValue(
         ObjectInformation objInf,
-        ControlledVocabulary typeOfSamplingProcedure,
-        Map<String, String> content
-) {
+        Map<String, String> locationValueName,
+        String geographicLocationIdentifier
+) implements DDIObject {
 }
