@@ -44,7 +44,6 @@ pipeline {
                             sh "./mvnw -Pnative clean verify -DbuildNumber=${env.BUILD_NUMBER}"
                         }
                     }
-                    when { branch 'main' }
                 }
                 stage('Record Issues') {
                     steps {
@@ -74,7 +73,7 @@ pipeline {
                     sh "./mvnw -Pnative spring-boot:build-image-no-fork -Dspring-boot.build-image.imageName=${image_tag}"
                 }
             }
-            when { branch 'main' }
+            //when { branch 'main' }
         }
 		stage('Build and Push Docker image') {
             steps {
