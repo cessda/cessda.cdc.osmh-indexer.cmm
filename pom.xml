@@ -57,7 +57,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- Compiler options -->
-        <java.version>21</java.version>
+        <java.version>25</java.version>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven.compiler.source>${java.version}</maven.compiler.source>
     </properties>
@@ -74,23 +74,6 @@
         <dependency>
             <groupId>co.elastic.clients</groupId>
             <artifactId>elasticsearch-java</artifactId>
-        </dependency>
-
-        <!-- Logging -->
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-        </dependency>
-
-        <!-- Json Encoder in Logstash for Logback -->
-        <dependency>
-            <groupId>net.logstash.logback</groupId>
-            <artifactId>logstash-logback-encoder</artifactId>
-            <version>9.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.janino</groupId>
-            <artifactId>janino</artifactId>
         </dependency>
 
         <!--Utils -->
@@ -219,6 +202,9 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <createdDate>now</createdDate>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
@@ -226,6 +212,10 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.graalvm.buildtools</groupId>
+                <artifactId>native-maven-plugin</artifactId>
             </plugin>
 
             <!-- Test -->
@@ -304,21 +294,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <!--Docker Containerisation-->
-            <plugin>
-                <groupId>com.google.cloud.tools</groupId>
-                <artifactId>jib-maven-plugin</artifactId>
-                <version>3.5.1</version>
-                <configuration>
-                    <to>
-                        <image>cessda/${project.artifactId}:${project.version}</image>
-                    </to>
-                    <container>
-                        <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
-                        <ports>9902</ports>
-                    </container>
-                </configuration>
             </plugin>
             <!-- Elasticsearch -->
             <plugin>

@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Executors;
 
 import static eu.cessda.pasc.oci.mock.data.RecordTestData.*;
 import static eu.cessda.pasc.oci.mock.data.ReposTestData.getSingleEndpoint;
@@ -144,7 +145,7 @@ public class ConsumerSchedulerTest {
      */
     private IndexerConsumerService mockRecordRequests() throws IOException, IndexerException {
 
-        var indexerConsumerService = new IndexerConsumerService(extractor, recordXMLParser);
+        var indexerConsumerService = new IndexerConsumerService(Executors.newSingleThreadExecutor(), extractor, recordXMLParser);
         var recordHeaders = objectMapper.<List<Header>>readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE, RECORD_HEADER_LIST);
 
         // mock record requests from each header

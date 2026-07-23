@@ -30,7 +30,7 @@ pipeline {
 		stage('Pull SDK Docker Image') {
             agent {
                 docker {
-                    image 'eclipse-temurin:21'
+                    image 'eclipse-temurin:25'
                     reuseNode true
                 }
             }
@@ -41,19 +41,10 @@ pipeline {
                 stage('Build Project') {
                     steps {
                         withMaven {
-                            sh "./mvnw clean install -DbuildNumber=${env.BUILD_NUMBER}"
+                            sh "./mvnw -Pnative clean verify -DbuildNumber=${env.BUILD_NUMBER}"
                         }
                     }
                     when { branch 'main' }
-                }
-                // Not running on main - test only (for PRs and integration branches)
-                stage('Test Project') {
-                    steps {
-                        withMaven {
-                            sh './mvnw clean verify'
-                        }
-                    }
-                    when { not { branch 'main' } }
                 }
                 stage('Record Issues') {
                     steps {
@@ -77,12 +68,18 @@ pipeline {
                 }
             }
         }
+        stage('Build Docker Image') {
+            steps {
+                withMaven {
+                    sh "./mvnw -Pnative spring-boot:build-image-no-fork -Dspring-boot.build-image.imageName=${image_tag}"
+                }
+            }
+            when { branch 'main' }
+        }
 		stage('Build and Push Docker image') {
             steps {
                 sh "gcloud auth configure-docker ${ARTIFACT_REGISTRY_HOST}"
-                withMaven {
-                    sh "./mvnw jib:build -Dimage=${image_tag}"
-                }
+                sh "docker push ${IMAGE_TAG}"
                 sh "gcloud artifacts docker tags add ${image_tag} ${DOCKER_ARTIFACT_REGISTRY}/${product_name}-${module_name}:${env.BRANCH_NAME}-latest"
             }
             when { branch 'main' }

@@ -33,6 +33,7 @@ import org.jdom2.Namespace;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
@@ -57,7 +58,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.io.Files.getNameWithoutExtension;
-import static net.logstash.logback.argument.StructuredArguments.value;
 
 /**
  * Service Class responsible for querying the repository to fetch remote records.
@@ -68,7 +68,7 @@ import static net.logstash.logback.argument.StructuredArguments.value;
 @Slf4j
 public class RecordXMLParser {
 
-    private static final XPathExpression<Element> OAI_RECORD_EXPRESSION = XPathFactory.instance().compile(OaiPmhConstants.RECORD_ELEMENT, Filters.element(), null, OaiPmhConstants.OAI_NS);
+    private static final XPathExpression<Element> OAI_RECORD_EXPRESSION =  XPathFactory.instance().compile(OaiPmhConstants.RECORD_ELEMENT, Filters.element(), null, OaiPmhConstants.OAI_NS);
     private static final int MAX_FILE_SIZE_MB = 50;
 
     private final CMMStudyMapper cmmStudyMapper;
@@ -84,10 +84,10 @@ public class RecordXMLParser {
     }
 
     @Autowired
-    public RecordXMLParser(CMMStudyMapper cmmStudyMapper, StreamingLifecycleMapper streamingLifecycleMapper) {
+    public RecordXMLParser(CMMStudyMapper cmmStudyMapper, StreamingLifecycleMapper streamingLifecycleMapper, XMLInputFactory xmlInputFactory) {
         this.cmmStudyMapper = cmmStudyMapper;
         this.streamingLifecycleMapper = streamingLifecycleMapper;
-        this.xmlInputFactory = XMLInputFactory.newFactory();
+        this.xmlInputFactory = xmlInputFactory;
     }
 
     /**
@@ -163,7 +163,7 @@ public class RecordXMLParser {
         try {
             // Set last modified to the file modified time if the header is not present or invalid
             lastModified = Files.getLastModifiedTime(path).toString();
-        } catch (IOException e) {
+        } catch (IOException _) {
             // Fallback - use the current time
             lastModified = OffsetDateTime.now(ZoneId.systemDefault()).toString();
         }
@@ -270,10 +270,9 @@ public class RecordXMLParser {
         }
         if (suppressedNamespaceWarnings.add(e.getNamespace())) {
             // Only log on first encounter with this namespace
-            log.warn("[{}]: {} cannot be parsed: {}. Further reports for this namespace have been suppressed.",
-                value(LoggingConstants.REPO_NAME, code),
-                value(LoggingConstants.STUDY_ID, recordIdentifier),
-                e.getMessage()
+            log.atWarn().addKeyValue(LoggingConstants.STUDY_ID, recordIdentifier).log(
+                "[{}]: {} cannot be parsed: {}. Further reports for this namespace have been suppressed.",
+                 code, recordIdentifier, e.getMessage()
             );
         }
     }
@@ -291,11 +290,9 @@ public class RecordXMLParser {
             try {
                 baseURL = new URI(uriString);
             } catch (URISyntaxException e) {
-                log.warn("{}: {}: {} could not be parsed as a URL: {}",
-                    value(LoggingConstants.REPO_NAME, repo.code()),
-                    value(LoggingConstants.STUDY_ID, path),
-                    uriString,
-                    e.toString()
+                log.atWarn().addKeyValue(LoggingConstants.STUDY_ID, path).log(
+                    "{}: {}: {} could not be parsed as a URL: {}",
+                    repo.code(), path, uriString, e.getMessage()
                 );
             }
 
@@ -337,8 +334,6 @@ public class RecordXMLParser {
     @SuppressWarnings("java:S3776")
     private CMMStudy mapDDIRecordToCMMStudy(Repo repository, Request request, Record recordObj, String fileName, String fileLastModified) {
 
-        CMMStudy.CMMStudyBuilder builder = CMMStudy.builder();
-
         String studyNumber;
         String lastModified;
         if (recordObj.recordHeader() != null) {
@@ -353,104 +348,98 @@ public class RecordXMLParser {
             lastModified = fileLastModified;
         }
 
-        builder.studyNumber(studyNumber);
-        builder.lastModified(lastModified);
-
-        // Check if metadata is present, parse if it is
-        var metadata = recordObj.metadata();
-        if (metadata != null) {
-            // Get the XPaths required for the metadata
-            var xPaths = XPaths.getXPaths(metadata.getRootElement().getNamespace());
-
-            var defaultLangIsoCode = cmmStudyMapper.parseDefaultLanguage(metadata, repository, xPaths);
-            builder.titleStudy(cmmStudyMapper.parseStudyTitle(metadata, xPaths, defaultLangIsoCode));
-
-            var parseStudyUrlResults = cmmStudyMapper.parseStudyUrl(metadata, xPaths);
-            builder.studyUrl(parseStudyUrlResults.results());
-
-            var parseDataAccessURIResults = cmmStudyMapper.parseDataAccessURI(metadata, xPaths, defaultLangIsoCode);
-            builder.dataAccessUrl(parseDataAccessURIResults.results());
-
-            if (!parseStudyUrlResults.exceptions().isEmpty() || !parseDataAccessURIResults.exceptions().isEmpty()) {
-                // Copy exceptions into a single list
-                var combinedExceptions = new ArrayList<>(
-                    parseStudyUrlResults.exceptions().size() + parseDataAccessURIResults.exceptions().size()
-                );
-                combinedExceptions.addAll(parseDataAccessURIResults.exceptions());
-                combinedExceptions.addAll(parseStudyUrlResults.exceptions());
-
-                log.warn("[{}] Some URLs in study {} couldn't be parsed: {}",
-                    value(LoggingConstants.REPO_NAME, repository.code()),
-                    value(LoggingConstants.STUDY_ID, studyNumber),
-                    combinedExceptions
-                );
-            }
-
-            builder.abstractField(cmmStudyMapper.parseAbstract(metadata, xPaths, defaultLangIsoCode));
-            builder.pidStudies(cmmStudyMapper.parsePidStudies(metadata, xPaths));
-            builder.creators(cmmStudyMapper.parseCreator(metadata, xPaths));
-            builder.dataAccess(cmmStudyMapper.parseDataAccess(metadata, xPaths, defaultLangIsoCode, repository.code()));
-            builder.dataAccessFreeTexts(cmmStudyMapper.parseDataAccessFreeText(metadata, xPaths, defaultLangIsoCode));
-            builder.classifications(cmmStudyMapper.parseClassifications(metadata, xPaths, defaultLangIsoCode));
-            builder.keywords(cmmStudyMapper.parseKeywords(metadata, xPaths, defaultLangIsoCode));
-            builder.typeOfTimeMethods(cmmStudyMapper.parseTypeOfTimeMethod(metadata, xPaths, defaultLangIsoCode));
-            builder.studyAreaCountries(cmmStudyMapper.parseStudyAreaCountries(metadata, xPaths, defaultLangIsoCode));
-            builder.unitTypes(cmmStudyMapper.parseUnitTypes(metadata, xPaths, defaultLangIsoCode));
-            builder.publisher(cmmStudyMapper.parsePublisher(metadata, xPaths, defaultLangIsoCode));
-            cmmStudyMapper.parseYrOfPublication(metadata, xPaths).ifPresent(builder::publicationYear);
-            builder.fileLanguages(cmmStudyMapper.parseFileLanguages(metadata, xPaths));
-            builder.typeOfSamplingProcedures(cmmStudyMapper.parseTypeOfSamplingProcedure(metadata, xPaths, defaultLangIsoCode));
-            builder.typeOfModeOfCollections(cmmStudyMapper.parseTypeOfModeOfCollection(metadata, xPaths, defaultLangIsoCode));
-
-            var dataCollectionPeriodResults = cmmStudyMapper.parseDataCollectionDates(metadata, xPaths);
-            if (dataCollectionPeriodResults.exceptions() != null) {
-                // Parsing errors occurred, log here
-                log.warn("[{}] Some dates in study {} couldn't be parsed: {}",
-                    value(LoggingConstants.REPO_NAME, repository.code()),
-                    value(LoggingConstants.STUDY_ID, studyNumber),
-                    dataCollectionPeriodResults.exceptions().toString()
-                );
-            }
-            dataCollectionPeriodResults.results().getStartDate().ifPresent(builder::dataCollectionPeriodStartdate);
-            dataCollectionPeriodResults.results().getEndDate().ifPresent(builder::dataCollectionPeriodEnddate);
-            dataCollectionPeriodResults.results().getDataCollectionYear().ifPresent(builder::dataCollectionYear);
-            builder.dataCollectionFreeTexts(dataCollectionPeriodResults.results().getFreeTexts());
-
-            try {
-                builder.universe(cmmStudyMapper.parseUniverses(metadata, xPaths, defaultLangIsoCode));
-            } catch (InvalidUniverseException e) {
-                log.warn("[{}] Some universes in study {} couldn't be parsed: {}",
-                    value(LoggingConstants.REPO_NAME, repository.code()),
-                    value(LoggingConstants.STUDY_ID, studyNumber),
-                    e.toString()
-                );
-            }
-            builder.relatedPublications(cmmStudyMapper.parseRelatedPublications(metadata, xPaths, defaultLangIsoCode));
-            builder.funding(cmmStudyMapper.parseFunding(metadata, xPaths, defaultLangIsoCode));
-            builder.dataKindFreeTexts(cmmStudyMapper.parseDataKindFreeText(metadata, xPaths, defaultLangIsoCode));
-            builder.generalDataFormats(cmmStudyMapper.parseGeneralDataFormats(metadata, xPaths, defaultLangIsoCode));
-            builder.series(cmmStudyMapper.parseSeries(metadata, xPaths, defaultLangIsoCode));
-        }
-
         URI repositoryUrl;
         if (request.baseURL() != null) {
             repositoryUrl = request.baseURL();
         } else {
             repositoryUrl = repository.url();
         }
-        builder.repositoryUrl(repositoryUrl);
 
-        try {
-            //should retrieve from header, if present
-            builder.studyXmlSourceUrl(OaiPmhHelpers.buildGetStudyFullUrl(repository.url(), studyNumber, repository.preferredMetadataParam()));
-        } catch (URISyntaxException e) {
-            log.warn("[{}] Study URL for {} couldn't be parsed: {}",
-                value(LoggingConstants.REPO_NAME, repository.code()),
-                value(LoggingConstants.STUDY_ID, studyNumber),
-                e.toString()
-            );
+        try (var _ = MDC.putCloseable(LoggingConstants.STUDY_ID, studyNumber)) {
+            CMMStudy.CMMStudyBuilder builder = CMMStudy.builder();
+
+            builder.studyNumber(studyNumber);
+            builder.lastModified(lastModified);
+            builder.repositoryUrl(repositoryUrl);
+
+            // Check if metadata is present, parse if it is
+            var metadata = recordObj.metadata();
+            if (metadata != null) {
+                // Get the XPaths required for the metadata
+                var xPaths = XPaths.getXPaths(metadata.getRootElement().getNamespace());
+
+                var defaultLangIsoCode = cmmStudyMapper.parseDefaultLanguage(metadata, repository, xPaths);
+                builder.titleStudy(cmmStudyMapper.parseStudyTitle(metadata, xPaths, defaultLangIsoCode));
+
+                var parseStudyUrlResults = cmmStudyMapper.parseStudyUrl(metadata, xPaths);
+                builder.studyUrl(parseStudyUrlResults.results());
+
+                var parseDataAccessURIResults = cmmStudyMapper.parseDataAccessURI(metadata, xPaths, defaultLangIsoCode);
+                builder.dataAccessUrl(parseDataAccessURIResults.results());
+
+                if (!parseStudyUrlResults.exceptions().isEmpty() || !parseDataAccessURIResults.exceptions().isEmpty()) {
+                    // Copy exceptions into a single list
+                    var combinedExceptions = new ArrayList<>(
+                            parseStudyUrlResults.exceptions().size() + parseDataAccessURIResults.exceptions().size()
+                    );
+                    combinedExceptions.addAll(parseDataAccessURIResults.exceptions());
+                    combinedExceptions.addAll(parseStudyUrlResults.exceptions());
+
+                    log.warn("[{}] Some URLs in study {} couldn't be parsed: {}",
+                            repository.code(), studyNumber, combinedExceptions
+                    );
+                }
+
+                builder.abstractField(cmmStudyMapper.parseAbstract(metadata, xPaths, defaultLangIsoCode));
+                builder.pidStudies(cmmStudyMapper.parsePidStudies(metadata, xPaths));
+                builder.creators(cmmStudyMapper.parseCreator(metadata, xPaths));
+                builder.dataAccess(cmmStudyMapper.parseDataAccess(metadata, xPaths, defaultLangIsoCode, repository.code()));
+                builder.dataAccessFreeTexts(cmmStudyMapper.parseDataAccessFreeText(metadata, xPaths, defaultLangIsoCode));
+                builder.classifications(cmmStudyMapper.parseClassifications(metadata, xPaths, defaultLangIsoCode));
+                builder.keywords(cmmStudyMapper.parseKeywords(metadata, xPaths, defaultLangIsoCode));
+                builder.typeOfTimeMethods(cmmStudyMapper.parseTypeOfTimeMethod(metadata, xPaths, defaultLangIsoCode));
+                builder.studyAreaCountries(cmmStudyMapper.parseStudyAreaCountries(metadata, xPaths, defaultLangIsoCode));
+                builder.unitTypes(cmmStudyMapper.parseUnitTypes(metadata, xPaths, defaultLangIsoCode));
+                builder.publisher(cmmStudyMapper.parsePublisher(metadata, xPaths, defaultLangIsoCode));
+                cmmStudyMapper.parseYrOfPublication(metadata, xPaths).ifPresent(builder::publicationYear);
+                builder.fileLanguages(cmmStudyMapper.parseFileLanguages(metadata, xPaths));
+                builder.typeOfSamplingProcedures(cmmStudyMapper.parseTypeOfSamplingProcedure(metadata, xPaths, defaultLangIsoCode));
+                builder.typeOfModeOfCollections(cmmStudyMapper.parseTypeOfModeOfCollection(metadata, xPaths, defaultLangIsoCode));
+
+                var dataCollectionPeriodResults = cmmStudyMapper.parseDataCollectionDates(metadata, xPaths);
+                if (dataCollectionPeriodResults.exceptions() != null) {
+                    // Parsing errors occurred, log here
+                    log.warn("[{}] Some dates in study {} couldn't be parsed: {}",
+                            repository.code(), studyNumber, dataCollectionPeriodResults.exceptions().toString()
+                    );
+                }
+                dataCollectionPeriodResults.results().getStartDate().ifPresent(builder::dataCollectionPeriodStartdate);
+                dataCollectionPeriodResults.results().getEndDate().ifPresent(builder::dataCollectionPeriodEnddate);
+                dataCollectionPeriodResults.results().getDataCollectionYear().ifPresent(builder::dataCollectionYear);
+                builder.dataCollectionFreeTexts(dataCollectionPeriodResults.results().getFreeTexts());
+
+                try {
+                    builder.universe(cmmStudyMapper.parseUniverses(metadata, xPaths, defaultLangIsoCode));
+                } catch (InvalidUniverseException e) {
+                    log.warn("[{}] Some universes in study {} couldn't be parsed: {}",
+                            repository.code(), studyNumber, e.toString()
+                    );
+                }
+                builder.relatedPublications(cmmStudyMapper.parseRelatedPublications(metadata, xPaths, defaultLangIsoCode));
+                builder.funding(cmmStudyMapper.parseFunding(metadata, xPaths, defaultLangIsoCode));
+                builder.dataKindFreeTexts(cmmStudyMapper.parseDataKindFreeText(metadata, xPaths, defaultLangIsoCode));
+                builder.generalDataFormats(cmmStudyMapper.parseGeneralDataFormats(metadata, xPaths, defaultLangIsoCode));
+                builder.series(cmmStudyMapper.parseSeries(metadata, xPaths, defaultLangIsoCode));
+            }
+
+            try {
+                //should retrieve from header, if present
+                builder.studyXmlSourceUrl(OaiPmhHelpers.buildGetStudyFullUrl(repository.url(), studyNumber, repository.preferredMetadataParam()));
+            } catch (URISyntaxException e) {
+                log.warn("[{}] Study URL for {} couldn't be parsed: {}", repository.code(), studyNumber, e.toString());
+            }
+
+            return builder.build();
         }
-
-        return builder.build();
     }
 }

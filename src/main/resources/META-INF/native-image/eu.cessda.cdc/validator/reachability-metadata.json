@@ -1,0 +1,24 @@
+{
+  "reflection": [
+    {
+      "type": "org.jaxen.saxpath.base.XPathReader",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "glob": "elasticsearch/**/*.json"
+    },
+    {
+      "glob": "json/schema/*.json"
+    },
+    {
+      "glob": "data_access_mappings.json"
+    }
+  ]
+}

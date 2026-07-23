@@ -154,7 +154,7 @@ public final class XPaths {
         .typeOfModeOfCollectionXPath(new ResolvingXMLMapper<>("//s:StudyUnit[1]/d:DataCollection", "//s:StudyUnit[1]/r:DataCollectionReference", "//d:CollectionEvent/d:ModeOfCollection", (List<Element> elementList) -> typeOfModeOfCollectionLifecycleStrategy(elementList, DDI_3_2_ATTR_NAMES)))
         // PID of Related publication
         .relatedPublicationsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:OtherMaterial", ParsingStrategies::relatedPublicationLifecycleStrategy))
-        /// /r:Citation/r:InternationalIdentifier/r:IdentifierContent
+        // /r:Citation/r:InternationalIdentifier/r:IdentifierContent
         // Study description language
         .recordDefaultLanguage("//ddi:DDIInstance/@xml:lang")
         // Description of population
