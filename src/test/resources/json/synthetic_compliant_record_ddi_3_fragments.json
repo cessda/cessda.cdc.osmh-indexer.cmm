@@ -6,15 +6,11 @@
   "classifications": {
     "en": [
       {
-        "vocab": "",
-        "vocabUri": "",
-        "id": "",
+        "id": "7803963d-cc69-4cf3-89fd-dc752bb16086",
         "term": "Health.PublicHealth"
       },
       {
-        "vocab": "",
-        "vocabUri": "",
-        "id": "",
+        "id": "7803963d-cc69-4cf3-89fd-dc752bb16086",
         "term": "Health.ReproductiveHealth"
       }
     ]
@@ -22,17 +18,22 @@
   "creators": {
     "no": [
       {
-        "name": "NTNU"
+        "name": "NTNU",
+        "affiliation" : "NTNU"
       }
     ],
     "en": [
       {
-        "name": "NTNU"
+        "name": "NTNU",
+        "affiliation" : "NTNU"
       }
     ]
   },
-  "dataAccess": "Uncategorized",
-  "dataAccessFreeTexts": {},
+  "dataAccess": "Open",
+  "dataAccessFreeTexts" : {
+    "no" : [ "Syntetisk Tilgang Beskrivelse NO" ],
+    "en" : [ "Synthetic Access Description EN" ]
+  },
   "dataAccessUrl": {},
   "dataCollectionPeriodStartdate": "2021-12-01",
   "dataCollectionPeriodEnddate": "2022-11-30",
@@ -63,8 +64,22 @@
       }
     ]
   },
-  "generalDataFormats": {},
-  "keywords": {},
+  "generalDataFormats": {
+    "en": [{
+      "vocabUri": "urn:ddi:int.ddi.cv:GeneralDataFormat:2.0.3",
+      "vocab": "GeneralDataFormat",
+      "term": "Numeric"
+    }]
+  },
+  "keywords": {
+    "en": [
+      {
+        "vocabUri": "https://elsst.cessda.eu/id/",
+        "vocab": "ELSST",
+        "term": "POLITICAL ISSUES"
+      }
+    ]
+  },
   "pidStudies": {
     "*": [
       {
@@ -76,37 +91,119 @@
   "publicationYear": "2024-05-03T00:00:00Z",
   "publisher": {
     "no": {
-      "abbr": "",
+      "abbr": "Sikt",
       "publisher": "Sikt - Kunnskapssektorens tjenesteleverandør"
     },
     "en": {
-      "abbr": "",
+      "abbr": "Sikt",
       "publisher": "Sikt - Norwegian Agency for Shared Services in Education and Research"
     }
   },
-  "relatedPublications": {},
-  "series": {},
-  "studyAreaCountries": {},
+  "relatedPublications": {
+    "en": [{
+      "title": "Synthetic Publication 1",
+      "holdings": [
+        "https://doi.org/10.4232/00000",
+        "doi:10.4232/00000"
+      ],
+      "publicationDate": "2025"
+    }
+    ],
+    "de": [{
+      "title": "Synthetische Publikation 1",
+      "holdings": [
+        "https://doi.org/10.4232/00000",
+        "doi:10.4232/00000"
+      ],
+      "publicationDate": "2025"
+    }]
+  },
+  "series": {
+    "de": [
+      {
+        "names": [
+          "Ausgedachter Serienname"
+        ],
+        "descriptions": [
+          "Dies ist ein Beispiel für eine Serienbeschreibung. Diese erfundene Serie wurde über mehrere erfundene Jahrzehnte hinweg gesammelt."
+        ],
+        "uris": [
+          "https://example.com/series",
+          "https://example.com/seriesaltlink"
+        ]
+      }
+    ],
+    "en": [
+      {
+        "names": [
+          "Made up series name",
+          "Has second made up name in English"
+        ],
+        "descriptions": [
+          "This is an example of series description. This made up series has been collected over several made-up decades."
+        ],
+        "uris": [
+          "https://example.com/series",
+          "https://example.com/seriesaltlink"
+        ]
+      }
+    ]
+  },
+  "studyAreaCountries": {
+    "de": [{
+      "abbr": "US",
+      "country": "Vereinigte Staaten von Amerika"
+    }],
+    "en": [{
+      "abbr": "US",
+      "country": "United States of America"
+    }]
+  },
   "studyNumber": "no.nsd:39c1f667-17c2-475b-9333-846f59666e32:16",
   "studyUrl": {},
-  "typeOfModeOfCollections": {},
+  "typeOfModeOfCollections" : {
+    "en" : [ {
+      "id" : "00f4b65f-fcfd-4fa7-a113-27acb13d3b1e",
+      "term" : "Interview.FaceToFace.CAPIorCAMI"
+    }, {
+      "id" : "00f4b65f-fcfd-4fa7-a113-27acb13d3b1e",
+      "term" : "Interview.FaceToFace"
+    } ]
+  },
   "titleStudy": {
     "no": "Addressing Domestic Violence in Antenatal Care Environments 2 (ADVANCE 2)",
     "en": "Addressing Domestic Violence in Antenatal Care Environments 2 (ADVANCE 2)"
   },
-  "typeOfTimeMethods": {},
-  "typeOfSamplingProcedures": {},
+  "typeOfTimeMethods": {
+    "en": [
+      {
+        "id": "5247ed79-600e-431c-ad3b-b1743df6295c",
+        "term": "CrossSection"
+      }
+    ]
+  },
+  "typeOfSamplingProcedures" : {
+    "en" : [ {
+      "id" : "60c23367-cf0c-41d3-b885-4af6ad800ec8",
+      "term" : "MixedProbabilityNonprobability"
+    } ]
+  },
   "unitTypes": {
     "en": [
       {
-        "vocab": "",
-        "vocabUri": "",
-        "id": "",
+        "id" : "0bdbed9d-6e38-4158-8fff-dc7ae75ad6f1",
         "term": "Individual"
       }
     ]
   },
-  "universe": {},
+  "universe": {
+    "en": {
+      "exclusion": "Pregnant women attending the Outpatient Department (OPD) of Obstetrics and Gynecology departments at two collaborating hospitals in Nepal."
+    },
+    "no": {
+      "exclusion": "Gravide kvinner som deltar i poliklinisk avdeling (OPD) for obstetrikk og gynekologi ved to samarbeidende sykehus i Nepal."
+    }
+  },
   "lastModified": "2024-05-03T13:14:02.3620880Z",
   "studyXmlSourceUrl": "https://oai.ukdataservice.ac.uk:8443/oai/provider?verb=GetRecord&identifier=no.nsd%3A39c1f667-17c2-475b-9333-846f59666e32%3A16&metadataPrefix=ddi",
   "repositoryUrl": "/oai/request"

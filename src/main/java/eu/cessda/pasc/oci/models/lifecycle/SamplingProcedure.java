@@ -13,21 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.cessda.pasc.oci.models;
+package eu.cessda.pasc.oci.models.lifecycle;
 
-import lombok.Builder;
+import java.util.Map;
 
-/**
- * Represents an OAI-PMH header.
- *
- * @param deleted Deletion status on the remote repository
- * @author moses AT doraventures DOT com
- * @see <a href="http://www.openarchives.org/OAI/openarchivesprotocol.html#Record">http://www.openarchives.org/OAI/openarchivesprotocol.html#Record</a>
- */
-@Builder
-public record RecordHeader(
-    String lastModified,
-    String identifier,
-    boolean deleted
+public record SamplingProcedure(
+        ObjectInformation objInf,
+        ControlledVocabulary typeOfSamplingProcedure,
+        Map<String, String> content
 ) {
 }

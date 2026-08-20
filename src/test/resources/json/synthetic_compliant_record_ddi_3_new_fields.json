@@ -6,42 +6,34 @@
   "classifications": {
     "de": [
       {
-        "vocabUri": "",
         "vocab": "ZA-Kategorien",
-        "term": "Politische Fragen (Issues)",
-        "id": ""
+        "term": "Politische Fragen (Issues)"
       },
       {
         "vocabUri": "https://vocabularies.cessda.eu/urn/urn:ddi:int.cessda.cv:TopicClassification:4.2.2",
         "vocab": "CESSDA Topic Classification",
-        "term": "Internationale Politik und Internationale Organisationen",
-        "id": ""
+        "term": "Internationale Politik und Internationale Organisationen"
       },
       {
         "vocabUri": "https://vocabularies.cessda.eu/urn/urn:ddi:int.cessda.cv:TopicClassification:4.2.2",
         "vocab": "CESSDA Topic Classification",
-        "term": "Konflikte, Sicherheit und Frieden",
-        "id": ""
+        "term": "Konflikte, Sicherheit und Frieden"
       }
     ],
     "en": [
       {
-        "vocabUri": "",
         "vocab": "ZA-Categories",
-        "term": "Political Issues",
-        "id": ""
+        "term": "Political Issues"
       },
       {
         "vocabUri": "https://vocabularies.cessda.eu/urn/urn:ddi:int.cessda.cv:TopicClassification:4.2.2",
         "vocab": "CESSDA Topic Classification",
-        "term": "International politics and organisations",
-        "id": ""
+        "term": "International politics and organisations"
       },
       {
         "vocabUri": "https://vocabularies.cessda.eu/urn/urn:ddi:int.cessda.cv:TopicClassification:4.2.2",
         "vocab": "CESSDA Topic Classification",
-        "term": "Conflict, security and peace",
-        "id": ""
+        "term": "Conflict, security and peace"
       }
     ]
   },
@@ -109,10 +101,7 @@
       }
     ]
   },
-  "fileLanguages":[
-    "de",
-    "en"
-  ],
+  "fileLanguages":[],
   "funding": {
     "en": [
       {
@@ -131,8 +120,7 @@
     "en": [{
       "vocabUri": "urn:ddi:int.ddi.cv:GeneralDataFormat:2.0.3",
       "vocab": "GeneralDataFormat",
-      "term": "Numeric",
-      "id": ""
+      "term": "Numeric"
     }]
   },
   "keywords": {
@@ -140,8 +128,7 @@
       {
         "vocabUri": "https://elsst.cessda.eu/id/",
         "vocab": "ELSST",
-        "term": "POLITICAL ISSUES",
-        "id": ""
+        "term": "POLITICAL ISSUES"
       }
     ]
   },
@@ -160,7 +147,6 @@
       "publisher": "GESIS - Leibniz Institute for the Social Sciences"
     },
     "de": {
-      "abbr": "",
       "publisher": "GESIS - Leibniz Institut für Sozialwissenschaften"
     }
   },
@@ -208,18 +194,12 @@
   "typeOfModeOfCollections": {
     "en": [
       {
-        "vocabUri": "",
-        "vocab": "",
-        "term": "Oral survey with standardized questionnaire",
-        "id": ""
+        "term": "Oral survey with standardized questionnaire"
       }
     ],
     "de": [
       {
-        "vocabUri": "",
-        "vocab": "",
-        "term": "Mündliche Befragung mit standardisiertem Fragebogen",
-        "id": ""
+        "term": "Mündliche Befragung mit standardisiertem Fragebogen"
       }
     ]
   },
@@ -227,17 +207,13 @@
     "en": [
       {
         "vocabUri": "urn:ddi:int.ddi.cv:SamplingProcedure:1.1.4",
-        "vocab": "",
-        "term": "Quota sample",
-        "id": ""
+        "term": "Quota sample"
       }
     ],
     "de": [
       {
         "vocabUri": "urn:ddi:int.ddi.cv:SamplingProcedure:1.1.4",
-        "vocab": "",
-        "term": "Quotenauswahl",
-        "id": ""
+        "term": "Quotenauswahl"
       }
     ]
   },
@@ -246,8 +222,7 @@
       {
         "vocabUri": "urn:ddi:int.ddi.cv:TimeMethod:1.2.3",
         "vocab": "TimeMethod",
-        "term": "Longitudinal",
-        "id": ""
+        "term": "Longitudinal"
       }
     ]
   },
@@ -255,8 +230,7 @@
     "en": [{
       "vocabUri": "urn:ddi:int.ddi.cv:AnalysisUnit:2.1.3",
       "vocab": "AnalysisUnit",
-      "term": "Individual",
-      "id": ""
+      "term": "Individual"
     }]
   },
   "universe": {

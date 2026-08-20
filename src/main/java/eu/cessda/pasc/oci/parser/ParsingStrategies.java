@@ -221,20 +221,23 @@ class ParsingStrategies{
     @NonNull
     @SuppressWarnings("java:S131")
     static Optional<TermVocabAttributes> termVocabAttributeLifecycleStrategy(Element element, TermVocabAttributeNames attrNames) {
-        String vocab = "";
-        String vocabUri = "";
+        String id = null;
+        String vocab = null;
+        String vocabUri = null;
 
         var term = element.getText();
         for (var attr : element.getAttributes()) {
             String attrName = attr.getName();
-            if (attrName.equals(attrNames.vocab())) {
+            if (attrName.equals(attrNames.id())) {
+                id = attr.getValue();
+            } else if (attrName.equals(attrNames.vocab())) {
                 vocab = attr.getValue();
             } else if (attrName.equals(attrNames.vocabUri())) {
                 vocabUri = attr.getValue();
             }
         }
 
-        return Optional.of(new TermVocabAttributes(vocab, vocabUri, "", term));
+        return Optional.of(new TermVocabAttributes(vocab, vocabUri, id, term));
     }
 
     /**
@@ -462,13 +465,25 @@ class ParsingStrategies{
             var inclusionStatus = parseInclusionStatus(universeElement);
 
             // Language specific content is stored in sub-elements which needs to be flattened
-            for (var otherMaterial : universeElement.getChildren("Description", null)) {
+            var labels = universeElement.getChildren("Label", null);
+            for (var otherMaterial : labels) {
                 for (var contentElement : otherMaterial.getChildren("Content", null)) {
                     map.computeIfAbsent(
                         XMLMapper.getLangOfElement(contentElement), k -> new ArrayList<>()
                     ).add(
                         new UniverseElement(inclusionStatus, contentElement.getText())
                     );
+                }
+            }
+            if (labels.isEmpty()) {
+                for (var otherMaterial : universeElement.getChildren("Description", null)) {
+                    for (var contentElement : otherMaterial.getChildren("Content", null)) {
+                        map.computeIfAbsent(
+                                XMLMapper.getLangOfElement(contentElement), k -> new ArrayList<>()
+                        ).add(
+                                new UniverseElement(inclusionStatus, contentElement.getText())
+                        );
+                    }
                 }
             }
         }
@@ -532,12 +547,12 @@ class ParsingStrategies{
     }
 
     @NonNull
-    static CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateTimeParseException>> dataCollectionPeriodsStrategy(List<Element> elementList) {
+    static CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, DateTimeParseException> dataCollectionPeriodsStrategy(List<Element> elementList) {
         var dateAttrs = getDateElementAttributesValueMap(elementList);
 
         var dataCollectionPeriodBuilder = CMMStudyMapper.DataCollectionPeriod.builder();
 
-        var parseExceptions = new ArrayList<DateTimeParseException>(2);
+        DateTimeParseException parseException = null;
 
         if (dateAttrs.containsKey(SINGLE_ATTR)) {
             final String singleDateValue = dateAttrs.get(SINGLE_ATTR);
@@ -546,7 +561,7 @@ class ParsingStrategies{
                 var year = TimeUtility.getTimeFormat(singleDateValue, Year::from);
                 dataCollectionPeriodBuilder.dataCollectionYear(year.getValue());
             } catch (DateTimeParseException e) {
-                parseExceptions.add(e);
+                parseException = e;
             }
         } else {
             if (dateAttrs.containsKey(START_ATTR)) {
@@ -556,7 +571,7 @@ class ParsingStrategies{
                     var year = TimeUtility.getTimeFormat(startDateValue, Year::from);
                     dataCollectionPeriodBuilder.dataCollectionYear(year.getValue());
                 } catch (DateTimeParseException e) {
-                    parseExceptions.add(e);
+                    parseException = e;
                 }
             }
             if (dateAttrs.containsKey(END_ATTR)) {
@@ -570,13 +585,13 @@ class ParsingStrategies{
 
         return new CMMStudyMapper.ParseResults<>(
             dataCollectionPeriodBuilder.build(),
-            parseExceptions
+            parseException
         );
     }
 
     @NonNull
     @SuppressWarnings("java:S131")
-    static CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateTimeParseException>> dataCollectionPeriodsLifecycleStrategy(Element dataCollectionDate) {
+    static CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, DateTimeParseException> dataCollectionPeriodsLifecycleStrategy(Element dataCollectionDate) {
         String startDate = null;
         String endDate = null;
         String singleDate = null;
@@ -589,30 +604,27 @@ class ParsingStrategies{
             }
         }
 
-        var parseExceptions = new ArrayList<DateTimeParseException>();
+        DateTimeParseException parseException = null;
 
         // Derive the data collection year
         Integer year = null;
-        if (singleDate != null) {
-            try {
-                var parsedYear = TimeUtility.getTimeFormat(singleDate, Year::from);
-                year = parsedYear.getValue();
-            } catch (DateTimeParseException e) {
-                parseExceptions.add(e);
+        try {
+            if (singleDate != null) {
+                year = parseDateIntoYear(singleDate);
+            } else if(startDate != null) {
+                year = parseDateIntoYear(startDate);
             }
-        }
-
-        if (year == null && startDate != null) {
-            try {
-                var parsedYear = TimeUtility.getTimeFormat(startDate, Year::from);
-                year = parsedYear.getValue();
-            } catch (DateTimeParseException e) {
-                parseExceptions.add(e);
-            }
+        } catch (DateTimeParseException e) {
+            parseException = e;
         }
 
         var dataCollectionPeriod = new CMMStudyMapper.DataCollectionPeriod(startDate, year, endDate, Collections.emptyMap());
-        return new CMMStudyMapper.ParseResults<>(dataCollectionPeriod, parseExceptions);
+        return new CMMStudyMapper.ParseResults<>(dataCollectionPeriod, parseException);
+    }
+
+    public static int parseDateIntoYear(String singleDate) throws DateTimeParseException {
+        var parsedYear = TimeUtility.getTimeFormat(singleDate, Year::from);
+        return parsedYear.getValue();
     }
 
     @NonNull
@@ -755,7 +767,7 @@ class ParsingStrategies{
         // Merge name and abbreviation maps
         var publisherMap = new HashMap<String, Publisher>();
         Stream.concat(nameMap.keySet().stream(), abbrMap.keySet().stream()).distinct().forEach(key ->
-            publisherMap.put(key, new Publisher(abbrMap.getOrDefault(key, ""), nameMap.getOrDefault(key, "")))
+            publisherMap.put(key, new Publisher(abbrMap.get(key), nameMap.get(key)))
         );
 
         return Collections.unmodifiableMap(publisherMap);
@@ -889,8 +901,9 @@ class ParsingStrategies{
      */
     static Map<String, Creator> individualStrategy(Element element, Map<String, Affiliation> affiliationMap) {
         var identification = element.getChild("IndividualIdentification", null);
-        if (identification == null)
+        if (identification == null) {
             return Collections.emptyMap();
+        }
 
         var map = new HashMap<String, Creator>();
 
@@ -922,17 +935,16 @@ class ParsingStrategies{
             if (fullName != null) {
                 for (var string : fullName.getChildren(STRING, null)) {
                     var lang = getLangOfElement(string);
-                    List<Creator.Identifier> identifiers = new ArrayList<>();
+                    var identifiers = new ArrayList<Creator.Identifier>(personalIds.size() + affiliationIds.size());
 
-                    if (!personalIds.isEmpty())
-                        identifiers.addAll(personalIds);
-                    if (!affiliationIds.isEmpty())
-                        identifiers.addAll(affiliationIds);
+                    identifiers.addAll(personalIds);
+                    identifiers.addAll(affiliationIds);
 
                     var creator = new Creator(
                             string.getTextTrim(),
                             affiliationName,
-                            identifiers.isEmpty() ? null : identifiers);
+                            identifiers
+                    );
 
                     if (isPreferred) {
                         map.put(lang, creator);
@@ -1058,7 +1070,7 @@ class ParsingStrategies{
                         var vocabAttributes = termVocabAttributes.get();
                         vocabAttributesList.add(new TermVocabAttributes(vocabAttributes.vocab(), vocabAttributes.vocabUri(), vocabAttributes.id(), term));
                     } else {
-                        vocabAttributesList.add(new TermVocabAttributes("", "", "", term));
+                        vocabAttributesList.add(new TermVocabAttributes(null, null, null, term));
                     }
                 }
 
@@ -1089,7 +1101,7 @@ class ParsingStrategies{
 
             // Filter by TypeOfMaterial = "Related Publication"
             var typeOfMaterial = element.getChildTextTrim("TypeOfMaterial", null);
-            if (typeOfMaterial == null || !typeOfMaterial.equalsIgnoreCase("Related Publication")) {
+            if (!"Related Publication".equalsIgnoreCase(typeOfMaterial)) {
                 continue;
             }
 
@@ -1180,7 +1192,7 @@ class ParsingStrategies{
                     var creatorMap = individualStrategy(r.element(), Collections.emptyMap());
 
                     // Create a Publisher to represent this creator
-                    var publisherMap = new HashMap<String, Publisher>(creatorMap.size());
+                    var publisherMap = HashMap.<String, Publisher>newHashMap(creatorMap.size());
                     creatorMap.forEach((lang, creator) -> {
                         var publisher = new Publisher(null, creator.name());
                         publisherMap.put(lang, publisher);
@@ -1321,32 +1333,40 @@ class ParsingStrategies{
 
         for (Element element : elements) {
             String raw = element.getTextTrim();
-            if (raw.isBlank()) {
-                continue;
-            }
-
-            // Normalize to lowercase and strip all non-alphanumerics (spaces, underscores, etc.)
-            String normalized = NORMALIZE_PATTERN.matcher(raw.toLowerCase()).replaceAll("");
-
-            // Open: exact or suffix so it still works for info:eu-repo/semantics/openAccess also
-            if (normalized.endsWith(OPEN_ACCESS)) {
-                return "Open";
-            }
-
-            // Restricted: exact or suffix so it still works for info:eu-repo/semantics/restrictedAccess also
-            if (RESTRICTED.contains(normalized)) {
-                return "Restricted";
-            }
-
-            // Fallback for partial matches
-            for (String t : RESTRICTED) {
-                if (normalized.endsWith(t)) {
-                    return "Restricted";
+            if (!raw.isBlank()) {
+                var dataAccess = parseDataAccessString(raw);
+                if (dataAccess != null) {
+                    return dataAccess;
                 }
             }
         }
 
         // Return null if no valid value was found
+        return null;
+    }
+
+    @Nullable
+    public static String parseDataAccessString(String raw) {
+        // Normalize to lowercase and strip all non-alphanumerics (spaces, underscores, etc.)
+        String normalized = NORMALIZE_PATTERN.matcher(raw.toLowerCase()).replaceAll("");
+
+        // Open: exact or suffix so it still works for info:eu-repo/semantics/openAccess also
+        if (normalized.endsWith(OPEN_ACCESS)) {
+            return "Open";
+        }
+
+        // Restricted: exact or suffix so it still works for info:eu-repo/semantics/restrictedAccess also
+        if (RESTRICTED.contains(normalized)) {
+            return "Restricted";
+        }
+
+        // Fallback for partial matches
+        for (String t : RESTRICTED) {
+            if (normalized.endsWith(t)) {
+                return "Restricted";
+            }
+        }
+
         return null;
     }
 
@@ -1401,17 +1421,17 @@ class ParsingStrategies{
 
         for (var seriesElement : elements) {
 
-            var uriMap = new HashMap<String, List<URI>>();
+            var uriList = new ArrayList<URI>();
             var nameMap = new HashMap<String, List<String>>();
             var descriptionMap = new HashMap<String, List<String>>();
 
+            // SeriesRepositoryLocation is not localised
             for (var repoLocation : seriesElement.getChildren("SeriesRepositoryLocation", null)) {
-                var lang = XMLMapper.getLangOfElement(repoLocation);
-                uriMap.computeIfAbsent(lang, k -> new ArrayList<>()).add(URI.create(repoLocation.getTextTrim()));
+                uriList.add(URI.create(repoLocation.getTextTrim()));
             }
 
             for (var nameElement : seriesElement.getChildren("SeriesName", null)) {
-                for (var nameContent : nameElement.getChildren("String", null)) {
+                for (var nameContent : nameElement.getChildren(STRING, null)) {
                     var lang = XMLMapper.getLangOfElement(nameContent);
                     nameMap.computeIfAbsent(lang, k -> new ArrayList<>()).add(nameContent.getTextTrim());
                 }
@@ -1424,15 +1444,14 @@ class ParsingStrategies{
                 }
             }
 
-            var allLangs = new HashSet<>(uriMap.keySet());
-            allLangs.addAll(nameMap.keySet());
+            var allLangs = new HashSet<>(nameMap.keySet());
             allLangs.addAll(descriptionMap.keySet());
 
             for (String lang : allLangs) {
                 var series = new Series(
-                    nameMap.getOrDefault(lang, new ArrayList<>()),
-                    descriptionMap.getOrDefault(lang, new ArrayList<>()),
-                    uriMap.getOrDefault(lang, new ArrayList<>())
+                    nameMap.getOrDefault(lang, Collections.emptyList()),
+                    descriptionMap.getOrDefault(lang, Collections.emptyList()),
+                    uriList
                 );
                 seriesMap.computeIfAbsent(lang, k -> new ArrayList<>()).add(series);
             }

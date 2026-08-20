@@ -131,12 +131,16 @@
                                 <OrganizationName>
                                     <r:String xml:lang="en">Sikt - Norwegian Agency for Shared Services in Education and Research</r:String>
                                     <r:String xml:lang="no">Sikt - Kunnskapssektorens tjenesteleverandør</r:String>
+                                    <r:Abbreviation>
+                                        <r:String xml:lang="en">Sikt</r:String>
+                                        <r:String xml:lang="no">Sikt</r:String>
+                                    </r:Abbreviation>
                                 </OrganizationName>
                             </OrganizationIdentification>
                         </Organization>
                     </Fragment>
                     <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
-                        <Universe isUniversallyUnique="true" versionDate="2024-04-29T13:53:58.9438971Z" xmlns="ddi:conceptualcomponent:3_3">
+                        <Universe isInclusive="false" isUniversallyUnique="true" versionDate="2024-04-29T13:53:58.9438971Z" xmlns="ddi:conceptualcomponent:3_3">
                             <r:URN>urn:ddi:no.nsd:7fc27ed5-9094-4181-9717-cb228812f326:2</r:URN>
                             <r:Agency>no.nsd</r:Agency>
                             <r:ID>7fc27ed5-9094-4181-9717-cb228812f326</r:ID>
@@ -670,7 +674,7 @@
                                     <r:String xml:lang="no">Addressing Domestic Violence in Antenatal Care Environments 2 (ADVANCE 2)</r:String>
                                 </r:Title>
                                 <r:Creator>
-                                    <r:CreatorName>
+                                    <r:CreatorName affiliation="NTNU">
                                         <r:String xml:lang="en">NTNU</r:String>
                                         <r:String xml:lang="no">NTNU</r:String>
                                     </r:CreatorName>
@@ -849,6 +853,14 @@
                                         <r:TypeOfObject>Organization</r:TypeOfObject>
                                     </r:ContributorReference>
                                 </r:Contributor>
+                                <r:Contributor>
+                                    <r:ContributorReference>
+                                        <r:Agency>eu.cessda</r:Agency>
+                                        <r:ID>synthetic-id</r:ID>
+                                        <r:Version>1.0.0</r:Version>
+                                        <r:TypeOfObject>Individual</r:TypeOfObject>
+                                    </r:ContributorReference>
+                                </r:Contributor>
                                 <r:PublicationDate>
                                     <r:SimpleDate>2024-05-03T00:00:00Z</r:SimpleDate>
                                 </r:PublicationDate>
@@ -895,6 +907,21 @@ Spørsmålene merket med 'Relevant,' 'Understandable/Clear', og 'Sensitive' ble 
                                 <r:Version>2</r:Version>
                                 <r:TypeOfObject>Universe</r:TypeOfObject>
                             </r:UniverseReference>
+                            <r:SeriesStatement>
+                                <r:SeriesRepositoryLocation>https://example.com/series</r:SeriesRepositoryLocation>
+                                <r:SeriesRepositoryLocation>https://example.com/seriesaltlink</r:SeriesRepositoryLocation>
+                                <r:SeriesName>
+                                    <r:String xml:lang="en">Made up series name</r:String>
+                                    <r:String xml:lang="de">Ausgedachter Serienname</r:String>
+                                </r:SeriesName>
+                                <r:SeriesName>
+                                    <r:String xml:lang="en">Has second made up name in English</r:String>
+                                </r:SeriesName>
+                                <r:SeriesDescription>
+                                    <r:Content xml:lang="en">This is an example of series description. This made up series has been collected over several made-up decades.</r:Content>
+                                    <r:Content xml:lang="de">Dies ist ein Beispiel für eine Serienbeschreibung. Diese erfundene Serie wurde über mehrere erfundene Jahrzehnte hinweg gesammelt.</r:Content>
+                                </r:SeriesDescription>
+                            </r:SeriesStatement>
                             <r:FundingInformation>
                                 <r:AgencyOrganizationReference>
                                     <r:Agency>no.nsd</r:Agency>
@@ -912,6 +939,7 @@ Spørsmålene merket med 'Relevant,' 'Understandable/Clear', og 'Sensitive' ble 
                                     <r:Version>16</r:Version>
                                     <r:Subject controlledVocabularyID="7803963d-cc69-4cf3-89fd-dc752bb16086" controlledVocabularyAgencyName="no.nsd" controlledVocabularyVersionID="1">Health.PublicHealth</r:Subject>
                                     <r:Subject controlledVocabularyID="7803963d-cc69-4cf3-89fd-dc752bb16086" controlledVocabularyAgencyName="no.nsd" controlledVocabularyVersionID="1">Health.ReproductiveHealth</r:Subject>
+                                    <r:Keyword xml:lang="en" controlledVocabularyAgencyName="cessda" controlledVocabularyName="ELSST" controlledVocabularyURN="https://elsst.cessda.eu/id/">POLITICAL ISSUES</r:Keyword>
                                 </r:TopicalCoverage>
                                 <r:SpatialCoverage isUniversallyUnique="true">
                                     <r:URN>urn:ddi:no.nsd:afd2b786-69f3-4876-a494-0f6ffe62c399:16</r:URN>
@@ -929,6 +957,12 @@ Spørsmålene merket med 'Relevant,' 'Understandable/Clear', og 'Sensitive' ble 
                                         <r:Content xml:lang="no">Land</r:Content>
                                     </r:Description>
                                     <r:CountryCode>NP</r:CountryCode>
+                                    <r:GeographicLocationReference>
+                                        <r:Agency>de.gesis</r:Agency>
+                                        <r:ID>ZA0004_GeoLocUS</r:ID>
+                                        <r:Version>1.0.0</r:Version>
+                                        <r:TypeOfObject>GeographicLocation</r:TypeOfObject>
+                                    </r:GeographicLocationReference>
                                 </r:SpatialCoverage>
                                 <r:TemporalCoverage isUniversallyUnique="true">
                                     <r:URN>urn:ddi:no.nsd:0c91610a-d5b9-4bf8-8fa2-11d90e50a9b1:16</r:URN>
@@ -943,6 +977,13 @@ Spørsmålene merket med 'Relevant,' 'Understandable/Clear', og 'Sensitive' ble 
                             </r:Coverage>
                             <r:AnalysisUnit controlledVocabularyID="0bdbed9d-6e38-4158-8fff-dc7ae75ad6f1" controlledVocabularyAgencyName="no.nsd" controlledVocabularyVersionID="1">Individual</r:AnalysisUnit>
                             <r:KindOfData controlledVocabularyID="7a26bd9e-8af6-49d6-8028-e0b698b8ead7" controlledVocabularyAgencyName="no.nsd" controlledVocabularyVersionID="2">Numeric</r:KindOfData>
+                            <r:GeneralDataFormat controlledVocabularyAgencyName="DDI Alliance" controlledVocabularyName="GeneralDataFormat" controlledVocabularyURN="urn:ddi:int.ddi.cv:GeneralDataFormat:2.0.3">Numeric</r:GeneralDataFormat>
+                            <r:OtherMaterialSchemeReference>
+                                <r:Agency>gesis</r:Agency>
+                                <r:ID>othermat</r:ID>
+                                <r:Version>1.0.0</r:Version>
+                                <r:TypeOfObject>OtherMaterialScheme</r:TypeOfObject>
+                            </r:OtherMaterialSchemeReference>
                             <r:DataCollectionReference>
                                 <r:Agency>no.nsd</r:Agency>
                                 <r:ID>c60e5fba-6b5d-4061-9dd1-792bf681c603</r:ID>
@@ -1029,6 +1070,128 @@ Spørsmålene merket med 'Relevant,' 'Understandable/Clear', og 'Sensitive' ble 
                                 </OrganizationName>
                             </OrganizationIdentification>
                         </Organization>
+                    </Fragment>
+                    <Fragment xmlns:a="ddi:archive:3_3" xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+                        <a:Archive>
+                            <r:URN>urn:ddi:no.nsd:5725b3ee-a8ba-4868-b59c-4fc21c5331b4:3</r:URN>
+                            <a:ArchiveSpecific>
+                                <a:Item>
+                                    <a:Access>
+                                        <r:Agency>eu.cessda</r:Agency>
+                                        <r:ID>AccessType</r:ID>
+                                        <r:Version>1.0.0</r:Version>
+                                        <a:TypeOfAccess>info:eu-repo/semantics/openAccess</a:TypeOfAccess>
+                                        <r:Description>
+                                            <r:Content xml:lang="en">Synthetic Access Description EN</r:Content>
+                                            <r:Content xml:lang="no">Syntetisk Tilgang Beskrivelse NO</r:Content>
+                                        </r:Description>
+                                    </a:Access>
+                                </a:Item>
+                            </a:ArchiveSpecific>
+                        </a:Archive>
+                    </Fragment>
+                    <Fragment xmlns:a="ddi:archive:3_3" xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+                        <a:Individual>
+                            <r:Agency>eu.cessda</r:Agency>
+                            <r:ID>synthetic-id</r:ID>
+                            <r:Version>1.0.0</r:Version>
+                            <a:IndividualIdentification>
+                                <a:IndividualName>
+                                    <a:FullName>
+                                        <r:String xml:lang="en">Synthetic ORCID EN</r:String>
+                                        <r:String xml:lang="no">Syntetisk ORCID NO</r:String>
+                                    </a:FullName>
+                                </a:IndividualName>
+                                <a:ResearcherID>
+                                    <a:TypeOfID>ORCID</a:TypeOfID>
+                                    <a:ResearcherIdentification>0000-0000-0000-0000</a:ResearcherIdentification>
+                                    <r:URI>https://orcid.org/0000-0000-0000-0000</r:URI>
+                                </a:ResearcherID>
+                            </a:IndividualIdentification>
+                        </a:Individual>
+                    </Fragment>
+                    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+                        <r:OtherMaterialScheme>
+                            <r:Agency>gesis</r:Agency>
+                            <r:ID>othermat</r:ID>
+                            <r:Version>1.0.0</r:Version>
+                            <r:OtherMaterial>
+                                <r:Agency>de.gesis</r:Agency>
+                                <r:ID>ZA0004_Mat4</r:ID>
+                                <r:Version>1.0.0</r:Version>
+                                <r:TypeOfMaterial controlledVocabularyAgencyName="gesis" controlledVocabularyName="GesisTypeOfMaterial">OriginalLiterature</r:TypeOfMaterial>
+                                <r:Description>
+                                    <r:Content>Free, Lloyd A.:
+                                        Six Allies And A Neutral.
+                                        Glencoe, Ill.: Free Press 1959
+                                    </r:Content>
+                                </r:Description>
+                            </r:OtherMaterial>
+                            <r:OtherMaterial xml:lang="de">
+                                <r:Agency>de.gesis</r:Agency>
+                                <r:ID>ZA0004_OthMat54968</r:ID>
+                                <r:Version>1.0.0</r:Version>
+                                <r:UserID typeOfUserID="Dokument-ID">54968</r:UserID>
+                                <r:TypeOfMaterial controlledVocabularyName="GesisDBKTypeOfMaterial">Questionnaire</r:TypeOfMaterial>
+                                <r:Description>
+                                    <r:Content xml:lang="en"/>
+                                    <r:Content xml:lang="de"/>
+                                </r:Description>
+                                <r:Citation>
+                                    <r:Title>
+                                        <r:String xml:lang="en">ZA0004-10_q.pdf (Questionnaire)</r:String>
+                                        <r:String xml:lang="de">ZA0004-10_q.pdf (Fragebogen)</r:String>
+                                    </r:Title>
+                                </r:Citation>
+                                <r:ExternalURLReference>https://dbk.gesis.org/dbksearch/download.asp?id=54968</r:ExternalURLReference>
+                            </r:OtherMaterial>
+                            <r:OtherMaterial>
+                                <r:Agency>de.gesis</r:Agency>
+                                <r:ID>ZA0004_RelPub1</r:ID>
+                                <r:Version>1.0.0</r:Version>
+                                <r:TypeOfMaterial>Related Publication</r:TypeOfMaterial>
+                                <r:Citation>
+                                    <r:Title>
+                                        <r:String xml:lang="en">Synthetic Publication 1</r:String>
+                                        <r:String xml:lang="de">Synthetische Publikation 1</r:String>
+                                    </r:Title>
+                                    <r:PublicationDate>
+                                        <r:SimpleDate>2025</r:SimpleDate>
+                                    </r:PublicationDate>
+                                    <r:InternationalIdentifier>
+                                        <r:IdentifierContent>doi:10.4232/00000</r:IdentifierContent>
+                                        <r:ManagingAgency>DOI</r:ManagingAgency>
+                                    </r:InternationalIdentifier>
+                                </r:Citation>
+                                <r:ExternalURLReference>https://doi.org/10.4232/00000</r:ExternalURLReference>
+                            </r:OtherMaterial>
+                        </r:OtherMaterialScheme>
+                    </Fragment>
+                    <Fragment xmlns:r="ddi:reusable:3_3" xmlns="ddi:instance:3_3">
+                        <r:GeographicLocation>
+                            <r:Agency>de.gesis</r:Agency>
+                            <r:ID>ZA0004_GeoLocUS</r:ID>
+                            <r:Version>1.0.0</r:Version>
+                            <r:Description>
+                                <r:Content xml:lang="en"/>
+                                <r:Content xml:lang="de"/>
+                            </r:Description>
+                            <r:GeographicLevelDescription>
+                                <r:Content>Countries and Regions (ISO3166-1/2)</r:Content>
+                            </r:GeographicLevelDescription>
+                            <r:LocationValue>
+                                <r:Agency>de.gesis</r:Agency>
+                                <r:ID>ZA0004_LocValUS</r:ID>
+                                <r:Version>1.0.0</r:Version>
+                                <r:LocationValueName>
+                                    <r:String xml:lang="en">United States of America</r:String>
+                                    <r:String xml:lang="de">Vereinigte Staaten von Amerika</r:String>
+                                </r:LocationValueName>
+                                <r:GeographicLocationIdentifier>
+                                    <r:GeographicCode>US</r:GeographicCode>
+                                </r:GeographicLocationIdentifier>
+                            </r:LocationValue>
+                        </r:GeographicLocation>
                     </Fragment>
                 </ddi:FragmentInstance>
             </oai:metadata>
