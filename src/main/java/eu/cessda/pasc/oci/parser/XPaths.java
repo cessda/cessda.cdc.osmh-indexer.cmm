@@ -60,7 +60,7 @@ public final class XPaths {
     private final XMLMapper<Map<String, List<String>>> studyURLXPath;
     private final XMLMapper<Map<String, List<Pid>>> pidStudyXPath;
     private final XMLMapper<Map<String, List<String>>> dataRestrctnXPath;
-    private final XMLMapper<CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateTimeParseException>>> dataCollectionPeriodsXPath;
+    private final XMLMapper<CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, DateTimeParseException>> dataCollectionPeriodsXPath;
     private final XMLMapper<Map<String, List<TermVocabAttributes>>> classificationsXPath;
     private final XMLMapper<Map<String, List<TermVocabAttributes>>> keywordsXPath;
     private final XMLMapper<Map<String, List<TermVocabAttributes>>> typeOfTimeMethodXPath;
@@ -88,12 +88,12 @@ public final class XPaths {
     private final XMLMapper<Map<String, List<TermVocabAttributes>>> generalDataFormatXPath;
     private final XMLMapper<Map<String, List<Series>>> seriesXPath;
 
-    private static final CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateTimeParseException>> EMPTY_PARSE_RESULTS = new CMMStudyMapper.ParseResults<>(
+    static final CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, DateTimeParseException> EMPTY_PARSE_RESULTS = new CMMStudyMapper.ParseResults<>(
         new CMMStudyMapper.DataCollectionPeriod(null, null, null, Collections.emptyMap()),
-        Collections.emptyList()
+        null
     );
 
-    private static final TermVocabAttributeNames DDI_3_2_ATTR_NAMES = new TermVocabAttributeNames("codeListName", "codeListURN");
+    private static final TermVocabAttributeNames DDI_3_2_ATTR_NAMES = new TermVocabAttributeNames("codeListID", "codeListName", "codeListURN");
     private static final Function<Element, Optional<TermVocabAttributes>> TERM_VOCAB_ATTR_3_2_STRATEGY = (Element element) ->
         ParsingStrategies.termVocabAttributeLifecycleStrategy(element, DDI_3_2_ATTR_NAMES);
 
@@ -125,7 +125,7 @@ public final class XPaths {
         // Relations (for affiliations of individual creators)
         .relationElementsXPath(new SimpleXMLMapper<>("//a:Relation", Function.identity()))
         // Data access open/restricted
-        .dataAccessXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/a:Archive/a:ArchiveSpecific/a:Item/a:Access/a:AccessTypeName/r:String", ParsingStrategies::dataAccessStrategy))
+        .dataAccessXPath(new ResolvingXMLMapper<>("//s:StudyUnit[1]/a:Archive", "//s:StudyUnit[1]/r:ArchiveReference", "//a:ArchiveSpecific/a:Item/a:Access/a:AccessTypeName/r:String", ParsingStrategies::dataAccessStrategy))
         // Terms of data access
         .dataRestrctnXPath(new ResolvingXMLMapper<>("//s:StudyUnit[1]/a:Archive", "//s:StudyUnit[1]/r:ArchiveReference", "//a:ArchiveSpecific/a:Item/a:Access/r:Description/r:Content", extractMetadataObjectListForEachLang(ParsingStrategies::nullableElementValueStrategy)))
         // Data collection period
@@ -137,7 +137,7 @@ public final class XPaths {
         // Keywords
         .keywordsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:TopicalCoverage/r:Keyword", extractMetadataObjectListForEachLang(TERM_VOCAB_ATTR_3_2_STRATEGY)))
         // Time dimension
-        .typeOfTimeMethodXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:Methodology/d:TimeMethod", (List<Element> elementList) -> typeOfTimeMethodLifecycleStrategy(elementList, DDI_3_2_ATTR_NAMES)))
+        .typeOfTimeMethodXPath(new SimpleXMLMapper<>("//d:Methodology/d:TimeMethod", (List<Element> elementList) -> typeOfTimeMethodLifecycleStrategy(elementList, DDI_3_2_ATTR_NAMES)))
         // Country
         .studyAreaCountriesXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:SpatialCoverage/r:GeographicLocationReference", ParsingStrategies::geographicLocationStrategy))
         // Analysis unit
@@ -151,7 +151,7 @@ public final class XPaths {
         // Sampling procedure
         .samplingXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:Methodology/d:SamplingProcedure", (List<Element> elementList) -> samplingProceduresLifecycleStrategy(elementList, DDI_3_2_ATTR_NAMES)))
         // Data collection mode
-        .typeOfModeOfCollectionXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:CollectionEvent/d:ModeOfCollection", (List<Element> elementList) -> typeOfModeOfCollectionLifecycleStrategy(elementList, DDI_3_2_ATTR_NAMES)))
+        .typeOfModeOfCollectionXPath(new ResolvingXMLMapper<>("//s:StudyUnit[1]/d:DataCollection", "//s:StudyUnit[1]/r:DataCollectionReference", "//d:CollectionEvent/d:ModeOfCollection", (List<Element> elementList) -> typeOfModeOfCollectionLifecycleStrategy(elementList, DDI_3_2_ATTR_NAMES)))
         // PID of Related publication
         .relatedPublicationsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:OtherMaterial", ParsingStrategies::relatedPublicationLifecycleStrategy))
         /// /r:Citation/r:InternationalIdentifier/r:IdentifierContent
@@ -167,7 +167,7 @@ public final class XPaths {
         .seriesXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:SeriesStatement", ParsingStrategies::seriesLifecycleStrategy))
         .build();
 
-    private static final TermVocabAttributeNames DDI_3_3_ATTR_NAMES = new TermVocabAttributeNames("controlledVocabularyName", "controlledVocabularyURN");
+    private static final TermVocabAttributeNames DDI_3_3_ATTR_NAMES = new TermVocabAttributeNames("controlledVocabularyID", "controlledVocabularyName", "controlledVocabularyURN");
     private static final Function<Element, Optional<TermVocabAttributes>> TERM_VOCAB_ATTR_3_3_STRATEGY = (Element element) ->
         ParsingStrategies.termVocabAttributeLifecycleStrategy(element, DDI_3_3_ATTR_NAMES);
 
@@ -187,20 +187,22 @@ public final class XPaths {
         })
         // PID of Related publication
         .withRelatedPublicationsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:OtherMaterialScheme/r:OtherMaterial", ParsingStrategies::relatedPublicationLifecycleStrategy))
-        // Data access open/restricted
-        .withDataAccessXPath(new SimpleXMLMapper<>("//s:StudyUnit/a:Archive/a:ArchiveSpecific/a:Item/a:Access/a:TypeOfAccess", ParsingStrategies::dataAccessStrategy))
         // Topics
         .withClassificationsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:TopicalCoverage/r:Subject", extractMetadataObjectListForEachLang(TERM_VOCAB_ATTR_3_3_STRATEGY)))
         // Keywords
         .withKeywordsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:TopicalCoverage/r:Keyword", extractMetadataObjectListForEachLang(TERM_VOCAB_ATTR_3_3_STRATEGY)))
         // Time dimension
-        .withTypeOfTimeMethodXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:Methodology/d:TimeMethod", (List<Element> elementList) -> ParsingStrategies.typeOfTimeMethodLifecycleStrategy(elementList, DDI_3_3_ATTR_NAMES)))
+        .withTypeOfTimeMethodXPath(new SimpleXMLMapper<>("//d:Methodology/d:TimeMethod", (List<Element> elementList) -> ParsingStrategies.typeOfTimeMethodLifecycleStrategy(elementList, DDI_3_3_ATTR_NAMES)))
+        // Data access open/restricted
+        .withDataAccessXPath(new ResolvingXMLMapper<>("//s:StudyUnit[1]/a:Archive", "//s:StudyUnit[1]/r:ArchiveReference", "//a:ArchiveSpecific/a:Item/a:Access/a:TypeOfAccess", ParsingStrategies::dataAccessStrategy))
         // Analysis unit
         .withUnitTypeXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:AnalysisUnit", (List<Element> elementList) -> ParsingStrategies.analysisUnitStrategy(elementList, DDI_3_3_ATTR_NAMES)))
         // Sampling procedure
-        .withSamplingXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:Methodology/d:SamplingProcedure", (List<Element> elementList) -> ParsingStrategies.samplingProceduresLifecycleStrategy(elementList, DDI_3_3_ATTR_NAMES)))
+        .withSamplingXPath(new ResolvingXMLMapper<>("//s:StudyUnit[1]/d:DataCollection", "//s:StudyUnit[1]/r:DataCollectionReference", "//d:Methodology/d:SamplingProcedure", (List<Element> elementList) -> ParsingStrategies.samplingProceduresLifecycleStrategy(elementList, DDI_3_3_ATTR_NAMES)))
         // Data collection mode
-        .withTypeOfModeOfCollectionXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/d:DataCollection/d:CollectionEvent/d:ModeOfCollection", (List<Element> elementList) -> ParsingStrategies.typeOfModeOfCollectionLifecycleStrategy(elementList, DDI_3_3_ATTR_NAMES)))
+        .withTypeOfModeOfCollectionXPath(new ResolvingXMLMapper<>("//s:StudyUnit[1]/d:DataCollection", "//s:StudyUnit[1]/r:DataCollectionReference", "//d:CollectionEvent/d:ModeOfCollection", (List<Element> elementList) -> typeOfModeOfCollectionLifecycleStrategy(elementList, DDI_3_3_ATTR_NAMES)))
+        // PID of Related publication
+        .withRelatedPublicationsXPath(new ResolvingXMLMapper<>("//s:StudyUnit[1]/r:OtherMaterialScheme", "//s:StudyUnit[1]/r:OtherMaterialSchemeReference", "//r:OtherMaterial", ParsingStrategies::relatedPublicationLifecycleStrategy))
         // General data format
         .withGeneralDataFormatXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:GeneralDataFormat", extractMetadataObjectListForEachLang(TERM_VOCAB_ATTR_3_3_STRATEGY)));
 

@@ -69,7 +69,7 @@ public class RecordXMLParserNesstarTest {
         var recordXML = ResourceHandler.getResource("xml/nesstar/synthetic_compliant_cmm_nesstar.xml");
 
         // When
-        var result = new RecordXMLParser(cmmStudyMapper).getRecord(nesstarRepo, Path.of(recordXML.toURI()));
+        var result = new RecordXMLParser().getRecord(nesstarRepo, Path.of(recordXML.toURI()));
 
         // Then
         then(result).hasSize(1);
@@ -89,7 +89,7 @@ public class RecordXMLParserNesstarTest {
         var recordXML = ResourceHandler.getResource("xml/nesstar/synthetic_compliant_cmm_nesstar.xml");
 
         // When
-        var record = new RecordXMLParser(cmmStudyMapper).getRecord(nesstarRepo, Path.of(recordXML.toURI()));
+        var record = new RecordXMLParser().getRecord(nesstarRepo, Path.of(recordXML.toURI()));
 
         // Then
         then(record).hasSize(1);
@@ -104,7 +104,7 @@ public class RecordXMLParserNesstarTest {
         var recordXML = ResourceHandler.getResource("xml/nesstar/synthetic_compliant_cmm_nesstar_single_date.xml");
 
         // When
-        var record = new RecordXMLParser(cmmStudyMapper).getRecord(nesstarRepo, Path.of(recordXML.toURI()));
+        var record = new RecordXMLParser().getRecord(nesstarRepo, Path.of(recordXML.toURI()));
         then(record).hasSize(1);
         utils.validateCMMStudyResultAgainstSchema(record.getFirst());
         var jsonString = objectMapper.writeValueAsString(record.getFirst());
@@ -123,7 +123,7 @@ public class RecordXMLParserNesstarTest {
         var expectedCmmStudyJsonString = ResourceHandler.getResource("xml/nesstar/synthetic_compliant_cmm_nesstar.xml");
 
         // When
-        var record = new RecordXMLParser(cmmStudyMapper).getRecord(nesstarRepo, Path.of(expectedCmmStudyJsonString.toURI())).getFirst();
+        var record = new RecordXMLParser().getRecord(nesstarRepo, Path.of(expectedCmmStudyJsonString.toURI())).getFirst();
 
         // Then
         then(record.titleStudy()).containsKey("xy");
@@ -141,7 +141,7 @@ public class RecordXMLParserNesstarTest {
         var recordXML = ResourceHandler.getResource("xml/nesstar/synthetic_compliant_cmm_nesstar_repeated_abstract.xml");
 
         // When
-        var record = new RecordXMLParser(cmmStudyMapper).getRecord(nesstarRepo, Path.of(recordXML.toURI()));
+        var record = new RecordXMLParser().getRecord(nesstarRepo, Path.of(recordXML.toURI()));
 
         // Then
         then(record).hasSize(1);
@@ -160,7 +160,7 @@ public class RecordXMLParserNesstarTest {
         var recordXML = ResourceHandler.getResource("xml/nesstar/synthetic_compliant_cmm_nesstar_with_perTitl_xml_lang.xml");
 
         // When
-        var record = new RecordXMLParser(cmmStudyMapper).getRecord(nesstarRepo, Path.of(recordXML.toURI()));
+        var record = new RecordXMLParser().getRecord(nesstarRepo, Path.of(recordXML.toURI()));
 
         // Then
         then(record).hasSize(1);
@@ -177,7 +177,7 @@ public class RecordXMLParserNesstarTest {
         var recordXML = ResourceHandler.getResource("xml/nesstar/synthetic_nesstar_deleted_record.xml");
 
         // When
-        var record = new RecordXMLParser(cmmStudyMapper).getRecord(nesstarRepo, Path.of(recordXML.toURI()));
+        var record = new RecordXMLParser().getRecord(nesstarRepo, Path.of(recordXML.toURI()));
 
         // Then
         then(record).isEmpty();
@@ -190,7 +190,7 @@ public class RecordXMLParserNesstarTest {
         var recordXML = ResourceHandler.getResource("xml/nesstar/synthetic_nesstar_record_with_error.xml");
 
         // When
-        var result = new RecordXMLParser(cmmStudyMapper).getRecord(nesstarRepo, Path.of(recordXML.toURI()));
+        var result = new RecordXMLParser().getRecord(nesstarRepo, Path.of(recordXML.toURI()));
 
         // Then
         then(result).isEmpty();
@@ -203,7 +203,7 @@ public class RecordXMLParserNesstarTest {
         var recordXML = ResourceHandler.getResource("xml/nesstar/synthetic_compliant_cmm_nesstar.xml");
 
         // When
-        var result = new RecordXMLParser(cmmStudyMapper).getRecord(nesstarRepo, Path.of(recordXML.toURI()));
+        var result = new RecordXMLParser().getRecord(nesstarRepo, Path.of(recordXML.toURI()));
 
         // Then
         then(result).hasSize(1);
@@ -243,7 +243,7 @@ public class RecordXMLParserNesstarTest {
         );
 
         // When
-        var result = new RecordXMLParser(cmmStudyMapper).getRecord(langRepo, Path.of(recordXML.toURI()));
+        var result = new RecordXMLParser().getRecord(langRepo, Path.of(recordXML.toURI()));
 
         then(result).hasSize(1);
         utils.validateCMMStudyResultAgainstSchema(result.getFirst());

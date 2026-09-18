@@ -21,12 +21,10 @@ import eu.cessda.pasc.oci.exception.InvalidUniverseException;
 import eu.cessda.pasc.oci.exception.UnsupportedXMLNamespaceException;
 import eu.cessda.pasc.oci.exception.XMLParseException;
 import eu.cessda.pasc.oci.models.Record;
-import eu.cessda.pasc.oci.models.RecordHeader;
 import eu.cessda.pasc.oci.models.Request;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
-import eu.cessda.pasc.oci.models.cmmstudy.TermVocabAttributes;
-import eu.cessda.pasc.oci.models.cmmstudy.VocabAttributes;
-import lombok.NonNull;
+import eu.cessda.pasc.oci.models.lifecycle.StudyUnit;
+import eu.cessda.pasc.oci.models.oaipmh.Header;
 import lombok.extern.slf4j.Slf4j;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -37,16 +35,25 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StreamUtils;
 
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.channels.Channels;
+import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.io.Files.getNameWithoutExtension;
@@ -65,22 +72,33 @@ public class RecordXMLParser {
     private static final int MAX_FILE_SIZE_MB = 50;
 
     private final CMMStudyMapper cmmStudyMapper;
+    private final StreamingLifecycleMapper streamingLifecycleMapper;
+    private final XMLInputFactory xmlInputFactory;
+
     private Set<Namespace> suppressedNamespaceWarnings = null;
 
+    public RecordXMLParser() throws IOException {
+        this.cmmStudyMapper = new CMMStudyMapper();
+        this.streamingLifecycleMapper = new StreamingLifecycleMapper();
+        this.xmlInputFactory = XMLInputFactory.newFactory();
+    }
+
     @Autowired
-    public RecordXMLParser(CMMStudyMapper cmmStudyMapper) {
+    public RecordXMLParser(CMMStudyMapper cmmStudyMapper, StreamingLifecycleMapper streamingLifecycleMapper) {
         this.cmmStudyMapper = cmmStudyMapper;
+        this.streamingLifecycleMapper = streamingLifecycleMapper;
+        this.xmlInputFactory = XMLInputFactory.newFactory();
     }
 
     /**
      * Load an XML document from the given path.
      * @param path the path to the XML document.
-     * @throws XMLParseException if the document could not be parsed, or an IO error occurred.
      */
-    private Document getDocument(Path path) throws XMLParseException {
-        try (var channel = Files.newByteChannel(path)) {
-            if (channel.size() > MAX_FILE_SIZE_MB * (1000*1000)) { // 50 MB
-                throw new IOException("File size " + (channel.size()/(1000*1000)) + " MB is greater than " + MAX_FILE_SIZE_MB +" MB" );
+    private Document getDocument(Path path, SeekableByteChannel channel) throws XMLParseException {
+        // DOM Parser has a max size
+        try {
+            if (channel.size() > MAX_FILE_SIZE_MB * (1000 * 1000)) { // 50 MB
+                throw new IOException("File size " + (channel.size() / (1000 * 1000)) + " MB is greater than " + MAX_FILE_SIZE_MB + " MB");
             }
             var inputStream = Channels.newInputStream(channel);
             return OaiPmhHelpers.getSaxBuilder().build(inputStream);
@@ -90,37 +108,35 @@ public class RecordXMLParser {
     }
 
     /**
-     * Parse an OAI-PMH record header element into a {@link RecordHeader} object.
+     * Parse an OAI-PMH record header element into a {@link Header} object.
      *
      * @param headerElement the element to parse.
      * @return a record header.
      */
     @SuppressWarnings({"java:S131", "java:S1301"}) // There is no need to take action for other element names
-    private RecordHeader parseRecordHeader(Element headerElement) {
+    private Header parseRecordHeader(Element headerElement) {
 
-        var recordHeaderBuilder = RecordHeader.builder();
+        // Header values
+        String identifier = null;
+        String datestamp = null;
+        List<String> setSpec = Collections.emptyList();
+        boolean deleted = false;
 
         // Check if the record is deleted
         if (headerElement.hasAttributes()) {
             var deletedAttribute = headerElement.getAttributeValue(OaiPmhConstants.STATUS_ATTR);
-            recordHeaderBuilder.deleted(OaiPmhConstants.DELETED.equals(deletedAttribute));
+            deleted = OaiPmhConstants.DELETED.equals(deletedAttribute);
         }
 
         // Parse the elements of the header
         var childElements = headerElement.getChildren();
         for (var child : childElements) {
             switch (child.getName()) {
-                case OaiPmhConstants.IDENTIFIER -> {
-                    String identifier = child.getText();
-                    recordHeaderBuilder.identifier(identifier);
-                }
-                case OaiPmhConstants.DATESTAMP_ELEMENT -> {
-                    String lastModified = child.getText();
-                    recordHeaderBuilder.lastModified(lastModified);
-                }
+                case OaiPmhConstants.IDENTIFIER -> identifier = child.getText();
+                case OaiPmhConstants.DATESTAMP_ELEMENT -> datestamp = child.getText();
             }
         }
-        return recordHeaderBuilder.build();
+        return new Header(identifier, datestamp, setSpec, deleted);
     }
 
     /**
@@ -131,9 +147,40 @@ public class RecordXMLParser {
      * @throws XMLParseException if an error occurred parsing the XML.
      */
     public List<CMMStudy> getRecord(Repo repo, Path path) throws XMLParseException {
+        try (var byteChannel = Files.newByteChannel(path)) {
+            return getRecordImpl(repo, path, byteChannel);
+        } catch (IOException | XMLStreamException e) {
+            throw new XMLParseException(path.toUri(), e);
+        }
+    }
 
-        // Retrieve
-        var document = getDocument(path);
+    @SuppressWarnings("UnstableApiUsage")
+    private List<CMMStudy> getRecordImpl(Repo repo, Path path, SeekableByteChannel byteChannel) throws XMLParseException, XMLStreamException, IOException {
+
+        // Fallback study number and last modified
+        String fileName = getNameWithoutExtension(path.toString());
+        String lastModified;
+        try {
+            // Set last modified to the file modified time if the header is not present or invalid
+            lastModified = Files.getLastModifiedTime(path).toString();
+        } catch (IOException e) {
+            // Fallback - use the current time
+            lastModified = OffsetDateTime.now(ZoneId.systemDefault()).toString();
+        }
+
+        // Try using the streaming parser
+        try {
+            var inputStream = StreamUtils.nonClosing(Channels.newInputStream(byteChannel));
+            return parseRecordStreaming(repo, inputStream, fileName, lastModified);
+        } catch (UnsupportedDDIException e) {
+            log.debug("[{}]: {}: falling back to the DOM parser: {}", repo, path, e.toString());
+
+            // Reset byte channel
+            byteChannel.position(0);
+        }
+
+        // Retrieve document
+        var document = getDocument(path, byteChannel);
 
         // Parse request element to retrieve the base URL of the repository
         var request = parseRecord(repo, path, document);
@@ -147,12 +194,70 @@ public class RecordXMLParser {
                 continue;
             }
             try {
-                var cmmStudy = mapDDIRecordToCMMStudy(repo, request, recordObj, path);
+                var cmmStudy = mapDDIRecordToCMMStudy(repo, request, recordObj, fileName, lastModified);
                 cmmStudies.add(cmmStudy);
             } catch (UnsupportedXMLNamespaceException e) {
                 var recordIdentifier = recordObj.recordHeader() != null ? recordObj.recordHeader().identifier() : null;
                 logUnsupportedNamespace(repo.code(), recordIdentifier, e);
             }
+        }
+
+
+        return cmmStudies;
+    }
+
+    /**
+     * Parse a record using the streaming lifecycle parser
+     *
+     * @param repo the repository.
+     * @param inputStream the input stream.
+     * @param fileName the file name.
+     * @return a list of studies.
+     * @throws UnsupportedDDIException if the DDI is unsupported.
+     * @throws XMLStreamException if an error occurs parsing the XML.
+     */
+    private List<CMMStudy> parseRecordStreaming(Repo repo, InputStream inputStream, String fileName, String fileLastModified) throws UnsupportedDDIException, XMLStreamException {
+
+        var source = new StreamSource(inputStream);
+
+        // Parse the document
+        var parser = StreamingLifecycleParser.parseDocument(xmlInputFactory, source);
+
+        /*
+         * OAI-PMH Request
+         */
+        var uri = parser.getRequest().map(URI::create).orElse(null);
+
+        /*
+         * OAI-PMH Header
+         */
+        var recordHeader = parser.getRecordHeader();
+        String studyNumber;
+        String lastModified;
+        if (recordHeader.isPresent()) {
+            var h = recordHeader.get();
+            studyNumber = h.identifier();
+            lastModified = h.datestamp();
+        } else {
+            // Derive the study number from the file name
+            studyNumber = fileName;
+            lastModified = fileLastModified;
+        }
+
+        // Get top level study units
+        var studyUnitList = parser.getObjectsByType(StudyUnit.class);
+
+        // Get all components
+        var allComponents = parser.getObjectsById();
+
+        var cmmStudies = new ArrayList<CMMStudy>();
+
+        for (var studyUnit : studyUnitList) {
+            // Get study
+            var cmmStudy = streamingLifecycleMapper.parseFragmentedStudy(
+                    repo, uri, studyNumber, lastModified, allComponents, studyUnit
+            );
+            cmmStudies.add(cmmStudy);
         }
 
         return cmmStudies;
@@ -178,7 +283,7 @@ public class RecordXMLParser {
         if (document.getRootElement().getNamespace().equals(OaiPmhConstants.OAI_NS)) {
 
             // Parse request element
-            var elem = document.getRootElement().getChild("request", OaiPmhConstants.OAI_NS);
+            var elem = document.getRootElement().getChild(OaiPmhConstants.REQUEST, OaiPmhConstants.OAI_NS);
 
             var uriString = elem.getTextTrim();
 
@@ -227,10 +332,10 @@ public class RecordXMLParser {
      * @param repository the source repository.
      * @param request the request element from the OAI-PMH response.
      * @param recordObj   the {@link Record} to convert.
-     * @param path the path of the source XML.
+     * @param fileName the path of the source XML.
      */
-    @SuppressWarnings({"java:S3776", "UnstableApiUsage"})
-    private CMMStudy mapDDIRecordToCMMStudy(Repo repository, Request request, Record recordObj, Path path) {
+    @SuppressWarnings("java:S3776")
+    private CMMStudy mapDDIRecordToCMMStudy(Repo repository, Request request, Record recordObj, String fileName, String fileLastModified) {
 
         CMMStudy.CMMStudyBuilder builder = CMMStudy.builder();
 
@@ -239,17 +344,13 @@ public class RecordXMLParser {
         if (recordObj.recordHeader() != null) {
             // A header was present, extract values
             studyNumber = recordObj.recordHeader().identifier();
-            lastModified = recordObj.recordHeader().lastModified();
+            lastModified = recordObj.recordHeader().datestamp();
         } else {
             // Derive the study number from the file name
-            studyNumber = getNameWithoutExtension(path.toString());
-            try {
-                // Set last modified to the file modified time if the header is not present or invalid
-                lastModified = Files.getLastModifiedTime(path).toString();
-            } catch (IOException e) {
-                // Fallback - use the current time
-                lastModified = OffsetDateTime.now(ZoneId.systemDefault()).toString();
-            }
+            studyNumber = fileName;
+
+            // Set last modified to the file modified time if the header is not present or invalid
+            lastModified = fileLastModified;
         }
 
         builder.studyNumber(studyNumber);
@@ -302,12 +403,12 @@ public class RecordXMLParser {
             builder.typeOfModeOfCollections(cmmStudyMapper.parseTypeOfModeOfCollection(metadata, xPaths, defaultLangIsoCode));
 
             var dataCollectionPeriodResults = cmmStudyMapper.parseDataCollectionDates(metadata, xPaths);
-            if (!dataCollectionPeriodResults.exceptions().isEmpty()) {
+            if (dataCollectionPeriodResults.exceptions() != null) {
                 // Parsing errors occurred, log here
                 log.warn("[{}] Some dates in study {} couldn't be parsed: {}",
                     value(LoggingConstants.REPO_NAME, repository.code()),
                     value(LoggingConstants.STUDY_ID, studyNumber),
-                    dataCollectionPeriodResults.exceptions()
+                    dataCollectionPeriodResults.exceptions().toString()
                 );
             }
             dataCollectionPeriodResults.results().getStartDate().ifPresent(builder::dataCollectionPeriodStartdate);

@@ -16,6 +16,7 @@
 package eu.cessda.pasc.oci.parser;
 
 record TermVocabAttributeNames(
+    String id,
     String vocab,
     String vocabUri
 ) {

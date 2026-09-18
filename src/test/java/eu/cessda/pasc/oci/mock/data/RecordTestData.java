@@ -36,11 +36,11 @@ public final class RecordTestData {
     public static final String LIST_RECORDER_HEADERS_BODY_EXAMPLE = """
 [
   {
-    "lastModified": "2018-02-21T07:48:38Z",
+    "datestamp": "2018-02-21T07:48:38Z",
     "identifier": "997"
   },
   {
-    "lastModified": "2018-02-19",
+    "datestamp": "2018-02-19",
     "identifier": "998"
   }
 ]""";
