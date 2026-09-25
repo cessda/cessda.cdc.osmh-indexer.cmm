@@ -97,8 +97,9 @@ public class RecordXMLParser {
     private Document getDocument(Path path, SeekableByteChannel channel) throws XMLParseException {
         // DOM Parser has a max size
         try {
-            if (channel.size() > MAX_FILE_SIZE_MB * (1000 * 1000)) { // 50 MB
-                throw new IOException("File size " + (channel.size() / (1000 * 1000)) + " MB is greater than " + MAX_FILE_SIZE_MB + " MB");
+            long size = channel.size();
+            if (size > MAX_FILE_SIZE_MB * (1000 * 1000)) { // 50 MB
+                throw new IOException("File size " + (size / (1000 * 1000)) + " MB is greater than " + MAX_FILE_SIZE_MB + " MB");
             }
             var inputStream = Channels.newInputStream(channel);
             return OaiPmhHelpers.getSaxBuilder().build(inputStream);
