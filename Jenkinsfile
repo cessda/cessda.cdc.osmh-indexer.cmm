@@ -18,7 +18,7 @@ pipeline {
 	environment {
 		product_name = "cdc"
 		module_name = "osmh-indexer"
-		image_tag = "${DOCKER_ARTIFACT_REGISTRY}/${product_name}-${module_name}:${env.BRANCH_NAME.replaceAll('[^a-z0-9\\.\\_\\-]', '-')}-${env.BUILD_NUMBER}"
+		image_tag = "${DOCKER_ARTIFACT_REGISTRY}/${product_name}-${module_name}:${env.GIT_COMMIT}"
 	}
 
     agent {
@@ -75,11 +75,11 @@ pipeline {
             }
             //when { branch 'main' }
         }
-		stage('Build and Push Docker image') {
+		stage('Push Docker image') {
             steps {
                 sh "gcloud auth configure-docker ${ARTIFACT_REGISTRY_HOST}"
                 sh "docker push ${IMAGE_TAG}"
-                sh "gcloud artifacts docker tags add ${image_tag} ${DOCKER_ARTIFACT_REGISTRY}/${product_name}-${module_name}:${env.BRANCH_NAME}-latest"
+                sh "gcloud artifacts docker tags add ${image_tag} ${DOCKER_ARTIFACT_REGISTRY}/${product_name}-${module_name}:${latest}"
             }
             when { branch 'main' }
 		}
