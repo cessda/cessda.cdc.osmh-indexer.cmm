@@ -19,6 +19,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
+
+import javax.xml.stream.XMLInputFactory;
+import java.util.concurrent.ForkJoinPool;
 
 /**
  * Extra Util configuration
@@ -28,8 +32,19 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @Slf4j
 public class UtilitiesConfiguration {
+
+    @Bean("applicationTaskExecutor")
+    ConcurrentTaskExecutor applicationTaskExecutor() {
+        return new ConcurrentTaskExecutor(ForkJoinPool.commonPool());
+    }
+
     @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper();
+    }
+
+    @Bean
+    public XMLInputFactory xmlInputFactory() {
+        return XMLInputFactory.newFactory();
     }
 }

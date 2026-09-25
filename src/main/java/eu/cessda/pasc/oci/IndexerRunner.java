@@ -23,6 +23,7 @@ import eu.cessda.pasc.oci.elasticsearch.IngestService;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -36,9 +37,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
-
-import static net.logstash.logback.argument.StructuredArguments.keyValue;
-import static net.logstash.logback.argument.StructuredArguments.value;
 
 @Component
 @Slf4j
@@ -84,19 +82,19 @@ public class IndexerRunner {
 
             try (repoStream) {
                 repoStream.forEach(repo -> {
-                    try {
+                    try (var _ = MDC.putCloseable(LoggingConstants.REPO_NAME, repo.code())) {
                         // Index the repository
                         indexRepository(repo);
                     } catch (Exception e) {
                         // Handle exceptional completion here, this allows failures to be logged as soon as possible
-                        log.error("[{}]: Unexpected error occurred when harvesting!", value(LoggingConstants.REPO_NAME, repo.code()), e);
+                        log.error("[{}]: Unexpected error occurred when harvesting!", repo.code(), e);
                     }
                 });
 
 
-                log.info("Indexing finished. Summary of the current state:\nTotal number of records: {}",
-                    value("total_cmm_studies", ingestService.getTotalHitCount("*"))
-                );
+                long recordCount = ingestService.getTotalHitCount("*");
+                log.atInfo().addKeyValue("total_cmm_studies", recordCount).addArgument(recordCount)
+                        .log("Indexing finished. Summary of the current state:\nTotal number of records: {}");
             } catch (IOException e) {
                 log.warn("Indexing finished. An IO error occurred when getting the total number of records: {}", e.toString());
             } finally {
@@ -116,30 +114,24 @@ public class IndexerRunner {
     @SuppressWarnings("try")
     private void indexRepository(Repo repo) {
         var startTime = Instant.now();
-        log.info("Processing Repo [{}]{}", repo, keyValue(LoggingConstants.REPO_NAME, repo.code(), ""));
+        log.info("Processing Repo [{}]", repo);
         var langStudies = indexer.getRecords(repo);
         for (var entry : langStudies.entrySet()) {
             var lang = entry.getKey();
-            try {
+            try (var _ = MDC.putCloseable(LoggingConstants.LANG_CODE, lang)) {
                 indexRecords(repo, lang, entry.getValue());
             } catch (IndexingException e) {
-                log.error("[{}({})] Indexing failed: {}: {}",
-                    value(LoggingConstants.REPO_NAME, repo.code()),
-                    value(LoggingConstants.LANG_CODE, lang),
-                    value(LoggingConstants.EXCEPTION_NAME, e.getClass().getName()),
-                    value(LoggingConstants.REASON, e.getMessage())
-                );
+                log.atError()
+                        .addKeyValue(LoggingConstants.EXCEPTION_NAME, e.getClass().getName())
+                        .addKeyValue(LoggingConstants.REASON, e.getMessage())
+                        .log("[{}({})] Indexing failed: {}", repo.code(), lang, e.toString());
             } catch (ElasticsearchException e) {
-                log.error("[{}({})] Error communicating with Elasticsearch!",
-                    value(LoggingConstants.REPO_NAME, repo.code()),
-                    value(LoggingConstants.LANG_CODE, lang), e
-                );
+                log.error("[{}({})] Error communicating with Elasticsearch!", repo.code(), lang, e);
             }
         }
-        log.info("[{}] Repo finished, took {} seconds",
-            value(LoggingConstants.REPO_NAME, repo.code()),
-            value("repository_duration", Duration.between(startTime, Instant.now()).toSeconds())
-        );
+        var repositoryDurationSeconds = Duration.between(startTime, Instant.now()).toSeconds();
+        log.atInfo().addKeyValue("repository_duration", repositoryDurationSeconds)
+                    .log("[{}] Repo finished, took {} seconds", repo.code(), repositoryDurationSeconds);
     }
 
 
@@ -171,12 +163,9 @@ public class IndexerRunner {
                     }
                 }
             } catch (ElasticsearchException | UncheckedIOException e) {
-                if (!(e instanceof ElasticsearchException) || !e.getMessage().contains("index_not_found_exception")) {
-                    log.warn("[{}({})] Couldn't retrieve existing studies for deletions: {}",
-                        value(LoggingConstants.REPO_NAME, repo.code()),
-                        value(LoggingConstants.LANG_CODE, langIsoCode),
-                        e.toString()
-                    );
+                if (!(e instanceof ElasticsearchException elasticsearchException)
+                        || !"index_not_found_exception".equals(elasticsearchException.response().error().type())) {
+                    log.warn("[{}({})] Couldn't retrieve existing studies for deletions: {}", repo.code(), langIsoCode, e.toString());
                 }
             }
 
@@ -184,13 +173,13 @@ public class IndexerRunner {
             ingestService.bulkIndex(cmmStudies, langIsoCode);
             ingestService.bulkDelete(studiesToDelete, langIsoCode);
 
-            log.info("[{}({})] Indexing succeeded: {} studies created, {} studies deleted, {} studies updated.",
-                value(LoggingConstants.REPO_NAME, repo.code()),
-                value(LoggingConstants.LANG_CODE, langIsoCode),
-                value("created_cmm_studies", studiesUpdated.studiesCreated),
-                value("deleted_cmm_studies", studiesToDelete.size()),
-                value("updated_cmm_studies", studiesUpdated.studiesUpdated)
-            );
+            log.atInfo()
+                    .addKeyValue("created_cmm_studies", studiesUpdated.studiesCreated)
+                    .addKeyValue("deleted_cmm_studies", studiesToDelete.size())
+                    .addKeyValue("updated_cmm_studies", studiesUpdated.studiesUpdated)
+                    .log("[{}({})] Indexing succeeded: {} studies created, {} studies deleted, {} studies updated.",
+                        repo.code(), langIsoCode, studiesUpdated.studiesCreated, studiesToDelete.size(), studiesUpdated.studiesUpdated
+                    );
         }
     }
 

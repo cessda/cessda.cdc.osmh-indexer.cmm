@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.nio.file.Path;
+import java.util.concurrent.Executors;
 
 import static eu.cessda.pasc.oci.mock.data.ReposTestData.getUKDSRepo;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -51,7 +52,7 @@ public class IndexerConsumerServiceTest {
 
     @Before
     public void setUp() {
-        indexerConsumerService = new IndexerConsumerService(languageExtractor, recordXMLParser);
+        indexerConsumerService = new IndexerConsumerService(Executors.newSingleThreadExecutor(), languageExtractor, recordXMLParser);
     }
 
     @Test

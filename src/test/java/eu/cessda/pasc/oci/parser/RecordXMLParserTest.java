@@ -193,7 +193,7 @@ public class RecordXMLParserTest {
         utils.validateCMMStudyResultAgainstSchema(record.getFirst());
     }
 
-    @Test()
+    @Test
     public void shouldReturnEmptyOptionalFromOaiPmhDDI2_5MetadataRecord_MarkedAsNotActive() throws IOException, IndexerException, URISyntaxException {
 
         // Given

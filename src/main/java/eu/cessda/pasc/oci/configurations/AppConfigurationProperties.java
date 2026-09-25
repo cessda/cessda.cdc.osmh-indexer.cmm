@@ -46,7 +46,7 @@ public record AppConfigurationProperties(
             // Enable all supported languages by default
             this.languages = SUPPORTED_LANGUAGES;
         } else {
-            this.languages = new HashSet<>(languages.size());
+            this.languages = HashSet.newHashSet(languages.size());
 
             // Flag if unsupported languages are specified
             boolean unsupportedLanguage = false;

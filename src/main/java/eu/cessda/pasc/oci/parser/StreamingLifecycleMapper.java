@@ -15,7 +15,6 @@
  */
 package eu.cessda.pasc.oci.parser;
 
-import eu.cessda.pasc.oci.LoggingConstants;
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.configurations.Repo;
 import eu.cessda.pasc.oci.models.cmmstudy.*;
@@ -33,7 +32,6 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 
 import static eu.cessda.pasc.oci.parser.ParsingStrategies.parseDataAccessString;
-import static net.logstash.logback.argument.StructuredArguments.value;
 
 @Component
 @Slf4j
@@ -192,9 +190,7 @@ public class StreamingLifecycleMapper {
                 series = parseSeriesStatement(seriesStatement);
             } catch (URISyntaxException e) {
                 log.warn("[{}] URLs in the Series Statement in study {} couldn't be parsed: {}",
-                        value(LoggingConstants.REPO_NAME, repository.code()),
-                        value(LoggingConstants.STUDY_ID, studyNumber),
-                        e.toString()
+                        repository.code(), studyNumber, e.getMessage()
                 );
             }
         }
@@ -227,9 +223,7 @@ public class StreamingLifecycleMapper {
             studyXmlSourceUrl = OaiPmhHelpers.buildGetStudyFullUrl(repository.url(), studyNumber, repository.preferredMetadataParam());
         } catch (URISyntaxException e) {
             log.warn("[{}] Study URL for {} couldn't be parsed: {}",
-                    value(LoggingConstants.REPO_NAME, repository.code()),
-                    value(LoggingConstants.STUDY_ID, studyNumber),
-                    e.toString()
+                    repository.code(), studyNumber, e.getMessage()
             );
         }
 
