@@ -85,7 +85,7 @@ pipeline {
 		}
 		stage('Check Requirements and Deployments') {
 			steps {
-                build job: 'cessda.cdc.deploy/main', parameters: [string(name: 'osmh_indexer_image_tag', value: "${env.BRANCH_NAME}-${env.BUILD_NUMBER}")], wait: false
+                build job: 'cessda.cdc.deploy/main', parameters: [string(name: 'osmh_indexer_image_tag', value: "${env.GIT_COMMIT}")], wait: false
 			}
             when { branch 'main' }
 		}
