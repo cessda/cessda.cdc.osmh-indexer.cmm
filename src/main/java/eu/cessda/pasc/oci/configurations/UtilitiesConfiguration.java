@@ -45,6 +45,8 @@ public class UtilitiesConfiguration {
 
     @Bean
     public XMLInputFactory xmlInputFactory() {
-        return XMLInputFactory.newFactory();
+        var xmlInputFactory = XMLInputFactory.newFactory();
+        xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        return xmlInputFactory;
     }
 }
