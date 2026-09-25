@@ -73,7 +73,7 @@ pipeline {
                     sh "./mvnw -Pnative spring-boot:build-image-no-fork -Dspring-boot.build-image.imageName=${image_tag}"
                 }
             }
-            //when { branch 'main' }
+            when { branch 'main' }
         }
 		stage('Push Docker image') {
             steps {
