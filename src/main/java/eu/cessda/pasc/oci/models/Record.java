@@ -15,6 +15,8 @@
  */
 package eu.cessda.pasc.oci.models;
 
+import eu.cessda.pasc.oci.models.oaipmh.Header;
+
 import javax.annotation.Nullable;
 
 /**
@@ -23,5 +25,5 @@ import javax.annotation.Nullable;
  * @param recordHeader The record header.
  * @param metadata     A parsed element.
  */
-public record Record(@Nullable RecordHeader recordHeader, @Nullable org.jdom2.Document metadata) {
+public record Record(@Nullable Header recordHeader, @Nullable org.jdom2.Document metadata) {
 }

@@ -20,8 +20,8 @@ import eu.cessda.pasc.oci.exception.XMLParseException;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudy;
 import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import eu.cessda.pasc.oci.parser.RecordXMLParser;
-import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,13 +31,10 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.google.common.io.Files.getFileExtension;
-import static java.lang.Math.max;
-import static net.logstash.logback.argument.StructuredArguments.value;
 
 @Service
 @Slf4j
@@ -45,17 +42,14 @@ public class IndexerConsumerService {
 
     protected static final String FAILED_TO_GET_STUDY_ID = "[{}] Failed to get StudyId [{}]: {}";
     protected static final String LIST_RECORD_HEADERS_FAILED = "[{}] ListRecordHeaders failed: {}";
-    protected static final String LIST_RECORD_HEADERS_FAILED_WITH_MESSAGE = LIST_RECORD_HEADERS_FAILED + ": {}";
-    protected static final String FAILED_TO_GET_STUDY_ID_WITH_MESSAGE = FAILED_TO_GET_STUDY_ID + ": {}";
 
-    // Executor thread pool, ensure that at least 2 threads are available
-    private final ExecutorService executor = Executors.newWorkStealingPool(max(2, Runtime.getRuntime().availableProcessors()));
-
+    private final Executor executor;
     private final RecordXMLParser recordXMLParser;
     private final LanguageExtractor languageExtractor;
 
     @Autowired
-    public IndexerConsumerService(LanguageExtractor languageExtractor, RecordXMLParser recordXMLParser) {
+    public IndexerConsumerService(Executor executor, LanguageExtractor languageExtractor, RecordXMLParser recordXMLParser) {
+        this.executor = executor;
         this.languageExtractor = languageExtractor;
         this.recordXMLParser = recordXMLParser;
     }
@@ -74,7 +68,7 @@ public class IndexerConsumerService {
          */
         Objects.requireNonNull(repo.path(), "Repo " + repo.code() + " has no path defined");
 
-        log.debug("[{}] Parsing records.", "Repo " + repo.code() + " has no path defined");
+        log.debug("[{}] Parsing records.", repo.code());
 
         try (var stream = Files.find(repo.path(), 1, (path, attributes) ->
             // Find XML files in the source directory.
@@ -84,43 +78,53 @@ public class IndexerConsumerService {
 
             var studiesByLanguage = new ConcurrentHashMap<String, List<CMMStudyOfLanguage>>();
 
+            var mdc = MDC.getCopyOfContextMap();
+
             // Parse the XML asynchronously
             stream.map(path -> CompletableFuture.runAsync(() -> {
-                // Extract the individual studies from the parsed XML
-                var records = getRecord(repo, path);
+                try {
+                    MDC.setContextMap(mdc);
 
-                // Collect all study entries into a list
-                for (var cmmStudy : records) {
-                    var extractedStudies = languageExtractor.extractFromStudy(cmmStudy, repo);
-                    if (!extractedStudies.isEmpty()) {
-                        studies.getAndIncrement();
+                    // Extract the individual studies from the parsed XML
+                    var records = getRecord(repo, path);
+
+                    // Collect all study entries into a list
+                    for (var cmmStudy : records) {
+                        var extractedStudies = languageExtractor.extractFromStudy(cmmStudy, repo);
+                        if (!extractedStudies.isEmpty()) {
+                            studies.getAndIncrement();
+                        }
+                        extractedStudies.forEach((lang, study) -> {
+                            try (var _ = MDC.putCloseable(LoggingConstants.STUDY_ID, study.id())) {
+                                studiesByLanguage.computeIfAbsent(
+                                    // Ensure the list is only modified by one thread
+                                    lang, _ -> Collections.synchronizedList(new ArrayList<>())
+                                ).add(study);
+                            }
+                        });
                     }
-                    extractedStudies.forEach((lang, study) ->
-                        studiesByLanguage.computeIfAbsent(
-                            // Ensure the list is only modified by one thread
-                            lang, k -> Collections.synchronizedList(new ArrayList<>())
-                        ).add(study)
-                    );
+                } finally {
+                    MDC.clear();
                 }
-            }, executor).exceptionally(
-                    e -> { log.warn("[{}] Couldn't parse {}", repo.code(), path, e); return null; }
-                ))
+            }, executor).exceptionally(e -> {
+                MDC.setContextMap(mdc);
+                log.warn("[{}] Couldn't parse {}", repo.code(), path, e);
+                MDC.clear();
+                return null;
+            }))
                 .toList()
                 // Wait for the XML to be parsed
                 .forEach(CompletableFuture::join);
 
-            log.info("[{}] Retrieved {} studies.",
-                value(LoggingConstants.REPO_NAME, repo.code()),
-                value("present_cmm_record", studies.get())
-            );
+            log.atInfo().addKeyValue("present_cmm_record", studies.get())
+                    .log("[{}] Retrieved {} studies.", repo.code(), studies.get());
 
             return studiesByLanguage;
         } catch (IOException e) {
-            log.error(LIST_RECORD_HEADERS_FAILED_WITH_MESSAGE,
-                value(LoggingConstants.REPO_NAME, repo.code()),
-                value(LoggingConstants.EXCEPTION_NAME, e.getClass().getName()),
-                value(LoggingConstants.REASON, e.getMessage())
-            );
+            log.atError()
+                    .addKeyValue(LoggingConstants.EXCEPTION_NAME, e.getClass().getName())
+                    .addKeyValue(LoggingConstants.REASON, e.getMessage())
+                    .log(LIST_RECORD_HEADERS_FAILED, repo.code(), e.toString());
         }
         return Collections.emptyMap();
     }
@@ -136,18 +140,12 @@ public class IndexerConsumerService {
         try {
             return recordXMLParser.getRecord(repo, path);
         } catch (XMLParseException e) {
-            log.warn(FAILED_TO_GET_STUDY_ID_WITH_MESSAGE,
-                value(LoggingConstants.REPO_NAME, repo.code()),
-                value(LoggingConstants.STUDY_ID, path),
-                value(LoggingConstants.EXCEPTION_NAME, e.getClass().getName()),
-                value(LoggingConstants.REASON, e.getMessage())
-            );
+            log.atWarn()
+                    .addKeyValue(LoggingConstants.STUDY_ID, path)
+                    .addKeyValue(LoggingConstants.EXCEPTION_NAME, e.getClass().getName())
+                    .addKeyValue(LoggingConstants.REASON, e.getMessage())
+                    .log(FAILED_TO_GET_STUDY_ID, repo.code(), path, e.toString());
         }
         return Collections.emptyList();
-    }
-
-    @PreDestroy
-    private void shutdown() {
-        executor.shutdownNow();
     }
 }

@@ -17,7 +17,11 @@ package eu.cessda.pasc.oci;
 
 import eu.cessda.pasc.oci.configurations.AppConfigurationProperties;
 import eu.cessda.pasc.oci.configurations.ESConfigurationProperties;
+import eu.cessda.pasc.oci.models.DataAccessMapping;
+import eu.cessda.pasc.oci.models.PipelineMetadata;
+import eu.cessda.pasc.oci.models.cmmstudy.CMMStudyOfLanguage;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -26,13 +30,14 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @EnableConfigurationProperties({AppConfigurationProperties.class, ESConfigurationProperties.class})
+@RegisterReflectionForBinding({ CMMStudyOfLanguage.class, DataAccessMapping.class, PipelineMetadata.class })
 @SpringBootApplication
 @Slf4j
 public class OCIApplication {
 
     private static int exitCode = 0;
 
-	public static void main(String[] args) {
+	static void main(String[] args) {
         // Start the application. This method returns once Runner.run() returns.
         var applicationContext = SpringApplication.run(OCIApplication.class, args);
 
@@ -43,8 +48,8 @@ public class OCIApplication {
 
     @Component
     @Profile("!test")
-    @SuppressWarnings({"java:S3985", "EffectivelyPrivate", "UnusedNestedClass"})
-    private static class Runner implements CommandLineRunner {
+    @SuppressWarnings({"java:S3985", "UnusedNestedClass"})
+    public static class Runner implements CommandLineRunner {
         private final ConsumerScheduler consumerScheduler;
 
         public Runner(ConsumerScheduler consumerScheduler) {

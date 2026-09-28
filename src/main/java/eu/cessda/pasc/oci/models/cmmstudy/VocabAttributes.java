@@ -16,6 +16,8 @@
 package eu.cessda.pasc.oci.models.cmmstudy;
 
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * VocabAttributes pojo to hold the control vocab attributes of element:
  * <p>
@@ -26,5 +28,6 @@ package eu.cessda.pasc.oci.models.cmmstudy;
  *
  * @author moses AT doraventures DOT com
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record VocabAttributes(String vocab, String vocabUri, String id) {
 }

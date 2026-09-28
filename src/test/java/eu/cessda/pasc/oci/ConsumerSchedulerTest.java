@@ -23,7 +23,7 @@ import eu.cessda.pasc.oci.configurations.Repo;
 import eu.cessda.pasc.oci.elasticsearch.IndexingException;
 import eu.cessda.pasc.oci.elasticsearch.IngestService;
 import eu.cessda.pasc.oci.exception.IndexerException;
-import eu.cessda.pasc.oci.models.RecordHeader;
+import eu.cessda.pasc.oci.models.oaipmh.Header;
 import eu.cessda.pasc.oci.parser.RecordXMLParser;
 import eu.cessda.pasc.oci.service.DebuggingJMXBean;
 import org.junit.Test;
@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Executors;
 
 import static eu.cessda.pasc.oci.mock.data.RecordTestData.*;
 import static eu.cessda.pasc.oci.mock.data.ReposTestData.getSingleEndpoint;
@@ -59,7 +60,7 @@ public class ConsumerSchedulerTest {
     private final RecordXMLParser recordXMLParser = mock(RecordXMLParser.class);
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
-    private static final CollectionType RECORD_HEADER_LIST = objectMapper.getTypeFactory().constructCollectionType(List.class, RecordHeader.class);
+    private static final CollectionType RECORD_HEADER_LIST = objectMapper.getTypeFactory().constructCollectionType(List.class, Header.class);
 
     private DebuggingJMXBean mockDebuggingJMXBean() throws IOException {
         var debuggingJMXBean = mock(DebuggingJMXBean.class);
@@ -144,8 +145,8 @@ public class ConsumerSchedulerTest {
      */
     private IndexerConsumerService mockRecordRequests() throws IOException, IndexerException {
 
-        var indexerConsumerService = new IndexerConsumerService(extractor, recordXMLParser);
-        var recordHeaders = objectMapper.<List<RecordHeader>>readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE, RECORD_HEADER_LIST);
+        var indexerConsumerService = new IndexerConsumerService(Executors.newSingleThreadExecutor(), extractor, recordXMLParser);
+        var recordHeaders = objectMapper.<List<Header>>readValue(LIST_RECORDER_HEADERS_BODY_EXAMPLE, RECORD_HEADER_LIST);
 
         // mock record requests from each header
         var ukdsRepo = getUKDSRepo();

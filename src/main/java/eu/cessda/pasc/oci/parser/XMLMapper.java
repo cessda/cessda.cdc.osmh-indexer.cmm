@@ -284,8 +284,15 @@ public interface XMLMapper<T> {
                 switch (child.getName()) {
                     case "URN" -> {
                         // If the URN matches, return directly
-                        if (child.getTextTrim().equals(urn)) {
+                        var trimmedElementText = child.getTextTrim();
+                        if (trimmedElementText.equals(urn)) {
                             return Optional.of(new ResolvedReference(typeOfObject, object));
+                        } else if (agency != null && id != null && version != null) {
+                            // Try comparing a synthetic URN
+                            var syntheticURN = "urn:ddi:" + agency + ":" + id + ":" + version;
+                            if (trimmedElementText.equals(syntheticURN)) {
+                                return Optional.of(new ResolvedReference(typeOfObject, object));
+                            }
                         }
                     }
                     case "Agency" -> agencyMatches = child.getTextTrim().equals(agency);
