@@ -48,6 +48,9 @@
                 <r:String xml:lang="de">GESIS - Leibniz Institut für Sozialwissenschaften</r:String>
             </r:PublisherName>
         </r:Publisher>
+        <r:PublicationDate>
+            <r:SimpleDate>1964</r:SimpleDate>
+        </r:PublicationDate>
         <r:Language>de</r:Language>
         <r:Copyright>
             <r:String xml:lang="en">All metadata from GESIS DBK are available free of restriction under the Creative
@@ -212,7 +215,7 @@
                 </r:PublisherReference>
             </r:Publisher>
             <r:PublicationDate>
-                <r:SimpleDate>1964</r:SimpleDate>
+                <r:SimpleDate>4064</r:SimpleDate>
             </r:PublicationDate>
             <r:InternationalIdentifier>
                 <r:IdentifierContent>doi:10.4232/1.0004</r:IdentifierContent>

@@ -537,6 +537,30 @@ class ParsingStrategies{
         }
     }
 
+    /**
+     * Extract the textual date value of the given element.
+     * <p>
+     * This strategy will return {@code null} if the year in the element text
+     * is greater than the current year, filtering out embargoed studies that
+     * have a publishing date in the future.
+     *
+     * @param element the element to parse.
+     * @return the value of the element text, or {@code null} if the text is not present.
+     * @see <a href="https://github.com/cessda/cessda.cdc.versions/issues/713">#713</a>
+     */
+    @Nullable
+    static String dateLifecycleStrategy(Element element) {
+        var value = element.getTextTrim();
+
+        if (value.isBlank()) {
+            return null;
+        }
+
+        var year = TimeUtility.getTimeFormat(value, Year::from);
+
+        return !year.isAfter(Year.now()) ? value : null;
+    }
+
     @NonNull
     static Map<String, Creator> creatorsLifecycleStrategy(Element element) {
         var creatorsMap = new HashMap<String, Creator>();

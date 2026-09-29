@@ -132,7 +132,8 @@ public final class XPaths {
         // Data collection period
         .dataCollectionPeriodsXPath(new ResolvingXMLMapper<>("//s:StudyUnit[1]/d:DataCollection", "//s:StudyUnit[1]/r:DataCollectionReference", "//d:CollectionEvent/d:DataCollectionDate", elementList -> getFirstEntry(ParsingStrategies::dataCollectionPeriodsLifecycleStrategy).apply(elementList).orElse(EMPTY_PARSE_RESULTS)))
         // Publication year
-        .yearOfPubXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Citation/r:PublicationDate/r:SimpleDate", getFirstEntry(Element::getTextTrim)))
+        .yearOfPubXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Citation/r:PublicationDate/r:SimpleDate", getFirstEntry(ParsingStrategies::dateLifecycleStrategy)))
+        .yearOfPubFallbackXPath(new SimpleXMLMapper<>("/ddi:DDIInstance/r:Citation/r:PublicationDate/r:SimpleDate", getFirstEntry(ParsingStrategies::dateLifecycleStrategy)))
         // Topics
         .classificationsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:TopicalCoverage/r:Subject", extractMetadataObjectListForEachLang(TERM_VOCAB_ATTR_3_2_STRATEGY)))
         // Keywords
