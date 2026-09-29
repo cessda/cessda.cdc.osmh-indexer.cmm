@@ -48,6 +48,7 @@ public final class XPaths {
     // Codebook Paths
     private final String recordDefaultLanguage;
     private final XMLMapper<Optional<String>> yearOfPubXPath;
+    private final XMLMapper<Optional<String>> yearOfPubFallbackXPath;
     private final XMLMapper<Map<String, String>> abstractXPath;
     private final XMLMapper<Map<String, String>> titleXPath;
     @Nullable
@@ -131,7 +132,8 @@ public final class XPaths {
         // Data collection period
         .dataCollectionPeriodsXPath(new ResolvingXMLMapper<>("//s:StudyUnit[1]/d:DataCollection", "//s:StudyUnit[1]/r:DataCollectionReference", "//d:CollectionEvent/d:DataCollectionDate", elementList -> getFirstEntry(ParsingStrategies::dataCollectionPeriodsLifecycleStrategy).apply(elementList).orElse(EMPTY_PARSE_RESULTS)))
         // Publication year
-        .yearOfPubXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Citation/r:PublicationDate/r:SimpleDate", getFirstEntry(Element::getTextTrim)))
+        .yearOfPubXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Citation/r:PublicationDate/r:SimpleDate", getFirstEntry(ParsingStrategies::dateLifecycleStrategy)))
+        .yearOfPubFallbackXPath(new SimpleXMLMapper<>("/ddi:DDIInstance/r:Citation/r:PublicationDate/r:SimpleDate", getFirstEntry(ParsingStrategies::dateLifecycleStrategy)))
         // Topics
         .classificationsXPath(new SimpleXMLMapper<>("//s:StudyUnit[1]/r:Coverage/r:TopicalCoverage/r:Subject", extractMetadataObjectListForEachLang(TERM_VOCAB_ATTR_3_2_STRATEGY)))
         // Keywords
@@ -275,7 +277,8 @@ public final class XPaths {
         // Data collection period
         .dataCollectionPeriodsXPath(new SimpleXMLMapper<>("//ddi:codeBook//ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate", ParsingStrategies::dataCollectionPeriodsStrategy))
         // Publication year
-        .yearOfPubXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:distDate[1]", getFirstEntry(ParsingStrategies::dateStrategy)))
+        .yearOfPubXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:distDate", getFirstEntry(ParsingStrategies::dateStrategy)))
+        .yearOfPubFallbackXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:docDscr/ddi:citation/ddi:distStmt/ddi:distDate", getFirstEntry(ParsingStrategies::dateStrategy)))
         // Topics
         .classificationsXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:subject/ddi:topcClas", extractMetadataObjectListForEachLang(element -> ParsingStrategies.termVocabAttributeStrategy(element, false))))
         // Keywords
@@ -319,7 +322,8 @@ public final class XPaths {
         .namespace(new Namespace[]{ Namespace.getNamespace("ddi", "http://www.icpsr.umich.edu/DDI") })
         .recordDefaultLanguage("//ddi:codeBook/@xml-lang") // Nesstar with "-"
         // Closest for Nesstar based on CMM mapping doc but the above existing one for ddi2.5 seems to be present in Nesstar
-        .yearOfPubXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/citation/distStmt/distDate[1]", getFirstEntry(ParsingStrategies::dateStrategy)))
+        .yearOfPubXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/citation/distStmt/distDate", getFirstEntry(ParsingStrategies::dateStrategy)))
+        .yearOfPubFallbackXPath(new SimpleXMLMapper<>("//ddi:codeBook/docDscr/citation/distStmt/distDate", getFirstEntry(ParsingStrategies::dateStrategy)))
         .abstractXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/abstract", parseLanguageContentOfElement(Element::getTextTrim, (a, b) -> a + "<br>" + b)))
         .titleXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/citation/titlStmt/titl", parseLanguageContentOfElement(Element::getTextTrim)))
         .parTitleXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/citation/titlStmt/parTitl", parseLanguageContentOfElement(Element::getTextTrim)))
