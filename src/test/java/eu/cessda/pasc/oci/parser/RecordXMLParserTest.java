@@ -102,6 +102,16 @@ public class RecordXMLParserTest {
         then(result.unitTypes().size()).isEqualTo(2);
         then(result.unitTypes().get("fi").getFirst().term()).isEqualTo("Henkilö");
         then(result.unitTypes().get("en").getFirst().term()).isEqualTo("Individual");
+
+        // Verifies series extraction
+        then(result.series()).doesNotContainKey(XMLMapper.EMPTY_LANGUAGE);
+        then(result.series().size()).isEqualTo(2);
+        then(result.series().get("fi")).hasSize(1);
+        then(result.series().get("fi").getFirst().names()).containsExactly("Kehitysyhteistyötutkimukset");
+        then(result.series().get("fi").getFirst().descriptions()).containsExactly("Kehitysyhteistyötutkimukset ovat ulkoministeriön teettämiä mielipidetiedusteluja, joissa on kartoitettu kehitysyhteistyön tiedontarvetta ja kansalaisten asennoitumista kehitysyhteistyöhön. Aineistot on kerännyt Taloustutkimus. Aineistoja on kerätty vuodesta 1997 alkaen.");
+        then(result.series().get("en")).hasSize(1);
+        then(result.series().get("en").getFirst().names()).containsExactly("Development Cooperation Surveys");
+        then(result.series().get("en").getFirst().descriptions()).containsExactly("Development Cooperation Surveys are commissioned by the Ministry for Foreign Affairs of Finland and study citizens' opinions, attitudes and information needs connected with development cooperation. The data collection has been conducted by Taloustutkimus. The survey series was launched in 1997.");
     }
 
     @Test

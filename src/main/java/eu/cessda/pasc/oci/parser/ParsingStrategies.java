@@ -1406,26 +1406,44 @@ class ParsingStrategies{
     }
 
     /**
-     * Constructs a {@link Series} using the given element.
+     * Constructs language-specific {@link Series} objects using the given element.
      * <p>
      * Names come from `serName` child elements, descriptions from `serInfo` child elements,
      * and uri from the {@value OaiPmhConstants#URI_ATTR} attribute.
+     * <p>
+     * Supports both language-specific `serStmt` elements and `serStmt` elements containing mixed-language child elements.
      *
      * @param element the {@link Element} to parse.
-     * @return a {@link Series} if at least one name, description, or uri is found.
+     * @return a {@link Map} with the key set to the language, and the value a {@link List} of {@link Series}.
      */
-    static Optional<Series> seriesStrategy(Element element) {
+    @NonNull
+    static Map<String, List<Series>> seriesStrategy(Element element) {
         var namespace = element.getNamespace();
+        var parentLanguage = XMLMapper.getLangOfElement(element);
 
-        var names = element.getChildren("serName", namespace).stream()
-                .map(Element::getTextTrim)
-                .filter(name -> !name.isEmpty())
-                .collect(Collectors.toList());
+        var namesByLanguage = new HashMap<String, List<String>>();
+        for (var nameElement : element.getChildren("serName", namespace)) {
+            var name = nameElement.getTextTrim();
+            if (!name.isEmpty()) {
+                var language = XMLMapper.getLangOfElement(nameElement);
+                if (XMLMapper.EMPTY_LANGUAGE.equals(language)) {
+                    language = parentLanguage;
+                }
+                namesByLanguage.computeIfAbsent(language, k -> new ArrayList<>()).add(name);
+            }
+        }
 
-        var descriptions = element.getChildren("serInfo", namespace).stream()
-                .map(Element::getTextTrim)
-                .filter(info -> !info.isEmpty())
-                .collect(Collectors.toList());
+        var descriptionsByLanguage = new HashMap<String, List<String>>();
+        for (var descriptionElement : element.getChildren("serInfo", namespace)) {
+            var description = descriptionElement.getTextTrim();
+            if (!description.isEmpty()) {
+                var language = XMLMapper.getLangOfElement(descriptionElement);
+                if (XMLMapper.EMPTY_LANGUAGE.equals(language)) {
+                    language = parentLanguage;
+                }
+                descriptionsByLanguage.computeIfAbsent(language, k -> new ArrayList<>()).add(description);
+            }
+        }
 
         var uriString = element.getAttributeValue(URI_ATTR);
         var uris = new ArrayList<URI>();
@@ -1437,11 +1455,30 @@ class ParsingStrategies{
             }
         }
 
-        if (names.isEmpty() && descriptions.isEmpty() && uris.isEmpty()) {
-            return Optional.empty();
+        var languages = new HashSet<String>();
+        languages.addAll(namesByLanguage.keySet());
+        languages.addAll(descriptionsByLanguage.keySet());
+
+        /*
+        * If no language was discovered from child elements, fall back to the language of the series element itself.
+        * This allows URI-only series metadata to be retained.
+        */
+        if (languages.isEmpty()) {
+            languages.add(parentLanguage);
         }
 
-        return Optional.of(new Series(names, descriptions, uris));
+        var languageSpecificSeries = new HashMap<String, List<Series>>();
+        for (var language : languages) {
+            var names = namesByLanguage.getOrDefault(language, List.of());
+            var descriptions = descriptionsByLanguage.getOrDefault(language, List.of());
+            if (names.isEmpty() && descriptions.isEmpty() && uris.isEmpty()) {
+                continue;
+            }
+            var series = new Series(names, descriptions, List.copyOf(uris));
+            languageSpecificSeries.computeIfAbsent(language, k -> new ArrayList<>()).add(series);
+        }
+
+        return languageSpecificSeries;
     }
 
     /**

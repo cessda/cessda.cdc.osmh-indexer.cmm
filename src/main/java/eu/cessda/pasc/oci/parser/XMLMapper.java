@@ -319,4 +319,31 @@ public interface XMLMapper<T> {
      */
     record ResolvedReference(String type, Element element) {
     }
+
+    /**
+     * Extracts language-aware metadata from the given list of {@link Element}s, using the given element extractor {@link Function}.
+     * <p>
+     * Unlike {@link #extractMetadataObjectListForEachLang(Function)}, the parser strategy determines the language of the
+     * extracted metadata. This allows a single element to produce metadata for multiple languages.
+     *
+     * @param <T> the type returned by the parser strategy.
+     * @param elementExtractor the strategy to apply to each element.
+     * @return a {@link Map} with the key set to the language, and the value a {@link List} of {@link T}.
+     */
+    @NonNull
+    static <T> Function<List<Element>, Map<String, List<T>>> extractLanguageAwareMetadata(Function<Element, Map<String, List<T>>> elementExtractor) {
+        return elementList -> {
+            var map = new HashMap<String, List<T>>();
+
+            for (var element : elementList) {
+                var extractedMetadata = elementExtractor.apply(element);
+
+                for (var languageEntry : extractedMetadata.entrySet()) {
+                    map.computeIfAbsent(languageEntry.getKey(), k -> new ArrayList<>()).addAll(languageEntry.getValue());
+                }
+            }
+
+            return map;
+        };
+    }
 }
