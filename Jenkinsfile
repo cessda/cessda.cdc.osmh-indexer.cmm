@@ -41,7 +41,7 @@ pipeline {
                 stage('Build Project') {
                     steps {
                         withMaven {
-                            sh "./mvnw -Pnative clean verify -DbuildNumber=${env.BUILD_NUMBER}"
+                            sh "./mvnw clean verify -DbuildNumber=${env.BUILD_NUMBER}"
                         }
                     }
                 }
@@ -70,7 +70,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 withMaven {
-                    sh "./mvnw -Pnative spring-boot:build-image-no-fork -Dspring-boot.build-image.imageName=${image_tag}"
+                    sh "./mvnw spring-boot:build-image-no-fork -Dspring-boot.build-image.imageName=${image_tag}"
                 }
             }
             when { branch 'main' }
