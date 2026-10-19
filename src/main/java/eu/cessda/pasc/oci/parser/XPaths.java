@@ -312,7 +312,7 @@ public final class XPaths {
         // Data kind
         .dataKindXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:dataKind", extractMetadataObjectListForEachLang(ParsingStrategies::dataKindFreeTextStrategy)))
         // Series
-        .seriesXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:serStmt", extractMetadataObjectListForEachLang(ParsingStrategies::seriesStrategy)))
+        .seriesXPath(new SimpleXMLMapper<>("//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:serStmt", extractLanguageAwareMetadata(ParsingStrategies::seriesStrategy)))
         .build();
 
     /**
@@ -351,7 +351,7 @@ public final class XPaths {
         .fundingXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/citation/prodStmt/grantNo", extractMetadataObjectListForEachLang(ParsingStrategies::fundingStrategy)))
         // Data kind
         .dataKindXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/stdyInfo/sumDscr/dataKind", extractMetadataObjectListForEachLang(ParsingStrategies::dataKindFreeTextStrategy)))
-        .seriesXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/citation/serStmt", extractMetadataObjectListForEachLang(ParsingStrategies::seriesStrategy)))
+        .seriesXPath(new SimpleXMLMapper<>("//ddi:codeBook/stdyDscr/citation/serStmt", extractLanguageAwareMetadata(ParsingStrategies::seriesStrategy)))
         .build();
 
     /**
