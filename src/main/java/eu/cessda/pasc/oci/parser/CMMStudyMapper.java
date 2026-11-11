@@ -240,8 +240,14 @@ public class CMMStudyMapper {
      * - Time series
      * - Cross-section
      * - Cross-section ad-hoc follow-up
+     * - Other
      *
-     * Returns null if no reliable category can be derived.
+     * Matches English, German, and French DDI Time Method CV terms and
+     * common variants found in harvested metadata. Non-empty values that
+     * cannot be mapped to one of the four specific categories are mapped
+     * to Other.
+     *
+     * Returns null if a time method value is not available.
      *
      * XPath = {@link XPaths#getTypeOfTimeMethodXPath()}
      */
@@ -252,38 +258,75 @@ public class CMMStudyMapper {
             return null;
         }
 
-        for (var entry : parsed.values()) {
-            for (var attr : entry) {
-                String value = null;
+        boolean hasValue = false;
 
-                if (attr.id() != null && !attr.id().isBlank()) {
-                    value = attr.id();
-                } else if (attr.term() != null && !attr.term().isBlank()) {
-                    value = attr.term();
-                }
+        for (var entries : parsed.values()) {
+            for (var attr : entries) {
+                for (var value : new String[] { attr.id(), attr.term() }) {
+                    if (value == null || value.isBlank()) {
+                        continue;
+                    }
+                    hasValue = true;
 
-                if (value == null) {
-                    continue;
-                }
+                    var normalized = value.toLowerCase(Locale.ROOT).strip();
 
-                String n = value.toLowerCase(Locale.ROOT).strip();
+                    // Longitudinal and its narrower CV concepts
+                    if (normalized.contains("longitudinal")
+                            || normalized.contains("längsschnitt")
+                            || normalized.contains("panel")
+                            || normalized.contains("cohort")
+                            || normalized.contains("continuous")
+                            || normalized.contains("repeatable")
+                            || normalized.contains("annual")
+                            || normalized.contains("annuelle")) {
+                        return "Longitudinal";
+                    }
 
-                if (n.contains("timeseries") || n.contains("time series")) {
-                    return "Time series";
-                }
-                if (n.contains("longitudinal") || n.contains("panel") || n.contains("cohort") || n.contains("repeated")) {
-                    return "Longitudinal";
-                }
-                if (n.contains("crosssection") || n.contains("cross-section") || n.contains("cross section")) {
-                    if (n.contains("followup") || n.contains("follow-up") || n.contains("follow up")) {
+                    // Time series
+                    if (normalized.contains("timeseries")
+                            || normalized.contains("time series")
+                            || normalized.contains("zeitreihen")
+                            || normalized.contains("série temporelle")) {
+                        return "Time series";
+                    }
+
+                    // Cross section & Cross section ad-hoc follow-up
+                    var crossSection = normalized.contains("crosssection")
+                            || normalized.contains("cross-section")
+                            || normalized.contains("cross section")
+                            || normalized.contains("querschnitt")
+                            || normalized.contains("transversale");
+
+                    var followUp = normalized.contains("followup")
+                            || normalized.contains("follow-up")
+                            || normalized.contains("follow up")
+                            || normalized.contains("nachuntersuchung")
+                            || normalized.contains("complémentaire");
+
+                    if (crossSection && followUp) {
                         return "Cross-section ad-hoc follow-up";
                     }
-                    return "Cross-section";
+
+                    if (crossSection) {
+                        return "Cross-section";
+                    }
                 }
             }
         }
 
-        return null;
+        // Temporary logging for values for which no category could be derived
+        parsed.forEach((language, attributes) ->
+            attributes.forEach(attr ->
+                log.info(
+                    "UNMAPPED TIME METHOD: lang={}, id={}, term={}",
+                    language,
+                    attr.id(),
+                    attr.term()
+                )
+            )
+        );
+
+        return hasValue ? "Other" : null;
     }
 
     /**

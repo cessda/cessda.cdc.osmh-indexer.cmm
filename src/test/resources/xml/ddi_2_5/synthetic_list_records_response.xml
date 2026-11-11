@@ -158,7 +158,7 @@
                                 <!-- Suggested by PUG: Element value/term in "timeMethod" wins over "concept" -->
                                 <timeMeth>DE: Längsschnitt: Panel 2<concept xml:lang="de" vocab="DE: DDI Time Method 2">DE: Longitudinal.Panel 2</concept></timeMeth>
                                 <!-- UKDS example -->
-                                <timeMeth>Default-lang: Repeated cross-sectional study</timeMeth>
+                                <timeMeth>Default-lang: Longitudinal: Repeated cross-sectional study</timeMeth>
                                 <dataCollector>National Centre for Social Research</dataCollector>
                                 <!-- Compliant examples -->
                                 <sampProc>This is the term<concept xml:lang="en" ID="madeUp" vocab="DDI Sampling Procedure" vocabURI="urn:ddi-cv:SamplingProcedure:1.1">This is the id</concept></sampProc>
