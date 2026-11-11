@@ -16,6 +16,7 @@
 package eu.cessda.pasc.oci.parser;
 
 import lombok.NonNull;
+import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.filter.Filters;
@@ -86,7 +87,9 @@ public class ResolvingXMLMapper<T> implements XMLMapper<T> {
             XPathExpression<Element> targetExpression = XPathFactory.instance().compile(withinXPath, Filters.element(), null, namespace);
             var targetElementList = new ArrayList<Element>();
             for (var element : elementList) {
-                var targetElement = targetExpression.evaluate(element);
+                var clonedElement = element.clone();
+                var document = new Document(clonedElement);
+                var targetElement = targetExpression.evaluate(document);
                 targetElementList.addAll(targetElement);
             }
 

@@ -16,6 +16,8 @@
 package eu.cessda.pasc.oci.models.cmmstudy;
 
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * TermVocabAttributes pojo this represents the attributes and terms from such a element:
  * <p>
@@ -27,6 +29,7 @@ package eu.cessda.pasc.oci.models.cmmstudy;
  *
  * @author moses AT doraventures DOT com
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record TermVocabAttributes(
     String vocab,
     String vocabUri,

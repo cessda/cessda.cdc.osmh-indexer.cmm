@@ -170,10 +170,19 @@ public class CMMStudyMapper {
     /**
      * Parses Year of Publication from:
      * <p>
-     * Xpath = {@link XPaths#getYearOfPubXPath()}
+     * Xpath = {@link XPaths#getYearOfPubXPath()} or
+     * Xpath = {@link XPaths#getYearOfPubFallbackXPath()}
      */
     Optional<String> parseYrOfPublication(Document document, XPaths xPaths) {
-        return xPaths.getYearOfPubXPath().resolve(document, xPaths.getNamespace());
+        // Primary xPath, returns null if the date is missing or if the date is in the future
+        var primary = xPaths.getYearOfPubXPath().resolve(document, xPaths.getNamespace());
+
+        if (primary.isPresent()) {
+            return primary;
+        }
+
+        // Fallback xPath, also returns null if the date is missing or if the date is in the future
+        return xPaths.getYearOfPubFallbackXPath().resolve(document, xPaths.getNamespace());
     }
 
     /**
@@ -235,25 +244,19 @@ public class CMMStudyMapper {
     }
 
     /**
-     * Parses Type Of Time Method Category as one of:
+     * Maps parsed Type Of Time Method values to one of:
      * - Longitudinal
      * - Time series
      * - Cross-section
      * - Cross-section ad-hoc follow-up
      * - Other
      *
-     * Matches English, German, and French DDI Time Method CV terms and
-     * common variants found in harvested metadata. Non-empty values that
-     * cannot be mapped to one of the four specific categories are mapped
-     * to Other.
+     * Matches English, German, and French DDI Time Method CV terms and common variants found in harvested metadata.
+     * Non-empty values that cannot be mapped to one of the four specific categories are mapped to Other.
      *
      * Returns null if a time method value is not available.
-     *
-     * XPath = {@link XPaths#getTypeOfTimeMethodXPath()}
      */
-    String parseTypeOfTimeMethodCategory(Document doc, XPaths xPaths, String defaultLangIsoCode) {
-        var parsed = parseTypeOfTimeMethod(doc, xPaths, defaultLangIsoCode);
-
+    static String parseTypeOfTimeMethodCategory(Map<String, List<TermVocabAttributes>> parsed) {
         if (parsed == null || parsed.isEmpty()) {
             return null;
         }
@@ -274,11 +277,7 @@ public class CMMStudyMapper {
                     if (normalized.contains("longitudinal")
                             || normalized.contains("längsschnitt")
                             || normalized.contains("panel")
-                            || normalized.contains("cohort")
-                            || normalized.contains("continuous")
-                            || normalized.contains("repeatable")
-                            || normalized.contains("annual")
-                            || normalized.contains("annuelle")) {
+                            || normalized.contains("cohort")) {
                         return "Longitudinal";
                     }
 
@@ -290,7 +289,7 @@ public class CMMStudyMapper {
                         return "Time series";
                     }
 
-                    // Cross section & Cross section ad-hoc follow-up
+                    // Cross section and Cross section ad-hoc follow-up
                     var crossSection = normalized.contains("crosssection")
                             || normalized.contains("cross-section")
                             || normalized.contains("cross section")
@@ -313,18 +312,6 @@ public class CMMStudyMapper {
                 }
             }
         }
-
-        // Temporary logging for values for which no category could be derived
-        parsed.forEach((language, attributes) ->
-            attributes.forEach(attr ->
-                log.info(
-                    "UNMAPPED TIME METHOD: lang={}, id={}, term={}",
-                    language,
-                    attr.id(),
-                    attr.term()
-                )
-            )
-        );
 
         return hasValue ? "Other" : null;
     }
@@ -441,7 +428,7 @@ public class CMMStudyMapper {
     /**
      * Parses Data Access to be Open / Restricted if possible, otherwise returns Uncategorized.
      * <p>
-     * Xpath = {@link XPaths#getDataAccessXPath()}, {@link XPaths#getDataAccessAltXPath()} and {@link XPaths#getDataRestrctnXPath()}
+     * Xpath = {@link XPaths#getDataAccessXPath()} and {@link XPaths#getDataRestrctnXPath()}
      * <p>
      */
     String parseDataAccess(Document doc, XPaths xPaths, String defaultLangIsoCode, String repository) {
@@ -505,7 +492,7 @@ public class CMMStudyMapper {
      * <p>
      * For Data Collection start and end date plus the four digit Year value as Data Collection Year
      */
-    ParseResults<DataCollectionPeriod, List<DateTimeParseException>> parseDataCollectionDates(Document doc, XPaths xPaths) {
+    ParseResults<DataCollectionPeriod, DateTimeParseException> parseDataCollectionDates(Document doc, XPaths xPaths) {
         var parseResults = xPaths.getDataCollectionPeriodsXPath().resolve(doc, xPaths.getNamespace());
         return new ParseResults<>(parseResults.results, parseResults.exceptions);
     }
@@ -544,32 +531,33 @@ public class CMMStudyMapper {
 
             var universes = new HashMap<String, Universe>();
             for (var entry : extractedUniverses.entrySet()) {
-                universes.compute(entry.getKey(), (k, universe) -> {
-                    if (universe == null) {
-                        // Empty universe to be copied in the switch expression
-                        universe = new Universe(null, null);
-                    }
-
-                    // Loop over all universe entries for each language
-                    for (var extractedUniverse : entry.getValue()) {
-                        var content = extractedUniverse.content();
-
-                        // Switch based on whether the universe is included or excluded,
-                        // copying in any previous inclusions or exclusions
-                        universe = switch (extractedUniverse.clusion()) {
-                            case I -> new Universe(content, universe.exclusion());
-                            case E -> new Universe(universe.inclusion(), content);
-                        };
-                    }
-
-                    return universe;
-                });
+                universes.compute(entry.getKey(), (k, universe) -> convertUniverseElementToUniverse(entry.getValue()));
             }
 
             return Collections.unmodifiableMap(universes);
         } else {
             return Collections.emptyMap();
         }
+    }
+
+    public static @NonNull Universe convertUniverseElementToUniverse(List<UniverseElement> universeElements) {
+
+        // Empty universe to be copied in the switch expression
+        Universe universe = new Universe(null, null);
+
+        // Loop over all universe entries, this captures both inclusions and exclusions
+        for (var extractedUniverse : universeElements) {
+            var content = extractedUniverse.content();
+
+            // Switch based on whether the universe is included or excluded,
+            // copying in any previous inclusions or exclusions
+            universe = switch (extractedUniverse.clusion()) {
+                case I -> new Universe(content, universe.exclusion());
+                case E -> new Universe(universe.inclusion(), content);
+            };
+        }
+
+        return universe;
     }
 
     Map<String, List<RelatedPublication>> parseRelatedPublications(Document document, XPaths xPaths, String defaultLangIsoCode) {

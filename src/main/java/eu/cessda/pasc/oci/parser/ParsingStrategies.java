@@ -221,20 +221,23 @@ class ParsingStrategies{
     @NonNull
     @SuppressWarnings("java:S131")
     static Optional<TermVocabAttributes> termVocabAttributeLifecycleStrategy(Element element, TermVocabAttributeNames attrNames) {
-        String vocab = "";
-        String vocabUri = "";
+        String id = null;
+        String vocab = null;
+        String vocabUri = null;
 
         var term = element.getText();
         for (var attr : element.getAttributes()) {
             String attrName = attr.getName();
-            if (attrName.equals(attrNames.vocab())) {
+            if (attrName.equals(attrNames.id())) {
+                id = attr.getValue();
+            } else if (attrName.equals(attrNames.vocab())) {
                 vocab = attr.getValue();
             } else if (attrName.equals(attrNames.vocabUri())) {
                 vocabUri = attr.getValue();
             }
         }
 
-        return Optional.of(new TermVocabAttributes(vocab, vocabUri, "", term));
+        return Optional.of(new TermVocabAttributes(vocab, vocabUri, id, term));
     }
 
     /**
@@ -462,13 +465,25 @@ class ParsingStrategies{
             var inclusionStatus = parseInclusionStatus(universeElement);
 
             // Language specific content is stored in sub-elements which needs to be flattened
-            for (var otherMaterial : universeElement.getChildren("Description", null)) {
+            var labels = universeElement.getChildren("Label", null);
+            for (var otherMaterial : labels) {
                 for (var contentElement : otherMaterial.getChildren("Content", null)) {
                     map.computeIfAbsent(
                         XMLMapper.getLangOfElement(contentElement), k -> new ArrayList<>()
                     ).add(
                         new UniverseElement(inclusionStatus, contentElement.getText())
                     );
+                }
+            }
+            if (labels.isEmpty()) {
+                for (var otherMaterial : universeElement.getChildren("Description", null)) {
+                    for (var contentElement : otherMaterial.getChildren("Content", null)) {
+                        map.computeIfAbsent(
+                                XMLMapper.getLangOfElement(contentElement), k -> new ArrayList<>()
+                        ).add(
+                                new UniverseElement(inclusionStatus, contentElement.getText())
+                        );
+                    }
                 }
             }
         }
@@ -497,18 +512,53 @@ class ParsingStrategies{
 
     /**
      * Extract the value of the {@code date} attribute of the given element.
+     * <p>
+     * This strategy will return {@code null} if the year in the date attribute
+     * is greater than the current year, filtering out embargoed studies that
+     * have a publishing date in the future.
      *
      * @param element the element to parse.
      * @return the value of the date attribute, or {@code null} if the attribute is not present.
+     * @see <a href="https://github.com/cessda/cessda.cdc.versions/issues/713">#713</a>
      */
     @Nullable
     static String dateStrategy(Element element) {
         var attribute = element.getAttribute("date", null);
         if (attribute != null) {
-            return attribute.getValue();
+            var dateAttributeValue = attribute.getValue();
+
+            // Parse the year from the string
+            var year = TimeUtility.getTimeFormat(dateAttributeValue, Year::from);
+
+            // Return the date if the year is not after the current year
+            return !year.isAfter(Year.now()) ? dateAttributeValue : null;
         } else {
             return null;
         }
+    }
+
+    /**
+     * Extract the textual date value of the given element.
+     * <p>
+     * This strategy will return {@code null} if the year in the element text
+     * is greater than the current year, filtering out embargoed studies that
+     * have a publishing date in the future.
+     *
+     * @param element the element to parse.
+     * @return the value of the element text, or {@code null} if the text is not present.
+     * @see <a href="https://github.com/cessda/cessda.cdc.versions/issues/713">#713</a>
+     */
+    @Nullable
+    static String dateLifecycleStrategy(Element element) {
+        var value = element.getTextTrim();
+
+        if (value.isBlank()) {
+            return null;
+        }
+
+        var year = TimeUtility.getTimeFormat(value, Year::from);
+
+        return !year.isAfter(Year.now()) ? value : null;
     }
 
     @NonNull
@@ -532,12 +582,12 @@ class ParsingStrategies{
     }
 
     @NonNull
-    static CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateTimeParseException>> dataCollectionPeriodsStrategy(List<Element> elementList) {
+    static CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, DateTimeParseException> dataCollectionPeriodsStrategy(List<Element> elementList) {
         var dateAttrs = getDateElementAttributesValueMap(elementList);
 
         var dataCollectionPeriodBuilder = CMMStudyMapper.DataCollectionPeriod.builder();
 
-        var parseExceptions = new ArrayList<DateTimeParseException>(2);
+        DateTimeParseException parseException = null;
 
         if (dateAttrs.containsKey(SINGLE_ATTR)) {
             final String singleDateValue = dateAttrs.get(SINGLE_ATTR);
@@ -546,7 +596,7 @@ class ParsingStrategies{
                 var year = TimeUtility.getTimeFormat(singleDateValue, Year::from);
                 dataCollectionPeriodBuilder.dataCollectionYear(year.getValue());
             } catch (DateTimeParseException e) {
-                parseExceptions.add(e);
+                parseException = e;
             }
         } else {
             if (dateAttrs.containsKey(START_ATTR)) {
@@ -556,7 +606,7 @@ class ParsingStrategies{
                     var year = TimeUtility.getTimeFormat(startDateValue, Year::from);
                     dataCollectionPeriodBuilder.dataCollectionYear(year.getValue());
                 } catch (DateTimeParseException e) {
-                    parseExceptions.add(e);
+                    parseException = e;
                 }
             }
             if (dateAttrs.containsKey(END_ATTR)) {
@@ -570,13 +620,13 @@ class ParsingStrategies{
 
         return new CMMStudyMapper.ParseResults<>(
             dataCollectionPeriodBuilder.build(),
-            parseExceptions
+            parseException
         );
     }
 
     @NonNull
     @SuppressWarnings("java:S131")
-    static CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, List<DateTimeParseException>> dataCollectionPeriodsLifecycleStrategy(Element dataCollectionDate) {
+    static CMMStudyMapper.ParseResults<CMMStudyMapper.DataCollectionPeriod, DateTimeParseException> dataCollectionPeriodsLifecycleStrategy(Element dataCollectionDate) {
         String startDate = null;
         String endDate = null;
         String singleDate = null;
@@ -589,30 +639,27 @@ class ParsingStrategies{
             }
         }
 
-        var parseExceptions = new ArrayList<DateTimeParseException>();
+        DateTimeParseException parseException = null;
 
         // Derive the data collection year
         Integer year = null;
-        if (singleDate != null) {
-            try {
-                var parsedYear = TimeUtility.getTimeFormat(singleDate, Year::from);
-                year = parsedYear.getValue();
-            } catch (DateTimeParseException e) {
-                parseExceptions.add(e);
+        try {
+            if (singleDate != null) {
+                year = parseDateIntoYear(singleDate);
+            } else if(startDate != null) {
+                year = parseDateIntoYear(startDate);
             }
-        }
-
-        if (year == null && startDate != null) {
-            try {
-                var parsedYear = TimeUtility.getTimeFormat(startDate, Year::from);
-                year = parsedYear.getValue();
-            } catch (DateTimeParseException e) {
-                parseExceptions.add(e);
-            }
+        } catch (DateTimeParseException e) {
+            parseException = e;
         }
 
         var dataCollectionPeriod = new CMMStudyMapper.DataCollectionPeriod(startDate, year, endDate, Collections.emptyMap());
-        return new CMMStudyMapper.ParseResults<>(dataCollectionPeriod, parseExceptions);
+        return new CMMStudyMapper.ParseResults<>(dataCollectionPeriod, parseException);
+    }
+
+    public static int parseDateIntoYear(String singleDate) throws DateTimeParseException {
+        var parsedYear = TimeUtility.getTimeFormat(singleDate, Year::from);
+        return parsedYear.getValue();
     }
 
     @NonNull
@@ -755,7 +802,7 @@ class ParsingStrategies{
         // Merge name and abbreviation maps
         var publisherMap = new HashMap<String, Publisher>();
         Stream.concat(nameMap.keySet().stream(), abbrMap.keySet().stream()).distinct().forEach(key ->
-            publisherMap.put(key, new Publisher(abbrMap.getOrDefault(key, ""), nameMap.getOrDefault(key, "")))
+            publisherMap.put(key, new Publisher(abbrMap.get(key), nameMap.get(key)))
         );
 
         return Collections.unmodifiableMap(publisherMap);
@@ -889,8 +936,9 @@ class ParsingStrategies{
      */
     static Map<String, Creator> individualStrategy(Element element, Map<String, Affiliation> affiliationMap) {
         var identification = element.getChild("IndividualIdentification", null);
-        if (identification == null)
+        if (identification == null) {
             return Collections.emptyMap();
+        }
 
         var map = new HashMap<String, Creator>();
 
@@ -922,17 +970,16 @@ class ParsingStrategies{
             if (fullName != null) {
                 for (var string : fullName.getChildren(STRING, null)) {
                     var lang = getLangOfElement(string);
-                    List<Creator.Identifier> identifiers = new ArrayList<>();
+                    var identifiers = new ArrayList<Creator.Identifier>(personalIds.size() + affiliationIds.size());
 
-                    if (!personalIds.isEmpty())
-                        identifiers.addAll(personalIds);
-                    if (!affiliationIds.isEmpty())
-                        identifiers.addAll(affiliationIds);
+                    identifiers.addAll(personalIds);
+                    identifiers.addAll(affiliationIds);
 
                     var creator = new Creator(
                             string.getTextTrim(),
                             affiliationName,
-                            identifiers.isEmpty() ? null : identifiers);
+                            identifiers
+                    );
 
                     if (isPreferred) {
                         map.put(lang, creator);
@@ -1058,7 +1105,7 @@ class ParsingStrategies{
                         var vocabAttributes = termVocabAttributes.get();
                         vocabAttributesList.add(new TermVocabAttributes(vocabAttributes.vocab(), vocabAttributes.vocabUri(), vocabAttributes.id(), term));
                     } else {
-                        vocabAttributesList.add(new TermVocabAttributes("", "", "", term));
+                        vocabAttributesList.add(new TermVocabAttributes(null, null, null, term));
                     }
                 }
 
@@ -1089,7 +1136,7 @@ class ParsingStrategies{
 
             // Filter by TypeOfMaterial = "Related Publication"
             var typeOfMaterial = element.getChildTextTrim("TypeOfMaterial", null);
-            if (typeOfMaterial == null || !typeOfMaterial.equalsIgnoreCase("Related Publication")) {
+            if (!"Related Publication".equalsIgnoreCase(typeOfMaterial)) {
                 continue;
             }
 
@@ -1180,7 +1227,7 @@ class ParsingStrategies{
                     var creatorMap = individualStrategy(r.element(), Collections.emptyMap());
 
                     // Create a Publisher to represent this creator
-                    var publisherMap = new HashMap<String, Publisher>(creatorMap.size());
+                    var publisherMap = HashMap.<String, Publisher>newHashMap(creatorMap.size());
                     creatorMap.forEach((lang, creator) -> {
                         var publisher = new Publisher(null, creator.name());
                         publisherMap.put(lang, publisher);
@@ -1321,27 +1368,10 @@ class ParsingStrategies{
 
         for (Element element : elements) {
             String raw = element.getTextTrim();
-            if (raw.isBlank()) {
-                continue;
-            }
-
-            // Normalize to lowercase and strip all non-alphanumerics (spaces, underscores, etc.)
-            String normalized = NORMALIZE_PATTERN.matcher(raw.toLowerCase(Locale.ROOT)).replaceAll("");
-
-            // Open: exact or suffix so it still works for info:eu-repo/semantics/openAccess also
-            if (normalized.endsWith(OPEN_ACCESS)) {
-                return "Open";
-            }
-
-            // Restricted: exact or suffix so it still works for info:eu-repo/semantics/restrictedAccess also
-            if (RESTRICTED.contains(normalized)) {
-                return "Restricted";
-            }
-
-            // Fallback for partial matches
-            for (String t : RESTRICTED) {
-                if (normalized.endsWith(t)) {
-                    return "Restricted";
+            if (!raw.isBlank()) {
+                var dataAccess = parseDataAccessString(raw);
+                if (dataAccess != null) {
+                    return dataAccess;
                 }
             }
         }
@@ -1350,27 +1380,70 @@ class ParsingStrategies{
         return null;
     }
 
+    @Nullable
+    public static String parseDataAccessString(String raw) {
+        // Normalize to lowercase and strip all non-alphanumerics (spaces, underscores, etc.)
+        String normalized = NORMALIZE_PATTERN.matcher(raw.toLowerCase()).replaceAll("");
+
+        // Open: exact or suffix so it still works for info:eu-repo/semantics/openAccess also
+        if (normalized.endsWith(OPEN_ACCESS)) {
+            return "Open";
+        }
+
+        // Restricted: exact or suffix so it still works for info:eu-repo/semantics/restrictedAccess also
+        if (RESTRICTED.contains(normalized)) {
+            return "Restricted";
+        }
+
+        // Fallback for partial matches
+        for (String t : RESTRICTED) {
+            if (normalized.endsWith(t)) {
+                return "Restricted";
+            }
+        }
+
+        return null;
+    }
+
     /**
-     * Constructs a {@link Series} using the given element.
+     * Constructs language-specific {@link Series} objects using the given element.
      * <p>
      * Names come from `serName` child elements, descriptions from `serInfo` child elements,
      * and uri from the {@value OaiPmhConstants#URI_ATTR} attribute.
+     * <p>
+     * Supports both language-specific `serStmt` elements and `serStmt` elements containing mixed-language child elements.
      *
      * @param element the {@link Element} to parse.
-     * @return a {@link Series} if at least one name, description, or uri is found.
+     * @return a {@link Map} with the key set to the language, and the value a {@link List} of {@link Series}.
      */
-    static Optional<Series> seriesStrategy(Element element) {
+    @NonNull
+    static Map<String, List<Series>> seriesStrategy(Element element) {
         var namespace = element.getNamespace();
+        var parentLanguage = XMLMapper.getLangOfElement(element);
 
-        var names = element.getChildren("serName", namespace).stream()
-                .map(Element::getTextTrim)
-                .filter(name -> !name.isEmpty())
-                .collect(Collectors.toList());
+        var namesByLanguage = new HashMap<String, List<String>>();
+        for (var nameElement : element.getChildren("serName", namespace)) {
+            var name = nameElement.getTextTrim();
+            if (!name.isEmpty()) {
+                var language = XMLMapper.getLangOfElement(nameElement);
+                if (XMLMapper.EMPTY_LANGUAGE.equals(language)) {
+                    language = parentLanguage;
+                }
+                namesByLanguage.computeIfAbsent(language, k -> new ArrayList<>()).add(name);
+            }
+        }
 
-        var descriptions = element.getChildren("serInfo", namespace).stream()
-                .map(Element::getTextTrim)
-                .filter(info -> !info.isEmpty())
-                .collect(Collectors.toList());
+        var descriptionsByLanguage = new HashMap<String, List<String>>();
+        for (var descriptionElement : element.getChildren("serInfo", namespace)) {
+            var description = descriptionElement.getTextTrim();
+            if (!description.isEmpty()) {
+                var language = XMLMapper.getLangOfElement(descriptionElement);
+                if (XMLMapper.EMPTY_LANGUAGE.equals(language)) {
+                    language = parentLanguage;
+                }
+                descriptionsByLanguage.computeIfAbsent(language, k -> new ArrayList<>()).add(description);
+            }
+        }
 
         var uriString = element.getAttributeValue(URI_ATTR);
         var uris = new ArrayList<URI>();
@@ -1382,11 +1455,30 @@ class ParsingStrategies{
             }
         }
 
-        if (names.isEmpty() && descriptions.isEmpty() && uris.isEmpty()) {
-            return Optional.empty();
+        var languages = new HashSet<String>();
+        languages.addAll(namesByLanguage.keySet());
+        languages.addAll(descriptionsByLanguage.keySet());
+
+        /*
+        * If no language was discovered from child elements, fall back to the language of the series element itself.
+        * This allows URI-only series metadata to be retained.
+        */
+        if (languages.isEmpty()) {
+            languages.add(parentLanguage);
         }
 
-        return Optional.of(new Series(names, descriptions, uris));
+        var languageSpecificSeries = new HashMap<String, List<Series>>();
+        for (var language : languages) {
+            var names = namesByLanguage.getOrDefault(language, List.of());
+            var descriptions = descriptionsByLanguage.getOrDefault(language, List.of());
+            if (names.isEmpty() && descriptions.isEmpty() && uris.isEmpty()) {
+                continue;
+            }
+            var series = new Series(names, descriptions, List.copyOf(uris));
+            languageSpecificSeries.computeIfAbsent(language, k -> new ArrayList<>()).add(series);
+        }
+
+        return languageSpecificSeries;
     }
 
     /**
@@ -1401,17 +1493,17 @@ class ParsingStrategies{
 
         for (var seriesElement : elements) {
 
-            var uriMap = new HashMap<String, List<URI>>();
+            var uriList = new ArrayList<URI>();
             var nameMap = new HashMap<String, List<String>>();
             var descriptionMap = new HashMap<String, List<String>>();
 
+            // SeriesRepositoryLocation is not localised
             for (var repoLocation : seriesElement.getChildren("SeriesRepositoryLocation", null)) {
-                var lang = XMLMapper.getLangOfElement(repoLocation);
-                uriMap.computeIfAbsent(lang, k -> new ArrayList<>()).add(URI.create(repoLocation.getTextTrim()));
+                uriList.add(URI.create(repoLocation.getTextTrim()));
             }
 
             for (var nameElement : seriesElement.getChildren("SeriesName", null)) {
-                for (var nameContent : nameElement.getChildren("String", null)) {
+                for (var nameContent : nameElement.getChildren(STRING, null)) {
                     var lang = XMLMapper.getLangOfElement(nameContent);
                     nameMap.computeIfAbsent(lang, k -> new ArrayList<>()).add(nameContent.getTextTrim());
                 }
@@ -1424,15 +1516,14 @@ class ParsingStrategies{
                 }
             }
 
-            var allLangs = new HashSet<>(uriMap.keySet());
-            allLangs.addAll(nameMap.keySet());
+            var allLangs = new HashSet<>(nameMap.keySet());
             allLangs.addAll(descriptionMap.keySet());
 
             for (String lang : allLangs) {
                 var series = new Series(
-                    nameMap.getOrDefault(lang, new ArrayList<>()),
-                    descriptionMap.getOrDefault(lang, new ArrayList<>()),
-                    uriMap.getOrDefault(lang, new ArrayList<>())
+                    nameMap.getOrDefault(lang, Collections.emptyList()),
+                    descriptionMap.getOrDefault(lang, Collections.emptyList()),
+                    uriList
                 );
                 seriesMap.computeIfAbsent(lang, k -> new ArrayList<>()).add(series);
             }

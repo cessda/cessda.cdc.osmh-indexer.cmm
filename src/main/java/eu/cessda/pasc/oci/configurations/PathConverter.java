@@ -15,9 +15,9 @@
  */
 package eu.cessda.pasc.oci.configurations;
 
+import org.jspecify.annotations.NonNull;
 import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;

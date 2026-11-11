@@ -83,7 +83,7 @@ public class RecordXMLParserDDI3Test {
         var expectedJson = ResourceHandler.getResourceAsString(expectedJSON);
 
         // When
-        var result = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
+        var result = new RecordXMLParser().getRecord(repo, Path.of(recordXML.toURI()));
 
         then(result).hasSize(1);
         utils.validateCMMStudyResultAgainstSchema(result.getFirst());

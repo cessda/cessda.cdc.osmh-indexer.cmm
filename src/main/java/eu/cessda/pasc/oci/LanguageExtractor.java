@@ -32,7 +32,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static net.logstash.logback.argument.StructuredArguments.value;
+import static eu.cessda.pasc.oci.LoggingConstants.*;
 
 /**
  * Component responsible for extracting and mapping languages in which a given CMMStudy is available.
@@ -72,7 +72,7 @@ public class LanguageExtractor {
                 langCode -> getCmmStudyOfLanguage(cmmStudy, langCode, Set.copyOf(validLanguages), repository)
             ));
         } else {
-            log.debug("[{}] No valid languages for study [{}]",  value(LoggingConstants.REPO_NAME, repository.code()), value(LoggingConstants.STUDY_ID,cmmStudy.studyNumber()));
+            log.debug("[{}] No valid languages for study [{}]", repository.code(), cmmStudy.studyNumber());
             return Collections.emptyMap();
         }
     }
@@ -97,11 +97,14 @@ public class LanguageExtractor {
 
     private CMMStudyOfLanguage getCmmStudyOfLanguage(CMMStudy cmmStudy, String lang, Set<String> availableLanguages, Repo repository) {
 
-        log.trace("[{}] Extracting CMMStudyOfLanguage for study [{}], language [{}]",
-            value(LoggingConstants.REPO_NAME, repository.code()),
-            value(LoggingConstants.STUDY_ID, cmmStudy.studyNumber()),
-            value(LoggingConstants.LANG_CODE, lang)
-        );
+        log.atTrace().setMessage("[{}] Extracting CMMStudyOfLanguage for study [{}], language [{}]")
+                .addArgument(repository.code())
+                .addArgument(cmmStudy.studyNumber())
+                .addArgument(lang)
+                .addKeyValue(REPO_NAME, repository.code())
+                .addKeyValue(STUDY_ID, cmmStudy.studyNumber())
+                .addKeyValue(LANG_CODE, lang)
+                .log();
 
         CMMStudyOfLanguage.CMMStudyOfLanguageBuilder builder = CMMStudyOfLanguage.builder();
 

@@ -74,12 +74,10 @@
                                 <distDate xml:lang="fi" date="2017-10-26"/>
                                 <distDate xml:lang="en" date="2017-12-12"/>
                             </distStmt>
-                            <serStmt URI="https://services.fsd.tuni.fi/catalogue/series/22?lang=fi" xml:lang="fi" ID="S22">
+                            <serStmt URI="https://services.fsd.tuni.fi/catalogue/series/22" ID="S22">
                                 <serName xml:lang="fi">Kehitysyhteistyötutkimukset</serName>
-                                <serInfo xml:lang="fi">Kehitysyhteistyötutkimukset ovat ulkoministeriön teettämiä mielipidetiedusteluja, joissa on kartoitettu kehitysyhteistyön tiedontarvetta ja kansalaisten asennoitumista kehitysyhteistyöhön. Aineistot on kerännyt Taloustutkimus. Aineistoja on kerätty vuodesta 1997 alkaen.</serInfo>
-                            </serStmt>
-                            <serStmt URI="https://services.fsd.tuni.fi/catalogue/series/22?lang=en" xml:lang="en">
                                 <serName xml:lang="en">Development Cooperation Surveys</serName>
+                                <serInfo xml:lang="fi">Kehitysyhteistyötutkimukset ovat ulkoministeriön teettämiä mielipidetiedusteluja, joissa on kartoitettu kehitysyhteistyön tiedontarvetta ja kansalaisten asennoitumista kehitysyhteistyöhön. Aineistot on kerännyt Taloustutkimus. Aineistoja on kerätty vuodesta 1997 alkaen.</serInfo>
                                 <serInfo xml:lang="en">Development Cooperation Surveys are commissioned by the Ministry for Foreign Affairs of Finland and study citizens' opinions, attitudes and information needs connected with development cooperation. The data collection has been conducted by Taloustutkimus. The survey series was launched in 1997.</serInfo>
                             </serStmt>
                             <verStmt>

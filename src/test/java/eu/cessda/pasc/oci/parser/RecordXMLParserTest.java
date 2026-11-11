@@ -30,7 +30,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -69,7 +68,7 @@ public class RecordXMLParserTest {
         var recordXML = ResourceHandler.getResource("xml/ddi_2_5/synthetic_compliant_cmm.xml");
 
         // When
-        var result = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
+        var result = new RecordXMLParser().getRecord(repo, Path.of(recordXML.toURI()));
 
         then(result).hasSize(1);
         utils.validateCMMStudyResultAgainstSchema(result.getFirst());
@@ -88,7 +87,7 @@ public class RecordXMLParserTest {
         var recordXML = ResourceHandler.getResource("xml/ddi_2_5/oai-fsd_uta_fi-FSD3187.xml");
 
         // When
-        var optionalResult = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
+        var optionalResult = new RecordXMLParser().getRecord(repo, Path.of(recordXML.toURI()));
 
         then(optionalResult).hasSize(1);
 
@@ -103,6 +102,16 @@ public class RecordXMLParserTest {
         then(result.unitTypes().size()).isEqualTo(2);
         then(result.unitTypes().get("fi").getFirst().term()).isEqualTo("Henkilö");
         then(result.unitTypes().get("en").getFirst().term()).isEqualTo("Individual");
+
+        // Verifies series extraction
+        then(result.series()).doesNotContainKey(XMLMapper.EMPTY_LANGUAGE);
+        then(result.series().size()).isEqualTo(2);
+        then(result.series().get("fi")).hasSize(1);
+        then(result.series().get("fi").getFirst().names()).containsExactly("Kehitysyhteistyötutkimukset");
+        then(result.series().get("fi").getFirst().descriptions()).containsExactly("Kehitysyhteistyötutkimukset ovat ulkoministeriön teettämiä mielipidetiedusteluja, joissa on kartoitettu kehitysyhteistyön tiedontarvetta ja kansalaisten asennoitumista kehitysyhteistyöhön. Aineistot on kerännyt Taloustutkimus. Aineistoja on kerätty vuodesta 1997 alkaen.");
+        then(result.series().get("en")).hasSize(1);
+        then(result.series().get("en").getFirst().names()).containsExactly("Development Cooperation Surveys");
+        then(result.series().get("en").getFirst().descriptions()).containsExactly("Development Cooperation Surveys are commissioned by the Ministry for Foreign Affairs of Finland and study citizens' opinions, attitudes and information needs connected with development cooperation. The data collection has been conducted by Taloustutkimus. The survey series was launched in 1997.");
     }
 
     @Test
@@ -112,7 +121,7 @@ public class RecordXMLParserTest {
         var recordXML = ResourceHandler.getResource("xml/ddi_2_5/ddi_record_1683.xml");
 
         // When
-        var record = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
+        var record = new RecordXMLParser().getRecord(repo, Path.of(recordXML.toURI()));
 
         // Then
         then(record).hasSize(1);
@@ -127,7 +136,7 @@ public class RecordXMLParserTest {
         var recordXML = ResourceHandler.getResource("xml/ddi_2_5/ddi_record_1683.xml");
 
         // When
-        var record = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
+        var record = new RecordXMLParser().getRecord(repo, Path.of(recordXML.toURI()));
         then(record).hasSize(1);
         utils.validateCMMStudyResultAgainstSchema(record.getFirst());
         final ObjectMapper mapper = new ObjectMapper();
@@ -147,7 +156,7 @@ public class RecordXMLParserTest {
         var recordXML = ResourceHandler.getResource("xml/ddi_2_5/ddi_record_1683_with_codebookXmlLag.xml");
 
         // When
-        var record = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
+        var record = new RecordXMLParser().getRecord(repo, Path.of(recordXML.toURI()));
         String actualCmmStudyJsonString = objectMapper.writeValueAsString(record.getFirst());
 
         // then
@@ -166,7 +175,7 @@ public class RecordXMLParserTest {
         var recordXML = ResourceHandler.getResource("xml/ddi_2_5/ddi_record_2305_fsd_repeat_abstract.xml");
 
         // When
-        var record = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
+        var record = new RecordXMLParser().getRecord(repo, Path.of(recordXML.toURI()));
 
         then(record).hasSize(1);
         then(record.getFirst().abstractField().size()).isEqualTo(3);
@@ -186,7 +195,7 @@ public class RecordXMLParserTest {
         var recordXML = ResourceHandler.getResource("xml/ddi_2_5/ddi_record_1683.xml");
 
         // When
-        var record = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
+        var record = new RecordXMLParser().getRecord(repo, Path.of(recordXML.toURI()));
 
         then(record).hasSize(1);
         then(record.getFirst().titleStudy().size()).isEqualTo(3);
@@ -194,14 +203,14 @@ public class RecordXMLParserTest {
         utils.validateCMMStudyResultAgainstSchema(record.getFirst());
     }
 
-    @Test()
+    @Test
     public void shouldReturnEmptyOptionalFromOaiPmhDDI2_5MetadataRecord_MarkedAsNotActive() throws IOException, IndexerException, URISyntaxException {
 
         // Given
         var recordXML = ResourceHandler.getResource("xml/ddi_2_5/ddi_record_1031_deleted.xml");
 
         // When
-        var record = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
+        var record = new RecordXMLParser().getRecord(repo, Path.of(recordXML.toURI()));
 
         // Then
         then(record).isEmpty();
@@ -214,7 +223,7 @@ public class RecordXMLParserTest {
         var recordXML = ResourceHandler.getResource("xml/ddi_2_5/ddi_record_WithError.xml");
 
         // When
-        var record = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
+        var record = new RecordXMLParser().getRecord(repo, Path.of(recordXML.toURI()));
 
         // Then
         then(record).isEmpty();
@@ -227,7 +236,7 @@ public class RecordXMLParserTest {
         var recordXML = ResourceHandler.getResource("xml/ddi_2_5/ddi_record_ukds_example.xml");
 
         // When
-        var result = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
+        var result = new RecordXMLParser().getRecord(repo, Path.of(recordXML.toURI()));
 
         then(result).hasSize(1);
         utils.validateCMMStudyResultAgainstSchema(result.getFirst());
@@ -235,13 +244,13 @@ public class RecordXMLParserTest {
     }
 
     @Test
-    public void shouldHaveNullDataCollectionYearWhenRequiredFieldsAreNotPreset() throws FileNotFoundException, URISyntaxException, XMLParseException {
+    public void shouldHaveNullDataCollectionYearWhenRequiredFieldsAreNotPreset() throws IOException, URISyntaxException, XMLParseException {
 
         // Given
         var recordXML = ResourceHandler.getResource("xml/ddi_2_5/ddi_record_ukds_example.xml");
 
         // When
-        var result = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
+        var result = new RecordXMLParser().getRecord(repo, Path.of(recordXML.toURI()));
 
         then(result).hasSize(1);
         then(result.getFirst().dataCollectionYear()).isNull();
@@ -271,7 +280,7 @@ public class RecordXMLParserTest {
         var recordXML = ResourceHandler.getResource("xml/ddi_2_5/ddi_record_ukds_example.xml");
 
         // When
-        var result = new RecordXMLParser(cmmStudyMapper).getRecord(repository, Path.of(recordXML.toURI()));
+        var result = new RecordXMLParser().getRecord(repository, Path.of(recordXML.toURI()));
 
         then(result).hasSize(1);
         utils.validateCMMStudyResultAgainstSchema(result.getFirst());
@@ -287,7 +296,7 @@ public class RecordXMLParserTest {
         var expectedJson = ResourceHandler.getResourceAsString("json/synthetic_compliant_record.json");
 
         // When
-        var result = new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(recordXML.toURI()));
+        var result = new RecordXMLParser().getRecord(repo, Path.of(recordXML.toURI()));
 
         then(result).hasSize(2);
 
@@ -302,11 +311,11 @@ public class RecordXMLParserTest {
     }
 
     @Test(expected = XMLParseException.class)
-    public void shouldThrowIfAnIOErrorOccurs() throws FileNotFoundException, URISyntaxException, XMLParseException {
+    public void shouldThrowIfAnIOErrorOccurs() throws IOException, URISyntaxException, XMLParseException {
         // Given
         var invalidXML = ResourceHandler.getResource("xml/invalid-xml");
 
         // Expect parsing to fail
-        new RecordXMLParser(cmmStudyMapper).getRecord(repo, Path.of(invalidXML.toURI()));
+        new RecordXMLParser().getRecord(repo, Path.of(invalidXML.toURI()));
     }
 }
