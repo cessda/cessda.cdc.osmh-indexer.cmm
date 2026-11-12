@@ -244,10 +244,19 @@ public class CMMStudyMapper {
     }
 
     /**
-     * Maps a Time Method value to a specific category.
+     * Maps a Time Method value to one of:
+     *
+     * <ul>
+     *   <li>Longitudinal</li>
+     *   <li>Time series</li>
+     *   <li>Cross-section</li>
+     *   <li>Cross-section ad-hoc follow-up</li>
+     * </ul>
+     * <p>
+     * Matches English, German, and French DDI Time Method CV terms and common variants found in harvested metadata.
      *
      * @param value the Time Method value to map
-     * @return the mapped category, or an empty Optional if the value could not be mapped
+     * @return the mapped category, or an empty {@link Optional} if the value could not be mapped
      */
     private static Optional<String> mapTimeMethodCategory(String value) {
         var normalized = value.toLowerCase(Locale.ROOT).strip();
@@ -293,20 +302,12 @@ public class CMMStudyMapper {
     }
 
     /**
-     * Maps parsed Type Of Time Method values to one of:
+     * Maps parsed Type Of Time Method values to a specific category.
+     * <p>
+     * Non-empty values that cannot be mapped to one of the specific categories are mapped to Other.
      *
-     * <ul>
-     *   <li>Longitudinal</li>
-     *   <li>Time series</li>
-     *   <li>Cross-section</li>
-     *   <li>Cross-section ad-hoc follow-up</li>
-     *   <li> Other</li>
-     * </ul>
-     * <p>
-     * Matches English, German, and French DDI Time Method CV terms and common variants found in harvested metadata.
-     * Non-empty values that cannot be mapped to one of the four specific categories are mapped to Other.
-     * <p>
-     * Returns an empty {@link Optional} if a time method value is not available.
+     * @param parsed the parsed Time Method values
+     * @return the mapped category, or an empty {@link Optional} if a time method value is not available.
      */
     static Optional<String> parseTypeOfTimeMethodCategory(Map<String, List<TermVocabAttributes>> parsed) {
         boolean hasValue = false;
