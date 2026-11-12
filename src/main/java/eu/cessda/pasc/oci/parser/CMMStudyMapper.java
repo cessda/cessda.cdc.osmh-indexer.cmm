@@ -244,8 +244,57 @@ public class CMMStudyMapper {
     }
 
     /**
+     * Maps a Time Method value to a specific category.
+     *
+     * @param value the Time Method value to map
+     * @return the mapped category, or an empty Optional if the value could not be mapped
+     */
+    private static Optional<String> parseTypeOfTimeMethodCategory(String value) {
+        var normalized = value.toLowerCase(Locale.ROOT).strip();
+
+        // Longitudinal and its narrower CV concepts
+        if (normalized.contains("longitudinal")
+                || normalized.contains("längsschnitt")
+                || normalized.contains("panel")
+                || normalized.contains("cohort")) {
+            return Optional.of("Longitudinal");
+        }
+
+        // Time series
+        if (normalized.contains("timeseries")
+                || normalized.contains("time series")
+                || normalized.contains("zeitreihen")
+                || normalized.contains("série temporelle")) {
+            return Optional.of("Time series");
+        }
+
+        // Cross section and Cross section ad-hoc follow-up
+        var crossSection = normalized.contains("crosssection")
+                || normalized.contains("cross-section")
+                || normalized.contains("cross section")
+                || normalized.contains("querschnitt")
+                || normalized.contains("transversale");
+
+        var followUp = normalized.contains("followup")
+                || normalized.contains("follow-up")
+                || normalized.contains("follow up")
+                || normalized.contains("nachuntersuchung")
+                || normalized.contains("complémentaire");
+
+        if (crossSection && followUp) {
+            return Optional.of("Cross-section ad-hoc follow-up");
+        }
+
+        if (crossSection) {
+            return Optional.of("Cross-section");
+        }
+
+        return Optional.empty();
+    }
+
+    /**
      * Maps parsed Type Of Time Method values to one of:
-     * 
+     *
      * <ul>
      *   <li>Longitudinal</li>
      *   <li>Time series</li>
@@ -259,64 +308,32 @@ public class CMMStudyMapper {
      * <p>
      * Returns {@code null} if a time method value is not available.
      */
-    static String parseTypeOfTimeMethodCategory(Map<String, List<TermVocabAttributes>> parsed) {
-        if (parsed == null || parsed.isEmpty()) {
-            return null;
-        }
-
+    static Optional<String> parseTypeOfTimeMethodCategory(Map<String, List<TermVocabAttributes>> parsed) {
         boolean hasValue = false;
 
         for (var entries : parsed.values()) {
             for (var attr : entries) {
-                for (var value : new String[] { attr.id(), attr.term() }) {
-                    if (value == null || value.isBlank()) {
-                        continue;
-                    }
+                if (attr.id() != null && !attr.id().isBlank()) {
                     hasValue = true;
 
-                    var normalized = value.toLowerCase(Locale.ROOT).strip();
-
-                    // Longitudinal and its narrower CV concepts
-                    if (normalized.contains("longitudinal")
-                            || normalized.contains("längsschnitt")
-                            || normalized.contains("panel")
-                            || normalized.contains("cohort")) {
-                        return "Longitudinal";
+                    var category = parseTypeOfTimeMethodCategory(attr.id());
+                    if (category.isPresent()) {
+                        return category;
                     }
+                }
 
-                    // Time series
-                    if (normalized.contains("timeseries")
-                            || normalized.contains("time series")
-                            || normalized.contains("zeitreihen")
-                            || normalized.contains("série temporelle")) {
-                        return "Time series";
-                    }
+                if (attr.term() != null && !attr.term().isBlank()) {
+                    hasValue = true;
 
-                    // Cross section and Cross section ad-hoc follow-up
-                    var crossSection = normalized.contains("crosssection")
-                            || normalized.contains("cross-section")
-                            || normalized.contains("cross section")
-                            || normalized.contains("querschnitt")
-                            || normalized.contains("transversale");
-
-                    var followUp = normalized.contains("followup")
-                            || normalized.contains("follow-up")
-                            || normalized.contains("follow up")
-                            || normalized.contains("nachuntersuchung")
-                            || normalized.contains("complémentaire");
-
-                    if (crossSection && followUp) {
-                        return "Cross-section ad-hoc follow-up";
-                    }
-
-                    if (crossSection) {
-                        return "Cross-section";
+                    var category = parseTypeOfTimeMethodCategory(attr.term());
+                    if (category.isPresent()) {
+                        return category;
                     }
                 }
             }
         }
 
-        return hasValue ? "Other" : null;
+        return hasValue ? Optional.of("Other") : Optional.empty();
     }
 
     /**

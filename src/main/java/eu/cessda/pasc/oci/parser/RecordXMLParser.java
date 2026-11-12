@@ -401,7 +401,7 @@ public class RecordXMLParser {
 
                 var typeOfTimeMethods = cmmStudyMapper.parseTypeOfTimeMethod(metadata, xPaths, defaultLangIsoCode);
                 builder.typeOfTimeMethods(typeOfTimeMethods);
-                builder.typeOfTimeMethodCategory(CMMStudyMapper.parseTypeOfTimeMethodCategory(typeOfTimeMethods));
+                cmmStudyMapper.parseTypeOfTimeMethodCategory(typeOfTimeMethods).ifPresent(builder::typeOfTimeMethodCategory);
                 builder.studyAreaCountries(cmmStudyMapper.parseStudyAreaCountries(metadata, xPaths, defaultLangIsoCode));
                 builder.unitTypes(cmmStudyMapper.parseUnitTypes(metadata, xPaths, defaultLangIsoCode));
                 builder.publisher(cmmStudyMapper.parsePublisher(metadata, xPaths, defaultLangIsoCode));

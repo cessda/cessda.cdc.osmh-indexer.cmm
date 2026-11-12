@@ -150,7 +150,7 @@ public class StreamingLifecycleMapper {
 
         var typeOfSamplingProcedures = dataCollectionResult.typeOfSamplingProcedures();
         var typeOfTimeMethods = Map.of(defaultLang, dataCollectionResult.timeMethodList());
-        var typeOfTimeMethodCategory = CMMStudyMapper.parseTypeOfTimeMethodCategory(typeOfTimeMethods);
+        var typeOfTimeMethodCategory = CMMStudyMapper.parseTypeOfTimeMethodCategory(typeOfTimeMethods).orElse(null);
         var typeOfModeOfCollections = Map.of(defaultLang, dataCollectionResult.typeOfModeOfCollectionsList());
 
         /*
