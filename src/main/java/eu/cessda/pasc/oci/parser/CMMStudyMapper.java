@@ -245,11 +245,14 @@ public class CMMStudyMapper {
 
     /**
      * Maps parsed Type Of Time Method values to one of:
-     * - Longitudinal
-     * - Time series
-     * - Cross-section
-     * - Cross-section ad-hoc follow-up
-     * - Other
+     * 
+     * <ul>
+     *   <li>Longitudinal</li>
+     *   <li>Time series</li>
+     *   <li>Cross-section</li>
+     *   <li>Cross-section ad-hoc follow-up</li>
+     *   <li> Other</li>
+     * </ul>
      *
      * Matches English, German, and French DDI Time Method CV terms and common variants found in harvested metadata.
      * Non-empty values that cannot be mapped to one of the four specific categories are mapped to Other.
