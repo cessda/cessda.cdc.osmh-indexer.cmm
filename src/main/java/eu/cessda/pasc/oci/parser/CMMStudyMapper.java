@@ -249,7 +249,7 @@ public class CMMStudyMapper {
      * @param value the Time Method value to map
      * @return the mapped category, or an empty Optional if the value could not be mapped
      */
-    private static Optional<String> parseTypeOfTimeMethodCategory(String value) {
+    private static Optional<String> mapTimeMethodCategory(String value) {
         var normalized = value.toLowerCase(Locale.ROOT).strip();
 
         // Longitudinal and its narrower CV concepts
@@ -306,7 +306,7 @@ public class CMMStudyMapper {
      * Matches English, German, and French DDI Time Method CV terms and common variants found in harvested metadata.
      * Non-empty values that cannot be mapped to one of the four specific categories are mapped to Other.
      * <p>
-     * Returns {@code null} if a time method value is not available.
+     * Returns an empty {@link Optional} if a time method value is not available.
      */
     static Optional<String> parseTypeOfTimeMethodCategory(Map<String, List<TermVocabAttributes>> parsed) {
         boolean hasValue = false;
@@ -316,7 +316,7 @@ public class CMMStudyMapper {
                 if (attr.id() != null && !attr.id().isBlank()) {
                     hasValue = true;
 
-                    var category = parseTypeOfTimeMethodCategory(attr.id());
+                    var category = mapTimeMethodCategory(attr.id());
                     if (category.isPresent()) {
                         return category;
                     }
@@ -325,7 +325,7 @@ public class CMMStudyMapper {
                 if (attr.term() != null && !attr.term().isBlank()) {
                     hasValue = true;
 
-                    var category = parseTypeOfTimeMethodCategory(attr.term());
+                    var category = mapTimeMethodCategory(attr.term());
                     if (category.isPresent()) {
                         return category;
                     }
