@@ -256,7 +256,7 @@ public class CMMStudyMapper {
      * <p>
      * Matches English, German, and French DDI Time Method CV terms and common variants found in harvested metadata.
      * Non-empty values that cannot be mapped to one of the four specific categories are mapped to Other.
-     *
+     * <p>
      * Returns null if a time method value is not available.
      */
     static String parseTypeOfTimeMethodCategory(Map<String, List<TermVocabAttributes>> parsed) {
