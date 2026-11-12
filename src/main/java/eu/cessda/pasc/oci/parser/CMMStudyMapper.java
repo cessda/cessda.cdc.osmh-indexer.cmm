@@ -253,7 +253,7 @@ public class CMMStudyMapper {
      *   <li>Cross-section ad-hoc follow-up</li>
      *   <li> Other</li>
      * </ul>
-     *
+     * <p>
      * Matches English, German, and French DDI Time Method CV terms and common variants found in harvested metadata.
      * Non-empty values that cannot be mapped to one of the four specific categories are mapped to Other.
      *
