@@ -223,6 +223,7 @@
       }
     ]
   },
+  "typeOfTimeMethodCategory": "Longitudinal",
   "unitTypes": {
     "en": [{
       "vocabUri": "urn:ddi:int.ddi.cv:AnalysisUnit:2.1.3",

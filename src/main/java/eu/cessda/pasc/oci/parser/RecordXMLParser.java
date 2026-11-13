@@ -398,7 +398,10 @@ public class RecordXMLParser {
                 builder.dataAccessFreeTexts(cmmStudyMapper.parseDataAccessFreeText(metadata, xPaths, defaultLangIsoCode));
                 builder.classifications(cmmStudyMapper.parseClassifications(metadata, xPaths, defaultLangIsoCode));
                 builder.keywords(cmmStudyMapper.parseKeywords(metadata, xPaths, defaultLangIsoCode));
-                builder.typeOfTimeMethods(cmmStudyMapper.parseTypeOfTimeMethod(metadata, xPaths, defaultLangIsoCode));
+
+                var typeOfTimeMethods = cmmStudyMapper.parseTypeOfTimeMethod(metadata, xPaths, defaultLangIsoCode);
+                builder.typeOfTimeMethods(typeOfTimeMethods);
+                cmmStudyMapper.parseTypeOfTimeMethodCategory(typeOfTimeMethods).ifPresent(builder::typeOfTimeMethodCategory);
                 builder.studyAreaCountries(cmmStudyMapper.parseStudyAreaCountries(metadata, xPaths, defaultLangIsoCode));
                 builder.unitTypes(cmmStudyMapper.parseUnitTypes(metadata, xPaths, defaultLangIsoCode));
                 builder.publisher(cmmStudyMapper.parsePublisher(metadata, xPaths, defaultLangIsoCode));

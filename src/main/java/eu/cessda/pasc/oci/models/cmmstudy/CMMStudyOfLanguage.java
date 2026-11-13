@@ -66,6 +66,7 @@ public record CMMStudyOfLanguage(
     @JsonProperty("typeOfModeOfCollections") List<TermVocabAttributes> typeOfModeOfCollections,
     @JsonProperty("titleStudy") String titleStudy,
     @JsonProperty("typeOfTimeMethods") List<TermVocabAttributes> typeOfTimeMethods,
+    @JsonProperty("typeOfTimeMethodCategory") String typeOfTimeMethodCategory,
     @JsonProperty("typeOfSamplingProcedures") List<TermVocabAttributes> typeOfSamplingProcedures,
     @JsonProperty("unitTypes") List<TermVocabAttributes> unitTypes,
     @JsonProperty("universe") Universe universe,

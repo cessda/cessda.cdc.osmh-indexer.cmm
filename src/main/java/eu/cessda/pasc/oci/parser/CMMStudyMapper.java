@@ -244,6 +244,100 @@ public class CMMStudyMapper {
     }
 
     /**
+     * Maps a Time Method value to one of:
+     *
+     * <ul>
+     *   <li>Longitudinal</li>
+     *   <li>Time series</li>
+     *   <li>Cross-section</li>
+     *   <li>Cross-section ad-hoc follow-up</li>
+     * </ul>
+     * <p>
+     * Matches English, German, and French DDI Time Method CV terms and common variants found in harvested metadata.
+     *
+     * @param value the Time Method value to map
+     * @return the mapped category, or an empty {@link Optional} if the value could not be mapped
+     */
+    private static Optional<String> mapTimeMethodCategory(String value) {
+        var normalized = value.toLowerCase(Locale.ROOT).strip();
+
+        // Longitudinal and its narrower CV concepts
+        if (normalized.contains("longitudinal")
+                || normalized.contains("längsschnitt")
+                || normalized.contains("panel")
+                || normalized.contains("cohort")) {
+            return Optional.of("Longitudinal");
+        }
+
+        // Time series
+        if (normalized.contains("timeseries")
+                || normalized.contains("time series")
+                || normalized.contains("zeitreihen")
+                || normalized.contains("série temporelle")) {
+            return Optional.of("Time series");
+        }
+
+        // Cross section and Cross section ad-hoc follow-up
+        var crossSection = normalized.contains("crosssection")
+                || normalized.contains("cross-section")
+                || normalized.contains("cross section")
+                || normalized.contains("querschnitt")
+                || normalized.contains("transversale");
+
+        var followUp = normalized.contains("followup")
+                || normalized.contains("follow-up")
+                || normalized.contains("follow up")
+                || normalized.contains("nachuntersuchung")
+                || normalized.contains("complémentaire");
+
+        if (crossSection && followUp) {
+            return Optional.of("Cross-section ad-hoc follow-up");
+        }
+
+        if (crossSection) {
+            return Optional.of("Cross-section");
+        }
+
+        return Optional.empty();
+    }
+
+    /**
+     * Maps parsed Type Of Time Method values to a specific category.
+     * <p>
+     * Non-empty values that cannot be mapped to one of the specific categories are mapped to Other.
+     *
+     * @param parsed the parsed Time Method values
+     * @return the mapped category, or an empty {@link Optional} if a time method value is not available.
+     */
+    static Optional<String> parseTypeOfTimeMethodCategory(Map<String, List<TermVocabAttributes>> parsed) {
+        boolean hasValue = false;
+
+        for (var entries : parsed.values()) {
+            for (var attr : entries) {
+                if (attr.id() != null && !attr.id().isBlank()) {
+                    hasValue = true;
+
+                    var category = mapTimeMethodCategory(attr.id());
+                    if (category.isPresent()) {
+                        return category;
+                    }
+                }
+
+                if (attr.term() != null && !attr.term().isBlank()) {
+                    hasValue = true;
+
+                    var category = mapTimeMethodCategory(attr.term());
+                    if (category.isPresent()) {
+                        return category;
+                    }
+                }
+            }
+        }
+
+        return hasValue ? Optional.of("Other") : Optional.empty();
+    }
+
+    /**
      * Parses Type Of Mode Of Collection(s) from:
      * <p>
      * Xpath = {@link XPaths#getTypeOfModeOfCollectionXPath()}

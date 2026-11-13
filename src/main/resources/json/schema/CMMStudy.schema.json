@@ -556,6 +556,10 @@
       "additionalProperties": false,
       "description": "Time Methods for this CMMStudy in potentially multiple languages."
     },
+    "typeOfTimeMethodCategory": {
+      "type": "string",
+      "description": "Time Method as one of the pre-defined values/categories. Categories closely follow DDI Alliance CV values but are more simplified."
+    },
     "unitTypes": {
       "type": "object",
       "patternProperties": {

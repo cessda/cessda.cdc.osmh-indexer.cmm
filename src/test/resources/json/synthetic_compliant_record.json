@@ -90,11 +90,12 @@
       {
         "vocabUri": "",
         "vocab": "",
-        "term": "Default-lang: Repeated cross-sectional study",
+        "term": "Default-lang: Longitudinal: Repeated cross-sectional study",
         "id": ""
       }
     ]
   },
+  "typeOfTimeMethodCategory": "Longitudinal",
   "creators": {
     "fi": [
       {
